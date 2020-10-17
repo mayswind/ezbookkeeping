@@ -1,0 +1,11 @@
+package errs
+
+import (
+	"net/http"
+)
+
+var (
+	ErrDatabaseTypeInvalid = NewSystemError(SYSTEM_SUBCATEGORY_DATABASE, 0, http.StatusInternalServerError, "database type is invalid")
+	ErrDatabaseHostInvalid = NewSystemError(SYSTEM_SUBCATEGORY_DATABASE, 1, http.StatusInternalServerError, "database host is invalid")
+	ErrDatabaseIsNull      = NewSystemError(SYSTEM_SUBCATEGORY_DATABASE, 2, http.StatusInternalServerError, "database cannot be null")
+)

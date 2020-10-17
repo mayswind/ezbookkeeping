@@ -1,0 +1,16 @@
+[Unit]
+Description=lab (lightweight account book) application
+After=syslog.target
+After=network.target
+After=mariadb.service mysqld.service postgresql.service
+
+[Service]
+Type=simple
+User=labapp
+Group=labapp
+WorkingDirectory=/usr/local/bin/labapp
+ExecStart=/usr/local/bin/labapp/lab server run
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

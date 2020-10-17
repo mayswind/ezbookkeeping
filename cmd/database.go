@@ -29,7 +29,8 @@ func updateDatabaseStructure(c *cli.Context) error {
 
 	log.BootInfof("[database.updateDatabaseStructure] starting maintaining")
 
-	_ = datastore.Container.UserStore.SyncStructs(new(models.User))
+	_ = datastore.Container.UserStore.SyncStructs(new(models.User), new(models.TwoFactor), new(models.TwoFactorRecoveryCode))
+	_ = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
 
 	log.BootInfof("[database.updateDatabaseStructure] maintained successfully")
 

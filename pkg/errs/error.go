@@ -71,3 +71,8 @@ func Or(err error, defaultErr *Error) *Error {
 		return defaultErr
 	}
 }
+
+func IsCustomError(err error) bool {
+	_, ok := err.(*Error);
+	return ok
+}

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"path/filepath"
 
 	"github.com/gin-contrib/gzip"
@@ -77,8 +78,8 @@ func startWebServer(c *cli.Context) error {
 	router.NoRoute(bindApi(api.Default.ApiNotFound))
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
-	router.StaticFile("/", filepath.Join(config.StaticRootPath, "index.html"))
-	router.StaticFile("login", filepath.Join(config.StaticRootPath, "login.html"))
+	router.StaticFile("/mobile", filepath.Join(config.StaticRootPath, "mobile.html"))
+	router.StaticFile("/desktop", filepath.Join(config.StaticRootPath, "desktop.html"))
 
 	if config.EnableUserRegister {
 		router.StaticFile("register", filepath.Join(config.StaticRootPath, "register.html"))
@@ -88,7 +89,12 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
+	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 	router.Static("/lang", filepath.Join(config.StaticRootPath, "lang"))
+
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently,"/mobile")
+	})
 
 	apiRoute := router.Group("/api")
 

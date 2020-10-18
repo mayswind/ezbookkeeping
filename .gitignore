@@ -138,6 +138,9 @@ fabric.properties
 ### node_modules/
 node_modules/
 
+# Node.js Build Target
+dist/
+
 # Visual Studio Code
 .vscode/
 *.code-workspace

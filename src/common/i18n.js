@@ -8,4 +8,4 @@ export default {
         'en': en,
         'zh_Hans': zhHans
     }
-}
+};

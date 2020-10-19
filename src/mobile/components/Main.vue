@@ -2,10 +2,10 @@
     <f7-page name="home">
         <f7-navbar :title="$t('global.app.title')"></f7-navbar>
         <f7-tabs animated swipeable routable>
-            <f7-tab id="main-tab-home" class="page-content" tab-active />
-            <f7-tab id="main-tab-journals" class="page-content" />
-            <f7-tab id="main-tab-accounts" class="page-content" />
-            <f7-tab id="main-tab-charts" class="page-content" />
+            <f7-tab id="main-tab-home" class="page-content" tab-active></f7-tab>
+            <f7-tab id="main-tab-journals" class="page-content"></f7-tab>
+            <f7-tab id="main-tab-accounts" class="page-content"></f7-tab>
+            <f7-tab id="main-tab-charts" class="page-content"></f7-tab>
         </f7-tabs>
         <f7-toolbar tabbar bottom>
             <f7-link route-tab-id="main-tab-home" href="/" class="lab-toolbar-link-with-icon" icon-f7="house" icon-size="24px" :text="$t('Home')" tab-link-active></f7-link>

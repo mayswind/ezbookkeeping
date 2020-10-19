@@ -90,10 +90,9 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
-	router.Static("/lang", filepath.Join(config.StaticRootPath, "lang"))
 
 	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently,"/mobile")
+		c.Redirect(http.StatusMovedPermanently, "/mobile")
 	})
 
 	apiRoute := router.Group("/api")

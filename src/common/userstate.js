@@ -1,4 +1,4 @@
-const tokenLocalStorageKey = 'UserToken';
+const tokenLocalStorageKey = 'lab_user_token';
 
 function getToken() {
     return localStorage.getItem(tokenLocalStorageKey);

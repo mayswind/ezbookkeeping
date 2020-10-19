@@ -9,25 +9,30 @@ import 'framework7-icons';
 
 import './assets/css/custom.css';
 
-import i18nOptions from '../common/i18n.js';
+import i18n from '../common/i18n.js';
+import settings from '../common/settings.js';
 import App from './App.vue';
 
 Vue.use(VueI18n);
 Framework7.use(Framework7Vue);
 
-const i18n = new VueI18n(i18nOptions);
+const i18nInstance = new VueI18n(i18n.i18nOptions);
 
-Vue.prototype.languages = {
-    setI18nLanguage: lang => {
-        i18n.locale = lang;
-        axios.defaults.headers.common['Accept-Language'] = lang;
-        document.querySelector('html').setAttribute('lang', lang);
-        return lang;
+Vue.prototype.$setLanguage = function (locale) {
+    if (settings.getLanguage() !== locale) {
+        settings.setLanguage(locale);
     }
+
+    i18nInstance.locale = locale;
+    axios.defaults.headers.common['Accept-Language'] = locale;
+    document.querySelector('html').setAttribute('lang', locale);
+    return locale;
 }
+
+Vue.prototype.$setLanguage(settings.getLanguage() || i18n.getDefaultLanguage());
 
 new Vue({
     el: '#app',
-    i18n: i18n,
+    i18n: i18nInstance,
     render: h => h(App),
 });

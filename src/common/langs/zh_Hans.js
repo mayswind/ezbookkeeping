@@ -28,9 +28,10 @@ export default {
     'Password': '密码',
     'Log In': '登录',
     'Don\'t have an account?': '还没有账号？',
-    'Sign up': '注册',
-    'Have problem with login?': '登录遇到问题？',
-    'Forget Password': '找回密码',
+    'Create an account': '创建新账号',
+    'Forget Password?': '找回密码?',
+    'Please input username': '请输入用户名',
+    'Please input password': '请输入密码',
     'Unable to login': '无法登录',
     'Logout': '退出登录'
 };

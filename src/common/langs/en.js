@@ -1,7 +1,7 @@
 export default {
     'global': {
         'app': {
-            'title': 'lightweight account book'
+            'title': 'lab app'
         }
     },
     'error': {
@@ -28,9 +28,10 @@ export default {
     'Password': 'Password',
     'Log In': 'Log In',
     'Don\'t have an account?': 'Don\'t have an account?',
-    'Sign up': 'Sign up',
-    'Have problem with login?': 'Have problem with login?',
-    'Forget Password': 'Forget Password',
+    'Create an account': 'Create an account',
+    'Forget Password?': 'Forget Password?',
+    'Please input username': 'Please input username',
+    'Please input password': 'Please input password',
     'Unable to login': 'Unable to login',
     'Logout': 'Logout'
 };

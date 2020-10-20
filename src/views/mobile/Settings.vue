@@ -8,15 +8,12 @@
 </template>
 
 <script>
-import userState from '../../common/userstate.js';
-
 export default {
     methods: {
         logout() {
-            const self = this;
-            const router = self.$f7router;
+            const router = this.$f7router;
 
-            userState.clearToken();
+            this.$user.clearToken();
             router.navigate('/');
         }
     }

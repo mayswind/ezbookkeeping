@@ -5,8 +5,6 @@
             <f7-list-input
                 type="text"
                 clear-button
-                validate
-                required
                 :label="$t('Username')"
                 :placeholder="$t('Username or Email')"
                 :value="username"
@@ -15,8 +13,6 @@
             <f7-list-input
                 type="password"
                 clear-button
-                validate
-                required
                 :label="$t('Password')"
                 :placeholder="$t('Password')"
                 :value="password"
@@ -24,7 +20,7 @@
             ></f7-list-input>
         </f7-list>
         <f7-list>
-            <f7-list-button @click="login">{{ $t('Log In') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': inputIsEmpty }" @click="login">{{ $t('Log In') }}</f7-list-button>
             <f7-block-footer>
                 <span v-t="'Don\'t have an account?'"></span>&nbsp;
                 <f7-link href="/signup">{{ $t('Create an account') }}</f7-link>
@@ -49,25 +45,26 @@
 </template>
 
 <script>
-import services from '../../common/services.js'
-import userState from '../../common/userstate.js'
-import i18n from '../../common/i18n.js';
-
 export default {
     data() {
+        const self = this;
+
         return {
             username: '',
             password: '',
-            allLanguages: i18n.getAllLanguages()
+            allLanguages: self.$getAllLanguages()
         };
     },
     computed: {
+        inputIsEmpty() {
+            return !this.username || !this.password;
+        },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
-            let lang = i18n.getLanguage(currentLocale);
+            let lang = this.$getLanguage(currentLocale);
 
             if (!lang) {
-                lang = i18n.getLanguage(i18n.getDefaultLanguage());
+                lang = this.$getLanguage(this.$getDefaultLanguage());
             }
 
             return lang.displayName;
@@ -97,7 +94,7 @@ export default {
                 }
             }, 200);
 
-            services.authorize({
+            self.$services.authorize({
                 loginName: self.username,
                 password: self.password
             }).then(response => {
@@ -106,7 +103,7 @@ export default {
                 const data = response.data;
 
                 if (data && data.success && data.result && typeof(data.result) === 'string') {
-                    userState.updateToken(data.result);
+                    self.$user.updateToken(data.result);
                     router.navigate('/');
                 } else {
                     app.dialog.alert(self.$i18n.t('Unable to login'));

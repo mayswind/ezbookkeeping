@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import routes from './router.js';
+import routes from './router/mobile.js';
 
 export default {
     data() {
@@ -20,3 +20,12 @@ export default {
     }
 }
 </script>
+
+<style>
+body {
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+</style>

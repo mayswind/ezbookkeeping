@@ -1,7 +1,7 @@
 export default {
     'global': {
         'app': {
-            'title': 'lab app'
+            'title': 'lab account book'
         }
     },
     'error': {

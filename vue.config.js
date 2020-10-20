@@ -1,14 +1,14 @@
 module.exports = {
     pages: {
         desktop: {
-            entry: 'src/desktop/main.js',
-            template: 'src/desktop/public/index.html',
+            entry: 'src/desktop-main.js',
+            template: 'src/public/desktop.html',
             filename: 'desktop.html',
             chunks: ['vendors-common-bundle', 'vendors-desktop-bundle', 'common-bundle', 'desktop']
         },
         mobile: {
-            entry: 'src/mobile/main.js',
-            template: 'src/mobile/public/index.html',
+            entry: 'src/mobile-main.js',
+            template: 'src/public/mobile.html',
             filename: 'mobile.html',
             chunks: ['vendors-common-bundle', 'vendors-mobile-bundle', 'common-bundle', 'mobile']
         }

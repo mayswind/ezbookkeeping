@@ -1,10 +1,10 @@
-import userState from "../common/userstate.js";
+import userState from "../lib/userstate.js";
 
-import MainPage from './components/Main.vue';
-import MainPageHomeTab from './components/main/Home.vue';
+import MainPage from '../views/mobile/Main.vue';
+import MainPageHomeTab from '../views/mobile/main/Home.vue';
 
-import LoginPage from './components/Login.vue';
-import SettingsPage from './components/Settings.vue';
+import LoginPage from '../views/mobile/Login.vue';
+import SettingsPage from '../views/mobile/Settings.vue';
 
 function checkLogin(to, from, resolve, reject) {
     const router = this;

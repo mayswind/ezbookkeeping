@@ -20,3 +20,11 @@
 <script>
 export default {}
 </script>
+
+<style>
+.lab-toolbar-link-with-icon i+span {
+    font-size: 11px;
+    margin-top: 3px;
+    margin-left: 0;
+}
+</style>

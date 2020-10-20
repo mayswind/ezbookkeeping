@@ -54,7 +54,7 @@
                 <div class="padding-horizontal padding-bottom">
                     <f7-list no-hairlines class="twofa-auth-form">
                         <f7-list-input
-                            type="password"
+                            type="number"
                             outline
                             clear-button
                             :placeholder="$t('Passcode')"

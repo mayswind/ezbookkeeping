@@ -1,7 +1,7 @@
 export default {
     'global': {
         'app': {
-            'title': 'lab account book'
+            'title': 'lab account book',
         }
     },
     'error': {
@@ -20,8 +20,10 @@ export default {
         'two factor recovery code is invalid': 'Two factor recovery code is invalid',
         'two factor is not enabled': 'Two factor is not enabled',
         'two factor has already been enabled': 'Two factor has already been enabled',
-        'two factor recovery code does not exist': 'Two factor recovery code does not exist'
+        'two factor recovery code does not exist': 'Two factor recovery code does not exist',
     },
+    'OK': 'OK',
+    'Cancel': 'Cancel',
     'Done': 'Done',
     'Home': 'Home',
     'Journals': 'Journals',
@@ -46,5 +48,6 @@ export default {
     'Unable to verify': 'Unable to verify',
     'Use a scratch code': 'Use a scratch code',
     'Language': 'Language',
-    'Logout': 'Logout'
+    'Log Out': 'Log Out',
+    'Are you sure you want to log out?': 'Are you sure you want to log out?',
 };

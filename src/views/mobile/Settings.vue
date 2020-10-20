@@ -11,7 +11,7 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
-            <f7-list-button @click="logout">{{ $t('Logout') }}</f7-list-button>
+            <f7-list-button @click="logout">{{ $t('Log Out') }}</f7-list-button>
         </f7-list>
     </f7-page>
 </template>
@@ -37,10 +37,26 @@ export default {
     },
     methods: {
         logout() {
-            const router = this.$f7router;
+            const self = this;
+            const app = self.$f7;
+            const router = self.$f7router;
 
-            this.$user.clearToken();
-            router.navigate('/');
+            app.dialog.create({
+                title: self.$i18n.t('global.app.title'),
+                text: self.$i18n.t('Are you sure you want to log out?'),
+                buttons: [
+                    {
+                        text: self.$i18n.t('Cancel'),
+                    },
+                    {
+                        text: self.$i18n.t('OK'),
+                        onClick: () => {
+                            this.$user.clearToken();
+                            router.navigate('/');
+                        }
+                    }
+                ]
+            }).open();
         }
     }
 };

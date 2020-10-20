@@ -1,7 +1,7 @@
 export default {
     'global': {
         'app': {
-            'title': 'lab 轻记账'
+            'title': 'lab 轻记账',
         }
     },
     'error': {
@@ -20,8 +20,10 @@ export default {
         'two factor recovery code is invalid': '两步验证恢复口令无效',
         'two factor is not enabled': '两步验证没有启用',
         'two factor has already been enabled': '两步验证已经启用',
-        'two factor recovery code does not exist': '两步验证恢复口令不存在'
+        'two factor recovery code does not exist': '两步验证恢复口令不存在',
     },
+    'OK': '确定',
+    'Cancel': '取消',
     'Done': '完成',
     'Home': '首页',
     'Journals': '流水',
@@ -46,5 +48,6 @@ export default {
     'Unable to verify': '无法验证',
     'Use a scratch code': '使用验证口令',
     'Language': '语言',
-    'Logout': '退出登录'
+    'Log Out': '退出登录',
+    'Are you sure you want to log out?': '您确定是否要退出登录？',
 };

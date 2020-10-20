@@ -17,6 +17,7 @@ export default {
         'login name or password is invalid': 'Login name or password is invalid',
         'login name or password is wrong': 'Login name or password is wrong'
     },
+    'Done': 'Done',
     'Home': 'Home',
     'Journals': 'Journals',
     'Accounts': 'Accounts',
@@ -33,5 +34,6 @@ export default {
     'Please input username': 'Please input username',
     'Please input password': 'Please input password',
     'Unable to login': 'Unable to login',
+    'Language': 'Language',
     'Logout': 'Logout'
 };

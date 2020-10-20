@@ -17,6 +17,7 @@ export default {
         'login name or password is invalid': '登录名或密码无效',
         'login name or password is wrong': '登录名或密码错误'
     },
+    'Done': '完成',
     'Home': '首页',
     'Journals': '流水',
     'Accounts': '账户',
@@ -33,5 +34,6 @@ export default {
     'Please input username': '请输入用户名',
     'Please input password': '请输入密码',
     'Unable to login': '无法登录',
+    'Language': '语言',
     'Logout': '退出登录'
 };

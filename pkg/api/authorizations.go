@@ -74,7 +74,13 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logined, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
-	return token, nil
+
+	authResp := &models.AuthResponse{
+		Token : token,
+		Need2FA: twoFactorEnable,
+	}
+
+	return authResp, nil
 }
 
 func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interface{}, *errs.Error) {
@@ -123,7 +129,13 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
-	return token, nil
+
+	authResp := &models.AuthResponse{
+		Token : token,
+		Need2FA: false,
+	}
+
+	return authResp, nil
 }
 
 func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Context) (interface{}, *errs.Error) {
@@ -144,7 +156,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	}
 
 	if !enableTwoFactor {
-		return nil, errs.ErrTwoFactorKeyIsNotEnabled
+		return nil, errs.ErrTwoFactorIsNotEnabled
 	}
 
 	user, err := a.users.GetUserById(uid)

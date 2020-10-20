@@ -15,7 +15,12 @@ export default {
         'email already exists': 'Email already exists',
         'login name is invalid': 'Login name is invalid',
         'login name or password is invalid': 'Login name or password is invalid',
-        'login name or password is wrong': 'Login name or password is wrong'
+        'login name or password is wrong': 'Login name or password is wrong',
+        'passcode is invalid': 'Passcode is invalid',
+        'two factor recovery code is invalid': 'Two factor recovery code is invalid',
+        'two factor is not enabled': 'Two factor is not enabled',
+        'two factor has already been enabled': 'Two factor has already been enabled',
+        'two factor recovery code does not exist': 'Two factor recovery code does not exist'
     },
     'Done': 'Done',
     'Home': 'Home',
@@ -34,6 +39,12 @@ export default {
     'Please input username': 'Please input username',
     'Please input password': 'Please input password',
     'Unable to login': 'Unable to login',
+    'Two-Factor Authentication': 'Two-Factor Authentication',
+    'Passcode': 'Passcode',
+    'Verify': 'Verify',
+    'Please input passcode': 'Please input passcode',
+    'Unable to verify': 'Unable to verify',
+    'Use a scratch code': 'Use a scratch code',
     'Language': 'Language',
     'Logout': 'Logout'
 };

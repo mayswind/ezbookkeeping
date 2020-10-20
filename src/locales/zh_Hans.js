@@ -15,7 +15,12 @@ export default {
         'email already exists': '邮箱已经存在',
         'login name is invalid': '登录名无效',
         'login name or password is invalid': '登录名或密码无效',
-        'login name or password is wrong': '登录名或密码错误'
+        'login name or password is wrong': '登录名或密码错误',
+        'passcode is invalid': '验证码无效',
+        'two factor recovery code is invalid': '两步验证恢复口令无效',
+        'two factor is not enabled': '两步验证没有启用',
+        'two factor has already been enabled': '两步验证已经启用',
+        'two factor recovery code does not exist': '两步验证恢复口令不存在'
     },
     'Done': '完成',
     'Home': '首页',
@@ -34,6 +39,12 @@ export default {
     'Please input username': '请输入用户名',
     'Please input password': '请输入密码',
     'Unable to login': '无法登录',
+    'Two-Factor Authentication': '两步验证',
+    'Passcode': '验证码',
+    'Verify': '验证',
+    'Please input passcode': '请输入验证码',
+    'Unable to verify': '无法验证',
+    'Use a scratch code': '使用验证口令',
     'Language': '语言',
     'Logout': '退出登录'
 };

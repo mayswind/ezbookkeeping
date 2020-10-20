@@ -21,7 +21,19 @@ axios.interceptors.response.use(response => {
 });
 
 export default {
-    authorize: (params) => {
-        return axios.post('authorize.json', params);
+    authorize: ({ loginName, password }) => {
+        return axios.post('authorize.json', {
+            loginName,
+            password
+        });
+    },
+    authorize2FA: ({ passcode, token }) => {
+        return axios.post('2fa/authorize.json', {
+            passcode
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
     }
 };

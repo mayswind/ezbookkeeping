@@ -33,7 +33,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorStatusHandler(c *core.Context) (in
 	uid := c.GetCurrentUid()
 	twoFactorSetting, err := a.twoFactorAuthorizations.GetUserTwoFactorSettingByUid(uid)
 
-	if err == errs.ErrTwoFactorKeyIsNotEnabled {
+	if err == errs.ErrTwoFactorIsNotEnabled {
 		statusResp := &models.TwoFactorStatusResponse{
 			Enable: false,
 		}
@@ -64,7 +64,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.Conte
 	}
 
 	if enabled {
-		return nil, errs.ErrTwoFactorKeyAlreadyEnabled
+		return nil, errs.ErrTwoFactorAlreadyEnabled
 	}
 
 	user, err := a.users.GetUserById(uid)
@@ -123,7 +123,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.Conte
 	}
 
 	if exists {
-		return nil, errs.ErrTwoFactorKeyAlreadyEnabled
+		return nil, errs.ErrTwoFactorAlreadyEnabled
 	}
 
 	user, err := a.users.GetUserById(uid)
@@ -212,7 +212,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorDisableHandler(c *core.Context) (i
 	}
 
 	if !enableTwoFactor {
-		return nil, errs.ErrTwoFactorKeyIsNotEnabled
+		return nil, errs.ErrTwoFactorIsNotEnabled
 	}
 
 	err = a.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(uid)
@@ -244,7 +244,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorRecoveryCodeRegenerateHandler(c *c
 	}
 
 	if !enableTwoFactor {
-		return nil, errs.ErrTwoFactorKeyIsNotEnabled
+		return nil, errs.ErrTwoFactorIsNotEnabled
 	}
 
 	recoveryCodes, err := a.twoFactorAuthorizations.GenerateTwoFactorRecoveryCodes()

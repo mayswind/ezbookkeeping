@@ -8,7 +8,7 @@
                 :label="$t('Username')"
                 :placeholder="$t('Username or Email')"
                 :value="username"
-                @input="username = $event.target.value"
+                @input="username = $event.target.value; tempToken = ''"
             ></f7-list-input>
             <f7-list-input
                 type="password"
@@ -16,7 +16,7 @@
                 :label="$t('Password')"
                 :placeholder="$t('Password')"
                 :value="password"
-                @input="password = $event.target.value"
+                @input="password = $event.target.value; tempToken = ''"
             ></f7-list-input>
         </f7-list>
         <f7-list>
@@ -41,6 +41,34 @@
                 ></f7-list-item>
             </f7-list>
         </f7-popover>
+
+        <f7-sheet
+            id="2fa-auth-sheet"
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <f7-list no-hairlines class="twofa-auth-form">
+                        <f7-list-input
+                            type="password"
+                            outline
+                            clear-button
+                            :placeholder="$t('Passcode')"
+                            :value="passcode"
+                            @input="passcode = $event.target.value"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" @click="verify">{{ $t('Verify') }}</f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link href="/2fa-scratch-code">{{ $t('Use a scratch code') }}</f7-link>
+                    </div>
+                </div>
+            </div>
+        </f7-sheet>
     </f7-page>
 </template>
 
@@ -52,12 +80,17 @@ export default {
         return {
             username: '',
             password: '',
+            passcode: '',
+            tempToken: '',
             allLanguages: self.$getAllLanguages()
         };
     },
     computed: {
         inputIsEmpty() {
             return !this.username || !this.password;
+        },
+        twoFAInputIsEmpty() {
+            return !this.passcode;
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
@@ -86,11 +119,16 @@ export default {
                 return;
             }
 
+            if (self.tempToken) {
+                app.sheet.open('#2fa-auth-sheet');
+                return;
+            }
+
             let hasResponse = false;
 
             setTimeout(() => {
                 if (!hasResponse) {
-                    self.$f7.preloader.show();
+                    app.preloader.show();
                 }
             }, 200);
 
@@ -102,12 +140,19 @@ export default {
                 self.$f7.preloader.hide();
                 const data = response.data;
 
-                if (data && data.success && data.result && typeof(data.result) === 'string') {
-                    self.$user.updateToken(data.result);
-                    router.navigate('/');
-                } else {
+                if (!data || !data.success || !data.result || !data.result.token) {
                     app.dialog.alert(self.$i18n.t('Unable to login'));
+                    return;
                 }
+
+                if (data.result.need2FA) {
+                    self.tempToken = data.result.token;
+                    app.sheet.open('#2fa-auth-sheet');
+                    return;
+                }
+
+                self.$user.updateToken(data.result.token);
+                router.navigate('/');
             }).catch(error => {
                 hasResponse = true;
                 self.$f7.preloader.hide();
@@ -119,9 +164,53 @@ export default {
                 }
             })
         },
+        verify() {
+            const self = this;
+            const app = self.$f7;
+            const router = self.$f7router;
+
+            if (!this.passcode) {
+                app.dialog.alert(self.$i18n.t('Please input passcode'));
+                return;
+            }
+
+            app.preloader.show();
+
+            self.$services.authorize2FA({
+                passcode: self.passcode,
+                token: self.tempToken
+            }).then(response => {
+                self.$f7.preloader.hide();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.token) {
+                    app.dialog.alert(self.$i18n.t('Unable to verify'));
+                    return;
+                }
+
+                self.$user.updateToken(data.result.token);
+                app.sheet.close('#2fa-auth-sheet');
+                router.navigate('/');
+            }).catch(error => {
+                self.$f7.preloader.hide();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    app.dialog.alert(self.$i18n.t(`error.${error.response.data.errorMessage}`));
+                } else {
+                    app.dialog.alert(self.$i18n.t('Unable to verify'));
+                }
+            })
+        },
         changeLanguage(locale) {
             this.$setLanguage(locale);
         }
     }
 };
 </script>
+
+<style scoped>
+.twofa-auth-form {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+</style>

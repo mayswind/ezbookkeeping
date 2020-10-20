@@ -53,7 +53,7 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(uid int64) 
 	if err != nil {
 		return nil, err
 	} else if !has {
-		return nil, errs.ErrTwoFactorKeyIsNotEnabled
+		return nil, errs.ErrTwoFactorIsNotEnabled
 	}
 
 	twoFactor.Secret, err = utils.DecryptSecret(twoFactor.Secret, s.CurrentConfig().SecretKey)
@@ -109,7 +109,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error 
 		deletedRows, err := sess.Where("uid=?", uid).Delete(&models.TwoFactor{})
 
 		if deletedRows < 1 {
-			return errs.ErrTwoFactorKeyIsNotEnabled
+			return errs.ErrTwoFactorIsNotEnabled
 		}
 
 		return err

@@ -21,6 +21,9 @@ axios.interceptors.response.use(response => {
 });
 
 export default {
+    setLocale: locale => {
+        axios.defaults.headers.common['Accept-Language'] = locale;
+    },
     authorize: ({ loginName, password }) => {
         return axios.post('authorize.json', {
             loginName,

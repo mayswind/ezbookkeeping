@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import axios from 'axios';
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 
@@ -28,7 +27,7 @@ Vue.prototype.$setLanguage = function (locale) {
     }
 
     i18n.locale = locale;
-    axios.defaults.headers.common['Accept-Language'] = locale;
+    services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
     return locale;
 };

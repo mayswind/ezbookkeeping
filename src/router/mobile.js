@@ -18,6 +18,18 @@ function checkLogin(to, from, resolve, reject) {
     router.navigate('/login');
 }
 
+function checkNotLogin(to, from, resolve, reject) {
+    const router = this;
+
+    if (!userState.isUserLogined()) {
+        resolve();
+        return;
+    }
+
+    reject();
+    router.navigate('/');
+}
+
 const routes = [
     {
         path: '/',
@@ -34,7 +46,8 @@ const routes = [
     },
     {
         path: '/login',
-        component: LoginPage
+        component: LoginPage,
+        beforeEnter: checkNotLogin
     },
     {
         path: '/settings',

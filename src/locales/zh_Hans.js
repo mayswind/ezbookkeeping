@@ -56,7 +56,7 @@ export default {
     'Verify': '验证',
     'Please input passcode': '请输入验证码',
     'Unable to verify': '无法验证',
-    'Use a scratch code': '使用验证口令',
+    'Use a backup code': '使用备用码',
     'Language': '语言',
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定是否要退出登录？',

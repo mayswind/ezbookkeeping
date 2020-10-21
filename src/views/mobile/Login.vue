@@ -64,7 +64,7 @@
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" @click="verify">{{ $t('Verify') }}</f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link href="/2fa-scratch-code">{{ $t('Use a scratch code') }}</f7-link>
+                        <f7-link href="/2fa-backup-code">{{ $t('Use a backup code') }}</f7-link>
                     </div>
                 </div>
             </div>

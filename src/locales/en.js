@@ -56,7 +56,7 @@ export default {
     'Verify': 'Verify',
     'Please input passcode': 'Please input passcode',
     'Unable to verify': 'Unable to verify',
-    'Use a scratch code': 'Use a scratch code',
+    'Use a backup code': 'Use a backup code',
     'Language': 'Language',
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',

@@ -51,5 +51,8 @@ export default {
     },
     logout: () => {
         return axios.get('v1/logout.json');
-    }
+    },
+    refreshToken: () => {
+        return axios.post('v1/tokens/refresh.json');
+    },
 };

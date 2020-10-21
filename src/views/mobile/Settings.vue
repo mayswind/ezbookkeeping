@@ -4,7 +4,7 @@
         <f7-list>
             <f7-list-item
                 :title="$t('Language')"
-                smart-select :smart-select-params="{ openIn: 'sheet', sheetCloseLinkText: $t('Done') }">
+                smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
                 <select v-model="currentLocale">
                     <option v-for="(lang, locale) in allLanguages"
                             :key="locale"

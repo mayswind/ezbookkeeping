@@ -29,6 +29,7 @@ export default {
     'Journals': 'Journals',
     'Accounts': 'Accounts',
     'Charts': 'Charts',
+    'New Record': 'New Record',
     'Settings': 'Settings',
     'Back': 'Back',
     'Username': 'Username',

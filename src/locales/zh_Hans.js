@@ -29,6 +29,7 @@ export default {
     'Journals': '流水',
     'Accounts': '账户',
     'Charts': '图表',
+    'New Record': '记一笔',
     'Settings': '设置',
     'Back': '返回',
     'Username': '用户名',

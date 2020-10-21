@@ -49,6 +49,15 @@ export default {
             }
         });
     },
+    authorize2FAByBackupCode: ({ recoveryCode, token }) => {
+        return axios.post('2fa/recovery.json', {
+            recoveryCode
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    },
     logout: () => {
         return axios.get('v1/logout.json');
     },

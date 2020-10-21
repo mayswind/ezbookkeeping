@@ -190,5 +190,11 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
-	return token, nil
+
+	authResp := &models.AuthResponse{
+		Token : token,
+		Need2FA: false,
+	}
+
+	return authResp, nil
 }

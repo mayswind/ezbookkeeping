@@ -57,14 +57,23 @@
                             type="number"
                             outline
                             clear-button
+                            v-if="twoFAVerifyType === 'passcode'"
                             :placeholder="$t('Passcode')"
                             :value="passcode"
                             @input="passcode = $event.target.value"
                         ></f7-list-input>
+                        <f7-list-input
+                            outline
+                            clear-button
+                            v-if="twoFAVerifyType === 'backupcode'"
+                            :placeholder="$t('Backup Code')"
+                            :value="backupCode"
+                            @input="backupCode = $event.target.value"
+                        ></f7-list-input>
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" @click="verify">{{ $t('Verify') }}</f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link href="/2fa-backup-code">{{ $t('Use a backup code') }}</f7-link>
+                        <f7-link @click="switch2FAVerifyType">{{ $t(twoFAVerifyTypeSwitchName) }}</f7-link>
                     </div>
                 </div>
             </div>
@@ -81,7 +90,10 @@ export default {
             username: '',
             password: '',
             passcode: '',
+            backupCode: '',
             tempToken: '',
+            twoFAVerifyType: 'passcode',
+            twoFAVerifyTypeSwitchName: 'Use a backup code',
             allLanguages: self.$getAllLanguages()
         };
     },
@@ -90,7 +102,11 @@ export default {
             return !this.username || !this.password;
         },
         twoFAInputIsEmpty() {
-            return !this.passcode;
+            if (this.twoFAVerifyType === 'backupcode') {
+                return !this.backupCode;
+            } else {
+                return !this.passcode;
+            }
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
@@ -173,17 +189,31 @@ export default {
             const app = self.$f7;
             const router = self.$f7router;
 
-            if (!this.passcode) {
+            if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
                 self.$alert('Please input passcode');
+                return;
+            } else if (this.twoFAVerifyType === 'backupcode' && !this.backupCode) {
+                self.$alert('Please input backup code');
                 return;
             }
 
             app.preloader.show();
 
-            self.$services.authorize2FA({
-                passcode: self.passcode,
-                token: self.tempToken
-            }).then(response => {
+            let promise = null;
+
+            if (self.twoFAVerifyType === 'backupcode') {
+                promise = self.$services.authorize2FAByBackupCode({
+                    recoveryCode: self.backupCode,
+                    token: self.tempToken
+                });
+            } else {
+                promise = self.$services.authorize2FA({
+                    passcode: self.passcode,
+                    token: self.tempToken
+                });
+            }
+
+            promise.then(response => {
                 app.preloader.hide();
                 const data = response.data;
 
@@ -204,6 +234,15 @@ export default {
                     self.$alert('Unable to verify');
                 }
             })
+        },
+        switch2FAVerifyType() {
+            if (this.twoFAVerifyType === 'passcode') {
+                this.twoFAVerifyType = 'backupcode';
+                this.twoFAVerifyTypeSwitchName = 'Use a passcode';
+            } else {
+                this.twoFAVerifyType = 'passcode';
+                this.twoFAVerifyTypeSwitchName = 'Use a backup code';
+            }
         },
         changeLanguage(locale) {
             this.$setLanguage(locale);

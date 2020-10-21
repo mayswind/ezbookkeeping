@@ -110,12 +110,12 @@ export default {
             const router = self.$f7router;
 
             if (!this.username) {
-                app.dialog.alert(self.$i18n.t('Please input username'));
+                self.$alert('Please input username');
                 return;
             }
 
             if (!this.password) {
-                app.dialog.alert(self.$i18n.t('Please input password'));
+                self.$alert('Please input password');
                 return;
             }
 
@@ -141,7 +141,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
-                    app.dialog.alert(self.$i18n.t('Unable to login'));
+                    self.$alert('Unable to login');
                     return;
                 }
 
@@ -158,9 +158,9 @@ export default {
                 self.$f7.preloader.hide();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    app.dialog.alert(self.$i18n.t(`error.${error.response.data.errorMessage}`));
+                    self.$alert(`error.${error.response.data.errorMessage}`);
                 } else {
-                    app.dialog.alert(self.$i18n.t('Unable to login'));
+                    self.$alert('Unable to login');
                 }
             })
         },
@@ -170,7 +170,7 @@ export default {
             const router = self.$f7router;
 
             if (!this.passcode) {
-                app.dialog.alert(self.$i18n.t('Please input passcode'));
+                self.$alert('Please input passcode');
                 return;
             }
 
@@ -180,11 +180,11 @@ export default {
                 passcode: self.passcode,
                 token: self.tempToken
             }).then(response => {
-                self.$f7.preloader.hide();
+                app.preloader.hide();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
-                    app.dialog.alert(self.$i18n.t('Unable to verify'));
+                    self.$alert('Unable to verify');
                     return;
                 }
 
@@ -192,12 +192,12 @@ export default {
                 app.sheet.close('#2fa-auth-sheet');
                 router.navigate('/');
             }).catch(error => {
-                self.$f7.preloader.hide();
+                app.preloader.hide();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    app.dialog.alert(self.$i18n.t(`error.${error.response.data.errorMessage}`));
+                    self.$alert(`error.${error.response.data.errorMessage}`);
                 } else {
-                    app.dialog.alert(self.$i18n.t('Unable to verify'));
+                    self.$alert('Unable to verify');
                 }
             })
         },

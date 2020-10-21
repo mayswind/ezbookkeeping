@@ -31,7 +31,35 @@ Vue.prototype.$setLanguage = function (locale) {
     axios.defaults.headers.common['Accept-Language'] = locale;
     document.querySelector('html').setAttribute('lang', locale);
     return locale;
-}
+};
+Vue.prototype.$alert = function (message, confirmCallback) {
+    this.$f7.dialog.create({
+        title: i18n.t('global.app.title'),
+        text: i18n.t(message),
+        buttons: [
+            {
+                text: i18n.t('OK'),
+                onClick: confirmCallback
+            }
+        ]
+    }).open();
+};
+Vue.prototype.$confirm = function (message, confirmCallback, cancelCallback) {
+    this.$f7.dialog.create({
+        title: i18n.t('global.app.title'),
+        text: i18n.t(message),
+        buttons: [
+            {
+                text: i18n.t('Cancel'),
+                onClick: cancelCallback
+            },
+            {
+                text: i18n.t('OK'),
+                onClick: confirmCallback
+            }
+        ]
+    }).open();
+};
 Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
 

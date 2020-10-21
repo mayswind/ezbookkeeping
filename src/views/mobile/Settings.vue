@@ -38,25 +38,12 @@ export default {
     methods: {
         logout() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
-            app.dialog.create({
-                title: self.$i18n.t('global.app.title'),
-                text: self.$i18n.t('Are you sure you want to log out?'),
-                buttons: [
-                    {
-                        text: self.$i18n.t('Cancel'),
-                    },
-                    {
-                        text: self.$i18n.t('OK'),
-                        onClick: () => {
-                            this.$user.clearToken();
-                            router.navigate('/');
-                        }
-                    }
-                ]
-            }).open();
+            self.$confirm('Are you sure you want to log out?', () => {
+                self.$user.clearToken();
+                router.navigate('/');
+            });
         }
     }
 };

@@ -79,4 +79,21 @@ new Vue({
     el: '#app',
     i18n: i18n,
     render: h => h(App),
+    mounted: function () {
+        const app = this.$f7;
+
+        window.addEventListener('popstate', () => {
+            if (document.querySelectorAll('.modal-in').length > 0) {
+                app.dialog.close();
+            }
+        }, false);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27 || event.which === 27) {
+                if (document.querySelectorAll('.modal-in').length > 0) {
+                    app.dialog.close();
+                }
+            }
+        }, false);
+    }
 });

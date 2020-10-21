@@ -17,6 +17,16 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
     return response;
 }, error => {
+    if (error.response && error.response.data && error.response.data.errorCode) {
+        const errorCode = error.response.data.errorCode;
+
+        if (202001 <= errorCode && errorCode <= 202007) { // unauthorized access or token is invalid
+            userState.clearToken();
+            location.reload();
+            return Promise.reject({ processed: true });
+        }
+    }
+
     return Promise.reject(error);
 });
 
@@ -38,5 +48,8 @@ export default {
                 Authorization: `Bearer ${token}`
             }
         });
+    },
+    logout: () => {
+        return axios.get('v1/logout.json');
     }
 };

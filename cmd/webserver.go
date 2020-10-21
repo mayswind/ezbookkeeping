@@ -118,6 +118,9 @@ func startWebServer(c *cli.Context) error {
 		apiV1Route := apiRoute.Group("/v1")
 		apiV1Route.Use(bindMiddleware(middlewares.JWTAuthorization))
 		{
+			// Logout
+			apiV1Route.GET("/logout.json", bindApi(api.Tokens.TokenRevokeCurrentHandler))
+
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler))

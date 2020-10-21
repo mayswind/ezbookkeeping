@@ -137,7 +137,7 @@ export default {
                 password: self.password
             }).then(response => {
                 hasResponse = true;
-                self.$f7.preloader.hide();
+                app.preloader.hide();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
@@ -155,14 +155,18 @@ export default {
                 router.navigate('/');
             }).catch(error => {
                 hasResponse = true;
-                self.$f7.preloader.hide();
+                app.preloader.hide();
+
+                if (error && error.processed) {
+                    return;
+                }
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert(`error.${error.response.data.errorMessage}`);
                 } else {
                     self.$alert('Unable to login');
                 }
-            })
+            });
         },
         verify() {
             const self = this;

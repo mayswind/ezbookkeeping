@@ -38,11 +38,44 @@ export default {
     methods: {
         logout() {
             const self = this;
+            const app = self.$f7;
             const router = self.$f7router;
 
             self.$confirm('Are you sure you want to log out?', () => {
-                self.$user.clearToken();
-                router.navigate('/');
+                let hasResponse = false;
+
+                setTimeout(() => {
+                    if (!hasResponse) {
+                        app.preloader.show();
+                    }
+                }, 200);
+
+                self.$services.logout().then(response => {
+                    hasResponse = true;
+                    app.preloader.hide();
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        self.$alert('Unable to logout');
+                        return;
+                    }
+
+                    self.$user.clearToken();
+                    router.navigate('/');
+                }).catch(error => {
+                    hasResponse = true;
+                    app.preloader.hide();
+
+                    if (error && error.processed) {
+                        return;
+                    }
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        self.$alert(`error.${error.response.data.errorMessage}`);
+                    } else {
+                        self.$alert('Unable to logout');
+                    }
+                });
             });
         }
     }

@@ -5,6 +5,15 @@ export default {
         }
     },
     'error': {
+        'unauthorized access': '未授权的登录',
+        'token is expired': '认证令牌已过期',
+        'token is invalid': '认证令牌无效',
+        'user token id is invalid': '用户认证令牌ID无效',
+        'token id is invalid': '认证令牌ID无效',
+        'token is not found': '认证令牌不存在',
+        'token type is invalid': '认证令牌类型无效',
+        'token requires two factor authorization': '认证令牌需要两步验证',
+        'token does not require two factor authorization': '认证令牌不需要两步验证',
         'user id is invalid': '用户ID无效',
         'username is empty': '用户名为空',
         'email is empty': '电子邮箱为空',
@@ -51,4 +60,5 @@ export default {
     'Language': '语言',
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定是否要退出登录？',
+    'Unable to logout': '无法退出登录',
 };

@@ -5,6 +5,15 @@ export default {
         }
     },
     'error': {
+        'unauthorized access': 'Unauthorized access',
+        'token is expired': 'Token is expired',
+        'token is invalid': 'Token is invalid',
+        'user token id is invalid': 'User token id is invalid',
+        'token id is invalid': 'Token id is invalid',
+        'token is not found': 'Token is not found',
+        'token type is invalid': 'Token type is invalid',
+        'token requires two factor authorization': 'Token requires two factor authorization',
+        'token does not require two factor authorization': 'Token does not require two factor authorization',
         'user id is invalid': 'User id is invalid',
         'username is empty': 'Username is empty',
         'email is empty': 'Email is empty',
@@ -51,4 +60,5 @@ export default {
     'Language': 'Language',
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',
+    'Unable to logout': 'Unable to logout',
 };

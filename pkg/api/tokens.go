@@ -53,6 +53,34 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 	return tokenResps, nil
 }
 
+func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *errs.Error) {
+	claims := c.GetTokenClaims()
+	uid := c.GetCurrentUid()
+	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[tokens.TokenRevokeCurrentHandler] parse user token id failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	tokenRecord := &models.TokenRecord{
+		Uid: uid,
+		UserTokenId: userTokenId,
+		CreatedUnixTime: claims.IssuedAt,
+	}
+
+	tokenId := a.tokens.GenerateTokenId(tokenRecord)
+	err = a.tokens.DeleteToken(tokenRecord)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[token.TokenRevokeCurrentHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenId, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[token.TokenRevokeCurrentHandler] user \"uid:%d\" has revoked token \"id:%s\"", uid, tokenId)
+	return true, nil
+}
+
 func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Error) {
 	var tokenRevokeReq models.TokenRevokeRequest
 	err := c.ShouldBindJSON(&tokenRevokeReq)

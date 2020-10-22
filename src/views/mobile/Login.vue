@@ -25,7 +25,7 @@
                 <span v-t="'Don\'t have an account?'"></span>&nbsp;
                 <f7-link href="/signup">{{ $t('Create an account') }}</f7-link>
                 <br/>
-                <f7-link href="/forget-pwd">{{ $t('Forget Password?') }}</f7-link>
+                <f7-link class="disabled" href="/forget-pwd">{{ $t('Forget Password?') }}</f7-link>
             </f7-block-footer>
             <f7-block-footer>
             </f7-block-footer>

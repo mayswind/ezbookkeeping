@@ -20,17 +20,17 @@
             ></f7-list-input>
         </f7-list>
         <f7-list>
-            <f7-list-button :class="{ 'disabled': inputIsEmpty }" @click="login">{{ $t('Log In') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': inputIsEmpty }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
                 <span v-t="'Don\'t have an account?'"></span>&nbsp;
-                <f7-link href="/signup">{{ $t('Create an account') }}</f7-link>
+                <f7-link href="/signup" :text="$t('Create an account')"></f7-link>
                 <br/>
-                <f7-link class="disabled" href="/forget-pwd">{{ $t('Forget Password?') }}</f7-link>
+                <f7-link class="disabled" href="/forget-pwd" :text="$t('Forget Password?')"></f7-link>
             </f7-block-footer>
             <f7-block-footer>
             </f7-block-footer>
         </f7-list>
-        <f7-button small popover-open=".popover-menu">{{ currentLanguageName }}</f7-button>
+        <f7-button small popover-open=".popover-menu" :text="currentLanguageName"></f7-button>
         <f7-popover class="popover-menu">
             <f7-list>
                 <f7-list-item
@@ -49,7 +49,7 @@
         >
             <div class="sheet-modal-swipe-step">
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
+                    <div style="font-size: 18px"><b v-t="'Two-Factor Authentication'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <f7-list no-hairlines class="twofa-auth-form">
@@ -71,9 +71,9 @@
                             @input="backupCode = $event.target.value"
                         ></f7-list-input>
                     </f7-list>
-                    <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" @click="verify">{{ $t('Verify') }}</f7-button>
+                    <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" :text="$t('Verify')" @click="verify"></f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link @click="switch2FAVerifyType">{{ $t(twoFAVerifyTypeSwitchName) }}</f7-link>
+                        <f7-link @click="switch2FAVerifyType" :text="$t(twoFAVerifyTypeSwitchName)"></f7-link>
                     </div>
                 </div>
             </div>

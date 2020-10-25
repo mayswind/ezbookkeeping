@@ -4,6 +4,7 @@ import MainPage from '../views/mobile/Main.vue';
 import MainPageHomeTab from '../views/mobile/main/Home.vue';
 
 import LoginPage from '../views/mobile/Login.vue';
+import SignUpPage from '../views/mobile/Signup.vue';
 import SettingsPage from '../views/mobile/Settings.vue';
 
 function checkLogin(to, from, resolve, reject) {
@@ -47,6 +48,11 @@ const routes = [
     {
         path: '/login',
         component: LoginPage,
+        beforeEnter: checkNotLogin
+    },
+    {
+        path: '/signup',
+        component: SignUpPage,
         beforeEnter: checkNotLogin
     },
     {

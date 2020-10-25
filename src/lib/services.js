@@ -58,6 +58,14 @@ export default {
             }
         });
     },
+    register: ({ username, email, nickname, password }) => {
+        return axios.post('register.json', {
+            username,
+            email,
+            nickname,
+            password
+        });
+    },
     logout: () => {
         return axios.get('logout.json');
     },

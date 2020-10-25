@@ -78,6 +78,12 @@ Vue.prototype.$confirm = function (message, confirmCallback, cancelCallback) {
         ]
     }).open();
 };
+Vue.prototype.$toast = function (message, timeout) {
+    this.$f7.toast.create({
+        text: i18n.t(message),
+        closeTimeout: timeout || 1500
+    }).open();
+};
 Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
 

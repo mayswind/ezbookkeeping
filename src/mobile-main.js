@@ -6,7 +6,7 @@ import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
 
-import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions } from './lib/i18n.js';
+import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError } from './lib/i18n.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
@@ -32,9 +32,28 @@ Vue.prototype.$setLanguage = function (locale) {
     return locale;
 };
 Vue.prototype.$alert = function (message, confirmCallback) {
+    let parameters = {};
+
+    if (message && message.error) {
+        const localizedError = getLocalizedError(message.error);
+        message = localizedError.message;
+
+        if (localizedError.parameters) {
+            for (let i = 0; i < localizedError.parameters.length; i++) {
+                const parameter = localizedError.parameters[i];
+
+                if (parameter.localized) {
+                    parameters[parameter.key] = i18n.t(`parameter.${parameter.value}`);
+                } else {
+                    parameters[parameter.key] = parameter.value;
+                }
+            }
+        }
+    }
+
     this.$f7.dialog.create({
         title: i18n.t('global.app.title'),
-        text: i18n.t(message),
+        text: i18n.t(message, parameters),
         buttons: [
             {
                 text: i18n.t('OK'),

@@ -178,7 +178,7 @@ export default {
                 }
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert(`error.${error.response.data.errorMessage}`);
+                    self.$alert({ error: error.response.data });
                 } else {
                     self.$alert('Unable to login');
                 }
@@ -229,7 +229,7 @@ export default {
                 app.preloader.hide();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert(`error.${error.response.data.errorMessage}`);
+                    self.$alert({ error: error.response.data });
                 } else {
                     self.$alert('Unable to verify');
                 }

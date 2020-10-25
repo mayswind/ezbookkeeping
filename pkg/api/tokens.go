@@ -54,8 +54,19 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 }
 
 func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *errs.Error) {
-	claims := c.GetTokenClaims()
-	uid := c.GetCurrentUid()
+	_, claims, err := a.tokens.ParseToken(c)
+
+	if err != nil {
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid, err := utils.StringToInt64(claims.Id)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[tokens.TokenRevokeCurrentHandler] parse user id failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
 	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 
 	if err != nil {

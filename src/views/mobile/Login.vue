@@ -6,7 +6,7 @@
                 type="text"
                 clear-button
                 :label="$t('Username')"
-                :placeholder="$t('Username or Email')"
+                :placeholder="$t('Your username or Email')"
                 :value="username"
                 @input="username = $event.target.value; tempToken = ''"
             ></f7-list-input>
@@ -14,7 +14,7 @@
                 type="password"
                 clear-button
                 :label="$t('Password')"
-                :placeholder="$t('Password')"
+                :placeholder="$t('Your password')"
                 :value="password"
                 @input="password = $event.target.value; tempToken = ''"
             ></f7-list-input>

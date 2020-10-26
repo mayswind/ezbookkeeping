@@ -1,5 +1,11 @@
 import { defaultLanguage, allLanguages } from '../locales/index.js'
 
+const apiNotFoundErrorCode = 100001;
+const specifiedApiNotFoundErrors = {
+    '/api/register.json': {
+        message: 'User registration is disabled'
+    }
+};
 const validatorErrorCode = 200000;
 const parameterizedErrors = [
     {
@@ -134,6 +140,12 @@ export function getI18nOptions() {
 }
 
 export function getLocalizedError(error) {
+    if (error.errorCode === apiNotFoundErrorCode && specifiedApiNotFoundErrors[error.path]) {
+        return {
+            message: `${specifiedApiNotFoundErrors[error.path].message}`
+        };
+    }
+
     if (error.errorCode !== validatorErrorCode) {
         return {
             message: `error.${error.errorMessage}`

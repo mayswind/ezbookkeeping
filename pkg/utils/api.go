@@ -37,6 +37,7 @@ func PrintErrorResult(c *core.Context, err *errs.Error) {
 		"success": false,
 		"errorCode": err.Code(),
 		"errorMessage": errorMessage,
+		"path": c.Request.URL.Path,
 	})
 }
 

@@ -6,6 +6,7 @@ export default {
     },
     'error': {
         'system error': 'System Error',
+        'api not found': 'Failed to request api',
         'incomplete or incorrect submission': 'Incomplete or incorrect submission',
         'operation failed': 'Operation failed',
         'nothing will be updated': 'Nothing will be updated',
@@ -92,6 +93,7 @@ export default {
     'Language': 'Language',
     'You have been successfully registered': 'You have been successfully registered',
     'Unable to sign up': 'Unable to sign up',
+    'User registration is disabled': 'User registration is disabled',
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',
     'Unable to logout': 'Unable to logout',

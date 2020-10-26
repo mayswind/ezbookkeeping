@@ -6,6 +6,7 @@ export default {
     },
     'error': {
         'system error': '系统错误',
+        'api not found': '接口调用失败',
         'incomplete or incorrect submission': '提交不完整或不正确',
         'operation failed': '操作失败',
         'nothing will be updated': '没有内容更新',
@@ -92,6 +93,7 @@ export default {
     'Language': '语言',
     'You have been successfully registered': '注册成功',
     'Unable to sign up': '无法注册',
+    'User registration is disabled': '用户注册已禁用',
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定是否要退出登录？',
     'Unable to logout': '无法退出登录',

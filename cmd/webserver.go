@@ -81,10 +81,6 @@ func startWebServer(c *cli.Context) error {
 	router.StaticFile("/mobile", filepath.Join(config.StaticRootPath, "mobile.html"))
 	router.StaticFile("/desktop", filepath.Join(config.StaticRootPath, "desktop.html"))
 
-	if config.EnableUserRegister {
-		router.StaticFile("register", filepath.Join(config.StaticRootPath, "register.html"))
-	}
-
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
 	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))

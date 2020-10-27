@@ -13,6 +13,7 @@
     "framework7": "^5.7.13",
     "framework7-icons": "^3.0.1",
     "framework7-vue": "^5.7.13",
+    "js-cookie": "^2.2.1",
     "vue": "^2.6.11",
     "vue-i18n": "^8.22.0"
   },

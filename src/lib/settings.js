@@ -1,4 +1,8 @@
+import Cookies from 'js-cookie'
+
 const settingsLocalStorageKey = 'lab_user_settings';
+const serverSettingsCookieKey = 'ACP_SETTINGS';
+
 const defaultSettings = {
     lang: 'en'
 };
@@ -37,7 +41,23 @@ function setOption(key, value) {
     return setSettings(settings);
 }
 
+function getServerSetting(key) {
+    const settings = Cookies.get(serverSettingsCookieKey) || '';
+    const settingsArr = settings.split('_');
+
+    for (let i = 0; i < settingsArr.length; i++) {
+        const pairs = settingsArr[i].split('.');
+
+        if (pairs[0] === key) {
+            return pairs[1];
+        }
+    }
+
+    return undefined;
+}
+
 export default {
     getLanguage: () => getOriginalOption('lang'),
-    setLanguage: value => setOption('lang', value)
+    setLanguage: value => setOption('lang', value),
+    isUserRegistrationEnabled: () => getServerSetting('r') === '1'
 };

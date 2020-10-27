@@ -23,7 +23,7 @@
             <f7-list-button :class="{ 'disabled': inputIsEmpty }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
                 <span v-t="'Don\'t have an account?'"></span>&nbsp;
-                <f7-link href="/signup" :text="$t('Create an account')"></f7-link>
+                <f7-link :class="{'disabled': !isUserRegistrationEnabled}" href="/signup" :text="$t('Create an account')"></f7-link>
                 <br/>
                 <f7-link class="disabled" href="/forget-pwd" :text="$t('Forget Password?')"></f7-link>
             </f7-block-footer>
@@ -98,6 +98,9 @@ export default {
         };
     },
     computed: {
+        isUserRegistrationEnabled() {
+            return this.$isUserRegistrationEnabled();
+        },
         inputIsEmpty() {
             return !this.username || !this.password;
         },

@@ -78,8 +78,9 @@ func startWebServer(c *cli.Context) error {
 	router.NoRoute(bindApi(api.Default.ApiNotFound))
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
-	router.StaticFile("/mobile", filepath.Join(config.StaticRootPath, "mobile.html"))
-	router.StaticFile("/desktop", filepath.Join(config.StaticRootPath, "desktop.html"))
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/mobile/")
+	})
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
 	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
@@ -87,9 +88,17 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 
-	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/mobile")
-	})
+	mobileEntryRoute := router.Group("/mobile")
+	mobileEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
+	{
+		mobileEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "mobile.html"))
+	}
+
+	desktopEntryRoute := router.Group("/desktop")
+	desktopEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
+	{
+		desktopEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "desktop.html"))
+	}
 
 	apiRoute := router.Group("/api")
 

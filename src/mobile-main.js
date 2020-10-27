@@ -31,6 +31,8 @@ Vue.prototype.$setLanguage = function (locale) {
     document.querySelector('html').setAttribute('lang', locale);
     return locale;
 };
+Vue.prototype.$isUserRegistrationEnabled = settings.isUserRegistrationEnabled;
+
 Vue.prototype.$alert = function (message, confirmCallback) {
     let parameters = {};
 
@@ -84,6 +86,7 @@ Vue.prototype.$toast = function (message, timeout) {
         closeTimeout: timeout || 1500
     }).open();
 };
+
 Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
 

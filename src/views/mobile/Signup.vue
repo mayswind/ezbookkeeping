@@ -15,16 +15,25 @@
                 type="password"
                 clear-button
                 :label="$t('Password')"
-                :placeholder="$t('Your password')"
+                :placeholder="$t('Your password, at least 6 characters')"
                 :value="password"
                 @input="password = $event.target.value"
+            ></f7-list-input>
+
+            <f7-list-input
+                type="password"
+                clear-button
+                :label="$t('Confirmation Password')"
+                :placeholder="$t('Re-enter the password')"
+                :value="confirmPassword"
+                @input="confirmPassword = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
                 type="email"
                 clear-button
                 :label="$t('E-mail')"
-                :placeholder="$t('Your email')"
+                :placeholder="$t('Your email address')"
                 :value="email"
                 @input="email = $event.target.value"
             ></f7-list-input>
@@ -37,6 +46,8 @@
                 :value="nickname"
                 @input="nickname = $event.target.value"
             ></f7-list-input>
+
+            <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
         <f7-button large fill :class="{ 'disabled': inputIsEmpty }" :text="$t('Sign Up')" @click="signup"></f7-button>
@@ -49,13 +60,39 @@ export default {
         return {
             username: '',
             password: '',
+            confirmPassword: '',
             email: '',
             nickname: ''
         };
     },
     computed: {
         inputIsEmpty() {
-            return !this.username || !this.password || !this.email || !this.nickname;
+            return !!this.inputEmptyProblemMessage;
+        },
+        inputIsInvalid() {
+            return !!this.inputInvalidProblemMessage;
+        },
+        inputEmptyProblemMessage() {
+            if (!this.username) {
+                return 'Username cannot be empty';
+            } else if (!this.password) {
+                return 'Password cannot be empty';
+            } else if (!this.confirmPassword) {
+                return 'Confirmation password cannot be empty';
+            } else if (!this.email) {
+                return 'Email address cannot be empty';
+            } else if (!this.nickname) {
+                return 'Nickname cannot be empty';
+            } else {
+                return null;
+            }
+        },
+        inputInvalidProblemMessage() {
+            if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
+                return 'Password and confirmation password do not match';
+            } else {
+                return null;
+            }
         }
     },
     methods: {
@@ -64,23 +101,10 @@ export default {
             const app = self.$f7;
             const router = self.$f7router;
 
-            if (!this.username) {
-                self.$alert('Please input username');
-                return;
-            }
+            let problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
 
-            if (!this.password) {
-                self.$alert('Please input password');
-                return;
-            }
-
-            if (!this.email) {
-                self.$alert('Please input email');
-                return;
-            }
-
-            if (!this.nickname) {
-                self.$alert('Please input nickname');
+            if (problemMessage) {
+                self.$alert(problemMessage);
                 return;
             }
 

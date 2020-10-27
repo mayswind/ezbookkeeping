@@ -32,4 +32,8 @@ export default {}
     margin-top: 3px;
     margin-left: 0;
 }
+
+.lab-list-item-error-info div.item-footer {
+    color: var(--f7-input-error-text-color)
+}
 </style>

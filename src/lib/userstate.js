@@ -32,6 +32,14 @@ function updateToken(item) {
     }
 }
 
+function updateUsername(value) {
+    localStorage.setItem(userNameLocalStorageKey, value);
+}
+
+function updateUserNickname(value) {
+    localStorage.setItem(userNickNameLocalStorageKey, value);
+}
+
 function clearToken() {
     localStorage.removeItem(tokenLocalStorageKey);
     localStorage.removeItem(userNameLocalStorageKey);
@@ -46,5 +54,7 @@ export default {
     getUserNickName,
     isUserLogined,
     updateToken,
+    updateUsername,
+    updateUserNickname,
     clearToken
 };

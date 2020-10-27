@@ -129,12 +129,12 @@ export default {
             const router = self.$f7router;
 
             if (!this.username) {
-                self.$alert('Please input username');
+                self.$alert('Username cannot be empty');
                 return;
             }
 
             if (!this.password) {
-                self.$alert('Please input password');
+                self.$alert('Password cannot be empty');
                 return;
             }
 
@@ -193,10 +193,10 @@ export default {
             const router = self.$f7router;
 
             if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
-                self.$alert('Please input passcode');
+                self.$alert('Passcode cannot be empty');
                 return;
             } else if (this.twoFAVerifyType === 'backupcode' && !this.backupCode) {
-                self.$alert('Please input backup code');
+                self.$alert('Backup code cannot be empty');
                 return;
             }
 

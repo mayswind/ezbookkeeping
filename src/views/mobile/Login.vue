@@ -170,7 +170,7 @@ export default {
                     return;
                 }
 
-                self.$user.updateToken(data.result.token);
+                self.$user.updateToken(data.result);
                 router.navigate('/');
             }).catch(error => {
                 hasResponse = true;
@@ -225,7 +225,7 @@ export default {
                     return;
                 }
 
-                self.$user.updateToken(data.result.token);
+                self.$user.updateToken(data.result);
                 app.sheet.close('#2fa-auth-sheet');
                 router.navigate('/');
             }).catch(error => {

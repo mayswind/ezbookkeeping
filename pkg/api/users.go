@@ -63,7 +63,15 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
-	return token, nil
+
+	authResp := &models.AuthResponse{
+		Token : token,
+		Username: user.Username,
+		Nickname: user.Nickname,
+		Need2FA: false,
+	}
+
+	return authResp, nil
 }
 
 func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error) {

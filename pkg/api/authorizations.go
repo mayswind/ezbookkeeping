@@ -77,6 +77,8 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 
 	authResp := &models.AuthResponse{
 		Token : token,
+		Username: user.Username,
+		Nickname: user.Nickname,
 		Need2FA: twoFactorEnable,
 	}
 
@@ -132,6 +134,8 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 
 	authResp := &models.AuthResponse{
 		Token : token,
+		Username: user.Username,
+		Nickname: user.Nickname,
 		Need2FA: false,
 	}
 
@@ -193,6 +197,8 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 
 	authResp := &models.AuthResponse{
 		Token : token,
+		Username: user.Username,
+		Nickname: user.Nickname,
 		Need2FA: false,
 	}
 

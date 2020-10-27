@@ -107,7 +107,7 @@ export default {
                     return;
                 }
 
-                if (typeof(data.result) === 'string') {
+                if (typeof(data.result) === 'object') {
                     self.$user.updateToken(data.result);
                 }
 

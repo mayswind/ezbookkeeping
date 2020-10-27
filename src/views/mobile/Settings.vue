@@ -1,6 +1,12 @@
 <template>
-    <f7-page name="home">
+    <f7-page name="settings">
         <f7-navbar :title="$t('Settings')" :back-link="$t('Back')"></f7-navbar>
+        <f7-block-title>{{ userNickName }}</f7-block-title>
+        <f7-list>
+            <f7-list-item :title="$t('User Profile')" link="#"></f7-list-item>
+            <f7-list-button @click="logout">{{ $t('Log Out') }}</f7-list-button>
+        </f7-list>
+        <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-list>
             <f7-list-item
                 :title="$t('Language')"
@@ -11,7 +17,6 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
-            <f7-list-button @click="logout">{{ $t('Log Out') }}</f7-list-button>
         </f7-list>
     </f7-page>
 </template>
@@ -26,6 +31,9 @@ export default {
         };
     },
     computed: {
+        userNickName() {
+            return this.$user.getUserNickName() || this.$user.getUserName() || this.$t('User');
+        },
         currentLocale: {
             get: function () {
                 return this.$i18n.locale

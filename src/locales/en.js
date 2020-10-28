@@ -103,6 +103,7 @@ export default {
     'You have been successfully registered': 'You have been successfully registered',
     'Unable to sign up': 'Unable to sign up',
     'User registration is disabled': 'User registration is disabled',
+    'Unable to get user profile': 'Unable to get user profile',
     'Nothing has been modified': 'Nothing has been modified',
     'Your profile has been successfully updated': 'Your profile has been successfully updated',
     'Unable to update user profile': 'Unable to update user profile',

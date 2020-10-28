@@ -72,6 +72,9 @@ export default {
     refreshToken: () => {
         return axios.post('v1/tokens/refresh.json');
     },
+    getProfile: () => {
+        return axios.get('v1/users/profile/get.json');
+    },
     updateProfile: ({ email, nickname, password }) => {
         return axios.post('v1/users/profile/update.json', {
             email,

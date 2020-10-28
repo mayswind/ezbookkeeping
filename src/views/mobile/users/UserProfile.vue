@@ -67,6 +67,8 @@ export default {
         inputIsNotChangedProblemMessage() {
             if (!this.password && !this.confirmPassword && !this.email && !this.nickname) {
                 return 'Nothing has been modified';
+            } else if (!this.password && !this.confirmPassword && this.email === this.oldEmail && this.nickname === this.oldNickname) {
+                return 'Nothing has been modified';
             } else if (!this.password && this.confirmPassword) {
                 return 'Password cannot be empty';
             } else if (this.password && !this.confirmPassword) {
@@ -82,6 +84,43 @@ export default {
                 return null;
             }
         }
+    },
+    created() {
+        const self = this;
+        const app = self.$f7;
+        const router = self.$f7router;
+
+        app.preloader.show();
+
+        self.$services.getProfile().then(response => {
+            app.preloader.hide();
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                self.$alert('Unable to get user profile', () => {
+                    router.back();
+                });
+                return;
+            }
+
+            self.oldEmail = data.result.email;
+            self.oldNickname = data.result.nickname;
+
+            self.email = self.oldEmail
+            self.nickname = self.oldNickname;
+        }).catch(error => {
+            app.preloader.hide();
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                self.$alert({ error: error.response.data }, () => {
+                    router.back();
+                });
+            } else {
+                self.$alert('Unable to get user profile', () => {
+                    router.back();
+                });
+            }
+        });
     },
     methods: {
         update() {
@@ -127,7 +166,7 @@ export default {
                 }
 
                 self.$toast('Your profile has been successfully updated');
-                router.back();
+                router.back('/settings', { force: true });
             }).catch(error => {
                 hasResponse = true;
                 app.preloader.hide();

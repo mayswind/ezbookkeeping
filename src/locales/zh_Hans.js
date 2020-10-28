@@ -103,6 +103,7 @@ export default {
     'You have been successfully registered': '注册成功',
     'Unable to sign up': '无法注册',
     'User registration is disabled': '用户注册已禁用',
+    'Unable to get user profile': '无法获取用户信息',
     'Nothing has been modified': '没有修改的项目',
     'Your profile has been successfully updated': '您的用户信息更新成功',
     'Unable to update user profile': '无法更新用户信息',

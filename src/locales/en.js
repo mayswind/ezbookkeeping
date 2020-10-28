@@ -93,7 +93,7 @@ export default {
     'Backup Code': 'Backup Code',
     'Verify': 'Verify',
     'Passcode cannot be empty': 'Passcode cannot be empty',
-    'Backup code cannot be empty': 'Please input backup code',
+    'Backup code cannot be empty': 'Backup code cannot be empty',
     'Unable to verify': 'Unable to verify',
     'Use a backup code': 'Use a backup code',
     'Use a passcode': 'Use a passcode',

@@ -83,22 +83,26 @@ func startWebServer(c *cli.Context) error {
 	})
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
-	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
-	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
-	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
-	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 
 	mobileEntryRoute := router.Group("/mobile")
 	mobileEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
 	{
 		mobileEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "mobile.html"))
 	}
+	router.Static("/mobile/js", filepath.Join(config.StaticRootPath, "js"))
+	router.Static("/mobile/css", filepath.Join(config.StaticRootPath, "css"))
+	router.Static("/mobile/img", filepath.Join(config.StaticRootPath, "img"))
+	router.Static("/mobile/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 
 	desktopEntryRoute := router.Group("/desktop")
 	desktopEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
 	{
 		desktopEntryRoute.StaticFile("/", filepath.Join(config.StaticRootPath, "desktop.html"))
 	}
+	router.Static("/desktop/js", filepath.Join(config.StaticRootPath, "js"))
+	router.Static("/desktop/css", filepath.Join(config.StaticRootPath, "css"))
+	router.Static("/desktop/img", filepath.Join(config.StaticRootPath, "img"))
+	router.Static("/desktop/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 
 	apiRoute := router.Group("/api")
 

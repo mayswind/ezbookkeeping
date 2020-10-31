@@ -52,9 +52,10 @@
         </f7-popover>
 
         <f7-sheet
-            id="2fa-auth-sheet"
             style="height:auto; --f7-sheet-bg-color: #fff;"
             backdrop
+            close-on-escape
+            :opened="show2faSheet" @sheet:closed="show2faSheet = false"
         >
             <div class="sheet-modal-swipe-step">
                 <div class="display-flex padding justify-content-space-between align-items-center">
@@ -101,6 +102,7 @@ export default {
             passcode: '',
             backupCode: '',
             tempToken: '',
+            show2faSheet: false,
             twoFAVerifyType: 'passcode',
             twoFAVerifyTypeSwitchName: 'Use a backup code',
             allLanguages: self.$getAllLanguages()
@@ -151,7 +153,7 @@ export default {
             }
 
             if (self.tempToken) {
-                app.sheet.open('#2fa-auth-sheet');
+                self.show2faSheet = true;
                 return;
             }
 
@@ -178,7 +180,7 @@ export default {
 
                 if (data.result.need2FA) {
                     self.tempToken = data.result.token;
-                    app.sheet.open('#2fa-auth-sheet');
+                    self.show2faSheet = true;
                     return;
                 }
 
@@ -238,7 +240,7 @@ export default {
                 }
 
                 self.$user.updateToken(data.result);
-                app.sheet.close('#2fa-auth-sheet');
+                self.show2faSheet = false;
                 router.navigate('/');
             }).catch(error => {
                 app.preloader.hide();

@@ -35,7 +35,7 @@ axios.interceptors.response.use(response => {
     if (error.response && error.response.data && error.response.data.errorCode) {
         const errorCode = error.response.data.errorCode;
 
-        if (202001 <= errorCode && errorCode <= 202007) { // unauthorized access or token is invalid
+        if (202001 <= errorCode && errorCode <= 202008) { // unauthorized access or token is invalid
             userState.clearToken();
             location.reload();
             return Promise.reject({ processed: true });

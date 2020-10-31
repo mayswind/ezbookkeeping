@@ -19,6 +19,7 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
+            <f7-list-item :title="$t('About')" link="/about"></f7-list-item>
         </f7-list>
     </f7-page>
 </template>

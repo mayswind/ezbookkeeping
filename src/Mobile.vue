@@ -31,4 +31,8 @@ body {
     -moz-user-select: none;
     user-select: none;
 }
+
+.work-break-all {
+    word-break: break-all;
+}
 </style>

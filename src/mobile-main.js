@@ -118,6 +118,9 @@ new Vue({
         window.addEventListener('popstate', () => {
             if (document.querySelectorAll('.modal-in').length > 0) {
                 app.dialog.close();
+                app.sheet.close();
+                app.popup.close();
+                return false;
             }
         }, false);
 
@@ -125,6 +128,9 @@ new Vue({
             if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27 || event.which === 27) {
                 if (document.querySelectorAll('.modal-in').length > 0) {
                     app.dialog.close();
+                    app.sheet.close();
+                    app.popup.close();
+                    return false;
                 }
             }
         }, false);

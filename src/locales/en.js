@@ -61,8 +61,10 @@ export default {
     },
     'OK': 'OK',
     'Cancel': 'Cancel',
+    'Close': 'Close',
     'Update': 'Update',
     'Done': 'Done',
+    'Version': 'Version',
     'User': 'User',
     'Application': 'Application',
     'Home': 'Home',
@@ -123,4 +125,7 @@ export default {
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',
     'Unable to logout': 'Unable to logout',
+    'About': 'About',
+    'Official Website': 'Official Website',
+    'License': 'License',
 };

@@ -61,8 +61,10 @@ export default {
     },
     'OK': '确定',
     'Cancel': '取消',
+    'Close': '关闭',
     'Update': '更新',
     'Done': '完成',
+    'Version': '版本',
     'User': '用户',
     'Application': '应用',
     'Home': '首页',
@@ -123,4 +125,7 @@ export default {
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定是否要退出登录？',
     'Unable to logout': '无法退出登录',
+    'About': '关于',
+    'Official Website': '官方网站',
+    'License': '许可协议',
 };

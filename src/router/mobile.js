@@ -6,6 +6,7 @@ import MainPageHomeTab from '../views/mobile/main/Home.vue';
 import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
 import SettingsPage from '../views/mobile/Settings.vue';
+import AboutPage from "../views/mobile/About.vue";
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
 import SessionListPage from "../views/mobile/users/SessionList.vue";
 
@@ -60,6 +61,11 @@ const routes = [
     {
         path: '/settings',
         component: SettingsPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/about',
+        component: AboutPage,
         beforeEnter: checkLogin
     },
     {

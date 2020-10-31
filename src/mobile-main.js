@@ -95,13 +95,7 @@ Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 
 // refresh token if user is logined
 if (userstate.isUserLogined()) {
-    services.refreshToken().then(response => {
-        const data = response.data;
-
-        if (data && data.success && data.result) {
-            userstate.updateToken(data.result);
-        }
-    });
+    services.refreshToken();
 }
 
 new Vue({

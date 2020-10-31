@@ -1,12 +1,27 @@
 import axios from 'axios';
 import userState from "./userstate.js";
 
+let needBlockRequest = false;
+let blockedRequests = [];
+
 axios.defaults.baseURL = '/api';
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (needBlockRequest && !config.ignoreBlocked) {
+        return new Promise(resolve => {
+            blockedRequests.push(newToken => {
+                if (newToken) {
+                    config.headers.Authorization = `Bearer ${newToken}`;
+                }
+
+                resolve(config);
+            });
+        });
     }
 
     return config;
@@ -70,7 +85,29 @@ export default {
         return axios.get('logout.json');
     },
     refreshToken: () => {
-        return axios.post('v1/tokens/refresh.json');
+        needBlockRequest = true;
+
+        return axios.post('v1/tokens/refresh.json', {} , {
+            ignoreBlocked: true
+        }).then(response => {
+            const data = response.data;
+
+            if (data && data.success && data.result && data.result.newToken) {
+                userState.updateToken(data.result.newToken);
+
+                if (data.result.oldTokenId) {
+                    axios.post('v1/tokens/revoke.json', {
+                        tokenId: data.result.oldTokenId
+                    });
+                }
+            }
+
+            needBlockRequest = false;
+            return data.result.newToken;
+        }).then(newToken => {
+            blockedRequests.forEach(func => func(newToken));
+            blockedRequests.length = 0;
+        });
     },
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');

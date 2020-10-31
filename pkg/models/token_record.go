@@ -18,6 +18,11 @@ type TokenRevokeRequest struct {
 	TokenId string `json:"tokenId" binding:"required,notBlank"`
 }
 
+type TokenRefreshResponse struct {
+	NewToken   string `json:"newToken"`
+	OldTokenId string `json:"oldTokenId"`
+}
+
 type TokenInfoResponse struct {
 	TokenId   string         `json:"tokenId"`
 	TokenType core.TokenType `json:"tokenType"`

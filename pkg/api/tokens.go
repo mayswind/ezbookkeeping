@@ -146,14 +146,21 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Err
 	}
 
 	oldTokenClaims := c.GetTokenClaims()
-	err = a.tokens.DeleteTokenByClaims(oldTokenClaims)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[token.TokenRefreshHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
+	oldUserTokenId, _ := utils.StringToInt64(oldTokenClaims.UserTokenId)
+	oldTokenRecord := &models.TokenRecord{
+		Uid: uid,
+		UserTokenId: oldUserTokenId,
+		CreatedUnixTime: oldTokenClaims.IssuedAt,
 	}
 
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[token.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
-	return token, nil
+
+	refreshResp := &models.TokenRefreshResponse{
+		NewToken: token,
+		OldTokenId: a.tokens.GenerateTokenId(oldTokenRecord),
+	}
+
+	return refreshResp, nil
 }

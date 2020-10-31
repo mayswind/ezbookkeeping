@@ -116,6 +116,14 @@ export default {
             blockedRequests.length = 0;
         });
     },
+    getTokens: () => {
+        return axios.get('v1/tokens/list.json');
+    },
+    revokeToken: ({ tokenId }) => {
+        return axios.post('v1/tokens/revoke.json', {
+            tokenId
+        });
+    },
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },
@@ -124,14 +132,6 @@ export default {
             email,
             nickname,
             password
-        });
-    },
-    getTokens: () => {
-        return axios.get('v1/tokens/list.json');
-    },
-    revokeToken: ({ tokenId }) => {
-        return axios.post('v1/tokens/revoke.json', {
-            tokenId
         });
     },
 };

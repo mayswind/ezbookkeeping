@@ -182,7 +182,7 @@ export default {
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });
-                } else {
+                } else if (!error.processed) {
                     self.$alert('Unable to login');
                 }
             });
@@ -233,7 +233,7 @@ export default {
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });
-                } else {
+                } else if (!error.processed) {
                     self.$alert('Unable to verify');
                 }
             })

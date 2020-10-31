@@ -45,7 +45,7 @@ export default {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();
                 });
-            } else {
+            } else if (!error.processed) {
                 self.$alert('Unable to get session list', () => {
                     router.back();
                 });
@@ -84,7 +84,7 @@ export default {
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         self.$alert({error: error.response.data});
-                    } else {
+                    } else if (!error.processed) {
                         self.$alert('Unable to logout from this session');
                     }
                 });

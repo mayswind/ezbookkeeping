@@ -42,6 +42,32 @@
         </f7-list>
 
         <f7-button large fill :class="{ 'disabled': inputIsNotChanged }" :text="$t('Update')" @click="update"></f7-button>
+
+        <f7-sheet
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+            :opened="showInputPasswordSheet" @sheet:closed="showInputPasswordSheet = false"
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="input-password-tips">{{ $t('Please enter your current password when modifying your password') }}</p>
+                    <f7-list no-hairlines class="input-password-form">
+                        <f7-list-input
+                            type="password"
+                            outline
+                            clear-button
+                            :placeholder="$t('Password')"
+                            :value="currentPassword"
+                            @input="currentPassword = $event.target.value"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': !currentPassword }" :text="$t('Continue')" @click="update"></f7-button>
+                </div>
+            </div>
+        </f7-sheet>
     </f7-page>
 </template>
 
@@ -49,12 +75,14 @@
 export default {
     data() {
         return {
+            currentPassword: '',
             password: '',
             confirmPassword: '',
             oldEmail: '',
             email: '',
             oldNickname: '',
-            nickname: ''
+            nickname: '',
+            showInputPasswordSheet: false
         };
     },
     computed: {
@@ -128,10 +156,17 @@ export default {
             const app = self.$f7;
             const router = self.$f7router;
 
+            self.showInputPasswordSheet = false;
+
             let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage;
 
             if (problemMessage) {
                 self.$alert(problemMessage);
+                return;
+            }
+
+            if (self.password && !self.currentPassword) {
+                self.showInputPasswordSheet = true;
                 return;
             }
 
@@ -145,11 +180,14 @@ export default {
 
             self.$services.updateProfile({
                 password: self.password,
+                oldPassword: self.currentPassword,
                 email: self.email,
                 nickname: self.nickname
             }).then(response => {
                 hasResponse = true;
                 app.preloader.hide();
+                self.currentPassword = '';
+
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -170,6 +208,7 @@ export default {
             }).catch(error => {
                 hasResponse = true;
                 app.preloader.hide();
+                self.currentPassword = '';
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });
@@ -181,3 +220,14 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.input-password-tips {
+    margin-top: 0;
+}
+
+.input-password-form {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+</style>

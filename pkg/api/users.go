@@ -131,8 +131,16 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		userUpdateReq.Email = ""
 	}
 
-	if userUpdateReq.Password != "" && !a.users.IsPasswordEqualsUserPassword(userUpdateReq.Password, user) {
-		anythingUpdate = true
+	if userUpdateReq.Password != "" {
+		if !a.users.IsPasswordEqualsUserPassword(userUpdateReq.OldPassword, user) {
+			return nil, errs.ErrUserPasswordWrong
+		}
+
+		if !a.users.IsPasswordEqualsUserPassword(userUpdateReq.Password, user) {
+			anythingUpdate = true
+		} else {
+			userUpdateReq.Password = ""
+		}
 	} else {
 		userUpdateReq.Password = ""
 	}

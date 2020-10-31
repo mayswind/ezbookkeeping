@@ -39,9 +39,10 @@ type UserRegisterRequest struct {
 }
 
 type UserProfileUpdateRequest struct {
-	Email    string `json:"email" binding:"omitempty,notBlank,max=100,validEmail"`
-	Nickname string `json:"nickname" binding:"omitempty,notBlank,max=64"`
-	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+	Email       string `json:"email" binding:"omitempty,notBlank,max=100,validEmail"`
+	Nickname    string `json:"nickname" binding:"omitempty,notBlank,max=64"`
+	Password    string `json:"password" binding:"omitempty,min=6,max=128"`
+	OldPassword string `json:"oldPassword" binding:"omitempty,min=6,max=128"`
 }
 
 type UserProfileResponse struct {

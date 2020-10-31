@@ -127,11 +127,12 @@ export default {
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },
-    updateProfile: ({ email, nickname, password }) => {
+    updateProfile: ({ email, nickname, password, oldPassword }) => {
         return axios.post('v1/users/profile/update.json', {
             email,
             nickname,
-            password
+            password,
+            oldPassword
         });
     },
 };

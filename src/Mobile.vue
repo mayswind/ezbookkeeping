@@ -14,7 +14,10 @@ export default {
                 name: 'lab',
                 id: 'net.mayswind.lab',
                 theme: 'ios',
-                routes: routes
+                routes: routes,
+                view: {
+                    animate : false
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -a -v -i -trimpath -o lab lab
 
 # Build frontend files
 FROM node:12.19.0-alpine3.12 AS fe-builder
+RUN apk add git
 WORKDIR /go/src/github.com/mayswind/lab
 COPY . .
 RUN npm install && npm run build

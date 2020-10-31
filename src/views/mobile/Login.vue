@@ -110,7 +110,7 @@ export default {
     },
     computed: {
         version() {
-            return this.$version();
+            return 'v' + this.$version();
         },
         isUserRegistrationEnabled() {
             return this.$isUserRegistrationEnabled();

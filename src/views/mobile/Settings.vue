@@ -4,6 +4,8 @@
         <f7-block-title>{{ userNickName }}</f7-block-title>
         <f7-list>
             <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
+            <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa/overview"></f7-list-item>
+            <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
             <f7-list-button @click="logout">{{ $t('Log Out') }}</f7-list-button>
         </f7-list>
         <f7-block-title>{{ $t('Application') }}</f7-block-title>

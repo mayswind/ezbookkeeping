@@ -32,10 +32,15 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
     return response;
 }, error => {
-    if (error.response && error.response.data && error.response.data.errorCode) {
+    if (error.response && !error.response.config.ignoreError && error.response.data && error.response.data.errorCode) {
         const errorCode = error.response.data.errorCode;
 
-        if (202001 <= errorCode && errorCode <= 202008) { // unauthorized access or token is invalid
+        if (errorCode === 202001 // unauthorized access
+            && errorCode <= 202002 // current token is invalid
+            && errorCode <= 202003 // current token is expired
+            && errorCode <= 202004 // current token type is invalid
+            && errorCode <= 202005 // current token requires two factor authorization
+            && errorCode <= 202006) { // current token does not require two factor authorization
             userState.clearToken();
             location.reload();
             return Promise.reject({ processed: true });
@@ -98,6 +103,8 @@ export default {
                 if (data.result.oldTokenId) {
                     axios.post('v1/tokens/revoke.json', {
                         tokenId: data.result.oldTokenId
+                    }, {
+                        ignoreError: true
                     });
                 }
             }
@@ -117,6 +124,14 @@ export default {
             email,
             nickname,
             password
+        });
+    },
+    getTokens: () => {
+        return axios.get('v1/tokens/list.json');
+    },
+    revokeToken: ({ tokenId }) => {
+        return axios.post('v1/tokens/revoke.json', {
+            tokenId
         });
     },
 };

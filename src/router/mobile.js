@@ -7,6 +7,7 @@ import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
 import SettingsPage from '../views/mobile/Settings.vue';
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
+import SessionListPage from "../views/mobile/users/SessionList.vue";
 
 function checkLogin(to, from, resolve, reject) {
     const router = this;
@@ -64,6 +65,11 @@ const routes = [
     {
         path: '/user/profile',
         component: UserProfilePage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/user/sessions',
+        component: SessionListPage,
         beforeEnter: checkLogin
     },
     {

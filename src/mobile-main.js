@@ -1,7 +1,12 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
+import VueI18nFilter from 'vue-i18n-filter'
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
+import VueMoment from 'vue-moment';
+
+import moment from 'moment';
+import 'moment/min/locales';
 
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
@@ -13,6 +18,8 @@ import userstate from './lib/userstate.js';
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
+Vue.use(VueI18nFilter);
+Vue.use(VueMoment, { moment });
 Framework7.use(Framework7Vue);
 
 const i18n = new VueI18n(getI18nOptions());
@@ -27,6 +34,7 @@ Vue.prototype.$setLanguage = function (locale) {
     }
 
     i18n.locale = locale;
+    moment.locale(locale);
     services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
     return locale;

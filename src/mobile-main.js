@@ -12,6 +12,7 @@ import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
 
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError } from './lib/i18n.js';
+import version from './lib/version.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
@@ -24,6 +25,7 @@ Framework7.use(Framework7Vue);
 
 const i18n = new VueI18n(getI18nOptions());
 
+Vue.prototype.$version = version.getVersion;
 Vue.prototype.$settings = settings;
 Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
 Vue.prototype.$getAllLanguages = getAllLanguages;

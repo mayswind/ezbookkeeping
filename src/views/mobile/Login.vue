@@ -31,6 +31,15 @@
             </f7-block-footer>
         </f7-list>
         <f7-button small popover-open=".popover-menu" :text="currentLanguageName"></f7-button>
+        <f7-list>
+            <f7-block-footer>
+                <span>Powered by </span>
+                <f7-link external href="https://github.com/mayswind/lab" target="_blank">lab</f7-link>&nbsp;
+                <span>{{ version }}</span>
+            </f7-block-footer>
+            <f7-block-footer>
+            </f7-block-footer>
+        </f7-list>
         <f7-popover class="popover-menu">
             <f7-list>
                 <f7-list-item
@@ -98,6 +107,9 @@ export default {
         };
     },
     computed: {
+        version() {
+            return this.$version();
+        },
         isUserRegistrationEnabled() {
             return this.$isUserRegistrationEnabled();
         },

@@ -1,3 +1,6 @@
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const pkgFile = require('./package.json');
+
 module.exports = {
     pages: {
         desktop: {
@@ -42,7 +45,15 @@ module.exports = {
                     minChunks: 2
                 }
             }
-        })
+        });
+
+        config.plugin('define').tap(definitions => {
+            const gitRevisionPlugin = new GitRevisionPlugin();
+            definitions[0]['process.env']['VERSION'] = JSON.stringify(pkgFile.version);
+            definitions[0]['process.env']['COMMIT_HASH'] = JSON.stringify(gitRevisionPlugin.commithash());
+
+            return definitions;
+        });
     },
     devServer: {
         host: '0.0.0.0',

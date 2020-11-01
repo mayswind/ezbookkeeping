@@ -9,6 +9,8 @@ import routes from './router/mobile.js';
 
 export default {
     data() {
+        const self = this;
+
         return {
             f7params: {
                 name: 'lab',
@@ -16,7 +18,7 @@ export default {
                 theme: 'ios',
                 routes: routes,
                 view: {
-                    animate : false
+                    animate : self.$settings.isEnableAnimate()
                 }
             }
         }

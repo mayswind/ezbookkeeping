@@ -4,7 +4,8 @@ const settingsLocalStorageKey = 'lab_user_settings';
 const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
-    lang: 'en'
+    lang: 'en',
+    animate: true
 };
 
 function getOriginalSettings() {
@@ -59,5 +60,7 @@ function getServerSetting(key) {
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    isEnableAnimate: () => getOriginalOption('animate'),
+    setEnableAnimate: value => setOption('animate', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1'
 };

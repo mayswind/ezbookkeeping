@@ -111,6 +111,7 @@ export default {
     'Sign Up': '注册',
     'User Profile': '用户信息',
     'Language': '语言',
+    'Enable Animate': '启用动画',
     'You have been successfully registered': '注册成功',
     'Unable to sign up': '无法注册',
     'User registration is disabled': '用户注册已禁用',

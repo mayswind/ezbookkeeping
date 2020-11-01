@@ -19,6 +19,10 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Animate') }}</span>
+                <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
+            </f7-list-item>
             <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>
     </f7-page>
@@ -46,6 +50,17 @@ export default {
             },
             set: function (value) {
                 this.$setLanguage(value);
+            }
+        },
+        isEnableAnimate: {
+            get: function () {
+                return this.$settings.isEnableAnimate();
+            },
+            set: function (value) {
+                if (value !== this.$settings.isEnableAnimate()) {
+                    this.$settings.setEnableAnimate(value);
+                    location.reload();
+                }
             }
         }
     },

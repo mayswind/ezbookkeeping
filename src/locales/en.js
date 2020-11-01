@@ -111,6 +111,7 @@ export default {
     'Sign Up': 'Sign Up',
     'User Profile': 'User Profile',
     'Language': 'Language',
+    'Enable Animate': 'Enable Animate',
     'You have been successfully registered': 'You have been successfully registered',
     'Unable to sign up': 'Unable to sign up',
     'User registration is disabled': 'User registration is disabled',

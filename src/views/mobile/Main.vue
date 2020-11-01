@@ -6,7 +6,7 @@
                 <f7-link href="/new-record" icon-f7="plus_square" :text="$t('New Record')"></f7-link>
             </f7-nav-right>
         </f7-navbar>
-        <f7-tabs animated swipeable routable>
+        <f7-tabs animated routable>
             <f7-tab id="main-tab-home" class="page-content" tab-active></f7-tab>
             <f7-tab id="main-tab-journals" class="page-content"></f7-tab>
             <f7-tab id="main-tab-accounts" class="page-content"></f7-tab>

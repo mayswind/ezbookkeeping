@@ -9,7 +9,7 @@
             <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
         </f7-list>
 
-        <f7-popup class="license-popup" swipe-to-close close-on-escape>
+        <f7-popup class="license-popup">
             <f7-page>
                 <f7-navbar :title="$t('License')">
                     <f7-nav-right>

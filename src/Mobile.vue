@@ -16,11 +16,19 @@ export default {
                 name: 'lab',
                 id: 'net.mayswind.lab',
                 theme: 'ios',
+                autoDarkTheme: self.$settings.isEnableAutoDarkMode(),
                 routes: routes,
+                sheet: {
+                    backdrop: true,
+                    closeOnEscape: true
+                },
+                popup: {
+                    swipeToClose: true,
+                    closeOnEscape: true
+                },
                 view: {
                     animate : self.$settings.isEnableAnimate()
-                },
-                autoDarkTheme: self.$settings.isEnableAutoDarkMode()
+                }
             }
         }
     }

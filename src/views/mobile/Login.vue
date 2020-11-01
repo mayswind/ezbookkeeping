@@ -53,8 +53,6 @@
 
         <f7-sheet
             style="height:auto; --f7-sheet-bg-color: #fff;"
-            backdrop
-            close-on-escape
             :opened="show2faSheet" @sheet:closed="show2faSheet = false"
         >
             <div class="sheet-modal-swipe-step">

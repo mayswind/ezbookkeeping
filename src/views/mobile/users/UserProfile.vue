@@ -45,8 +45,6 @@
 
         <f7-sheet
             style="height:auto; --f7-sheet-bg-color: #fff;"
-            backdrop
-            close-on-escape
             :opened="showInputPasswordSheet" @sheet:closed="showInputPasswordSheet = false"
         >
             <div class="sheet-modal-swipe-step">

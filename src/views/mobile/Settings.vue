@@ -46,7 +46,7 @@ export default {
         },
         currentLocale: {
             get: function () {
-                return this.$i18n.locale
+                return this.$i18n.locale;
             },
             set: function (value) {
                 this.$setLanguage(value);

@@ -4,6 +4,7 @@ import VueI18nFilter from 'vue-i18n-filter'
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 import VueMoment from 'vue-moment';
+import VueClipboard from 'vue-clipboard2';
 
 import moment from 'moment';
 import 'moment/min/locales';
@@ -21,6 +22,7 @@ import App from './Mobile.vue';
 Vue.use(VueI18n);
 Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
+Vue.use(VueClipboard);
 Framework7.use(Framework7Vue);
 
 const i18n = new VueI18n(getI18nOptions());

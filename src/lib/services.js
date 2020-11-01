@@ -135,4 +135,26 @@ export default {
             oldPassword
         });
     },
+    get2FAStatus: () => {
+        return axios.get('v1/users/2fa/status.json');
+    },
+    enable2FA: () => {
+        return axios.post('v1/users/2fa/enable/request.json');
+    },
+    confirmEnable2FA: ({ secret, passcode }) => {
+        return axios.post('v1/users/2fa/enable/confirm.json', {
+            secret,
+            passcode
+        });
+    },
+    disable2FA: ({ password }) => {
+        return axios.post('v1/users/2fa/disable.json', {
+            password
+        });
+    },
+    regenerate2FARecoveryCode: ({ password }) => {
+        return axios.post('v1/users/2fa/recovery/regenerate.json', {
+            password
+        });
+    },
 };

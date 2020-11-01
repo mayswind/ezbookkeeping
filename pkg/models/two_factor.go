@@ -25,6 +25,14 @@ type TwoFactorEnableConfirmResponse struct {
 	RecoveryCodes []string `json:"recoveryCodes"`
 }
 
+type TwoFactorDisableRequest struct {
+	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
+type TwoFactorRegenerateRecoveryCodeRequest struct {
+	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 type TwoFactorStatusResponse struct {
 	Enable    bool  `json:"enable"`
 	CreatedAt int64 `json:"createdAt,omitempty"`

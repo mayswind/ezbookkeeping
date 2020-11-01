@@ -152,6 +152,12 @@
                         <span class="work-break-all">License: https://github.com/brockpetrie/vue-moment/blob/master/LICENSE</span>
                     </p>
                     <p>
+                        <strong>vue-clipboard2</strong><br/>
+                        <span>Copyright (c) 2017 Inndy &lt;inndy \dot tw \at gmail \dot com&gt;</span><br/>
+                        <span class="work-break-all">https://github.com/Inndy/vue-clipboard2</span><br/>
+                        <span class="work-break-all">License: https://github.com/Inndy/vue-clipboard2/blob/master/LICENSE</span>
+                    </p>
+                    <p>
                         <strong>core-js</strong><br/>
                         <span>Copyright (c) 2014-2020 Denis Pushkarev</span><br/>
                         <span class="work-break-all">https://github.com/zloirock/core-js</span><br/>

@@ -1,0 +1,372 @@
+<template>
+    <f7-page>
+        <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
+
+        <f7-list v-if="status === true">
+            <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
+            <f7-list-button @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
+            <f7-list-button @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+        </f7-list>
+
+        <f7-list v-else-if="status === false">
+            <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
+            <f7-list-button @click="enable">{{ $t('Enable') }}</f7-list-button>
+        </f7-list>
+
+        <f7-sheet
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+            close-on-escape
+            :opened="showInputPasscodeSheetForEnable" @sheet:closed="showInputPasscodeSheetForEnable = false; currentPasscodeForEnable = ''"
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b v-t="'Passcode'"></b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="input-passcode-tips">{{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}</p>
+                    <div class="input-passcode-qrcode-container">
+                        <img class="input-passcode-qrcode-img" :src="new2FAQRCode" />
+                    </div>
+                    <f7-list no-hairlines class="input-passcode-form">
+                        <f7-list-input
+                            type="number"
+                            outline
+                            clear-button
+                            :placeholder="$t('Passcode')"
+                            :value="currentPasscodeForEnable"
+                            @input="currentPasscodeForEnable = $event.target.value"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': !currentPasscodeForEnable }" :text="$t('Continue')" @click="enableConfirm"></f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link @click="showInputPasscodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
+                    </div>
+                </div>
+            </div>
+        </f7-sheet>
+
+        <f7-sheet
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+            close-on-escape
+            :opened="showInputPasswordSheetForDisable" @sheet:closed="showInputPasswordSheetForDisable = false; currentPasswordForDisable = ''"
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="input-password-tips">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
+                    <f7-list no-hairlines class="input-password-form">
+                        <f7-list-input
+                            type="password"
+                            outline
+                            clear-button
+                            :placeholder="$t('Password')"
+                            :value="currentPasswordForDisable"
+                            @input="currentPasswordForDisable = $event.target.value"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': !currentPasswordForDisable }" :text="$t('Continue')" @click="disable(currentPasswordForDisable)"></f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link @click="showInputPasswordSheetForDisable = false" :text="$t('Cancel')"></f7-link>
+                    </div>
+                </div>
+            </div>
+        </f7-sheet>
+
+        <f7-sheet
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+            close-on-escape
+            :opened="showInputPasswordSheetForRegenerate" @sheet:closed="showInputPasswordSheetForRegenerate = false; currentPasswordForRegenerate= ''"
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="input-password-tips">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
+                    <f7-list no-hairlines class="input-password-form">
+                        <f7-list-input
+                            type="password"
+                            outline
+                            clear-button
+                            :placeholder="$t('Password')"
+                            :value="currentPasswordForRegenerate"
+                            @input="currentPasswordForRegenerate = $event.target.value"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': !currentPasswordForRegenerate }" :text="$t('Continue')" @click="regenerateBackupCode(currentPasswordForRegenerate)"></f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link @click="showInputPasswordSheetForRegenerate = false" :text="$t('Cancel')"></f7-link>
+                    </div>
+                </div>
+            </div>
+        </f7-sheet>
+
+        <f7-sheet
+            style="height:auto; --f7-sheet-bg-color: #fff;"
+            backdrop
+            close-on-escape
+            :opened="showBackupCodeSheet" @sheet:closed="showBackupCodeSheet = false; currentBackupCode = ''"
+        >
+            <div class="sheet-modal-swipe-step">
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b v-t="'Backup Code'"></b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="input-password-tips">
+                        <span>{{ $t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.') }}</span>
+                        <f7-link icon-only icon-f7="doc_on_doc" icon-size="16px" class="icon-after-text"
+                                 v-clipboard:copy="currentBackupCode" v-clipboard:success="onBackupCodeCopied"></f7-link>
+                    </p>
+                    <textarea class="backup-code-textarea" rows="10" readonly="readonly" v-model="currentBackupCode"></textarea>
+                    <div class="margin-top text-align-center">
+                        <f7-link @click="showBackupCodeSheet = false" :text="$t('Close')"></f7-link>
+                    </div>
+                </div>
+            </div>
+        </f7-sheet>
+    </f7-page>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            status: null,
+            new2FASecret: '',
+            new2FAQRCode: '',
+            currentPasscodeForEnable: '',
+            currentPasswordForDisable: '',
+            currentPasswordForRegenerate: '',
+            currentBackupCode: '',
+            showInputPasscodeSheetForEnable: false,
+            showInputPasswordSheetForDisable: false,
+            showInputPasswordSheetForRegenerate: false,
+            showBackupCodeSheet: false
+        };
+    },
+    created() {
+        const self = this;
+        const app = self.$f7;
+        const router = self.$f7router;
+
+        app.preloader.show();
+
+        self.$services.get2FAStatus().then(response => {
+            app.preloader.hide();
+            const data = response.data;
+
+            if (!data || !data.success || !data.result || typeof(data.result.enable) !== 'boolean') {
+                self.$alert('Unable to get current two factor authentication status', () => {
+                    router.back();
+                });
+                return;
+            }
+
+            self.status = data.result.enable;
+        }).catch(error => {
+            app.preloader.hide();
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                self.$alert({ error: error.response.data }, () => {
+                    router.back();
+                });
+            } else if (!error.processed) {
+                self.$alert('Unable to get current two factor authentication status', () => {
+                    router.back();
+                });
+            }
+        });
+    },
+    methods: {
+        enable() {
+            const self = this;
+            const app = self.$f7;
+
+            self.new2FAQRCode = '';
+            self.new2FASecret = '';
+
+            app.preloader.show();
+
+            self.$services.enable2FA().then(response => {
+                app.preloader.hide();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.qrcode || !data.result.secret) {
+                    self.$alert('Unable to enable two factor authentication');
+                    return;
+                }
+
+                self.new2FAQRCode = data.result.qrcode;
+                self.new2FASecret = data.result.secret;
+
+                self.showInputPasscodeSheetForEnable = true;
+            }).catch(error => {
+                app.preloader.hide();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({error: error.response.data});
+                } else if (!error.processed) {
+                    self.$alert('Unable to enable two factor authentication');
+                }
+            });
+        },
+        enableConfirm() {
+            const self = this;
+            const app = self.$f7;
+
+            self.$services.confirmEnable2FA({
+                secret: self.new2FASecret,
+                passcode: self.currentPasscodeForEnable
+            }).then(response => {
+                app.preloader.hide();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.token) {
+                    self.$alert('Unable to enable two factor authentication');
+                    return;
+                }
+
+                self.new2FAQRCode = '';
+                self.new2FASecret = '';
+
+                self.status = true;
+                self.showInputPasscodeSheetForEnable = false;
+
+                self.$user.updateToken(data.result.token);
+
+                if (data.result.recoveryCodes && data.result.recoveryCodes.length) {
+                    self.currentBackupCode = data.result.recoveryCodes.join('\n');
+                    self.showBackupCodeSheet = true;
+                }
+            }).catch(error => {
+                app.preloader.hide();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({error: error.response.data});
+                } else if (!error.processed) {
+                    self.$alert('Unable to enable two factor authentication');
+                }
+            });
+        },
+        disable(password) {
+            const self = this;
+            const app = self.$f7;
+
+            if (!password) {
+                self.currentPasswordForDisable = '';
+                self.showInputPasswordSheetForDisable = true;
+                return;
+            }
+
+            app.preloader.show();
+
+            self.$services.disable2FA({
+                password: password
+            }).then(response => {
+                app.preloader.hide();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$alert('Unable to disable two factor authentication');
+                    return;
+                }
+
+                self.status = false;
+                self.showInputPasswordSheetForDisable = false;
+                self.$toast('Two factor authentication has been disabled');
+            }).catch(error => {
+                app.preloader.hide();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({error: error.response.data});
+                } else if (!error.processed) {
+                    self.$alert('Unable to disable two factor authentication');
+                }
+            });
+        },
+        regenerateBackupCode(password) {
+            const self = this;
+            const app = self.$f7;
+
+            if (!password) {
+                self.currentPasswordForRegenerate = '';
+                self.showInputPasswordSheetForRegenerate = true;
+                return;
+            }
+
+            app.preloader.show();
+
+            self.$services.regenerate2FARecoveryCode({
+                password: password
+            }).then(response => {
+                app.preloader.hide();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.recoveryCodes || !data.result.recoveryCodes.length) {
+                    self.$alert('Unable to regenerate two factor authentication backup codes');
+                    return;
+                }
+
+                self.showInputPasswordSheetForRegenerate = false;
+
+                self.currentBackupCode = data.result.recoveryCodes.join('\n');
+                self.showBackupCodeSheet = true;
+            }).catch(error => {
+                app.preloader.hide();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({error: error.response.data});
+                } else if (!error.processed) {
+                    self.$alert('Unable to regenerate two factor authentication backup codes');
+                }
+            });
+        },
+        onBackupCodeCopied() {
+            this.$toast('Backup codes copied');
+        }
+    }
+};
+</script>
+
+<style scoped>
+.input-passcode-tips {
+    margin-top: 0;
+}
+
+.input-passcode-qrcode-container {
+    width: 100%;
+    text-align: center;
+}
+
+.input-passcode-qrcode-img {
+    width: 240px;
+    height: 240px;
+}
+
+.input-passcode-form {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.input-password-tips {
+    margin-top: 0;
+}
+
+.input-password-tips .icon-after-text {
+    margin-left: 6px;
+}
+
+.input-password-form {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.backup-code-textarea {
+    width: 100%;
+}
+</style>

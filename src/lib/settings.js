@@ -5,7 +5,8 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
     lang: 'en',
-    animate: true
+    animate: true,
+    autoDarkMode: false
 };
 
 function getOriginalSettings() {
@@ -62,5 +63,7 @@ export default {
     setLanguage: value => setOption('lang', value),
     isEnableAnimate: () => getOriginalOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
+    isEnableAutoDarkMode: () => getOriginalOption('autoDarkMode'),
+    setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1'
 };

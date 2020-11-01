@@ -19,7 +19,8 @@ export default {
                 routes: routes,
                 view: {
                     animate : self.$settings.isEnableAnimate()
-                }
+                },
+                autoDarkTheme: self.$settings.isEnableAutoDarkMode()
             }
         }
     }

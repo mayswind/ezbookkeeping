@@ -23,6 +23,10 @@
                 <span>{{ $t('Enable Animate') }}</span>
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Auto Dark Mode') }}</span>
+                <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
+            </f7-list-item>
             <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>
     </f7-page>
@@ -59,6 +63,17 @@ export default {
             set: function (value) {
                 if (value !== this.$settings.isEnableAnimate()) {
                     this.$settings.setEnableAnimate(value);
+                    location.reload();
+                }
+            }
+        },
+        isEnableAutoDarkMode: {
+            get: function () {
+                return this.$settings.isEnableAutoDarkMode();
+            },
+            set: function (value) {
+                if (value !== this.$settings.isEnableAutoDarkMode()) {
+                    this.$settings.setEnableAutoDarkMode(value);
                     location.reload();
                 }
             }

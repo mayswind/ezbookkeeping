@@ -6,7 +6,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 const defaultSettings = {
     lang: 'en',
     animate: true,
-    autoDarkMode: false
+    autoDarkMode: true
 };
 
 function getOriginalSettings() {

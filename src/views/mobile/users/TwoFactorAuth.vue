@@ -14,7 +14,7 @@
         </f7-list>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto;"
             :opened="showInputPasscodeSheetForEnable" @sheet:closed="showInputPasscodeSheetForEnable = false; currentPasscodeForEnable = ''"
         >
             <div class="sheet-modal-swipe-step">
@@ -45,7 +45,7 @@
         </f7-sheet>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto"
             :opened="showInputPasswordSheetForDisable" @sheet:closed="showInputPasswordSheetForDisable = false; currentPasswordForDisable = ''"
         >
             <div class="sheet-modal-swipe-step">
@@ -73,7 +73,7 @@
         </f7-sheet>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto"
             :opened="showInputPasswordSheetForRegenerate" @sheet:closed="showInputPasswordSheetForRegenerate = false; currentPasswordForRegenerate= ''"
         >
             <div class="sheet-modal-swipe-step">
@@ -101,7 +101,7 @@
         </f7-sheet>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto"
             :opened="showBackupCodeSheet" @sheet:closed="showBackupCodeSheet = false; currentBackupCode = ''"
         >
             <div class="sheet-modal-swipe-step">

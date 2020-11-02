@@ -52,7 +52,7 @@
         </f7-popover>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto"
             :opened="show2faSheet" @sheet:closed="show2faSheet = false"
         >
             <div class="sheet-modal-swipe-step">

@@ -44,7 +44,7 @@
         <f7-button large fill :class="{ 'disabled': inputIsNotChanged || updating }" :text="$t('Update')" @click="update"></f7-button>
 
         <f7-sheet
-            style="height:auto; --f7-sheet-bg-color: #fff;"
+            style="height:auto"
             :opened="showInputPasswordSheet" @sheet:closed="showInputPasswordSheet = false"
         >
             <div class="sheet-modal-swipe-step">

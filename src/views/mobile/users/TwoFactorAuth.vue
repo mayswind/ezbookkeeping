@@ -4,13 +4,13 @@
 
         <f7-list v-if="status === true">
             <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
-            <f7-list-button @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
-            <f7-list-button @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': disabling }" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
         </f7-list>
 
         <f7-list v-else-if="status === false">
             <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
-            <f7-list-button @click="enable">{{ $t('Enable') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>
         </f7-list>
 
         <f7-sheet
@@ -38,7 +38,7 @@
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': !currentPasscodeForEnable }" :text="$t('Continue')" @click="enableConfirm"></f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link @click="showInputPasscodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
+                        <f7-link :class="{ 'disabled': enableConfirming }" @click="showInputPasscodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': !currentPasswordForDisable }" :text="$t('Continue')" @click="disable(currentPasswordForDisable)"></f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link @click="showInputPasswordSheetForDisable = false" :text="$t('Cancel')"></f7-link>
+                        <f7-link :class="{ 'disabled': disabling }" @click="showInputPasswordSheetForDisable = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
             </div>
@@ -94,7 +94,7 @@
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': !currentPasswordForRegenerate }" :text="$t('Continue')" @click="regenerateBackupCode(currentPasswordForRegenerate)"></f7-button>
                     <div class="margin-top text-align-center">
-                        <f7-link @click="showInputPasswordSheetForRegenerate = false" :text="$t('Cancel')"></f7-link>
+                        <f7-link :class="{ 'disabled': regenerating }" @click="showInputPasswordSheetForRegenerate = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
             </div>
@@ -135,6 +135,10 @@ export default {
             currentPasswordForDisable: '',
             currentPasswordForRegenerate: '',
             currentBackupCode: '',
+            enabling: false,
+            enableConfirming: false,
+            disabling: false,
+            regenerating: false,
             showInputPasscodeSheetForEnable: false,
             showInputPasswordSheetForDisable: false,
             showInputPasswordSheetForRegenerate: false,
@@ -143,13 +147,12 @@ export default {
     },
     created() {
         const self = this;
-        const app = self.$f7;
         const router = self.$f7router;
 
-        app.preloader.show();
+        self.$showLoading();
 
         self.$services.get2FAStatus().then(response => {
-            app.preloader.hide();
+            self.$hideLoading();
             const data = response.data;
 
             if (!data || !data.success || !data.result || typeof(data.result.enable) !== 'boolean') {
@@ -161,7 +164,7 @@ export default {
 
             self.status = data.result.enable;
         }).catch(error => {
-            app.preloader.hide();
+            self.$hideLoading();
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
@@ -177,15 +180,16 @@ export default {
     methods: {
         enable() {
             const self = this;
-            const app = self.$f7;
 
             self.new2FAQRCode = '';
             self.new2FASecret = '';
 
-            app.preloader.show();
+            self.enabling = true;
+            self.$showLoading(() => self.enabling);
 
             self.$services.enable2FA().then(response => {
-                app.preloader.hide();
+                self.enabling = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.qrcode || !data.result.secret) {
@@ -198,7 +202,8 @@ export default {
 
                 self.showInputPasscodeSheetForEnable = true;
             }).catch(error => {
-                app.preloader.hide();
+                self.enabling = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({error: error.response.data});
@@ -209,13 +214,16 @@ export default {
         },
         enableConfirm() {
             const self = this;
-            const app = self.$f7;
+
+            self.enableConfirming = true;
+            self.$showLoading(() => self.enableConfirming);
 
             self.$services.confirmEnable2FA({
                 secret: self.new2FASecret,
                 passcode: self.currentPasscodeForEnable
             }).then(response => {
-                app.preloader.hide();
+                self.enableConfirming = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
@@ -236,7 +244,8 @@ export default {
                     self.showBackupCodeSheet = true;
                 }
             }).catch(error => {
-                app.preloader.hide();
+                self.enableConfirming = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({error: error.response.data});
@@ -247,7 +256,6 @@ export default {
         },
         disable(password) {
             const self = this;
-            const app = self.$f7;
 
             if (!password) {
                 self.currentPasswordForDisable = '';
@@ -255,12 +263,14 @@ export default {
                 return;
             }
 
-            app.preloader.show();
+            self.disabling = true;
+            self.$showLoading(() => self.disabling);
 
             self.$services.disable2FA({
                 password: password
             }).then(response => {
-                app.preloader.hide();
+                self.disabling = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -272,7 +282,8 @@ export default {
                 self.showInputPasswordSheetForDisable = false;
                 self.$toast('Two factor authentication has been disabled');
             }).catch(error => {
-                app.preloader.hide();
+                self.disabling = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({error: error.response.data});
@@ -283,7 +294,6 @@ export default {
         },
         regenerateBackupCode(password) {
             const self = this;
-            const app = self.$f7;
 
             if (!password) {
                 self.currentPasswordForRegenerate = '';
@@ -291,12 +301,14 @@ export default {
                 return;
             }
 
-            app.preloader.show();
+            self.regenerating = true;
+            self.$showLoading(() => self.regenerating);
 
             self.$services.regenerate2FARecoveryCode({
                 password: password
             }).then(response => {
-                app.preloader.hide();
+                self.regenerating = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.recoveryCodes || !data.result.recoveryCodes.length) {
@@ -309,7 +321,8 @@ export default {
                 self.currentBackupCode = data.result.recoveryCodes.join('\n');
                 self.showBackupCodeSheet = true;
             }).catch(error => {
-                app.preloader.hide();
+                self.regenerating = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({error: error.response.data});

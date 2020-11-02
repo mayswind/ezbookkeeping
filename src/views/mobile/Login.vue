@@ -20,7 +20,7 @@
             ></f7-list-input>
         </f7-list>
         <f7-list>
-            <f7-list-button :class="{ 'disabled': inputIsEmpty }" :text="$t('Log In')" @click="login"></f7-list-button>
+            <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
                 <span v-t="'Don\'t have an account?'"></span>&nbsp;
                 <f7-link :class="{'disabled': !isUserRegistrationEnabled}" href="/signup" :text="$t('Create an account')"></f7-link>
@@ -79,7 +79,7 @@
                             @input="backupCode = $event.target.value"
                         ></f7-list-input>
                     </f7-list>
-                    <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty }" :text="$t('Verify')" @click="verify"></f7-button>
+                    <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty || verifying }" :text="$t('Verify')" @click="verify"></f7-button>
                     <div class="margin-top text-align-center">
                         <f7-link @click="switch2FAVerifyType" :text="$t(twoFAVerifyTypeSwitchName)"></f7-link>
                     </div>
@@ -100,6 +100,8 @@ export default {
             passcode: '',
             backupCode: '',
             tempToken: '',
+            logining: false,
+            verifying: false,
             show2faSheet: false,
             twoFAVerifyType: 'passcode',
             twoFAVerifyTypeSwitchName: 'Use a backup code',
@@ -137,7 +139,6 @@ export default {
     methods: {
         login() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
             if (!this.username) {
@@ -155,20 +156,15 @@ export default {
                 return;
             }
 
-            let hasResponse = false;
-
-            setTimeout(() => {
-                if (!hasResponse) {
-                    app.preloader.show();
-                }
-            }, 200);
+            self.logining = true;
+            self.$showLoading(() => self.logining);
 
             self.$services.authorize({
                 loginName: self.username,
                 password: self.password
             }).then(response => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.logining = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
@@ -185,8 +181,8 @@ export default {
                 self.$user.updateToken(data.result);
                 router.navigate('/');
             }).catch(error => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.logining = false;
+                self.$hideLoading();
 
                 if (error && error.processed) {
                     return;
@@ -201,7 +197,6 @@ export default {
         },
         verify() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
             if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
@@ -212,7 +207,8 @@ export default {
                 return;
             }
 
-            app.preloader.show();
+            self.verifying = true;
+            self.$showLoading(() => self.verifying);
 
             let promise = null;
 
@@ -229,7 +225,8 @@ export default {
             }
 
             promise.then(response => {
-                app.preloader.hide();
+                self.verifying = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
@@ -241,7 +238,8 @@ export default {
                 self.show2faSheet = false;
                 router.navigate('/');
             }).catch(error => {
-                app.preloader.hide();
+                self.verifying = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });

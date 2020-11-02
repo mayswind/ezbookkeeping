@@ -99,6 +99,20 @@ Vue.prototype.$toast = function (message, timeout) {
         closeTimeout: timeout || 1500
     }).open();
 };
+Vue.prototype.$showLoading = function (delayConditionFunc, delayMills) {
+    if (!delayConditionFunc) {
+        return this.$f7.preloader.show();
+    }
+
+    setTimeout(() => {
+        if (delayConditionFunc()) {
+            this.$f7.preloader.show();
+        }
+    }, delayMills || 200);
+};
+Vue.prototype.$hideLoading = function () {
+    return this.$f7.preloader.hide();
+};
 
 Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;

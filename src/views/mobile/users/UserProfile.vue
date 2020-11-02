@@ -41,7 +41,7 @@
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
-        <f7-button large fill :class="{ 'disabled': inputIsNotChanged }" :text="$t('Update')" @click="update"></f7-button>
+        <f7-button large fill :class="{ 'disabled': inputIsNotChanged || updating }" :text="$t('Update')" @click="update"></f7-button>
 
         <f7-sheet
             style="height:auto; --f7-sheet-bg-color: #fff;"
@@ -63,7 +63,7 @@
                             @input="currentPassword = $event.target.value"
                         ></f7-list-input>
                     </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPassword }" :text="$t('Continue')" @click="update"></f7-button>
+                    <f7-button large fill :class="{ 'disabled': !currentPassword || updating }" :text="$t('Continue')" @click="update"></f7-button>
                 </div>
             </div>
         </f7-sheet>
@@ -81,6 +81,7 @@ export default {
             email: '',
             oldNickname: '',
             nickname: '',
+            updating: false,
             showInputPasswordSheet: false
         };
     },
@@ -114,13 +115,12 @@ export default {
     },
     created() {
         const self = this;
-        const app = self.$f7;
         const router = self.$f7router;
 
-        app.preloader.show();
+        self.$showLoading();
 
         self.$services.getProfile().then(response => {
-            app.preloader.hide();
+            self.$hideLoading();
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -136,7 +136,7 @@ export default {
             self.email = self.oldEmail
             self.nickname = self.oldNickname;
         }).catch(error => {
-            app.preloader.hide();
+            self.$hideLoading();
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
@@ -152,7 +152,6 @@ export default {
     methods: {
         update() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
             self.showInputPasswordSheet = false;
@@ -169,13 +168,8 @@ export default {
                 return;
             }
 
-            let hasResponse = false;
-
-            setTimeout(() => {
-                if (!hasResponse) {
-                    app.preloader.show();
-                }
-            }, 200);
+            self.updating = true;
+            self.$showLoading(() => self.updating);
 
             self.$services.updateProfile({
                 password: self.password,
@@ -183,8 +177,8 @@ export default {
                 email: self.email,
                 nickname: self.nickname
             }).then(response => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.updating = false;
+                self.$hideLoading();
                 self.currentPassword = '';
 
                 const data = response.data;
@@ -205,8 +199,8 @@ export default {
                 self.$toast('Your profile has been successfully updated');
                 router.back('/settings', { force: true });
             }).catch(error => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.updating = false;
+                self.$hideLoading();
                 self.currentPassword = '';
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {

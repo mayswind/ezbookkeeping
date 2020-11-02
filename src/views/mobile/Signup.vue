@@ -50,7 +50,7 @@
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
-        <f7-button large fill :class="{ 'disabled': inputIsEmpty }" :text="$t('Sign Up')" @click="signup"></f7-button>
+        <f7-button large fill :class="{ 'disabled': inputIsEmpty || signuping }" :text="$t('Sign Up')" @click="signup"></f7-button>
     </f7-page>
 </template>
 
@@ -62,7 +62,8 @@ export default {
             password: '',
             confirmPassword: '',
             email: '',
-            nickname: ''
+            nickname: '',
+            signuping: false
         };
     },
     computed: {
@@ -98,7 +99,6 @@ export default {
     methods: {
         signup() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
             let problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
@@ -108,13 +108,8 @@ export default {
                 return;
             }
 
-            let hasResponse = false;
-
-            setTimeout(() => {
-                if (!hasResponse) {
-                    app.preloader.show();
-                }
-            }, 200);
+            self.signuping = true;
+            self.$showLoading(() => self.signuping);
 
             self.$services.register({
                 username: self.username,
@@ -122,8 +117,8 @@ export default {
                 email: self.email,
                 nickname: self.nickname
             }).then(response => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.signuping = false;
+                self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -138,8 +133,8 @@ export default {
                 self.$toast('You have been successfully registered');
                 router.navigate('/');
             }).catch(error => {
-                hasResponse = true;
-                app.preloader.hide();
+                self.signuping = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });

@@ -21,13 +21,12 @@ export default {
     },
     created() {
         const self = this;
-        const app = self.$f7;
         const router = self.$f7router;
 
-        app.preloader.show();
+        self.$showLoading();
 
         self.$services.getTokens().then(response => {
-            app.preloader.hide();
+            self.$hideLoading();
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -39,7 +38,7 @@ export default {
 
             self.tokens = data.result;
         }).catch(error => {
-            app.preloader.hide();
+            self.$hideLoading();
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
@@ -59,12 +58,12 @@ export default {
             const $$ = app.$;
 
             self.$confirm('Are you sure you want to logout from this session?', () => {
-                app.preloader.show();
+                self.$showLoading();
 
                 self.$services.revokeToken({
                     tokenId: token.tokenId
                 }).then(response => {
-                    app.preloader.hide();
+                    self.$hideLoading();
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
@@ -80,7 +79,7 @@ export default {
                         }
                     });
                 }).catch(error => {
-                    app.preloader.hide();
+                    self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         self.$alert({error: error.response.data});

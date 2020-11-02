@@ -6,7 +6,7 @@
             <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
             <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
             <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
-            <f7-list-button @click="logout">{{ $t('Log Out') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>
         </f7-list>
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-list>
@@ -38,6 +38,7 @@ export default {
         const self = this;
 
         return {
+            logouting: false,
             allLanguages: self.$getAllLanguages()
         };
     },
@@ -82,21 +83,15 @@ export default {
     methods: {
         logout() {
             const self = this;
-            const app = self.$f7;
             const router = self.$f7router;
 
             self.$confirm('Are you sure you want to log out?', () => {
-                let hasResponse = false;
-
-                setTimeout(() => {
-                    if (!hasResponse) {
-                        app.preloader.show();
-                    }
-                }, 200);
+                self.logouting = true;
+                self.$showLoading(() => self.logouting);
 
                 self.$services.logout().then(response => {
-                    hasResponse = true;
-                    app.preloader.hide();
+                    self.logouting = false;
+                    self.$hideLoading();
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
@@ -107,8 +102,8 @@ export default {
                     self.$user.clearToken();
                     router.navigate('/');
                 }).catch(error => {
-                    hasResponse = true;
-                    app.preloader.hide();
+                    self.logouting = false;
+                    self.$hideLoading();
 
                     if (error && error.processed) {
                         return;

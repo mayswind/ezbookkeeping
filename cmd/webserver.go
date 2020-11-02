@@ -83,6 +83,8 @@ func startWebServer(c *cli.Context) error {
 	})
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
+	router.StaticFile("favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))
+	router.StaticFile("favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
 
 	mobileEntryRoute := router.Group("/mobile")
 	mobileEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
@@ -93,6 +95,10 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/mobile/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/mobile/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/mobile/fonts", filepath.Join(config.StaticRootPath, "fonts"))
+	router.StaticFile("/mobile/favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))
+	router.StaticFile("/mobile/favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
+	router.StaticFile("/mobile/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
+	router.StaticFile("/mobile/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 
 	desktopEntryRoute := router.Group("/desktop")
 	desktopEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))
@@ -103,6 +109,10 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/desktop/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/desktop/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/desktop/fonts", filepath.Join(config.StaticRootPath, "fonts"))
+	router.StaticFile("/desktop/favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))
+	router.StaticFile("/desktop/favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
+	router.StaticFile("/desktop/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
+	router.StaticFile("/desktop/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 
 	apiRoute := router.Group("/api")
 

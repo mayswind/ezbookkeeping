@@ -2,13 +2,18 @@
     <f7-page>
         <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-list v-if="status === true">
+        <f7-list v-if="loading" class="skeleton-text">
+            <f7-list-item title="Status" after="Unknwon"></f7-list-item>
+            <f7-list-button class="disabled">Operate</f7-list-button>
+        </f7-list>
+
+        <f7-list v-else-if="!loading && status === true">
             <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
             <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
             <f7-list-button :class="{ 'disabled': disabling }" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
         </f7-list>
 
-        <f7-list v-else-if="status === false">
+        <f7-list v-else-if="!loading && status === false">
             <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
             <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>
         </f7-list>
@@ -129,6 +134,7 @@ export default {
     data() {
         return {
             status: null,
+            loading: true,
             new2FASecret: '',
             new2FAQRCode: '',
             currentPasscodeForEnable: '',
@@ -149,10 +155,10 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        self.$showLoading();
+        self.loading = true;
 
         self.$services.get2FAStatus().then(response => {
-            self.$hideLoading();
+            self.loading = false;
             const data = response.data;
 
             if (!data || !data.success || !data.result || typeof(data.result.enable) !== 'boolean') {
@@ -164,7 +170,7 @@ export default {
 
             self.status = data.result.enable;
         }).catch(error => {
-            self.$hideLoading();
+            self.loading = false;
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {

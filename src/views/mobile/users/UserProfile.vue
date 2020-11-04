@@ -1,7 +1,15 @@
 <template>
     <f7-page>
         <f7-navbar :title="$t('User Profile')" :back-link="$t('Back')"></f7-navbar>
-        <f7-list no-hairlines-md>
+
+        <f7-list no-hairlines-md class="skeleton-text" v-if="loading">
+            <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
+            <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
+            <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
+            <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
+        </f7-list>
+
+        <f7-list no-hairlines-md v-else-if="!loading">
             <f7-list-input
                 type="password"
                 clear-button
@@ -81,6 +89,7 @@ export default {
             email: '',
             oldNickname: '',
             nickname: '',
+            loading: true,
             updating: false,
             showInputPasswordSheet: false
         };
@@ -117,10 +126,10 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        self.$showLoading();
+        self.loading = true;
 
         self.$services.getProfile().then(response => {
-            self.$hideLoading();
+            self.loading = false;
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -136,7 +145,7 @@ export default {
             self.email = self.oldEmail
             self.nickname = self.oldNickname;
         }).catch(error => {
-            self.$hideLoading();
+            self.loading = false;
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {

@@ -1,5 +1,5 @@
 <template>
-    <f7-page name="settings">
+    <f7-page>
         <f7-navbar :title="$t('Settings')" :back-link="$t('Back')"></f7-navbar>
         <f7-block-title>{{ userNickName }}</f7-block-title>
         <f7-list>

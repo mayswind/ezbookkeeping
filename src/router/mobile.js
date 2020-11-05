@@ -4,6 +4,13 @@ import HomePage from '../views/mobile/Home.vue';
 import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
 
+import TransactionDetailPage from '../views/mobile/transactions/Detail.vue'
+import TransactionNewPage from '../views/mobile/transactions/New.vue'
+
+import AccountListPage from '../views/mobile/accounts/AccountList.vue'
+
+import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue'
+
 import SettingsPage from '../views/mobile/Settings.vue';
 import AboutPage from "../views/mobile/About.vue";
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
@@ -49,6 +56,26 @@ const routes = [
         path: '/signup',
         component: SignUpPage,
         beforeEnter: checkNotLogin
+    },
+    {
+        path: '/transaction/details',
+        component: TransactionDetailPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/transaction/new',
+        component: TransactionNewPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/account/list',
+        component: AccountListPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/statistic/overview',
+        component: StatisticsOverviewPage,
+        beforeEnter: checkLogin
     },
     {
         path: '/settings',

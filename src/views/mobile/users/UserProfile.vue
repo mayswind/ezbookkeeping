@@ -220,12 +220,12 @@ export default {
                     return;
                 }
 
-                if (self.nickname) {
-                    self.$user.updateUserNickname(self.nickname);
+                if (typeof(data.result.newToken) === 'string') {
+                    self.$user.updateToken(data.result.newToken);
                 }
 
-                if (typeof(data.result) === 'string') {
-                    self.$user.updateToken(data.result);
+                if (typeof(data.result.user) === 'object') {
+                    self.$user.updateUserInfo(data.result.user);
                 }
 
                 self.$toast('Your profile has been successfully updated');

@@ -178,7 +178,7 @@ export default {
                     return;
                 }
 
-                self.$user.updateToken(data.result);
+                self.$user.updateTokenAndUserInfo(data.result);
                 router.navigate('/');
             }).catch(error => {
                 self.logining = false;
@@ -234,7 +234,7 @@ export default {
                     return;
                 }
 
-                self.$user.updateToken(data.result);
+                self.$user.updateTokenAndUserInfo(data.result);
                 self.show2faSheet = false;
                 router.navigate('/');
             }).catch(error => {

@@ -9,7 +9,6 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
-	"github.com/mayswind/lab/pkg/utils"
 )
 
 type UsersApi struct {
@@ -54,23 +53,22 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"%s\" has registered successfully, uid is %d", user.Username, user.Uid)
 
+	authResp := &models.AuthResponse{
+		Need2FA: false,
+		User: user.ToUserBasicInfo(),
+	}
+
 	token, claims, err := a.tokens.CreateToken(user, c)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[users.UserRegisterHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
-		return true, nil
+		return authResp, nil
 	}
 
+	authResp.Token = token
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
-
-	authResp := &models.AuthResponse{
-		Token : token,
-		Username: user.Username,
-		Nickname: user.Nickname,
-		Need2FA: false,
-	}
 
 	return authResp, nil
 }
@@ -87,18 +85,7 @@ func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error
 		return nil, errs.ErrUserNotFound
 	}
 
-	userResp := &models.UserProfileResponse{
-		Uid : utils.Int64ToString(user.Uid),
-		Username: user.Username,
-		Email: user.Email,
-		Nickname: user.Nickname,
-		Type: user.Type,
-		DefaultCurrency: user.DefaultCurrency,
-		CreatedAt: user.CreatedUnixTime,
-		UpdatedAt: user.UpdatedUnixTime,
-		LastLoginAt: user.LastLoginUnixTime,
-	}
-
+	userResp := user.ToUserProfileResponse()
 	return userResp, nil
 }
 
@@ -126,11 +113,16 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	userUpdateReq.Nickname = strings.TrimSpace(userUpdateReq.Nickname)
 
 	anythingUpdate := false
+	userNew := &models.User{
+		Uid: user.Uid,
+		Salt: user.Salt,
+		Rands: user.Rands,
+	}
 
 	if userUpdateReq.Email != "" && userUpdateReq.Email != user.Email {
+		user.Email = userUpdateReq.Email
+		userNew.Email = userUpdateReq.Email
 		anythingUpdate = true
-	} else {
-		userUpdateReq.Email = ""
 	}
 
 	if userUpdateReq.Password != "" {
@@ -139,36 +131,28 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		}
 
 		if !a.users.IsPasswordEqualsUserPassword(userUpdateReq.Password, user) {
+			userNew.Password = userUpdateReq.Password
 			anythingUpdate = true
-		} else {
-			userUpdateReq.Password = ""
 		}
-	} else {
-		userUpdateReq.Password = ""
 	}
 
 	if userUpdateReq.Nickname != "" && userUpdateReq.Nickname != user.Nickname {
+		user.Nickname = userUpdateReq.Nickname
+		userNew.Nickname = userUpdateReq.Nickname
 		anythingUpdate = true
-	} else {
-		userUpdateReq.Nickname = ""
 	}
 
 	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
+		user.DefaultCurrency = userUpdateReq.DefaultCurrency
+		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
 		anythingUpdate = true
-	} else {
-		userUpdateReq.DefaultCurrency = ""
 	}
 
 	if !anythingUpdate {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	user.Email = userUpdateReq.Email
-	user.Password = userUpdateReq.Password
-	user.Nickname = userUpdateReq.Nickname
-	user.DefaultCurrency = userUpdateReq.DefaultCurrency
-
-	keyProfileUpdated, err := a.users.UpdateUser(user)
+	keyProfileUpdated, err := a.users.UpdateUser(userNew)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -176,6 +160,10 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	}
 
 	log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" has updated successfully", user.Uid)
+
+	resp := &models.UserProfileUpdateResponse {
+		User: user.ToUserBasicInfo(),
+	}
 
 	if keyProfileUpdated {
 		now := time.Now().Unix()
@@ -191,14 +179,16 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 		if err != nil {
 			log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
-			return true, nil
+			return resp, nil
 		}
 
+		resp.NewToken = token
 		c.SetTokenClaims(claims)
 
 		log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
-		return token, nil
+
+		return resp, nil
 	} else {
-		return true, nil
+		return resp, nil
 	}
 }

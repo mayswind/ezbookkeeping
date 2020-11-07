@@ -1,60 +1,54 @@
 const tokenLocalStorageKey = 'lab_user_token';
-const userNameLocalStorageKey = 'lab_user_name';
-const userNickNameLocalStorageKey = 'lab_user_nickname';
+const userInfoLocalStorageKey = 'lab_user_info';
 
 function getToken() {
     return localStorage.getItem(tokenLocalStorageKey);
 }
 
-function getUserName() {
-    return localStorage.getItem(userNameLocalStorageKey);
-}
-
-function getUserNickName() {
-    return localStorage.getItem(userNickNameLocalStorageKey);
+function getUserInfo() {
+    const data = localStorage.getItem(userInfoLocalStorageKey);
+    return JSON.parse(data);
 }
 
 function isUserLogined() {
     return !!getToken();
 }
 
-function updateToken(item) {
-    if (typeof(item) === 'string') {
-        return localStorage.setItem(tokenLocalStorageKey, item);
-    } else if (typeof(item) === 'object') {
-        localStorage.setItem(tokenLocalStorageKey, item.token);
-        localStorage.setItem(userNameLocalStorageKey, item.username);
-        localStorage.setItem(userNickNameLocalStorageKey, item.nickname);
-
-        return true;
-    } else {
-        return false;
+function updateToken(token) {
+    if (typeof(token) === 'string') {
+        localStorage.setItem(tokenLocalStorageKey, token);
     }
 }
 
-function updateUsername(value) {
-    localStorage.setItem(userNameLocalStorageKey, value);
+function updateUserInfo(user) {
+    if (typeof(user) === 'object') {
+        localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(user));
+    }
 }
 
-function updateUserNickname(value) {
-    localStorage.setItem(userNickNameLocalStorageKey, value);
+function updateTokenAndUserInfo(item) {
+    if (typeof(item) === 'object') {
+        if (item.token) {
+            updateToken(item.token);
+        }
+
+        if (item.user) {
+            updateUserInfo(item.user);
+        }
+    }
 }
 
-function clearToken() {
+function clearTokenAndUserInfo() {
     localStorage.removeItem(tokenLocalStorageKey);
-    localStorage.removeItem(userNameLocalStorageKey);
-    localStorage.removeItem(userNickNameLocalStorageKey);
-
-    return true;
+    localStorage.removeItem(userInfoLocalStorageKey);
 }
 
 export default {
     getToken,
-    getUserName,
-    getUserNickName,
+    getUserInfo,
     isUserLogined,
     updateToken,
-    updateUsername,
-    updateUserNickname,
-    clearToken
+    updateUserInfo,
+    updateTokenAndUserInfo,
+    clearTokenAndUserInfo
 };

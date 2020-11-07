@@ -19,8 +19,9 @@ type TokenRevokeRequest struct {
 }
 
 type TokenRefreshResponse struct {
-	NewToken   string `json:"newToken"`
-	OldTokenId string `json:"oldTokenId"`
+	NewToken   string         `json:"newToken"`
+	OldTokenId string         `json:"oldTokenId"`
+	User       *UserBasicInfo `json:"user"`
 }
 
 type TokenInfoResponse struct {

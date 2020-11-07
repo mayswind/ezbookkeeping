@@ -160,6 +160,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Err
 	refreshResp := &models.TokenRefreshResponse{
 		NewToken: token,
 		OldTokenId: a.tokens.GenerateTokenId(oldTokenRecord),
+		User: user.ToUserBasicInfo(),
 	}
 
 	return refreshResp, nil

@@ -75,13 +75,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 
 	log.InfofWithRequestId(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logined, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
 
-	authResp := &models.AuthResponse{
-		Token : token,
-		Username: user.Username,
-		Nickname: user.Nickname,
-		Need2FA: twoFactorEnable,
-	}
-
+	authResp := a.getAuthResponse(token, twoFactorEnable, user)
 	return authResp, nil
 }
 
@@ -132,13 +126,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
-	authResp := &models.AuthResponse{
-		Token : token,
-		Username: user.Username,
-		Nickname: user.Nickname,
-		Need2FA: false,
-	}
-
+	authResp := a.getAuthResponse(token, false, user)
 	return authResp, nil
 }
 
@@ -195,12 +183,14 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
 
-	authResp := &models.AuthResponse{
-		Token : token,
-		Username: user.Username,
-		Nickname: user.Nickname,
-		Need2FA: false,
-	}
-
+	authResp := a.getAuthResponse(token, false, user)
 	return authResp, nil
+}
+
+func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) (*models.AuthResponse) {
+	return &models.AuthResponse{
+		Token : token,
+		Need2FA: need2FA,
+		User: user.ToUserBasicInfo(),
+	}
 }

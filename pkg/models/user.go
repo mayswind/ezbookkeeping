@@ -1,5 +1,7 @@
 package models
 
+import "github.com/mayswind/lab/pkg/utils"
+
 type UserType byte
 
 const (
@@ -27,6 +29,14 @@ type User struct {
 	LastLoginUnixTime int64
 }
 
+type UserBasicInfo struct {
+	Uid             string `json:"uid"`
+	Username        string `json:"username"`
+	Email           string `json:"email"`
+	Nickname        string `json:"nickname"`
+	DefaultCurrency string `json:"defaultCurrency"`
+}
+
 type UserLoginRequest struct {
 	LoginName string `json:"loginName" binding:"required,notBlank,max=100,validUsername|validEmail"`
 	Password  string `json:"password" binding:"required,min=6,max=128"`
@@ -48,6 +58,11 @@ type UserProfileUpdateRequest struct {
 	DefaultCurrency string `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
 }
 
+type UserProfileUpdateResponse struct {
+	User     *UserBasicInfo `json:"user"`
+	NewToken string         `json:"newToken,omitempty"`
+}
+
 type UserProfileResponse struct {
 	Uid             string   `json:"uid"`
 	Username        string   `json:"username"`
@@ -58,4 +73,28 @@ type UserProfileResponse struct {
 	CreatedAt       int64    `json:"createdAt"`
 	UpdatedAt       int64    `json:"updatedAt"`
 	LastLoginAt     int64    `json:"lastLoginAt"`
+}
+
+func (u User) ToUserBasicInfo() *UserBasicInfo {
+	return &UserBasicInfo{
+		Uid:             utils.Int64ToString(u.Uid),
+		Username:        u.Username,
+		Email:           u.Email,
+		Nickname:        u.Nickname,
+		DefaultCurrency: u.DefaultCurrency,
+	}
+}
+
+func (u User) ToUserProfileResponse() *UserProfileResponse {
+	return &UserProfileResponse{
+		Uid:             utils.Int64ToString(u.Uid),
+		Username:        u.Username,
+		Email:           u.Email,
+		Nickname:        u.Nickname,
+		Type:            u.Type,
+		DefaultCurrency: u.DefaultCurrency,
+		CreatedAt:       u.CreatedUnixTime,
+		UpdatedAt:       u.UpdatedUnixTime,
+		LastLoginAt:     u.LastLoginUnixTime,
+	}
 }

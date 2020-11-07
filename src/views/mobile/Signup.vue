@@ -144,8 +144,8 @@ export default {
                     return;
                 }
 
-                if (typeof(data.result) === 'object') {
-                    self.$user.updateToken(data.result);
+                if (typeof(data.result.token) === 'string') {
+                    self.$user.updateTokenAndUserInfo(data.result);
                 }
 
                 self.$toast('You have been successfully registered');

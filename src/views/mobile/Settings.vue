@@ -47,7 +47,8 @@ export default {
             return 'v' + this.$version();
         },
         userNickName() {
-            return this.$user.getUserNickName() || this.$user.getUserName() || this.$t('User');
+            const userInfo = this.$user.getUserInfo() || {};
+            return userInfo.nickname || userInfo.username || this.$t('User');
         },
         currentLocale: {
             get: function () {
@@ -99,7 +100,7 @@ export default {
                         return;
                     }
 
-                    self.$user.clearToken();
+                    self.$user.clearTokenAndUserInfo();
                     router.navigate('/');
                 }).catch(error => {
                     self.logouting = false;

@@ -47,6 +47,17 @@
                 @input="nickname = $event.target.value"
             ></f7-list-input>
 
+            <f7-list-input
+                type="select"
+                :label="$t('Default Currency')"
+                :value="defaultCurrency"
+                @input="defaultCurrency = $event.target.value"
+            >
+                <option v-for="currency in allCurrencies"
+                        :key="currency.code"
+                        :value="currency.code">{{ currency.displayName }}</option>
+            </f7-list-input>
+
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
@@ -57,13 +68,17 @@
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
             username: '',
             password: '',
             confirmPassword: '',
             email: '',
             nickname: '',
-            signuping: false
+            defaultCurrency: self.$t('default.currency'),
+            signuping: false,
+            allCurrencies: self.$getAllCurrencies()
         };
     },
     computed: {
@@ -84,6 +99,8 @@ export default {
                 return 'Email address cannot be empty';
             } else if (!this.nickname) {
                 return 'Nickname cannot be empty';
+            } else if (!this.defaultCurrency) {
+                return 'Default currency cannot be empty';
             } else {
                 return null;
             }
@@ -115,7 +132,8 @@ export default {
                 username: self.username,
                 password: self.password,
                 email: self.email,
-                nickname: self.nickname
+                nickname: self.nickname,
+                defaultCurrency: self.defaultCurrency
             }).then(response => {
                 self.signuping = false;
                 self.$hideLoading();

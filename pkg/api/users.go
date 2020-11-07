@@ -42,6 +42,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		Email:    userRegisterReq.Email,
 		Nickname: userRegisterReq.Nickname,
 		Password: userRegisterReq.Password,
+		DefaultCurrency: userRegisterReq.DefaultCurrency,
 	}
 
 	err = a.users.CreateUser(user)
@@ -92,6 +93,7 @@ func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error
 		Email: user.Email,
 		Nickname: user.Nickname,
 		Type: user.Type,
+		DefaultCurrency: user.DefaultCurrency,
 		CreatedAt: user.CreatedUnixTime,
 		UpdatedAt: user.UpdatedUnixTime,
 		LastLoginAt: user.LastLoginUnixTime,
@@ -151,6 +153,12 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		userUpdateReq.Nickname = ""
 	}
 
+	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
+		anythingUpdate = true
+	} else {
+		userUpdateReq.DefaultCurrency = ""
+	}
+
 	if !anythingUpdate {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
@@ -158,6 +166,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	user.Email = userUpdateReq.Email
 	user.Password = userUpdateReq.Password
 	user.Nickname = userUpdateReq.Nickname
+	user.DefaultCurrency = userUpdateReq.DefaultCurrency
 
 	keyProfileUpdated, err := a.users.UpdateUser(user)
 

@@ -13,6 +13,7 @@ import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
 
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError } from './lib/i18n.js';
+import currency from './consts/currency.js';
 import version from './lib/version.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
@@ -42,6 +43,25 @@ Vue.prototype.$setLanguage = function (locale) {
     services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
     return locale;
+};
+Vue.prototype.$getAllCurrencies = function () {
+    const allCurrencyCodes = currency.all;
+    const allCurrencies = [];
+
+    for (let i = 0; i < allCurrencyCodes.length; i++) {
+        const code = allCurrencyCodes[i];
+
+        allCurrencies.push({
+            code: code,
+            displayName: i18n.t(`currency.${code}`)
+        });
+    }
+
+    allCurrencies.sort(function(c1, c2){
+        return c1.displayName.localeCompare(c2.displayName);
+    })
+
+    return allCurrencies;
 };
 Vue.prototype.$isUserRegistrationEnabled = settings.isUserRegistrationEnabled;
 

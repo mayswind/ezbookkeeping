@@ -73,6 +73,7 @@ func startWebServer(c *cli.Context) error {
 		_ = v.RegisterValidation("notBlank", validators.NotBlank)
 		_ = v.RegisterValidation("validUsername", validators.ValidUsername)
 		_ = v.RegisterValidation("validEmail", validators.ValidEmail)
+		_ = v.RegisterValidation("validCurrency", validators.ValidCurrency)
 	}
 
 	router.NoRoute(bindApi(api.Default.ApiNotFound))

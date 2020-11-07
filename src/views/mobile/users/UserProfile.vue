@@ -7,6 +7,7 @@
             <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
             <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
             <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
+            <f7-list-input label="Default Currency" placeholder="Default Currency"></f7-list-input>
         </f7-list>
 
         <f7-list no-hairlines-md v-else-if="!loading">
@@ -46,6 +47,17 @@
                 @input="nickname = $event.target.value"
             ></f7-list-input>
 
+            <f7-list-input
+                type="select"
+                :label="$t('Default Currency')"
+                :value="defaultCurrency"
+                @input="defaultCurrency = $event.target.value"
+            >
+                <option v-for="currency in allCurrencies"
+                        :key="currency.code"
+                        :value="currency.code">{{ currency.displayName }}</option>
+            </f7-list-input>
+
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
@@ -81,6 +93,8 @@
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
             currentPassword: '',
             password: '',
@@ -89,9 +103,12 @@ export default {
             email: '',
             oldNickname: '',
             nickname: '',
+            defaultCurrency: '',
+            oldDefaultCurrency: '',
             loading: true,
             updating: false,
-            showInputPasswordSheet: false
+            showInputPasswordSheet: false,
+            allCurrencies: self.$getAllCurrencies()
         };
     },
     computed: {
@@ -104,7 +121,10 @@ export default {
         inputIsNotChangedProblemMessage() {
             if (!this.password && !this.confirmPassword && !this.email && !this.nickname) {
                 return 'Nothing has been modified';
-            } else if (!this.password && !this.confirmPassword && this.email === this.oldEmail && this.nickname === this.oldNickname) {
+            } else if (!this.password && !this.confirmPassword &&
+                this.email === this.oldEmail &&
+                this.nickname === this.oldNickname &&
+                this.defaultCurrency === this.oldDefaultCurrency) {
                 return 'Nothing has been modified';
             } else if (!this.password && this.confirmPassword) {
                 return 'Password cannot be empty';
@@ -141,9 +161,11 @@ export default {
 
             self.oldEmail = data.result.email;
             self.oldNickname = data.result.nickname;
+            self.oldDefaultCurrency = data.result.defaultCurrency;
 
             self.email = self.oldEmail
             self.nickname = self.oldNickname;
+            self.defaultCurrency = self.oldDefaultCurrency;
         }).catch(error => {
             self.loading = false;
 
@@ -184,7 +206,8 @@ export default {
                 password: self.password,
                 oldPassword: self.currentPassword,
                 email: self.email,
-                nickname: self.nickname
+                nickname: self.nickname,
+                defaultCurrency: self.defaultCurrency
             }).then(response => {
                 self.updating = false;
                 self.$hideLoading();

@@ -80,6 +80,14 @@ const parameterizedErrors = [
             field: 'parameter',
             localized: true
         }]
+    },
+    {
+        localeKey: 'parameter invalid currency',
+        regex: /^parameter "(\w+)" is invalid currency$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }]
     }
 ];
 

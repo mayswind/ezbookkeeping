@@ -174,6 +174,10 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		updateCols = append(updateCols, "nickname")
 	}
 
+	if user.DefaultCurrency != "" {
+		updateCols = append(updateCols, "default_currency")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

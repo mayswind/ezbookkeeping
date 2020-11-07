@@ -144,7 +144,7 @@ export default {
                     return;
                 }
 
-                if (typeof(data.result.token) === 'string') {
+                if (self.$utils.isString(data.result.token)) {
                     self.$user.updateTokenAndUserInfo(data.result);
                 }
 

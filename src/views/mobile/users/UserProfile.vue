@@ -220,11 +220,11 @@ export default {
                     return;
                 }
 
-                if (typeof(data.result.newToken) === 'string') {
+                if (self.$utils.isString(data.result.newToken)) {
                     self.$user.updateToken(data.result.newToken);
                 }
 
-                if (typeof(data.result.user) === 'object') {
+                if (self.$utils.isObject(data.result.user)) {
                     self.$user.updateUserInfo(data.result.user);
                 }
 

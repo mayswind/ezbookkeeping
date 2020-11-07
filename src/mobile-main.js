@@ -18,6 +18,7 @@ import version from './lib/version.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
+import utils from './lib/utils.js';
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
@@ -29,6 +30,7 @@ Framework7.use(Framework7Vue);
 const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
+Vue.prototype.$utils = utils;
 Vue.prototype.$settings = settings;
 Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
 Vue.prototype.$getAllLanguages = getAllLanguages;

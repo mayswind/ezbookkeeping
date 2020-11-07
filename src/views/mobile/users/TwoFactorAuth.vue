@@ -161,7 +161,7 @@ export default {
             self.loading = false;
             const data = response.data;
 
-            if (!data || !data.success || !data.result || typeof(data.result.enable) !== 'boolean') {
+            if (!data || !data.success || !data.result || !self.$utils.isBoolean(data.result.enable)) {
                 self.$alert('Unable to get current two factor authentication status', () => {
                     router.back();
                 });

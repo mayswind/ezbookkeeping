@@ -1,3 +1,5 @@
+import utils from './utils.js'
+
 const tokenLocalStorageKey = 'lab_user_token';
 const userInfoLocalStorageKey = 'lab_user_info';
 
@@ -15,19 +17,19 @@ function isUserLogined() {
 }
 
 function updateToken(token) {
-    if (typeof(token) === 'string') {
+    if (utils.isString(token)) {
         localStorage.setItem(tokenLocalStorageKey, token);
     }
 }
 
 function updateUserInfo(user) {
-    if (typeof(user) === 'object') {
+    if (utils.isObject(user)) {
         localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(user));
     }
 }
 
 function updateTokenAndUserInfo(item) {
-    if (typeof(item) === 'object') {
+    if (utils.isObject(item)) {
         if (item.token) {
             updateToken(item.token);
         }

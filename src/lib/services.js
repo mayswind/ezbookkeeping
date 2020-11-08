@@ -160,4 +160,18 @@ export default {
             password
         });
     },
+    getAllAccounts: () => {
+        return axios.get('v1/accounts/list.json');
+    },
+    addAccount: ({ category, type, name, icon, currency, comment, subAccounts }) => {
+        return axios.post('v1/accounts/add.json', {
+            category,
+            type,
+            name,
+            icon,
+            currency,
+            comment,
+            subAccounts
+        });
+    },
 };

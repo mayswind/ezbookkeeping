@@ -19,6 +19,7 @@ import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
 import utils from './lib/utils.js';
+import currencyFilter from './filters/currency.js';
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
@@ -138,6 +139,8 @@ Vue.prototype.$hideLoading = function () {
 
 Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
+
+Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 

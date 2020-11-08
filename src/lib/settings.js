@@ -5,6 +5,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
     lang: 'en',
+    currencyDisplayMode: 'code', // or 'none' or 'name'
     animate: true,
     autoDarkMode: true
 };
@@ -30,6 +31,10 @@ function setSettings(settings) {
 
 function getOriginalOption(key) {
     return getOriginalSettings()[key];
+}
+
+function getOption(key) {
+    return getFinalSettings()[key];
 }
 
 function setOption(key, value) {
@@ -61,6 +66,8 @@ function getServerSetting(key) {
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
+    setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
     isEnableAnimate: () => getOriginalOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOriginalOption('autoDarkMode'),

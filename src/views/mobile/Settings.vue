@@ -19,6 +19,15 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
+            <f7-list-item
+                :title="$t('Currency Display Mode')"
+                smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
+                <select v-model="currencyDisplayMode">
+                    <option value="none">{{ $t('None') }}</option>
+                    <option value="code">{{ $t('Currency Code') }}</option>
+                    <option value="name">{{ $t('Currency Name') }}</option>
+                </select>
+            </f7-list-item>
             <f7-list-item>
                 <span>{{ $t('Enable Animate') }}</span>
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
@@ -56,6 +65,14 @@ export default {
             },
             set: function (value) {
                 this.$setLanguage(value);
+            }
+        },
+        currencyDisplayMode: {
+            get: function () {
+                return this.$settings.getCurrencyDisplayMode();
+            },
+            set: function (value) {
+                this.$settings.setCurrencyDisplayMode(value);
             }
         },
         isEnableAnimate: {

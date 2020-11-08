@@ -68,9 +68,9 @@ export default {
     setLanguage: value => setOption('lang', value),
     getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
     setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
-    isEnableAnimate: () => getOriginalOption('animate'),
+    isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
-    isEnableAutoDarkMode: () => getOriginalOption('autoDarkMode'),
+    isEnableAutoDarkMode: () => getOption('autoDarkMode'),
     setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1'
 };

@@ -94,7 +94,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models
 
 	twoFactor.CreatedUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Insert(twoFactor)
 		return err
 	})
@@ -105,7 +105,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error 
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=?", uid).Delete(&models.TwoFactor{})
 
 		if deletedRows < 1 {
@@ -138,7 +138,7 @@ func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid i
 		return errs.ErrTwoFactorRecoveryCodeNotExist
 	}
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Cols("used", "used_unix_time").Where("uid=? AND recovery_code=?", uid, recoveryCode).Update(&models.TwoFactorRecoveryCode{Used: true, UsedUnixTime: time.Now().Unix()})
 		return err
 	})
@@ -172,7 +172,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, 
 		}
 	}
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 
 		if err != nil {
@@ -197,7 +197,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(uid int64) 
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 		return err
 	})

@@ -105,7 +105,7 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTranscation(func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
 
 		if deletedRows < 1 {
@@ -137,7 +137,7 @@ func (s *TokenService) DeleteTokensBeforeTime(uid int64, expireTime int64) error
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTranscation(func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=? AND created_unix_time<?", uid, expireTime).Delete(&models.TokenRecord{})
 		return err
 	})
@@ -253,7 +253,7 @@ func (s *TokenService) createTokenRecord(tokenRecord *models.TokenRecord) error 
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTranscation(func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Insert(tokenRecord)
 		return err
 	})

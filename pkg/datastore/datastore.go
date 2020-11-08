@@ -18,8 +18,8 @@ func (s *DataStore) Query(key int64) *xorm.Session {
 	return s.Choose(key).NewSession()
 }
 
-func (s *DataStore) DoTranscation(key int64, fn func(sess *xorm.Session) error) (err error) {
-	return s.Choose(key).DoTranscation(fn)
+func (s *DataStore) DoTransaction(key int64, fn func(sess *xorm.Session) error) (err error) {
+	return s.Choose(key).DoTransaction(fn)
 }
 
 func (s *DataStore) SyncStructs(beans... interface{}) error {

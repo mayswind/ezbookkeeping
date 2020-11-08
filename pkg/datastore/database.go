@@ -6,7 +6,7 @@ type Database struct {
 	*xorm.EngineGroup
 }
 
-func (db *Database) DoTranscation(fn func(sess *xorm.Session) error) (err error) {
+func (db *Database) DoTransaction(fn func(sess *xorm.Session) error) (err error) {
 	sess := db.NewSession()
 	defer sess.Close()
 

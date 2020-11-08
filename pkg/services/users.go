@@ -140,7 +140,7 @@ func (s *UserService) CreateUser(user *models.User) error {
 	user.UpdatedUnixTime = time.Now().Unix()
 	user.LastLoginUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.Insert(user)
 		return err
 	})
@@ -181,7 +181,7 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 
-	err = s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	err = s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		updatedRows, err := sess.ID(user.Uid).Where("deleted=?", false).Cols(updateCols...).Update(user)
 
 		if updatedRows < 1 {
@@ -203,7 +203,7 @@ func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTranscation(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		_, err := sess.ID(uid).Where("deleted=?", false).Cols("last_login_unix_time").Update(&models.User{LastLoginUnixTime: time.Now().Unix()})
 		return err
 	})

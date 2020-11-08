@@ -179,7 +179,7 @@ export function getLocalizedError(error) {
     }
 
     return {
-        message: error.errorMessage
+        message: `error.${error.errorMessage}`
     };
 }
 

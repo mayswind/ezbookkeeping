@@ -14,7 +14,7 @@ import (
 func TestGenerateUuid(t *testing.T) {
 	expectedUnixTime := time.Now().Unix()
 	expectedUuidServerId := uint8(90)
-	expectedUuidType := UUID_TYPE_JOURNAL
+	expectedUuidType := UUID_TYPE_TRANSACTION
 
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: expectedUuidServerId})
 	uuid := generator.GenerateUuid(expectedUuidType)
@@ -48,7 +48,7 @@ func TestGenerateUuid_MultiType(t *testing.T) {
 	actualSeqId = uuidInfo.SequentialId
 	assert.Equal(t, uint32(expectedSeqId), actualSeqId)
 
-	uuid = generator.GenerateUuid(UUID_TYPE_JOURNAL)
+	uuid = generator.GenerateUuid(UUID_TYPE_TRANSACTION)
 	uuidInfo = generator.ParseUuidInfo(uuid)
 	actualSeqId = uuidInfo.SequentialId
 	assert.Equal(t, uint32(expectedSeqId), actualSeqId)

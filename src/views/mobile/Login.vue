@@ -17,6 +17,7 @@
                 :placeholder="$t('Your password')"
                 :value="password"
                 @input="password = $event.target.value; tempToken = ''"
+                @keyup.enter.native="loginByPressEnter"
             ></f7-list-input>
         </f7-list>
         <f7-list>
@@ -200,6 +201,16 @@ export default {
                     self.$alert('Unable to login');
                 }
             });
+        },
+        loginByPressEnter() {
+            const app = this.$f7;
+            const $$ = app.$;
+
+            if ($$('.modal-in').length) {
+                return;
+            }
+
+            return this.login();
         },
         verify() {
             const self = this;

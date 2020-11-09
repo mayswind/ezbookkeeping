@@ -47,8 +47,8 @@ export default function ({i18n}, value, currencyCode) {
     if (currencyDisplayMode === 'code') {
         return `${value} ${currencyCode}`;
     } else if (currencyDisplayMode === 'name') {
-        const name = i18n.t(`currency.${currencyCode}`);
-        return `${value} ${name}`;
+        const currencyName = i18n.t(`currency.${currencyCode}`);
+        return `${value} ${currencyName}`;
     } else {
         return value;
     }

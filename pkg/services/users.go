@@ -157,6 +157,14 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 	keyProfileUpdated = false
 
 	if user.Email != "" {
+		exists, err := s.ExistsEmail(user.Email)
+
+		if err != nil {
+			return false, err
+		} else if exists {
+			return false, errs.ErrUserEmailAlreadyExists
+		}
+
 		user.EmailVerified = false
 
 		updateCols = append(updateCols, "email")
@@ -183,6 +191,10 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 
 	err = s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		updatedRows, err := sess.ID(user.Uid).Where("deleted=?", false).Cols(updateCols...).Update(user)
+
+		if err != nil {
+			return errs.ErrDatabaseOperationFailed
+		}
 
 		if updatedRows < 1 {
 			return errs.ErrUserNotFound

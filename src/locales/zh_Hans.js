@@ -174,6 +174,7 @@ export default {
     'error': {
         'system error': '系统错误',
         'api not found': '接口调用失败',
+        'database operation failed': '数据库操作失败',
         'incomplete or incorrect submission': '提交不完整或不正确',
         'operation failed': '操作失败',
         'nothing will be updated': '没有内容更新',

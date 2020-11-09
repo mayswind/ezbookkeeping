@@ -174,6 +174,7 @@ export default {
     'error': {
         'system error': 'System Error',
         'api not found': 'Failed to request api',
+        'database operation failed': 'Database operation failed',
         'incomplete or incorrect submission': 'Incomplete or incorrect submission',
         'operation failed': 'Operation failed',
         'nothing will be updated': 'Nothing will be updated',

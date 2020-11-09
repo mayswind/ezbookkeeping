@@ -319,6 +319,7 @@ export default {
     'Unable to add account': 'Unable to add account',
     'User Profile': 'User Profile',
     'Language': 'Language',
+    'Enable Thousands Separator': 'Enable Thousands Separator',
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',

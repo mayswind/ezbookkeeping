@@ -5,6 +5,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
     lang: 'en',
+    thousandsSeparator: true,
     currencyDisplayMode: 'code', // or 'none' or 'name'
     animate: true,
     autoDarkMode: true
@@ -66,6 +67,8 @@ function getServerSetting(key) {
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    isEnableThousandsSeparator: () => getOption('thousandsSeparator'),
+    setEnableThousandsSeparator: value => setOption('thousandsSeparator', value),
     getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
     setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
     isEnableAnimate: () => getOption('animate'),

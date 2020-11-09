@@ -1,7 +1,22 @@
 import settings from "../lib/settings.js";
 import utils from "../lib/utils.js";
 
-export default function ({ i18n }, value, currencyCode) {
+function appendThousandsSeparator(value) {
+    const finalChars = [];
+
+    for (let i = 0; i < value.length; i++) {
+        if (i % 3 === 0 && i > 0) {
+            finalChars.push(',');
+        }
+
+        finalChars.push(value.charAt(value.length - 1 - i));
+    }
+
+    finalChars.reverse();
+    return finalChars.join('');
+}
+
+export default function ({i18n}, value, currencyCode) {
     if (!utils.isNumber(value) && !utils.isString(value)) {
         return value;
     }
@@ -17,8 +32,13 @@ export default function ({ i18n }, value, currencyCode) {
     } else if (value.length === 2) {
         value = '0.' + value;
     } else {
-        const integer = value.substr(0, value.length - 2);
-        const decimals = value.substr(value.length - 2, 2);
+        let integer = value.substr(0, value.length - 2);
+        let decimals = value.substr(value.length - 2, 2);
+
+        if (settings.isEnableThousandsSeparator() && integer.length > 3) {
+            integer = appendThousandsSeparator(integer);
+        }
+
         value = `${integer}.${decimals}`;
     }
 

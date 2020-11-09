@@ -319,6 +319,7 @@ export default {
     'Unable to add account': '无法添加账户',
     'User Profile': '用户信息',
     'Language': '语言',
+    'Enable Thousands Separator': '启用千位分隔符',
     'Currency Display Mode': '货币显示模式',
     'Currency Code': '货币代码',
     'Currency Name': '货币名称',

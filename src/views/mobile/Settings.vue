@@ -19,6 +19,10 @@
                             :value="locale">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Thousands Separator') }}</span>
+                <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
+            </f7-list-item>
             <f7-list-item
                 :title="$t('Currency Display Mode')"
                 smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
@@ -65,6 +69,14 @@ export default {
             },
             set: function (value) {
                 this.$setLanguage(value);
+            }
+        },
+        isEnableThousandsSeparator: {
+            get: function () {
+                return this.$settings.isEnableThousandsSeparator();
+            },
+            set: function (value) {
+                this.$settings.setEnableThousandsSeparator(value);
             }
         },
         currencyDisplayMode: {

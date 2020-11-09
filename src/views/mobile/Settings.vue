@@ -44,11 +44,8 @@
 <script>
 export default {
     data() {
-        const self = this;
-
         return {
-            logouting: false,
-            allLanguages: self.$getAllLanguages()
+            logouting: false
         };
     },
     computed: {
@@ -58,6 +55,9 @@ export default {
         userNickName() {
             const userInfo = this.$user.getUserInfo() || {};
             return userInfo.nickname || userInfo.username || this.$t('User');
+        },
+        allLanguages() {
+            return this.$getAllLanguages();
         },
         currentLocale: {
             get: function () {

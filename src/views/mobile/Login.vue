@@ -92,8 +92,6 @@
 <script>
 export default {
     data() {
-        const self = this;
-
         return {
             username: '',
             password: '',
@@ -103,14 +101,15 @@ export default {
             logining: false,
             verifying: false,
             show2faSheet: false,
-            twoFAVerifyType: 'passcode',
-            twoFAVerifyTypeSwitchName: 'Use a backup code',
-            allLanguages: self.$getAllLanguages()
+            twoFAVerifyType: 'passcode'
         };
     },
     computed: {
         version() {
             return 'v' + this.$version();
+        },
+        allLanguages() {
+            return this.$getAllLanguages();
         },
         isUserRegistrationEnabled() {
             return this.$isUserRegistrationEnabled();
@@ -123,6 +122,13 @@ export default {
                 return !this.backupCode;
             } else {
                 return !this.passcode;
+            }
+        },
+        twoFAVerifyTypeSwitchName() {
+            if (this.twoFAVerifyType === 'backupcode') {
+                return 'Use a passcode';
+            } else {
+                return 'Use a backup code';
             }
         },
         currentLanguageName() {
@@ -251,10 +257,8 @@ export default {
         switch2FAVerifyType() {
             if (this.twoFAVerifyType === 'passcode') {
                 this.twoFAVerifyType = 'backupcode';
-                this.twoFAVerifyTypeSwitchName = 'Use a passcode';
             } else {
                 this.twoFAVerifyType = 'passcode';
-                this.twoFAVerifyTypeSwitchName = 'Use a backup code';
             }
         },
         changeLanguage(locale) {

@@ -7,8 +7,8 @@
                 clear-button
                 :label="$t('Username')"
                 :placeholder="$t('Your username')"
-                :value="username"
-                @input="username = $event.target.value"
+                :value="user.username"
+                @input="user.username = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -16,8 +16,8 @@
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password, at least 6 characters')"
-                :value="password"
-                @input="password = $event.target.value"
+                :value="user.password"
+                @input="user.password = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -25,8 +25,8 @@
                 clear-button
                 :label="$t('Confirmation Password')"
                 :placeholder="$t('Re-enter the password')"
-                :value="confirmPassword"
-                @input="confirmPassword = $event.target.value"
+                :value="user.confirmPassword"
+                @input="user.confirmPassword = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -34,8 +34,8 @@
                 clear-button
                 :label="$t('E-mail')"
                 :placeholder="$t('Your email address')"
-                :value="email"
-                @input="email = $event.target.value"
+                :value="user.email"
+                @input="user.email = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -43,15 +43,15 @@
                 clear-button
                 :label="$t('Nickname')"
                 :placeholder="$t('Your nickname')"
-                :value="nickname"
-                @input="nickname = $event.target.value"
+                :value="user.nickname"
+                @input="user.nickname = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
                 type="select"
                 :label="$t('Default Currency')"
-                :value="defaultCurrency"
-                @input="defaultCurrency = $event.target.value"
+                :value="user.defaultCurrency"
+                @input="user.defaultCurrency = $event.target.value"
             >
                 <option v-for="currency in allCurrencies"
                         :key="currency.code"
@@ -71,17 +71,21 @@ export default {
         const self = this;
 
         return {
-            username: '',
-            password: '',
-            confirmPassword: '',
-            email: '',
-            nickname: '',
-            defaultCurrency: self.$t('default.currency'),
-            signuping: false,
-            allCurrencies: self.$getAllCurrencies()
+            user: {
+                username: '',
+                password: '',
+                confirmPassword: '',
+                email: '',
+                nickname: '',
+                defaultCurrency: self.$t('default.currency')
+            },
+            signuping: false
         };
     },
     computed: {
+        allCurrencies() {
+            return this.$getAllCurrencies();
+        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -89,24 +93,24 @@ export default {
             return !!this.inputInvalidProblemMessage;
         },
         inputEmptyProblemMessage() {
-            if (!this.username) {
+            if (!this.user.username) {
                 return 'Username cannot be empty';
-            } else if (!this.password) {
+            } else if (!this.user.password) {
                 return 'Password cannot be empty';
-            } else if (!this.confirmPassword) {
+            } else if (!this.user.confirmPassword) {
                 return 'Confirmation password cannot be empty';
-            } else if (!this.email) {
+            } else if (!this.user.email) {
                 return 'Email address cannot be empty';
-            } else if (!this.nickname) {
+            } else if (!this.user.nickname) {
                 return 'Nickname cannot be empty';
-            } else if (!this.defaultCurrency) {
+            } else if (!this.user.defaultCurrency) {
                 return 'Default currency cannot be empty';
             } else {
                 return null;
             }
         },
         inputInvalidProblemMessage() {
-            if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
+            if (this.user.password && this.user.confirmPassword && this.user.password !== this.user.confirmPassword) {
                 return 'Password and confirmation password do not match';
             } else {
                 return null;
@@ -129,11 +133,11 @@ export default {
             self.$showLoading(() => self.signuping);
 
             self.$services.register({
-                username: self.username,
-                password: self.password,
-                email: self.email,
-                nickname: self.nickname,
-                defaultCurrency: self.defaultCurrency
+                username: self.user.username,
+                password: self.user.password,
+                email: self.user.email,
+                nickname: self.user.nickname,
+                defaultCurrency: self.user.defaultCurrency
             }).then(response => {
                 self.signuping = false;
                 self.$hideLoading();

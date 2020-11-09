@@ -16,8 +16,8 @@
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password')"
-                :value="password"
-                @input="password = $event.target.value"
+                :value="newProfile.password"
+                @input="newProfile.password = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -25,8 +25,8 @@
                 clear-button
                 :label="$t('Confirmation Password')"
                 :placeholder="$t('Re-enter the password')"
-                :value="confirmPassword"
-                @input="confirmPassword = $event.target.value"
+                :value="newProfile.confirmPassword"
+                @input="newProfile.confirmPassword = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -34,8 +34,8 @@
                 clear-button
                 :label="$t('E-mail')"
                 :placeholder="$t('Your email address')"
-                :value="email"
-                @input="email = $event.target.value"
+                :value="newProfile.email"
+                @input="newProfile.email = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
@@ -43,15 +43,15 @@
                 clear-button
                 :label="$t('Nickname')"
                 :placeholder="$t('Your nickname')"
-                :value="nickname"
-                @input="nickname = $event.target.value"
+                :value="newProfile.nickname"
+                @input="newProfile.nickname = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
                 type="select"
                 :label="$t('Default Currency')"
-                :value="defaultCurrency"
-                @input="defaultCurrency = $event.target.value"
+                :value="newProfile.defaultCurrency"
+                @input="newProfile.defaultCurrency = $event.target.value"
             >
                 <option v-for="currency in allCurrencies"
                         :key="currency.code"
@@ -61,7 +61,7 @@
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
-        <f7-button large fill :class="{ 'disabled': inputIsNotChanged || updating }" :text="$t('Update')" @click="update"></f7-button>
+        <f7-button large fill :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || updating }" :text="$t('Update')" @click="update"></f7-button>
 
         <f7-sheet
             style="height:auto"
@@ -93,25 +93,29 @@
 <script>
 export default {
     data() {
-        const self = this;
-
         return {
+            newProfile: {
+                password: '',
+                confirmPassword: '',
+                email: '',
+                nickname: '',
+                defaultCurrency: ''
+            },
+            oldProfile: {
+                email: '',
+                nickname: '',
+                defaultCurrency: ''
+            },
             currentPassword: '',
-            password: '',
-            confirmPassword: '',
-            oldEmail: '',
-            email: '',
-            oldNickname: '',
-            nickname: '',
-            defaultCurrency: '',
-            oldDefaultCurrency: '',
             loading: true,
             updating: false,
-            showInputPasswordSheet: false,
-            allCurrencies: self.$getAllCurrencies()
+            showInputPasswordSheet: false
         };
     },
     computed: {
+        allCurrencies() {
+            return this.$getAllCurrencies();
+        },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
         },
@@ -119,24 +123,30 @@ export default {
             return !!this.inputInvalidProblemMessage;
         },
         inputIsNotChangedProblemMessage() {
-            if (!this.password && !this.confirmPassword && !this.email && !this.nickname) {
+            if (!this.newProfile.password && !this.newProfile.confirmPassword && !this.newProfile.email && !this.newProfile.nickname) {
                 return 'Nothing has been modified';
-            } else if (!this.password && !this.confirmPassword &&
-                this.email === this.oldEmail &&
-                this.nickname === this.oldNickname &&
-                this.defaultCurrency === this.oldDefaultCurrency) {
+            } else if (!this.newProfile.password && !this.newProfile.confirmPassword &&
+                this.newProfile.email === this.oldProfile.email &&
+                this.newProfile.nickname === this.oldProfile.nickname &&
+                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency) {
                 return 'Nothing has been modified';
-            } else if (!this.password && this.confirmPassword) {
+            } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be empty';
-            } else if (this.password && !this.confirmPassword) {
+            } else if (this.newProfile.password && !this.newProfile.confirmPassword) {
                 return 'Confirmation password cannot be empty';
             } else {
                 return null;
             }
         },
         inputInvalidProblemMessage() {
-            if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
+            if (this.newProfile.password && this.newProfile.confirmPassword && this.newProfile.password !== this.newProfile.confirmPassword) {
                 return 'Password and confirmation password do not match';
+            } else if (!this.newProfile.email) {
+                return 'Email address cannot be empty';
+            } else if (!this.newProfile.nickname) {
+                return 'Nickname cannot be empty';
+            } else if (!this.newProfile.defaultCurrency) {
+                return 'Default currency cannot be empty';
             } else {
                 return null;
             }
@@ -159,13 +169,13 @@ export default {
                 return;
             }
 
-            self.oldEmail = data.result.email;
-            self.oldNickname = data.result.nickname;
-            self.oldDefaultCurrency = data.result.defaultCurrency;
+            self.oldProfile.email = data.result.email;
+            self.oldProfile.nickname = data.result.nickname;
+            self.oldProfile.defaultCurrency = data.result.defaultCurrency;
 
-            self.email = self.oldEmail
-            self.nickname = self.oldNickname;
-            self.defaultCurrency = self.oldDefaultCurrency;
+            self.newProfile.email = self.oldProfile.email
+            self.newProfile.nickname = self.oldProfile.nickname;
+            self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
         }).catch(error => {
             self.loading = false;
 
@@ -194,7 +204,7 @@ export default {
                 return;
             }
 
-            if (self.password && !self.currentPassword) {
+            if (self.newProfile.password && !self.currentPassword) {
                 self.showInputPasswordSheet = true;
                 return;
             }
@@ -203,11 +213,11 @@ export default {
             self.$showLoading(() => self.updating);
 
             self.$services.updateProfile({
-                password: self.password,
+                password: self.newProfile.password,
                 oldPassword: self.currentPassword,
-                email: self.email,
-                nickname: self.nickname,
-                defaultCurrency: self.defaultCurrency
+                email: self.newProfile.email,
+                nickname: self.newProfile.nickname,
+                defaultCurrency: self.newProfile.defaultCurrency
             }).then(response => {
                 self.updating = false;
                 self.$hideLoading();

@@ -6,8 +6,8 @@
             <f7-list-input
                 type="select"
                 :label="$t('Account Category')"
-                :value="category"
-                @input="category = $event.target.value"
+                :value="account.category"
+                @input="account.category = $event.target.value"
             >
                 <option v-for="accountCategory in allAccountCategories"
                         :key="accountCategory.id"
@@ -18,8 +18,8 @@
                 type="select"
                 disabled
                 :label="$t('Account Type')"
-                :value="type"
-                @input="type = $event.target.value"
+                :value="account.type"
+                @input="account.type = $event.target.value"
             >
                 <option value="1">{{ $t('Single Account') }}</option>
                 <option value="2">{{ $t('Multi Sub Accounts') }}</option>
@@ -30,15 +30,15 @@
                 clear-button
                 :label="$t('Account Name')"
                 :placeholder="$t('Your account name')"
-                :value="name"
-                @input="name = $event.target.value"
+                :value="account.name"
+                @input="account.name = $event.target.value"
             ></f7-list-input>
 
             <f7-list-input
                 type="select"
                 :label="$t('Currency')"
-                :value="currency"
-                @input="currency = $event.target.value"
+                :value="account.currency"
+                @input="account.currency = $event.target.value"
             >
                 <option v-for="currency in allCurrencies"
                         :key="currency.code"
@@ -49,8 +49,8 @@
                 type="textarea"
                 :label="$t('Description')"
                 :placeholder="$t('Your account description (optional)')"
-                :value="comment"
-                @input="comment = $event.target.value"
+                :value="account.comment"
+                @input="account.comment = $event.target.value"
             ></f7-list-input>
 
             <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
@@ -66,18 +66,24 @@ export default {
         const self = this;
 
         return {
-            category: 1,
-            type: 1,
-            name: '',
-            icon: "1",
-            currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
-            comment: '',
-            submitting: false,
-            allAccountCategories: self.$constants.account.allCategories,
-            allCurrencies: self.$getAllCurrencies()
+            account: {
+                category: 1,
+                type: 1,
+                name: '',
+                icon: "1",
+                currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
+                comment: ''
+            },
+            submitting: false
         };
     },
     computed: {
+        allAccountCategories() {
+            return this.$constants.account.allCategories;
+        },
+        allCurrencies() {
+            return this.$getAllCurrencies();
+        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -85,13 +91,13 @@ export default {
             return !!this.inputInvalidProblemMessage;
         },
         inputEmptyProblemMessage() {
-            if (!this.category) {
+            if (!this.account.category) {
                 return 'Account category cannot be empty';
-            } else if (!this.type) {
+            } else if (!this.account.type) {
                 return 'Account type cannot be empty';
-            } else if (!this.name) {
+            } else if (!this.account.name) {
                 return 'Account name cannot be empty';
-            } else if (!this.currency) {
+            } else if (!this.account.currency) {
                 return 'Account currency cannot be empty';
             } else {
                 return null;
@@ -117,12 +123,12 @@ export default {
             self.$showLoading(() => self.signuping);
 
             self.$services.addAccount({
-                category: parseInt(self.category),
-                type: parseInt(self.type),
-                name: self.name,
-                icon: self.icon,
-                currency: self.currency,
-                comment: self.comment
+                category: parseInt(self.account.category),
+                type: parseInt(self.account.type),
+                name: self.account.name,
+                icon: self.account.icon,
+                currency: self.account.currency,
+                comment: self.account.comment
             }).then(response => {
                 self.submitting = false;
                 self.$hideLoading();

@@ -15,6 +15,22 @@
             </f7-list>
         </f7-block>
 
+        <f7-block class="skeleton-text" v-if="loading">
+            <f7-block-title>Account Category 2</f7-block-title>
+            <f7-list media-list>
+                <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+            </f7-list>
+        </f7-block>
+
+        <f7-block class="skeleton-text" v-if="loading">
+            <f7-block-title>Account Category 3</f7-block-title>
+            <f7-list media-list>
+                <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+            </f7-list>
+        </f7-block>
+
         <f7-block v-for="accountCategory in usedAccountCategories" :key="accountCategory.id">
             <f7-block-title>{{ $t(accountCategory.name) }}</f7-block-title>
             <f7-list media-list>

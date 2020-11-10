@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page ptr @ptr:refresh="reload">
         <f7-navbar :title="$t('Device & Sessions')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-list media-list class="skeleton-text" v-if="loading">
@@ -58,6 +58,30 @@ export default {
         });
     },
     methods: {
+        reload(done) {
+            const self = this;
+
+            self.$services.getTokens().then(response => {
+                done();
+
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$toast('Unable to get session list');
+                    return;
+                }
+
+                self.tokens = data.result;
+            }).catch(error => {
+                done();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$toast({ error: error.response.data });
+                } else if (!error.processed) {
+                    self.$toast('Unable to get session list');
+                }
+            });
+        },
         revoke(token) {
             const self = this;
             const app = self.$f7;

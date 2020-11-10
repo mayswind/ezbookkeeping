@@ -43,6 +43,13 @@ body {
     user-select: none;
 }
 
+:root {
+    --f7-theme-color: #c67e48;
+    --f7-theme-color-rgb: 198, 126, 72;
+    --f7-theme-color-shade: #af6a36;
+    --f7-theme-color-tint: #d09467;
+}
+
 .work-break-all {
     word-break: break-all;
 }

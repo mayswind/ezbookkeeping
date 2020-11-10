@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page ptr @ptr:refresh="reload">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Account List')" :back-link="$t('Back')"></f7-nav-title>
@@ -97,18 +97,7 @@ export default {
                 return;
             }
 
-            self.accounts = {};
-
-            for (let i = 0; i < data.result.length; i++) {
-                const account = data.result[i];
-
-                if (!self.accounts[account.category]) {
-                    self.accounts[account.category] = [];
-                }
-
-                const accountList = self.accounts[account.category];
-                accountList.push(account);
-            }
+            self.accounts = self.$utils.getCategorizedAccounts(data.result);
         }).catch(error => {
             self.loading = false;
 
@@ -124,6 +113,30 @@ export default {
         });
     },
     methods: {
+        reload(done) {
+            const self = this;
+
+            self.$services.getAllAccounts().then(response => {
+                done();
+
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$toast('Unable to get account list');
+                    return;
+                }
+
+                self.accounts = self.$utils.getCategorizedAccounts(data.result);
+            }).catch(error => {
+                done();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$toast({ error: error.response.data });
+                } else if (!error.processed) {
+                    self.$toast('Unable to get account list');
+                }
+            });
+        },
         edit() {
 
         },

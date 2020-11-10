@@ -26,6 +26,23 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+function getCategorizedAccounts(allAccounts) {
+    const ret = {};
+
+    for (let i = 0; i < allAccounts.length; i++) {
+        const account = allAccounts[i];
+
+        if (!ret[account.category]) {
+            ret[account.category] = [];
+        }
+
+        const accountList = ret[account.category];
+        accountList.push(account);
+    }
+
+    return ret;
+}
+
 export default {
     isFunction,
     isObject,
@@ -33,4 +50,5 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    getCategorizedAccounts,
 };

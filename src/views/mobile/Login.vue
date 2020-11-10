@@ -61,7 +61,7 @@
                     <div style="font-size: 18px"><b v-t="'Two-Factor Authentication'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list no-hairlines class="twofa-auth-form">
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
                             outline
@@ -278,10 +278,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.twofa-auth-form {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-</style>

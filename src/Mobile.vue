@@ -54,6 +54,14 @@ body {
     word-break: break-all;
 }
 
+.full-line {
+    width: 100%;
+}
+
+.icon-after-text {
+    margin-left: 6px;
+}
+
 .lab-list-item-error-info div.item-footer {
     color: var(--f7-input-error-text-color)
 }

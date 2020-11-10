@@ -72,8 +72,8 @@
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="input-password-tips">{{ $t('Please enter your current password when modifying your password') }}</p>
-                    <f7-list no-hairlines class="input-password-form">
+                    <p class="no-margin-top">{{ $t('Please enter your current password when modifying your password') }}</p>
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline
@@ -255,14 +255,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.input-password-tips {
-    margin-top: 0;
-}
-
-.input-password-form {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-</style>

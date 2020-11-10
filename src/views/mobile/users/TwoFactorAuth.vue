@@ -27,11 +27,13 @@
                     <div style="font-size: 18px"><b v-t="'Passcode'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="input-passcode-tips">{{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}</p>
-                    <div class="input-passcode-qrcode-container">
-                        <img class="input-passcode-qrcode-img" :src="new2FAQRCode" />
+                    <p class="no-margin-top margin-bottom-half">{{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}</p>
+                    <div class="row">
+                        <div class="col-100 text-align-center">
+                            <img alt="qrcode" width="240px" height="240px" :src="new2FAQRCode" />
+                        </div>
                     </div>
-                    <f7-list no-hairlines class="input-passcode-form">
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
                             outline
@@ -58,8 +60,8 @@
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="input-password-tips">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
-                    <f7-list no-hairlines class="input-password-form">
+                    <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline
@@ -86,8 +88,8 @@
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="input-password-tips">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
-                    <f7-list no-hairlines class="input-password-form">
+                    <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline
@@ -114,12 +116,12 @@
                     <div style="font-size: 18px"><b v-t="'Backup Code'"></b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <p class="input-password-tips">
+                    <p class="no-margin-top margin-bottom-half">
                         <span>{{ $t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.') }}</span>
                         <f7-link icon-only icon-f7="doc_on_doc" icon-size="16px" class="icon-after-text"
                                  v-clipboard:copy="currentBackupCode" v-clipboard:success="onBackupCodeCopied"></f7-link>
                     </p>
-                    <textarea class="backup-code-textarea" rows="10" readonly="readonly" v-model="currentBackupCode"></textarea>
+                    <textarea class="full-line" rows="10" readonly="readonly" v-model="currentBackupCode"></textarea>
                     <div class="margin-top text-align-center">
                         <f7-link @click="showBackupCodeSheet = false" :text="$t('Close')"></f7-link>
                     </div>
@@ -343,41 +345,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.input-passcode-tips {
-    margin-top: 0;
-}
-
-.input-passcode-qrcode-container {
-    width: 100%;
-    text-align: center;
-}
-
-.input-passcode-qrcode-img {
-    width: 240px;
-    height: 240px;
-}
-
-.input-passcode-form {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.input-password-tips {
-    margin-top: 0;
-}
-
-.input-password-tips .icon-after-text {
-    margin-left: 6px;
-}
-
-.input-password-form {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.backup-code-textarea {
-    width: 100%;
-}
-</style>

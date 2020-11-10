@@ -245,6 +245,8 @@ export default {
     'Disable': 'Disable',
     'Disabled': 'Disabled',
     'Version': 'Version',
+    'Edit': 'Edit',
+    'Delete': 'Delete',
     'Search': 'Search',
     'User': 'User',
     'Application': 'Application',

@@ -245,6 +245,8 @@ export default {
     'Disable': '禁用',
     'Disabled': '禁用',
     'Version': '版本',
+    'Edit': '编辑',
+    'Delete': '删除',
     'Search': '搜索',
     'User': '用户',
     'Application': '应用',

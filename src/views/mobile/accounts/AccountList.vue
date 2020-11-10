@@ -8,36 +8,51 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="skeleton-text" v-if="loading">
-            <f7-block-title>Account Category</f7-block-title>
-            <f7-list media-list>
-                <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
-            </f7-list>
-        </f7-block>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-header>Account Category</f7-card-header>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-block class="skeleton-text" v-if="loading">
-            <f7-block-title>Account Category 2</f7-block-title>
-            <f7-list media-list>
-                <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
-                <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
-            </f7-list>
-        </f7-block>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-header>Account Category 2</f7-card-header>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                    <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-block class="skeleton-text" v-if="loading">
-            <f7-block-title>Account Category 3</f7-block-title>
-            <f7-list media-list>
-                <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
-                <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
-            </f7-list>
-        </f7-block>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-header>Account Category 3</f7-card-header>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                    <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-block v-for="accountCategory in usedAccountCategories" :key="accountCategory.id">
-            <f7-block-title>{{ $t(accountCategory.name) }}</f7-block-title>
-            <f7-list media-list>
-                <f7-list-item v-for="account in accounts[accountCategory.id]" :key="account.id"
-                    :title="account.name" :after="account.balance | currency(account.currency)"></f7-list-item>
-            </f7-list>
-        </f7-block>
+        <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id">
+            <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item v-for="account in accounts[accountCategory.id]" :key="account.id"
+                                  :title="account.name" :after="account.balance | currency(account.currency)"
+                                  link="#" swipeout
+                    >
+                        <f7-swipeout-actions right>
+                            <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
+                            <f7-swipeout-button color="red" :text="$t('Delete')" @click="remove(account)"></f7-swipeout-button>
+                        </f7-swipeout-actions>
+                    </f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
     </f7-page>
 </template>
 
@@ -109,7 +124,12 @@ export default {
         });
     },
     methods: {
+        edit() {
 
+        },
+        remove() {
+
+        }
     }
 };
 </script>

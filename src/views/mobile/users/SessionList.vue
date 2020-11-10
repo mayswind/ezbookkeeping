@@ -9,7 +9,7 @@
 
         <f7-list media-list v-else-if="!loading">
             <f7-list-item swipeout v-for="token in tokens" :key="token.tokenId" :id="token | tokenDomId" :title="token | tokenTitle | t" :after="token.createdAt | moment($t('format.datetime.long'))" :text="token.userAgent">
-                <f7-swipeout-actions right v-if="!token.isCurrent"  >
+                <f7-swipeout-actions right v-if="!token.isCurrent">
                     <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(token)"></f7-swipeout-button>
                 </f7-swipeout-actions>
             </f7-list-item>

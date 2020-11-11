@@ -35,7 +35,7 @@ Vue.prototype.$version = version.getVersion;
 Vue.prototype.$constants = {
     account: account
 };
-Vue.prototype.$utils = utils;
+Vue.prototype.$utilities = utils;
 Vue.prototype.$settings = settings;
 Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
 Vue.prototype.$getAllLanguages = getAllLanguages;

@@ -73,7 +73,7 @@ export default {
             for (let i = 0; i < allAccountCategories.length; i++) {
                 const accountCategory = allAccountCategories[i];
 
-                if (this.$utils.isArray(this.accounts[accountCategory.id]) && this.accounts[accountCategory.id].length) {
+                if (this.$utilities.isArray(this.accounts[accountCategory.id]) && this.accounts[accountCategory.id].length) {
                     usedAccountCategories.push(accountCategory);
                 }
             }
@@ -98,7 +98,7 @@ export default {
                 return;
             }
 
-            self.accounts = self.$utils.getCategorizedAccounts(data.result);
+            self.accounts = self.$utilities.getCategorizedAccounts(data.result);
         }).catch(error => {
             self.loading = false;
 
@@ -127,7 +127,7 @@ export default {
                     return;
                 }
 
-                self.accounts = self.$utils.getCategorizedAccounts(data.result);
+                self.accounts = self.$utilities.getCategorizedAccounts(data.result);
             }).catch(error => {
                 done();
 

@@ -242,11 +242,11 @@ export default {
                     return;
                 }
 
-                if (self.$utils.isString(data.result.newToken)) {
+                if (self.$utilities.isString(data.result.newToken)) {
                     self.$user.updateToken(data.result.newToken);
                 }
 
-                if (self.$utils.isObject(data.result.user)) {
+                if (self.$utilities.isObject(data.result.user)) {
                     self.$user.updateUserInfo(data.result.user);
                 }
 

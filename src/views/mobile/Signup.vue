@@ -157,7 +157,7 @@ export default {
                     return;
                 }
 
-                if (self.$utils.isString(data.result.token)) {
+                if (self.$utilities.isString(data.result.token)) {
                     self.$user.updateTokenAndUserInfo(data.result);
                 }
 

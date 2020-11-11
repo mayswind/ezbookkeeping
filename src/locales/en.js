@@ -212,6 +212,7 @@ export default {
         'account cannot have sub accounts': 'Account cannot have sub accounts',
     },
     'parameter': {
+        'id': 'ID',
         'username': 'Username',
         'password': 'Password',
         'passcode': 'Passcode',
@@ -322,6 +323,8 @@ export default {
     'Account currency cannot be empty': 'Account currency cannot be empty',
     'You have added a new account': 'You have added a new account',
     'Unable to add account': 'Unable to add account',
+    'Are you sure you want to delete this account?': 'Are you sure you want to delete this account?',
+    'Unable to delete this account': 'Unable to delete this account',
     'User Profile': 'User Profile',
     'Language': 'Language',
     'Enable Thousands Separator': 'Enable Thousands Separator',

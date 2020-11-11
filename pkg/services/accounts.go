@@ -121,3 +121,27 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		return nil
 	})
 }
+
+func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.Account{
+		Deleted: true,
+		UpdatedUnixTime: now,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
+		if deletedRows < 1 {
+			return errs.ErrAccountNotFound
+		}
+
+		return err
+	})
+}

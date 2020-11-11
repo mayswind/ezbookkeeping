@@ -212,6 +212,7 @@ export default {
         'account cannot have sub accounts': '账户不能包含子账户',
     },
     'parameter': {
+        'id': 'ID',
         'username': '用户名',
         'password': '密码',
         'passcode': '验证码',
@@ -322,6 +323,8 @@ export default {
     'Account currency cannot be empty': '账户货币不能为空',
     'You have added a new account': '您已经添加新账户',
     'Unable to add account': '无法添加账户',
+    'Are you sure you want to delete this account?': '您确定要删除该账户吗?',
+    'Unable to delete this account': '无法删除该账户',
     'User Profile': '用户信息',
     'Language': '语言',
     'Enable Thousands Separator': '启用千位分隔符',

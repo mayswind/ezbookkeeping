@@ -124,6 +124,27 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	return accountInfoResp, nil
 }
 
+func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountDeleteReq models.AccountDeleteRequest
+	err := c.ShouldBindJSON(&accountDeleteReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountDeleteHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	err = a.accounts.DeleteAccounts(uid, []int64{accountDeleteReq.Id})
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%s\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[accounts.AccountDeleteHandler] user \"uid:%d\" has deleted account \"id:%s\"", uid, accountDeleteReq.Id)
+	return true, nil
+}
+
 func (a *AccountsApi) createNewAccount(uid int64, accountCreateReq *models.AccountCreateRequest, order int) *models.Account {
 	return &models.Account{
 		Uid:          uid,

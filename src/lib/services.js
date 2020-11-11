@@ -174,4 +174,9 @@ export default {
             subAccounts
         });
     },
+    deleteAccount: ({ id }) => {
+        return axios.post('v1/accounts/delete.json', {
+            id
+        });
+    },
 };

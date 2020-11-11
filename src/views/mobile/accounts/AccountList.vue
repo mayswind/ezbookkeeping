@@ -41,7 +41,8 @@
             <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
             <f7-card-content :padding="false">
                 <f7-list>
-                    <f7-list-item v-for="account in accounts[accountCategory.id]" :key="account.id"
+                    <f7-list-item v-for="account in accounts[accountCategory.id]"
+                                  :key="account.id" :id="account | accountDomId"
                                   :title="account.name" :after="account.balance | currency(account.currency)"
                                   link="#" swipeout
                     >
@@ -140,8 +141,48 @@ export default {
         edit() {
 
         },
-        remove() {
+        remove(account) {
+            const self = this;
+            const app = self.$f7;
+            const $$ = app.$;
 
+            self.$confirm('Are you sure you want to delete this account?', () => {
+                self.$showLoading();
+
+                self.$services.deleteAccount({
+                    id: account.id
+                }).then(response => {
+                    self.$hideLoading();
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        self.$alert('Unable to delete this account');
+                        return;
+                    }
+
+                    app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
+                        const accountList = self.accounts[account.category];
+                        for (let i = 0; i < accountList.length; i++) {
+                            if (accountList[i].id === account.id) {
+                                accountList.splice(i, 1);
+                            }
+                        }
+                    });
+                }).catch(error => {
+                    self.$hideLoading();
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        self.$alert({error: error.response.data});
+                    } else if (!error.processed) {
+                        self.$alert('Unable to delete this account');
+                    }
+                });
+            });
+        }
+    },
+    filters: {
+        accountDomId(account) {
+            return 'account_' + account.id;
         }
     }
 };

@@ -19,7 +19,7 @@
             <f7-card-content :padding="false">
                 <f7-list>
                     <f7-list-item
-                        :key="currentLocale"
+                        :key="currentLocale + '_lang'"
                         :title="$t('Language')"
                         smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
                         <select v-model="currentLocale">
@@ -33,7 +33,7 @@
                         <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
                     </f7-list-item>
                     <f7-list-item
-                        :key="currentLocale"
+                        :key="currentLocale + '_currency_display'"
                         :title="$t('Currency Display Mode')"
                         smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
                         <select v-model="currencyDisplayMode">

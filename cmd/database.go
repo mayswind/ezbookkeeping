@@ -1,17 +1,17 @@
 package cmd
 
 import (
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/datastore"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 )
 
-var Database = cli.Command{
+var Database = &cli.Command{
 	Name:  "database",
 	Usage: "lab database maintenance",
-	Subcommands: []cli.Command{
+	Subcommands: []*cli.Command{
 		{
 			Name:   "update",
 			Usage:  "Update database structure",

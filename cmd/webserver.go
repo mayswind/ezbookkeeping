@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/api"
 	"github.com/mayswind/lab/pkg/core"
@@ -22,10 +22,10 @@ import (
 	"github.com/mayswind/lab/pkg/validators"
 )
 
-var WebServer = cli.Command{
+var WebServer = &cli.Command{
 	Name:  "server",
 	Usage: "lab web server operation",
-	Subcommands: []cli.Command{
+	Subcommands: []*cli.Command{
 		{
 			Name:   "run",
 			Usage:  "Run lab web server",

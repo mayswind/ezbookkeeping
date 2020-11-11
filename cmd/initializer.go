@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/datastore"
 	"github.com/mayswind/lab/pkg/log"
@@ -14,7 +14,7 @@ import (
 
 func initializeSystem(c *cli.Context) (*settings.Config, error) {
 	var err error
-	configFilePath := c.GlobalString("conf-path")
+	configFilePath := c.String("conf-path")
 
 	if configFilePath != "" {
 		if _, err = os.Stat(configFilePath); err != nil {

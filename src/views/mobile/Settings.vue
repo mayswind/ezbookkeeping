@@ -1,47 +1,59 @@
 <template>
-    <f7-page :key="currentLocale">
+    <f7-page>
         <f7-navbar :title="$t('Settings')" :back-link="$t('Back')"></f7-navbar>
-        <f7-block-title>{{ userNickName }}</f7-block-title>
-        <f7-list>
-            <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
-            <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
-            <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
-            <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>
-        </f7-list>
+
+        <f7-block-title class="margin-top">{{ userNickName }}</f7-block-title>
+        <f7-card>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
+                    <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
+                    <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
+                    <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
-        <f7-list>
-            <f7-list-item
-                :title="$t('Language')"
-                smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
-                <select v-model="currentLocale">
-                    <option v-for="(lang, locale) in allLanguages"
-                            :key="locale"
-                            :value="locale">{{ lang.displayName }}</option>
-                </select>
-            </f7-list-item>
-            <f7-list-item>
-                <span>{{ $t('Enable Thousands Separator') }}</span>
-                <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
-            </f7-list-item>
-            <f7-list-item
-                :title="$t('Currency Display Mode')"
-                smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
-                <select v-model="currencyDisplayMode">
-                    <option value="none">{{ $t('None') }}</option>
-                    <option value="code">{{ $t('Currency Code') }}</option>
-                    <option value="name">{{ $t('Currency Name') }}</option>
-                </select>
-            </f7-list-item>
-            <f7-list-item>
-                <span>{{ $t('Enable Animate') }}</span>
-                <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
-            </f7-list-item>
-            <f7-list-item>
-                <span>{{ $t('Enable Auto Dark Mode') }}</span>
-                <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
-            </f7-list-item>
-            <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
-        </f7-list>
+        <f7-card>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item
+                        :key="currentLocale"
+                        :title="$t('Language')"
+                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
+                        <select v-model="currentLocale">
+                            <option v-for="(lang, locale) in allLanguages"
+                                    :key="locale"
+                                    :value="locale">{{ lang.displayName }}</option>
+                        </select>
+                    </f7-list-item>
+                    <f7-list-item>
+                        <span>{{ $t('Enable Thousands Separator') }}</span>
+                        <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
+                    </f7-list-item>
+                    <f7-list-item
+                        :key="currentLocale"
+                        :title="$t('Currency Display Mode')"
+                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
+                        <select v-model="currencyDisplayMode">
+                            <option value="none">{{ $t('None') }}</option>
+                            <option value="code">{{ $t('Currency Code') }}</option>
+                            <option value="name">{{ $t('Currency Name') }}</option>
+                        </select>
+                    </f7-list-item>
+                    <f7-list-item>
+                        <span>{{ $t('Enable Animate') }}</span>
+                        <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
+                    </f7-list-item>
+                    <f7-list-item>
+                        <span>{{ $t('Enable Auto Dark Mode') }}</span>
+                        <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
+                    </f7-list-item>
+                    <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
     </f7-page>
 </template>
 

@@ -235,6 +235,8 @@ export default {
     'Cancel': 'Cancel',
     'Close': 'Close',
     'Submit': 'Submit',
+    'Add': 'Add',
+    'Save': 'Save',
     'Update': 'Update',
     'None': 'None',
     'Done': 'Done',

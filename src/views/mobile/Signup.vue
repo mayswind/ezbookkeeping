@@ -1,67 +1,76 @@
 <template>
     <f7-page>
-        <f7-navbar :title="$t('Sign Up')" :back-link="$t('Back')"></f7-navbar>
-        <f7-list no-hairlines-md>
-            <f7-list-input
-                type="text"
-                clear-button
-                :label="$t('Username')"
-                :placeholder="$t('Your username')"
-                :value="user.username"
-                @input="user.username = $event.target.value"
-            ></f7-list-input>
+        <f7-navbar>
+            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
+            <f7-nav-title :title="$t('Sign Up')"></f7-nav-title>
+            <f7-nav-right>
+                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t('Submit')" @click="submit"></f7-link>
+            </f7-nav-right>
+        </f7-navbar>
 
-            <f7-list-input
-                type="password"
-                clear-button
-                :label="$t('Password')"
-                :placeholder="$t('Your password, at least 6 characters')"
-                :value="user.password"
-                @input="user.password = $event.target.value"
-            ></f7-list-input>
+        <f7-card>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-input
+                        type="text"
+                        clear-button
+                        :label="$t('Username')"
+                        :placeholder="$t('Your username')"
+                        :value="user.username"
+                        @input="user.username = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="password"
-                clear-button
-                :label="$t('Confirmation Password')"
-                :placeholder="$t('Re-enter the password')"
-                :value="user.confirmPassword"
-                @input="user.confirmPassword = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="password"
+                        clear-button
+                        :label="$t('Password')"
+                        :placeholder="$t('Your password, at least 6 characters')"
+                        :value="user.password"
+                        @input="user.password = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="email"
-                clear-button
-                :label="$t('E-mail')"
-                :placeholder="$t('Your email address')"
-                :value="user.email"
-                @input="user.email = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="password"
+                        clear-button
+                        :label="$t('Confirmation Password')"
+                        :placeholder="$t('Re-enter the password')"
+                        :value="user.confirmPassword"
+                        @input="user.confirmPassword = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="text"
-                clear-button
-                :label="$t('Nickname')"
-                :placeholder="$t('Your nickname')"
-                :value="user.nickname"
-                @input="user.nickname = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="email"
+                        clear-button
+                        :label="$t('E-mail')"
+                        :placeholder="$t('Your email address')"
+                        :value="user.email"
+                        @input="user.email = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="select"
-                :label="$t('Default Currency')"
-                :value="user.defaultCurrency"
-                @input="user.defaultCurrency = $event.target.value"
-            >
-                <option v-for="currency in allCurrencies"
-                        :key="currency.code"
-                        :value="currency.code">{{ currency.displayName }}</option>
-            </f7-list-input>
+                    <f7-list-input
+                        type="text"
+                        clear-button
+                        :label="$t('Nickname')"
+                        :placeholder="$t('Your nickname')"
+                        :value="user.nickname"
+                        @input="user.nickname = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
-        </f7-list>
+                    <f7-list-input
+                        type="select"
+                        :label="$t('Default Currency')"
+                        :value="user.defaultCurrency"
+                        @input="user.defaultCurrency = $event.target.value"
+                    >
+                        <option v-for="currency in allCurrencies"
+                                :key="currency.code"
+                                :value="currency.code">{{ currency.displayName }}</option>
+                    </f7-list-input>
 
-        <f7-button large fill :class="{ 'disabled': inputIsEmpty || signuping }" :text="$t('Sign Up')" @click="signup"></f7-button>
+                    <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
     </f7-page>
 </template>
 
@@ -79,7 +88,7 @@ export default {
                 nickname: '',
                 defaultCurrency: self.$t('default.currency')
             },
-            signuping: false
+            submitting: false
         };
     },
     computed: {
@@ -118,7 +127,7 @@ export default {
         }
     },
     methods: {
-        signup() {
+        submit() {
             const self = this;
             const router = self.$f7router;
 
@@ -129,8 +138,8 @@ export default {
                 return;
             }
 
-            self.signuping = true;
-            self.$showLoading(() => self.signuping);
+            self.submitting = true;
+            self.$showLoading(() => self.submitting);
 
             self.$services.register({
                 username: self.user.username,
@@ -139,7 +148,7 @@ export default {
                 nickname: self.user.nickname,
                 defaultCurrency: self.user.defaultCurrency
             }).then(response => {
-                self.signuping = false;
+                self.submitting = false;
                 self.$hideLoading();
                 const data = response.data;
 
@@ -155,7 +164,7 @@ export default {
                 self.$toast('You have been successfully registered');
                 router.navigate('/');
             }).catch(error => {
-                self.signuping = false;
+                self.submitting = false;
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {

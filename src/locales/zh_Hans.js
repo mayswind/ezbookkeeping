@@ -235,6 +235,8 @@ export default {
     'Cancel': '取消',
     'Close': '关闭',
     'Submit': '提交',
+    'Add': '添加',
+    'Save': '保存',
     'Update': '更新',
     'None': '无',
     'Done': '完成',

@@ -1,67 +1,79 @@
 <template>
     <f7-page>
-        <f7-navbar :title="$t('User Profile')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar>
+            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
+            <f7-nav-title :title="$t('User Profile')"></f7-nav-title>
+            <f7-nav-right>
+                <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="$t('Save')" @click="save"></f7-link>
+            </f7-nav-right>
+        </f7-navbar>
 
-        <f7-list no-hairlines-md class="skeleton-text" v-if="loading">
-            <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
-            <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
-            <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
-            <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
-            <f7-list-input label="Default Currency" placeholder="Default Currency"></f7-list-input>
-        </f7-list>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
+                    <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
+                    <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
+                    <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
+                    <f7-list-input label="Default Currency" placeholder="Default Currency"></f7-list-input>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-list no-hairlines-md v-else-if="!loading">
-            <f7-list-input
-                type="password"
-                clear-button
-                :label="$t('Password')"
-                :placeholder="$t('Your password')"
-                :value="newProfile.password"
-                @input="newProfile.password = $event.target.value"
-            ></f7-list-input>
+        <f7-card v-else-if="!loading">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-input
+                        type="password"
+                        clear-button
+                        :label="$t('Password')"
+                        :placeholder="$t('Your password')"
+                        :value="newProfile.password"
+                        @input="newProfile.password = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="password"
-                clear-button
-                :label="$t('Confirmation Password')"
-                :placeholder="$t('Re-enter the password')"
-                :value="newProfile.confirmPassword"
-                @input="newProfile.confirmPassword = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="password"
+                        clear-button
+                        :label="$t('Confirmation Password')"
+                        :placeholder="$t('Re-enter the password')"
+                        :value="newProfile.confirmPassword"
+                        @input="newProfile.confirmPassword = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="email"
-                clear-button
-                :label="$t('E-mail')"
-                :placeholder="$t('Your email address')"
-                :value="newProfile.email"
-                @input="newProfile.email = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="email"
+                        clear-button
+                        :label="$t('E-mail')"
+                        :placeholder="$t('Your email address')"
+                        :value="newProfile.email"
+                        @input="newProfile.email = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="text"
-                clear-button
-                :label="$t('Nickname')"
-                :placeholder="$t('Your nickname')"
-                :value="newProfile.nickname"
-                @input="newProfile.nickname = $event.target.value"
-            ></f7-list-input>
+                    <f7-list-input
+                        type="text"
+                        clear-button
+                        :label="$t('Nickname')"
+                        :placeholder="$t('Your nickname')"
+                        :value="newProfile.nickname"
+                        @input="newProfile.nickname = $event.target.value"
+                    ></f7-list-input>
 
-            <f7-list-input
-                type="select"
-                :label="$t('Default Currency')"
-                :value="newProfile.defaultCurrency"
-                @input="newProfile.defaultCurrency = $event.target.value"
-            >
-                <option v-for="currency in allCurrencies"
-                        :key="currency.code"
-                        :value="currency.code">{{ currency.displayName }}</option>
-            </f7-list-input>
+                    <f7-list-input
+                        type="select"
+                        :label="$t('Default Currency')"
+                        :value="newProfile.defaultCurrency"
+                        @input="newProfile.defaultCurrency = $event.target.value"
+                    >
+                        <option v-for="currency in allCurrencies"
+                                :key="currency.code"
+                                :value="currency.code">{{ currency.displayName }}</option>
+                    </f7-list-input>
 
-            <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
-        </f7-list>
-
-        <f7-button large fill :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || updating }" :text="$t('Update')" @click="update"></f7-button>
+                    <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
         <f7-sheet
             style="height:auto"
@@ -83,7 +95,7 @@
                             @input="currentPassword = $event.target.value"
                         ></f7-list-input>
                     </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPassword || updating }" :text="$t('Continue')" @click="update"></f7-button>
+                    <f7-button large fill :class="{ 'disabled': !currentPassword || saving }" :text="$t('Continue')" @click="save"></f7-button>
                 </div>
             </div>
         </f7-sheet>
@@ -108,7 +120,7 @@ export default {
             },
             currentPassword: '',
             loading: true,
-            updating: false,
+            saving: false,
             showInputPasswordSheet: false
         };
     },
@@ -191,7 +203,7 @@ export default {
         });
     },
     methods: {
-        update() {
+        save() {
             const self = this;
             const router = self.$f7router;
 
@@ -209,8 +221,8 @@ export default {
                 return;
             }
 
-            self.updating = true;
-            self.$showLoading(() => self.updating);
+            self.saving = true;
+            self.$showLoading(() => self.saving);
 
             self.$services.updateProfile({
                 password: self.newProfile.password,
@@ -219,7 +231,7 @@ export default {
                 nickname: self.newProfile.nickname,
                 defaultCurrency: self.newProfile.defaultCurrency
             }).then(response => {
-                self.updating = false;
+                self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';
 
@@ -241,7 +253,7 @@ export default {
                 self.$toast('Your profile has been successfully updated');
                 router.back('/settings', { force: true });
             }).catch(error => {
-                self.updating = false;
+                self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';
 

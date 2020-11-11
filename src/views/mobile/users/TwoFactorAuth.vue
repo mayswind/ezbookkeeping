@@ -2,21 +2,33 @@
     <f7-page>
         <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-list v-if="loading" class="skeleton-text">
-            <f7-list-item title="Status" after="Unknwon"></f7-list-item>
-            <f7-list-button class="disabled">Operate</f7-list-button>
-        </f7-list>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item title="Status" after="Unknown"></f7-list-item>
+                    <f7-list-button class="disabled">Operate</f7-list-button>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-list v-else-if="!loading && status === true">
-            <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
-            <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
-            <f7-list-button :class="{ 'disabled': disabling }" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
-        </f7-list>
+        <f7-card v-else-if="!loading && status === true">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
+                    <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
+                    <f7-list-button :class="{ 'disabled': disabling }" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
-        <f7-list v-else-if="!loading && status === false">
-            <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
-            <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>
-        </f7-list>
+        <f7-card v-else-if="!loading && status === false">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
+                    <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
         <f7-sheet
             style="height:auto;"

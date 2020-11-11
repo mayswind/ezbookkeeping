@@ -2,12 +2,16 @@
     <f7-page>
         <f7-navbar :title="$t('About')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-list>
-            <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
-            <f7-list-item external :title="$t('Official Website')" after="https://github.com/mayswind/lab"
-                          link="https://github.com/mayswind/lab" target="_blank"></f7-list-item>
-            <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
-        </f7-list>
+        <f7-card>
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
+                    <f7-list-item external :title="$t('Official Website')" after="https://github.com/mayswind/lab"
+                                  link="https://github.com/mayswind/lab" target="_blank"></f7-list-item>
+                    <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
         <f7-popup class="license-popup">
             <f7-page>

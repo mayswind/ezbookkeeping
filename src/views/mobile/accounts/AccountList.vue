@@ -2,7 +2,7 @@
     <f7-page ptr @ptr:refresh="reload">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Account List')" :back-link="$t('Back')"></f7-nav-title>
+            <f7-nav-title :title="$t('Account List')"></f7-nav-title>
             <f7-nav-right>
                 <f7-link href="/account/add" icon-f7="plus"></f7-link>
             </f7-nav-right>

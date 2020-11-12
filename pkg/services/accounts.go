@@ -38,13 +38,13 @@ func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, erro
 	return accounts, err
 }
 
-func (s *AccountService) GetMaxDisplayOrder(uid int64) (int, error) {
+func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
 	account := &models.Account{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, models.ACCOUNT_PARENT_ID_LEVEL_ONE).OrderBy("display_order desc").Limit(1).Get(account)
+	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, models.ACCOUNT_PARENT_ID_LEVEL_ONE, category).OrderBy("display_order desc").Limit(1).Get(account)
 
 	if err != nil {
 		return 0, err
@@ -57,7 +57,7 @@ func (s *AccountService) GetMaxDisplayOrder(uid int64) (int, error) {
 	}
 }
 
-func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, parentAccountId int64) (int, error) {
+func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models.AccountCategory, parentAccountId int64) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -67,7 +67,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, parentAccountId
 	}
 
 	account := &models.Account{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, parentAccountId).OrderBy("display_order desc").Limit(1).Get(account)
+	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, parentAccountId, category).OrderBy("display_order desc").Limit(1).Get(account)
 
 	if err != nil {
 		return 0, err

@@ -92,7 +92,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	maxOrderId, err := a.accounts.GetMaxDisplayOrder(uid)
+	maxOrderId, err := a.accounts.GetMaxDisplayOrder(uid, accountCreateReq.Category)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())

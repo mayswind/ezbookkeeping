@@ -307,6 +307,7 @@ export default {
     'Receivables': 'Receivables',
     'Investment Account': 'Investment Account',
     'Unable to get account list': 'Unable to get account list',
+    'No available account': 'No available account',
     'Add Account': 'Add Account',
     'Account Category': 'Account Category',
     'Single Account': 'Single Account',

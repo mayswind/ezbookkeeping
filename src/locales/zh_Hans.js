@@ -307,6 +307,7 @@ export default {
     'Receivables': '应收款项',
     'Investment Account': '投资账户',
     'Unable to get account list': '无法获取账户列表',
+    'No available account': '没有可用的账户',
     'Add Account': '添加账户',
     'Account Category': '账户分类',
     'Single Account': '单一账户',

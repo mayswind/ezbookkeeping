@@ -38,6 +38,14 @@
             </f7-card-content>
         </f7-card>
 
+        <f7-card v-if="noAvailableAccount">
+            <f7-card-content :padding="false">
+                <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
+                    <f7-list-item :title="$t('No available account')" @taphold.native="setSortable()"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
         <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id" v-show="showHidden || hasShownAccount(accountCategory)">
             <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
             <f7-card-content :padding="false">
@@ -73,6 +81,32 @@ export default {
         };
     },
     computed: {
+        noAvailableAccount() {
+            let allAccountCount = 0;
+            let shownAccountCount = 0;
+
+            for (let category in this.accounts) {
+                if (!Object.prototype.hasOwnProperty.call(this.accounts, category)) {
+                    continue;
+                }
+
+                const accountList = this.accounts[category];
+
+                for (let i = 0; i < accountList.length; i++) {
+                    if (!accountList[i].hidden) {
+                        shownAccountCount++;
+                    }
+
+                    allAccountCount++;
+                }
+            }
+
+            if (this.showHidden) {
+                return allAccountCount < 1;
+            } else {
+                return shownAccountCount < 1;
+            }
+        },
         usedAccountCategories() {
             const allAccountCategories = this.$constants.account.allCategories;
             const usedAccountCategories = [];

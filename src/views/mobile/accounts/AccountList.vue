@@ -5,7 +5,7 @@
             <f7-nav-title :title="$t('Account List')"></f7-nav-title>
             <f7-nav-right>
                 <f7-link href="/account/add" icon-f7="plus" v-if="!sortable"></f7-link>
-                <f7-link :text="$t('Done')" :class="{ 'disabled': savingSort }" @click="saveSortResult" v-else-if="sortable"></f7-link>
+                <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -38,11 +38,11 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id">
+        <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id" v-show="showHidden || hasShownAccount(accountCategory)">
             <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
             <f7-card-content :padding="false">
                 <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item v-for="account in accounts[accountCategory.id]"
+                    <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
                                   :title="account.name" :after="account.balance | currency(account.currency)"
                                   link="#" swipeout @taphold.native="setSortable()"
@@ -66,8 +66,10 @@ export default {
         return {
             accounts: {},
             loading: true,
+            showHidden: false,
             sortable: false,
-            savingSort: false
+            displayOrderModified: false,
+            displayOrderSaving: false
         };
     },
     computed: {
@@ -143,8 +145,27 @@ export default {
                 }
             });
         },
+        hasShownAccount(accountCategory) {
+            if (!this.accounts[accountCategory.id].length) {
+                return false;
+            }
+
+            let shownCount = 0;
+
+            for (let i = 0; i < this.accounts[accountCategory.id].length; i++) {
+                const account = this.accounts[accountCategory.id][i];
+
+                if (!account.hidden) {
+                    shownCount++;
+                }
+            }
+
+            return shownCount > 0;
+        },
         setSortable() {
+            this.showHidden = true;
             this.sortable = true;
+            this.displayOrderModified = false;
         },
         onSort(event) {
             if (!event || !event.el || !event.el.id || event.el.id.indexOf('account_') !== 0) {
@@ -162,12 +183,20 @@ export default {
 
             const accountList = this.accounts[account.category];
             accountList.splice(event.to, 0, accountList.splice(event.from, 1)[0]);
+
+            this.displayOrderModified = true;
         },
         saveSortResult() {
             const self = this;
             const newDisplayOrders = [];
 
-            self.savingSort = true;
+            if (!self.displayOrderModified) {
+                self.showHidden = false;
+                self.sortable = false;
+                return;
+            }
+
+            self.displayOrderSaving = true;
 
             for (let category in self.accounts) {
                 if (!Object.prototype.hasOwnProperty.call(self.accounts, category)) {
@@ -189,7 +218,7 @@ export default {
             self.$services.moveAccount({
                 newDisplayOrders: newDisplayOrders
             }).then(response => {
-                self.savingSort = false;
+                self.displayOrderSaving = false;
                 self.$hideLoading();
 
                 const data = response.data;
@@ -199,9 +228,11 @@ export default {
                     return;
                 }
 
+                self.showHidden = false;
                 self.sortable = false;
+                self.displayOrderModified = false;
             }).catch(error => {
-                self.savingSort = false;
+                self.displayOrderSaving = false;
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {

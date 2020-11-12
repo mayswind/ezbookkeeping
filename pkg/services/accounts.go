@@ -123,6 +123,10 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 }
 
 func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*models.Account) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
 	for i := 0; i < len(accounts); i++ {
 		accounts[i].UpdatedUnixTime = time.Now().Unix()
 	}

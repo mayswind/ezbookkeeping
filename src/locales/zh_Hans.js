@@ -323,6 +323,7 @@ export default {
     'Account currency cannot be empty': '账户货币不能为空',
     'You have added a new account': '您已经添加新账户',
     'Unable to add account': '无法添加账户',
+    'Unable to move account': '无法移动账户',
     'Are you sure you want to delete this account?': '您确定要删除该账户吗?',
     'Unable to delete this account': '无法删除该账户',
     'User Profile': '用户信息',

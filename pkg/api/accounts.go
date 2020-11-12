@@ -124,6 +124,40 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	return accountInfoResp, nil
 }
 
+func (a *AccountsApi) AccountMoveHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountMoveReq models.AccountMoveRequest
+	err := c.ShouldBindJSON(&accountMoveReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountMoveHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	accounts := make([]*models.Account, len(accountMoveReq.NewDisplayOrders))
+
+	for i := 0; i < len(accountMoveReq.NewDisplayOrders); i++ {
+		newDisplayOrder := accountMoveReq.NewDisplayOrders[i]
+		account := &models.Account{
+			Uid:          uid,
+			AccountId:    newDisplayOrder.Id,
+			DisplayOrder: newDisplayOrder.DisplayOrder,
+		}
+
+		accounts[i] = account
+	}
+
+	err = a.accounts.ModifyAccountDisplayOrders(uid, accounts)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountMoveHandler] failed to move accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[accounts.AccountMoveHandler] user \"uid:%d\" has moved accounts", uid)
+	return true, nil
+}
+
 func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
 	var accountDeleteReq models.AccountDeleteRequest
 	err := c.ShouldBindJSON(&accountDeleteReq)

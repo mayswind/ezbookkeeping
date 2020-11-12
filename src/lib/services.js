@@ -174,6 +174,11 @@ export default {
             subAccounts
         });
     },
+    moveAccount: ({ newDisplayOrders }) => {
+        return axios.post('v1/accounts/move.json', {
+            newDisplayOrders,
+        });
+    },
     deleteAccount: ({ id }) => {
         return axios.post('v1/accounts/delete.json', {
             id

@@ -161,6 +161,7 @@ func startWebServer(c *cli.Context) error {
 			// Accounts
 			apiV1Route.GET("/accounts/list.json", bindApi(api.Accounts.AccountListHandler))
 			apiV1Route.POST("/accounts/add.json", bindApi(api.Accounts.AccountCreateHandler))
+			apiV1Route.POST("/accounts/move.json", bindApi(api.Accounts.AccountMoveHandler))
 			apiV1Route.POST("/accounts/delete.json", bindApi(api.Accounts.AccountDeleteHandler))
 		}
 	}

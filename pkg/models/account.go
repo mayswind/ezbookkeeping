@@ -51,6 +51,15 @@ type AccountCreateRequest struct {
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 }
 
+type AccountMoveRequest struct {
+	NewDisplayOrders []*AccountNewDisplayOrderRequest `json:"newDisplayOrders"`
+}
+
+type AccountNewDisplayOrderRequest struct {
+	Id           int64 `json:"id,string" binding:"required,min=1"`
+	DisplayOrder int   `json:"displayOrder"`
+}
+
 type AccountDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
 }

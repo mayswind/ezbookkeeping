@@ -122,6 +122,25 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 	})
 }
 
+func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*models.Account) error {
+	for i := 0; i < len(accounts); i++ {
+		accounts[i].UpdatedUnixTime = time.Now().Unix()
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		for i := 0; i < len(accounts); i++ {
+			account := accounts[i]
+			_, err := sess.Cols("display_order", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, account.Uid, false).Update(account)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

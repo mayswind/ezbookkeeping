@@ -18,6 +18,9 @@ export default {
                 theme: 'ios',
                 autoDarkTheme: self.$settings.isEnableAutoDarkMode(),
                 routes: routes,
+                touch: {
+                    tapHold: true
+                },
                 sheet: {
                     backdrop: true,
                     closeOnEscape: true

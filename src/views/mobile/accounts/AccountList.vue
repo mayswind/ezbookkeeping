@@ -4,7 +4,8 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Account List')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link href="/account/add" icon-f7="plus"></f7-link>
+                <f7-link href="/account/add" icon-f7="plus" v-if="!sortable"></f7-link>
+                <f7-link :text="$t('Done')" :class="{ 'disabled': savingSort }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -40,11 +41,11 @@
         <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id">
             <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
             <f7-card-content :padding="false">
-                <f7-list>
+                <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="account in accounts[accountCategory.id]"
                                   :key="account.id" :id="account | accountDomId"
                                   :title="account.name" :after="account.balance | currency(account.currency)"
-                                  link="#" swipeout
+                                  link="#" swipeout @taphold.native="setSortable()"
                     >
                         <f7-swipeout-actions right>
                             <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
@@ -64,7 +65,9 @@ export default {
     data() {
         return {
             accounts: {},
-            loading: true
+            loading: true,
+            sortable: false,
+            savingSort: false
         };
     },
     computed: {
@@ -140,6 +143,74 @@ export default {
                 }
             });
         },
+        setSortable() {
+            this.sortable = true;
+        },
+        onSort(event) {
+            if (!event || !event.el || !event.el.id || event.el.id.indexOf('account_') !== 0) {
+                this.$toast('Unable to move account');
+                return;
+            }
+
+            const id = event.el.id.substr(8);
+            const account = this.$utilities.getAccountByAccountId(this.accounts, id);
+
+            if (!account || !this.accounts[account.category] || !this.accounts[account.category][event.to]) {
+                this.$toast('Unable to move account');
+                return;
+            }
+
+            const accountList = this.accounts[account.category];
+            accountList.splice(event.to, 0, accountList.splice(event.from, 1)[0]);
+        },
+        saveSortResult() {
+            const self = this;
+            const newDisplayOrders = [];
+
+            self.savingSort = true;
+
+            for (let category in self.accounts) {
+                if (!Object.prototype.hasOwnProperty.call(self.accounts, category)) {
+                    continue;
+                }
+
+                const accountList = self.accounts[category];
+
+                for (let i = 0; i < accountList.length; i++) {
+                    newDisplayOrders.push({
+                        id: accountList[i].id,
+                        displayOrder: i + 1
+                    });
+                }
+            }
+
+            self.$showLoading();
+
+            self.$services.moveAccount({
+                newDisplayOrders: newDisplayOrders
+            }).then(response => {
+                self.savingSort = false;
+                self.$hideLoading();
+
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$alert('Unable to move account');
+                    return;
+                }
+
+                self.sortable = false;
+            }).catch(error => {
+                self.savingSort = false;
+                self.$hideLoading();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({ error: error.response.data });
+                } else if (!error.processed) {
+                    self.$alert('Unable to move account');
+                }
+            });
+        },
         edit() {
 
         },
@@ -174,7 +245,7 @@ export default {
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$alert({error: error.response.data});
+                        self.$alert({ error: error.response.data });
                     } else if (!error.processed) {
                         self.$alert('Unable to delete this account');
                     }

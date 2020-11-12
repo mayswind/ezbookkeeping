@@ -43,6 +43,24 @@ function getCategorizedAccounts(allAccounts) {
     return ret;
 }
 
+function getAccountByAccountId(categorizedAccounts, accountId) {
+    for (let category in categorizedAccounts) {
+        if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
+            continue;
+        }
+
+        const accountList = categorizedAccounts[category];
+
+        for (let i = 0; i < accountList.length; i++) {
+            if (accountList[i].id === accountId) {
+                return accountList[i];
+            }
+        }
+    }
+
+    return null;
+}
+
 export default {
     isFunction,
     isObject,
@@ -51,4 +69,5 @@ export default {
     isNumber,
     isBoolean,
     getCategorizedAccounts,
+    getAccountByAccountId,
 };

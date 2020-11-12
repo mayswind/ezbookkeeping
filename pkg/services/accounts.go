@@ -154,7 +154,6 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 
 	updateModel := &models.Account{
 		Deleted: true,
-		UpdatedUnixTime: now,
 		DeletedUnixTime: now,
 	}
 

@@ -183,6 +183,24 @@ export function getLocalizedError(error) {
     };
 }
 
+export function getLocalizedErrorParameters(parameters, i18nFunc) {
+    let localizedParameters = {};
+
+    if (parameters) {
+        for (let i = 0; i < parameters.length; i++) {
+            const parameter = parameters[i];
+
+            if (parameter.localized) {
+                localizedParameters[parameter.key] = i18nFunc(`parameter.${parameter.value}`);
+            } else {
+                localizedParameters[parameter.key] = parameter.value;
+            }
+        }
+    }
+
+    return localizedParameters;
+}
+
 function getLocaleFromLanguageAlias(alias) {
     for (let locale in allLanguages) {
         if (!Object.prototype.hasOwnProperty.call(allLanguages, locale)) {

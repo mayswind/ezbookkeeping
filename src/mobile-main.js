@@ -12,7 +12,7 @@ import 'moment/min/locales';
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
 
-import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError } from './lib/i18n.js';
+import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import currency from './consts/currency.js';
 import account from './consts/account.js';
 import version from './lib/version.js';
@@ -78,18 +78,7 @@ Vue.prototype.$alert = function (message, confirmCallback) {
     if (message && message.error) {
         const localizedError = getLocalizedError(message.error);
         message = localizedError.message;
-
-        if (localizedError.parameters) {
-            for (let i = 0; i < localizedError.parameters.length; i++) {
-                const parameter = localizedError.parameters[i];
-
-                if (parameter.localized) {
-                    parameters[parameter.key] = i18n.t(`parameter.${parameter.value}`);
-                } else {
-                    parameters[parameter.key] = parameter.value;
-                }
-            }
-        }
+        parameters = getLocalizedErrorParameters(localizedError.parameters, i18n.t);
     }
 
     this.$f7.dialog.create({
@@ -120,8 +109,16 @@ Vue.prototype.$confirm = function (message, confirmCallback, cancelCallback) {
     }).open();
 };
 Vue.prototype.$toast = function (message, timeout) {
+    let parameters = {};
+
+    if (message && message.error) {
+        const localizedError = getLocalizedError(message.error);
+        message = localizedError.message;
+        parameters = getLocalizedErrorParameters(localizedError.parameters, i18n.t);
+    }
+
     this.$f7.toast.create({
-        text: i18n.t(message),
+        text: i18n.t(message, parameters),
         position: 'center',
         closeTimeout: timeout || 1500
     }).open();

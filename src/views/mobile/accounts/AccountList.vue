@@ -48,7 +48,9 @@
                     >
                         <f7-swipeout-actions right>
                             <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
-                            <f7-swipeout-button color="red" :text="$t('Delete')" @click="remove(account)"></f7-swipeout-button>
+                            <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account)">
+                                <f7-icon f7="trash"></f7-icon>
+                            </f7-swipeout-button>
                         </f7-swipeout-actions>
                     </f7-list-item>
                 </f7-list>

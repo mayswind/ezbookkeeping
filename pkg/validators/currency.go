@@ -4,6 +4,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const PARENT_ACCOUNT_CURRENCY_PLACEHODLER = "---"
+
 // ISO 4217
 var ALL_CURRENCY_NAMES = map[string]bool {
 	"AED": true, //UAE Dirham
@@ -167,6 +169,10 @@ var ALL_CURRENCY_NAMES = map[string]bool {
 
 func ValidCurrency(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
+		if value == PARENT_ACCOUNT_CURRENCY_PLACEHODLER {
+			return true
+		}
+
 		_, ok := ALL_CURRENCY_NAMES[value]
 		return ok
 	}

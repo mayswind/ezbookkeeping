@@ -1,7 +1,5 @@
 const totalAccountIconCount = 22;
-const defaultAccountIcon = {
-    f7Icon: 'bag'
-};
+const defaultAccountIconId = '1';
 const allAccountIcons = {
     '1': {
         f7Icon: 'bag'
@@ -70,6 +68,7 @@ const allAccountIcons = {
 
 export default {
     allAccountIcons: allAccountIcons,
-    defaultAccountIcon: defaultAccountIcon,
+    defaultAccountIconId: defaultAccountIconId,
+    defaultAccountIcon: allAccountIcons[defaultAccountIconId],
     totalAccountIconCount: totalAccountIconCount,
 };

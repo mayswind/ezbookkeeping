@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
+	"github.com/mayswind/lab/pkg/validators"
 )
 
 type AccountsApi struct {
@@ -85,6 +86,25 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 		if len(accountCreateReq.SubAccounts) < 1 {
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account does not have any sub accounts")
 			return nil, errs.ErrAccountHaveNoSubAccount
+		}
+
+		if accountCreateReq.Currency != validators.PARENT_ACCOUNT_CURRENCY_PLACEHODLER {
+			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parent account cannot set currency")
+			return nil, errs.ErrParentAccountCannotSetCurrency
+		}
+
+		for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
+			subAccount := accountCreateReq.SubAccounts[i]
+
+			if subAccount.Category != accountCreateReq.Category {
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] category of sub account not equals to parent")
+				return nil, errs.ErrSubAccountCategoryNotEqualsToParent
+			}
+
+			if subAccount.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub account type invalid")
+				return nil, errs.ErrSubAccountTypeInvalid
+			}
 		}
 	} else {
 		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account type invalid, type is %d", accountCreateReq.Type)
@@ -206,6 +226,7 @@ func (a *AccountsApi) createNewAccount(uid int64, accountCreateReq *models.Accou
 		Name:         accountCreateReq.Name,
 		DisplayOrder: order,
 		Category:     accountCreateReq.Category,
+		Type:         accountCreateReq.Type,
 		Icon:         accountCreateReq.Icon,
 		Currency:     accountCreateReq.Currency,
 		Comment:      accountCreateReq.Comment,

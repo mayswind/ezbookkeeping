@@ -1,3 +1,5 @@
+const parentAccountCurrencyPlacehodler = '---';
+
 // ISO 4217
 const allCurrencies = [
     'AED', //UAE Dirham
@@ -160,5 +162,6 @@ const allCurrencies = [
 ];
 
 export default {
+    parentAccountCurrencyPlacehodler: parentAccountCurrencyPlacehodler,
     all: allCurrencies
 };

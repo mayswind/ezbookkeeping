@@ -35,6 +35,7 @@ const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
 Vue.prototype.$constants = {
+    currency: currency,
     icons: icons,
     account: account,
 };

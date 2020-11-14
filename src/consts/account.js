@@ -35,7 +35,12 @@ const allAccountCategories = [
         defaultAccountIconId: '6'
     }
 ];
+const allAccountTypes = {
+    SingleAccount: 1,
+    MultiSubAccounts: 2
+};
 
 export default {
-    allCategories: allAccountCategories
+    allCategories: allAccountCategories,
+    allAccountTypes: allAccountTypes,
 };

@@ -174,6 +174,12 @@ export default {
             subAccounts
         });
     },
+    hideAccount: ({ id, hidden }) => {
+        return axios.post('v1/accounts/hide.json', {
+            id,
+            hidden
+        });
+    },
     moveAccount: ({ newDisplayOrders }) => {
         return axios.post('v1/accounts/move.json', {
             newDisplayOrders,

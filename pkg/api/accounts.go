@@ -124,6 +124,27 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	return accountInfoResp, nil
 }
 
+func (a *AccountsApi) AccountHideHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountHideReq models.AccountHideRequest
+	err := c.ShouldBindJSON(&accountHideReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountHideHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	err = a.accounts.HideAccount(uid, []int64{accountHideReq.Id}, accountHideReq.Hidden)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountHideHandler] failed to hide account \"id:%d\" for user \"uid:%d\", because %s", accountHideReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[accounts.AccountHideHandler] user \"uid:%d\" has hidden account \"id:%d\"", uid, accountHideReq.Id)
+	return true, nil
+}
+
 func (a *AccountsApi) AccountMoveHandler(c *core.Context) (interface{}, *errs.Error) {
 	var accountMoveReq models.AccountMoveRequest
 	err := c.ShouldBindJSON(&accountMoveReq)
@@ -171,11 +192,11 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.
 	err = a.accounts.DeleteAccounts(uid, []int64{accountDeleteReq.Id})
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%s\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
+		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountDeleteHandler] user \"uid:%d\" has deleted account \"id:%s\"", uid, accountDeleteReq.Id)
+	log.InfofWithRequestId(c, "[accounts.AccountDeleteHandler] user \"uid:%d\" has deleted account \"id:%d\"", uid, accountDeleteReq.Id)
 	return true, nil
 }
 

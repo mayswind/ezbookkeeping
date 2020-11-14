@@ -55,7 +55,12 @@
                                   :title="account.name" :after="account.balance | currency(account.currency)"
                                   link="#" swipeout @taphold.native="setSortable()"
                     >
-                        <f7-swipeout-actions right>
+                        <f7-swipeout-actions left v-if="sortable">
+                            <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right" @click="hide(account, !account.hidden)">
+                                <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
+                            </f7-swipeout-button>
+                        </f7-swipeout-actions>
+                        <f7-swipeout-actions right v-if="!sortable">
                             <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
                             <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account)">
                                 <f7-icon f7="trash"></f7-icon>
@@ -278,6 +283,43 @@ export default {
         },
         edit() {
 
+        },
+        hide(account, hidden) {
+            const self = this;
+
+            self.$showLoading();
+
+            self.$services.hideAccount({
+                id: account.id,
+                hidden: hidden
+            }).then(response => {
+                self.$hideLoading();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    if (hidden) {
+                        self.$toast('Unable to hide this account');
+                    } else {
+                        self.$toast('Unable to unhide this account');
+                    }
+
+                    return;
+                }
+
+                account.hidden = hidden;
+            }).catch(error => {
+                self.$hideLoading();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$toast({ error: error.response.data });
+                } else if (!error.processed) {
+                    if (hidden) {
+                        self.$toast('Unable to hide this account');
+                    } else {
+                        self.$toast('Unable to unhide this account');
+                    }
+                }
+            });
         },
         remove(account) {
             const self = this;

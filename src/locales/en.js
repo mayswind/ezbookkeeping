@@ -324,6 +324,8 @@ export default {
     'Account currency cannot be empty': 'Account currency cannot be empty',
     'You have added a new account': 'You have added a new account',
     'Unable to add account': 'Unable to add account',
+    'Unable to hide this account': 'Unable to hide this account',
+    'Unable to unhide this account': 'Unable to unhide this account',
     'Unable to move account': 'Unable to move account',
     'Are you sure you want to delete this account?': 'Are you sure you want to delete this account?',
     'Unable to delete this account': 'Unable to delete this account',

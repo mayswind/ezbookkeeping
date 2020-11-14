@@ -51,6 +51,11 @@ type AccountCreateRequest struct {
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 }
 
+type AccountHideRequest struct {
+	Id     int64 `json:"id,string" binding:"required,min=1"`
+	Hidden bool  `json:"hidden"`
+}
+
 type AccountMoveRequest struct {
 	NewDisplayOrders []*AccountNewDisplayOrderRequest `json:"newDisplayOrders"`
 }

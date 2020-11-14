@@ -1,3 +1,4 @@
+// ISO 4217
 const allCurrencies = [
     'AED', //UAE Dirham
     'AFN', //Afghani

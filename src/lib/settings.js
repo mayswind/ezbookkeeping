@@ -7,6 +7,7 @@ const defaultSettings = {
     lang: 'en',
     thousandsSeparator: true,
     currencyDisplayMode: 'code', // or 'none' or 'name'
+    showAccountBalance: true,
     animate: true,
     autoDarkMode: true
 };
@@ -71,6 +72,8 @@ export default {
     setEnableThousandsSeparator: value => setOption('thousandsSeparator', value),
     getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
     setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
+    isShowAccountBalance: () => getOption('showAccountBalance'),
+    setShowAccountBalance: value => setOption('showAccountBalance', value),
     isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),

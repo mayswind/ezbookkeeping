@@ -52,7 +52,7 @@
                 <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
-                                  :title="account.name" :after="account.balance | currency(account.currency)"
+                                  :title="account.name" :after="accountBalance(account) | currency(account.currency)"
                                   link="#" swipeout @taphold.native="setSortable()"
                     >
                         <f7-swipeout-actions left v-if="sortable">
@@ -200,6 +200,13 @@ export default {
             }
 
             return shownCount > 0;
+        },
+        accountBalance(account) {
+            if (this.$settings.isShowAccountBalance()) {
+                return account.balance;
+            } else {
+                return '---';
+            }
         },
         setSortable() {
             this.showHidden = true;

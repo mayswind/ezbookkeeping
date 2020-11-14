@@ -335,6 +335,7 @@ export default {
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',
+    'Show Account Balance': 'Show Account Balance',
     'Enable Animate': 'Enable Animate',
     'Enable Auto Dark Mode': 'Enable Auto Dark Mode',
     'You have been successfully registered': 'You have been successfully registered',

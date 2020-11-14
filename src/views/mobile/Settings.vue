@@ -43,6 +43,10 @@
                         </select>
                     </f7-list-item>
                     <f7-list-item>
+                        <span>{{ $t('Show Account Balance') }}</span>
+                        <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
+                    </f7-list-item>
+                    <f7-list-item>
                         <span>{{ $t('Enable Animate') }}</span>
                         <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
                     </f7-list-item>
@@ -97,6 +101,14 @@ export default {
             },
             set: function (value) {
                 this.$settings.setCurrencyDisplayMode(value);
+            }
+        },
+        showAccountBalance: {
+            get: function () {
+                return this.$settings.isShowAccountBalance();
+            },
+            set: function (value) {
+                this.$settings.setShowAccountBalance(value);
             }
         },
         isEnableAnimate: {

@@ -55,7 +55,11 @@
                                   :title="account.name" :after="accountBalance(account) | currency(account.currency)"
                                   link="#" swipeout @taphold.native="setSortable()"
                     >
-                        <f7-icon slot="media" :f7="account.icon | accountIcon"></f7-icon>
+                        <f7-icon slot="media" :f7="account.icon | accountIcon">
+                            <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
+                                <f7-icon f7="eye_slash_fill"></f7-icon>
+                            </f7-badge>
+                        </f7-icon>
                         <f7-swipeout-actions left v-if="sortable">
                             <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right" @click="hide(account, !account.hidden)">
                                 <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>

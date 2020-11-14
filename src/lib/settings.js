@@ -8,7 +8,7 @@ const defaultSettings = {
     thousandsSeparator: true,
     currencyDisplayMode: 'code', // or 'none' or 'name'
     showAccountBalance: true,
-    animate: true,
+    animate: false,
     autoDarkMode: true
 };
 

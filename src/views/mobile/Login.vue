@@ -56,7 +56,7 @@
             style="height:auto"
             :opened="show2faSheet" @sheet:closed="show2faSheet = false"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Two-Factor Authentication'"></b></div>
                 </div>
@@ -85,7 +85,7 @@
                         <f7-link @click="switch2FAVerifyType" :text="$t(twoFAVerifyTypeSwitchName)"></f7-link>
                     </div>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
     </f7-page>
 </template>

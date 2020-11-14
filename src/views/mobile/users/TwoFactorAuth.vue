@@ -34,7 +34,7 @@
             style="height:auto;"
             :opened="showInputPasscodeSheetForEnable" @sheet:closed="showInputPasscodeSheetForEnable = false; currentPasscodeForEnable = ''"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Passcode'"></b></div>
                 </div>
@@ -60,14 +60,14 @@
                         <f7-link :class="{ 'disabled': enableConfirming }" @click="showInputPasscodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
 
         <f7-sheet
             style="height:auto"
             :opened="showInputPasswordSheetForDisable" @sheet:closed="showInputPasswordSheetForDisable = false; currentPasswordForDisable = ''"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
@@ -88,14 +88,14 @@
                         <f7-link :class="{ 'disabled': disabling }" @click="showInputPasswordSheetForDisable = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
 
         <f7-sheet
             style="height:auto"
             :opened="showInputPasswordSheetForRegenerate" @sheet:closed="showInputPasswordSheetForRegenerate = false; currentPasswordForRegenerate= ''"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
@@ -116,14 +116,14 @@
                         <f7-link :class="{ 'disabled': regenerating }" @click="showInputPasswordSheetForRegenerate = false" :text="$t('Cancel')"></f7-link>
                     </div>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
 
         <f7-sheet
             style="height:auto"
             :opened="showBackupCodeSheet" @sheet:closed="showBackupCodeSheet = false; currentBackupCode = ''"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Backup Code'"></b></div>
                 </div>
@@ -138,7 +138,7 @@
                         <f7-link @click="showBackupCodeSheet = false" :text="$t('Close')"></f7-link>
                     </div>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
     </f7-page>
 </template>

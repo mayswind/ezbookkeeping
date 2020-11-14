@@ -79,7 +79,7 @@
             style="height:auto"
             :opened="showInputPasswordSheet" @sheet:closed="showInputPasswordSheet = false"
         >
-            <div>
+            <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
@@ -97,7 +97,7 @@
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': !currentPassword || saving }" :text="$t('Continue')" @click="save"></f7-button>
                 </div>
-            </div>
+            </f7-page-content>
         </f7-sheet>
     </f7-page>
 </template>

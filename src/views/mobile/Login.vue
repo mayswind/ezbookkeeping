@@ -56,7 +56,7 @@
             style="height:auto"
             :opened="show2faSheet" @sheet:closed="show2faSheet = false"
         >
-            <div class="sheet-modal-swipe-step">
+            <div>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Two-Factor Authentication'"></b></div>
                 </div>

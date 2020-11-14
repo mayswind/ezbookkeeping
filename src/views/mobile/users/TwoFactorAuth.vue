@@ -34,7 +34,7 @@
             style="height:auto;"
             :opened="showInputPasscodeSheetForEnable" @sheet:closed="showInputPasscodeSheetForEnable = false; currentPasscodeForEnable = ''"
         >
-            <div class="sheet-modal-swipe-step">
+            <div>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Passcode'"></b></div>
                 </div>
@@ -67,7 +67,7 @@
             style="height:auto"
             :opened="showInputPasswordSheetForDisable" @sheet:closed="showInputPasswordSheetForDisable = false; currentPasswordForDisable = ''"
         >
-            <div class="sheet-modal-swipe-step">
+            <div>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
@@ -95,7 +95,7 @@
             style="height:auto"
             :opened="showInputPasswordSheetForRegenerate" @sheet:closed="showInputPasswordSheetForRegenerate = false; currentPasswordForRegenerate= ''"
         >
-            <div class="sheet-modal-swipe-step">
+            <div>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
                 </div>
@@ -123,7 +123,7 @@
             style="height:auto"
             :opened="showBackupCodeSheet" @sheet:closed="showBackupCodeSheet = false; currentBackupCode = ''"
         >
-            <div class="sheet-modal-swipe-step">
+            <div>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b v-t="'Backup Code'"></b></div>
                 </div>

@@ -315,6 +315,7 @@ export default {
     'Account Type': '账户类型',
     'Account Name': '账户名称',
     'Your account name': '你的账户名称',
+    'Account Icon': '账户图标',
     'Currency': '货币',
     'Description': '描述',
     'Your account description (optional)': '你的账户描述 (可选)',

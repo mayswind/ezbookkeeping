@@ -65,6 +65,19 @@ body {
     margin-left: 6px;
 }
 
+.badge.right-bottom-icon {
+    margin-left: -12px;
+    margin-top: 15px;
+    width: 16px;
+    height: 16px;
+}
+
+.badge.right-bottom-icon > .icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
 .lab-list-item-error-info div.item-footer {
     color: var(--f7-input-error-text-color)
 }

@@ -14,6 +14,7 @@ import 'framework7-icons';
 
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import currency from './consts/currency.js';
+import icons from './consts/icon.js';
 import account from './consts/account.js';
 import version from './lib/version.js';
 import settings from './lib/settings.js';
@@ -21,6 +22,7 @@ import services from './lib/services.js';
 import userstate from './lib/userstate.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
+import accountIconFilter from './filters/accountIcon.js';
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
@@ -33,7 +35,8 @@ const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
 Vue.prototype.$constants = {
-    account: account
+    icons: icons,
+    account: account,
 };
 Vue.prototype.$utilities = utils;
 Vue.prototype.$settings = settings;
@@ -142,6 +145,7 @@ Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
 
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
+Vue.filter('accountIcon', (value) => accountIconFilter(value));
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 

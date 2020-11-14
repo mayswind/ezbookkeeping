@@ -1,31 +1,38 @@
 const allAccountCategories = [
     {
         id: 1,
-        name: 'Cash'
+        name: 'Cash',
+        defaultAccountIconId: '1'
     },
     {
         id: 2,
-        name: 'Debit Card'
+        name: 'Debit Card',
+        defaultAccountIconId: '2'
     },
     {
         id: 3,
-        name: 'Credit Card'
+        name: 'Credit Card',
+        defaultAccountIconId: '2'
     },
     {
         id: 4,
-        name: 'Virtual Account'
+        name: 'Virtual Account',
+        defaultAccountIconId: '3'
     },
     {
         id: 5,
-        name: 'Debt Account'
+        name: 'Debt Account',
+        defaultAccountIconId: '4'
     },
     {
         id: 6,
-        name: 'Receivables'
+        name: 'Receivables',
+        defaultAccountIconId: '5'
     },
     {
         id: 7,
-        name: 'Investment Account'
+        name: 'Investment Account',
+        defaultAccountIconId: '6'
     }
 ];
 

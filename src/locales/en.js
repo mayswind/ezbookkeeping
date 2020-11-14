@@ -315,6 +315,7 @@ export default {
     'Account Type': 'Account Type',
     'Account Name': 'Account Name',
     'Your account name': 'Your account name',
+    'Account Icon': 'Account Icon',
     'Currency': 'Currency',
     'Description': 'Description',
     'Your account description (optional)': 'Your account description (optional)',

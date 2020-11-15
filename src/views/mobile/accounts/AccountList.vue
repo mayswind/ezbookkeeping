@@ -83,7 +83,8 @@
                             </li>
                         </f7-block>
                         <f7-swipeout-actions left v-if="sortable">
-                            <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right" @click="hide(account, !account.hidden)">
+                            <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                                                overswipe @click="hide(account, !account.hidden)">
                                 <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                             </f7-swipeout-button>
                         </f7-swipeout-actions>

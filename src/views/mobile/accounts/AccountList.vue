@@ -162,7 +162,6 @@ export default {
         self.loading = true;
 
         self.$services.getAllAccounts().then(response => {
-            self.loading = false;
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -173,9 +172,8 @@ export default {
             }
 
             self.accounts = self.$utilities.getCategorizedAccounts(data.result);
-        }).catch(error => {
             self.loading = false;
-
+        }).catch(error => {
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();

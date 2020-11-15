@@ -46,7 +46,6 @@ export default {
         self.loading = true;
 
         self.$services.getTokens().then(response => {
-            self.loading = false;
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -57,9 +56,8 @@ export default {
             }
 
             self.tokens = data.result;
-        }).catch(error => {
             self.loading = false;
-
+        }).catch(error => {
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();

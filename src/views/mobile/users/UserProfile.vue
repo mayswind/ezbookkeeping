@@ -171,7 +171,6 @@ export default {
         self.loading = true;
 
         self.$services.getProfile().then(response => {
-            self.loading = false;
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -188,9 +187,8 @@ export default {
             self.newProfile.email = self.oldProfile.email
             self.newProfile.nickname = self.oldProfile.nickname;
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
-        }).catch(error => {
             self.loading = false;
-
+        }).catch(error => {
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();

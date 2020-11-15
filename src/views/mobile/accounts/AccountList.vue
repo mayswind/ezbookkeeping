@@ -318,8 +318,8 @@ export default {
                 }
             });
         },
-        edit() {
-
+        edit(account) {
+            this.$f7router.navigate('/account/edit?id=' + account.id);
         },
         hide(account, hidden) {
             const self = this;

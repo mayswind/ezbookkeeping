@@ -8,7 +8,7 @@ import TransactionDetailPage from '../views/mobile/transactions/Detail.vue'
 import TransactionNewPage from '../views/mobile/transactions/New.vue'
 
 import AccountListPage from '../views/mobile/accounts/AccountList.vue'
-import AccountAddPage from '../views/mobile/accounts/AccountAdd.vue'
+import AccountEditPage from '../views/mobile/accounts/AccountEdit.vue'
 
 import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue'
 
@@ -75,7 +75,12 @@ const routes = [
     },
     {
         path: '/account/add',
-        component: AccountAddPage,
+        component: AccountEditPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/account/edit',
+        component: AccountEditPage,
         beforeEnter: checkLogin
     },
     {

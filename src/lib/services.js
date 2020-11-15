@@ -166,6 +166,9 @@ export default {
     getAllAccounts: () => {
         return axios.get('v1/accounts/list.json');
     },
+    getAccount: ({ id }) => {
+        return axios.get('v1/accounts/get.json?id=' + id);
+    },
     addAccount: ({ category, type, name, icon, currency, comment, subAccounts }) => {
         return axios.post('v1/accounts/add.json', {
             category,
@@ -174,6 +177,17 @@ export default {
             icon,
             currency,
             comment,
+            subAccounts
+        });
+    },
+    modifyAccount: ({ id, category, name, icon, comment, hidden, subAccounts }) => {
+        return axios.post('v1/accounts/modify.json', {
+            id,
+            category,
+            name,
+            icon,
+            comment,
+            hidden,
             subAccounts
         });
     },

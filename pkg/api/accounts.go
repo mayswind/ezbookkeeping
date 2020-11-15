@@ -68,6 +68,48 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 	return userFinalAccountResps, nil
 }
 
+func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountGetReq models.AccountGetRequest
+	err := c.ShouldBindQuery(&accountGetReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountGetHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	accountAndSubAccounts, err := a.accounts.GetAccountByAccountId(uid, accountGetReq.Id)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	accountRespMap := make(map[int64]*models.AccountInfoResponse)
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		acccountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
+		accountRespMap[acccountResp.Id] = acccountResp
+	}
+
+	accountResp := accountRespMap[accountGetReq.Id]
+
+	if accountResp == nil {
+		return nil, errs.ErrAccountNotFound
+	}
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		if accountAndSubAccounts[i].ParentAccountId == accountResp.Id {
+			subAccountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
+			accountResp.SubAccounts = append(accountResp.SubAccounts, subAccountResp)
+		}
+	}
+
+	sort.Sort(accountResp.SubAccounts)
+
+	return accountResp, nil
+}
+
 func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.Error) {
 	var accountCreateReq models.AccountCreateRequest
 	err := c.ShouldBindJSON(&accountCreateReq)
@@ -142,6 +184,79 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	return accountInfoResp, nil
+}
+
+func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountModifyReq models.AccountModifyRequest
+	err := c.ShouldBindJSON(&accountModifyReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountModifyHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	accountAndSubAccounts, err := a.accounts.GetAccountByAccountId(uid, accountModifyReq.Id)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	accountMap := make(map[int64]*models.Account)
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		acccount := accountAndSubAccounts[i]
+		accountMap[acccount.AccountId] = acccount
+	}
+
+	if _, exists := accountMap[accountModifyReq.Id]; !exists {
+		return nil, errs.ErrAccountNotFound
+	}
+
+	if len(accountModifyReq.SubAccounts)+1 != len(accountAndSubAccounts) {
+		return nil, errs.ErrCannotAddOrDeleteSubAccountsWhenModify
+	}
+
+	anythingUpdate := false
+	var toUpdateAccounts []*models.Account
+
+	toUpdateAccount := a.getToUpdateAccount(uid, &accountModifyReq, accountMap[accountModifyReq.Id])
+
+	if toUpdateAccount != nil {
+		anythingUpdate = true
+		toUpdateAccounts = append(toUpdateAccounts, toUpdateAccount)
+	}
+
+	for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
+		subAcccountReq := accountModifyReq.SubAccounts[i]
+
+		if _, exists := accountMap[subAcccountReq.Id]; !exists {
+			return nil, errs.ErrAccountNotFound
+		}
+
+		toUpdateSubAccount := a.getToUpdateAccount(uid, subAcccountReq, accountMap[subAcccountReq.Id])
+
+		if toUpdateSubAccount != nil {
+			anythingUpdate = true
+			toUpdateAccounts = append(toUpdateAccounts, toUpdateSubAccount)
+		}
+	}
+
+	if !anythingUpdate {
+		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	err = a.accounts.ModifyAccounts(uid, toUpdateAccounts)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to update account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[accounts.AccountModifyHandler] user \"uid:%d\" has updated account \"id:%d\" successfully", uid, accountModifyReq.Id)
+
+	return true, nil
 }
 
 func (a *AccountsApi) AccountHideHandler(c *core.Context) (interface{}, *errs.Error) {
@@ -245,4 +360,26 @@ func (a *AccountsApi) createSubAccounts(uid int64, accountCreateReq *models.Acco
 	}
 
 	return childrenAccounts
+}
+
+func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.AccountModifyRequest, oldAccount *models.Account) *models.Account {
+	newAccount := &models.Account{
+		AccountId: oldAccount.AccountId,
+		Uid:       uid,
+		Name:      accountModifyReq.Name,
+		Category:  accountModifyReq.Category,
+		Icon:      accountModifyReq.Icon,
+		Comment:   accountModifyReq.Comment,
+		Hidden:    accountModifyReq.Hidden,
+	}
+
+	if newAccount.Name != oldAccount.Name ||
+		newAccount.Category != oldAccount.Category ||
+		newAccount.Icon != oldAccount.Icon ||
+		newAccount.Comment != oldAccount.Comment ||
+		newAccount.Hidden != oldAccount.Hidden {
+		return newAccount
+	}
+
+	return nil
 }

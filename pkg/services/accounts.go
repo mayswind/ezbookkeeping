@@ -38,6 +38,21 @@ func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, erro
 	return accounts, err
 }
 
+func (s *AccountService) GetAccountByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if accountId <= 0 {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	var accounts []*models.Account
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).OrderBy("parent_account_id asc, display_order asc").Find(&accounts)
+
+	return accounts, err
+}
+
 func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -112,6 +127,31 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		for i := 0; i < len(allAccounts); i++ {
 			account := allAccounts[i]
 			_, err := sess.Insert(account)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	for i := 0; i < len(accounts); i++ {
+		accounts[i].UpdatedUnixTime = now
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		for i := 0; i < len(accounts); i++ {
+			account := accounts[i]
+			_, err := sess.Cols("name", "category", "icon", "comment", "hidden", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
 
 			if err != nil {
 				return err

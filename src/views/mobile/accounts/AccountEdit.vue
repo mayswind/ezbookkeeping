@@ -2,13 +2,22 @@
     <f7-page>
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Add Account')"></f7-nav-title>
+            <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t('Add')" @click="add"></f7-link>
+                <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card>
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-input label="Account Category" placeholder="Category"></f7-list-input>
+                    <f7-list-input label="Account Type" placeholder="Account Type"></f7-list-input>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-else-if="!loading">
             <f7-card-content :padding="false">
                 <f7-list>
                     <f7-list-input
@@ -24,6 +33,7 @@
 
                     <f7-list-input
                         type="select"
+                        :class="{ 'disabled': editAccountId }"
                         :label="$t('Account Type')"
                         :value="account.type"
                         @input="account.type = $event.target.value"
@@ -35,7 +45,18 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-if="account.type === $constants.account.allAccountTypes.SingleAccount.toString()">
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-content :padding="false">
+                <f7-list>
+                    <f7-list-input label="Account Name" placeholder="Your account name"></f7-list-input>
+                    <f7-list-item header="Account Icon" after="Icon"></f7-list-item>
+                    <f7-list-input label="Currency" placeholder="Currency"></f7-list-input>
+                    <f7-list-input type="textarea" label="Description" placeholder="Your account description (optional)"></f7-list-input>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount.toString()">
             <f7-card-content :padding="false">
                 <f7-list>
                     <f7-list-input
@@ -47,13 +68,14 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" link="#"
+                    <f7-list-item :header="$t('Account Icon')" key="singleTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
                         <f7-icon slot="after" :f7="account.icon | accountIcon"></f7-icon>
                     </f7-list-item>
 
                     <f7-list-input
                         type="select"
+                        :class="{ 'disabled': editAccountId }"
                         :label="$t('Currency')"
                         :value="account.currency"
                         @input="account.currency = $event.target.value"
@@ -70,11 +92,15 @@
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
                     ></f7-list-input>
+
+                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
+        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
             <f7-card-content :padding="false">
                 <f7-list>
                     <f7-list-input
@@ -86,7 +112,7 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" link="#"
+                    <f7-list-item :header="$t('Account Icon')" key="multiTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
                         <f7-icon slot="after" :f7="account.icon | accountIcon"></f7-icon>
                     </f7-list-item>
@@ -98,14 +124,19 @@
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
                     ></f7-list-input>
+
+                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
             <f7-card-footer>
-                <f7-button large fill :text="$t('Add Sub Account')" @click="addSubAccount"></f7-button>
+                <f7-button large fill :class="{ 'disabled': editAccountId }"
+                           :text="$t('Add Sub Account')" @click="addSubAccount"></f7-button>
             </f7-card-footer>
         </f7-card>
 
-        <f7-block class="no-padding no-margin" v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
+        <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
             <f7-card v-for="(subAccount, idx) in subAccounts" :key="idx">
                 <f7-card-content :padding="false">
                     <f7-list>
@@ -118,13 +149,14 @@
                             @input="subAccount.name = $event.target.value"
                         ></f7-list-input>
 
-                        <f7-list-item :header="$t('Sub Account Icon')" link="#"
+                        <f7-list-item :header="$t('Sub Account Icon')" key="subAccountIconSelection" link="#"
                                       @click="showIconSelectionSheet(subAccount)">
                             <f7-icon slot="after" :f7="subAccount.icon | accountIcon"></f7-icon>
                         </f7-list-item>
 
                         <f7-list-input
                             type="select"
+                            :class="{ 'disabled': editAccountId }"
                             :label="$t('Currency')"
                             :value="subAccount.currency"
                             @input="subAccount.currency = $event.target.value"
@@ -141,10 +173,15 @@
                             :value="subAccount.comment"
                             @input="subAccount.comment = $event.target.value"
                         ></f7-list-input>
+
+                        <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+                            <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
+                        </f7-list-item>
                     </f7-list>
                 </f7-card-content>
                 <f7-card-footer>
-                    <f7-button large fill color="red" :text="$t('Remove Sub Account')" @click="removeSubAccount(subAccount)"></f7-button>
+                    <f7-button large fill :class="{ 'disabled': editAccountId }"
+                               color="red" :text="$t('Remove Sub Account')" @click="removeSubAccount(subAccount)"></f7-button>
                 </f7-card-footer>
             </f7-card>
         </f7-block>
@@ -179,13 +216,16 @@ export default {
         const self = this;
 
         return {
+            editAccountId: null,
+            loading: false,
             account: {
                 category: '1',
                 type: self.$constants.account.allAccountTypes.SingleAccount.toString(),
                 name: '',
                 icon: self.$constants.icons.defaultAccountIconId,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
-                comment: ''
+                comment: '',
+                visible: true
             },
             subAccounts: [],
             accountChoosingIcon: null,
@@ -194,6 +234,20 @@ export default {
         };
     },
     computed: {
+        title() {
+            if (!this.editAccountId) {
+                return 'Add Account';
+            } else {
+                return 'Edit Account';
+            }
+        },
+        saveButtonTitle() {
+            if (!this.editAccountId) {
+                return 'Add';
+            } else {
+                return 'Save';
+            }
+        },
         allAccountCategories() {
             return this.$constants.account.allCategories;
         },
@@ -229,6 +283,70 @@ export default {
             return this.$getAllCurrencies();
         }
     },
+    created() {
+        const self = this;
+        const query = self.$f7route.query;
+        const router = self.$f7router;
+
+        if (query.id) {
+            self.loading = true;
+
+            self.editAccountId = query.id;
+            self.$services.getAccount({
+                id: self.editAccountId
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$alert('Unable to get account', () => {
+                        router.back();
+                    });
+                    return;
+                }
+
+                const account = data.result;
+                self.account.id = account.id;
+                self.account.category = account.category.toString();
+                self.account.type = account.type.toString();
+                self.account.name = account.name;
+                self.account.icon = account.icon;
+                self.account.currency = account.currency;
+                self.account.comment = account.comment;
+                self.account.visible = !account.hidden;
+
+                if (account.subAccounts && account.subAccounts.length > 0) {
+                    for (let i = 0; i < account.subAccounts.length; i++) {
+                        const subAccount = account.subAccounts[i];
+
+                        self.subAccounts.push({
+                            id: subAccount.id,
+                            category: subAccount.category.toString(),
+                            type: subAccount.type.toString(),
+                            name: subAccount.name,
+                            icon: subAccount.icon,
+                            currency: subAccount.currency,
+                            comment: subAccount.comment,
+                            visible: !subAccount.hidden
+                        });
+                    }
+                }
+
+                self.loading = false;
+            }).catch(error => {
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({ error: error.response.data }, () => {
+                        router.back();
+                    });
+                } else if (!error.processed) {
+                    self.$alert('Unable to get account', () => {
+                        router.back();
+                    });
+                }
+            });
+        } else {
+            self.loading = false;
+        }
+    },
     methods: {
         addSubAccount() {
             const self = this;
@@ -255,7 +373,7 @@ export default {
         },
         showIconSelectionSheet(account) {
             this.accountChoosingIcon = account;
-            this.showIconSelection = true
+            this.showIconSelection = true;
         },
         setSelectedIcon(accountIcon) {
             if (!this.accountChoosingIcon) {
@@ -270,7 +388,7 @@ export default {
             this.accountChoosingIcon = null;
             this.showIconSelection = false;
         },
-        add() {
+        save() {
             const self = this;
             const router = self.$f7router;
 
@@ -289,19 +407,25 @@ export default {
             if (self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     const subAccount = self.subAccounts[i];
-
-                    subAccounts.push({
+                    const submitAccount = {
                         category: parseInt(self.account.category),
                         type: self.$constants.account.allAccountTypes.SingleAccount,
                         name: subAccount.name,
                         icon: subAccount.icon,
                         currency: subAccount.currency,
                         comment: subAccount.comment
-                    });
+                    };
+
+                    if (self.editAccountId) {
+                        submitAccount.id = subAccount.id;
+                        submitAccount.hidden = !subAccount.visible;
+                    }
+
+                    subAccounts.push(submitAccount);
                 }
             }
 
-            self.$services.addAccount({
+            const submitAccount = {
                 category: parseInt(self.account.category),
                 type: parseInt(self.account.type),
                 name: self.account.name,
@@ -309,17 +433,38 @@ export default {
                 currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlacehodler,
                 comment: self.account.comment,
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,
-            }).then(response => {
+            };
+
+            let promise = null;
+
+            if (!self.editAccountId) {
+                promise = self.$services.addAccount(submitAccount);
+            } else {
+                submitAccount.id = self.account.id;
+                submitAccount.hidden = !self.account.visible;
+                promise = self.$services.modifyAccount(submitAccount);
+            }
+
+            promise.then(response => {
                 self.submitting = false;
                 self.$hideLoading();
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to add account');
+                    if (!self.editAccountId) {
+                        self.$alert('Unable to add account');
+                    } else {
+                        self.$alert('Unable to save account');
+                    }
                     return;
                 }
 
-                self.$toast('You have added a new account');
+                if (!self.editAccountId) {
+                    self.$toast('You have added a new account');
+                } else {
+                    self.$toast('You have saved this account');
+                }
+
                 router.back('/account/list', { force: true });
             }).catch(error => {
                 self.submitting = false;
@@ -328,7 +473,11 @@ export default {
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to add account');
+                    if (!self.editAccountId) {
+                        self.$alert('Unable to add account');
+                    } else {
+                        self.$alert('Unable to save account');
+                    }
                 }
             });
         },

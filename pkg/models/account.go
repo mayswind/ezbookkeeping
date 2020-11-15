@@ -51,6 +51,20 @@ type AccountCreateRequest struct {
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 }
 
+type AccountGetRequest struct {
+	Id int64 `form:"id,string" binding:"required,min=1"`
+}
+
+type AccountModifyRequest struct {
+	Id          int64                   `json:"id,string" binding:"required,min=1"`
+	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
+	Category    AccountCategory         `json:"category" binding:"required"`
+	Icon        int64                   `json:"icon,string" binding:"min=1"`
+	Comment     string                  `json:"comment" binding:"max=255"`
+	Hidden      bool                    `json:"hidden"`
+	SubAccounts []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
+}
+
 type AccountHideRequest struct {
 	Id     int64 `json:"id,string" binding:"required,min=1"`
 	Hidden bool  `json:"hidden"`

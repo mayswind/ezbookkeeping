@@ -82,7 +82,7 @@ Vue.prototype.$alert = function (message, confirmCallback) {
     if (message && message.error) {
         const localizedError = getLocalizedError(message.error);
         message = localizedError.message;
-        parameters = getLocalizedErrorParameters(localizedError.parameters, i18n.t);
+        parameters = getLocalizedErrorParameters(localizedError.parameters, s => i18n.t(s));
     }
 
     this.$f7.dialog.create({

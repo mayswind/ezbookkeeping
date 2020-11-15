@@ -38,10 +38,10 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-if="noAvailableAccount">
+        <f7-card v-if="!loading && noAvailableAccount">
             <f7-card-content :padding="false">
-                <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item :title="$t('No available account')" @taphold.native="setSortable()"></f7-list-item>
+                <f7-list>
+                    <f7-list-item :title="$t('No available account')"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -207,6 +207,10 @@ export default {
             return shownCount > 0;
         },
         accountBalance(account) {
+            if (account.type !== this.$constants.account.allAccountTypes.SingleAccount) {
+                return null;
+            }
+
             if (this.$settings.isShowAccountBalance()) {
                 return account.balance;
             } else {

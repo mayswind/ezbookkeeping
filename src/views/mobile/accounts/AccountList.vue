@@ -49,17 +49,39 @@
         <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id" v-show="showHidden || hasShownAccount(accountCategory)">
             <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
             <f7-card-content :padding="false">
-                <f7-list sortable sortable-tap-hold :sortable-enabled="sortable" @sortable:sort="onSort">
+                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
-                                  :title="account.name" :after="accountBalance(account) | currency(account.currency)"
-                                  link="#" swipeout @taphold.native="setSortable()"
+                                  :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
+                                  :after="accountBalance(account) | currency(account.currency)"
+                                  :link="account.type === $constants.account.allAccountTypes.SingleAccount ? '#' : null"
+                                  swipeout @taphold.native="setSortable()"
                     >
-                        <f7-icon slot="media" :f7="account.icon | accountIcon">
-                            <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
-                                <f7-icon f7="eye_slash_fill"></f7-icon>
-                            </f7-badge>
-                        </f7-icon>
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex">
+                                <f7-icon slot="media" :f7="account.icon | accountIcon">
+                                    <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
+                                        <f7-icon f7="eye_slash_fill"></f7-icon>
+                                    </f7-badge>
+                                </f7-icon>
+                                <div class="nested-list-item-title">{{ account.name }}</div>
+                            </div>
+                            <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
+                                <ul class="no-padding">
+                                    <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
+                                                  :key="subAccount.id" :id="subAccount | accountDomId"
+                                                  :title="subAccount.name" :after="accountBalance(subAccount) | currency(subAccount.currency)"
+                                                  link="#"
+                                    >
+                                        <f7-icon slot="media" :f7="subAccount.icon | accountIcon">
+                                            <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
+                                                <f7-icon f7="eye_slash_fill"></f7-icon>
+                                            </f7-badge>
+                                        </f7-icon>
+                                    </f7-list-item>
+                                </ul>
+                            </li>
+                        </f7-block>
                         <f7-swipeout-actions left v-if="sortable">
                             <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right" @click="hide(account, !account.hidden)">
                                 <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>

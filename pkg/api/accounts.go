@@ -92,9 +92,9 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 		accountRespMap[acccountResp.Id] = acccountResp
 	}
 
-	accountResp := accountRespMap[accountGetReq.Id]
+	accountResp, exists := accountRespMap[accountGetReq.Id]
 
-	if accountResp == nil {
+	if !exists {
 		return nil, errs.ErrAccountNotFound
 	}
 

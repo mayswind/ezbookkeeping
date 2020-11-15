@@ -130,8 +130,8 @@
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
-            <f7-card-footer>
-                <f7-button large fill :class="{ 'disabled': editAccountId }"
+            <f7-card-footer v-if="!editAccountId">
+                <f7-button large fill
                            :text="$t('Add Sub Account')" @click="addSubAccount"></f7-button>
             </f7-card-footer>
         </f7-card>
@@ -179,8 +179,8 @@
                         </f7-list-item>
                     </f7-list>
                 </f7-card-content>
-                <f7-card-footer>
-                    <f7-button large fill :class="{ 'disabled': editAccountId }"
+                <f7-card-footer v-if="!editAccountId">
+                    <f7-button large fill
                                color="red" :text="$t('Remove Sub Account')" @click="removeSubAccount(subAccount)"></f7-button>
                 </f7-card-footer>
             </f7-card>

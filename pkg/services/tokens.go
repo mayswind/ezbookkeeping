@@ -116,6 +116,25 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 	})
 }
 
+func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecord) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	return s.TokenDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		for i := 0; i < len(tokenRecords); i++ {
+			tokenRecord := tokenRecords[i]
+			_, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
 	uid, err := utils.StringToInt64(claims.Id)
 

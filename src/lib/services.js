@@ -126,6 +126,9 @@ export default {
             tokenId
         });
     },
+    revokeAllTokens: () => {
+        return axios.post('v1/tokens/revokeAll.json');
+    },
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },

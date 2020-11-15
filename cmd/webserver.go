@@ -143,6 +143,7 @@ func startWebServer(c *cli.Context) error {
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler))
+			apiV1Route.POST("/tokens/revokeAll.json", bindApi(api.Tokens.TokenRevokeAllHandler))
 			apiV1Route.POST("/tokens/refresh.json", bindApi(api.Tokens.TokenRefreshHandler))
 
 			// Users

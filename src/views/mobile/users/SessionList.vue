@@ -1,6 +1,12 @@
 <template>
     <f7-page ptr @ptr:refresh="reload">
-        <f7-navbar :title="$t('Device & Sessions')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar>
+            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
+            <f7-nav-title :title="$t('Device & Sessions')"></f7-nav-title>
+            <f7-nav-right>
+                <f7-link :class="{ 'disabled': tokens.length < 2 }" :text="$t('Logout All')" @click="revokeAll"></f7-link>
+            </f7-nav-right>
+        </f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content :padding="false">
@@ -123,6 +129,43 @@ export default {
                         self.$alert({error: error.response.data});
                     } else if (!error.processed) {
                         self.$alert('Unable to logout from this session');
+                    }
+                });
+            });
+        },
+        revokeAll() {
+            const self = this;
+
+            if (self.tokens.length < 2) {
+                return;
+            }
+
+            self.$confirm('Are you sure you want to logout all other sessions?', () => {
+                self.$showLoading();
+
+                self.$services.revokeAllTokens().then(response => {
+                    self.$hideLoading();
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        self.$alert('Unable to logout all other sessions');
+                        return;
+                    }
+
+                    for (let i = self.tokens.length - 1; i >= 0; i--) {
+                        if (!self.tokens[i].isCurrent) {
+                            self.tokens.splice(i, 1);
+                        }
+                    }
+
+                    self.$toast('You have logged out all other sessions');
+                }).catch(error => {
+                    self.$hideLoading();
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        self.$alert({error: error.response.data});
+                    } else if (!error.processed) {
+                        self.$alert('Unable to logout all other sessions');
                     }
                 });
             });

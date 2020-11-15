@@ -75,8 +75,8 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	}
 
 	tokenRecord := &models.TokenRecord{
-		Uid: uid,
-		UserTokenId: userTokenId,
+		Uid:             uid,
+		UserTokenId:     userTokenId,
 		CreatedUnixTime: claims.IssuedAt,
 	}
 
@@ -129,6 +129,40 @@ func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Erro
 	return true, nil
 }
 
+func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.Error) {
+	uid := c.GetCurrentUid()
+	tokens, err := a.tokens.GetAllTokensByUid(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[tokens.TokenRevokeAllHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	claims := c.GetTokenClaims()
+	currentTokenIndex := 0
+
+	for i := 0; i < len(tokens); i++ {
+		token := tokens[i]
+
+		if utils.Int64ToString(token.Uid) == claims.Id && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
+			currentTokenIndex = i
+			break
+		}
+	}
+
+	tokens = append(tokens[:currentTokenIndex], tokens[currentTokenIndex+1:]...)
+
+	err = a.tokens.DeleteTokens(uid, tokens)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[token.TokenRevokeAllHandler] failed to revoke all tokens for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[token.TokenRevokeAllHandler] user \"uid:%d\" has revoked all tokens", uid)
+	return true, nil
+}
+
 func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(uid)
@@ -148,8 +182,8 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Err
 	oldTokenClaims := c.GetTokenClaims()
 	oldUserTokenId, _ := utils.StringToInt64(oldTokenClaims.UserTokenId)
 	oldTokenRecord := &models.TokenRecord{
-		Uid: uid,
-		UserTokenId: oldUserTokenId,
+		Uid:             uid,
+		UserTokenId:     oldUserTokenId,
 		CreatedUnixTime: oldTokenClaims.IssuedAt,
 	}
 
@@ -158,9 +192,9 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Err
 	log.InfofWithRequestId(c, "[token.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	refreshResp := &models.TokenRefreshResponse{
-		NewToken: token,
+		NewToken:   token,
 		OldTokenId: a.tokens.GenerateTokenId(oldTokenRecord),
-		User: user.ToUserBasicInfo(),
+		User:       user.ToUserBasicInfo(),
 	}
 
 	return refreshResp, nil

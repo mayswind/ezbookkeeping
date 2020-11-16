@@ -32,6 +32,7 @@ type Account struct {
 	Name            string          `xorm:"VARCHAR(32) NOT NULL"`
 	DisplayOrder    int             `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Icon            int64           `xorm:"NOT NULL"`
+	Color           string          `xorm:"VARCHAR(6) NOT NULL"`
 	Currency        string          `xorm:"VARCHAR(3) NOT NULL"`
 	Balance         int64           `xorm:"NOT NULL"`
 	Comment         string          `xorm:"VARCHAR(255) NOT NULL"`
@@ -46,6 +47,7 @@ type AccountCreateRequest struct {
 	Category    AccountCategory         `json:"category" binding:"required"`
 	Type        AccountType             `json:"type" binding:"required"`
 	Icon        int64                   `json:"icon,string" binding:"required,min=1"`
+	Color       string                  `json:"color" binding:"required,len=6,validRGBColor"`
 	Currency    string                  `json:"currency" binding:"required,len=3,validCurrency"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
@@ -60,6 +62,7 @@ type AccountModifyRequest struct {
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
 	Category    AccountCategory         `json:"category" binding:"required"`
 	Icon        int64                   `json:"icon,string" binding:"min=1"`
+	Color       string                  `json:"color" binding:"required,len=6,validRGBColor"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	Hidden      bool                    `json:"hidden"`
 	SubAccounts []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
@@ -90,6 +93,7 @@ type AccountInfoResponse struct {
 	Category     AccountCategory          `json:"category"`
 	Type         AccountType              `json:"type"`
 	Icon         int64                    `json:"icon,string"`
+	Color        string                   `json:"color"`
 	Currency     string                   `json:"currency"`
 	Balance      int64                    `json:"balance"`
 	Comment      string                   `json:"comment"`
@@ -106,6 +110,7 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 		Category:     a.Category,
 		Type:         a.Type,
 		Icon:         a.Icon,
+		Color:        a.Color,
 		Currency:     a.Currency,
 		Balance:      a.Balance,
 		Comment:      a.Comment,

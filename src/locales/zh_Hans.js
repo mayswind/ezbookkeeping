@@ -224,6 +224,7 @@ export default {
         'nickname': '昵称',
         'oldPassword': '当前密码',
         'defaultCurrency': '默认货币',
+        'color': '颜色',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter}无效',
@@ -328,6 +329,8 @@ export default {
     'Your sub account name': '你的子账户名称',
     'Account Icon': '账户图标',
     'Sub Account Icon': '子账户图标',
+    'Account Color': '账户颜色',
+    'Sub Account Color': '子账户颜色',
     'Currency': '货币',
     'Description': '描述',
     'Your account description (optional)': '你的账户描述 (可选)',

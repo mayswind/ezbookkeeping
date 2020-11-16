@@ -14,6 +14,7 @@ import 'framework7-icons';
 
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import currency from './consts/currency.js';
+import colors from './consts/color.js';
 import icons from './consts/icon.js';
 import account from './consts/account.js';
 import version from './lib/version.js';
@@ -36,6 +37,7 @@ const i18n = new VueI18n(getI18nOptions());
 Vue.prototype.$version = version.getVersion;
 Vue.prototype.$constants = {
     currency: currency,
+    colors: colors,
     icons: icons,
     account: account,
 };

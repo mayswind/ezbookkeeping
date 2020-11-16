@@ -224,6 +224,7 @@ export default {
         'nickname': 'Nickname',
         'oldPassword': 'Current Password',
         'defaultCurrency': 'Default Currency',
+        'color': 'Color',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter} is invalid',
@@ -328,6 +329,8 @@ export default {
     'Your sub account name': 'Your sub account name',
     'Account Icon': 'Account Icon',
     'Sub Account Icon': 'Sub Account Icon',
+    'Account Color': 'Account Color',
+    'Sub Account Color': 'Sub Account Color',
     'Currency': 'Currency',
     'Description': 'Description',
     'Your account description (optional)': 'Your account description (optional)',

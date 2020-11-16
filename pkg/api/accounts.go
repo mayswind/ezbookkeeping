@@ -343,6 +343,7 @@ func (a *AccountsApi) createNewAccount(uid int64, accountCreateReq *models.Accou
 		Category:     accountCreateReq.Category,
 		Type:         accountCreateReq.Type,
 		Icon:         accountCreateReq.Icon,
+		Color:        accountCreateReq.Color,
 		Currency:     accountCreateReq.Currency,
 		Comment:      accountCreateReq.Comment,
 	}
@@ -369,6 +370,7 @@ func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.Acc
 		Name:      accountModifyReq.Name,
 		Category:  accountModifyReq.Category,
 		Icon:      accountModifyReq.Icon,
+		Color:     accountModifyReq.Color,
 		Comment:   accountModifyReq.Comment,
 		Hidden:    accountModifyReq.Hidden,
 	}
@@ -376,6 +378,7 @@ func (a *AccountsApi) getToUpdateAccount(uid int64, accountModifyReq *models.Acc
 	if newAccount.Name != oldAccount.Name ||
 		newAccount.Category != oldAccount.Category ||
 		newAccount.Icon != oldAccount.Icon ||
+		newAccount.Color != oldAccount.Color ||
 		newAccount.Comment != oldAccount.Comment ||
 		newAccount.Hidden != oldAccount.Hidden {
 		return newAccount

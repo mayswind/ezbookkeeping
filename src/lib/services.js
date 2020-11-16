@@ -169,23 +169,25 @@ export default {
     getAccount: ({ id }) => {
         return axios.get('v1/accounts/get.json?id=' + id);
     },
-    addAccount: ({ category, type, name, icon, currency, comment, subAccounts }) => {
+    addAccount: ({ category, type, name, icon, color, currency, comment, subAccounts }) => {
         return axios.post('v1/accounts/add.json', {
             category,
             type,
             name,
             icon,
+            color,
             currency,
             comment,
             subAccounts
         });
     },
-    modifyAccount: ({ id, category, name, icon, comment, hidden, subAccounts }) => {
+    modifyAccount: ({ id, category, name, icon, color, comment, hidden, subAccounts }) => {
         return axios.post('v1/accounts/modify.json', {
             id,
             category,
             name,
             icon,
+            color,
             comment,
             hidden,
             subAccounts

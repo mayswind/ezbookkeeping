@@ -50,6 +50,7 @@
                 <f7-list>
                     <f7-list-input label="Account Name" placeholder="Your account name"></f7-list-input>
                     <f7-list-item header="Account Icon" after="Icon"></f7-list-item>
+                    <f7-list-item header="Account Color" after="Color"></f7-list-item>
                     <f7-list-input label="Currency" placeholder="Currency"></f7-list-input>
                     <f7-list-input type="textarea" label="Description" placeholder="Your account description (optional)"></f7-list-input>
                 </f7-list>
@@ -70,7 +71,12 @@
 
                     <f7-list-item :header="$t('Account Icon')" key="singleTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
-                        <f7-icon slot="after" :f7="account.icon | accountIcon"></f7-icon>
+                        <f7-icon slot="after" :f7="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                    </f7-list-item>
+
+                    <f7-list-item :header="$t('Account Color')" key="singleTypeAccountColorSelection" link="#"
+                                  @click="showColorSelectionSheet(account)">
+                        <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
                     </f7-list-item>
 
                     <f7-list-input
@@ -114,7 +120,12 @@
 
                     <f7-list-item :header="$t('Account Icon')" key="multiTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
-                        <f7-icon slot="after" :f7="account.icon | accountIcon"></f7-icon>
+                        <f7-icon slot="after" :f7="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                    </f7-list-item>
+
+                    <f7-list-item :header="$t('Account Color')" key="multiTypeAccountColorSelection" link="#"
+                                  @click="showColorSelectionSheet(account)">
+                        <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
                     </f7-list-item>
 
                     <f7-list-input
@@ -151,7 +162,12 @@
 
                         <f7-list-item :header="$t('Sub Account Icon')" key="subAccountIconSelection" link="#"
                                       @click="showIconSelectionSheet(subAccount)">
-                            <f7-icon slot="after" :f7="subAccount.icon | accountIcon"></f7-icon>
+                            <f7-icon slot="after" :f7="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
+                        </f7-list-item>
+
+                        <f7-list-item :header="$t('Sub Account Color')" key="subAccountColorSelection" link="#"
+                                      @click="showColorSelectionSheet(subAccount)">
+                            <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + subAccount.color }"></f7-icon>
                         </f7-list-item>
 
                         <f7-list-input
@@ -207,6 +223,28 @@
                 </f7-block>
             </f7-page-content>
         </f7-sheet>
+
+        <f7-sheet :opened="showColorSelection" @sheet:closed="hideColorSelectionSheet">
+            <f7-toolbar>
+                <div class="left"></div>
+                <div class="right">
+                    <f7-link sheet-close :text="$t('Done')"></f7-link>
+                </div>
+            </f7-toolbar>
+            <f7-page-content>
+                <f7-block>
+                    <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allAccountColorRows" :key="idx">
+                        <f7-col v-for="accountColor in row" :key="accountColor.color">
+                            <f7-icon f7="app_fill" :style="{ color: '#' + accountColor.color }" @click.native="setSelectedColor(accountColor.color)">
+                                <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingColor && accountChoosingColor.color === accountColor.color">
+                                    <f7-icon f7="checkmark_alt"></f7-icon>
+                                </f7-badge>
+                            </f7-icon>
+                        </f7-col>
+                    </f7-row>
+                </f7-block>
+            </f7-page-content>
+        </f7-sheet>
     </f7-page>
 </template>
 
@@ -223,14 +261,17 @@ export default {
                 type: self.$constants.account.allAccountTypes.SingleAccount.toString(),
                 name: '',
                 icon: self.$constants.icons.defaultAccountIconId,
+                color: self.$constants.colors.defaultAccountColor,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
                 comment: '',
                 visible: true
             },
             subAccounts: [],
             accountChoosingIcon: null,
+            accountChoosingColor: null,
             submitting: false,
-            showIconSelection: false
+            showIconSelection: false,
+            showColorSelection: false
         };
     },
     computed: {
@@ -279,6 +320,24 @@ export default {
 
             return ret;
         },
+        allAccountColorRows() {
+            const allAccountColors = this.$constants.colors.allAccountColors;
+            const colorPerRow = 7;
+            const ret = [];
+            let rowCount = -1;
+
+            for (let i = 0; i < allAccountColors.length; i++) {
+                if (i % colorPerRow === 0) {
+                    ret[++rowCount] = [];
+                }
+
+                ret[rowCount].push({
+                    color: allAccountColors[i]
+                });
+            }
+
+            return ret;
+        },
         allCurrencies() {
             return this.$getAllCurrencies();
         }
@@ -310,6 +369,7 @@ export default {
                 self.account.type = account.type.toString();
                 self.account.name = account.name;
                 self.account.icon = account.icon;
+                self.account.color = account.color;
                 self.account.currency = account.currency;
                 self.account.comment = account.comment;
                 self.account.visible = !account.hidden;
@@ -324,6 +384,7 @@ export default {
                             type: subAccount.type.toString(),
                             name: subAccount.name,
                             icon: subAccount.icon,
+                            color: subAccount.color,
                             currency: subAccount.currency,
                             comment: subAccount.comment,
                             visible: !subAccount.hidden
@@ -360,6 +421,7 @@ export default {
                 type: null,
                 name: '',
                 icon: this.account.icon,
+                color: this.account.color,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
                 comment: ''
             });
@@ -388,6 +450,23 @@ export default {
             this.accountChoosingIcon = null;
             this.showIconSelection = false;
         },
+        showColorSelectionSheet(account) {
+            this.accountChoosingColor = account;
+            this.showColorSelection = true;
+        },
+        setSelectedColor(color) {
+            if (!this.accountChoosingColor) {
+                return;
+            }
+
+            this.accountChoosingColor.color = color;
+            this.accountChoosingColor = null;
+            this.showColorSelection = false;
+        },
+        hideColorSelectionSheet() {
+            this.accountChoosingColor = null;
+            this.showColorSelection = false;
+        },
         save() {
             const self = this;
             const router = self.$f7router;
@@ -412,6 +491,7 @@ export default {
                         type: self.$constants.account.allAccountTypes.SingleAccount,
                         name: subAccount.name,
                         icon: subAccount.icon,
+                        color: subAccount.color,
                         currency: subAccount.currency,
                         comment: subAccount.comment
                     };
@@ -430,6 +510,7 @@ export default {
                 type: parseInt(self.account.type),
                 name: self.account.name,
                 icon: self.account.icon,
+                color: self.account.color,
                 currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlacehodler,
                 comment: self.account.comment,
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,

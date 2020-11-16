@@ -1,7 +1,5 @@
 package models
 
-import "github.com/mayswind/lab/pkg/utils"
-
 type UserType byte
 
 const (
@@ -64,20 +62,16 @@ type UserProfileUpdateResponse struct {
 }
 
 type UserProfileResponse struct {
-	Uid             string   `json:"uid"`
 	Username        string   `json:"username"`
 	Email           string   `json:"email"`
 	Nickname        string   `json:"nickname"`
 	Type            UserType `json:"type"`
 	DefaultCurrency string   `json:"defaultCurrency"`
-	CreatedAt       int64    `json:"createdAt"`
-	UpdatedAt       int64    `json:"updatedAt"`
 	LastLoginAt     int64    `json:"lastLoginAt"`
 }
 
 func (u User) ToUserBasicInfo() *UserBasicInfo {
 	return &UserBasicInfo{
-		Uid:             utils.Int64ToString(u.Uid),
 		Username:        u.Username,
 		Email:           u.Email,
 		Nickname:        u.Nickname,
@@ -87,14 +81,11 @@ func (u User) ToUserBasicInfo() *UserBasicInfo {
 
 func (u User) ToUserProfileResponse() *UserProfileResponse {
 	return &UserProfileResponse{
-		Uid:             utils.Int64ToString(u.Uid),
 		Username:        u.Username,
 		Email:           u.Email,
 		Nickname:        u.Nickname,
 		Type:            u.Type,
 		DefaultCurrency: u.DefaultCurrency,
-		CreatedAt:       u.CreatedUnixTime,
-		UpdatedAt:       u.UpdatedUnixTime,
 		LastLoginAt:     u.LastLoginUnixTime,
 	}
 }

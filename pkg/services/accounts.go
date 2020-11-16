@@ -227,6 +227,8 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 			return errs.ErrAccountNotFound
 		}
 
+		_, err = sess.Cols("deleted", "deleted_unix_time").In("parent_account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
 		return err
 	})
 }

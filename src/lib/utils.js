@@ -1,3 +1,5 @@
+import accountConstants from '../consts/account.js'
+
 function isFunction(val) {
     return typeof(val) === 'function';
 }
@@ -61,6 +63,40 @@ function getAccountByAccountId(categorizedAccounts, accountId) {
     return null;
 }
 
+function getAllFilteredAccountsBalance(categorizedAccounts, accountCategoryFilter) {
+    const allAccountCategories = accountConstants.allCategories;
+    const ret = [];
+
+    for (let categoryIdx = 0; categoryIdx < allAccountCategories.length; categoryIdx++) {
+        const accountCategory = allAccountCategories[categoryIdx];
+
+        if (!accountCategoryFilter(accountCategory) || !categorizedAccounts[accountCategory.id]) {
+            continue;
+        }
+
+        for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].length; accountIdx++) {
+            const account = categorizedAccounts[accountCategory.id][accountIdx];
+
+            if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+                ret.push({
+                    balance: account.balance,
+                    currency: account.currency
+                });
+            } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+                for (let subAccountIdx = 0; subAccountIdx < account.subAccounts.length; subAccountIdx++) {
+                    const subAccount = account.subAccounts[subAccountIdx];
+                    ret.push({
+                        balance: subAccount.balance,
+                        currency: subAccount.currency
+                    });
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 export default {
     isFunction,
     isObject,
@@ -70,4 +106,5 @@ export default {
     isBoolean,
     getCategorizedAccounts,
     getAccountByAccountId,
+    getAllFilteredAccountsBalance,
 };

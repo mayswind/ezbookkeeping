@@ -9,6 +9,24 @@
             </f7-nav-right>
         </f7-navbar>
 
+        <f7-card :class="{ 'bg-color-yellow': true, 'skeleton-text': loading }">
+            <f7-card-header class="display-block" style="padding-top: 100px;">
+                <small :style="{ opacity: 0.6 }">{{ $t('Net assets') }}</small><br />
+                <big>{{ netAssets | currency(defaultCurrency) }}</big>
+                <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
+                    <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
+                </f7-link>
+                <br />
+                <small class="account-overview-info" :style="{ opacity: 0.6 }">
+                    <span>{{ $t('Total assets') }}</span>
+                    <span>{{ totalAssets | currency(defaultCurrency) }}</span>
+                    <span>|</span>
+                    <span>{{ $t('Total liabilities') }}</span>
+                    <span>{{ totalLiabilities | currency(defaultCurrency) }}</span>
+                </small>
+            </f7-card-header>
+        </f7-card>
+
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>Account Category</f7-card-header>
             <f7-card-content :padding="false">
@@ -47,7 +65,12 @@
         </f7-card>
 
         <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id" v-show="showHidden || hasShownAccount(accountCategory)">
-            <f7-card-header>{{ $t(accountCategory.name) }}</f7-card-header>
+            <f7-card-header>
+                <small :style="{ opacity: 0.6 }">
+                    <span>{{ $t(accountCategory.name) }}</span>
+                    <span style="margin-left: 10px">{{ accountCategoryTotalBalance(accountCategory) | currency(defaultCurrency) }}</span>
+                </small>
+            </f7-card-header>
             <f7-card-content :padding="false">
                 <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
@@ -109,11 +132,15 @@ export default {
             loading: true,
             showHidden: false,
             sortable: false,
+            showAccountBalance: this.$settings.isShowAccountBalance(),
             displayOrderModified: false,
             displayOrderSaving: false
         };
     },
     computed: {
+        defaultCurrency() {
+            return this.$user.getUserInfo() ? this.$user.getUserInfo().defaultCurrency : this.$t('default.currency');
+        },
         noAvailableAccount() {
             let allAccountCount = 0;
             let shownAccountCount = 0;
@@ -153,6 +180,63 @@ export default {
             }
 
             return usedAccountCategories;
+        },
+        netAssets() {
+            if (!this.showAccountBalance) {
+                return '---';
+            }
+
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, () => true);
+            let netAssets = 0;
+
+            for (let i = 0; i < accountsBalance.length; i++) {
+                if (accountsBalance[i].currency === this.defaultCurrency) {
+                    netAssets += accountsBalance[i].balance;
+                } else {
+                    // TODO: calculate exchange rate
+                    netAssets += accountsBalance[i].balance;
+                }
+            }
+
+            return netAssets;
+        },
+        totalAssets() {
+            if (!this.showAccountBalance) {
+                return '---';
+            }
+
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isAsset);
+            let totalAssets = 0;
+
+            for (let i = 0; i < accountsBalance.length; i++) {
+                if (accountsBalance[i].currency === this.defaultCurrency) {
+                    totalAssets += accountsBalance[i].balance;
+                } else {
+                    // TODO: calculate exchange rate
+                    totalAssets += accountsBalance[i].balance;
+                }
+            }
+
+            return totalAssets;
+        },
+        totalLiabilities() {
+            if (!this.showAccountBalance) {
+                return '---';
+            }
+
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isLiability);
+            let totalLiabilities = 0;
+
+            for (let i = 0; i < accountsBalance.length; i++) {
+                if (accountsBalance[i].currency === this.defaultCurrency) {
+                    totalLiabilities += accountsBalance[i].balance;
+                } else {
+                    // TODO: calculate exchange rate
+                    totalLiabilities += accountsBalance[i].balance;
+                }
+            }
+
+            return totalLiabilities;
         }
     },
     created() {
@@ -227,16 +311,39 @@ export default {
 
             return shownCount > 0;
         },
+        toggleShowAccountBalance() {
+            this.showAccountBalance = !this.showAccountBalance;
+            this.$settings.setShowAccountBalance(this.showAccountBalance);
+        },
         accountBalance(account) {
             if (account.type !== this.$constants.account.allAccountTypes.SingleAccount) {
                 return null;
             }
 
-            if (this.$settings.isShowAccountBalance()) {
+            if (this.showAccountBalance) {
                 return account.balance;
             } else {
                 return '---';
             }
+        },
+        accountCategoryTotalBalance(accountCategory) {
+            if (!this.showAccountBalance) {
+                return '---';
+            }
+
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.id === accountCategory.id);
+            let totalBalance = 0;
+
+            for (let i = 0; i < accountsBalance.length; i++) {
+                if (accountsBalance[i].currency === this.defaultCurrency) {
+                    totalBalance += accountsBalance[i].balance;
+                } else {
+                    // TODO: calculate exchange rate
+                    totalBalance += accountsBalance[i].balance;
+                }
+            }
+
+            return totalBalance;
         },
         setSortable() {
             this.showHidden = true;
@@ -404,3 +511,13 @@ export default {
     }
 };
 </script>
+
+<style>
+.account-overview-info > span {
+    margin-right: 4px;
+}
+
+.account-overview-info > span:last-child {
+    margin-right: 0;
+}
+</style>

@@ -12,7 +12,7 @@
         <f7-card :class="{ 'bg-color-yellow': true, 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 100px;">
                 <small :style="{ opacity: 0.6 }">{{ $t('Net assets') }}</small><br />
-                <big>{{ netAssets | currency(defaultCurrency) }}</big>
+                <span class="net-assets">{{ netAssets | currency(defaultCurrency) }}</span>
                 <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
                     <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                 </f7-link>
@@ -513,6 +513,10 @@ export default {
 </script>
 
 <style>
+.net-assets {
+    font-size: 1.5em;
+}
+
 .account-overview-info > span {
     margin-right: 4px;
 }

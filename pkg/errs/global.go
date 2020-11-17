@@ -11,6 +11,7 @@ var (
 	ErrRequestIdInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 2, http.StatusInternalServerError, "request id is invalid")
 	ErrCiphertextInvalid               = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 3, http.StatusInternalServerError, "ciphertext is invalid")
 	ErrNothingWillBeUpdated            = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 4, http.StatusBadRequest, "nothing will be updated")
+	ErrFailedToRequestRemoteApi        = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 5, http.StatusBadRequest, "failed to request third party api")
 )
 
 func GetParameterInvalidMessage(field string) string {

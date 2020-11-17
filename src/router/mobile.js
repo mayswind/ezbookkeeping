@@ -13,6 +13,7 @@ import AccountEditPage from '../views/mobile/accounts/AccountEdit.vue';
 import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue';
 
 import SettingsPage from '../views/mobile/Settings.vue';
+import ExchangeRatesPage from "../views/mobile/ExchangeRates.vue";
 import AboutPage from "../views/mobile/About.vue";
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
 import TwoFactorAuthPage from "../views/mobile/users/TwoFactorAuth.vue";
@@ -91,6 +92,11 @@ const routes = [
     {
         path: '/settings',
         component: SettingsPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/exchange_rates',
+        component: ExchangeRatesPage,
         beforeEnter: checkLogin
     },
     {

@@ -5,6 +5,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
     lang: 'en',
+    autoUpdateExchangeRatesData: true,
     thousandsSeparator: true,
     currencyDisplayMode: 'code', // or 'none' or 'name'
     showAccountBalance: true,
@@ -72,6 +73,8 @@ function clearSettings() {
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    isAutoUpdateExchangeRatesData: () => getOption('autoUpdateExchangeRatesData'),
+    setAutoUpdateExchangeRatesData: value => setOption('autoUpdateExchangeRatesData', value),
     isEnableThousandsSeparator: () => getOption('thousandsSeparator'),
     setEnableThousandsSeparator: value => setOption('thousandsSeparator', value),
     getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),

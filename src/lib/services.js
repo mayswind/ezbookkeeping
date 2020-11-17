@@ -1,5 +1,6 @@
 import axios from 'axios';
 import userState from "./userstate.js";
+import exchangeRates from "./exchangeRates.js";
 
 let needBlockRequest = false;
 let blockedRequests = [];
@@ -207,6 +208,22 @@ export default {
     deleteAccount: ({ id }) => {
         return axios.post('v1/accounts/delete.json', {
             id
+        });
+    },
+    getLatestExchangeRates: () => {
+        return axios.get('v1/exchange_rates/latest.json');
+    },
+    refreshLatestExchangeRates: () => {
+        return axios.get('v1/exchange_rates/latest.json', {
+            ignoreError: true
+        }).then(response => {
+            const data = response.data;
+
+            if (data && data.success && data.result && data.result.exchangeRates) {
+                exchangeRates.setExchangeRates(data.result);
+            }
+
+            return data.result;
         });
     },
 };

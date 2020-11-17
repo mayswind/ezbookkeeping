@@ -8,6 +8,9 @@ export default {
         'currency': 'CNY',
     },
     'format': {
+        'date': {
+            'long': 'YYYY年MM月DD日'
+        },
         'datetime': {
             'long': 'YYYY年MM月DD日 HH:mm:ss',
         }
@@ -178,6 +181,7 @@ export default {
         'incomplete or incorrect submission': '提交不完整或不正确',
         'operation failed': '操作失败',
         'nothing will be updated': '没有内容更新',
+        'failed to request third party api': '请求第三方接口失败',
         'user id is invalid': '用户ID无效',
         'username is empty': '用户名为空',
         'email is empty': '电子邮箱为空',
@@ -359,6 +363,7 @@ export default {
     'Unable to delete this account': '无法删除该账户',
     'User Profile': '用户信息',
     'Language': '语言',
+    'Auto Update Exchange Rates Data': '自动更新汇率数据',
     'Enable Thousands Separator': '启用千位分隔符',
     'Currency Display Mode': '货币显示模式',
     'Currency Code': '货币代码',
@@ -399,6 +404,14 @@ export default {
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定是否要退出登录？',
     'Unable to logout': '无法退出登录',
+    'Exchange Rates Data': '汇率数据',
+    'Base Currency': '基准货币',
+    'Last Updated': '最后更新',
+    'Data source': '数据来源',
+    'No exchange rates data': '没有汇率数据',
+    'There is no exchange rates data for your default currency': '没有您默认货币的汇率数据',
+    'Exchange rates data has been updated': '汇率数据已更新',
+    'Unable to get exchange rates data': '无法获取汇率数据',
     'About': '关于',
     'Official Website': '官方网站',
     'License': '许可协议',

@@ -8,6 +8,9 @@ export default {
         'currency': 'USD',
     },
     'format': {
+        'date': {
+            'long': 'MM/DD/YYYY'
+        },
         'datetime': {
             'long': 'MM/DD/YYYY HH:mm:ss',
         }
@@ -178,6 +181,7 @@ export default {
         'incomplete or incorrect submission': 'Incomplete or incorrect submission',
         'operation failed': 'Operation failed',
         'nothing will be updated': 'Nothing will be updated',
+        'failed to request third party api': 'Failed to request third party api',
         'user id is invalid': 'User id is invalid',
         'username is empty': 'Username is empty',
         'email is empty': 'Email is empty',
@@ -359,6 +363,7 @@ export default {
     'Unable to delete this account': 'Unable to delete this account',
     'User Profile': 'User Profile',
     'Language': 'Language',
+    'Auto Update Exchange Rates Data': 'Auto Update Exchange Rates Data',
     'Enable Thousands Separator': 'Enable Thousands Separator',
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
@@ -399,6 +404,14 @@ export default {
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',
     'Unable to logout': 'Unable to logout',
+    'Exchange Rates Data': 'Exchange Rates Data',
+    'Base Currency': 'Base Currency',
+    'Last Updated': 'Last Updated',
+    'Data source': 'Data source',
+    'No exchange rates data': 'No exchange rates data',
+    'There is no exchange rates data for your default currency': 'There is no exchange rates data for your default currency',
+    'Exchange rates data has been updated': 'Exchange rates data has been updated',
+    'Unable to get exchange rates data': 'Unable to get exchange rates data',
     'About': 'About',
     'Official Website': 'Official Website',
     'License': 'License',

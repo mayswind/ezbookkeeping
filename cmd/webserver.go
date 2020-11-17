@@ -168,6 +168,9 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.POST("/accounts/hide.json", bindApi(api.Accounts.AccountHideHandler))
 			apiV1Route.POST("/accounts/move.json", bindApi(api.Accounts.AccountMoveHandler))
 			apiV1Route.POST("/accounts/delete.json", bindApi(api.Accounts.AccountDeleteHandler))
+
+			// Exchange Rates
+			apiV1Route.GET("/exchange_rates/latest.json", bindApi(api.ExchangeRates.LatestExchangeRateHandler))
 		}
 	}
 

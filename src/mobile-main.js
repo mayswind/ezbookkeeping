@@ -22,6 +22,7 @@ import version from './lib/version.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
+import exchangeRates from './lib/exchangeRates.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
 import accountIconFilter from './filters/accountIcon.js';
@@ -149,6 +150,7 @@ Vue.prototype.$hideLoading = function () {
 };
 
 Vue.prototype.$services = services;
+Vue.prototype.$exchangeRates = exchangeRates;
 Vue.prototype.$user = userstate;
 
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
@@ -161,6 +163,11 @@ Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 // refresh token if user is logined
 if (userstate.isUserLogined()) {
     services.refreshToken();
+}
+
+// auto refresh exchange rates data
+if (settings.isAutoUpdateExchangeRatesData()) {
+    services.refreshLatestExchangeRates();
 }
 
 new Vue({

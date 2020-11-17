@@ -29,6 +29,13 @@
                         </select>
                     </f7-list-item>
 
+                    <f7-list-item :title="$t('Exchange Rates Data')" :after="exchangeRatesLastUpdateDate" link="/exchange_rates"></f7-list-item>
+
+                    <f7-list-item>
+                        <span>{{ $t('Auto Update Exchange Rates Data') }}</span>
+                        <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
+                    </f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Enable Thousands Separator') }}</span>
                         <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
@@ -91,6 +98,18 @@ export default {
             },
             set: function (value) {
                 this.$setLanguage(value);
+            }
+        },
+        exchangeRatesLastUpdateDate() {
+            const exchangeRates = this.$exchangeRates.getExchangeRates();
+            return exchangeRates && exchangeRates.date ? this.$moment(exchangeRates.date).format(this.$t('format.date.long')) : '';
+        },
+        isAutoUpdateExchangeRatesData: {
+            get: function () {
+                return this.$settings.isAutoUpdateExchangeRatesData();
+            },
+            set: function (value) {
+                this.$settings.setAutoUpdateExchangeRatesData(value);
             }
         },
         isEnableThousandsSeparator: {
@@ -161,6 +180,7 @@ export default {
 
                     self.$user.clearTokenAndUserInfo();
                     self.$settings.clearSettings();
+                    self.$exchangeRates.clearExchangeRates();
                     router.navigate('/');
                 }).catch(error => {
                     self.logouting = false;

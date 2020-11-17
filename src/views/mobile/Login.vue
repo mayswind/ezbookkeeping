@@ -186,6 +186,11 @@ export default {
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);
+
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$services.refreshLatestExchangeRates();
+                }
+
                 router.navigate('/');
             }).catch(error => {
                 self.logining = false;
@@ -252,6 +257,11 @@ export default {
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);
+
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$services.refreshLatestExchangeRates();
+                }
+
                 self.show2faSheet = false;
                 router.navigate('/');
             }).catch(error => {

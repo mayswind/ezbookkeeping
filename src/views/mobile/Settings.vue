@@ -28,10 +28,12 @@
                                     :value="locale">{{ lang.displayName }}</option>
                         </select>
                     </f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Enable Thousands Separator') }}</span>
                         <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
                     </f7-list-item>
+
                     <f7-list-item
                         :key="currentLocale + '_currency_display'"
                         :title="$t('Currency Display Mode')"
@@ -42,18 +44,22 @@
                             <option value="name">{{ $t('Currency Name') }}</option>
                         </select>
                     </f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Show Account Balance') }}</span>
                         <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
                     </f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Enable Animate') }}</span>
                         <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
                     </f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Enable Auto Dark Mode') }}</span>
                         <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
                     </f7-list-item>
+
                     <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
                 </f7-list>
             </f7-card-content>

@@ -65,6 +65,10 @@ function getServerSetting(key) {
     return undefined;
 }
 
+function clearSettings() {
+    localStorage.removeItem(settingsLocalStorageKey);
+}
+
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
@@ -78,5 +82,6 @@ export default {
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),
     setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
-    isUserRegistrationEnabled: () => getServerSetting('r') === '1'
+    isUserRegistrationEnabled: () => getServerSetting('r') === '1',
+    clearSettings: clearSettings
 };

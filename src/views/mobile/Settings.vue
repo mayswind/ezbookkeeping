@@ -154,6 +154,7 @@ export default {
                     }
 
                     self.$user.clearTokenAndUserInfo();
+                    self.$settings.clearSettings();
                     router.navigate('/');
                 }).catch(error => {
                     self.logouting = false;

@@ -34,7 +34,7 @@
                 <f7-list>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
                                   :title="exchangeRate.currencyDisplayName"
-                                  :after="exchangeRate.rate | exchangeRate(exchangeRatesData.exchangeRates, exchangeRatesData.baseCurrency, baseCurrency)"></f7-list-item>
+                                  :after="exchangeRate.rate | exchangeRate(exchangeRatesData.exchangeRates, baseCurrency)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
@@ -147,7 +147,7 @@ export default {
         }
     },
     filters: {
-        exchangeRate(oldRate, exchangeRates, baseCurrency, currentCurrency) {
+        exchangeRate(oldRate, exchangeRates, currentCurrency) {
             const exchangeRateMap = {};
 
             for (let i = 0; i < exchangeRates.length; i++) {

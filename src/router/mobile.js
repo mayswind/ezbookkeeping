@@ -4,13 +4,13 @@ import HomePage from '../views/mobile/Home.vue';
 import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
 
-import TransactionDetailPage from '../views/mobile/transactions/Detail.vue'
-import TransactionNewPage from '../views/mobile/transactions/New.vue'
+import TransactionDetailPage from '../views/mobile/transactions/Detail.vue';
+import TransactionNewPage from '../views/mobile/transactions/New.vue';
 
-import AccountListPage from '../views/mobile/accounts/AccountList.vue'
-import AccountEditPage from '../views/mobile/accounts/AccountEdit.vue'
+import AccountListPage from '../views/mobile/accounts/AccountList.vue';
+import AccountEditPage from '../views/mobile/accounts/AccountEdit.vue';
 
-import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue'
+import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue';
 
 import SettingsPage from '../views/mobile/Settings.vue';
 import AboutPage from "../views/mobile/About.vue";

@@ -126,6 +126,19 @@ export function getDefaultLanguage() {
         }
     }
 
+    if (!allLanguages[browserLocale] && browserLocale.split('-').length > 1) { // maybe language-script-region
+        const localeParts = browserLocale.split('-');
+        browserLocale = localeParts[0] + '-' + localeParts[1];
+
+        if (!allLanguages[browserLocale]) {
+            const locale = getLocaleFromLanguageAlias(browserLocale);
+
+            if (locale) {
+                browserLocale = locale;
+            }
+        }
+    }
+
     if (!allLanguages[browserLocale]) {
         return defaultLanguage;
     }
@@ -215,6 +228,10 @@ function getLocaleFromLanguageAlias(alias) {
             continue;
         }
 
+        if (locale.toLowerCase() === alias.toLowerCase()) {
+            return locale;
+        }
+
         const lang = allLanguages[locale];
         const aliases = lang.aliases;
 
@@ -223,7 +240,7 @@ function getLocaleFromLanguageAlias(alias) {
         }
 
         for (let i = 0; i < aliases.length; i++) {
-            if (aliases[i] === alias) {
+            if (aliases[i].toLowerCase() === alias.toLowerCase()) {
                 return locale;
             }
         }

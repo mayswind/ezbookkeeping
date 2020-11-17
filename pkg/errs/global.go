@@ -48,3 +48,7 @@ func GetParameterInvalidEmailMessage(field string) string {
 func GetParameterInvalidCurrencyMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid currency", field)
 }
+
+func GetParameterInvalidHexRGBColorMessage(field string) string {
+	return fmt.Sprintf("parameter \"%s\" is invalid color", field)
+}

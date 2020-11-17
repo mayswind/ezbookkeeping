@@ -236,6 +236,7 @@ export default {
         'parameter invalid username format': '{parameter} is invalid format',
         'parameter invalid email format': '{parameter} is invalid format',
         'parameter invalid currency': '{parameter} is invalid format',
+        'parameter invalid color': '{parameter} is invalid format',
     },
     'OK': 'OK',
     'Cancel': 'Cancel',

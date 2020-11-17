@@ -47,7 +47,7 @@ type AccountCreateRequest struct {
 	Category    AccountCategory         `json:"category" binding:"required"`
 	Type        AccountType             `json:"type" binding:"required"`
 	Icon        int64                   `json:"icon,string" binding:"required,min=1"`
-	Color       string                  `json:"color" binding:"required,len=6,validRGBColor"`
+	Color       string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency    string                  `json:"currency" binding:"required,len=3,validCurrency"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
@@ -62,7 +62,7 @@ type AccountModifyRequest struct {
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
 	Category    AccountCategory         `json:"category" binding:"required"`
 	Icon        int64                   `json:"icon,string" binding:"min=1"`
-	Color       string                  `json:"color" binding:"required,len=6,validRGBColor"`
+	Color       string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	Hidden      bool                    `json:"hidden"`
 	SubAccounts []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`

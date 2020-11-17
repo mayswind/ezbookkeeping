@@ -236,6 +236,7 @@ export default {
         'parameter invalid username format': '{parameter}格式错误',
         'parameter invalid email format': '{parameter}格式错误',
         'parameter invalid currency': '{parameter}格式错误',
+        'parameter invalid color': '{parameter}格式错误',
     },
     'OK': '确定',
     'Cancel': '取消',

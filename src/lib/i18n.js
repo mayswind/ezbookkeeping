@@ -88,6 +88,14 @@ const parameterizedErrors = [
             field: 'parameter',
             localized: true
         }]
+    },
+    {
+        localeKey: 'parameter invalid color',
+        regex: /^parameter "(\w+)" is invalid color$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }]
     }
 ];
 

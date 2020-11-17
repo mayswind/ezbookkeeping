@@ -6,9 +6,9 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
-func ValidRGBColor(fl validator.FieldLevel) bool {
+func ValidHexRGBColor(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
-		if utils.IsValidRGBColor(value) {
+		if utils.IsValidHexRGBColor(value) {
 			return true
 		}
 	}

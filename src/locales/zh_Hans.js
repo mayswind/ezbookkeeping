@@ -380,6 +380,7 @@ export default {
     'Unable to get session list': '无法获取会话列表',
     'Current': '当前',
     'Other Device': '其他设备',
+    'Unknown Device': '未知设备',
     'Are you sure you want to logout from this session?': '您确定是否要退出该会话？',
     'Unable to logout from this session': '无法退出该会话',
     'Are you sure you want to logout all other sessions?': '您确定是否要退出其他所有会话？',

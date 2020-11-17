@@ -65,10 +65,28 @@ const allAccountIcons = {
         f7Icon: 'bitcoin'
     }
 };
+const deviceIcons = {
+    mobile: {
+        f7Icon: 'device_phone_portrait'
+    },
+    tablet: {
+        f7Icon: 'device_tablet_portrait'
+    },
+    wearable: {
+        f7Icon: 'device_phone_portrait'
+    },
+    desktop: {
+        f7Icon: 'device_desktop'
+    },
+    tv: {
+        f7Icon: 'tv'
+    }
+};
 
 export default {
     allAccountIcons: allAccountIcons,
     defaultAccountIconId: defaultAccountIconId,
     defaultAccountIcon: allAccountIcons[defaultAccountIconId],
     totalAccountIconCount: totalAccountIconCount,
+    deviceIcons: deviceIcons,
 };

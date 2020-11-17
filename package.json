@@ -15,6 +15,7 @@
     "framework7-vue": "^5.7.14",
     "js-cookie": "^2.2.1",
     "moment": "^2.29.1",
+    "ua-parser-js": "^0.7.22",
     "vue": "^2.6.12",
     "vue-clipboard2": "^0.3.1",
     "vue-i18n": "^8.22.1",

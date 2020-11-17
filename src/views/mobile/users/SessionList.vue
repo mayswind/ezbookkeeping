@@ -11,8 +11,12 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content :padding="false">
                 <f7-list media-list>
-                    <f7-list-item title="Token Name" after="MM/DD/YYYY HH:mm:ss"
-                        text="Mozilla/5.0 (OS Name & Version or Device Name; CPU Architecture ...) AppleWebKit/Version (KHTML, like Gecko) Software Name/Version Software Name/Version ..."></f7-list-item>
+                    <f7-list-item class="list-item-media-valign-middle"
+                                  title="Current"
+                                  text="Device Name (Browser xx.x.xxxx.xx)">
+                        <f7-icon slot="media" f7="device_phone_portrait"></f7-icon>
+                        <small slot="after">MM/DD/YYYY HH:mm:ss</small>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -20,7 +24,14 @@
         <f7-card v-else-if="!loading">
             <f7-card-content :padding="false">
                 <f7-list media-list>
-                    <f7-list-item swipeout v-for="token in tokens" :key="token.tokenId" :id="token | tokenDomId" :title="token | tokenTitle | t" :after="token.createdAt | moment($t('format.datetime.long'))" :text="token.userAgent">
+                    <f7-list-item class="list-item-media-valign-middle" swipeout
+                                  v-for="token in tokens"
+                                  :key="token.tokenId"
+                                  :id="token | tokenDomId"
+                                  :title="token | tokenTitle | t"
+                                  :text="token | tokenDevice | t">
+                        <f7-icon slot="media" :f7="token | tokenIcon"></f7-icon>
+                        <small slot="after">{{ token.createdAt | moment($t('format.datetime.long')) }}</small>
                         <f7-swipeout-actions right v-if="!token.isCurrent">
                             <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(token)"></f7-swipeout-button>
                         </f7-swipeout-actions>

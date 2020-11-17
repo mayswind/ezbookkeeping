@@ -152,6 +152,12 @@ const licenses = [
         copyright: 'Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors',
         url: 'https://github.com/js-cookie/js-cookie',
         licenseUrl: 'https://github.com/js-cookie/js-cookie/blob/master/LICENSE'
+    },
+    {
+        name: 'UAParser.js',
+        copyright: 'Copyright (c) 2012-2019 Faisal Salman <f@faisalman.com>',
+        url: 'https://github.com/faisalman/ua-parser-js',
+        licenseUrl: 'https://github.com/faisalman/ua-parser-js/blob/master/license.md'
     }
 ];
 

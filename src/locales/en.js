@@ -380,6 +380,7 @@ export default {
     'Unable to get session list': 'Unable to get session list',
     'Current': 'Current',
     'Other Device': 'Other Device',
+    'Unknown Device': 'Unknown Device',
     'Are you sure you want to logout from this session?': 'Are you sure you want to logout from this session?',
     'Unable to logout from this session': 'Unable to logout from this session',
     'Are you sure you want to logout all other sessions?': 'Are you sure you want to logout all other sessions?',

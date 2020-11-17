@@ -1,4 +1,5 @@
-import accountConstants from '../consts/account.js'
+import uaParser from 'ua-parser-js';
+import accountConstants from '../consts/account.js';
 
 function isFunction(val) {
     return typeof(val) === 'function';
@@ -26,6 +27,26 @@ function isNumber(val) {
 
 function isBoolean(val) {
     return typeof(val) === 'boolean';
+}
+
+function parseUserAgent(ua) {
+    const uaParseRet = uaParser(ua);
+
+    return {
+        device: {
+            vendor: uaParseRet.device.vendor,
+            model: uaParseRet.device.model,
+            type: uaParseRet.device.type
+        },
+        os: {
+            name: uaParseRet.os.name,
+            version: uaParseRet.os.version
+        },
+        browser: {
+            name: uaParseRet.browser.name,
+            version: uaParseRet.browser.version
+        }
+    };
 }
 
 function getCategorizedAccounts(allAccounts) {
@@ -104,6 +125,7 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    parseUserAgent,
     getCategorizedAccounts,
     getAccountByAccountId,
     getAllFilteredAccountsBalance,

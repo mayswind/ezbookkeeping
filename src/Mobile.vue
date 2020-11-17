@@ -107,6 +107,10 @@ body {
     display: none;
 }
 
+.list-item-media-valign-middle .item-media {
+    align-self: normal !important;
+}
+
 .lab-list-item-error-info div.item-footer {
     color: var(--f7-input-error-text-color)
 }

@@ -25,6 +25,8 @@ import userstate from './lib/userstate.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
 import accountIconFilter from './filters/accountIcon.js';
+import tokenDeviceFilter from './filters/tokenDevice.js';
+import tokenIconFilter from './filters/tokenIcon.js';
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
@@ -151,6 +153,8 @@ Vue.prototype.$user = userstate;
 
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
+Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
+Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 

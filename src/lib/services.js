@@ -36,11 +36,11 @@ axios.interceptors.response.use(response => {
         const errorCode = error.response.data.errorCode;
 
         if (errorCode === 202001 // unauthorized access
-            && errorCode <= 202002 // current token is invalid
-            && errorCode <= 202003 // current token is expired
-            && errorCode <= 202004 // current token type is invalid
-            && errorCode <= 202005 // current token requires two factor authorization
-            && errorCode <= 202006) { // current token does not require two factor authorization
+            || errorCode === 202002 // current token is invalid
+            || errorCode === 202003 // current token is expired
+            || errorCode === 202004 // current token type is invalid
+            || errorCode === 202005 // current token requires two factor authorization
+            || errorCode === 202006) { // current token does not require two factor authorization
             userState.clearTokenAndUserInfo();
             location.reload();
             return Promise.reject({ processed: true });

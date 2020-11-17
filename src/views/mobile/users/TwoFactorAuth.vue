@@ -36,7 +36,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Passcode'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Passcode') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}</p>
@@ -69,7 +69,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
@@ -97,7 +97,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
@@ -125,7 +125,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Backup Code'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Backup Code') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">

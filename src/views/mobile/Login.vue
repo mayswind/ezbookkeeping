@@ -23,7 +23,7 @@
         <f7-list>
             <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
-                <span v-t="'Don\'t have an account?'"></span>&nbsp;
+                <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
                 <f7-link :class="{'disabled': !isUserRegistrationEnabled}" href="/signup" :text="$t('Create an account')"></f7-link>
                 <br/>
                 <f7-link class="disabled" href="/forget-pwd" :text="$t('Forget Password?')"></f7-link>
@@ -58,7 +58,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Two-Factor Authentication'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <f7-list no-hairlines class="no-margin-top margin-bottom">

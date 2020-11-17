@@ -81,7 +81,7 @@
         >
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b v-t="'Current Password'"></b></div>
+                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top">{{ $t('Please enter your current password when modifying your password') }}</p>

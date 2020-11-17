@@ -60,7 +60,7 @@ func getValidationErrorText(err validator.FieldError) string {
 	case "validEmail":
 		return errs.GetParameterInvalidEmailMessage(fieldName)
 	case "validCurrency":
-		return errs.GetParameterInvalidCurrencylMessage(fieldName)
+		return errs.GetParameterInvalidCurrencyMessage(fieldName)
 	}
 
 	return errs.GetParameterInvalidMessage(fieldName)

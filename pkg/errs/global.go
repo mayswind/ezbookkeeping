@@ -45,6 +45,6 @@ func GetParameterInvalidEmailMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid email format", field)
 }
 
-func GetParameterInvalidCurrencylMessage(field string) string {
+func GetParameterInvalidCurrencyMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid currency", field)
 }

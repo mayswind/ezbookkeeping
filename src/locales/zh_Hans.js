@@ -266,7 +266,7 @@ export default {
     'Back': '返回',
     'Username': '用户名',
     'Your username': '你的用户名',
-    'Your username or Email': '你的用户名或注册邮箱',
+    'Your username or email': '你的用户名或注册邮箱',
     'Password': '密码',
     'Your password': '你的密码',
     'Your password, at least 6 characters': '你的密码，至少6个字符',

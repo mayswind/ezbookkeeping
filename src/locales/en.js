@@ -266,7 +266,7 @@ export default {
     'Back': 'Back',
     'Username': 'Username',
     'Your username': 'Your username',
-    'Your username or Email': 'Your username or Email',
+    'Your username or email': 'Your username or email',
     'Password': 'Password',
     'Your password': 'Your password',
     'Your password, at least 6 characters': 'Your password, at least 6 characters',

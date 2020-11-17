@@ -213,7 +213,7 @@
                 <f7-block>
                     <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allAccountIconRows" :key="idx">
                         <f7-col v-for="accountIcon in row" :key="accountIcon.id">
-                            <f7-icon :f7="accountIcon.f7Icon" @click.native="setSelectedIcon(accountIcon)">
+                            <f7-icon :f7="accountIcon.f7Icon" :style="{ color: '#' + (accountChoosingIcon ? accountChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(accountIcon)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingIcon && accountChoosingIcon.icon === accountIcon.id">
                                     <f7-icon f7="checkmark_alt"></f7-icon>
                                 </f7-badge>

@@ -224,7 +224,12 @@ export default {
         'nickname': 'Nickname',
         'oldPassword': 'Current Password',
         'defaultCurrency': 'Default Currency',
+        'name': 'Name',
+        'category': 'Category',
+        'type': 'Type',
         'color': 'Color',
+        'currency': 'Currency',
+        'comment': 'Comment',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter} is invalid',

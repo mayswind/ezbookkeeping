@@ -224,7 +224,12 @@ export default {
         'nickname': '昵称',
         'oldPassword': '当前密码',
         'defaultCurrency': '默认货币',
+        'name': '名称',
+        'category': '分类',
+        'type': '类型',
         'color': '颜色',
+        'currency': '货币',
+        'comment': '备注',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter}无效',

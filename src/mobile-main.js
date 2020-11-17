@@ -17,6 +17,7 @@ import currency from './consts/currency.js';
 import colors from './consts/color.js';
 import icons from './consts/icon.js';
 import account from './consts/account.js';
+import licenses from './consts/licenses.js';
 import version from './lib/version.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
@@ -35,6 +36,7 @@ Framework7.use(Framework7Vue);
 const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
+Vue.prototype.$licenses = licenses;
 Vue.prototype.$constants = {
     currency: currency,
     colors: colors,

@@ -98,6 +98,10 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountCategoryFilte
         for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].length; accountIdx++) {
             const account = categorizedAccounts[accountCategory.id][accountIdx];
 
+            if (account.hidden) {
+                continue;
+            }
+
             if (account.type === accountConstants.allAccountTypes.SingleAccount) {
                 ret.push({
                     balance: account.balance,

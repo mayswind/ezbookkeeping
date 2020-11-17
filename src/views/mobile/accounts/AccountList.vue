@@ -188,17 +188,28 @@ export default {
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, () => true);
             let netAssets = 0;
+            let hasUnCalculatedAmount = false;
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     netAssets += accountsBalance[i].balance;
                 } else {
-                    // TODO: calculate exchange rate
-                    netAssets += accountsBalance[i].balance;
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                    if (!this.$utilities.isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    netAssets += Math.floor(balance);
                 }
             }
 
-            return netAssets;
+            if (hasUnCalculatedAmount) {
+                return netAssets + '+';
+            } else {
+                return netAssets;
+            }
         },
         totalAssets() {
             if (!this.showAccountBalance) {
@@ -207,17 +218,28 @@ export default {
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isAsset);
             let totalAssets = 0;
+            let hasUnCalculatedAmount = false;
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     totalAssets += accountsBalance[i].balance;
                 } else {
-                    // TODO: calculate exchange rate
-                    totalAssets += accountsBalance[i].balance;
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                    if (!this.$utilities.isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    totalAssets += Math.floor(balance);
                 }
             }
 
-            return totalAssets;
+            if (hasUnCalculatedAmount) {
+                return totalAssets + '+';
+            } else {
+                return totalAssets;
+            }
         },
         totalLiabilities() {
             if (!this.showAccountBalance) {
@@ -226,17 +248,28 @@ export default {
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isLiability);
             let totalLiabilities = 0;
+            let hasUnCalculatedAmount = false;
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     totalLiabilities += accountsBalance[i].balance;
                 } else {
-                    // TODO: calculate exchange rate
-                    totalLiabilities += accountsBalance[i].balance;
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                    if (!this.$utilities.isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    totalLiabilities += Math.floor(balance);
                 }
             }
 
-            return totalLiabilities;
+            if (hasUnCalculatedAmount) {
+                return totalLiabilities + '+';
+            } else {
+                return totalLiabilities;
+            }
         }
     },
     created() {
@@ -333,17 +366,28 @@ export default {
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.id === accountCategory.id);
             let totalBalance = 0;
+            let hasUnCalculatedAmount = false;
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     totalBalance += accountsBalance[i].balance;
                 } else {
-                    // TODO: calculate exchange rate
-                    totalBalance += accountsBalance[i].balance;
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                    if (!this.$utilities.isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    totalBalance += Math.floor(balance);
                 }
             }
 
-            return totalBalance;
+            if (hasUnCalculatedAmount) {
+                return totalBalance + '+';
+            } else {
+                return totalBalance;
+            }
         },
         setSortable() {
             this.showHidden = true;

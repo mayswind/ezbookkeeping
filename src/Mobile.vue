@@ -67,15 +67,15 @@ body {
 
 .badge.right-bottom-icon {
     margin-left: -12px;
-    margin-top: 15px;
+    margin-top: 14px;
     width: 16px;
     height: 16px;
 }
 
 .badge.right-bottom-icon > .icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
 }
 
 .nested-list-item .item-title {

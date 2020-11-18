@@ -11,17 +11,17 @@
 
         <f7-card :class="{ 'bg-color-yellow': true, 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 100px;">
-                <small :style="{ opacity: 0.6 }">{{ $t('Net assets') }}</small><br />
+                <small :style="{ opacity: 0.6 }">{{ loading ? 'Net assets' : $t('Net assets') }}</small><br />
                 <span class="net-assets">{{ netAssets | currency(defaultCurrency) }}</span>
                 <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
                     <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                 </f7-link>
                 <br />
                 <small class="account-overview-info" :style="{ opacity: 0.6 }">
-                    <span>{{ $t('Total assets') }}</span>
+                    <span>{{ loading ? 'Total assets' : $t('Total assets') }}</span>
                     <span>{{ totalAssets | currency(defaultCurrency) }}</span>
                     <span>|</span>
-                    <span>{{ $t('Total liabilities') }}</span>
+                    <span>{{ loading ? 'Total liabilities' : $t('Total liabilities') }}</span>
                     <span>{{ totalLiabilities | currency(defaultCurrency) }}</span>
                 </small>
             </f7-card-header>

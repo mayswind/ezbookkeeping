@@ -188,7 +188,7 @@ export default {
                 self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$services.refreshLatestExchangeRates();
+                    self.$services.autoRefreshLatestExchangeRates();
                 }
 
                 router.navigate('/');

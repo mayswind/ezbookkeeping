@@ -167,7 +167,7 @@ if (userstate.isUserLogined()) {
 
 // auto refresh exchange rates data
 if (settings.isAutoUpdateExchangeRatesData()) {
-    services.refreshLatestExchangeRates();
+    services.autoRefreshLatestExchangeRates();
 }
 
 new Vue({

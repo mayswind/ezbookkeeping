@@ -1,4 +1,5 @@
 import axios from 'axios';
+import moment from 'moment';
 import userState from "./userstate.js";
 import exchangeRates from "./exchangeRates.js";
 
@@ -213,7 +214,13 @@ export default {
     getLatestExchangeRates: () => {
         return axios.get('v1/exchange_rates/latest.json');
     },
-    refreshLatestExchangeRates: () => {
+    autoRefreshLatestExchangeRates: () => {
+        const currentExchangeRateData = exchangeRates.getExchangeRates();
+
+        if (currentExchangeRateData && currentExchangeRateData.date === moment().format('YYYY-MM-DD')) {
+            return;
+        }
+
         return axios.get('v1/exchange_rates/latest.json', {
             ignoreError: true
         }).then(response => {

@@ -414,6 +414,7 @@ export default {
     'Exchange rates data has been updated': '汇率数据已更新',
     'Unable to get exchange rates data': '无法获取汇率数据',
     'About': '关于',
+    'Build Time': '编译时间',
     'Official Website': '官方网站',
     'License': '许可协议',
 };

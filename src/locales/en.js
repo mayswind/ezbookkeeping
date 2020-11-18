@@ -414,6 +414,7 @@ export default {
     'Exchange rates data has been updated': 'Exchange rates data has been updated',
     'Unable to get exchange rates data': 'Unable to get exchange rates data',
     'About': 'About',
+    'Build Time': 'Build Time',
     'Official Website': 'Official Website',
     'License': 'License',
 };

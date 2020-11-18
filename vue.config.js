@@ -51,6 +51,7 @@ module.exports = {
             const gitRevisionPlugin = new GitRevisionPlugin();
             definitions[0]['process.env']['VERSION'] = JSON.stringify(pkgFile.version);
             definitions[0]['process.env']['COMMIT_HASH'] = JSON.stringify(gitRevisionPlugin.commithash());
+            definitions[0]['process.env']['BUILD_UNIXTIME'] = JSON.stringify(parseInt((new Date().getTime() / 1000).toString()));
 
             return definitions;
         });

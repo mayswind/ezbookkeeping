@@ -39,6 +39,7 @@ Framework7.use(Framework7Vue);
 const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
+Vue.prototype.$buildTime = version.getBuildTime;
 Vue.prototype.$licenses = licenses;
 Vue.prototype.$constants = {
     currency: currency,

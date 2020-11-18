@@ -182,6 +182,7 @@ new Vue({
                 app.dialog.close();
                 app.sheet.close();
                 app.popup.close();
+                app.actions.close();
                 return false;
             }
         }, false);

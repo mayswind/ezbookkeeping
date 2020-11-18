@@ -3,7 +3,8 @@
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Account List')"></f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right class="navbar-compact-icons">
+                <f7-link icon-f7="ellipsis" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link href="/account/add" icon-f7="plus" v-if="!sortable"></f7-link>
                 <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
@@ -121,6 +122,15 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
+        <f7-actions close-by-outside-click :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button @click="sortable = true">{{ $t('Sort') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button color="red" close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
     </f7-page>
 </template>
 
@@ -133,6 +143,7 @@ export default {
             showHidden: false,
             sortable: false,
             showAccountBalance: this.$settings.isShowAccountBalance(),
+            showMoreActionSheet: false,
             displayOrderModified: false,
             displayOrderSaving: false
         };

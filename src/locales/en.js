@@ -267,6 +267,7 @@ export default {
     'Edit': 'Edit',
     'Delete': 'Delete',
     'Search': 'Search',
+    'Sort': 'Sort',
     'User': 'User',
     'Application': 'Application',
     'Details': 'Details',

@@ -53,6 +53,10 @@ body {
     --f7-theme-color-tint: #d09467;
 }
 
+.navbar .navbar-compact-icons.right a + a {
+    margin-left: 0;
+}
+
 .work-break-all {
     word-break: break-all;
 }

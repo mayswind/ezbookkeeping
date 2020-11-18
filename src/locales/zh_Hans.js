@@ -267,6 +267,7 @@ export default {
     'Edit': '编辑',
     'Delete': '删除',
     'Search': '搜索',
+    'Sort': '排序',
     'User': '用户',
     'Application': '应用',
     'Details': '详情',

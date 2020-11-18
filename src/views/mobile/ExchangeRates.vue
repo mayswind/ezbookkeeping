@@ -113,12 +113,17 @@ export default {
 
             self.updating = true;
 
+            if (!done) {
+                self.$showLoading();
+            }
+
             self.$services.getLatestExchangeRates().then(response => {
                 if (done) {
                     done();
                 }
 
                 self.updating = false;
+                self.$hideLoading();
 
                 const data = response.data;
 
@@ -137,6 +142,7 @@ export default {
                 }
 
                 self.updating = false;
+                self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$toast({ error: error.response.data });

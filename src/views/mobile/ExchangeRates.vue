@@ -167,7 +167,16 @@ export default {
             if (newRateStr.indexOf('.') < 0) {
                 return newRateStr;
             } else {
-                return newRateStr.substr(0, Math.max(6, newRateStr.indexOf('.') + 2));
+                let firstNonZeroPos = 0;
+
+                for (let i = 0; i < newRateStr.length; i++) {
+                    if (newRateStr.charAt(i) !== '.' && newRateStr.charAt(i) !== '0') {
+                        firstNonZeroPos = Math.min(i + 4, newRateStr.length);
+                        break;
+                    }
+                }
+
+                return newRateStr.substr(0, Math.max(6, Math.max(firstNonZeroPos, newRateStr.indexOf('.') + 2)));
             }
         }
     }

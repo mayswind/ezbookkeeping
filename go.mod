@@ -14,7 +14,6 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.6.1
-	github.com/urfave/cli v1.22.5
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	gopkg.in/ini.v1 v1.62.0

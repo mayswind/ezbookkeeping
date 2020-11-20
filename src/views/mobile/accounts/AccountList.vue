@@ -197,7 +197,7 @@ export default {
         },
         netAssets() {
             if (!this.showAccountBalance) {
-                return '---';
+                return '***';
             }
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, () => true);
@@ -227,7 +227,7 @@ export default {
         },
         totalAssets() {
             if (!this.showAccountBalance) {
-                return '---';
+                return '***';
             }
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isAsset);
@@ -257,7 +257,7 @@ export default {
         },
         totalLiabilities() {
             if (!this.showAccountBalance) {
-                return '---';
+                return '***';
             }
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isLiability);
@@ -370,12 +370,12 @@ export default {
             if (this.showAccountBalance) {
                 return account.balance;
             } else {
-                return '---';
+                return '***';
             }
         },
         accountCategoryTotalBalance(accountCategory) {
             if (!this.showAccountBalance) {
-                return '---';
+                return '***';
             }
 
             const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.id === accountCategory.id);

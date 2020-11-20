@@ -118,6 +118,12 @@ const licenses = [
         licenseUrl: 'https://github.com/Inndy/vue-clipboard2/blob/master/LICENSE'
     },
     {
+        name: 'vue-pincode-input',
+        copyright: 'Copyright (c) 2019 Maxim Noverin',
+        url: 'https://github.com/Seokky/vue-pincode-input',
+        licenseUrl: 'https://github.com/Seokky/vue-pincode-input/blob/master/LICENSE'
+    },
+    {
         name: 'core-js',
         copyright: 'Copyright (c) 2014-2020 Denis Pushkarev',
         url: 'https://github.com/zloirock/core-js',
@@ -152,6 +158,12 @@ const licenses = [
         copyright: 'Copyright (c) JS Foundation and other contributors',
         url: 'https://momentjs.com',
         licenseUrl: 'https://github.com/moment/moment/blob/develop/LICENSE'
+    },
+    {
+        name: 'crypto-js',
+        copyright: 'Copyright (c) 2009-2013 Jeff Mott, Copyright (c) 2013-2016 Evan Vosberg',
+        url: 'https://github.com/brix/crypto-js',
+        licenseUrl: 'https://github.com/brix/crypto-js/blob/develop/LICENSE'
     },
     {
         name: 'js-cookie',

@@ -57,6 +57,16 @@ body {
     margin-left: 0;
 }
 
+.vue-pincode-input {
+    margin: 3px !important;
+    padding: 5px !important;
+    box-shadow: 0 0 3px rgba(0,0,0,.5) !important;
+}
+
+.list-item-pincode-input .item-inner {
+    justify-content: center;
+}
+
 .work-break-all {
     word-break: break-all;
 }

@@ -3,6 +3,7 @@ import VueI18n from 'vue-i18n';
 import VueI18nFilter from 'vue-i18n-filter'
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
+import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
 
@@ -34,6 +35,7 @@ Vue.use(VueI18n);
 Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
+Vue.component('PincodeInput', PincodeInput);
 Framework7.use(Framework7Vue);
 
 const i18n = new VueI18n(getI18nOptions());
@@ -161,14 +163,16 @@ Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 
-// refresh token if user is logined
-if (userstate.isUserLogined()) {
-    services.refreshToken();
-}
+if (!settings.isEnableApplicationLock()) {
+    // refresh token if user is logined
+    if (userstate.isUserLogined()) {
+        services.refreshToken();
+    }
 
-// auto refresh exchange rates data
-if (settings.isAutoUpdateExchangeRatesData()) {
-    services.autoRefreshLatestExchangeRates();
+    // auto refresh exchange rates data
+    if (settings.isAutoUpdateExchangeRatesData()) {
+        services.autoRefreshLatestExchangeRates();
+    }
 }
 
 new Vue({

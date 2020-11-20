@@ -3,6 +3,7 @@ import userState from "../lib/userstate.js";
 import HomePage from '../views/mobile/Home.vue';
 import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
+import UnlockPage from '../views/mobile/Unlock.vue';
 
 import TransactionDetailPage from '../views/mobile/transactions/Detail.vue';
 import TransactionNewPage from '../views/mobile/transactions/New.vue';
@@ -13,6 +14,7 @@ import AccountEditPage from '../views/mobile/accounts/AccountEdit.vue';
 import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue';
 
 import SettingsPage from '../views/mobile/Settings.vue';
+import ApplicationLockPage from '../views/mobile/ApplicationLock.vue';
 import ExchangeRatesPage from "../views/mobile/ExchangeRates.vue";
 import AboutPage from "../views/mobile/About.vue";
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
@@ -22,25 +24,73 @@ import SessionListPage from "../views/mobile/users/SessionList.vue";
 function checkLogin(to, from, resolve, reject) {
     const router = this;
 
-    if (userState.isUserLogined()) {
-        resolve();
+    if (!userState.isUserLogined()) {
+        reject();
+        router.navigate('/login', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
         return;
     }
 
-    reject();
-    router.navigate('/login');
+    if (!userState.isUserUnlocked()) {
+        reject();
+        router.navigate('/unlock', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
+        return;
+    }
+
+    resolve();
+}
+
+function checkLocked(to, from, resolve, reject) {
+    const router = this;
+
+    if (!userState.isUserLogined()) {
+        reject();
+        router.navigate('/login', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
+        return;
+    }
+
+    if (userState.isUserUnlocked()) {
+        reject();
+        router.navigate('/', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
+        return;
+    }
+
+    resolve();
 }
 
 function checkNotLogin(to, from, resolve, reject) {
     const router = this;
 
-    if (!userState.isUserLogined()) {
-        resolve();
+    if (userState.isUserLogined() && !userState.isUserUnlocked()) {
+        reject();
+        router.navigate('/unlock', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
         return;
     }
 
-    reject();
-    router.navigate('/');
+    if (userState.isUserLogined()) {
+        reject();
+        router.navigate('/', {
+            clearPreviousHistory: true,
+            pushState: false
+        });
+        return;
+    }
+
+    resolve();
 }
 
 const routes = [
@@ -58,6 +108,11 @@ const routes = [
         path: '/signup',
         component: SignUpPage,
         beforeEnter: checkNotLogin
+    },
+    {
+        path: '/unlock',
+        component: UnlockPage,
+        beforeEnter: checkLocked
     },
     {
         path: '/transaction/details',
@@ -92,6 +147,11 @@ const routes = [
     {
         path: '/settings',
         component: SettingsPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/app_lock',
+        component: ApplicationLockPage,
         beforeEnter: checkLogin
     },
     {

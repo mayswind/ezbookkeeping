@@ -185,13 +185,14 @@ export default {
                     return;
                 }
 
+                self.$settings.setEnableApplicationLock(false);
                 self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$services.autoRefreshLatestExchangeRates();
                 }
 
-                router.navigate('/');
+                router.refreshPage();
             }).catch(error => {
                 self.logining = false;
                 self.$hideLoading();
@@ -256,6 +257,7 @@ export default {
                     return;
                 }
 
+                self.$settings.setEnableApplicationLock(false);
                 self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
@@ -263,7 +265,7 @@ export default {
                 }
 
                 self.show2faSheet = false;
-                router.navigate('/');
+                router.refreshPage();
             }).catch(error => {
                 self.verifying = false;
                 self.$hideLoading();

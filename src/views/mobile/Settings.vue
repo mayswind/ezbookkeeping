@@ -29,6 +29,8 @@
                         </select>
                     </f7-list-item>
 
+                    <f7-list-item :title="$t('Application Lock')" :after="isEnableApplicationLock ? $t('Enabled') : $t('Disabled')" link="/app_lock"></f7-list-item>
+
                     <f7-list-item :title="$t('Exchange Rates Data')" :after="exchangeRatesLastUpdateDate" link="/exchange_rates"></f7-list-item>
 
                     <f7-list-item>
@@ -99,6 +101,9 @@ export default {
             set: function (value) {
                 this.$setLanguage(value);
             }
+        },
+        isEnableApplicationLock() {
+            return this.$settings.isEnableApplicationLock();
         },
         exchangeRatesLastUpdateDate() {
             const exchangeRates = this.$exchangeRates.getExchangeRates();

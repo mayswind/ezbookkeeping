@@ -28,7 +28,6 @@ type User struct {
 }
 
 type UserBasicInfo struct {
-	Uid             string `json:"uid"`
 	Username        string `json:"username"`
 	Email           string `json:"email"`
 	Nickname        string `json:"nickname"`

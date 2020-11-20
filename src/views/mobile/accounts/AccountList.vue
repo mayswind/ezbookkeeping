@@ -18,11 +18,14 @@
                     <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                 </f7-link>
                 <br />
-                <small class="account-overview-info" :style="{ opacity: 0.6 }">
-                    <span>{{ loading ? 'Total assets' : $t('Total assets') }}</span>
+                <small class="account-overview-info" :style="{ opacity: 0.6 }" v-if="loading">
+                    <span>Total assets | Total liabilities</span>
+                </small>
+                <small class="account-overview-info" :style="{ opacity: 0.6 }" v-else-if="!loading">
+                    <span>{{ $t('Total assets') }}</span>
                     <span>{{ totalAssets | currency(defaultCurrency) }}</span>
                     <span>|</span>
-                    <span>{{ loading ? 'Total liabilities' : $t('Total liabilities') }}</span>
+                    <span>{{ $t('Total liabilities') }}</span>
                     <span>{{ totalLiabilities | currency(defaultCurrency) }}</span>
                 </small>
             </f7-card-header>

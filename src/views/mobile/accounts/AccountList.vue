@@ -122,12 +122,12 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
-        <f7-actions close-by-outside-click :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button @click="sortable = true">{{ $t('Sort') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
-                <f7-actions-button color="red" close>{{ $t('Cancel') }}</f7-actions-button>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
 

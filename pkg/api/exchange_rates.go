@@ -50,5 +50,10 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
+	latestExchangeRateResponse.ExchangeRates = append(latestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "EUR",
+		Rate: "1",
+	})
+
 	return latestExchangeRateResponse, nil
 }

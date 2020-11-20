@@ -124,7 +124,7 @@
         </f7-card>
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="sortable = true">{{ $t('Sort') }}</f7-actions-button>
+                <f7-actions-button @click="setSortable()">{{ $t('Sort') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -401,6 +401,10 @@ export default {
             }
         },
         setSortable() {
+            if (this.sortable) {
+                return;
+            }
+
             this.showHidden = true;
             this.sortable = true;
             this.displayOrderModified = false;

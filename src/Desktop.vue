@@ -1,7 +1,11 @@
 <template>
-    <div>Not Implemented</div>
+    <div></div>
 </template>
 
 <script>
-export default {}
+export default {
+    created() {
+        location.href = '../mobile/'
+    }
+}
 </script>

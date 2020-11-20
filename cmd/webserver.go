@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	"github.com/mssola/user_agent"
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/api"
@@ -81,7 +82,13 @@ func startWebServer(c *cli.Context) error {
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
 	router.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/mobile/")
+		ua := user_agent.New(c.GetHeader("User-Agent"))
+
+		if ua.Mobile() {
+			c.Redirect(http.StatusMovedPermanently, "/mobile/")
+		} else {
+			c.Redirect(http.StatusMovedPermanently, "/desktop/")
+		}
 	})
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))

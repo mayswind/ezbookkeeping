@@ -163,15 +163,15 @@ Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 
-if (!settings.isEnableApplicationLock()) {
-    // refresh token if user is logined
-    if (userstate.isUserLogined()) {
+if (userstate.isUserLogined()) {
+    if (!settings.isEnableApplicationLock()) {
+        // refresh token if user is logined
         services.refreshToken();
-    }
 
-    // auto refresh exchange rates data
-    if (settings.isAutoUpdateExchangeRatesData()) {
-        services.autoRefreshLatestExchangeRates();
+        // auto refresh exchange rates data
+        if (settings.isAutoUpdateExchangeRatesData()) {
+            services.autoRefreshLatestExchangeRates();
+        }
     }
 }
 

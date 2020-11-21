@@ -311,6 +311,7 @@ export default {
     'Unable to verify': '无法验证',
     'Use a backup code': '使用备用码',
     'Use a passcode': '使用验证码',
+    'PIN code is invalid': 'PIN码无效',
     'PIN code is wrong': 'PIN码错误',
     'Sign Up': '注册',
     'Transaction Details': '交易详情',

@@ -311,6 +311,7 @@ export default {
     'Unable to verify': 'Unable to verify',
     'Use a backup code': 'Use a backup code',
     'Use a passcode': 'Use a passcode',
+    'PIN code is invalid': 'PIN code is invalid',
     'PIN code is wrong': 'PIN code is wrong',
     'Sign Up': 'Sign Up',
     'Transaction Details': 'Transaction Details',

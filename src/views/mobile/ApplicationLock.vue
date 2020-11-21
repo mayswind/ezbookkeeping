@@ -38,7 +38,7 @@
                             <PincodeInput secure :length="6" v-model="currentPinCodeForEnable" />
                         </f7-list-item>
                     </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPinCodeForEnable }" :text="$t('Continue')" @click="enable(currentPinCodeForEnable)"></f7-button>
+                    <f7-button large fill :class="{ 'disabled': !currentPinCodeValid }" :text="$t('Continue')" @click="enable(currentPinCodeForEnable)"></f7-button>
                     <div class="margin-top text-align-center">
                         <f7-link @click="showInputPinCodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
                     </div>
@@ -57,10 +57,20 @@ export default {
             showInputPinCodeSheetForEnable: false
         };
     },
+    computed: {
+        currentPinCodeValid() {
+            return this.currentPinCodeForEnable && this.currentPinCodeForEnable.length === 6;
+        }
+    },
     methods: {
         enable(pinCode) {
             if (!pinCode) {
                 this.showInputPinCodeSheetForEnable = true;
+                return;
+            }
+
+            if (!this.currentPinCodeValid) {
+                this.$alert('PIN code is invalid');
                 return;
             }
 

@@ -79,6 +79,13 @@ function decryptToken() {
     sessionStorage.removeItem(appLockSecretSessionStorageKey);
 }
 
+function isCorrectPinCode(pinCode) {
+    const secret = getAppLockSecret(pinCode);
+    const currentSecret = sessionStorage.getItem(appLockSecretSessionStorageKey);
+
+    return secret === currentSecret;
+}
+
 function updateToken(token) {
     if (utils.isString(token)) {
         if (settings.isEnableApplicationLock()) {
@@ -125,6 +132,7 @@ export default {
     unlockToken,
     encryptToken,
     decryptToken,
+    isCorrectPinCode,
     updateToken,
     updateUserInfo,
     updateTokenAndUserInfo,

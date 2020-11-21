@@ -6,6 +6,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 const defaultSettings = {
     lang: 'en',
     applicationLock: false,
+    applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
     thousandsSeparator: true,
     currencyDisplayMode: 'code', // or 'none' or 'name'
@@ -76,6 +77,8 @@ export default {
     setLanguage: value => setOption('lang', value),
     isEnableApplicationLock: () => getOption('applicationLock'),
     setEnableApplicationLock: value => setOption('applicationLock', value),
+    isEnableApplicationLockWebAuthn: () => getOption('applicationLockWebAuthn'),
+    setEnableApplicationLockWebAuthn: value => setOption('applicationLockWebAuthn', value),
     isAutoUpdateExchangeRatesData: () => getOption('autoUpdateExchangeRatesData'),
     setAutoUpdateExchangeRatesData: value => setOption('autoUpdateExchangeRatesData', value),
     isEnableThousandsSeparator: () => getOption('thousandsSeparator'),

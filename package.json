@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "cbor-js": "^0.1.0",
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
     "framework7": "^5.7.14",

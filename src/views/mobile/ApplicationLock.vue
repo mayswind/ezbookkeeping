@@ -9,6 +9,10 @@
             <f7-card-content :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
+                    <f7-list-item v-if="isSupportedWebAuthn">
+                        <span>{{ $t('Face ID / Touch ID') }}</span>
+                        <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
+                    </f7-list-item>
                     <f7-list-button @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
                 </f7-list>
             </f7-card-content>
@@ -75,7 +79,9 @@
 export default {
     data() {
         return {
+            isSupportedWebAuthn: false,
             isEnableApplicationLock: this.$settings.isEnableApplicationLock(),
+            isEnableApplicationLockWebAuthn: this.$settings.isEnableApplicationLockWebAuthn(),
             currentPinCodeForEnable: '',
             currentPinCodeForDisable: '',
             showInputPinCodeSheetForEnable: false,
@@ -88,7 +94,50 @@ export default {
         },
         currentPinCodeForDisableValid() {
             return this.currentPinCodeForDisable && this.currentPinCodeForDisable.length === 6;
+        },
+    },
+    watch: {
+        isEnableApplicationLockWebAuthn: function (newValue) {
+            const self = this;
+
+            if (newValue) {
+                self.$showLoading();
+
+                self.$webauthn.registerCredential(
+                    self.$user.getUserInfo(),
+                    self.$user.getUserAppLockSecret(),
+                ).then(({ id }) => {
+                    self.$hideLoading();
+
+                    self.$user.saveWebAuthnConfig(id);
+                    self.$settings.setEnableApplicationLockWebAuthn(true);
+                    self.$toast('You have enabled Face ID/Touch ID successfully');
+                }).catch(({ notSupported, invalid }) => {
+                    self.$hideLoading();
+
+                    if (notSupported) {
+                        self.$toast('This device does not support Face ID/Touch ID');
+                    } else if (invalid) {
+                        self.$toast('Failed to enable Face ID/Touch ID');
+                    } else {
+                        self.$toast('User has canceled or this device does not support Face ID/Touch ID');
+                    }
+
+                    self.isEnableApplicationLockWebAuthn = false;
+                    self.$settings.setEnableApplicationLockWebAuthn(false);
+                    self.$user.clearWebAuthnConfig();
+                });
+            } else {
+                self.$settings.setEnableApplicationLockWebAuthn(false);
+                self.$user.clearWebAuthnConfig();
+            }
         }
+    },
+    created() {
+        const self = this;
+        self.$webauthn.isCompletelySupported().then(result => {
+            self.isSupportedWebAuthn = result;
+        });
     },
     methods: {
         enable(pinCode) {
@@ -111,6 +160,10 @@ export default {
             this.$settings.setEnableApplicationLock(true);
             this.isEnableApplicationLock = true;
 
+            this.$settings.setEnableApplicationLockWebAuthn(false);
+            this.$user.clearWebAuthnConfig();
+            this.isEnableApplicationLockWebAuthn = false;
+
             this.showInputPinCodeSheetForEnable = false;
         },
         disable(pinCode) {
@@ -132,6 +185,10 @@ export default {
             this.$user.decryptToken();
             this.$settings.setEnableApplicationLock(false);
             this.isEnableApplicationLock = false;
+
+            this.$settings.setEnableApplicationLockWebAuthn(false);
+            this.$user.clearWebAuthnConfig();
+            this.isEnableApplicationLockWebAuthn = false;
 
             this.showInputPinCodeSheetForDisable = false;
         }

@@ -166,6 +166,12 @@ const licenses = [
         licenseUrl: 'https://github.com/brix/crypto-js/blob/develop/LICENSE'
     },
     {
+        name: 'cbor-js',
+        copyright: 'Copyright (c) 2014 Patrick Gansterer <paroga@paroga.com>',
+        url: 'https://github.com/paroga/cbor-js',
+        licenseUrl: 'https://github.com/paroga/cbor-js/blob/master/LICENSE'
+    },
+    {
         name: 'js-cookie',
         copyright: 'Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors',
         url: 'https://github.com/js-cookie/js-cookie',

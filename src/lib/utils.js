@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import uaParser from 'ua-parser-js';
 import accountConstants from '../consts/account.js';
 
@@ -27,6 +28,27 @@ function isNumber(val) {
 
 function isBoolean(val) {
     return typeof(val) === 'boolean';
+}
+
+function base64encode(arrayBuffer) {
+    if (!arrayBuffer || arrayBuffer.length === 0) {
+        return null;
+    }
+
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+}
+
+function arrayBufferToString(arrayBuffer) {
+    return String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+}
+
+function stringToArrayBuffer(str){
+    return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
+}
+
+function generateRandomString() {
+    const baseString = 'lab_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
+    return CryptoJS.SHA256(baseString).toString();
 }
 
 function parseUserAgent(ua) {
@@ -129,6 +151,10 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    base64encode,
+    arrayBufferToString,
+    stringToArrayBuffer,
+    generateRandomString,
     parseUserAgent,
     getCategorizedAccounts,
     getAccountByAccountId,

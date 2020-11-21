@@ -24,6 +24,7 @@ import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
 import exchangeRates from './lib/exchangeRates.js';
+import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
 import accountIconFilter from './filters/accountIcon.js';
@@ -50,6 +51,7 @@ Vue.prototype.$constants = {
     account: account,
 };
 Vue.prototype.$utilities = utils;
+Vue.prototype.$webauthn = webauthn;
 Vue.prototype.$settings = settings;
 Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
 Vue.prototype.$getAllLanguages = getAllLanguages;

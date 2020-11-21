@@ -1,7 +1,7 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>{{ $t('PIN Code') }}</f7-login-screen-title>
-        <f7-list>
+        <f7-list form>
             <f7-list-item class="list-item-pincode-input">
                 <PincodeInput secure :length="6" v-model="pinCode" @keyup.native="unlock" />
             </f7-list-item>
@@ -27,6 +27,33 @@ export default {
             return this.pinCode && this.pinCode.length === 6;
         }
     },
+    created() {
+        const self = this;
+        const router = self.$f7router;
+
+        if (self.$settings.isEnableApplicationLockWebAuthn() && self.$user.getWebAuthnCredentialId()) {
+            self.$webauthn.verifyCredential(
+                self.$user.getWebAuthnCredentialId()
+            ).then(({ id, userSecret }) => {
+                self.$user.unlockTokenByWebAuthn(id, userSecret);
+                self.$services.refreshToken();
+
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$services.autoRefreshLatestExchangeRates();
+                }
+
+                router.refreshPage();
+            }).catch(({ notSupported, invalid }) => {
+                if (notSupported) {
+                    self.$toast('This device does not support Face ID/Touch ID');
+                } else if (invalid) {
+                    self.$toast('Failed to authenticate by Face ID/Touch ID');
+                } else {
+                    self.$toast('User has canceled or this device does not support Face ID/Touch ID');
+                }
+            });
+        }
+    },
     methods: {
         unlock() {
             if (!this.pinCodeValid) {
@@ -36,7 +63,7 @@ export default {
             const router = this.$f7router;
 
             try {
-                this.$user.unlockToken(this.pinCode);
+                this.$user.unlockTokenByPinCode(this.pinCode);
                 this.$services.refreshToken();
 
                 if (this.$settings.isAutoUpdateExchangeRatesData()) {

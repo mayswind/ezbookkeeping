@@ -6,7 +6,9 @@ import utils from './utils.js';
 const APP_LOCK_SECRET_BASE_STRING_PREFIX = 'LAB_LOCK_SECRET_';
 
 const tokenLocalStorageKey = 'lab_user_token';
+const webauthnConfigLocalStorageKey = 'lab_user_webauthn_config';
 const userInfoLocalStorageKey = 'lab_user_info';
+
 const tokenSessionStorageKey = 'lab_user_session_token';
 const appLockSecretSessionStorageKey = 'lab_user_app_lock_secret';
 
@@ -36,6 +38,11 @@ function getUserInfo() {
     return JSON.parse(data);
 }
 
+function getUserAppLockSecret() {
+    const currentSecret = sessionStorage.getItem(appLockSecretSessionStorageKey);
+    return currentSecret;
+}
+
 function isUserLogined() {
     return !!localStorage.getItem(tokenLocalStorageKey);
 }
@@ -52,7 +59,42 @@ function isUserUnlocked() {
     return !!sessionStorage.getItem(appLockSecretSessionStorageKey) && !!sessionStorage.getItem(tokenSessionStorageKey);
 }
 
-function unlockToken(pinCode) {
+function getWebAuthnCredentialId() {
+    const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
+    const webauthnConfig = JSON.parse(webauthnConfigData);
+
+    return webauthnConfig.credentialId;
+}
+
+function saveWebAuthnConfig(credentialId) {
+    const webAuthnConfig = {
+        credentialId: credentialId
+    };
+
+    localStorage.setItem(webauthnConfigLocalStorageKey, JSON.stringify(webAuthnConfig));
+}
+
+function clearWebAuthnConfig() {
+    localStorage.removeItem(webauthnConfigLocalStorageKey);
+}
+
+function unlockTokenByWebAuthn(credentialId, userSecret) {
+    const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
+    const webauthnConfig = JSON.parse(webauthnConfigData);
+
+    if (webauthnConfig.credentialId !== credentialId) {
+        return false;
+    }
+
+    const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
+    const secret = userSecret;
+    const token = getDecryptedToken(encryptedToken, secret);
+
+    sessionStorage.setItem(appLockSecretSessionStorageKey, secret);
+    sessionStorage.setItem(tokenSessionStorageKey, token);
+}
+
+function unlockTokenByPinCode(pinCode) {
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
     const secret = getAppLockSecret(pinCode);
     const token = getDecryptedToken(encryptedToken, secret);
@@ -127,9 +169,14 @@ function clearTokenAndUserInfo() {
 export default {
     getToken,
     getUserInfo,
+    getUserAppLockSecret,
     isUserLogined,
     isUserUnlocked,
-    unlockToken,
+    getWebAuthnCredentialId,
+    saveWebAuthnConfig,
+    clearWebAuthnConfig,
+    unlockTokenByWebAuthn,
+    unlockTokenByPinCode,
     encryptToken,
     decryptToken,
     isCorrectPinCode,

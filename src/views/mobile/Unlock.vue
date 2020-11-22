@@ -59,7 +59,14 @@ export default {
     },
     methods: {
         unlock() {
+            const app = this.$f7;
+            const $$ = app.$;
+
             if (!this.pinCodeValid) {
+                return;
+            }
+
+            if ($$('.modal-in').length) {
                 return;
             }
 

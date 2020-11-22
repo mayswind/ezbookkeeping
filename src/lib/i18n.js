@@ -1,4 +1,4 @@
-import { defaultLanguage, allLanguages } from '../locales/index.js'
+import { defaultLanguage, allLanguages } from '../locales/index.js';
 
 const apiNotFoundErrorCode = 100001;
 const specifiedApiNotFoundErrors = {

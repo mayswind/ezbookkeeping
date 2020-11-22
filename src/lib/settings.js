@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 
 const settingsLocalStorageKey = 'lab_user_settings';
 const serverSettingsCookieKey = 'ACP_SETTINGS';

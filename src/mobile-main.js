@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import VueI18nFilter from 'vue-i18n-filter'
+import VueI18nFilter from 'vue-i18n-filter';
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 import PincodeInput from 'vue-pincode-input';

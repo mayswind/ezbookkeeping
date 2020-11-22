@@ -185,7 +185,10 @@ export default {
                     return;
                 }
 
-                self.$settings.setEnableApplicationLock(false);
+                if (self.$settings.isEnableApplicationLock()) {
+                    self.$settings.setEnableApplicationLock(false);
+                }
+
                 self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
@@ -259,7 +262,10 @@ export default {
                     return;
                 }
 
-                self.$settings.setEnableApplicationLock(false);
+                if (self.$settings.isEnableApplicationLock()) {
+                    self.$settings.setEnableApplicationLock(false);
+                }
+
                 self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {

@@ -157,7 +157,9 @@ export default {
                     return;
                 }
 
-                self.$settings.setEnableApplicationLock(false);
+                if (self.$settings.isEnableApplicationLock()) {
+                    self.$settings.setEnableApplicationLock(false);
+                }
 
                 if (self.$utilities.isString(data.result.token)) {
                     self.$user.updateTokenAndUserInfo(data.result);

@@ -185,8 +185,10 @@ export default {
                     }
 
                     self.$user.clearTokenAndUserInfo();
-                    self.$settings.clearSettings();
                     self.$exchangeRates.clearExchangeRates();
+                    self.$settings.clearSettings();
+                    self.$locale.init();
+
                     router.navigate('/');
                 }).catch(error => {
                     self.$logger.error('failed to log out', error);

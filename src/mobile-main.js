@@ -92,6 +92,15 @@ Vue.prototype.$locale = {
         })
 
         return allCurrencies;
+    },
+    init: function () {
+        if (settings.getLanguage()) {
+            logger.info(`Current language is ${settings.getLanguage()}`);
+        } else {
+            logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
+        }
+
+        this.setLanguage(settings.getLanguage() || getDefaultLanguage());
     }
 };
 
@@ -170,13 +179,7 @@ Vue.filter('accountIcon', (value) => accountIconFilter(value));
 Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
 Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
-if (settings.getLanguage()) {
-    logger.info(`Current language is ${settings.getLanguage()}`);
-} else {
-    logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
-}
-
-Vue.prototype.$locale.setLanguage(settings.getLanguage() || getDefaultLanguage());
+Vue.prototype.$locale.init();
 
 if (userstate.isUserLogined()) {
     if (!settings.isEnableApplicationLock()) {

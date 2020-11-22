@@ -92,8 +92,9 @@ export default {
             const router = this.$f7router;
 
             this.$user.clearTokenAndUserInfo();
-            this.$settings.clearSettings();
             this.$exchangeRates.clearExchangeRates();
+            this.$settings.clearSettings();
+            this.$locale.init();
 
             router.navigate('/login', {
                 clearPreviousHistory: true

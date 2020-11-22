@@ -513,7 +513,7 @@ export default {
                 name: self.account.name,
                 icon: self.account.icon,
                 color: self.account.color,
-                currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlacehodler,
+                currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
                 comment: self.account.comment,
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,
             };

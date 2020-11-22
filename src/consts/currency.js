@@ -1,4 +1,4 @@
-const parentAccountCurrencyPlacehodler = '---';
+const parentAccountCurrencyPlaceholder = '---';
 const defaultCurrencySymbol = '¤';
 
 // ISO 4217
@@ -630,7 +630,7 @@ const allCurrencies = {
 };
 
 export default {
-    parentAccountCurrencyPlacehodler: parentAccountCurrencyPlacehodler,
+    parentAccountCurrencyPlaceholder: parentAccountCurrencyPlaceholder,
     defaultCurrencySymbol: defaultCurrencySymbol,
     all: allCurrencies
 };

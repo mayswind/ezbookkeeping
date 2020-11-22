@@ -51,6 +51,7 @@
                             <option value="none">{{ $t('None') }}</option>
                             <option value="code">{{ $t('Currency Code') }}</option>
                             <option value="name">{{ $t('Currency Name') }}</option>
+                            <option value="symbol">{{ $t('Currency Symbol') }}</option>
                         </select>
                     </f7-list-item>
 

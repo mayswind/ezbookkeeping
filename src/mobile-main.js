@@ -76,12 +76,14 @@ Vue.prototype.$locale = {
         const allCurrencyCodes = currency.all;
         const allCurrencies = [];
 
-        for (let i = 0; i < allCurrencyCodes.length; i++) {
-            const code = allCurrencyCodes[i];
+        for (let currencyCode in allCurrencyCodes) {
+            if (!Object.prototype.hasOwnProperty.call(allCurrencyCodes, currencyCode)) {
+                return;
+            }
 
             allCurrencies.push({
-                code: code,
-                displayName: i18n.t(`currency.${code}`)
+                code: currencyCode,
+                displayName: i18n.t(`currency.${currencyCode}`)
             });
         }
 

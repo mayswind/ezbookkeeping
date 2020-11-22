@@ -13,6 +13,9 @@ export default {
         },
         'datetime': {
             'long': 'YYYY年MM月DD日 HH:mm:ss',
+        },
+        'currency': {
+            'symbol': '{symbol} {amount}'
         }
     },
     'currency': {
@@ -373,6 +376,7 @@ export default {
     'Currency Display Mode': '货币显示模式',
     'Currency Code': '货币代码',
     'Currency Name': '货币名称',
+    'Currency Symbol': '货币符号',
     'Show Account Balance': '显示账户余额',
     'Enable Animate': '启用动画',
     'Enable Auto Dark Mode': '启用自动深色模式',

@@ -13,6 +13,9 @@ export default {
         },
         'datetime': {
             'long': 'MM/DD/YYYY HH:mm:ss',
+        },
+        'currency': {
+            'symbol': '{amount} {symbol}'
         }
     },
     'currency': {
@@ -373,6 +376,7 @@ export default {
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',
+    'Currency Symbol': 'Currency Symbol',
     'Show Account Balance': 'Show Account Balance',
     'Enable Animate': 'Enable Animate',
     'Enable Auto Dark Mode': 'Enable Auto Dark Mode',

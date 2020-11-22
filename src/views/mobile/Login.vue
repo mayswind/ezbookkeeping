@@ -110,10 +110,10 @@ export default {
             return 'v' + this.$version();
         },
         allLanguages() {
-            return this.$getAllLanguages();
+            return this.$locale.getAllLanguages();
         },
         isUserRegistrationEnabled() {
-            return this.$isUserRegistrationEnabled();
+            return this.$settings.isUserRegistrationEnabled();
         },
         inputIsEmpty() {
             return !this.username || !this.password;
@@ -134,10 +134,10 @@ export default {
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
-            let lang = this.$getLanguage(currentLocale);
+            let lang = this.$locale.getLanguage(currentLocale);
 
             if (!lang) {
-                lang = this.$getLanguage(this.$getDefaultLanguage());
+                lang = this.$locale.getLanguage(this.$locale.getDefaultLanguage());
             }
 
             return lang.displayName;
@@ -289,7 +289,7 @@ export default {
             }
         },
         changeLanguage(locale) {
-            this.$setLanguage(locale);
+            this.$locale.setLanguage(locale);
         }
     }
 };

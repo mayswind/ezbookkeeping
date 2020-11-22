@@ -92,14 +92,14 @@ export default {
             return userInfo.nickname || userInfo.username || this.$t('User');
         },
         allLanguages() {
-            return this.$getAllLanguages();
+            return this.$locale.getAllLanguages();
         },
         currentLocale: {
             get: function () {
                 return this.$i18n.locale;
             },
             set: function (value) {
-                this.$setLanguage(value);
+                this.$locale.setLanguage(value);
             }
         },
         isEnableApplicationLock() {

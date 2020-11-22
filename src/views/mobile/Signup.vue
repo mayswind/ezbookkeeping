@@ -93,7 +93,7 @@ export default {
     },
     computed: {
         allCurrencies() {
-            return this.$getAllCurrencies();
+            return this.$locale.getAllCurrencies();
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -161,6 +161,10 @@ export default {
 
                 if (self.$utilities.isString(data.result.token)) {
                     self.$user.updateTokenAndUserInfo(data.result);
+
+                    if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                        self.$services.autoRefreshLatestExchangeRates();
+                    }
                 }
 
                 self.$toast('You have been successfully registered');

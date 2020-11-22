@@ -44,6 +44,7 @@ const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion;
 Vue.prototype.$buildTime = version.getBuildTime;
+
 Vue.prototype.$licenses = licenses;
 Vue.prototype.$constants = {
     currency: currency,
@@ -51,44 +52,46 @@ Vue.prototype.$constants = {
     icons: icons,
     account: account,
 };
+
 Vue.prototype.$utilities = utils;
 Vue.prototype.$logger = logger;
 Vue.prototype.$webauthn = webauthn;
 Vue.prototype.$settings = settings;
-Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
-Vue.prototype.$getAllLanguages = getAllLanguages;
-Vue.prototype.$getLanguage = getLanguage;
-Vue.prototype.$setLanguage = function (locale) {
-    if (settings.getLanguage() !== locale) {
-        settings.setLanguage(locale);
+Vue.prototype.$locale = {
+    getDefaultLanguage: getDefaultLanguage,
+    getAllLanguages: getAllLanguages,
+    getLanguage: getLanguage,
+    setLanguage: function (locale) {
+        if (settings.getLanguage() !== locale) {
+            settings.setLanguage(locale);
+        }
+
+        i18n.locale = locale;
+        moment.locale(locale);
+        services.setLocale(locale);
+        document.querySelector('html').setAttribute('lang', locale);
+        return locale;
+    },
+    getAllCurrencies: function () {
+        const allCurrencyCodes = currency.all;
+        const allCurrencies = [];
+
+        for (let i = 0; i < allCurrencyCodes.length; i++) {
+            const code = allCurrencyCodes[i];
+
+            allCurrencies.push({
+                code: code,
+                displayName: i18n.t(`currency.${code}`)
+            });
+        }
+
+        allCurrencies.sort(function(c1, c2){
+            return c1.displayName.localeCompare(c2.displayName);
+        })
+
+        return allCurrencies;
     }
-
-    i18n.locale = locale;
-    moment.locale(locale);
-    services.setLocale(locale);
-    document.querySelector('html').setAttribute('lang', locale);
-    return locale;
 };
-Vue.prototype.$getAllCurrencies = function () {
-    const allCurrencyCodes = currency.all;
-    const allCurrencies = [];
-
-    for (let i = 0; i < allCurrencyCodes.length; i++) {
-        const code = allCurrencyCodes[i];
-
-        allCurrencies.push({
-            code: code,
-            displayName: i18n.t(`currency.${code}`)
-        });
-    }
-
-    allCurrencies.sort(function(c1, c2){
-        return c1.displayName.localeCompare(c2.displayName);
-    })
-
-    return allCurrencies;
-};
-Vue.prototype.$isUserRegistrationEnabled = settings.isUserRegistrationEnabled;
 
 Vue.prototype.$alert = function (message, confirmCallback) {
     let parameters = {};
@@ -171,7 +174,7 @@ if (settings.getLanguage()) {
     logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
 }
 
-Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
+Vue.prototype.$locale.setLanguage(settings.getLanguage() || getDefaultLanguage());
 
 if (userstate.isUserLogined()) {
     if (!settings.isEnableApplicationLock()) {

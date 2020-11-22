@@ -339,7 +339,7 @@ export default {
             return ret;
         },
         allCurrencies() {
-            return this.$getAllCurrencies();
+            return this.$locale.getAllCurrencies();
         }
     },
     created() {

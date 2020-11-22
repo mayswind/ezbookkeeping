@@ -126,7 +126,7 @@ export default {
     },
     computed: {
         allCurrencies() {
-            return this.$getAllCurrencies();
+            return this.$locale.getAllCurrencies();
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;

@@ -188,6 +188,8 @@ export default {
                     self.$exchangeRates.clearExchangeRates();
                     router.navigate('/');
                 }).catch(error => {
+                    self.$logger.error('failed to log out', error);
+
                     self.logouting = false;
                     self.$hideLoading();
 

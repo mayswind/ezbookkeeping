@@ -1,4 +1,5 @@
 import CBOR from 'cbor-js';
+import logger from './logger.js';
 import utils from './utils.js';
 
 const PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE = {
@@ -72,6 +73,8 @@ function registerCredential({ username, nickname }, userSecret) {
         }
     });
 
+    logger.debug('webauthn create options', publicKeyCredentialCreationOptions);
+
     return navigator.credentials.create({
         publicKey: publicKeyCredentialCreationOptions
     }).then(rawCredential => {
@@ -80,15 +83,20 @@ function registerCredential({ username, nickname }, userSecret) {
 
         const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
 
+        logger.debug('webauthn create raw response', rawCredential);
+
         if (rawCredential && rawCredential.rawId &&
             clientData && clientData.type === 'webauthn.create' && challengeFromClientData === challenge) {
-
-            return {
+            const ret = {
                 id: utils.base64encode(rawCredential.rawId),
                 clientData: clientData,
                 publicKey: publicKey,
                 rawCredential: rawCredential
             };
+
+            logger.debug('webauthn create response', ret);
+
+            return ret;
         } else {
             return Promise.reject({
                 invalid: true
@@ -137,22 +145,30 @@ function verifyCredential(credentialId) {
     });
     publicKeyCredentialRequestOptions.allowCredentials[0].id = Uint8Array.from(atob(credentialId), c=>c.charCodeAt(0)).buffer;
 
+    logger.debug('webauthn get options', publicKeyCredentialRequestOptions);
+
     return navigator.credentials.get({
         publicKey: publicKeyCredentialRequestOptions
     }).then(rawCredential => {
         const clientData = rawCredential ? parseClientData(rawCredential) : null;
         const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
 
+        logger.debug('webauthn get raw response', rawCredential);
+
         if (rawCredential && rawCredential.rawId &&
             rawCredential.response && rawCredential.response.userHandle &&
             clientData && clientData.type === 'webauthn.get' && challengeFromClientData === challenge) {
 
-            return {
+            const ret = {
                 id: utils.base64encode(rawCredential.rawId),
                 userSecret: utils.arrayBufferToString(rawCredential.response.userHandle),
                 clientData: clientData,
                 rawCredential: rawCredential
             };
+
+            logger.debug('webauthn get response', ret);
+
+            return ret;
         } else {
             return Promise.reject({
                 invalid: true

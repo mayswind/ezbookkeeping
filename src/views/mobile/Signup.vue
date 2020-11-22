@@ -166,6 +166,8 @@ export default {
                 self.$toast('You have been successfully registered');
                 router.navigate('/');
             }).catch(error => {
+                self.$logger.error('failed to sign up', error);
+
                 self.submitting = false;
                 self.$hideLoading();
 

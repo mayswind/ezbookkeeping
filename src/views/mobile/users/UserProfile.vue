@@ -189,6 +189,8 @@ export default {
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
             self.loading = false;
         }).catch(error => {
+            self.$logger.error('failed to get user profile', error);
+
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();
@@ -251,6 +253,8 @@ export default {
                 self.$toast('Your profile has been successfully updated');
                 router.back('/settings', { force: true });
             }).catch(error => {
+                self.$logger.error('failed to save user profile', error);
+
                 self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';

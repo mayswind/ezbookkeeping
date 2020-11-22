@@ -43,10 +43,12 @@ export default {
                 }
 
                 router.refreshPage();
-            }).catch(({ notSupported, invalid }) => {
-                if (notSupported) {
+            }).catch(error => {
+                self.$logger.error('failed to use webauthn to verify', error);
+
+                if (error.notSupported) {
                     self.$toast('This device does not support Face ID/Touch ID');
-                } else if (invalid) {
+                } else if (error.invalid) {
                     self.$toast('Failed to authenticate by Face ID/Touch ID');
                 } else {
                     self.$toast('User has canceled or this device does not support Face ID/Touch ID');
@@ -72,6 +74,7 @@ export default {
 
                 router.refreshPage();
             } catch (ex) {
+                this.$logger.error('failed to unlock by pin code', ex);
                 this.$alert('PIN code is wrong');
             }
         },

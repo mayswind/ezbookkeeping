@@ -5,6 +5,7 @@ const serverSettingsCookieKey = 'ACP_SETTINGS';
 
 const defaultSettings = {
     lang: 'en',
+    debug: false,
     applicationLock: false,
     applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
@@ -75,6 +76,8 @@ function clearSettings() {
 export default {
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    isEnableDebug: () => getOption('debug'),
+    setEnableDebug: value => setOption('debug', value),
     isEnableApplicationLock: () => getOption('applicationLock'),
     setEnableApplicationLock: value => setOption('applicationLock', value),
     isEnableApplicationLockWebAuthn: () => getOption('applicationLockWebAuthn'),

@@ -305,6 +305,8 @@ export default {
             self.accounts = self.$utilities.getCategorizedAccounts(data.result);
             self.loading = false;
         }).catch(error => {
+            self.$logger.error('failed to load account list', error);
+
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();
@@ -332,6 +334,8 @@ export default {
 
                 self.accounts = self.$utilities.getCategorizedAccounts(data.result);
             }).catch(error => {
+                self.$logger.error('failed to reload account list', error);
+
                 done();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -477,6 +481,8 @@ export default {
                 self.sortable = false;
                 self.displayOrderModified = false;
             }).catch(error => {
+                self.$logger.error('failed to save accounts display order', error);
+
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
@@ -514,6 +520,8 @@ export default {
 
                 account.hidden = hidden;
             }).catch(error => {
+                self.$logger.error('failed to change account visibility', error);
+
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -555,6 +563,8 @@ export default {
                         }
                     });
                 }).catch(error => {
+                    self.$logger.error('failed to delete account', error);
+
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {

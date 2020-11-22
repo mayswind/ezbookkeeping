@@ -20,6 +20,7 @@ import icons from './consts/icon.js';
 import account from './consts/account.js';
 import licenses from './consts/licenses.js';
 import version from './lib/version.js';
+import logger from './lib/logger.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
@@ -51,6 +52,7 @@ Vue.prototype.$constants = {
     account: account,
 };
 Vue.prototype.$utilities = utils;
+Vue.prototype.$logger = logger;
 Vue.prototype.$webauthn = webauthn;
 Vue.prototype.$settings = settings;
 Vue.prototype.$getDefaultLanguage = getDefaultLanguage;
@@ -162,6 +164,12 @@ Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, 
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
 Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
 Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
+
+if (settings.getLanguage()) {
+    logger.info(`Current language is ${settings.getLanguage()}`);
+} else {
+    logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
+}
 
 Vue.prototype.$setLanguage(settings.getLanguage() || getDefaultLanguage());
 

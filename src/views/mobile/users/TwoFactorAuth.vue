@@ -184,6 +184,8 @@ export default {
             self.status = data.result.enable;
             self.loading = false;
         }).catch(error => {
+            self.$logger.error('failed to get 2fa status', error);
+
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();
@@ -220,6 +222,8 @@ export default {
 
                 self.showInputPasscodeSheetForEnable = true;
             }).catch(error => {
+                self.$logger.error('failed to request to enable 2fa', error);
+
                 self.enabling = false;
                 self.$hideLoading();
 
@@ -262,6 +266,8 @@ export default {
                     self.showBackupCodeSheet = true;
                 }
             }).catch(error => {
+                self.$logger.error('failed to confirm to enable 2fa', error);
+
                 self.enableConfirming = false;
                 self.$hideLoading();
 
@@ -300,6 +306,8 @@ export default {
                 self.showInputPasswordSheetForDisable = false;
                 self.$toast('Two factor authentication has been disabled');
             }).catch(error => {
+                self.$logger.error('failed to disable 2fa', error);
+
                 self.disabling = false;
                 self.$hideLoading();
 
@@ -339,6 +347,8 @@ export default {
                 self.currentBackupCode = data.result.recoveryCodes.join('\n');
                 self.showBackupCodeSheet = true;
             }).catch(error => {
+                self.$logger.error('failed to regenerate 2fa recovery code', error);
+
                 self.regenerating = false;
                 self.$hideLoading();
 

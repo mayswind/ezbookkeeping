@@ -194,6 +194,8 @@ export default {
 
                 router.refreshPage();
             }).catch(error => {
+                self.$logger.error('failed to login', error);
+
                 self.logining = false;
                 self.$hideLoading();
 
@@ -267,6 +269,8 @@ export default {
                 self.show2faSheet = false;
                 router.refreshPage();
             }).catch(error => {
+                self.$logger.error('failed to verify 2fa', error);
+
                 self.verifying = false;
                 self.$hideLoading();
 

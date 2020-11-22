@@ -394,6 +394,8 @@ export default {
 
                 self.loading = false;
             }).catch(error => {
+                self.$logger.error('failed to load account info', error);
+
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$alert({ error: error.response.data }, () => {
                         router.back();
@@ -548,6 +550,8 @@ export default {
 
                 router.back('/account/list', { force: true });
             }).catch(error => {
+                self.$logger.error('failed to save account', error);
+
                 self.submitting = false;
                 self.$hideLoading();
 

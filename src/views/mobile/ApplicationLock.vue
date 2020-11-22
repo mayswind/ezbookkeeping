@@ -112,12 +112,14 @@ export default {
                     self.$user.saveWebAuthnConfig(id);
                     self.$settings.setEnableApplicationLockWebAuthn(true);
                     self.$toast('You have enabled Face ID/Touch ID successfully');
-                }).catch(({ notSupported, invalid }) => {
+                }).catch(error => {
+                    self.$logger.error('failed to enable FaceID/Touch ID', error);
+
                     self.$hideLoading();
 
-                    if (notSupported) {
+                    if (error.notSupported) {
                         self.$toast('This device does not support Face ID/Touch ID');
-                    } else if (invalid) {
+                    } else if (error.invalid) {
                         self.$toast('Failed to enable Face ID/Touch ID');
                     } else {
                         self.$toast('User has canceled or this device does not support Face ID/Touch ID');

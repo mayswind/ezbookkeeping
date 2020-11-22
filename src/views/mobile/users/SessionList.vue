@@ -69,6 +69,8 @@ export default {
             self.tokens = data.result;
             self.loading = false;
         }).catch(error => {
+            self.$logger.error('failed to load token list', error);
+
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 self.$alert({ error: error.response.data }, () => {
                     router.back();
@@ -96,6 +98,8 @@ export default {
 
                 self.tokens = data.result;
             }).catch(error => {
+                self.$logger.error('failed to reload token list', error);
+
                 done();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -132,6 +136,8 @@ export default {
                         }
                     });
                 }).catch(error => {
+                    self.$logger.error('failed to revoke token', error);
+
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -169,6 +175,8 @@ export default {
 
                     self.$toast('You have logged out all other sessions');
                 }).catch(error => {
+                    self.$logger.error('failed to revoke all tokens', error);
+
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {

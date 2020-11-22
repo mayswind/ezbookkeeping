@@ -137,6 +137,8 @@ export default {
 
                 self.$toast('Exchange rates data has been updated');
             }).catch(error => {
+                self.$logger.error('failed to get latest exchange rates data', error);
+
                 if (done) {
                     done();
                 }

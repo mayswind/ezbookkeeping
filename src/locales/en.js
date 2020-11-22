@@ -423,6 +423,7 @@ export default {
     'You have enabled Face ID/Touch ID successfully': 'You have enabled Face ID/Touch ID successfully',
     'This device does not support Face ID/Touch ID': 'This device does not support Face ID/Touch ID',
     'Failed to enable Face ID/Touch ID': 'Failed to enable Face ID/Touch ID',
+    'User has canceled authentication': 'User has canceled authentication',
     'User has canceled or this device does not support Face ID/Touch ID': 'User has canceled or this device does not support Face ID/Touch ID',
     'Failed to authenticate by Face ID/Touch ID': 'Failed to authenticate by Face ID/Touch ID',
     'Exchange Rates Data': 'Exchange Rates Data',

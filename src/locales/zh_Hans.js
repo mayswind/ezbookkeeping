@@ -423,6 +423,7 @@ export default {
     'You have enabled Face ID/Touch ID successfully': '您已经成功开启面容ID / 指纹ID',
     'This device does not support Face ID/Touch ID': '当前设备不支持 Face ID 或 Touch ID',
     'Failed to enable Face ID/Touch ID': '启用 Face ID 或 Touch ID 失败',
+    'User has canceled authentication': '用户已经取消认证',
     'User has canceled or this device does not support Face ID/Touch ID': '用户已取消或当前设备不支持 Face ID 或 Touch ID',
     'Failed to authenticate by Face ID/Touch ID': '使用 Face ID / Touch ID 认证失败',
     'Exchange Rates Data': '汇率数据',

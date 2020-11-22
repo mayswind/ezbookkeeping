@@ -49,6 +49,8 @@ export default {
 
                 if (error.notSupported) {
                     self.$toast('This device does not support Face ID/Touch ID');
+                } else if (error.name === 'NotAllowedError') {
+                    self.$toast('User has canceled authentication');
                 } else if (error.invalid) {
                     self.$toast('Failed to authenticate by Face ID/Touch ID');
                 } else {

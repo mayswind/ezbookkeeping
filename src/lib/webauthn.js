@@ -12,23 +12,14 @@ const PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE = {
     pubKeyCredParams: [
         // https://www.iana.org/assignments/cose/cose.xhtml#algorithms
         {type: "public-key", alg: -7},   // ECDSA w/ SHA-256
-        {type: "public-key", alg: -35},  // ECDSA w/ SHA-384
-        {type: "public-key", alg: -36},  // ECDSA w/ SHA-512
         {type: "public-key", alg: -257}, // RSASSA-PKCS1-v1_5 using SHA-256
-        {type: "public-key", alg: -258}, // RSASSA-PKCS1-v1_5 using SHA-384
-        {type: "public-key", alg: -259}, // RSASSA-PKCS1-v1_5 using SHA-512
-        {type: "public-key", alg: -37},  // RSASSA-PSS w/ SHA-256
-        {type: "public-key", alg: -38},  // RSASSA-PSS w/ SHA-384
-        {type: "public-key", alg: -39},  // RSASSA-PSS w/ SHA-512
-        {type: "public-key", alg: -8}    // EdDSA
     ],
     timeout: 1800000
 };
 
 const PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS_TEMPLATE = {
     allowCredentials: [{
-        type: 'public-key',
-        transports: ['internal']
+        type: 'public-key'
     }],
     userVerification: "required",
     timeout: 1800000

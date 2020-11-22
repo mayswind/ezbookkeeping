@@ -1,6 +1,6 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
-        <f7-login-screen-title>{{ $t('PIN Code') }}</f7-login-screen-title>
+        <f7-login-screen-title>{{ $t('Unlock') }}</f7-login-screen-title>
         <f7-list form>
             <f7-list-item class="list-item-pincode-input">
                 <PincodeInput secure :length="6" v-model="pinCode" @keyup.native="unlockByPin" />

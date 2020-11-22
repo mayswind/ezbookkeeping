@@ -61,13 +61,13 @@ function registerCredential({ username, nickname }, userSecret) {
 
     const challenge = utils.generateRandomString();
     const publicKeyCredentialCreationOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE, {
-        challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+        challenge: utils.stringToArrayBuffer(challenge),
         rp: {
             name: window.location.hostname,
             id: window.location.hostname
         },
         user: {
-            id: Uint8Array.from(userSecret, c => c.charCodeAt(0)),
+            id: utils.stringToArrayBuffer(userSecret),
             name: username,
             displayName: nickname
         }
@@ -140,10 +140,10 @@ function verifyCredential(credentialId) {
 
     const challenge = utils.generateRandomString();
     const publicKeyCredentialRequestOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS_TEMPLATE, {
-        challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+        challenge: utils.stringToArrayBuffer(challenge),
         rpId: window.location.hostname
     });
-    publicKeyCredentialRequestOptions.allowCredentials[0].id = Uint8Array.from(atob(credentialId), c=>c.charCodeAt(0)).buffer;
+    publicKeyCredentialRequestOptions.allowCredentials[0].id = utils.stringToArrayBuffer(atob(credentialId));
 
     logger.debug('webauthn get options', publicKeyCredentialRequestOptions);
 

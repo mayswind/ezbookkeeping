@@ -33,6 +33,7 @@ export default {
 
         if (self.$settings.isEnableApplicationLockWebAuthn() && self.$user.getWebAuthnCredentialId()) {
             self.$webauthn.verifyCredential(
+                self.$user.getUserInfo(),
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userSecret }) => {
                 self.$user.unlockTokenByWebAuthn(id, userSecret);

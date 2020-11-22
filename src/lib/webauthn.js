@@ -51,6 +51,8 @@ function registerCredential({ username, nickname }, userSecret) {
     }
 
     const challenge = utils.generateRandomString();
+    const userId = `${username}|${userSecret}`; // username 32bytes(max) + userSecret 24bytes = 56bytes(max)
+
     const publicKeyCredentialCreationOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE, {
         challenge: utils.stringToArrayBuffer(challenge),
         rp: {
@@ -58,7 +60,7 @@ function registerCredential({ username, nickname }, userSecret) {
             id: window.location.hostname
         },
         user: {
-            id: utils.stringToArrayBuffer(userSecret),
+            id: utils.stringToArrayBuffer(userId),
             name: username,
             displayName: nickname
         }
@@ -116,7 +118,7 @@ function parsePublicKeyFromAttestationData(credential) {
     return publicKeyBytes;
 }
 
-function verifyCredential(credentialId) {
+function verifyCredential({ username }, credentialId) {
     if (!window.location || !window.location.hostname) {
         return Promise.reject({
             notSupported: true
@@ -143,16 +145,17 @@ function verifyCredential(credentialId) {
     }).then(rawCredential => {
         const clientData = rawCredential ? parseClientData(rawCredential) : null;
         const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
+        const userIdParts = rawCredential && rawCredential.response && rawCredential.response.userHandle ? utils.arrayBufferToString(rawCredential.response.userHandle).split('|') : null;
 
         logger.debug('webauthn get raw response', rawCredential);
 
         if (rawCredential && rawCredential.rawId &&
-            rawCredential.response && rawCredential.response.userHandle &&
-            clientData && clientData.type === 'webauthn.get' && challengeFromClientData === challenge) {
-
+            clientData && clientData.type === 'webauthn.get' && challengeFromClientData === challenge &&
+            userIdParts && userIdParts.length === 2 && userIdParts[0] === username) {
             const ret = {
                 id: utils.base64encode(rawCredential.rawId),
-                userSecret: utils.arrayBufferToString(rawCredential.response.userHandle),
+                userName: userIdParts[0],
+                userSecret: userIdParts[1],
                 clientData: clientData,
                 rawCredential: rawCredential
             };

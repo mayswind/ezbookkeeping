@@ -13,7 +13,8 @@ const tokenSessionStorageKey = 'lab_user_session_token';
 const appLockSecretSessionStorageKey = 'lab_user_app_lock_secret';
 
 function getAppLockSecret(pinCode) {
-    return CryptoJS.SHA256(APP_LOCK_SECRET_BASE_STRING_PREFIX + pinCode).toString();
+    const hashedPinCode = CryptoJS.SHA256(APP_LOCK_SECRET_BASE_STRING_PREFIX + pinCode).toString();
+    return hashedPinCode.substr(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 
 function getEncryptedToken(token, secret) {

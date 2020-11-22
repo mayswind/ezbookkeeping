@@ -7,26 +7,28 @@ const publicKeyCredentialCreationOptionsBaseTemplate = {
     authenticatorSelection: {
         authenticatorAttachment: 'platform',
         requireResidentKey: false,
-        userVerification: "required"
+        userVerification: "discouraged"
     },
     pubKeyCredParams: [
         // https://www.iana.org/assignments/cose/cose.xhtml#algorithms
         {type: "public-key", alg: -7},   // ECDSA w/ SHA-256
         {type: "public-key", alg: -257}, // RSASSA-PKCS1-v1_5 using SHA-256
     ],
-    timeout: 1800000
+    timeout: 120000
 };
 
 const publicKeyCredentialRequestOptionsBaseTemplate = {
     allowCredentials: [{
         type: 'public-key'
     }],
-    userVerification: "required",
-    timeout: 1800000
-}
+    userVerification: "discouraged",
+    timeout: 120000
+};
 
 function isSupported() {
-    return !!window.PublicKeyCredential && !!navigator.credentials;
+    return !!window.PublicKeyCredential
+        && !!navigator.credentials
+        && utils.isFunction(window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable);
 }
 
 function isCompletelySupported() {

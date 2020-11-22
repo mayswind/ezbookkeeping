@@ -32,10 +32,14 @@ export default {
         const router = self.$f7router;
 
         if (self.$settings.isEnableApplicationLockWebAuthn() && self.$user.getWebAuthnCredentialId()) {
+            self.$showLoading();
+
             self.$webauthn.verifyCredential(
                 self.$user.getUserInfo(),
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userSecret }) => {
+                self.$hideLoading();
+
                 self.$user.unlockTokenByWebAuthn(id, userSecret);
                 self.$services.refreshToken();
 
@@ -45,6 +49,7 @@ export default {
 
                 router.refreshPage();
             }).catch(error => {
+                self.$hideLoading();
                 self.$logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {

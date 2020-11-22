@@ -47,7 +47,7 @@ function isCompletelySupported() {
 }
 
 function registerCredential({ username, nickname }, userSecret) {
-    if (!window.location || !window.location.hostname || !document.title) {
+    if (!window.location || !window.location.hostname) {
         return Promise.reject({
             notSupported: true
         });
@@ -63,13 +63,13 @@ function registerCredential({ username, nickname }, userSecret) {
     const publicKeyCredentialCreationOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE, {
         challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
         rp: {
-            name: document.title,
-            id: window.location.hostname,
+            name: window.location.hostname,
+            id: window.location.hostname
         },
         user: {
             id: Uint8Array.from(userSecret, c => c.charCodeAt(0)),
             name: username,
-            displayName: nickname,
+            displayName: nickname
         }
     });
 

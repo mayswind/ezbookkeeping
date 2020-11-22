@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import settings from './settings.js';
 import utils from './utils.js';
 
-const APP_LOCK_SECRET_BASE_STRING_PREFIX = 'LAB_LOCK_SECRET_';
+const appLockSecretBaseStringPrefix = 'LAB_LOCK_SECRET_';
 
 const tokenLocalStorageKey = 'lab_user_token';
 const webauthnConfigLocalStorageKey = 'lab_user_webauthn_config';
@@ -13,7 +13,7 @@ const tokenSessionStorageKey = 'lab_user_session_token';
 const appLockSecretSessionStorageKey = 'lab_user_app_lock_secret';
 
 function getAppLockSecret(pinCode) {
-    const hashedPinCode = CryptoJS.SHA256(APP_LOCK_SECRET_BASE_STRING_PREFIX + pinCode).toString();
+    const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();
     return hashedPinCode.substr(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 

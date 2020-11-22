@@ -2,7 +2,7 @@ import CBOR from 'cbor-js';
 import logger from './logger.js';
 import utils from './utils.js';
 
-const PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE = {
+const publicKeyCredentialCreationOptionsBaseTemplate = {
     attestation: "none",
     authenticatorSelection: {
         authenticatorAttachment: 'platform',
@@ -17,7 +17,7 @@ const PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE = {
     timeout: 1800000
 };
 
-const PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS_TEMPLATE = {
+const publicKeyCredentialRequestOptionsBaseTemplate = {
     allowCredentials: [{
         type: 'public-key'
     }],
@@ -53,7 +53,7 @@ function registerCredential({ username, nickname }, userSecret) {
     const challenge = utils.generateRandomString();
     const userId = `${username}|${userSecret}`; // username 32bytes(max) + userSecret 24bytes = 56bytes(max)
 
-    const publicKeyCredentialCreationOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_CREATION_OPTIONS_TEMPLATE, {
+    const publicKeyCredentialCreationOptions = Object.assign({}, publicKeyCredentialCreationOptionsBaseTemplate, {
         challenge: utils.stringToArrayBuffer(challenge),
         rp: {
             name: window.location.hostname,
@@ -132,7 +132,7 @@ function verifyCredential({ username }, credentialId) {
     }
 
     const challenge = utils.generateRandomString();
-    const publicKeyCredentialRequestOptions = Object.assign({}, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS_TEMPLATE, {
+    const publicKeyCredentialRequestOptions = Object.assign({}, publicKeyCredentialRequestOptionsBaseTemplate, {
         challenge: utils.stringToArrayBuffer(challenge),
         rpId: window.location.hostname
     });

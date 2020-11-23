@@ -442,4 +442,5 @@ export default {
     'Build Time': 'Build Time',
     'Official Website': 'Official Website',
     'License': 'License',
+    'An error has occurred': 'An error has occurred',
 };

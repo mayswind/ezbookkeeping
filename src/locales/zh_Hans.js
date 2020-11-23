@@ -442,4 +442,5 @@ export default {
     'Build Time': '编译时间',
     'Official Website': '官方网站',
     'License': '许可协议',
+    'An error has occurred': '发生错误',
 };

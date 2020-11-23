@@ -125,6 +125,7 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
+
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button @click="setSortable()">{{ $t('Sort') }}</f7-actions-button>
@@ -134,6 +135,15 @@
             </f7-actions-group>
         </f7-actions>
 
+        <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-label>{{ $t('Are you sure you want to delete this account?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="remove(accountToDelete)">{{ $t('Delete') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
     </f7-page>
 </template>
 
@@ -145,8 +155,10 @@ export default {
             loading: true,
             showHidden: false,
             sortable: false,
+            accountToDelete: null,
             showAccountBalance: this.$settings.isShowAccountBalance(),
             showMoreActionSheet: false,
+            showDeleteActionSheet: false,
             displayOrderModified: false,
             displayOrderSaving: false
         };
@@ -540,39 +552,50 @@ export default {
             const app = self.$f7;
             const $$ = app.$;
 
-            self.$confirm('Are you sure you want to delete this account?', () => {
-                self.$showLoading();
+            if (!account) {
+                self.$alert('An error has occurred');
+                return;
+            }
 
-                self.$services.deleteAccount({
-                    id: account.id
-                }).then(response => {
-                    self.$hideLoading();
-                    const data = response.data;
+            if (!self.showDeleteActionSheet) {
+                self.accountToDelete = account;
+                self.showDeleteActionSheet = true;
+                return;
+            }
 
-                    if (!data || !data.success || !data.result) {
-                        self.$alert('Unable to delete this account');
-                        return;
-                    }
+            self.showDeleteActionSheet = false;
+            self.accountToDelete = null;
+            self.$showLoading();
 
-                    app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
-                        const accountList = self.accounts[account.category];
-                        for (let i = 0; i < accountList.length; i++) {
-                            if (accountList[i].id === account.id) {
-                                accountList.splice(i, 1);
-                            }
+            self.$services.deleteAccount({
+                id: account.id
+            }).then(response => {
+                self.$hideLoading();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$alert('Unable to delete this account');
+                    return;
+                }
+
+                app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
+                    const accountList = self.accounts[account.category];
+                    for (let i = 0; i < accountList.length; i++) {
+                        if (accountList[i].id === account.id) {
+                            accountList.splice(i, 1);
                         }
-                    });
-                }).catch(error => {
-                    self.$logger.error('failed to delete account', error);
-
-                    self.$hideLoading();
-
-                    if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$alert({ error: error.response.data });
-                    } else if (!error.processed) {
-                        self.$alert('Unable to delete this account');
                     }
                 });
+            }).catch(error => {
+                self.$logger.error('failed to delete account', error);
+
+                self.$hideLoading();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$alert({ error: error.response.data });
+                } else if (!error.processed) {
+                    self.$alert('Unable to delete this account');
+                }
             });
         }
     },

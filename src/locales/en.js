@@ -429,6 +429,7 @@ export default {
     'User has canceled or this device does not support Face ID/Touch ID': 'User has canceled or this device does not support Face ID/Touch ID',
     'Failed to authenticate by Face ID/Touch ID': 'Failed to authenticate by Face ID/Touch ID',
     'Face ID/Touch ID authentication is not enabled': 'Face ID/Touch ID authentication is not enabled',
+    'Are you sure you want to re-login?': 'Are you sure you want to re-login?',
     'Exchange Rates Data': 'Exchange Rates Data',
     'Base Currency': 'Base Currency',
     'Last Updated': 'Last Updated',

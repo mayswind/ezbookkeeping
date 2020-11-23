@@ -429,6 +429,7 @@ export default {
     'User has canceled or this device does not support Face ID/Touch ID': '用户已取消或当前设备不支持面容ID/指纹ID',
     'Failed to authenticate by Face ID/Touch ID': '使用面容ID或指纹ID认证失败',
     'Face ID/Touch ID authentication is not enabled': '面容ID或指纹ID认证没有启用',
+    'Are you sure you want to re-login?': '您确定要重新登录？',
     'Exchange Rates Data': '汇率数据',
     'Base Currency': '基准货币',
     'Last Updated': '最后更新',

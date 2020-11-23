@@ -108,15 +108,18 @@ export default {
             }
         },
         relogin() {
-            const router = this.$f7router;
+            const self = this;
+            const router = self.$f7router;
 
-            this.$user.clearTokenAndUserInfo();
-            this.$exchangeRates.clearExchangeRates();
-            this.$settings.clearSettings();
-            this.$locale.init();
+            self.$confirm('Are you sure you want to re-login?', () => {
+                self.$user.clearTokenAndUserInfo();
+                self.$exchangeRates.clearExchangeRates();
+                self.$settings.clearSettings();
+                self.$locale.init();
 
-            router.navigate('/login', {
-                clearPreviousHistory: true
+                router.navigate('/login', {
+                    clearPreviousHistory: true
+                });
             });
         }
     }

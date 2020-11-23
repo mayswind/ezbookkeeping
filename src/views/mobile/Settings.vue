@@ -180,7 +180,7 @@ export default {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        self.$alert('Unable to logout');
+                        self.$toast('Unable to logout');
                         return;
                     }
 
@@ -201,9 +201,9 @@ export default {
                     }
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$alert({ error: error.response.data });
+                        self.$toast({ error: error.response.data });
                     } else if (!error.processed) {
-                        self.$alert('Unable to logout');
+                        self.$toast('Unable to logout');
                     }
                 });
             });

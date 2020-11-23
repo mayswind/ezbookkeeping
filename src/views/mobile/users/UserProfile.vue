@@ -174,7 +174,7 @@ export default {
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
-                self.$alert('Unable to get user profile', () => {
+                self.$toast('Unable to get user profile', () => {
                     router.back();
                 });
                 return;
@@ -192,11 +192,11 @@ export default {
             self.$logger.error('failed to get user profile', error);
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$alert({ error: error.response.data }, () => {
+                self.$toast({ error: error.response.data }, () => {
                     router.back();
                 });
             } else if (!error.processed) {
-                self.$alert('Unable to get user profile', () => {
+                self.$toast('Unable to get user profile', () => {
                     router.back();
                 });
             }
@@ -238,7 +238,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to update user profile');
+                    self.$toast('Unable to update user profile');
                     return;
                 }
 
@@ -260,9 +260,9 @@ export default {
                 self.currentPassword = '';
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to update user profile');
+                    self.$toast('Unable to update user profile');
                 }
             });
         }

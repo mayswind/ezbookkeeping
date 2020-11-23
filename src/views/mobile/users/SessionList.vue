@@ -60,7 +60,7 @@ export default {
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
-                self.$alert('Unable to get session list', () => {
+                self.$toast('Unable to get session list', () => {
                     router.back();
                 });
                 return;
@@ -72,11 +72,11 @@ export default {
             self.$logger.error('failed to load token list', error);
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$alert({ error: error.response.data }, () => {
+                self.$toast({ error: error.response.data }, () => {
                     router.back();
                 });
             } else if (!error.processed) {
-                self.$alert('Unable to get session list', () => {
+                self.$toast('Unable to get session list', () => {
                     router.back();
                 });
             }
@@ -124,7 +124,7 @@ export default {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        self.$alert('Unable to logout from this session');
+                        self.$toast('Unable to logout from this session');
                         return;
                     }
 
@@ -141,9 +141,9 @@ export default {
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$alert({error: error.response.data});
+                        self.$toast({error: error.response.data});
                     } else if (!error.processed) {
-                        self.$alert('Unable to logout from this session');
+                        self.$toast('Unable to logout from this session');
                     }
                 });
             });
@@ -163,7 +163,7 @@ export default {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        self.$alert('Unable to logout all other sessions');
+                        self.$toast('Unable to logout all other sessions');
                         return;
                     }
 
@@ -180,9 +180,9 @@ export default {
                     self.$hideLoading();
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$alert({error: error.response.data});
+                        self.$toast({error: error.response.data});
                     } else if (!error.processed) {
-                        self.$alert('Unable to logout all other sessions');
+                        self.$toast('Unable to logout all other sessions');
                     }
                 });
             });

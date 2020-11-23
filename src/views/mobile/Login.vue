@@ -175,7 +175,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
-                    self.$alert('Unable to login');
+                    self.$toast('Unable to login');
                     return;
                 }
 
@@ -207,9 +207,9 @@ export default {
                 }
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to login');
+                    self.$toast('Unable to login');
                 }
             });
         },
@@ -258,7 +258,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.token) {
-                    self.$alert('Unable to verify');
+                    self.$toast('Unable to verify');
                     return;
                 }
 
@@ -281,9 +281,9 @@ export default {
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to verify');
+                    self.$toast('Unable to verify');
                 }
             })
         },

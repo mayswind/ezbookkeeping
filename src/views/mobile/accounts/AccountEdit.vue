@@ -357,7 +357,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to get account', () => {
+                    self.$toast('Unable to get account', () => {
                         router.back();
                     });
                     return;
@@ -397,11 +397,11 @@ export default {
                 self.$logger.error('failed to load account info', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data }, () => {
+                    self.$toast({ error: error.response.data }, () => {
                         router.back();
                     });
                 } else if (!error.processed) {
-                    self.$alert('Unable to get account', () => {
+                    self.$toast('Unable to get account', () => {
                         router.back();
                     });
                 }
@@ -473,7 +473,17 @@ export default {
             const self = this;
             const router = self.$f7router;
 
-            let problemMessage = self.inputEmptyProblemMessage;
+            let problemMessage = self.getInputEmptyProblemMessage(self.account, false);
+
+            if (!problemMessage && self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
+                for (let i = 0; i < self.subAccounts.length; i++) {
+                    problemMessage = self.getInputEmptyProblemMessage(self.subAccounts[i], true);
+
+                    if (problemMessage) {
+                        break;
+                    }
+                }
+            }
 
             if (problemMessage) {
                 self.$alert(problemMessage);
@@ -535,9 +545,9 @@ export default {
 
                 if (!data || !data.success || !data.result) {
                     if (!self.editAccountId) {
-                        self.$alert('Unable to add account');
+                        self.$toast('Unable to add account');
                     } else {
-                        self.$alert('Unable to save account');
+                        self.$toast('Unable to save account');
                     }
                     return;
                 }
@@ -556,12 +566,12 @@ export default {
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
                     if (!self.editAccountId) {
-                        self.$alert('Unable to add account');
+                        self.$toast('Unable to add account');
                     } else {
-                        self.$alert('Unable to save account');
+                        self.$toast('Unable to save account');
                     }
                 }
             });

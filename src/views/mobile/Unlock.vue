@@ -104,7 +104,7 @@ export default {
                 router.refreshPage();
             } catch (ex) {
                 this.$logger.error('failed to unlock by pin code', ex);
-                this.$alert('PIN code is wrong');
+                this.$toast('PIN code is wrong');
             }
         },
         relogin() {

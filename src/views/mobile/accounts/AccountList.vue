@@ -308,7 +308,7 @@ export default {
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
-                self.$alert('Unable to get account list', () => {
+                self.$toast('Unable to get account list', () => {
                     router.back();
                 });
                 return;
@@ -320,11 +320,11 @@ export default {
             self.$logger.error('failed to load account list', error);
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$alert({ error: error.response.data }, () => {
+                self.$toast({ error: error.response.data }, () => {
                     router.back();
                 });
             } else if (!error.processed) {
-                self.$alert('Unable to get account list', () => {
+                self.$toast('Unable to get account list', () => {
                     router.back();
                 });
             }
@@ -485,7 +485,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to move account');
+                    self.$toast('Unable to move account');
                     return;
                 }
 
@@ -499,9 +499,9 @@ export default {
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to move account');
+                    self.$toast('Unable to move account');
                 }
             });
         },
@@ -574,7 +574,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to delete this account');
+                    self.$toast('Unable to delete this account');
                     return;
                 }
 
@@ -592,9 +592,9 @@ export default {
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to delete this account');
+                    self.$toast('Unable to delete this account');
                 }
             });
         }

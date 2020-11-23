@@ -153,7 +153,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    self.$alert('Unable to sign up');
+                    self.$toast('Unable to sign up');
                     return;
                 }
 
@@ -178,9 +178,9 @@ export default {
                 self.$hideLoading();
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$alert({ error: error.response.data });
+                    self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    self.$alert('Unable to sign up');
+                    self.$toast('Unable to sign up');
                 }
             });
         }

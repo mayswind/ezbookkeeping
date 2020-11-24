@@ -1,6 +1,6 @@
 import utils from './utils.js';
 
-const exchangeRatesLocalStorageKey = 'lab_exchange_rates';
+const exchangeRatesLocalStorageKey = 'lab_app_exchange_rates';
 
 function getExchangeRates() {
     const storageData = localStorage.getItem(exchangeRatesLocalStorageKey) || '{}';

@@ -10,19 +10,21 @@ const webauthnConfigLocalStorageKey = 'lab_user_webauthn_config';
 const userInfoLocalStorageKey = 'lab_user_info';
 
 const tokenSessionStorageKey = 'lab_user_session_token';
-const appLockSecretSessionStorageKey = 'lab_user_app_lock_secret';
+const appLockStateSessionStorageKey = 'lab_user_app_lock_state'; // { 'username': '', secret: '' }
 
 function getAppLockSecret(pinCode) {
     const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();
     return hashedPinCode.substr(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 
-function getEncryptedToken(token, secret) {
-    return CryptoJS.AES.encrypt(token, secret).toString();
+function getEncryptedToken(token, appLockState) {
+    const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
+    return CryptoJS.AES.encrypt(token, key).toString();
 }
 
-function getDecryptedToken(encryptedToken, secret) {
-    const bytes = CryptoJS.AES.decrypt(encryptedToken, secret);
+function getDecryptedToken(encryptedToken, appLockState) {
+    const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
+    const bytes = CryptoJS.AES.decrypt(encryptedToken, key);
     return bytes.toString(CryptoJS.enc.Utf8);
 }
 
@@ -39,9 +41,9 @@ function getUserInfo() {
     return JSON.parse(data);
 }
 
-function getUserAppLockSecret() {
-    const currentSecret = sessionStorage.getItem(appLockSecretSessionStorageKey);
-    return currentSecret;
+function getUserAppLockState() {
+    const data = sessionStorage.getItem(appLockStateSessionStorageKey);
+    return JSON.parse(data);
 }
 
 function isUserLogined() {
@@ -57,7 +59,7 @@ function isUserUnlocked() {
         return true;
     }
 
-    return !!sessionStorage.getItem(appLockSecretSessionStorageKey) && !!sessionStorage.getItem(tokenSessionStorageKey);
+    return !!sessionStorage.getItem(appLockStateSessionStorageKey) && !!sessionStorage.getItem(tokenSessionStorageKey);
 }
 
 function getWebAuthnCredentialId() {
@@ -79,7 +81,7 @@ function clearWebAuthnConfig() {
     localStorage.removeItem(webauthnConfigLocalStorageKey);
 }
 
-function unlockTokenByWebAuthn(credentialId, userSecret) {
+function unlockTokenByWebAuthn(credentialId, userName, userSecret) {
     const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
     const webauthnConfig = JSON.parse(webauthnConfigData);
 
@@ -88,28 +90,37 @@ function unlockTokenByWebAuthn(credentialId, userSecret) {
     }
 
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
-    const secret = userSecret;
-    const token = getDecryptedToken(encryptedToken, secret);
+    const appLockState = {
+        username: userName,
+        secret: userSecret
+    };
+    const token = getDecryptedToken(encryptedToken, appLockState);
 
-    sessionStorage.setItem(appLockSecretSessionStorageKey, secret);
+    sessionStorage.setItem(appLockStateSessionStorageKey, JSON.stringify(appLockState));
     sessionStorage.setItem(tokenSessionStorageKey, token);
 }
 
-function unlockTokenByPinCode(pinCode) {
+function unlockTokenByPinCode(userName, pinCode) {
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
-    const secret = getAppLockSecret(pinCode);
-    const token = getDecryptedToken(encryptedToken, secret);
+    const appLockState = {
+        username: userName,
+        secret: getAppLockSecret(pinCode)
+    };
+    const token = getDecryptedToken(encryptedToken, appLockState);
 
-    sessionStorage.setItem(appLockSecretSessionStorageKey, secret);
+    sessionStorage.setItem(appLockStateSessionStorageKey, JSON.stringify(appLockState));
     sessionStorage.setItem(tokenSessionStorageKey, token);
 }
 
-function encryptToken(pinCode) {
+function encryptToken(userName, pinCode) {
     const token = localStorage.getItem(tokenLocalStorageKey);
-    const secret = getAppLockSecret(pinCode);
-    const encryptedToken = getEncryptedToken(token, secret);
+    const appLockState = {
+        username: userName,
+        secret: getAppLockSecret(pinCode)
+    };
+    const encryptedToken = getEncryptedToken(token, appLockState);
 
-    sessionStorage.setItem(appLockSecretSessionStorageKey, secret);
+    sessionStorage.setItem(appLockStateSessionStorageKey, JSON.stringify(appLockState));
     sessionStorage.setItem(tokenSessionStorageKey, token);
     localStorage.setItem(tokenLocalStorageKey, encryptedToken);
 }
@@ -119,14 +130,14 @@ function decryptToken() {
 
     localStorage.setItem(tokenLocalStorageKey, token);
     sessionStorage.removeItem(tokenSessionStorageKey);
-    sessionStorage.removeItem(appLockSecretSessionStorageKey);
+    sessionStorage.removeItem(appLockStateSessionStorageKey);
 }
 
 function isCorrectPinCode(pinCode) {
     const secret = getAppLockSecret(pinCode);
-    const currentSecret = sessionStorage.getItem(appLockSecretSessionStorageKey);
+    const appLockState = getUserAppLockState();
 
-    return secret === currentSecret;
+    return appLockState && secret === appLockState.secret;
 }
 
 function updateToken(token) {
@@ -134,8 +145,9 @@ function updateToken(token) {
         if (settings.isEnableApplicationLock()) {
             sessionStorage.setItem(tokenSessionStorageKey, token);
 
-            const secret = sessionStorage.getItem(appLockSecretSessionStorageKey);
-            localStorage.setItem(tokenLocalStorageKey, getEncryptedToken(token, secret));
+            const appLockState = getUserAppLockState();
+            const encryptedToken = getEncryptedToken(token, appLockState);
+            localStorage.setItem(tokenLocalStorageKey, encryptedToken);
         } else {
             localStorage.setItem(tokenLocalStorageKey, token);
         }
@@ -160,9 +172,12 @@ function updateTokenAndUserInfo(item) {
     }
 }
 
-function clearTokenAndUserInfo() {
+function clearTokenAndUserInfo(clearAppLockState) {
+    if (clearAppLockState) {
+        sessionStorage.removeItem(appLockStateSessionStorageKey);
+    }
+
     sessionStorage.removeItem(tokenSessionStorageKey);
-    sessionStorage.removeItem(appLockSecretSessionStorageKey);
     localStorage.removeItem(tokenLocalStorageKey);
     localStorage.removeItem(userInfoLocalStorageKey);
 }
@@ -170,7 +185,7 @@ function clearTokenAndUserInfo() {
 export default {
     getToken,
     getUserInfo,
-    getUserAppLockSecret,
+    getUserAppLockState,
     isUserLogined,
     isUserUnlocked,
     getWebAuthnCredentialId,

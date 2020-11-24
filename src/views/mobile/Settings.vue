@@ -184,7 +184,7 @@ export default {
                         return;
                     }
 
-                    self.$user.clearTokenAndUserInfo();
+                    self.$user.clearTokenAndUserInfo(true);
                     self.$user.clearWebAuthnConfig();
                     self.$exchangeRates.clearExchangeRates();
                     self.$settings.clearSettings();

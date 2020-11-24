@@ -185,10 +185,15 @@ export default {
                     return;
                 }
 
-                if (self.$settings.isEnableApplicationLock()) {
-                    self.$settings.setEnableApplicationLock(false);
-                    self.$settings.setEnableApplicationLockWebAuthn(false);
-                    self.$user.clearWebAuthnConfig();
+                if (self.$settings.isEnableApplicationLock() || self.$user.getUserAppLockState()) {
+                    const appLockState = self.$user.getUserAppLockState();
+
+                    if (!appLockState || appLockState.username !== data.result.user.username) {
+                        self.$user.clearTokenAndUserInfo(true);
+                        self.$settings.setEnableApplicationLock(false);
+                        self.$settings.setEnableApplicationLockWebAuthn(false);
+                        self.$user.clearWebAuthnConfig();
+                    }
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);
@@ -264,10 +269,15 @@ export default {
                     return;
                 }
 
-                if (self.$settings.isEnableApplicationLock()) {
-                    self.$settings.setEnableApplicationLock(false);
-                    self.$settings.setEnableApplicationLockWebAuthn(false);
-                    self.$user.clearWebAuthnConfig();
+                if (self.$settings.isEnableApplicationLock() || self.$user.getUserAppLockState()) {
+                    const appLockState = self.$user.getUserAppLockState();
+
+                    if (!appLockState || appLockState.username !== data.result.user.username) {
+                        self.$user.clearTokenAndUserInfo(true);
+                        self.$settings.setEnableApplicationLock(false);
+                        self.$settings.setEnableApplicationLockWebAuthn(false);
+                        self.$user.clearWebAuthnConfig();
+                    }
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);

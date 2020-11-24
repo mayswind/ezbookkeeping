@@ -44,7 +44,7 @@ axios.interceptors.response.use(response => {
             || errorCode === 202005 // current token requires two factor authorization
             || errorCode === 202006 // current token does not require two factor authorization
         ) {
-            userState.clearTokenAndUserInfo();
+            userState.clearTokenAndUserInfo(false);
             location.reload();
             return Promise.reject({ processed: true });
         }

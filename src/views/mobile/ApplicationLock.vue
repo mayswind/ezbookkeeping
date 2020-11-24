@@ -104,8 +104,8 @@ export default {
                 self.$showLoading();
 
                 self.$webauthn.registerCredential(
+                    self.$user.getUserAppLockState(),
                     self.$user.getUserInfo(),
-                    self.$user.getUserAppLockSecret(),
                 ).then(({ id }) => {
                     self.$hideLoading();
 
@@ -160,7 +160,14 @@ export default {
                 return;
             }
 
-            this.$user.encryptToken(pinCode);
+            const user = this.$user.getUserInfo();
+
+            if (!user || !user.username) {
+                this.$alert('An error has occurred');
+                return;
+            }
+
+            this.$user.encryptToken(user.username, pinCode);
             this.$settings.setEnableApplicationLock(true);
             this.isEnableApplicationLock = true;
 

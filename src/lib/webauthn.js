@@ -39,7 +39,7 @@ function isCompletelySupported() {
     return window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
 }
 
-function registerCredential({ username, nickname }, userSecret) {
+function registerCredential({ username, secret }, { nickname }) {
     if (!window.location || !window.location.hostname) {
         return Promise.reject({
             notSupported: true
@@ -53,7 +53,7 @@ function registerCredential({ username, nickname }, userSecret) {
     }
 
     const challenge = utils.generateRandomString();
-    const userId = `${username}|${userSecret}`; // username 32bytes(max) + userSecret 24bytes = 56bytes(max)
+    const userId = `${username}|${secret}`; // username 32bytes(max) + secret 24bytes = 56bytes(max)
 
     const publicKeyCredentialCreationOptions = Object.assign({}, publicKeyCredentialCreationOptionsBaseTemplate, {
         challenge: utils.stringToArrayBuffer(challenge),

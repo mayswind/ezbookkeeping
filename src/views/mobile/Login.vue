@@ -187,6 +187,8 @@ export default {
 
                 if (self.$settings.isEnableApplicationLock()) {
                     self.$settings.setEnableApplicationLock(false);
+                    self.$settings.setEnableApplicationLockWebAuthn(false);
+                    self.$user.clearWebAuthnConfig();
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);
@@ -264,6 +266,8 @@ export default {
 
                 if (self.$settings.isEnableApplicationLock()) {
                     self.$settings.setEnableApplicationLock(false);
+                    self.$settings.setEnableApplicationLockWebAuthn(false);
+                    self.$user.clearWebAuthnConfig();
                 }
 
                 self.$user.updateTokenAndUserInfo(data.result);

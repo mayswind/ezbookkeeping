@@ -113,6 +113,7 @@ export default {
 
             self.$confirm('Are you sure you want to re-login?', () => {
                 self.$user.clearTokenAndUserInfo();
+                self.$user.clearWebAuthnConfig();
                 self.$exchangeRates.clearExchangeRates();
                 self.$settings.clearSettings();
                 self.$locale.init();

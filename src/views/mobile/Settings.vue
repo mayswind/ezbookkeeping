@@ -185,6 +185,7 @@ export default {
                     }
 
                     self.$user.clearTokenAndUserInfo();
+                    self.$user.clearWebAuthnConfig();
                     self.$exchangeRates.clearExchangeRates();
                     self.$settings.clearSettings();
                     self.$locale.init();

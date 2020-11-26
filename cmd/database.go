@@ -31,7 +31,7 @@ func updateDatabaseStructure(c *cli.Context) error {
 
 	_ = datastore.Container.UserStore.SyncStructs(new(models.User), new(models.TwoFactor), new(models.TwoFactorRecoveryCode))
 	_ = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
-	_ = datastore.Container.UserDataStore.SyncStructs(new(models.Account))
+	_ = datastore.Container.UserDataStore.SyncStructs(new(models.Account), new(models.TransactionCategory))
 
 	log.BootInfof("[database.updateDatabaseStructure] maintained successfully")
 

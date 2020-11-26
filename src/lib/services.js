@@ -212,6 +212,48 @@ export default {
             id
         });
     },
+    getAllTransactionCategories: ({ type, parentId }) => {
+        return axios.get('v1/transaction/categories/list.json?type=' + (type || '0') + '&parent_id=' + (parentId || parentId === 0 ? parentId : '-1'));
+    },
+    getTransactionCategory: ({ id }) => {
+        return axios.get('v1/transaction/categories/get.json?id=' + id);
+    },
+    addTransactionCategory: ({ name, type, parentId, icon, color, comment }) => {
+        return axios.post('v1/transaction/categories/add.json', {
+            name,
+            type,
+            parentId,
+            icon,
+            color,
+            comment
+        });
+    },
+    modifyTransactionCategory: ({ id, name, icon, color, comment, hidden }) => {
+        return axios.post('v1/transaction/categories/modify.json', {
+            id,
+            name,
+            icon,
+            color,
+            comment,
+            hidden
+        });
+    },
+    hideTransactionCategory: ({ id, hidden }) => {
+        return axios.post('v1/transaction/categories/hide.json', {
+            id,
+            hidden
+        });
+    },
+    moveTransactionCategory: ({ newDisplayOrders }) => {
+        return axios.post('v1/transaction/categories/move.json', {
+            newDisplayOrders,
+        });
+    },
+    deleteTransactionCategory: ({ id }) => {
+        return axios.post('v1/transaction/categories/delete.json', {
+            id
+        });
+    },
     getLatestExchangeRates: () => {
         return axios.get('v1/exchange_rates/latest.json');
     },

@@ -221,6 +221,9 @@ export default {
         'sub account category not equals to parent': 'Sub account category does not equal to parent',
         'sub account type invalid': 'Sub account type is invalid',
         'cannot add or delete sub accounts when modify account': 'You cannot add or delete sub accounts when modify account',
+        'transaction category id is invalid': 'Transaction category ID is invalid',
+        'transaction category not found': 'Transaction category is not found',
+        'transaction category type is invalid': 'Transaction category type is invalid',
     },
     'parameter': {
         'id': 'ID',
@@ -236,6 +239,7 @@ export default {
         'type': 'Type',
         'color': 'Color',
         'currency': 'Currency',
+        'parentId': 'Parent Node ID',
         'comment': 'Comment',
     },
     'parameterizedError': {

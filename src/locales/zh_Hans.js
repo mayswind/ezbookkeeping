@@ -221,6 +221,9 @@ export default {
         'sub account category not equals to parent': '子账户类别与父账户不同',
         'sub account type invalid': '子账户类型无效',
         'cannot add or delete sub accounts when modify account': '您不能在修改账户时添加或删除子账户',
+        'transaction category id is invalid': '交易分类ID无效',
+        'transaction category not found': '交易分类不存在',
+        'transaction category type is invalid': '交易分类类型无效',
     },
     'parameter': {
         'id': 'ID',
@@ -236,6 +239,7 @@ export default {
         'type': '类型',
         'color': '颜色',
         'currency': '货币',
+        'parentId': '父节点ID',
         'comment': '备注',
     },
     'parameterizedError': {

@@ -1,8 +1,8 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Settings')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-block-title class="margin-top">{{ userNickName }}</f7-block-title>
+        <f7-block-title class="margin-top">{{ currentNickName }}</f7-block-title>
         <f7-card>
             <f7-card-content :padding="false">
                 <f7-list>
@@ -80,17 +80,18 @@
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
+            currentNickName: self.getCurrentUserNickName(),
+            isEnableApplicationLock: this.$settings.isEnableApplicationLock(),
+            exchangeRatesLastUpdateDate: self.getExchangeRatesLastUpdateDate(),
             logouting: false
         };
     },
     computed: {
         version() {
             return 'v' + this.$version();
-        },
-        userNickName() {
-            const userInfo = this.$user.getUserInfo() || {};
-            return userInfo.nickname || userInfo.username || this.$t('User');
         },
         allLanguages() {
             return this.$locale.getAllLanguages();
@@ -102,13 +103,6 @@ export default {
             set: function (value) {
                 this.$locale.setLanguage(value);
             }
-        },
-        isEnableApplicationLock() {
-            return this.$settings.isEnableApplicationLock();
-        },
-        exchangeRatesLastUpdateDate() {
-            const exchangeRates = this.$exchangeRates.getExchangeRates();
-            return exchangeRates && exchangeRates.date ? this.$moment(exchangeRates.date).format(this.$t('format.date.long')) : '';
         },
         isAutoUpdateExchangeRatesData: {
             get: function () {
@@ -166,6 +160,19 @@ export default {
         }
     },
     methods: {
+        onPageAfterIn() {
+            this.currentNickName = this.getCurrentUserNickName();
+            this.isEnableApplicationLock = this.$settings.isEnableApplicationLock();
+            this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
+        },
+        getCurrentUserNickName() {
+            const userInfo = this.$user.getUserInfo() || {};
+            return userInfo.nickname || userInfo.username || this.$t('User');
+        },
+        getExchangeRatesLastUpdateDate() {
+            const exchangeRates = this.$exchangeRates.getExchangeRates();
+            return exchangeRates && exchangeRates.date ? this.$moment(exchangeRates.date).format(this.$t('format.date.long')) : '';
+        },
         logout() {
             const self = this;
             const router = self.$f7router;

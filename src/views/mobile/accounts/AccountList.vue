@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr @ptr:refresh="reload">
+    <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Account List')"></f7-nav-title>
@@ -331,11 +331,21 @@ export default {
         });
     },
     methods: {
+        onPageAfterIn() {
+            const self = this;
+            const previousRoute = self.$f7router.previousRoute;
+
+            if (previousRoute && (previousRoute.path === '/account/add' || previousRoute.path === '/account/edit') && !self.loading) {
+                self.reload(null);
+            }
+        },
         reload(done) {
             const self = this;
 
             self.$services.getAllAccounts().then(response => {
-                done();
+                if (done) {
+                    done();
+                }
 
                 const data = response.data;
 
@@ -348,7 +358,9 @@ export default {
             }).catch(error => {
                 self.$logger.error('failed to reload account list', error);
 
-                done();
+                if (done) {
+                    done();
+                }
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$toast({ error: error.response.data });

@@ -1,7 +1,7 @@
 <template>
     <f7-page>
         <f7-navbar>
-            <f7-nav-left back-link-force :back-link="$t('Back')"></f7-nav-left>
+            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Application Lock')"></f7-nav-title>
         </f7-navbar>
 

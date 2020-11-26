@@ -558,7 +558,7 @@ export default {
                     self.$toast('You have saved this account');
                 }
 
-                router.back('/account/list', { force: true });
+                router.back();
             }).catch(error => {
                 self.$logger.error('failed to save account', error);
 

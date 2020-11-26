@@ -251,7 +251,7 @@ export default {
                 }
 
                 self.$toast('Your profile has been successfully updated');
-                router.back('/settings', { force: true });
+                router.back();
             }).catch(error => {
                 self.$logger.error('failed to save user profile', error);
 

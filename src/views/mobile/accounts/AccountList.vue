@@ -33,7 +33,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>Account Category</f7-card-header>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
                 </f7-list>
@@ -42,7 +42,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>Account Category 2</f7-card-header>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
                     <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
@@ -52,7 +52,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>Account Category 3</f7-card-header>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
                     <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
@@ -61,7 +61,7 @@
         </f7-card>
 
         <f7-card v-if="!loading && noAvailableAccount">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('No available account')"></f7-list-item>
                 </f7-list>
@@ -75,7 +75,7 @@
                     <span style="margin-left: 10px">{{ accountCategoryTotalBalance(accountCategory) | currency(defaultCurrency) }}</span>
                 </small>
             </f7-card-header>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"

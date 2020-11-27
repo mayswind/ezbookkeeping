@@ -1,6 +1,6 @@
 <template>
     <f7-app :params="f7params">
-        <f7-view id="main-view" main url="/" :push-state="true" :push-state-animate="false"></f7-view>
+        <f7-view id="main-view" class="safe-areas" main url="/" :push-state="true" :push-state-animate="false"></f7-view>
     </f7-app>
 </template>
 

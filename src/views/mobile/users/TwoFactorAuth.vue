@@ -3,7 +3,7 @@
         <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item title="Status" after="Unknown"></f7-list-item>
                     <f7-list-button class="disabled">Operate</f7-list-button>
@@ -12,7 +12,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading && status === true">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
                     <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
@@ -22,7 +22,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading && status === false">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
                     <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>

@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card>
-            <f7-card-content :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item
                         :title="$t('Base Currency')"
@@ -25,12 +25,12 @@
         </f7-card>
 
         <f7-card>
-            <f7-card-content :padding="false" v-if="!exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="!exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
                 </f7-list>
             </f7-card-content>
-            <f7-card-content :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
                                   :title="exchangeRate.currencyDisplayName"

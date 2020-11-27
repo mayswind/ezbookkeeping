@@ -3,7 +3,7 @@
         <f7-navbar :title="$t('About')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-card>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
                     <f7-list-item :title="$t('Build Time')" :after="buildTime | moment($t('format.datetime.long'))"></f7-list-item>

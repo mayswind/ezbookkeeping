@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input
                         type="text"

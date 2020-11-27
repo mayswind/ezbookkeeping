@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list media-list>
                     <f7-list-item class="list-item-media-valign-middle"
                                   title="Current"
@@ -22,7 +22,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list media-list>
                     <f7-list-item class="list-item-media-valign-middle" swipeout
                                   v-for="token in tokens"

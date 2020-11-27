@@ -6,7 +6,7 @@
         </f7-navbar>
 
         <f7-card v-if="isEnableApplicationLock">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
                     <f7-list-item v-if="isSupportedWebAuthn">
@@ -19,7 +19,7 @@
         </f7-card>
 
         <f7-card v-else-if="!isEnableApplicationLock">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
                     <f7-list-button @click="enable(null)">{{ $t('Enable') }}</f7-list-button>

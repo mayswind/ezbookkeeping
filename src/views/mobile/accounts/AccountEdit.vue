@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input label="Account Category" placeholder="Category"></f7-list-input>
                     <f7-list-input label="Account Type" placeholder="Account Type"></f7-list-input>
@@ -18,7 +18,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input
                         type="select"
@@ -46,7 +46,7 @@
         </f7-card>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input label="Account Name" placeholder="Your account name"></f7-list-input>
                     <f7-list-item header="Account Icon" after="Icon"></f7-list-item>
@@ -58,7 +58,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount.toString()">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input
                         type="text"
@@ -107,7 +107,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input
                         type="text"
@@ -149,7 +149,7 @@
 
         <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
             <f7-card v-for="(subAccount, idx) in subAccounts" :key="idx">
-                <f7-card-content :padding="false">
+                <f7-card-content class="no-safe-areas" :padding="false">
                     <f7-list>
                         <f7-list-input
                             type="text"

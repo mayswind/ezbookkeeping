@@ -4,7 +4,7 @@
 
         <f7-block-title class="margin-top">{{ currentNickName }}</f7-block-title>
         <f7-card>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
                     <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
@@ -16,7 +16,7 @@
 
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-card>
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item
                         :key="currentLocale + '_lang'"

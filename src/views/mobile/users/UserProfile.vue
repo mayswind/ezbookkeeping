@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
                     <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
@@ -21,7 +21,7 @@
         </f7-card>
 
         <f7-card v-else-if="!loading">
-            <f7-card-content :padding="false">
+            <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input
                         type="password"

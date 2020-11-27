@@ -49,9 +49,9 @@
                         smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
                         <select v-model="currencyDisplayMode">
                             <option value="none">{{ $t('None') }}</option>
+                            <option value="symbol">{{ $t('Currency Symbol') }}</option>
                             <option value="code">{{ $t('Currency Code') }}</option>
                             <option value="name">{{ $t('Currency Name') }}</option>
-                            <option value="symbol">{{ $t('Currency Symbol') }}</option>
                         </select>
                     </f7-list-item>
 

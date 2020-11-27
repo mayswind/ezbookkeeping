@@ -10,7 +10,7 @@ const defaultSettings = {
     applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
     thousandsSeparator: true,
-    currencyDisplayMode: 'code', // or 'none' or 'name' or 'symbol'
+    currencyDisplayMode: 'symbol', // or 'none' or 'code' or 'name'
     showAccountBalance: true,
     animate: false,
     autoDarkMode: true

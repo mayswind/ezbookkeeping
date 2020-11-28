@@ -53,6 +53,10 @@ body {
     --f7-theme-color-tint: #d09467;
 }
 
+i.icon.la, i.icon.las, i.icon.lab {
+    font-size: 28px;
+}
+
 .navbar .navbar-compact-icons.right a + a {
     margin-left: 0;
 }

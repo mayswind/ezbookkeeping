@@ -6,9 +6,9 @@ export default function (iconId) {
         iconId = iconId.toString();
     }
 
-    if (iconId <= icons.totalAccountIconCount) {
-        return icons.allAccountIcons[iconId].f7Icon;
+    if (!icons.allAccountIcons[iconId]) {
+        return icons.defaultAccountIcon.icon;
     }
 
-    return icons.defaultAccountIcon.f7Icon;
+    return icons.allAccountIcons[iconId].icon;
 }

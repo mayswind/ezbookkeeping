@@ -9,37 +9,37 @@ const allAccountCategories = [
         id: 2,
         name: 'Debit Card',
         isAsset: true,
-        defaultAccountIconId: '2'
+        defaultAccountIconId: '100'
     },
     {
         id: 3,
         name: 'Credit Card',
         isLiability: true,
-        defaultAccountIconId: '2'
+        defaultAccountIconId: '100'
     },
     {
         id: 4,
         name: 'Virtual Account',
         isAsset: true,
-        defaultAccountIconId: '3'
+        defaultAccountIconId: '500'
     },
     {
         id: 5,
         name: 'Debt Account',
         isLiability: true,
-        defaultAccountIconId: '4'
+        defaultAccountIconId: '600'
     },
     {
         id: 6,
         name: 'Receivables',
         isAsset: true,
-        defaultAccountIconId: '5'
+        defaultAccountIconId: '700'
     },
     {
         id: 7,
         name: 'Investment Account',
         isAsset: true,
-        defaultAccountIconId: '6'
+        defaultAccountIconId: '800'
     }
 ];
 const allAccountTypes = {

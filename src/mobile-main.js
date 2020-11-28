@@ -13,6 +13,8 @@ import 'moment/min/locales';
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
 
+import 'line-awesome/dist/line-awesome/css/line-awesome.css';
+
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import currency from './consts/currency.js';
 import colors from './consts/color.js';

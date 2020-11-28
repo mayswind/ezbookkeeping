@@ -71,7 +71,7 @@
 
                     <f7-list-item :header="$t('Account Icon')" key="singleTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
-                        <f7-icon slot="after" :f7="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                        <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Account Color')" key="singleTypeAccountColorSelection" link="#"
@@ -120,7 +120,7 @@
 
                     <f7-list-item :header="$t('Account Icon')" key="multiTypeAccountIconSelection" link="#"
                                   @click="showIconSelectionSheet(account)">
-                        <f7-icon slot="after" :f7="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                        <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Account Color')" key="multiTypeAccountColorSelection" link="#"
@@ -162,7 +162,7 @@
 
                         <f7-list-item :header="$t('Sub Account Icon')" key="subAccountIconSelection" link="#"
                                       @click="showIconSelectionSheet(subAccount)">
-                            <f7-icon slot="after" :f7="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
+                            <f7-icon slot="after" :icon="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
                         </f7-list-item>
 
                         <f7-list-item :header="$t('Sub Account Color')" key="subAccountColorSelection" link="#"
@@ -210,15 +210,16 @@
                 </div>
             </f7-toolbar>
             <f7-page-content>
-                <f7-block>
+                <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allAccountIconRows" :key="idx">
                         <f7-col v-for="accountIcon in row" :key="accountIcon.id">
-                            <f7-icon :f7="accountIcon.f7Icon" :style="{ color: '#' + (accountChoosingIcon ? accountChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(accountIcon)">
+                            <f7-icon :icon="accountIcon.icon" :style="{ color: '#' + (accountChoosingIcon ? accountChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(accountIcon)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingIcon && accountChoosingIcon.icon === accountIcon.id">
                                     <f7-icon f7="checkmark_alt"></f7-icon>
                                 </f7-badge>
                             </f7-icon>
                         </f7-col>
+                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
                     </f7-row>
                 </f7-block>
             </f7-page-content>
@@ -232,7 +233,7 @@
                 </div>
             </f7-toolbar>
             <f7-page-content>
-                <f7-block>
+                <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allAccountColorRows" :key="idx">
                         <f7-col v-for="accountColor in row" :key="accountColor.color">
                             <f7-icon f7="app_fill" :style="{ color: '#' + accountColor.color }" @click.native="setSelectedColor(accountColor.color)">
@@ -241,6 +242,7 @@
                                 </f7-badge>
                             </f7-icon>
                         </f7-col>
+                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
                     </f7-row>
                 </f7-block>
             </f7-page-content>
@@ -267,6 +269,7 @@ export default {
                 visible: true
             },
             subAccounts: [],
+            iconCountPerRow: 7,
             accountChoosingIcon: null,
             accountChoosingColor: null,
             submitting: false,
@@ -294,7 +297,6 @@ export default {
         },
         allAccountIconRows() {
             const allAccountIcons = this.$constants.icons.allAccountIcons;
-            const iconPerRow = 7;
             const ret = [];
             let rowCount = 0;
 
@@ -307,14 +309,14 @@ export default {
 
                 if (!ret[rowCount]) {
                     ret[rowCount] = [];
-                } else if (ret[rowCount] && ret[rowCount].length >= iconPerRow) {
+                } else if (ret[rowCount] && ret[rowCount].length >= this.iconCountPerRow) {
                     rowCount++;
                     ret[rowCount] = [];
                 }
 
                 ret[rowCount].push({
                     id: accountIconId,
-                    f7Icon: accountIcon.f7Icon
+                    icon: accountIcon.icon
                 });
             }
 
@@ -322,12 +324,11 @@ export default {
         },
         allAccountColorRows() {
             const allAccountColors = this.$constants.colors.allAccountColors;
-            const colorPerRow = 7;
             const ret = [];
             let rowCount = -1;
 
             for (let i = 0; i < allAccountColors.length; i++) {
-                if (i % colorPerRow === 0) {
+                if (i % this.iconCountPerRow === 0) {
                     ret[++rowCount] = [];
                 }
 

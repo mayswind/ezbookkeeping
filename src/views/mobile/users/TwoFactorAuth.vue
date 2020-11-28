@@ -175,9 +175,8 @@ export default {
             const data = response.data;
 
             if (!data || !data.success || !data.result || !self.$utilities.isBoolean(data.result.enable)) {
-                self.$toast('Unable to get current two factor authentication status', () => {
-                    router.back();
-                });
+                self.$toast('Unable to get current two factor authentication status');
+                router.back();
                 return;
             }
 
@@ -187,13 +186,11 @@ export default {
             self.$logger.error('failed to get 2fa status', error);
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data }, () => {
-                    router.back();
-                });
+                self.$toast({ error: error.response.data });
+                router.back();
             } else if (!error.processed) {
-                self.$toast('Unable to get current two factor authentication status', () => {
-                    router.back();
-                });
+                self.$toast('Unable to get current two factor authentication status');
+                router.back();
             }
         });
     },

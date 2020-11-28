@@ -309,9 +309,8 @@ export default {
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get account list', () => {
-                    router.back();
-                });
+                self.$toast('Unable to get account list');
+                router.back();
                 return;
             }
 
@@ -321,13 +320,11 @@ export default {
             self.$logger.error('failed to load account list', error);
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data }, () => {
-                    router.back();
-                });
+                self.$toast({ error: error.response.data });
+                router.back();
             } else if (!error.processed) {
-                self.$toast('Unable to get account list', () => {
-                    router.back();
-                });
+                self.$toast('Unable to get account list');
+                router.back();
             }
         });
     },

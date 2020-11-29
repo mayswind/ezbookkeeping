@@ -26,6 +26,12 @@ export default function ({i18n}, value, currencyCode) {
         value = value.toString();
     }
 
+    const negative = value.charAt(0) === '-';
+
+    if (negative) {
+        value = value.substr(1);
+    }
+
     if (value.length === 0) {
         value = '0.00';
     } else if (value.length === 1) {
@@ -41,6 +47,10 @@ export default function ({i18n}, value, currencyCode) {
         }
 
         value = `${integer}.${decimals}`;
+    }
+
+    if (negative) {
+        value = `-${value}`;
     }
 
     const currencyDisplayMode = settings.getCurrencyDisplayMode();

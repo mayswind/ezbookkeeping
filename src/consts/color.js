@@ -1,5 +1,5 @@
-const defaultAccountColor = '000000';
-const allAccountColors = [
+const defaultColor = '000000';
+const allAvailableColors = [
     '000000', // black
     '8e8e93', // gray
     'ff3b30', // red
@@ -17,6 +17,8 @@ const allAccountColors = [
 ];
 
 export default {
-    allAccountColors: allAccountColors,
-    defaultAccountColor: defaultAccountColor,
+    allAccountColors: allAvailableColors,
+    defaultAccountColor: defaultColor,
+    allCategoryColors: allAvailableColors,
+    defaultCategoryColor: defaultColor,
 };

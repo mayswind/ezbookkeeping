@@ -31,6 +31,7 @@ import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
 import accountIconFilter from './filters/accountIcon.js';
+import categoryIconFilter from './filters/categoryIcon.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
 import App from './Mobile.vue';
@@ -178,6 +179,7 @@ Vue.prototype.$user = userstate;
 
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
+Vue.filter('categoryIcon', (value) => categoryIconFilter(value));
 Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
 Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 

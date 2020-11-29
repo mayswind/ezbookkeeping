@@ -7,6 +7,7 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
+                    <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
                     <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
                     <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
                     <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>

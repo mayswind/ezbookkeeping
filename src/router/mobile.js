@@ -17,9 +17,14 @@ import SettingsPage from '../views/mobile/Settings.vue';
 import ApplicationLockPage from '../views/mobile/ApplicationLock.vue';
 import ExchangeRatesPage from "../views/mobile/ExchangeRates.vue";
 import AboutPage from "../views/mobile/About.vue";
+
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
 import TwoFactorAuthPage from "../views/mobile/users/TwoFactorAuth.vue";
 import SessionListPage from "../views/mobile/users/SessionList.vue";
+
+import CategoryAllPage from "../views/mobile/categories/CategoryAll.vue";
+import CategoryListPage from "../views/mobile/categories/CategoryList.vue";
+import CategoryEditPage from "../views/mobile/categories/CategoryEdit.vue";
 
 function checkLogin(to, from, resolve, reject) {
     const router = this;
@@ -177,6 +182,26 @@ const routes = [
     {
         path: '/user/sessions',
         component: SessionListPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/category/all',
+        component: CategoryAllPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/category/list',
+        component: CategoryListPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/category/add',
+        component: CategoryEditPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/category/edit',
+        component: CategoryEditPage,
         beforeEnter: checkLogin
     },
     {

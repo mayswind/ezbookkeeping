@@ -157,6 +157,15 @@ const allAccountIcons = {
         icon: 'lab la-weixin'
     }
 };
+
+const defaultCategoryIconId = '1';
+const allCategoryIcons = {
+    // 1 - 99 : Expense - Food & Drink
+    '1': {
+        icon: 'las la-utensils'
+    }
+};
+
 const deviceIcons = {
     mobile: {
         f7Icon: 'device_phone_portrait'
@@ -179,5 +188,8 @@ export default {
     allAccountIcons: allAccountIcons,
     defaultAccountIconId: defaultAccountIconId,
     defaultAccountIcon: allAccountIcons[defaultAccountIconId],
+    allCategoryIcons: allCategoryIcons,
+    defaultCategoryIconId: defaultCategoryIconId,
+    defaultCategoryIcon: allCategoryIcons[defaultCategoryIconId],
     deviceIcons: deviceIcons,
 };

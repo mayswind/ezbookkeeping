@@ -125,6 +125,25 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 
 	uid := c.GetCurrentUid()
 
+	if categoryCreateReq.ParentId > 0 {
+		parentCategory, err := a.categories.GetCategoryByCategoryId(uid, categoryCreateReq.ParentId)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if parentCategory == nil {
+			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" does not exist for user \"uid:%d\"", categoryCreateReq.ParentId, uid)
+			return nil, errs.ErrParentTransactionCategoryNotFound
+		}
+
+		if parentCategory.ParentCategoryId > 0 {
+			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" has another parent category \"id:%d\" for user \"uid:%d\"", parentCategory.CategoryId, parentCategory.ParentCategoryId, uid)
+			return nil, errs.ErrCannotAddToSecondaryTransactionCategory
+		}
+	}
+
 	var maxOrderId = 0
 
 	if categoryCreateReq.ParentId <= 0 {

@@ -1,6 +1,6 @@
 const defaultAccountIconId = '1';
 const allAccountIcons = {
-    // 1 - 99 : cash symbols
+    // 1 - 99 : Cash Symbols
     '1': {
         icon: 'las la-wallet'
     },
@@ -13,14 +13,14 @@ const allAccountIcons = {
     '30': {
         icon: 'las la-piggy-bank'
     },
-    // 100 - 199 : bank service symbols
+    // 100 - 199 : Bank Service Symbols
     '100': {
         icon: 'las la-credit-card'
     },
     '110': {
         icon: 'las la-money-check-alt'
     },
-    // 500 - 999 : other symbols
+    // 500 - 999 : Other Symbols
     '500': {
         icon: 'las la-digital-tachograph'
     },
@@ -75,7 +75,7 @@ const allAccountIcons = {
     '990': {
         icon: 'las la-globe'
     },
-    // 1000 - 1999 : currency symbols
+    // 1000 - 1999 : Currency Symbols
     '1000': {
         icon: 'las la-dollar-sign'
     },
@@ -112,7 +112,7 @@ const allAccountIcons = {
     '1501': {
         icon: 'lab la-ethereum'
     },
-    // 5000 - 5999 : credit card brand symbols
+    // 5000 - 5999 : Credit Card Brand Symbols
     '5000': {
         icon: 'lab la-cc-visa'
     },
@@ -131,7 +131,7 @@ const allAccountIcons = {
     '5300': {
         icon: 'lab la-cc-diners-club'
     },
-    // 8000 - 8999 : e-pay brand symbols
+    // 8000 - 8999 : E-pay Brand Symbols
     '8000': {
         icon: 'lab la-paypal'
     },

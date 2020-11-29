@@ -212,7 +212,7 @@
             <f7-page-content>
                 <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allAccountIconRows" :key="idx">
-                        <f7-col v-for="accountIcon in row" :key="accountIcon.id">
+                        <f7-col class="text-align-center" v-for="accountIcon in row" :key="accountIcon.id">
                             <f7-icon :icon="accountIcon.icon" :style="{ color: '#' + (accountChoosingIcon ? accountChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(accountIcon)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingIcon && accountChoosingIcon.icon === accountIcon.id">
                                     <f7-icon f7="checkmark_alt"></f7-icon>
@@ -235,7 +235,7 @@
             <f7-page-content>
                 <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allAccountColorRows" :key="idx">
-                        <f7-col v-for="accountColor in row" :key="accountColor.color">
+                        <f7-col class="text-align-center" v-for="accountColor in row" :key="accountColor.color">
                             <f7-icon f7="app_fill" :style="{ color: '#' + accountColor.color }" @click.native="setSelectedColor(accountColor.color)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingColor && accountChoosingColor.color === accountColor.color">
                                     <f7-icon f7="checkmark_alt"></f7-icon>

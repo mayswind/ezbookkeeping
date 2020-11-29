@@ -66,7 +66,7 @@
             <f7-page-content>
                 <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allCategoryIconRows" :key="idx">
-                        <f7-col v-for="categoryIcon in row" :key="categoryIcon.id">
+                        <f7-col class="text-align-center" v-for="categoryIcon in row" :key="categoryIcon.id">
                             <f7-icon :icon="categoryIcon.icon" :style="{ color: '#' + (categoryChoosingIcon ? categoryChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(categoryIcon)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="categoryChoosingIcon && categoryChoosingIcon.icon === categoryIcon.id">
                                     <f7-icon f7="checkmark_alt"></f7-icon>
@@ -89,7 +89,7 @@
             <f7-page-content>
                 <f7-block class="margin-vertical">
                     <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allCategoryColorRows" :key="idx">
-                        <f7-col v-for="categoryColor in row" :key="categoryColor.color">
+                        <f7-col class="text-align-center" v-for="categoryColor in row" :key="categoryColor.color">
                             <f7-icon f7="app_fill" :style="{ color: '#' + categoryColor.color }" @click.native="setSelectedColor(categoryColor.color)">
                                 <f7-badge color="default" class="right-bottom-icon" v-if="categoryChoosingColor && categoryChoosingColor.color === categoryColor.color">
                                     <f7-icon f7="checkmark_alt"></f7-icon>

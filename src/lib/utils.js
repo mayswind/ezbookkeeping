@@ -106,21 +106,21 @@ function getAccountByAccountId(categorizedAccounts, accountId) {
     return null;
 }
 
-function getAllFilteredAccountsBalance(categorizedAccounts, accountCategoryFilter) {
+function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
     const allAccountCategories = accountConstants.allCategories;
     const ret = [];
 
     for (let categoryIdx = 0; categoryIdx < allAccountCategories.length; categoryIdx++) {
         const accountCategory = allAccountCategories[categoryIdx];
 
-        if (!accountCategoryFilter(accountCategory) || !categorizedAccounts[accountCategory.id]) {
+        if (!categorizedAccounts[accountCategory.id]) {
             continue;
         }
 
         for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].length; accountIdx++) {
             const account = categorizedAccounts[accountCategory.id][accountIdx];
 
-            if (account.hidden) {
+            if (account.hidden || !accountFilter(account)) {
                 continue;
             }
 
@@ -132,6 +132,11 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountCategoryFilte
             } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
                 for (let subAccountIdx = 0; subAccountIdx < account.subAccounts.length; subAccountIdx++) {
                     const subAccount = account.subAccounts[subAccountIdx];
+
+                    if (subAccount.hidden || !accountFilter(subAccount)) {
+                        continue;
+                    }
+
                     ret.push({
                         balance: subAccount.balance,
                         currency: subAccount.currency

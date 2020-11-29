@@ -15,6 +15,26 @@ const (
 	ACCOUNT_CATEGORY_INVESTMENT  AccountCategory = 7
 )
 
+var AssetAccountCategory = map[AccountCategory]bool{
+	ACCOUNT_CATEGORY_CASH:        true,
+	ACCOUNT_CATEGORY_DEBIT_CARD:  true,
+	ACCOUNT_CATEGORY_CREDIT_CARD: false,
+	ACCOUNT_CATEGORY_VIRTUAL:     true,
+	ACCOUNT_CATEGORY_DEBT:        false,
+	ACCOUNT_CATEGORY_RECEIVABLES: true,
+	ACCOUNT_CATEGORY_INVESTMENT:  true,
+}
+
+var LiabilityAccountCategory = map[AccountCategory]bool{
+	ACCOUNT_CATEGORY_CASH:        false,
+	ACCOUNT_CATEGORY_DEBIT_CARD:  false,
+	ACCOUNT_CATEGORY_CREDIT_CARD: true,
+	ACCOUNT_CATEGORY_VIRTUAL:     false,
+	ACCOUNT_CATEGORY_DEBT:        true,
+	ACCOUNT_CATEGORY_RECEIVABLES: false,
+	ACCOUNT_CATEGORY_INVESTMENT:  false,
+}
+
 type AccountType byte
 
 const (
@@ -98,6 +118,8 @@ type AccountInfoResponse struct {
 	Balance      int64                    `json:"balance"`
 	Comment      string                   `json:"comment"`
 	DisplayOrder int                      `json:"displayOrder"`
+	IsAsset      bool                     `json:"isAsset,omitempty"`
+	IsLiability  bool                     `json:"isLiability,omitempty"`
 	Hidden       bool                     `json:"hidden"`
 	SubAccounts  AccountInfoResponseSlice `json:"subAccounts,omitempty"`
 }
@@ -115,6 +137,8 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 		Balance:      a.Balance,
 		Comment:      a.Comment,
 		DisplayOrder: a.DisplayOrder,
+		IsAsset:      AssetAccountCategory[a.Category],
+		IsLiability:  LiabilityAccountCategory[a.Category],
 		Hidden:       a.Hidden,
 	}
 }

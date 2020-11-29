@@ -243,7 +243,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isAsset);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.isAsset);
             let totalAssets = 0;
             let hasUnCalculatedAmount = false;
 
@@ -273,7 +273,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.isLiability);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.isLiability);
             let totalLiabilities = 0;
             let hasUnCalculatedAmount = false;
 
@@ -404,7 +404,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, category => category.id === accountCategory.id);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.category === accountCategory.id);
             let totalBalance = 0;
             let hasUnCalculatedAmount = false;
 

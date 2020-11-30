@@ -56,7 +56,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet :opened="showIconSelection" @sheet:closed="hideIconSelectionSheet">
+        <f7-sheet class="category-icon-sheet" :opened="showIconSelection" @sheet:closed="hideIconSelectionSheet">
             <f7-toolbar>
                 <div class="left"></div>
                 <div class="right">
@@ -371,3 +371,11 @@ export default {
     }
 }
 </script>
+
+<style>
+@media (min-height: 630px) {
+    .category-icon-sheet {
+        height: 400px;
+    }
+}
+</style>

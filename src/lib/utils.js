@@ -30,6 +30,75 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+function copyObjectTo(fromObject, toObject) {
+    if (!isObject(fromObject)) {
+        return toObject;
+    }
+
+    if (!isObject(toObject)) {
+        toObject = {};
+    }
+
+    for (let key in fromObject) {
+        if (!Object.prototype.hasOwnProperty.call(fromObject, key)) {
+            continue;
+        }
+
+        const fromValue = fromObject[key];
+        const toValue = toObject[key];
+
+        if (isArray(fromValue)) {
+            toObject[key] = this.copyArrayTo(fromValue, toValue);
+        } else if (isObject(fromValue)) {
+            toObject[key] = this.copyObjectTo(fromValue, toValue);
+        } else {
+            if (fromValue !== toValue) {
+                toObject[key] = fromValue;
+            }
+        }
+    }
+
+    return toObject;
+}
+
+function copyArrayTo(fromArray, toArray) {
+    if (!isArray(fromArray)) {
+        return toArray;
+    }
+
+    if (!isArray(toArray)) {
+        toArray = [];
+    }
+
+    for (let i = 0; i < fromArray.length; i++) {
+        const fromValue = fromArray[i];
+
+        if (toArray.length > i) {
+            const toValue = toArray[i];
+
+            if (isArray(fromValue)) {
+                toArray[i] = this.copyArrayTo(fromValue, toValue);
+            } else if (isObject(fromValue)) {
+                toArray[i] = this.copyObjectTo(fromValue, toValue);
+            } else {
+                if (fromValue !== toValue) {
+                    toArray[i] = fromValue;
+                }
+            }
+        } else {
+            if (isArray(fromValue)) {
+                toArray.push(this.copyArrayTo(fromValue, []));
+            } else if (isObject(fromValue)) {
+                toArray.push(this.copyObjectTo(fromValue, {}));
+            } else {
+                toArray.push(fromValue);
+            }
+        }
+    }
+
+    return toArray;
+}
+
 function base64encode(arrayBuffer) {
     if (!arrayBuffer || arrayBuffer.length === 0) {
         return null;
@@ -156,6 +225,8 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    copyObjectTo,
+    copyArrayTo,
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,

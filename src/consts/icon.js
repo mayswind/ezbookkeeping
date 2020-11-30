@@ -237,6 +237,9 @@ const allCategoryIcons = {
     '170': {
         icon: 'las la-gem'
     },
+    '171': {
+        icon: 'las la-ring'
+    },
     '180': {
         icon: 'las la-spray-can'
     },
@@ -299,7 +302,7 @@ const allCategoryIcons = {
         icon: 'las la-tint'
     },
     '271': {
-        icon: 'las la-burn'
+        icon: 'las la-fire'
     },
     '290': {
         icon: 'las la-file-invoice'
@@ -497,6 +500,9 @@ const allCategoryIcons = {
         icon: 'las la-dice-d6'
     },
     '564': {
+        icon: 'las la-dice'
+    },
+    '565': {
         icon: 'las la-chess'
     },
     '570': {
@@ -521,18 +527,21 @@ const allCategoryIcons = {
         icon: 'las la-swimming-pool'
     },
     '592': {
-        icon: 'las la-hot-tub'
+        icon: 'las la-parachute-box'
     },
     '593': {
-        icon: 'las la-monument'
+        icon: 'las la-hot-tub'
     },
     '594': {
-        icon: 'las la-mountain'
+        icon: 'las la-monument'
     },
     '595': {
-        icon: 'las la-campground'
+        icon: 'las la-mountain'
     },
     '596': {
+        icon: 'las la-campground'
+    },
+    '597': {
         icon: 'las la-hotel'
     },
     '599': {
@@ -613,6 +622,9 @@ const allCategoryIcons = {
     '870': {
         icon: 'las la-x-ray'
     },
+    '880': {
+        icon: 'las la-glasses'
+    },
     '890': {
         icon: 'las la-thermometer'
     },
@@ -641,9 +653,6 @@ const allCategoryIcons = {
     '950': {
         icon: 'las la-file-invoice-dollar'
     },
-    '951': {
-        icon: 'las la-file-invoice'
-    },
     '960': {
         icon: 'las la-clipboard-check'
     },
@@ -652,6 +661,9 @@ const allCategoryIcons = {
     },
     '980': {
         icon: 'las la-credit-card'
+    },
+    '981': {
+        icon: 'las la-piggy-bank'
     },
     '990': {
         icon: 'las la-gavel'
@@ -663,80 +675,127 @@ const allCategoryIcons = {
     '1010': {
         icon: 'las la-minus-circle'
     },
-    '1020': {
+    // 2000 - 2099 : Income - Occupational Earnings
+    '2000': {
+        icon: 'las la-suitcase'
+    },
+    '2010': {
+        icon: 'las la-wallet'
+    },
+    '2020': {
+        icon: 'las la-trophy'
+    },
+    '2021': {
+        icon: 'las la-medal'
+    },
+    '2080': {
+        icon: 'las la-user-clock'
+    },
+    // 2000 - 2099 : Income - Finance & Investment
+    '2100': {
+        icon: 'las la-chart-area'
+    },
+    '2101': {
+        icon: 'las la-chart-line'
+    },
+    // 3000 - 3999 : Income - Miscellaneous
+    '3010': {
+        icon: 'las la-plus-circle'
+    },
+    // 4000 - 4099 : Transfer
+    '4000': {
+        icon: 'las la-exchange-alt'
+    },
+    '4900': {
+        icon: 'las la-arrow-circle-right'
+    },
+    // 5000 - 5999 : Miscellaneous
+    '5000': {
         icon: 'las la-star'
     },
-    '1030': {
+    '5010': {
+        icon: 'las la-magic'
+    },
+    '5020': {
+        icon: 'las la-infinity'
+    },
+    '5030': {
+        icon: 'las la-clipboard-list'
+    },
+    '5040': {
         icon: 'las la-trash-alt'
     },
-    '1040': {
+    '5050': {
         icon: 'las la-weight-hanging'
     },
-    '1100': {
+    '5100': {
         icon: 'las la-shopping-bag'
     },
-    '1101': {
+    '5101': {
         icon: 'las la-shopping-basket'
     },
-    '1102': {
+    '5102': {
         icon: 'las la-shopping-cart'
     },
-    // 5000 - 9999 : Brands
-    '5000': {
+    '5200': {
+        icon: 'las la-money-bill-wave-alt'
+    },
+    // 6000 - 9999 : Brands
+    '6000': {
         icon: 'lab la-amazon'
     },
-    '5001': {
+    '6001': {
         icon: 'lab la-ebay'
     },
-    '5100': {
+    '6100': {
         icon: 'lab la-app-store'
     },
-    '5101': {
+    '6101': {
         icon: 'lab la-google-play'
     },
-    '5200': {
+    '6200': {
         icon: 'lab la-windows'
     },
-    '5300': {
+    '6300': {
         icon: 'lab la-kickstarter'
     },
-    '5400': {
+    '6400': {
         icon: 'lab la-uber'
     },
-    '5500': {
+    '6500': {
         icon: 'lab la-fedex'
     },
-    '5501': {
+    '6501': {
         icon: 'lab la-ups'
     },
-    '5502': {
+    '6502': {
         icon: 'lab la-usps'
     },
-    '5503': {
+    '6503': {
         icon: 'lab la-dhl'
     },
-    '6000': {
+    '7000': {
         icon: 'lab la-playstation'
     },
-    '6001': {
+    '7001': {
         icon: 'lab la-xbox'
     },
-    '6100': {
+    '7100': {
         icon: 'lab la-steam'
     },
-    '6200': {
+    '7200': {
         icon: 'lab la-youtube'
     },
-    '6300': {
+    '7300': {
         icon: 'lab la-spotify'
     },
-    '6301': {
+    '7301': {
         icon: 'lab la-itunes'
     },
-    '7000': {
+    '8000': {
         icon: 'lab la-evernote'
     },
-    '8000': {
+    '8100': {
         icon: 'lab la-adobe'
     },
     '9000': {

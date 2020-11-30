@@ -25,6 +25,7 @@ import SessionListPage from "../views/mobile/users/SessionList.vue";
 import CategoryAllPage from "../views/mobile/categories/CategoryAll.vue";
 import CategoryListPage from "../views/mobile/categories/CategoryList.vue";
 import CategoryEditPage from "../views/mobile/categories/CategoryEdit.vue";
+import CategoryDefaultPage from "../views/mobile/categories/CategoryDefault.vue";
 
 function checkLogin(to, from, resolve, reject) {
     const router = this;
@@ -202,6 +203,11 @@ const routes = [
     {
         path: '/category/edit',
         component: CategoryEditPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/category/default',
+        component: CategoryDefaultPage,
         beforeEnter: checkLogin
     },
     {

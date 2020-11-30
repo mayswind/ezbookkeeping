@@ -27,6 +27,9 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list v-if="noAvailableCategory">
                     <f7-list-item :title="$t('No available category')"></f7-list-item>
+                    <f7-list-button v-if="hasSubCategories"
+                        :title="$t('Add Default Categories')"
+                        :href="'/category/default?type=' + categoryType"></f7-list-button>
                 </f7-list>
 
                 <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">

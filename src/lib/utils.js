@@ -7,7 +7,7 @@ function isFunction(val) {
 }
 
 function isObject(val) {
-    return val != null && typeof(val) === 'object';
+    return val != null && typeof(val) === 'object' && !isArray(val);
 }
 
 function isArray(val) {

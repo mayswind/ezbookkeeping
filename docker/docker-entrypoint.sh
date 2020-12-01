@@ -25,4 +25,8 @@ if [ "${LAB_CONF_PATH}" != "" ]; then
   conf_path_param="--conf-path=${LAB_CONF_PATH}";
 fi
 
-exec su-exec ${LAB_USER} /usr/local/bin/labapp/lab server run ${conf_path_param};
+if [ $# -gt 0 ]; then
+    exec "$@"
+else
+    exec su-exec ${LAB_USER} /usr/local/bin/labapp/lab server run ${conf_path_param};
+fi

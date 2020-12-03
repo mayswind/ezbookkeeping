@@ -173,6 +173,112 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 	return categoryResp, nil
 }
 
+func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (interface{}, *errs.Error) {
+	var categoryCreateBatchReq models.TransactionCategoryCreateBatchRequest
+	err := c.ShouldBindJSON(&categoryCreateBatchReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	categoryTypeMaxOrderMap := make(map[models.TransactionCategoryType]int)
+	categoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
+	categoriesMap[nil] = make([]*models.TransactionCategory, len(categoryCreateBatchReq.Categories))
+	totalCount := 0
+
+	for i := 0; i < len(categoryCreateBatchReq.Categories); i++ {
+		categoryCreateReq := categoryCreateBatchReq.Categories[i]
+		var maxOrderId, exists = categoryTypeMaxOrderMap[categoryCreateReq.Type]
+
+		if !exists {
+			maxOrderId, err = a.categories.GetMaxDisplayOrder(uid, categoryCreateReq.Type)
+
+			if err != nil {
+				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.ErrOperationFailed
+			}
+		}
+
+		category := a.createNewCategory(uid, &models.TransactionCategoryCreateRequest{
+			Name: categoryCreateReq.Name,
+			Type: categoryCreateReq.Type,
+			Icon: categoryCreateReq.Icon,
+			Color: categoryCreateReq.Color,
+		}, maxOrderId+1)
+
+		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
+
+		for j := 0; j < len(categoryCreateReq.SubCategories); j++ {
+			subCategory := a.createNewCategory(uid, categoryCreateReq.SubCategories[j], j+1)
+			categoriesMap[category][j] = subCategory
+			totalCount++
+		}
+
+		categoriesMap[nil][i] = category
+		categoryTypeMaxOrderMap[categoryCreateReq.Type] = maxOrderId+1
+		totalCount++
+	}
+
+	categories, err := a.categories.CreateCategories(uid, totalCount, categoriesMap)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] user \"uid:%d\" has created categoroies successfully", uid)
+
+	categoryResps := make([]*models.TransactionCategoryInfoResponse, len(categories))
+	categoryRespMap := make(map[int64]*models.TransactionCategoryInfoResponse)
+
+	for i := 0; i < len(categories); i++ {
+		categoryResps[i] = categories[i].ToTransactionCategoryInfoResponse()
+		categoryRespMap[categoryResps[i].Id] = categoryResps[i]
+	}
+
+	for i := 0; i < len(categoryResps); i++ {
+		categoryResp := categoryResps[i]
+
+		if categoryResp.ParentId <= models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+			continue
+		}
+
+		parentCategory, parentExists := categoryRespMap[categoryResp.ParentId]
+
+		if !parentExists || parentCategory == nil {
+			continue
+		}
+
+		parentCategory.SubCategories = append(parentCategory.SubCategories, categoryResp)
+	}
+
+	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
+
+	for i := 0; i < len(categoryResps); i++ {
+		if categoryResps[i].ParentId == models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+			sort.Sort(categoryResps[i].SubCategories)
+			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
+		}
+	}
+
+	sort.Sort(finalCategoryResps)
+
+	typeCategoryMapResponse := make(map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice)
+
+	for i := 0; i < len(finalCategoryResps); i++ {
+		category := finalCategoryResps[i]
+		categoryList, _ := typeCategoryMapResponse[category.Type]
+
+		categoryList = append(categoryList, category)
+		typeCategoryMapResponse[category.Type] = categoryList
+	}
+
+	return typeCategoryMapResponse, nil
+}
+
 func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (interface{}, *errs.Error) {
 	var categoryModifyReq models.TransactionCategoryModifyRequest
 	err := c.ShouldBindJSON(&categoryModifyReq)

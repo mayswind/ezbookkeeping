@@ -516,6 +516,7 @@ export default {
     'Unable to add category': '无法添加分类',
     'Unable to save category': '无法保存分类',
     'You have added a new category': '您已经添加新分类',
+    'You have added default categories': '您已经添加默认分类',
     'You have saved this category': '您已经保存该分类',
     'Are you sure you want to logout from this session?': '您确定要退出该会话？',
     'Unable to logout from this session': '无法退出该会话',

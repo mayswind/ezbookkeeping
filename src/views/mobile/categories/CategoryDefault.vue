@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Default Categories')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :text="$t('Save')" :class="{ 'disabled': saving }" @click="save"></f7-link>
+                <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -50,7 +50,7 @@ export default {
         return {
             categoryType: '',
             allCategories: [],
-            saving: false
+            submitting: false
         };
     },
     created() {
@@ -94,7 +94,67 @@ export default {
             }
         },
         save() {
+            const self = this;
+            const router = self.$f7router;
 
+            self.submitting = true;
+            self.$showLoading(() => self.submitting);
+
+            const categories = [];
+
+            for (let i = 0; i < self.allCategories.length; i++) {
+                const categoryInfo = self.allCategories[i];
+
+                for (let j = 0; j < categoryInfo.categories.length; j++) {
+                    const category = categoryInfo.categories[j];
+                    const submitCategory = {
+                        name: self.$t('category.' + category.name),
+                        type: parseInt(categoryInfo.type),
+                        icon: category.categoryIconId,
+                        color: category.color,
+                        subCategories: []
+                    }
+
+                    for (let k = 0; k < category.subCategories.length; k++) {
+                        const subCategory = category.subCategories[k];
+                        submitCategory.subCategories.push({
+                            name: self.$t('category.' + subCategory.name),
+                            type: parseInt(categoryInfo.type),
+                            icon: subCategory.categoryIconId,
+                            color: subCategory.color
+                        });
+                    }
+
+                    categories.push(submitCategory);
+                }
+            }
+
+            self.$services.addTransactionCategoryBatch({
+                categories: categories
+            }).then(response => {
+                self.submitting = false;
+                self.$hideLoading();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    self.$toast('Unable to add category');
+                    return;
+                }
+
+                self.$toast('You have added default categories');
+                router.back();
+            }).catch(error => {
+                self.$logger.error('failed to save default categories', error);
+
+                self.submitting = false;
+                self.$hideLoading();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$toast({ error: error.response.data });
+                } else if (!error.processed) {
+                    self.$toast('Unable to add category');
+                }
+            });
         }
     },
     filters: {

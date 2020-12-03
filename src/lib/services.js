@@ -228,6 +228,11 @@ export default {
             comment
         });
     },
+    addTransactionCategoryBatch: ({ categories }) => {
+        return axios.post('v1/transaction/categories/add_batch.json', {
+            categories
+        });
+    },
     modifyTransactionCategory: ({ id, name, icon, color, comment, hidden }) => {
         return axios.post('v1/transaction/categories/modify.json', {
             id,

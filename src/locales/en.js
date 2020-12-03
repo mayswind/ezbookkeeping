@@ -516,6 +516,7 @@ export default {
     'Unable to add category': 'Unable to add category',
     'Unable to save category': 'Unable to save category',
     'You have added a new category': 'You have added a new category',
+    'You have added default categories': 'You have added default categories',
     'You have saved this category': 'You have saved this category',
     'Are you sure you want to logout from this session?': 'Are you sure you want to logout from this session?',
     'Unable to logout from this session': 'Unable to logout from this session',

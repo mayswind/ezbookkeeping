@@ -150,6 +150,59 @@ func (s *TransactionCategoryService) CreateCategory(category *models.Transaction
 	})
 }
 
+func (s *TransactionCategoryService) CreateCategories(uid int64, totalCount int, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	var allCategories []*models.TransactionCategory
+	primaryCategories := categories[nil]
+
+	for i := 0; i < len(primaryCategories); i++ {
+		primaryCategory := primaryCategories[i]
+		primaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
+
+		primaryCategory.Deleted = false
+		primaryCategory.CreatedUnixTime = time.Now().Unix()
+		primaryCategory.UpdatedUnixTime = time.Now().Unix()
+
+		allCategories = append(allCategories, primaryCategory)
+
+		secondaryCategories := categories[primaryCategory]
+
+		for j := 0; j < len(secondaryCategories); j++ {
+			secondaryCategory := secondaryCategories[j]
+			secondaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
+			secondaryCategory.ParentCategoryId = primaryCategory.CategoryId
+
+			secondaryCategory.Deleted = false
+			secondaryCategory.CreatedUnixTime = time.Now().Unix()
+			secondaryCategory.UpdatedUnixTime = time.Now().Unix()
+
+			allCategories = append(allCategories, secondaryCategory)
+		}
+	}
+
+	err := s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		for i := 0; i < len(allCategories); i++ {
+			category := allCategories[i]
+			_, err := sess.Insert(category)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return allCategories, nil
+}
+
 func (s *TransactionCategoryService) ModifyCategory(category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid

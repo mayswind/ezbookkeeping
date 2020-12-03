@@ -15,6 +15,7 @@ RUN npm install && npm run build
 
 # Package docker image
 FROM alpine:3.12.0
+LABEL maintainer="MaysWind <i@mayswind.net>"
 RUN addgroup -S -g 1000 labapp && adduser -S -G labapp -u 1000 labapp
 RUN apk --no-cache add su-exec tzdata
 COPY --from=be-builder /go/src/github.com/mayswind/lab/lab /usr/local/bin/labapp/lab

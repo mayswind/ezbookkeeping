@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/lab/pkg/datastore"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/settings"
+	"github.com/mayswind/lab/pkg/utils"
 	"github.com/mayswind/lab/pkg/uuid"
 )
 
@@ -64,8 +65,22 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 		return nil, err
 	}
 
-	cfgJson, _ := json.Marshal(config)
+	cfgJson, _ := json.Marshal(getConfigWithNoSensitiveData(config))
 	log.BootInfof("[initializer.initializeSystem] has loaded configuration %s", cfgJson)
 
 	return config, nil
+}
+
+func getConfigWithNoSensitiveData(config *settings.Config) *settings.Config {
+	clonedConfig := &settings.Config{}
+	err := utils.Clone(config, clonedConfig)
+
+	if err != nil {
+		return config
+	}
+
+	clonedConfig.DatabaseConfig.DatabasePassword = "****"
+	clonedConfig.SecretKey = "****"
+
+	return clonedConfig
 }

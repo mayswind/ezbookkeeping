@@ -29,11 +29,67 @@ func updateDatabaseStructure(c *cli.Context) error {
 
 	log.BootInfof("[database.updateDatabaseStructure] starting maintaining")
 
-	_ = datastore.Container.UserStore.SyncStructs(new(models.User), new(models.TwoFactor), new(models.TwoFactorRecoveryCode))
-	_ = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
-	_ = datastore.Container.UserDataStore.SyncStructs(new(models.Account), new(models.TransactionCategory))
+	err = updateAllDatabaseTablesStructure()
 
-	log.BootInfof("[database.updateDatabaseStructure] maintained successfully")
+	if err != nil {
+		log.BootErrorf("[database.updateDatabaseStructure] update database table structure failed, because %s", err.Error())
+		return err
+	}
+
+	log.BootInfof("[database.updateDatabaseStructure] all tables maintained successfully")
+	return nil
+}
+
+func updateAllDatabaseTablesStructure() error {
+	var err error
+
+	err = datastore.Container.UserStore.SyncStructs(new(models.User))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] user table maintained successfully")
+	}
+
+	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactor))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor table maintained successfully")
+	}
+
+	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactorRecoveryCode))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor recovery code table maintained successfully")
+	}
+
+	err = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] token record table maintained successfully")
+	}
+
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.Account))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] account table maintained successfully")
+	}
+
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionCategory))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
+	}
 
 	return nil
 }

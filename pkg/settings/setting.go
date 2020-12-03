@@ -116,8 +116,9 @@ type Config struct {
 	EnableRequestLog bool
 
 	// Database
-	DatabaseConfig *DatabaseConfig
-	EnableQueryLog bool
+	DatabaseConfig     *DatabaseConfig
+	EnableQueryLog     bool
+	AutoUpdateDatabase bool
 
 	// Log
 	LogModes         []string
@@ -300,6 +301,7 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 
 	config.DatabaseConfig = dbConfig
 	config.EnableQueryLog = getConfigItemBoolValue(configFile, sectionName, "log_query", false)
+	config.AutoUpdateDatabase = getConfigItemBoolValue(configFile, sectionName, "auto_update_database", true)
 
 	return nil
 }

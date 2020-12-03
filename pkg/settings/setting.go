@@ -292,7 +292,14 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 	}
 
 	if dbConfig.DatabaseType == DBTYPE_SQLITE3 {
-		dbConfig.DatabasePath = getConfigItemStringValue(configFile, sectionName, "db_path")
+		staticDBPath := getConfigItemStringValue(configFile, sectionName, "db_path")
+		finalStaticDBPath, err := getFinalPath(config.WorkingPath, staticDBPath)
+
+		if err != nil {
+			return err
+		}
+
+		dbConfig.DatabasePath = finalStaticDBPath
 	}
 
 	dbConfig.MaxIdleConnection = getConfigItemIntValue(configFile, sectionName, "max_idle_conn", DEFAULT_DATABASE_MAX_IDLE_CONN)

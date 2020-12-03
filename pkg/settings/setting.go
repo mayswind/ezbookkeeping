@@ -293,12 +293,7 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 
 	if dbConfig.DatabaseType == DBTYPE_SQLITE3 {
 		staticDBPath := getConfigItemStringValue(configFile, sectionName, "db_path")
-		finalStaticDBPath, err := getFinalPath(config.WorkingPath, staticDBPath)
-
-		if err != nil {
-			return err
-		}
-
+		finalStaticDBPath, _ := getFinalPath(config.WorkingPath, staticDBPath)
 		dbConfig.DatabasePath = finalStaticDBPath
 	}
 
@@ -397,7 +392,7 @@ func getFinalPath(workingPath, p string) (string, error) {
 		return p, nil
 	}
 
-	return "", err
+	return p, err
 }
 
 func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...string) string {

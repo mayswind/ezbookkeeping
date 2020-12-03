@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -58,6 +59,18 @@ func InitializeDataStore(config *settings.Config) error {
 func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 	var connStr string
 	var err error
+
+	if dbConfig.DatabaseType == settings.DBTYPE_SQLITE3 {
+		if _, err = os.Stat(dbConfig.DatabasePath); err != nil {
+			file, err := os.Create(dbConfig.DatabasePath)
+
+			if err != nil {
+				return nil, err
+			}
+
+			defer file.Close()
+		}
+	}
 
 	if dbConfig.DatabaseType == settings.DBTYPE_MYSQL {
 		connStr, err = getMysqlConnectionString(dbConfig)

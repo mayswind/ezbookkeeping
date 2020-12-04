@@ -21,7 +21,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list form>
                     <f7-list-input
                         type="text"
                         clear-button

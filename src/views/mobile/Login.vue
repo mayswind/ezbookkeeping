@@ -61,7 +61,7 @@
                     <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
                             outline

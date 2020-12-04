@@ -19,7 +19,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list form>
                     <f7-list-input
                         type="select"
                         :label="$t('Account Category')"
@@ -59,7 +59,7 @@
 
         <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount.toString()">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list form>
                     <f7-list-input
                         type="text"
                         clear-button
@@ -108,7 +108,7 @@
 
         <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list form>
                     <f7-list-input
                         type="text"
                         clear-button

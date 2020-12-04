@@ -37,7 +37,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.') }}</p>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-item class="list-item-pincode-input">
                             <PincodeInput secure :length="6" v-model="currentPinCodeForEnable" />
                         </f7-list-item>
@@ -60,7 +60,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current PIN code when disable application lock') }}</p>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-item class="list-item-pincode-input">
                             <PincodeInput secure :length="6" v-model="currentPinCodeForDisable" />
                         </f7-list-item>

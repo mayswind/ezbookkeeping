@@ -22,7 +22,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list form>
                     <f7-list-input
                         type="password"
                         clear-button
@@ -85,7 +85,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top">{{ $t('Please enter your current password when modifying your password') }}</p>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline

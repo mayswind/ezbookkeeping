@@ -45,7 +45,7 @@
                             <img alt="qrcode" width="240px" height="240px" :src="new2FAQRCode" />
                         </div>
                     </div>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
                             outline
@@ -73,7 +73,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline
@@ -101,7 +101,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
                             outline

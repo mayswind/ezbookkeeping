@@ -4,6 +4,7 @@
         <f7-list form>
             <f7-list-input
                 type="text"
+                autocomplete="username"
                 clear-button
                 :label="$t('Username')"
                 :placeholder="$t('Your username or email')"
@@ -12,6 +13,7 @@
             ></f7-list-input>
             <f7-list-input
                 type="password"
+                autocomplete="current-password"
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password')"
@@ -64,6 +66,7 @@
                     <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
+                            autocomplete="one-time-code"
                             outline
                             clear-button
                             v-if="twoFAVerifyType === 'passcode'"

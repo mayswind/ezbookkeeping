@@ -13,6 +13,7 @@
                 <f7-list form>
                     <f7-list-input
                         type="text"
+                        autocomplete="username"
                         clear-button
                         :label="$t('Username')"
                         :placeholder="$t('Your username')"
@@ -22,6 +23,7 @@
 
                     <f7-list-input
                         type="password"
+                        autocomplete="new-password"
                         clear-button
                         :label="$t('Password')"
                         :placeholder="$t('Your password, at least 6 characters')"
@@ -31,6 +33,7 @@
 
                     <f7-list-input
                         type="password"
+                        autocomplete="new-password"
                         clear-button
                         :label="$t('Confirmation Password')"
                         :placeholder="$t('Re-enter the password')"
@@ -40,6 +43,7 @@
 
                     <f7-list-input
                         type="email"
+                        autocomplete="email"
                         clear-button
                         :label="$t('E-mail')"
                         :placeholder="$t('Your email address')"
@@ -49,6 +53,7 @@
 
                     <f7-list-input
                         type="text"
+                        autocomplete="nickname"
                         clear-button
                         :label="$t('Nickname')"
                         :placeholder="$t('Your nickname')"
@@ -58,6 +63,7 @@
 
                     <f7-list-input
                         type="select"
+                        autocomplete="transaction-currency"
                         :label="$t('Default Currency')"
                         :value="user.defaultCurrency"
                         @input="user.defaultCurrency = $event.target.value"

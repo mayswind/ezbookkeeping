@@ -48,6 +48,7 @@
                     <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
+                            autocomplete="one-time-code"
                             outline
                             clear-button
                             :placeholder="$t('Passcode')"
@@ -76,6 +77,7 @@
                     <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
+                            autocomplete="current-password"
                             outline
                             clear-button
                             :placeholder="$t('Password')"
@@ -104,6 +106,7 @@
                     <f7-list form no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="password"
+                            autocomplete="current-password"
                             outline
                             clear-button
                             :placeholder="$t('Password')"

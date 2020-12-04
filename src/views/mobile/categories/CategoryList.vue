@@ -16,9 +16,6 @@
                     <f7-list-item title="Category Name"></f7-list-item>
                     <f7-list-item title="Category Name 2"></f7-list-item>
                     <f7-list-item title="Category Name 3"></f7-list-item>
-                    <f7-list-item title="Category Name 4"></f7-list-item>
-                    <f7-list-item title="Category Name 5"></f7-list-item>
-                    <f7-list-item title="Category Name 6"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -200,7 +197,7 @@ export default {
             const self = this;
             const previousRoute = self.$f7router.previousRoute;
 
-            if (previousRoute && (previousRoute.path === '/category/add' || previousRoute.path === '/category/edit') && !self.loading) {
+            if (previousRoute && (previousRoute.path === '/category/add' || previousRoute.path === '/category/edit' || previousRoute.path === '/category/default') && !self.loading) {
                 self.reload(null);
             }
         },

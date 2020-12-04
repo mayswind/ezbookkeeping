@@ -129,6 +129,11 @@ i.icon.la, i.icon.las, i.icon.lab {
     align-self: normal !important;
 }
 
+.list .item-content .list-item-checked {
+    font-size: 20px;
+    color: var(--f7-radio-active-color, var(--f7-theme-color));
+}
+
 .lab-list-item-error-info div.item-footer {
     color: var(--f7-input-error-text-color)
 }

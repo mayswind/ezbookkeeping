@@ -365,6 +365,7 @@ export default {
     'Statistics': 'Statistics',
     'Settings': 'Settings',
     'Back': 'Back',
+    'Change Language': 'Change Language',
     'Unlock': 'Unlock',
     'Re-login': 'Re-login',
     'Username': 'Username',

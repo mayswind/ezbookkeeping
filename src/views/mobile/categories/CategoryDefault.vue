@@ -4,6 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Default Categories')"></f7-nav-title>
             <f7-nav-right>
+                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -19,7 +20,7 @@
                     <f7-list-item v-for="(category, idx) in categoryInfo.categories"
                                   :key="idx"
                                   :accordion-item="!!category.subCategories.length"
-                                  :title="$t('category.' + category.name)">
+                                  :title="$t('category.' + category.name, currentLocale)">
                         <f7-icon slot="media"
                                  :icon="category.categoryIconId | categoryIcon"
                                  :style="{ color: '#' + category.color }">
@@ -29,7 +30,7 @@
                             <f7-list>
                                 <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
                                               :key="subIdx"
-                                              :title="$t('category.' + subCategory.name)">
+                                              :title="$t('category.' + subCategory.name, currentLocale)">
                                     <f7-icon slot="media"
                                              :icon="subCategory.categoryIconId | categoryIcon"
                                              :style="{ color: '#' + subCategory.color }">
@@ -41,17 +42,57 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button @click="showChangeLocaleSheet = true">{{ $t('Change Language') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
+
+        <f7-sheet :opened="showChangeLocaleSheet" @sheet:closed="showChangeLocaleSheet = false">
+            <f7-toolbar>
+                <div class="left"></div>
+                <div class="right">
+                    <f7-link sheet-close :text="$t('Done')"></f7-link>
+                </div>
+            </f7-toolbar>
+            <f7-page-content>
+                <f7-list no-hairlines class="no-margin-top no-margin-bottom">
+                    <f7-list-item v-for="(lang, locale) in allLanguages"
+                                  :key="locale"
+                                  :value="locale"
+                                  :title="lang.displayName"
+                                  @click="currentLocale = locale; showChangeLocaleSheet = false">
+                        <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="currentLocale === locale"></f7-icon>
+                    </f7-list-item>
+                </f7-list>
+            </f7-page-content>
+        </f7-sheet>
     </f7-page>
 </template>
 
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
+            currentLocale: self.$i18n.locale,
             categoryType: '',
             allCategories: [],
-            submitting: false
+            submitting: false,
+            showMoreActionSheet: false,
+            showChangeLocaleSheet: false
         };
+    },
+    computed: {
+        allLanguages() {
+            return this.$locale.getAllLanguages();
+        }
     },
     created() {
         const self = this;
@@ -108,7 +149,7 @@ export default {
                 for (let j = 0; j < categoryInfo.categories.length; j++) {
                     const category = categoryInfo.categories[j];
                     const submitCategory = {
-                        name: self.$t('category.' + category.name),
+                        name: self.$t('category.' + category.name, self.currentLocale),
                         type: parseInt(categoryInfo.type),
                         icon: category.categoryIconId,
                         color: category.color,
@@ -118,7 +159,7 @@ export default {
                     for (let k = 0; k < category.subCategories.length; k++) {
                         const subCategory = category.subCategories[k];
                         submitCategory.subCategories.push({
-                            name: self.$t('category.' + subCategory.name),
+                            name: self.$t('category.' + subCategory.name, self.currentLocale),
                             type: parseInt(categoryInfo.type),
                             icon: subCategory.categoryIconId,
                             color: subCategory.color

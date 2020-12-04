@@ -469,6 +469,7 @@ export default {
     'Enable Animate': '启用动画',
     'Enable Auto Dark Mode': '启用自动深色模式',
     'You have been successfully registered': '注册成功',
+    'Do you want to initialize transaction categories now?': '您是否想现在初始化交易分类？',
     'Unable to sign up': '无法注册',
     'User registration is disabled': '用户注册已禁用',
     'Unable to get user profile': '无法获取用户信息',

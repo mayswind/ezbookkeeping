@@ -179,6 +179,10 @@ export default {
 
                 self.$toast('You have been successfully registered');
                 router.navigate('/');
+
+                self.$confirm('Do you want to initialize transaction categories now?', () => {
+                    router.navigate('/category/default?type=0');
+                });
             }).catch(error => {
                 self.$logger.error('failed to sign up', error);
 

@@ -37,54 +37,7 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (interfa
 		return nil, errs.ErrOperationFailed
 	}
 
-	categoryResps := make([]*models.TransactionCategoryInfoResponse, len(categories))
-	categoryRespMap := make(map[int64]*models.TransactionCategoryInfoResponse)
-
-	for i := 0; i < len(categories); i++ {
-		categoryResps[i] = categories[i].ToTransactionCategoryInfoResponse()
-		categoryRespMap[categoryResps[i].Id] = categoryResps[i]
-	}
-
-	for i := 0; i < len(categoryResps); i++ {
-		categoryResp := categoryResps[i]
-
-		if categoryResp.ParentId <= models.TRANSACTION_PARENT_ID_LEVEL_ONE {
-			continue
-		}
-
-		parentCategory, parentExists := categoryRespMap[categoryResp.ParentId]
-
-		if !parentExists || parentCategory == nil {
-			continue
-		}
-
-		parentCategory.SubCategories = append(parentCategory.SubCategories, categoryResp)
-	}
-
-	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
-
-	for i := 0; i < len(categoryResps); i++ {
-		if categoryListReq.ParentId <= 0 && categoryResps[i].ParentId == models.TRANSACTION_PARENT_ID_LEVEL_ONE {
-			sort.Sort(categoryResps[i].SubCategories)
-			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
-		} else if categoryListReq.ParentId > 0 && categoryResps[i].ParentId == categoryListReq.ParentId {
-			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
-		}
-	}
-
-	sort.Sort(finalCategoryResps)
-
-	typeCategoryMapResponse := make(map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice)
-
-	for i := 0; i < len(finalCategoryResps); i++ {
-		category := finalCategoryResps[i]
-		categoryList, _ := typeCategoryMapResponse[category.Type]
-
-		categoryList = append(categoryList, category)
-		typeCategoryMapResponse[category.Type] = categoryList
-	}
-
-	return typeCategoryMapResponse, nil
+	return a.getTransactionCategoryListByTypeResponse(categories, categoryListReq.ParentId)
 }
 
 func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (interface{}, *errs.Error) {
@@ -231,52 +184,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] user \"uid:%d\" has created categoroies successfully", uid)
 
-	categoryResps := make([]*models.TransactionCategoryInfoResponse, len(categories))
-	categoryRespMap := make(map[int64]*models.TransactionCategoryInfoResponse)
-
-	for i := 0; i < len(categories); i++ {
-		categoryResps[i] = categories[i].ToTransactionCategoryInfoResponse()
-		categoryRespMap[categoryResps[i].Id] = categoryResps[i]
-	}
-
-	for i := 0; i < len(categoryResps); i++ {
-		categoryResp := categoryResps[i]
-
-		if categoryResp.ParentId <= models.TRANSACTION_PARENT_ID_LEVEL_ONE {
-			continue
-		}
-
-		parentCategory, parentExists := categoryRespMap[categoryResp.ParentId]
-
-		if !parentExists || parentCategory == nil {
-			continue
-		}
-
-		parentCategory.SubCategories = append(parentCategory.SubCategories, categoryResp)
-	}
-
-	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
-
-	for i := 0; i < len(categoryResps); i++ {
-		if categoryResps[i].ParentId == models.TRANSACTION_PARENT_ID_LEVEL_ONE {
-			sort.Sort(categoryResps[i].SubCategories)
-			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
-		}
-	}
-
-	sort.Sort(finalCategoryResps)
-
-	typeCategoryMapResponse := make(map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice)
-
-	for i := 0; i < len(finalCategoryResps); i++ {
-		category := finalCategoryResps[i]
-		categoryList, _ := typeCategoryMapResponse[category.Type]
-
-		categoryList = append(categoryList, category)
-		typeCategoryMapResponse[category.Type] = categoryList
-	}
-
-	return typeCategoryMapResponse, nil
+	return a.getTransactionCategoryListByTypeResponse(categories, 0)
 }
 
 func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (interface{}, *errs.Error) {
@@ -413,4 +321,55 @@ func (a *TransactionCategoriesApi) createNewCategory(uid int64, categoryCreateRe
 		Color:            categoryCreateReq.Color,
 		Comment:          categoryCreateReq.Comment,
 	}
+}
+
+func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(categories []*models.TransactionCategory, parentId int64) (map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice, *errs.Error) {
+	categoryResps := make([]*models.TransactionCategoryInfoResponse, len(categories))
+	categoryRespMap := make(map[int64]*models.TransactionCategoryInfoResponse)
+
+	for i := 0; i < len(categories); i++ {
+		categoryResps[i] = categories[i].ToTransactionCategoryInfoResponse()
+		categoryRespMap[categoryResps[i].Id] = categoryResps[i]
+	}
+
+	for i := 0; i < len(categoryResps); i++ {
+		categoryResp := categoryResps[i]
+
+		if categoryResp.ParentId <= models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+			continue
+		}
+
+		parentCategory, parentExists := categoryRespMap[categoryResp.ParentId]
+
+		if !parentExists || parentCategory == nil {
+			continue
+		}
+
+		parentCategory.SubCategories = append(parentCategory.SubCategories, categoryResp)
+	}
+
+	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
+
+	for i := 0; i < len(categoryResps); i++ {
+		if parentId <= 0 && categoryResps[i].ParentId == models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+			sort.Sort(categoryResps[i].SubCategories)
+			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
+		} else if parentId > 0 && categoryResps[i].ParentId == parentId {
+			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
+		}
+	}
+
+	sort.Sort(finalCategoryResps)
+
+	typeCategoryMapResponse := make(map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice)
+
+	for i := 0; i < len(finalCategoryResps); i++ {
+		category := finalCategoryResps[i]
+		categoryList, _ := typeCategoryMapResponse[category.Type]
+
+		categoryList = append(categoryList, category)
+		typeCategoryMapResponse[category.Type] = categoryList
+	}
+
+	return typeCategoryMapResponse, nil
 }

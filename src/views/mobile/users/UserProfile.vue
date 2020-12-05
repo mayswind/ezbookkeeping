@@ -15,14 +15,13 @@
                     <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
                     <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
                     <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
-                    <f7-list-input label="Default Currency" placeholder="Default Currency"></f7-list-input>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
+                <f7-list form inline-labels>
                     <f7-list-input
                         type="password"
                         autocomplete="new-password"
@@ -63,17 +62,16 @@
                         @input="newProfile.nickname = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-input
-                        type="select"
-                        autocomplete="transaction-currency"
-                        :label="$t('Default Currency')"
-                        :value="newProfile.defaultCurrency"
-                        @input="newProfile.defaultCurrency = $event.target.value"
+                    <f7-list-item
+                        :title="$t('Default Currency')"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                     >
-                        <option v-for="currency in allCurrencies"
-                                :key="currency.code"
-                                :value="currency.code">{{ currency.displayName }}</option>
-                    </f7-list-input>
+                        <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
+                            <option v-for="currency in allCurrencies"
+                                    :key="currency.code"
+                                    :value="currency.code">{{ currency.displayName }}</option>
+                        </select>
+                    </f7-list-item>
 
                     <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
                 </f7-list>

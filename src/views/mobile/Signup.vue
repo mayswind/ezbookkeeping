@@ -61,19 +61,24 @@
                         @input="user.nickname = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-input
-                        type="select"
-                        autocomplete="transaction-currency"
-                        :label="$t('Default Currency')"
-                        :value="user.defaultCurrency"
-                        @input="user.defaultCurrency = $event.target.value"
-                    >
-                        <option v-for="currency in allCurrencies"
-                                :key="currency.code"
-                                :value="currency.code">{{ currency.displayName }}</option>
-                    </f7-list-input>
-
                     <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card>
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list form>
+                    <f7-list-item
+                        :header="$t('Default Currency')"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                    >
+                        <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
+                            <option v-for="currency in allCurrencies"
+                                    :key="currency.code"
+                                    :value="currency.code">{{ currency.displayName }}</option>
+                        </select>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

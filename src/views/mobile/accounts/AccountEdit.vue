@@ -79,17 +79,17 @@
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
                     </f7-list-item>
 
-                    <f7-list-input
-                        type="select"
+                    <f7-list-item
                         :class="{ 'disabled': editAccountId }"
-                        :label="$t('Currency')"
-                        :value="account.currency"
-                        @input="account.currency = $event.target.value"
+                        :header="$t('Currency')"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                     >
-                        <option v-for="currency in allCurrencies"
-                                :key="currency.code"
-                                :value="currency.code">{{ currency.displayName }}</option>
-                    </f7-list-input>
+                        <select autocomplete="transaction-currency" v-model="account.currency">
+                            <option v-for="currency in allCurrencies"
+                                    :key="currency.code"
+                                    :value="currency.code">{{ currency.displayName }}</option>
+                        </select>
+                    </f7-list-item>
 
                     <f7-list-input
                         type="textarea"
@@ -170,17 +170,17 @@
                             <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + subAccount.color }"></f7-icon>
                         </f7-list-item>
 
-                        <f7-list-input
-                            type="select"
+                        <f7-list-item
                             :class="{ 'disabled': editAccountId }"
-                            :label="$t('Currency')"
-                            :value="subAccount.currency"
-                            @input="subAccount.currency = $event.target.value"
+                            :header="$t('Currency')"
+                            smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                         >
-                            <option v-for="currency in allCurrencies"
-                                    :key="currency.code"
-                                    :value="currency.code">{{ currency.displayName }}</option>
-                        </f7-list-input>
+                            <select autocomplete="transaction-currency" v-model="subAccount.currency">
+                                <option v-for="currency in allCurrencies"
+                                        :key="currency.code"
+                                        :value="currency.code">{{ currency.displayName }}</option>
+                            </select>
+                        </f7-list-item>
 
                         <f7-list-input
                             type="textarea"

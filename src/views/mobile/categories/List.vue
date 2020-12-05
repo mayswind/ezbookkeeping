@@ -84,7 +84,7 @@
 export default {
     data() {
         return {
-            categories: {},
+            categories: [],
             hasSubCategories: false,
             categoryType: '',
             categoryId: '',

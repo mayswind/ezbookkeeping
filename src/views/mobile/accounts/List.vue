@@ -112,12 +112,12 @@
                         </f7-block>
                         <f7-swipeout-actions left v-if="sortable">
                             <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe @click="hide(account, !account.hidden)">
+                                                overswipe close @click="hide(account, !account.hidden)">
                                 <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                             </f7-swipeout-button>
                         </f7-swipeout-actions>
                         <f7-swipeout-actions right v-if="!sortable">
-                            <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
+                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
                             <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account)">
                                 <f7-icon f7="trash"></f7-icon>
                             </f7-swipeout-button>

@@ -44,12 +44,12 @@
                         </f7-icon>
                         <f7-swipeout-actions left v-if="sortable">
                             <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe @click="hide(category, !category.hidden)">
+                                                overswipe close @click="hide(category, !category.hidden)">
                                 <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                             </f7-swipeout-button>
                         </f7-swipeout-actions>
                         <f7-swipeout-actions right v-if="!sortable">
-                            <f7-swipeout-button color="orange" :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
+                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
                             <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category)">
                                 <f7-icon f7="trash"></f7-icon>
                             </f7-swipeout-button>

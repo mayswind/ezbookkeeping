@@ -67,13 +67,11 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 
 	if err != nil {
 		return nil, err
+	} else if !has {
+		return nil, errs.ErrTransactionCategoryNotFound
 	}
 
-	if has {
-		return category, nil
-	} else {
-		return nil, nil
-	}
+	return category, nil
 }
 
 func (s *TransactionCategoryService) GetCategoryAndSubCategoriesByCategoryId(uid int64, categoryId int64) ([]*models.TransactionCategory, error) {

@@ -78,7 +78,7 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 	}
 
 	uid := c.GetCurrentUid()
-	accountAndSubAccounts, err := a.accounts.GetAccountByAccountId(uid, accountGetReq.Id)
+	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(uid, accountGetReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
@@ -196,7 +196,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	accountAndSubAccounts, err := a.accounts.GetAccountByAccountId(uid, accountModifyReq.Id)
+	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(uid, accountModifyReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())

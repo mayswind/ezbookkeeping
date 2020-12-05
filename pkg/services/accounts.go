@@ -38,7 +38,7 @@ func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, erro
 	return accounts, err
 }
 
-func (s *AccountService) GetAccountByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
+func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -175,9 +175,9 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.Cols("hidden", "updated_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		updateRows, err := sess.Cols("hidden", "updated_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
-		if deletedRows < 1 {
+		if updateRows < 1 {
 			return errs.ErrAccountNotFound
 		}
 

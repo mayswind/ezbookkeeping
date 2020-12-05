@@ -161,8 +161,8 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 		return nil, errs.ErrOperationFailed
 	}
 
-	mainAccount := a.createNewAccount(uid, &accountCreateReq, maxOrderId+1)
-	childrenAccounts := a.createSubAccounts(uid, &accountCreateReq)
+	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
+	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
 	err = a.accounts.CreateAccounts(mainAccount, childrenAccounts)
 
@@ -335,7 +335,7 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.
 	return true, nil
 }
 
-func (a *AccountsApi) createNewAccount(uid int64, accountCreateReq *models.AccountCreateRequest, order int) *models.Account {
+func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, order int) *models.Account {
 	return &models.Account{
 		Uid:          uid,
 		Name:         accountCreateReq.Name,
@@ -349,7 +349,7 @@ func (a *AccountsApi) createNewAccount(uid int64, accountCreateReq *models.Accou
 	}
 }
 
-func (a *AccountsApi) createSubAccounts(uid int64, accountCreateReq *models.AccountCreateRequest) []*models.Account {
+func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest) []*models.Account {
 	if len(accountCreateReq.SubAccounts) <= 0 {
 		return nil
 	}
@@ -357,7 +357,7 @@ func (a *AccountsApi) createSubAccounts(uid int64, accountCreateReq *models.Acco
 	childrenAccounts := make([]*models.Account, len(accountCreateReq.SubAccounts))
 
 	for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
-		childrenAccounts[i] = a.createNewAccount(uid, accountCreateReq.SubAccounts[i], i+1)
+		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], i+1)
 	}
 
 	return childrenAccounts

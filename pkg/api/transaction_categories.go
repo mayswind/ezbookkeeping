@@ -110,7 +110,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 		return nil, errs.ErrOperationFailed
 	}
 
-	category := a.createNewCategory(uid, &categoryCreateReq, maxOrderId+1)
+	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
 
 	err = a.categories.CreateCategory(category)
 
@@ -155,7 +155,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 			}
 		}
 
-		category := a.createNewCategory(uid, &models.TransactionCategoryCreateRequest{
+		category := a.createNewCategoryModel(uid, &models.TransactionCategoryCreateRequest{
 			Name: categoryCreateReq.Name,
 			Type: categoryCreateReq.Type,
 			Icon: categoryCreateReq.Icon,
@@ -165,7 +165,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
 
 		for j := 0; j < len(categoryCreateReq.SubCategories); j++ {
-			subCategory := a.createNewCategory(uid, categoryCreateReq.SubCategories[j], j+1)
+			subCategory := a.createNewCategoryModel(uid, categoryCreateReq.SubCategories[j], j+1)
 			categoriesMap[category][j] = subCategory
 			totalCount++
 		}
@@ -310,7 +310,7 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (inter
 	return true, nil
 }
 
-func (a *TransactionCategoriesApi) createNewCategory(uid int64, categoryCreateReq *models.TransactionCategoryCreateRequest, order int) *models.TransactionCategory {
+func (a *TransactionCategoriesApi) createNewCategoryModel(uid int64, categoryCreateReq *models.TransactionCategoryCreateRequest, order int) *models.TransactionCategory {
 	return &models.TransactionCategory{
 		Uid:              uid,
 		Name:             categoryCreateReq.Name,

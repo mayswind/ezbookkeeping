@@ -212,10 +212,8 @@ func (s *TransactionCategoryService) ModifyCategory(category *models.Transaction
 		updatedRows, err := sess.Cols("name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("category_id=? AND uid=? AND deleted=?", category.CategoryId, category.Uid, false).Update(category)
 
 		if err != nil {
-			return errs.ErrDatabaseOperationFailed
-		}
-
-		if updatedRows < 1 {
+			return err
+		} else if updatedRows < 1 {
 			return errs.ErrTransactionCategoryNotFound
 		}
 
@@ -236,13 +234,15 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.Cols("hidden", "updated_unix_time").In("category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").In("category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
-		if deletedRows < 1 {
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
 			return errs.ErrTransactionCategoryNotFound
 		}
 
-		return err
+		return nil
 	})
 }
 
@@ -258,10 +258,12 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(categories); i++ {
 			category := categories[i]
-			_, err := sess.Cols("display_order", "updated_unix_time").Where("category_id=? AND uid=? AND deleted=?", category.CategoryId, uid, false).Update(category)
+			updatedRows, err := sess.Cols("display_order", "updated_unix_time").Where("category_id=? AND uid=? AND deleted=?", category.CategoryId, uid, false).Update(category)
 
 			if err != nil {
 				return err
+			} else if updatedRows < 1 {
+				return errs.ErrTransactionCategoryNotFound
 			}
 		}
 
@@ -284,7 +286,9 @@ func (s *TransactionCategoryService) DeleteCategories(uid int64, ids []int64) er
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").In("category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
-		if deletedRows < 1 {
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
 			return errs.ErrTransactionCategoryNotFound
 		}
 

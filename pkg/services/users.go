@@ -193,14 +193,12 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		updatedRows, err := sess.ID(user.Uid).Where("deleted=?", false).Cols(updateCols...).Update(user)
 
 		if err != nil {
-			return errs.ErrDatabaseOperationFailed
-		}
-
-		if updatedRows < 1 {
+			return err
+		} else if updatedRows < 1 {
 			return errs.ErrUserNotFound
 		}
 
-		return err
+		return nil
 	})
 
 	if err != nil {

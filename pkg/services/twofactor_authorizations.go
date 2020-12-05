@@ -108,11 +108,13 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error 
 	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=?", uid).Delete(&models.TwoFactor{})
 
-		if deletedRows < 1 {
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
 			return errs.ErrTwoFactorIsNotEnabled
 		}
 
-		return err
+		return nil
 	})
 }
 

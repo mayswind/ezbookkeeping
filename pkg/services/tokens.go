@@ -108,11 +108,13 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 	return s.TokenDB(tokenRecord.Uid).DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
 
-		if deletedRows < 1 {
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
 			return errs.ErrTokenRecordNotFound
 		}
 
-		return err
+		return nil
 	})
 }
 
@@ -124,10 +126,12 @@ func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecor
 	return s.TokenDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(tokenRecords); i++ {
 			tokenRecord := tokenRecords[i]
-			_, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
+			deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
 
 			if err != nil {
 				return err
+			} else if deletedRows < 1 {
+				return errs.ErrTokenRecordNotFound
 			}
 		}
 

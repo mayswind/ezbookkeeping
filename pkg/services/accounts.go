@@ -151,10 +151,12 @@ func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) e
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
-			_, err := sess.Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
+			updatedRows, err := sess.Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
 
 			if err != nil {
 				return err
+			} else if updatedRows < 1 {
+				return errs.ErrAccountNotFound
 			}
 		}
 
@@ -175,13 +177,15 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		updateRows, err := sess.Cols("hidden", "updated_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
-		if updateRows < 1 {
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
 			return errs.ErrAccountNotFound
 		}
 
-		return err
+		return nil
 	})
 }
 
@@ -197,10 +201,12 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
-			_, err := sess.Cols("display_order", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
+			updatedRows, err := sess.Cols("display_order", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
 
 			if err != nil {
 				return err
+			} else if updatedRows < 1 {
+				return errs.ErrAccountNotFound
 			}
 		}
 
@@ -223,7 +229,9 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
-		if deletedRows < 1 {
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
 			return errs.ErrAccountNotFound
 		}
 

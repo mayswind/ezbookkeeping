@@ -253,7 +253,7 @@ export default {
                 return;
             }
 
-            const id = event.el.id.substr(9);
+            const id = event.el.id.substr(9); // category_
             let category = null;
 
             for (let i = 0; i < this.categories.length; i++) {

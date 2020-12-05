@@ -457,7 +457,7 @@ export default {
                 return;
             }
 
-            const id = event.el.id.substr(8);
+            const id = event.el.id.substr(8); // account_
             const account = this.$utilities.getAccountByAccountId(this.accounts, id);
 
             if (!account || !this.accounts[account.category] || !this.accounts[account.category][event.to]) {

@@ -351,6 +351,11 @@ export default {
             }
         },
         reload(done) {
+            if (this.sortable) {
+                done();
+                return;
+            }
+
             const self = this;
 
             self.$services.getAllAccounts().then(response => {

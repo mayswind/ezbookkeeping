@@ -259,6 +259,39 @@ export default {
             id
         });
     },
+    getAllTransactionTags: () => {
+        return axios.get('v1/transaction/tags/list.json');
+    },
+    getTransactionTag: ({ id }) => {
+        return axios.get('v1/transaction/tags/get.json?id=' + id);
+    },
+    addTransactionTag: ({ name }) => {
+        return axios.post('v1/transaction/tags/add.json', {
+            name
+        });
+    },
+    modifyTransactionTag: ({ id, name }) => {
+        return axios.post('v1/transaction/tags/modify.json', {
+            id,
+            name
+        });
+    },
+    hideTransactionTag: ({ id, hidden }) => {
+        return axios.post('v1/transaction/tags/hide.json', {
+            id,
+            hidden
+        });
+    },
+    moveTransactionTag: ({ newDisplayOrders }) => {
+        return axios.post('v1/transaction/tags/move.json', {
+            newDisplayOrders,
+        });
+    },
+    deleteTransactionTag: ({ id }) => {
+        return axios.post('v1/transaction/tags/delete.json', {
+            id
+        });
+    },
     getLatestExchangeRates: () => {
         return axios.get('v1/exchange_rates/latest.json');
     },

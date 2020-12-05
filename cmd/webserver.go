@@ -195,6 +195,15 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.POST("/transaction/categories/move.json", bindApi(api.TransactionCategories.CategoryMoveHandler))
 			apiV1Route.POST("/transaction/categories/delete.json", bindApi(api.TransactionCategories.CategoryDeleteHandler))
 
+			// Transaction Tags
+			apiV1Route.GET("/transaction/tags/list.json", bindApi(api.TransactionTags.TagListHandler))
+			apiV1Route.GET("/transaction/tags/get.json", bindApi(api.TransactionTags.TagGetHandler))
+			apiV1Route.POST("/transaction/tags/add.json", bindApi(api.TransactionTags.TagCreateHandler))
+			apiV1Route.POST("/transaction/tags/modify.json", bindApi(api.TransactionTags.TagModifyHandler))
+			apiV1Route.POST("/transaction/tags/hide.json", bindApi(api.TransactionTags.TagHideHandler))
+			apiV1Route.POST("/transaction/tags/move.json", bindApi(api.TransactionTags.TagMoveHandler))
+			apiV1Route.POST("/transaction/tags/delete.json", bindApi(api.TransactionTags.TagDeleteHandler))
+
 			// Exchange Rates
 			apiV1Route.GET("/exchange_rates/latest.json", bindApi(api.ExchangeRates.LatestExchangeRateHandler))
 		}

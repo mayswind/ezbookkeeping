@@ -27,6 +27,8 @@ import CategoryListPage from "../views/mobile/categories/List.vue";
 import CategoryEditPage from "../views/mobile/categories/Edit.vue";
 import CategoryDefaultPage from "../views/mobile/categories/Default.vue";
 
+import TagListPage from "../views/mobile/tags/List.vue";
+
 function checkLogin(to, from, resolve, reject) {
     const router = this;
 
@@ -208,6 +210,11 @@ const routes = [
     {
         path: '/category/default',
         component: CategoryDefaultPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/tag/list',
+        component: TagListPage,
         beforeEnter: checkLogin
     },
     {

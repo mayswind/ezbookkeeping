@@ -91,5 +91,13 @@ func updateAllDatabaseTablesStructure() error {
 		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
 	}
 
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTag))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
+	}
+
 	return nil
 }

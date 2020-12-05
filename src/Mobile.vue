@@ -129,6 +129,15 @@ i.icon.la, i.icon.las, i.icon.lab {
     align-self: normal !important;
 }
 
+.list .item-content .input.list-title-input {
+    margin-top: calc(-1 * var(--f7-list-item-padding-vertical));
+    margin-bottom: calc(-1 * var(--f7-list-item-padding-vertical));
+}
+
+.list .item-content .list-item-valign-middle {
+    align-self: center;
+}
+
 .list .item-content .list-item-checked {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));

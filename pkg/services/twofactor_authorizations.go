@@ -2,8 +2,8 @@ package services
 
 import (
 	"time"
-	"xorm.io/xorm"
 
+	"xorm.io/xorm"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 

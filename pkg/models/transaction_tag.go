@@ -10,12 +10,12 @@ type TransactionTag struct {
 	UpdatedUnixTime int64
 }
 
-type TransactionTagCreateRequest struct {
-	Name string `json:"name" binding:"required,notBlank,max=32"`
-}
-
 type TransactionTagGetRequest struct {
 	Id int64 `form:"id,string" binding:"required,min=1"`
+}
+
+type TransactionTagCreateRequest struct {
+	Name string `json:"name" binding:"required,notBlank,max=32"`
 }
 
 type TransactionTagModifyRequest struct {

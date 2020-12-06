@@ -28,6 +28,15 @@ type TransactionCategory struct {
 	DeletedUnixTime  int64
 }
 
+type TransactionCategoryListRequest struct {
+	Type     TransactionCategoryType `form:"type" binding:"min=0"`
+	ParentId int64                   `form:"parent_id,string,default=-1" binding:"min=-1"`
+}
+
+type TransactionCategoryGetRequest struct {
+	Id int64 `form:"id,string" binding:"required,min=1"`
+}
+
 type TransactionCategoryCreateRequest struct {
 	Name     string                  `json:"name" binding:"required,notBlank,max=32"`
 	Type     TransactionCategoryType `json:"type" binding:"required"`
@@ -48,15 +57,6 @@ type TransactionCategoryCreateWithSubCategories struct {
 	Color         string                              `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Comment       string                              `json:"comment" binding:"max=255"`
 	SubCategories []*TransactionCategoryCreateRequest `json:"subCategories" binding:"required"`
-}
-
-type TransactionCategoryListRequest struct {
-	Type     TransactionCategoryType `form:"type" binding:"min=0"`
-	ParentId int64                   `form:"parent_id,string,default=-1" binding:"min=-1"`
-}
-
-type TransactionCategoryGetRequest struct {
-	Id int64 `form:"id,string" binding:"required,min=1"`
 }
 
 type TransactionCategoryModifyRequest struct {

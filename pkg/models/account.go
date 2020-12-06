@@ -62,6 +62,10 @@ type Account struct {
 	DeletedUnixTime int64
 }
 
+type AccountGetRequest struct {
+	Id int64 `form:"id,string" binding:"required,min=1"`
+}
+
 type AccountCreateRequest struct {
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
 	Category    AccountCategory         `json:"category" binding:"required"`
@@ -71,10 +75,6 @@ type AccountCreateRequest struct {
 	Currency    string                  `json:"currency" binding:"required,len=3,validCurrency"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
-}
-
-type AccountGetRequest struct {
-	Id int64 `form:"id,string" binding:"required,min=1"`
 }
 
 type AccountModifyRequest struct {

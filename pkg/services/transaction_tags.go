@@ -183,10 +183,8 @@ func (s *TransactionTagService) DeleteTags(uid int64, ids []int64) error {
 		return errs.ErrUserIdInvalid
 	}
 
-	tag := &models.TransactionTag{}
-
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.In("tag_id", ids).Where("uid=?", uid).Delete(tag)
+		deletedRows, err := sess.In("tag_id", ids).Where("uid=?", uid).Delete(&models.TransactionTag{})
 
 		if err != nil {
 			return err

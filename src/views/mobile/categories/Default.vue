@@ -125,9 +125,9 @@ export default {
         getDefaultCategories(categoryType) {
             switch (categoryType) {
                 case '1':
-                    return this.$constants.category.defaultExpenseCategories;
-                case '2':
                     return this.$constants.category.defaultIncomeCategories;
+                case '2':
+                    return this.$constants.category.defaultExpenseCategories;
                 case '3':
                     return this.$constants.category.defaultTransferCategories;
                 default:
@@ -202,9 +202,9 @@ export default {
         categoryTypeName(categoryType) {
             switch (categoryType) {
                 case '1':
-                    return 'Expense Categories';
-                case '2':
                     return 'Income Categories';
+                case '2':
+                    return 'Expense Categories';
                 case '3':
                     return 'Transfer Categories';
                 default:

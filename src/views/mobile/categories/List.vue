@@ -104,10 +104,10 @@ export default {
 
             switch (this.categoryType) {
                 case '1':
-                    title = 'Expense';
+                    title = 'Income';
                     break;
                 case '2':
-                    title = 'Income';
+                    title = 'Expense';
                     break;
                 case '3':
                     title = 'Transfer';

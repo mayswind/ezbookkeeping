@@ -63,7 +63,7 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND category_id=?", uid, false, categoryId).Get(category)
+	has, err := s.UserDataDB(uid).ID(categoryId).Where("uid=? AND deleted=?", uid, false).Get(category)
 
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ func (s *TransactionCategoryService) ModifyCategory(category *models.Transaction
 	category.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(category.Uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("category_id=? AND uid=? AND deleted=?", category.CategoryId, category.Uid, false).Update(category)
+		updatedRows, err := sess.ID(category.CategoryId).Cols("name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", category.Uid, false).Update(category)
 
 		if err != nil {
 			return err
@@ -258,7 +258,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(categories); i++ {
 			category := categories[i]
-			updatedRows, err := sess.Cols("display_order", "updated_unix_time").Where("category_id=? AND uid=? AND deleted=?", category.CategoryId, uid, false).Update(category)
+			updatedRows, err := sess.ID(category.CategoryId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(category)
 
 			if err != nil {
 				return err

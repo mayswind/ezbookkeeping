@@ -48,7 +48,7 @@ func (s *TransactionTagService) GetTagByTagId(uid int64, tagId int64) (*models.T
 	}
 
 	tag := &models.TransactionTag{}
-	has, err := s.UserDataDB(uid).Where("uid=? AND tag_id=?", uid, tagId).Get(tag)
+	has, err := s.UserDataDB(uid).ID(tagId).Where("uid=?", uid).Get(tag)
 
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (s *TransactionTagService) ModifyTag(tag *models.TransactionTag) error {
 	tag.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(tag.Uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("name", "updated_unix_time").Where("tag_id=? AND uid=?", tag.TagId, tag.Uid).Update(tag)
+		updatedRows, err := sess.ID(tag.TagId).Cols("name", "updated_unix_time").Where("uid=?", tag.Uid).Update(tag)
 
 		if err != nil {
 			return err
@@ -167,7 +167,7 @@ func (s *TransactionTagService) ModifyTagDisplayOrders(uid int64, tags []*models
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(tags); i++ {
 			tag := tags[i]
-			updatedRows, err := sess.Cols("display_order", "updated_unix_time").Where("tag_id=? AND uid=?", tag.TagId, uid).Update(tag)
+			updatedRows, err := sess.ID(tag.TagId).Cols("display_order", "updated_unix_time").Where("uid=?", uid).Update(tag)
 
 			if err != nil {
 				return err

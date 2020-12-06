@@ -151,7 +151,7 @@ func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) e
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
-			updatedRows, err := sess.Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
+			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
 
 			if err != nil {
 				return err
@@ -201,7 +201,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
-			updatedRows, err := sess.Cols("display_order", "updated_unix_time").Where("account_id=? AND uid=? AND deleted=?", account.AccountId, uid, false).Update(account)
+			updatedRows, err := sess.ID(account.AccountId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
 
 			if err != nil {
 				return err

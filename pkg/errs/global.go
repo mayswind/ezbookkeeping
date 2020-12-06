@@ -12,6 +12,8 @@ var (
 	ErrCiphertextInvalid               = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 3, http.StatusInternalServerError, "ciphertext is invalid")
 	ErrNothingWillBeUpdated            = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 4, http.StatusBadRequest, "nothing will be updated")
 	ErrFailedToRequestRemoteApi        = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 5, http.StatusBadRequest, "failed to request third party api")
+	ErrPageIndexInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 6, http.StatusBadRequest, "page index is invalid")
+	ErrPageCountInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 7, http.StatusBadRequest, "page count is invalid")
 )
 
 func GetParameterInvalidMessage(field string) string {

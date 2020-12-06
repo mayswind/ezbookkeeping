@@ -12,4 +12,6 @@ var (
 	ErrSubAccountCategoryNotEqualsToParent    = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 6, http.StatusBadRequest, "sub account category not equals to parent")
 	ErrSubAccountTypeInvalid                  = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 7, http.StatusBadRequest, "sub account type invalid")
 	ErrCannotAddOrDeleteSubAccountsWhenModify = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 8, http.StatusBadRequest, "cannot add or delete sub accounts when modify account")
+	ErrSourceAccountNotFound                  = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 9, http.StatusBadRequest, "source account not found")
+	ErrDestinationAccountNotFound             = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 10, http.StatusBadRequest, "destination account not found")
 )

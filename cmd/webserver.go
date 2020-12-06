@@ -185,6 +185,14 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.POST("/accounts/move.json", bindApi(api.Accounts.AccountMoveHandler))
 			apiV1Route.POST("/accounts/delete.json", bindApi(api.Accounts.AccountDeleteHandler))
 
+			// Transactions
+			apiV1Route.GET("/transactions/list.json", bindApi(api.Transactions.TransactionListHandler))
+			apiV1Route.GET("/transactions/list/by_month.json", bindApi(api.Transactions.TransactionListHandler))
+			apiV1Route.GET("/transactions/get.json", bindApi(api.Transactions.TransactionGetHandler))
+			apiV1Route.POST("/transactions/add.json", bindApi(api.Transactions.TransactionCreateHandler))
+			apiV1Route.POST("/transactions/modify.json", bindApi(api.Transactions.TransactionModifyHandler))
+			apiV1Route.POST("/transactions/delete.json", bindApi(api.Transactions.TransactionDeleteHandler))
+
 			// Transaction Categories
 			apiV1Route.GET("/transaction/categories/list.json", bindApi(api.TransactionCategories.CategoryListHandler))
 			apiV1Route.GET("/transaction/categories/get.json", bindApi(api.TransactionCategories.CategoryGetHandler))
@@ -220,7 +228,7 @@ func startWebServer(c *cli.Context) error {
 	} else if config.Protocol == settings.SCHEME_HTTPS {
 		log.BootInfof("[server.startWebServer] will run at https://%s", listenAddr)
 		err = router.RunTLS(listenAddr, config.CertFile, config.CertKeyFile)
-	} else  {
+	} else {
 		err = errs.ErrInvalidProtocol
 	}
 

@@ -83,6 +83,14 @@ func updateAllDatabaseTablesStructure() error {
 		log.BootInfof("[database.updateAllDatabaseTablesStructure] account table maintained successfully")
 	}
 
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.Transaction))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction table maintained successfully")
+	}
+
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionCategory))
 
 	if err != nil {

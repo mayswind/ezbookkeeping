@@ -150,6 +150,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 	transaction.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(transaction.Uid).DoTransaction(func(sess *xorm.Session) error {
+		// Get and verify source and destination account
 		sourceAccount := &models.Account{}
 		destinationAccount := &models.Account{}
 		has, err := sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
@@ -160,6 +161,23 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 			return errs.ErrSourceAccountNotFound
 		}
 
+		if transaction.DestinationAccountId == transaction.SourceAccountId {
+			destinationAccount = sourceAccount
+		} else {
+			has, err = sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrDestinationAccountNotFound
+			}
+		}
+
+		if sourceAccount.Currency == destinationAccount.Currency && transaction.SourceAmount != transaction.DestinationAmount {
+			return errs.ErrTransactionSourceAndDestinationAmountNotEqual
+		}
+
+		// Get and verify category
 		category := &models.TransactionCategory{}
 
 		if transaction.Type != models.TRANSACTION_TYPE_MODIFY_BALANCE {
@@ -176,34 +194,18 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 			}
 		}
 
-		if transaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
-			transaction.DestinationAmount = transaction.SourceAmount - sourceAccount.Balance
-		} else if transaction.Type == models.TRANSACTION_TYPE_INCOME {
-			if category.Type != models.CATEGORY_TYPE_INCOME {
-				return errs.ErrTransactionCategoryTypeInvalid
-			}
-		} else if transaction.Type == models.TRANSACTION_TYPE_EXPENSE {
-			if category.Type != models.CATEGORY_TYPE_EXPENSE {
-				return errs.ErrTransactionCategoryTypeInvalid
-			}
-		} else if transaction.Type == models.TRANSACTION_TYPE_TRANSFER {
-			if category.Type != models.CATEGORY_TYPE_TRANSFER {
-				return errs.ErrTransactionCategoryTypeInvalid
-			}
-
-			has, err := sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
-
-			if err != nil {
-				return err
-			} else if !has {
-				return errs.ErrDestinationAccountNotFound
-			}
-
-			if sourceAccount.Currency == destinationAccount.Currency && transaction.SourceAmount != transaction.DestinationAmount {
-				return errs.ErrTransactionSourceAndDestinationAmountNotEqual
-			}
+		if (transaction.Type == models.TRANSACTION_TYPE_INCOME && category.Type != models.CATEGORY_TYPE_INCOME) ||
+			(transaction.Type == models.TRANSACTION_TYPE_EXPENSE && category.Type != models.CATEGORY_TYPE_EXPENSE) ||
+			(transaction.Type == models.TRANSACTION_TYPE_TRANSFER && category.Type != models.CATEGORY_TYPE_TRANSFER) {
+			return errs.ErrTransactionCategoryTypeInvalid
 		}
 
+		// Calculate balance modification transaction real amount
+		if transaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
+			transaction.DestinationAmount = transaction.SourceAmount - destinationAccount.Balance
+		}
+
+		// Insert transaction row
 		createdRows, err := sess.Insert(transaction)
 
 		if err != nil || createdRows < 1 { // maybe another transaction has same time
@@ -231,9 +233,10 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 			}
 		}
 
+		// Update account table
 		if transaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -241,8 +244,8 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if transaction.Type == models.TRANSACTION_TYPE_INCOME {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -250,8 +253,8 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if transaction.Type == models.TRANSACTION_TYPE_EXPENSE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -296,6 +299,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 	updateCols = append(updateCols, "updated_unix_time")
 
 	err := s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
 		has, err := sess.ID(transaction.TransactionId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldTransaction)
 
@@ -321,6 +325,35 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			return errs.ErrTransactionTypeInvalid
 		}
 
+		// Get and verify source and destination account (if necessary)
+		sourceAccount := &models.Account{}
+		destinationAccount := &models.Account{}
+
+		if transaction.SourceAccountId != oldTransaction.SourceAccountId || transaction.SourceAmount != oldTransaction.SourceAmount {
+			has, err := sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrSourceAccountNotFound
+			}
+		}
+
+		if transaction.DestinationAccountId != oldTransaction.DestinationAccountId || transaction.DestinationAmount != oldTransaction.DestinationAmount {
+			if transaction.DestinationAccountId == transaction.SourceAccountId {
+				destinationAccount = sourceAccount
+			} else {
+				has, err := sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
+
+				if err != nil {
+					return err
+				} else if !has {
+					return errs.ErrDestinationAccountNotFound
+				}
+			}
+		}
+
+		// Append modified columns and verify
 		if transaction.CategoryId != oldTransaction.CategoryId {
 			if oldTransaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
 				if transaction.CategoryId > 0 {
@@ -366,33 +399,6 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			updateCols = append(updateCols, "transaction_time")
 		}
 
-		sourceAccount := &models.Account{}
-		destinationAccount := &models.Account{}
-
-		if transaction.SourceAccountId != oldTransaction.SourceAccountId || transaction.SourceAmount != oldTransaction.SourceAmount {
-			has, err := sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
-
-			if err != nil {
-				return err
-			} else if !has {
-				return errs.ErrSourceAccountNotFound
-			}
-		}
-
-		if transaction.DestinationAccountId != oldTransaction.DestinationAccountId || transaction.DestinationAmount != oldTransaction.DestinationAmount {
-			if transaction.DestinationAccountId == transaction.SourceAccountId {
-				destinationAccount = sourceAccount
-			} else {
-				has, err := sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
-
-				if err != nil {
-					return err
-				} else if !has {
-					return errs.ErrDestinationAccountNotFound
-				}
-			}
-		}
-
 		if transaction.SourceAccountId != oldTransaction.SourceAccountId {
 			updateCols = append(updateCols, "source_account_id")
 		}
@@ -418,6 +424,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			updateCols = append(updateCols, "comment")
 		}
 
+		// Update transaction row
 		updatedRows, err := sess.ID(transaction.TransactionId).Cols(updateCols...).Where("uid=? AND deleted=?", transaction.Uid, false).Update(transaction)
 
 		if err != nil {
@@ -426,14 +433,15 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			return errs.ErrTransactionNotFound
 		}
 
+		// Update account table
 		if oldTransaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
 			if transaction.SourceAccountId != oldTransaction.SourceAccountId {
 				return errs.ErrBalanceModificationTransactionCannotChangeAccountId
 			}
 
 			if transaction.SourceAmount != oldTransaction.SourceAmount {
-				sourceAccount.UpdatedUnixTime = time.Now().Unix()
-				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.DestinationAmount, transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+				destinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.DestinationAmount, transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 				if err != nil {
 					return err
@@ -510,6 +518,7 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
 		has, err := sess.ID(transactionId).Where("uid=? AND deleted=?", uid, false).Get(oldTransaction)
 
@@ -519,7 +528,9 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 			return errs.ErrTransactionNotFound
 		}
 
+		// Get and verify source and destination account
 		sourceAccount := &models.Account{}
+		destinationAccount := &models.Account{}
 		has, err = sess.ID(oldTransaction.SourceAccountId).Where("uid=? AND deleted=?", oldTransaction.Uid, false).Get(sourceAccount)
 
 		if err != nil {
@@ -528,6 +539,19 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 			return errs.ErrSourceAccountNotFound
 		}
 
+		if oldTransaction.DestinationAccountId == oldTransaction.SourceAccountId {
+			destinationAccount = sourceAccount
+		} else {
+			has, err = sess.ID(oldTransaction.DestinationAccountId).Where("uid=? AND deleted=?", oldTransaction.Uid, false).Get(destinationAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrDestinationAccountNotFound
+			}
+		}
+
+		// Update transaction row to deleted
 		deletedRows, err := sess.ID(transactionId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {
@@ -536,9 +560,10 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 			return errs.ErrTransactionNotFound
 		}
 
+		// Update account table
 		if oldTransaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -546,8 +571,8 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_TYPE_INCOME {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -555,8 +580,8 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_TYPE_EXPENSE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+			destinationAccount.UpdatedUnixTime = time.Now().Unix()
+			updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", oldTransaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
 			if err != nil {
 				return err
@@ -564,15 +589,6 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 				return errs.ErrDatabaseOperationFailed
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_TYPE_TRANSFER {
-			destinationAccount := &models.Account{}
-			has, err := sess.ID(oldTransaction.DestinationAccountId).Where("uid=? AND deleted=?", oldTransaction.Uid, false).Get(destinationAccount)
-
-			if err != nil {
-				return err
-			} else if !has {
-				return errs.ErrDestinationAccountNotFound
-			}
-
 			sourceAccount.UpdatedUnixTime = time.Now().Unix()
 			updatedSourceRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", oldTransaction.SourceAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
 

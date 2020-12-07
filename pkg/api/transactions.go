@@ -122,12 +122,20 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 	}
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId > 0 {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] balance modification transaction cannot set category id")
 		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
 	}
 
 	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId != transactionCreateReq.DestinationAccountId {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction source account is not destination account")
 		return nil, errs.ErrTransactionSourceAndDestinationIdNotEqual
-	} else if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAmount != transactionCreateReq.DestinationAmount {
+	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId == transactionCreateReq.DestinationAccountId {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] transfer transaction source account must not be destination account")
+		return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
+	}
+
+	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAmount != transactionCreateReq.DestinationAmount {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction source amount is not destination amount")
 		return nil, errs.ErrTransactionSourceAndDestinationAmountNotEqual
 	}
 

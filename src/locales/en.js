@@ -314,6 +314,7 @@ export default {
         'too much transaction in one second': 'There are too much transaction in one second, please choose another time',
         'balance modification transaction cannot set category': 'You cannot set category for balance modification transaction',
         'balance modification transaction cannot change account id': 'You cannot change account ID for balance modification transaction',
+        'balance modification transaction cannot add when other transaction exists': 'You cannot add balance modification transaction when other transaction already exists in this account',
         'transaction category id is invalid': 'Transaction category ID is invalid',
         'transaction category not found': 'Transaction category is not found',
         'transaction category type is invalid': 'Transaction category type is invalid',

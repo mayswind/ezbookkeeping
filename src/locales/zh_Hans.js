@@ -314,6 +314,7 @@ export default {
         'too much transaction in one second': '一秒钟内交易太多，请选择其他时间',
         'balance modification transaction cannot set category': '您无法对修改余额的交易设置分类',
         'balance modification transaction cannot change account id': '您无法对修改余额的交易修改账户ID',
+        'balance modification transaction cannot add when other transaction exists': '您不能在该账户已经存在其他交易时添加余额修改交易',
         'transaction category id is invalid': '交易分类ID无效',
         'transaction category not found': '交易分类不存在',
         'transaction category type is invalid': '交易分类类型无效',

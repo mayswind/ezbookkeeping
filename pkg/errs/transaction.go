@@ -12,4 +12,5 @@ var (
 	ErrTooMuchTransactionInOneSecond                       = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 6, http.StatusBadRequest, "too much transaction in one second")
 	ErrBalanceModificationTransactionCannotSetCategory     = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 7, http.StatusBadRequest, "balance modification transaction cannot set category")
 	ErrBalanceModificationTransactionCannotChangeAccountId = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 8, http.StatusBadRequest, "balance modification transaction cannot change account id")
+	ErrBalanceModificationTransactionCannotAddWhenNotEmpty = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 9, http.StatusBadRequest, "balance modification transaction cannot add when other transaction exists")
 )

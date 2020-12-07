@@ -154,5 +154,9 @@ func (a AccountInfoResponseSlice) Swap(i, j int) {
 }
 
 func (a AccountInfoResponseSlice) Less(i, j int) bool {
+	if a[i].Category != a[j].Category {
+		return a[i].Category < a[j].Category
+	}
+
 	return a[i].DisplayOrder < a[j].DisplayOrder
 }

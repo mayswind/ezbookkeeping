@@ -170,7 +170,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	newTransaction := &models.Transaction{

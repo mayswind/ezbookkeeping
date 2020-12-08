@@ -56,51 +56,22 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet class="category-icon-sheet" :opened="showIconSelection" @sheet:closed="hideIconSelectionSheet">
-            <f7-toolbar>
-                <div class="left"></div>
-                <div class="right">
-                    <f7-link sheet-close :text="$t('Done')"></f7-link>
-                </div>
-            </f7-toolbar>
-            <f7-page-content>
-                <f7-block class="margin-vertical">
-                    <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allCategoryIconRows" :key="idx">
-                        <f7-col class="text-align-center" v-for="categoryIcon in row" :key="categoryIcon.id">
-                            <f7-icon :icon="categoryIcon.icon" :style="{ color: '#' + (categoryChoosingIcon ? categoryChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(categoryIcon)">
-                                <f7-badge color="default" class="right-bottom-icon" v-if="categoryChoosingIcon && categoryChoosingIcon.icon === categoryIcon.id">
-                                    <f7-icon f7="checkmark_alt"></f7-icon>
-                                </f7-badge>
-                            </f7-icon>
-                        </f7-col>
-                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
-                    </f7-row>
-                </f7-block>
-            </f7-page-content>
-        </f7-sheet>
+        <IconSelectionSheet :icon="categoryChoosingIcon ? categoryChoosingIcon.icon : null"
+                            :color="categoryChoosingIcon ? categoryChoosingIcon.color : null"
+                            :column-count="iconCountPerRow"
+                            :show="showIconSelection"
+                            :all-icon-infos="this.$constants.icons.allCategoryIcons"
+                            @icon:change="onIconChanged"
+                            @icon:closed="onIconSelectionSheetClosed"
+        ></IconSelectionSheet>
 
-        <f7-sheet :opened="showColorSelection" @sheet:closed="hideColorSelectionSheet">
-            <f7-toolbar>
-                <div class="left"></div>
-                <div class="right">
-                    <f7-link sheet-close :text="$t('Done')"></f7-link>
-                </div>
-            </f7-toolbar>
-            <f7-page-content>
-                <f7-block class="margin-vertical">
-                    <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allCategoryColorRows" :key="idx">
-                        <f7-col class="text-align-center" v-for="categoryColor in row" :key="categoryColor.color">
-                            <f7-icon f7="app_fill" :style="{ color: '#' + categoryColor.color }" @click.native="setSelectedColor(categoryColor.color)">
-                                <f7-badge color="default" class="right-bottom-icon" v-if="categoryChoosingColor && categoryChoosingColor.color === categoryColor.color">
-                                    <f7-icon f7="checkmark_alt"></f7-icon>
-                                </f7-badge>
-                            </f7-icon>
-                        </f7-col>
-                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
-                    </f7-row>
-                </f7-block>
-            </f7-page-content>
-        </f7-sheet>
+        <ColorSelectionSheet :color="categoryChoosingColor ? categoryChoosingColor.color : null"
+                             :column-count="iconCountPerRow"
+                             :show="showColorSelection"
+                             :all-color-infos="this.$constants.colors.allCategoryColors"
+                             @color:change="onColorChanged"
+                             @color:closed="onColorSelectionSheetClosed"
+        ></ColorSelectionSheet>
     </f7-page>
 </template>
 
@@ -148,50 +119,6 @@ export default {
             } else {
                 return 'Save';
             }
-        },
-        allCategoryIconRows() {
-            const allCategoryIcons = this.$constants.icons.allCategoryIcons;
-            const ret = [];
-            let rowCount = 0;
-
-            for (let categoryIconId in allCategoryIcons) {
-                if (!Object.prototype.hasOwnProperty.call(allCategoryIcons, categoryIconId)) {
-                    continue;
-                }
-
-                const categoryIcon = allCategoryIcons[categoryIconId];
-
-                if (!ret[rowCount]) {
-                    ret[rowCount] = [];
-                } else if (ret[rowCount] && ret[rowCount].length >= this.iconCountPerRow) {
-                    rowCount++;
-                    ret[rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    id: categoryIconId,
-                    icon: categoryIcon.icon
-                });
-            }
-
-            return ret;
-        },
-        allCategoryColorRows() {
-            const allCategoryColors = this.$constants.colors.allCategoryColors;
-            const ret = [];
-            let rowCount = -1;
-
-            for (let i = 0; i < allCategoryColors.length; i++) {
-                if (i % this.iconCountPerRow === 0) {
-                    ret[++rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    color: allCategoryColors[i]
-                });
-            }
-
-            return ret;
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -267,16 +194,16 @@ export default {
             this.categoryChoosingIcon = category;
             this.showIconSelection = true;
         },
-        setSelectedIcon(categoryIcon) {
+        onIconChanged(icon) {
             if (!this.categoryChoosingIcon) {
                 return;
             }
 
-            this.categoryChoosingIcon.icon = categoryIcon.id;
+            this.categoryChoosingIcon.icon = icon;
             this.categoryChoosingIcon = null;
             this.showIconSelection = false;
         },
-        hideIconSelectionSheet() {
+        onIconSelectionSheetClosed() {
             this.categoryChoosingIcon = null;
             this.showIconSelection = false;
         },
@@ -284,7 +211,7 @@ export default {
             this.categoryChoosingColor = category;
             this.showColorSelection = true;
         },
-        setSelectedColor(color) {
+        onColorChanged(color) {
             if (!this.categoryChoosingColor) {
                 return;
             }
@@ -293,7 +220,7 @@ export default {
             this.categoryChoosingColor = null;
             this.showColorSelection = false;
         },
-        hideColorSelectionSheet() {
+        onColorSelectionSheetClosed() {
             this.categoryChoosingColor = null;
             this.showColorSelection = false;
         },

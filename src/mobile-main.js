@@ -35,6 +35,9 @@ import accountIconFilter from './filters/accountIcon.js';
 import categoryIconFilter from './filters/categoryIcon.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
+
+import IconSelectionSheet from "./components/mobile/IconSelectionSheet.vue";
+import ColorSelectionSheet from "./components/mobile/ColorSelectionSheet.vue";
 import App from './Mobile.vue';
 
 Vue.use(VueI18n);
@@ -42,6 +45,8 @@ Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
 Vue.component('PincodeInput', PincodeInput);
+Vue.component('IconSelectionSheet', IconSelectionSheet);
+Vue.component('ColorSelectionSheet', ColorSelectionSheet);
 Framework7.use(Framework7Vue);
 
 const i18n = new VueI18n(getI18nOptions());

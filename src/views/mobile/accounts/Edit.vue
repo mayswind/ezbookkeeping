@@ -202,51 +202,22 @@
             </f7-card>
         </f7-block>
 
-        <f7-sheet :opened="showIconSelection" @sheet:closed="hideIconSelectionSheet">
-            <f7-toolbar>
-                <div class="left"></div>
-                <div class="right">
-                    <f7-link sheet-close :text="$t('Done')"></f7-link>
-                </div>
-            </f7-toolbar>
-            <f7-page-content>
-                <f7-block class="margin-vertical">
-                    <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allAccountIconRows" :key="idx">
-                        <f7-col class="text-align-center" v-for="accountIcon in row" :key="accountIcon.id">
-                            <f7-icon :icon="accountIcon.icon" :style="{ color: '#' + (accountChoosingIcon ? accountChoosingIcon.color : '000000') }" @click.native="setSelectedIcon(accountIcon)">
-                                <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingIcon && accountChoosingIcon.icon === accountIcon.id">
-                                    <f7-icon f7="checkmark_alt"></f7-icon>
-                                </f7-badge>
-                            </f7-icon>
-                        </f7-col>
-                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
-                    </f7-row>
-                </f7-block>
-            </f7-page-content>
-        </f7-sheet>
+        <IconSelectionSheet :icon="accountChoosingIcon ? accountChoosingIcon.icon : null"
+                            :color="accountChoosingIcon ? accountChoosingIcon.color : null"
+                            :column-count="iconCountPerRow"
+                            :show="showIconSelection"
+                            :all-icon-infos="this.$constants.icons.allAccountIcons"
+                            @icon:change="onIconChanged"
+                            @icon:closed="onIconSelectionSheetClosed"
+        ></IconSelectionSheet>
 
-        <f7-sheet :opened="showColorSelection" @sheet:closed="hideColorSelectionSheet">
-            <f7-toolbar>
-                <div class="left"></div>
-                <div class="right">
-                    <f7-link sheet-close :text="$t('Done')"></f7-link>
-                </div>
-            </f7-toolbar>
-            <f7-page-content>
-                <f7-block class="margin-vertical">
-                    <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allAccountColorRows" :key="idx">
-                        <f7-col class="text-align-center" v-for="accountColor in row" :key="accountColor.color">
-                            <f7-icon f7="app_fill" :style="{ color: '#' + accountColor.color }" @click.native="setSelectedColor(accountColor.color)">
-                                <f7-badge color="default" class="right-bottom-icon" v-if="accountChoosingColor && accountChoosingColor.color === accountColor.color">
-                                    <f7-icon f7="checkmark_alt"></f7-icon>
-                                </f7-badge>
-                            </f7-icon>
-                        </f7-col>
-                        <f7-col v-for="idx in (iconCountPerRow - row.length)" :key="idx"></f7-col>
-                    </f7-row>
-                </f7-block>
-            </f7-page-content>
-        </f7-sheet>
+        <ColorSelectionSheet :color="accountChoosingColor ? accountChoosingColor.color : null"
+                             :column-count="iconCountPerRow"
+                             :show="showColorSelection"
+                             :all-color-infos="this.$constants.colors.allAccountColors"
+                             @color:change="onColorChanged"
+                             @color:closed="onColorSelectionSheetClosed"
+        ></ColorSelectionSheet>
     </f7-page>
 </template>
 
@@ -294,50 +265,6 @@ export default {
         },
         allAccountCategories() {
             return this.$constants.account.allCategories;
-        },
-        allAccountIconRows() {
-            const allAccountIcons = this.$constants.icons.allAccountIcons;
-            const ret = [];
-            let rowCount = 0;
-
-            for (let accountIconId in allAccountIcons) {
-                if (!Object.prototype.hasOwnProperty.call(allAccountIcons, accountIconId)) {
-                    continue;
-                }
-
-                const accountIcon = allAccountIcons[accountIconId];
-
-                if (!ret[rowCount]) {
-                    ret[rowCount] = [];
-                } else if (ret[rowCount] && ret[rowCount].length >= this.iconCountPerRow) {
-                    rowCount++;
-                    ret[rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    id: accountIconId,
-                    icon: accountIcon.icon
-                });
-            }
-
-            return ret;
-        },
-        allAccountColorRows() {
-            const allAccountColors = this.$constants.colors.allAccountColors;
-            const ret = [];
-            let rowCount = -1;
-
-            for (let i = 0; i < allAccountColors.length; i++) {
-                if (i % this.iconCountPerRow === 0) {
-                    ret[++rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    color: allAccountColors[i]
-                });
-            }
-
-            return ret;
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
@@ -437,16 +364,16 @@ export default {
             this.accountChoosingIcon = account;
             this.showIconSelection = true;
         },
-        setSelectedIcon(accountIcon) {
+        onIconChanged(icon) {
             if (!this.accountChoosingIcon) {
                 return;
             }
 
-            this.accountChoosingIcon.icon = accountIcon.id;
+            this.accountChoosingIcon.icon = icon;
             this.accountChoosingIcon = null;
             this.showIconSelection = false;
         },
-        hideIconSelectionSheet() {
+        onIconSelectionSheetClosed() {
             this.accountChoosingIcon = null;
             this.showIconSelection = false;
         },
@@ -454,7 +381,7 @@ export default {
             this.accountChoosingColor = account;
             this.showColorSelection = true;
         },
-        setSelectedColor(color) {
+        onColorChanged(color) {
             if (!this.accountChoosingColor) {
                 return;
             }
@@ -463,7 +390,7 @@ export default {
             this.accountChoosingColor = null;
             this.showColorSelection = false;
         },
-        hideColorSelectionSheet() {
+        onColorSelectionSheetClosed() {
             this.accountChoosingColor = null;
             this.showColorSelection = false;
         },

@@ -148,7 +148,7 @@ func (s *TransactionCategoryService) CreateCategory(category *models.Transaction
 	})
 }
 
-func (s *TransactionCategoryService) CreateCategories(uid int64, totalCount int, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}

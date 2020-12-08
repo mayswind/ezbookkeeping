@@ -175,7 +175,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		totalCount++
 	}
 
-	categories, err := a.categories.CreateCategories(uid, totalCount, categoriesMap)
+	categories, err := a.categories.CreateCategories(uid, categoriesMap)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())

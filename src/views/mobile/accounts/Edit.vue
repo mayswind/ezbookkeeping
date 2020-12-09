@@ -52,6 +52,7 @@
                     <f7-list-item header="Account Icon" after="Icon"></f7-list-item>
                     <f7-list-item header="Account Color" after="Color"></f7-list-item>
                     <f7-list-input label="Currency" placeholder="Currency"></f7-list-input>
+                    <f7-list-input label="Account Balance" placeholder="Balance"></f7-list-input>
                     <f7-list-input type="textarea" label="Description" placeholder="Your account description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>
@@ -90,6 +91,14 @@
                                     :value="currency.code">{{ currency.displayName }}</option>
                         </select>
                     </f7-list-item>
+
+                    <f7-list-item
+                        link="#"
+                        :class="{ 'disabled': editAccountId }"
+                        :header="$t('Account Balance')"
+                        :after="account.balance | currency(account.currency)"
+                        @click="showBalanceInputSheet(account)"
+                    ></f7-list-item>
 
                     <f7-list-input
                         type="textarea"
@@ -182,6 +191,14 @@
                             </select>
                         </f7-list-item>
 
+                        <f7-list-item
+                            link="#"
+                            :class="{ 'disabled': editAccountId }"
+                            :header="$t('Sub Account Balance')"
+                            :after="subAccount.balance | currency(subAccount.currency)"
+                            @click="showBalanceInputSheet(subAccount)"
+                        ></f7-list-item>
+
                         <f7-list-input
                             type="textarea"
                             :label="$t('Description')"
@@ -218,6 +235,12 @@
                              @color:change="onColorChanged"
                              @color:closed="onColorSelectionSheetClosed"
         ></ColorSelectionSheet>
+
+        <NumberPadSheet :amount="accountInputingBalance ? accountInputingBalance.balance : 0"
+                        :show="showBalanceInput"
+                        @numpad:change="onBalanceChanged"
+                        @numpad:closed="onBalanceInputSheetClosed"
+        ></NumberPadSheet>
     </f7-page>
 </template>
 
@@ -236,6 +259,7 @@ export default {
                 icon: self.$constants.icons.defaultAccountIconId,
                 color: self.$constants.colors.defaultAccountColor,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
+                balance: 0,
                 comment: '',
                 visible: true
             },
@@ -243,9 +267,11 @@ export default {
             iconCountPerRow: 7,
             accountChoosingIcon: null,
             accountChoosingColor: null,
+            accountInputingBalance: null,
             submitting: false,
             showIconSelection: false,
-            showColorSelection: false
+            showColorSelection: false,
+            showBalanceInput: false
         };
     },
     computed: {
@@ -298,6 +324,7 @@ export default {
                 self.account.icon = account.icon;
                 self.account.color = account.color;
                 self.account.currency = account.currency;
+                self.account.balance = account.balance;
                 self.account.comment = account.comment;
                 self.account.visible = !account.hidden;
 
@@ -313,6 +340,7 @@ export default {
                             icon: subAccount.icon,
                             color: subAccount.color,
                             currency: subAccount.currency,
+                            balance: subAccount.balance,
                             comment: subAccount.comment,
                             visible: !subAccount.hidden
                         });
@@ -350,6 +378,7 @@ export default {
                 icon: this.account.icon,
                 color: this.account.color,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
+                balance: 0,
                 comment: ''
             });
         },
@@ -394,6 +423,23 @@ export default {
             this.accountChoosingColor = null;
             this.showColorSelection = false;
         },
+        showBalanceInputSheet(account) {
+            this.accountInputingBalance = account;
+            this.showBalanceInput = true;
+        },
+        onBalanceChanged(amount) {
+            if (!this.accountInputingBalance) {
+                return;
+            }
+
+            this.accountInputingBalance.balance = amount;
+            this.accountInputingBalance = null;
+            this.showBalanceInput = false;
+        },
+        onBalanceInputSheetClosed() {
+            this.accountInputingBalance = null;
+            this.showBalanceInput = false;
+        },
         save() {
             const self = this;
             const router = self.$f7router;
@@ -430,6 +476,7 @@ export default {
                         icon: subAccount.icon,
                         color: subAccount.color,
                         currency: subAccount.currency,
+                        balance: subAccount.balance,
                         comment: subAccount.comment
                     };
 
@@ -449,6 +496,7 @@ export default {
                 icon: self.account.icon,
                 color: self.account.color,
                 currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
+                balance: self.account.balance,
                 comment: self.account.comment,
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,
             };

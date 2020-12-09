@@ -470,6 +470,8 @@ export default {
     'Account Color': '账户颜色',
     'Sub Account Color': '子账户颜色',
     'Currency': '货币',
+    'Account Balance': '账户余额',
+    'Sub Account Balance': '子账户余额',
     'Description': '描述',
     'Your account description (optional)': '你的账户描述 (可选)',
     'Your sub account description (optional)': '你的子账户描述 (可选)',

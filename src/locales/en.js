@@ -470,6 +470,8 @@ export default {
     'Account Color': 'Account Color',
     'Sub Account Color': 'Sub Account Color',
     'Currency': 'Currency',
+    'Account Balance': 'Account Balance',
+    'Sub Account Balance': 'Sub Account Balance',
     'Description': 'Description',
     'Your account description (optional)': 'Your account description (optional)',
     'Your sub account description (optional)': 'Your sub account description (optional)',

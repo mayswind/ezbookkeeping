@@ -18,19 +18,41 @@ export default {
                 theme: 'ios',
                 autoDarkTheme: self.$settings.isEnableAutoDarkMode(),
                 routes: routes,
-                touch: {
-                    tapHold: true
+                actions: {
+                    animate: self.$settings.isEnableAnimate(),
+                    backdrop: true,
+                    closeOnEscape: true
                 },
-                sheet: {
+                dialog: {
+                    animate: self.$settings.isEnableAnimate(),
+                    backdrop: true
+                },
+                popover: {
+                    animate: self.$settings.isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
                 },
                 popup: {
-                    swipeToClose: true,
+                    animate: self.$settings.isEnableAnimate(),
+                    backdrop: true,
+                    closeOnEscape: true,
+                    swipeToClose: true
+                },
+                sheet: {
+                    animate: self.$settings.isEnableAnimate(),
+                    backdrop: true,
                     closeOnEscape: true
                 },
+                smartSelect: {
+                    routableModals: false
+                },
+                touch: {
+                    tapHold: true,
+                    disableContextMenu: true
+                },
                 view: {
-                    animate : self.$settings.isEnableAnimate()
+                    animate: self.$settings.isEnableAnimate(),
+                    stackPages: true
                 }
             }
         }

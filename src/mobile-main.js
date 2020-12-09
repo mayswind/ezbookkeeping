@@ -126,6 +126,7 @@ Vue.prototype.$alert = function (message, confirmCallback) {
     this.$f7.dialog.create({
         title: i18n.t('global.app.title'),
         text: i18n.t(message, parameters),
+        animate: settings.isEnableAnimate(),
         buttons: [
             {
                 text: i18n.t('OK'),
@@ -138,6 +139,7 @@ Vue.prototype.$confirm = function (message, confirmCallback, cancelCallback) {
     this.$f7.dialog.create({
         title: i18n.t('global.app.title'),
         text: i18n.t(message),
+        animate: settings.isEnableAnimate(),
         buttons: [
             {
                 text: i18n.t('Cancel'),
@@ -210,24 +212,16 @@ new Vue({
     render: h => h(App),
     mounted: function () {
         const app = this.$f7;
+        const $$ = app.$;
 
-        window.addEventListener('popstate', () => {
-            if (document.querySelectorAll('.modal-in').length > 0) {
-                app.dialog.close();
-                app.sheet.close();
-                app.popup.close();
-                app.actions.close();
-                return false;
+        app.on('pageBeforeOut',  () => {
+            if ($$('.modal-in').length) {
+                app.actions.close('.actions-modal.modal-in', false);
+                app.dialog.close('.dialog.modal-in', false);
+                app.popover.close('.popover.modal-in', false);
+                app.popup.close('.popup.modal-in', false);
+                app.sheet.close('.sheet-modal.modal-in', false);
             }
-        }, false);
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27 || event.which === 27) {
-                if (document.querySelectorAll('.modal-in').length > 0) {
-                    app.dialog.close();
-                    return false;
-                }
-            }
-        }, false);
+        });
     }
 });

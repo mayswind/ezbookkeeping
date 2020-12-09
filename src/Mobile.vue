@@ -75,6 +75,14 @@ body {
     --f7-theme-color-tint: #d09467;
 }
 
+.no-right-border {
+    border-right: 0;
+}
+
+.no-bottom-border {
+    border-bottom: 0;
+}
+
 i.icon.la, i.icon.las, i.icon.lab {
     font-size: 28px;
 }

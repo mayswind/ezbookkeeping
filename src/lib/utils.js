@@ -1,6 +1,7 @@
 import CryptoJS from "crypto-js";
 import uaParser from 'ua-parser-js';
 import accountConstants from '../consts/account.js';
+import settings from "./settings.js";
 
 function isFunction(val) {
     return typeof(val) === 'function';
@@ -97,6 +98,120 @@ function copyArrayTo(fromArray, toArray) {
     }
 
     return toArray;
+}
+
+function appendThousandsSeparator(value) {
+    if (!settings.isEnableThousandsSeparator() || value.length <= 3) {
+        return value;
+    }
+
+    const negative = value.charAt(0) === '-';
+
+    if (negative) {
+        value = value.substr(1);
+    }
+
+    const dotPos = value.indexOf('.');
+    const integer = dotPos < 0 ? value : value.substr(0, dotPos);
+    const decimals = dotPos < 0 ? '' : value.substring(dotPos + 1, value.length);
+
+    const finalChars = [];
+
+    for (let i = 0; i < integer.length; i++) {
+        if (i % 3 === 0 && i > 0) {
+            finalChars.push(',');
+        }
+
+        finalChars.push(integer.charAt(integer.length - 1 - i));
+    }
+
+    finalChars.reverse();
+
+    let newInteger = finalChars.join('');
+
+    if (negative) {
+        newInteger = `-${newInteger}`;
+    }
+
+    if (dotPos < 0) {
+        return newInteger;
+    } else {
+        return `${newInteger}.${decimals}`;
+    }
+}
+
+function numericCurrencyToString(num) {
+    let str = num.toString();
+    const negative = str.charAt(0) === '-';
+
+    if (negative) {
+        str = str.substr(1);
+    }
+
+    if (str.length === 0) {
+        str = '0.00';
+    } else if (str.length === 1) {
+        str = '0.0' + str;
+    } else if (str.length === 2) {
+        str = '0.' + str;
+    } else {
+        let integer = str.substr(0, str.length - 2);
+        let decimals = str.substr(str.length - 2, 2);
+
+        integer = appendThousandsSeparator(integer);
+
+        str = `${integer}.${decimals}`;
+    }
+
+    if (negative) {
+        str = `-${str}`;
+    }
+
+    return str;
+}
+
+function stringCurrencyToNumeric(str) {
+    if (!str || str.length < 1) {
+        return 0;
+    }
+
+    const negative = str.charAt(0) === '-';
+
+    if (negative) {
+        str = str.substr(1);
+    }
+
+    if (!str || str.length < 1) {
+        return 0;
+    }
+
+    const sign = negative ? -1 : 1;
+
+    if (str.indexOf(',')) {
+        str = str.replaceAll(/,/g, '');
+    }
+
+    let dotPos = str.indexOf('.');
+
+    if (dotPos < 0) {
+        return sign * parseInt(str) * 100;
+    } else if (dotPos === 0) {
+        str = '0' + str;
+        dotPos++;
+    }
+
+    const integer = str.substr(0, dotPos);
+    const decimals = str.substring(dotPos + 1, str.length);
+
+    if (decimals.length < 1) {
+        return sign * parseInt(integer) * 100;
+    } else if (decimals.length === 1) {
+        return sign * parseInt(integer) * 100 + sign * parseInt(decimals) * 10;
+    } else if (decimals.length === 2) {
+        return sign * parseInt(integer) * 100 + sign * parseInt(decimals);
+    } else {
+        return sign * parseInt(integer) * 100 + sign * parseInt(decimals.substr(0, 2));
+    }
 }
 
 function base64encode(arrayBuffer) {
@@ -227,6 +342,9 @@ export default {
     isBoolean,
     copyObjectTo,
     copyArrayTo,
+    appendThousandsSeparator,
+    numericCurrencyToString,
+    stringCurrencyToNumeric,
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,

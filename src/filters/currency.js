@@ -2,21 +2,6 @@ import currency from "../consts/currency.js";
 import settings from "../lib/settings.js";
 import utils from "../lib/utils.js";
 
-function appendThousandsSeparator(value) {
-    const finalChars = [];
-
-    for (let i = 0; i < value.length; i++) {
-        if (i % 3 === 0 && i > 0) {
-            finalChars.push(',');
-        }
-
-        finalChars.push(value.charAt(value.length - 1 - i));
-    }
-
-    finalChars.reverse();
-    return finalChars.join('');
-}
-
 export default function ({i18n}, value, currencyCode) {
     if (!utils.isNumber(value) && !utils.isString(value)) {
         return value;
@@ -26,32 +11,7 @@ export default function ({i18n}, value, currencyCode) {
         value = value.toString();
     }
 
-    const negative = value.charAt(0) === '-';
-
-    if (negative) {
-        value = value.substr(1);
-    }
-
-    if (value.length === 0) {
-        value = '0.00';
-    } else if (value.length === 1) {
-        value = '0.0' + value;
-    } else if (value.length === 2) {
-        value = '0.' + value;
-    } else {
-        let integer = value.substr(0, value.length - 2);
-        let decimals = value.substr(value.length - 2, 2);
-
-        if (settings.isEnableThousandsSeparator() && integer.length > 3) {
-            integer = appendThousandsSeparator(integer);
-        }
-
-        value = `${integer}.${decimals}`;
-    }
-
-    if (negative) {
-        value = `-${value}`;
-    }
+    value = utils.numericCurrencyToString(value);
 
     const currencyDisplayMode = settings.getCurrencyDisplayMode();
 

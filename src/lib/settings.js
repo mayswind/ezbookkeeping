@@ -12,7 +12,7 @@ const defaultSettings = {
     thousandsSeparator: true,
     currencyDisplayMode: 'symbol', // or 'none' or 'code' or 'name'
     showAccountBalance: true,
-    animate: false,
+    animate: true,
     autoDarkMode: true
 };
 

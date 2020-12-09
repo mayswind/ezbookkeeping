@@ -13,4 +13,7 @@ var (
 	ErrBalanceModificationTransactionCannotSetCategory     = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 7, http.StatusBadRequest, "balance modification transaction cannot set category")
 	ErrBalanceModificationTransactionCannotChangeAccountId = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 8, http.StatusBadRequest, "balance modification transaction cannot change account id")
 	ErrBalanceModificationTransactionCannotAddWhenNotEmpty = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 9, http.StatusBadRequest, "balance modification transaction cannot add when other transaction exists")
+	ErrCannotAddTransactionToHiddenAccount                 = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 10, http.StatusBadRequest, "cannot add transaction to hidden account")
+	ErrCannotModifyTransactionInHiddenAccount              = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 11, http.StatusBadRequest, "cannot modify transaction of hidden account")
+	ErrCannotDeleteTransactionInHiddenAccount              = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 12, http.StatusBadRequest, "cannot delete transaction in hidden account")
 )

@@ -159,6 +159,8 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 			return err
 		} else if !has {
 			return errs.ErrSourceAccountNotFound
+		} else if sourceAccount.Hidden {
+			return errs.ErrCannotAddTransactionToHiddenAccount
 		}
 
 		if transaction.DestinationAccountId == transaction.SourceAccountId {
@@ -170,6 +172,8 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 				return err
 			} else if !has {
 				return errs.ErrDestinationAccountNotFound
+			} else if destinationAccount.Hidden {
+				return errs.ErrCannotAddTransactionToHiddenAccount
 			}
 		}
 
@@ -336,28 +340,27 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 		// Get and verify source and destination account (if necessary)
 		sourceAccount := &models.Account{}
 		destinationAccount := &models.Account{}
+		has, err = sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
 
-		if transaction.SourceAccountId != oldTransaction.SourceAccountId || transaction.SourceAmount != oldTransaction.SourceAmount {
-			has, err := sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
+		if err != nil {
+			return err
+		} else if !has {
+			return errs.ErrSourceAccountNotFound
+		} else if sourceAccount.Hidden {
+			return errs.ErrCannotModifyTransactionInHiddenAccount
+		}
+
+		if transaction.DestinationAccountId == transaction.SourceAccountId {
+			destinationAccount = sourceAccount
+		} else {
+			has, err = sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
 
 			if err != nil {
 				return err
 			} else if !has {
-				return errs.ErrSourceAccountNotFound
-			}
-		}
-
-		if transaction.DestinationAccountId != oldTransaction.DestinationAccountId || transaction.DestinationAmount != oldTransaction.DestinationAmount {
-			if transaction.DestinationAccountId == transaction.SourceAccountId {
-				destinationAccount = sourceAccount
-			} else {
-				has, err := sess.ID(transaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationAccount)
-
-				if err != nil {
-					return err
-				} else if !has {
-					return errs.ErrDestinationAccountNotFound
-				}
+				return errs.ErrDestinationAccountNotFound
+			} else if destinationAccount.Hidden {
+				return errs.ErrCannotModifyTransactionInHiddenAccount
 			}
 		}
 
@@ -545,6 +548,8 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 			return err
 		} else if !has {
 			return errs.ErrSourceAccountNotFound
+		} else if sourceAccount.Hidden {
+			return errs.ErrCannotDeleteTransactionInHiddenAccount
 		}
 
 		if oldTransaction.DestinationAccountId == oldTransaction.SourceAccountId {
@@ -556,6 +561,8 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 				return err
 			} else if !has {
 				return errs.ErrDestinationAccountNotFound
+			} else if destinationAccount.Hidden {
+				return errs.ErrCannotDeleteTransactionInHiddenAccount
 			}
 		}
 

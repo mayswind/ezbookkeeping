@@ -5,56 +5,56 @@
                 <span class="numpad-value">{{ currentDisplay }}</span>
             </f7-row>
             <f7-row class="numpad-buttons">
-                <span class="numpad-button numpad-button-num" @click="inputNum(7)">
-                    <span class="numpad-button-text">7</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(8)">
-                    <span class="numpad-button-text">8</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(9)">
-                    <span class="numpad-button-text">9</span>
-                </span>
-                <span class="numpad-button numpad-button-function no-right-border" @click="setSymbol('×')">
-                    <span class="numpad-button-text">&times;</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(4)">
-                    <span class="numpad-button-text">4</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(5)">
-                    <span class="numpad-button-text">5</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(6)">
-                    <span class="numpad-button-text">6</span>
-                </span>
-                <span class="numpad-button numpad-button-function no-right-border" @click="setSymbol('−')">
-                    <span class="numpad-button-text">&minus;</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(1)">
-                    <span class="numpad-button-text">1</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(2)">
-                    <span class="numpad-button-text">2</span>
-                </span>
-                <span class="numpad-button numpad-button-num" @click="inputNum(3)">
-                    <span class="numpad-button-text">3</span>
-                </span>
-                <span class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
-                    <span class="numpad-button-text">&plus;</span>
-                </span>
-                <span class="numpad-button numpad-button-num no-bottom-border" @click="inputDot()">
-                    <span class="numpad-button-text">.</span>
-                </span>
-                <span class="numpad-button numpad-button-num no-bottom-border" @click="inputNum(0)">
-                    <span class="numpad-button-text">0</span>
-                </span>
-                <span class="numpad-button numpad-button-num no-bottom-border" @click="backspace">
-                    <span class="numpad-button-text">
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
+                    <span class="numpad-button-text numpad-button-text-normal">7</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(8)">
+                    <span class="numpad-button-text numpad-button-text-normal">8</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(9)">
+                    <span class="numpad-button-text numpad-button-text-normal">9</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('×')">
+                    <span class="numpad-button-text numpad-button-text-normal">&times;</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(4)">
+                    <span class="numpad-button-text numpad-button-text-normal">4</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(5)">
+                    <span class="numpad-button-text numpad-button-text-normal">5</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(6)">
+                    <span class="numpad-button-text numpad-button-text-normal">6</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('−')">
+                    <span class="numpad-button-text numpad-button-text-normal">&minus;</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(1)">
+                    <span class="numpad-button-text numpad-button-text-normal">1</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(2)">
+                    <span class="numpad-button-text numpad-button-text-normal">2</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(3)">
+                    <span class="numpad-button-text numpad-button-text-normal">3</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
+                    <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="inputDot()">
+                    <span class="numpad-button-text numpad-button-text-normal">.</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="inputNum(0)">
+                    <span class="numpad-button-text numpad-button-text-normal">0</span>
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="backspace" @taphold.native="clear()">
+                    <span class="numpad-button-text numpad-button-text-normal">
                         <f7-icon f7="delete_left"></f7-icon>
                     </span>
-                </span>
-                <span class="numpad-button numpad-button-function numpad-button-confirm no-right-border no-bottom-border" @click="confirm()">
+                </f7-button>
+                <f7-button class="numpad-button numpad-button-confirm no-right-border no-bottom-border" fill @click="confirm()">
                     <span :class="{ 'numpad-button-text': true, 'numpad-button-text-confirm': !currentSymbol }">{{ confirmText }}</span>
-                </span>
+                </f7-button>
             </f7-row>
         </f7-page-content>
     </f7-sheet>
@@ -192,6 +192,11 @@ export default {
 
             this.currentValue = this.currentValue.substr(0, this.currentValue.length - 1);
         },
+        clear() {
+            this.currentValue = '';
+            this.previousValue = '';
+            this.currentSymbol = '';
+        },
         confirm() {
             if (this.currentSymbol && this.currentValue.length >= 1) {
                 const previousValue = this.$utilities.stringCurrencyToNumeric(this.previousValue);
@@ -268,9 +273,9 @@ export default {
     display: flex;
     position: relative;
     text-align: center;
+    border-radius: 0;
     border-right: 1px solid var(--f7-page-bg-color);
     border-bottom: 1px solid var(--f7-page-bg-color);
-    cursor: pointer;
     height: 60px;
     flex-direction: column;
     justify-content: center;
@@ -279,31 +284,31 @@ export default {
     user-select: none;
 }
 
-.numpad-button.active-state {
-    background-color: var(--f7-list-button-pressed-bg-color);
-}
-
 .numpad-button-num {
     width: calc(80% / 3);
 }
 
-.numpad-button-function {
+.numpad-button-function, .numpad-button-confirm {
     width: 20%;
 }
 
-.numpad-button-confirm {
-    background-color: var(--f7-theme-color);
-    color: #ffffff;
-}
-
-.numpad-button-confirm.active-state {
-    background-color: var(--f7-theme-color-tint);
+.numpad-button-num.active-state, .numpad-button-function.active-state {
+    background-color: rgba(var(--f7-color-black-rgb), .15);
 }
 
 .numpad-button-text {
     display: block;
     font-size: 28px;
+    font-weight: normal;
     line-height: 1;
+}
+
+.numpad-button-text-normal {
+    color: var(--f7-color-black);
+}
+
+.theme-dark .numpad-button-text-normal {
+    color: var(--f7-color-white);
 }
 
 .numpad-button-text-confirm {

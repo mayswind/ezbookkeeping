@@ -300,6 +300,7 @@ export default {
         'account must have at least one sub account': 'Account must have at least one sub account',
         'account cannot have sub accounts': 'Account cannot have sub accounts',
         'parent account cannot set currency': 'Parent account cannot set currency',
+        'parent account cannot set balance': 'Parent account cannot set balance',
         'sub account category not equals to parent': 'Sub account category does not equal to parent',
         'sub account type invalid': 'Sub account type is invalid',
         'cannot add or delete sub accounts when modify account': 'You cannot add or delete sub accounts when modify account',

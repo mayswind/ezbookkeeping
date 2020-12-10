@@ -135,6 +135,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 			return nil, errs.ErrParentAccountCannotSetCurrency
 		}
 
+		if accountCreateReq.Balance != 0 {
+			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parent account cannot set balance")
+			return nil, errs.ErrParentAccountCannotSetBalance
+		}
+
 		for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
 			subAccount := accountCreateReq.SubAccounts[i]
 
@@ -345,6 +350,7 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 		Icon:         accountCreateReq.Icon,
 		Color:        accountCreateReq.Color,
 		Currency:     accountCreateReq.Currency,
+		Balance:      accountCreateReq.Balance,
 		Comment:      accountCreateReq.Comment,
 	}
 }

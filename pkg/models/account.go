@@ -73,6 +73,7 @@ type AccountCreateRequest struct {
 	Icon        int64                   `json:"icon,string" binding:"required,min=1"`
 	Color       string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency    string                  `json:"currency" binding:"required,len=3,validCurrency"`
+	Balance     int64                   `json:"balance"`
 	Comment     string                  `json:"comment" binding:"max=255"`
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 }

@@ -11,3 +11,7 @@ func FormatToLongDateTime(t time.Time) string {
 func ParseFromLongDateTime(t string) (time.Time, error) {
 	return time.Parse(LongDateTimeFormat, t)
 }
+
+func GetTransactionTimeFromUnixTime(unixTime int64) int64 {
+	return unixTime * 1000
+}

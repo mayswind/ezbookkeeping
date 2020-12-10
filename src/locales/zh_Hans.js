@@ -300,6 +300,7 @@ export default {
         'account must have at least one sub account': '账户必须包含至少一个子账户',
         'account cannot have sub accounts': '账户不能包含子账户',
         'parent account cannot set currency': '父账户不能设置货币',
+        'parent account cannot set balance': '父账户不能设置余额',
         'sub account category not equals to parent': '子账户类别与父账户不同',
         'sub account type invalid': '子账户类型无效',
         'cannot add or delete sub accounts when modify account': '您不能在修改账户时添加或删除子账户',

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/mayswind/lab/pkg/utils"
 	"time"
 
 	"xorm.io/xorm"
@@ -100,7 +101,10 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		return errs.ErrUserIdInvalid
 	}
 
+	now := time.Now().Unix()
+
 	allAccounts := make([]*models.Account, len(childrenAccounts)+1)
+	var allInitTransactions []*models.Transaction
 
 	mainAccount.AccountId = s.GenerateUuid(uuid.UUID_TYPE_ACCOUNT)
 	allAccounts[0] = mainAccount
@@ -117,16 +121,46 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		}
 	}
 
+	transactionTime := utils.GetTransactionTimeFromUnixTime(now)
+
 	for i := 0; i < len(allAccounts); i++ {
 		allAccounts[i].Deleted = false
-		allAccounts[i].CreatedUnixTime = time.Now().Unix()
-		allAccounts[i].UpdatedUnixTime = time.Now().Unix()
+		allAccounts[i].CreatedUnixTime = now
+		allAccounts[i].UpdatedUnixTime = now
+
+		if allAccounts[i].Balance != 0 {
+			newTransaction := &models.Transaction{
+				TransactionId:        s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION),
+				Uid:                  allAccounts[i].Uid,
+				Deleted:              false,
+				Type:                 models.TRANSACTION_TYPE_MODIFY_BALANCE,
+				TransactionTime:      transactionTime,
+				SourceAccountId:      allAccounts[i].AccountId,
+				DestinationAccountId: allAccounts[i].AccountId,
+				SourceAmount:         allAccounts[i].Balance,
+				DestinationAmount:    allAccounts[i].Balance,
+				CreatedUnixTime:      now,
+				UpdatedUnixTime:      now,
+			}
+
+			transactionTime++
+			allInitTransactions = append(allInitTransactions, newTransaction)
+		}
 	}
 
 	return s.UserDataDB(mainAccount.Uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(allAccounts); i++ {
 			account := allAccounts[i]
 			_, err := sess.Insert(account)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		for i := 0; i < len(allInitTransactions); i++ {
+			transaction := allInitTransactions[i]
+			_, err := sess.Insert(transaction)
 
 			if err != nil {
 				return err
@@ -172,7 +206,7 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 	now := time.Now().Unix()
 
 	updateModel := &models.Account{
-		Hidden: hidden,
+		Hidden:          hidden,
 		UpdatedUnixTime: now,
 	}
 
@@ -222,7 +256,7 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 	now := time.Now().Unix()
 
 	updateModel := &models.Account{
-		Deleted: true,
+		Deleted:         true,
 		DeletedUnixTime: now,
 	}
 

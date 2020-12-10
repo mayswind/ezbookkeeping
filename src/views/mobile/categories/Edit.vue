@@ -298,11 +298,3 @@ export default {
     }
 }
 </script>
-
-<style>
-@media (min-height: 630px) {
-    .category-icon-sheet {
-        height: 400px;
-    }
-}
-</style>

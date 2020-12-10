@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet :opened="show" @sheet:closed="onSheetClosed">
+    <f7-sheet :class="{ 'icon-selection-huge-sheet': hugeIconRows }" :opened="show" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="left"></div>
             <div class="right">
@@ -58,6 +58,9 @@ export default {
             }
 
             return ret;
+        },
+        hugeIconRows() {
+            return this.allIconRows.length > 10;
         }
     },
     methods: {
@@ -70,3 +73,11 @@ export default {
     }
 }
 </script>
+
+<style>
+@media (min-height: 630px) {
+    .icon-selection-huge-sheet {
+        height: 400px;
+    }
+}
+</style>

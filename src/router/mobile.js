@@ -105,22 +105,34 @@ const routes = [
     {
         path: '/',
         component: HomePage,
-        beforeEnter: checkLogin
+        beforeEnter: checkLogin,
+        options: {
+            animate: false,
+        }
     },
     {
         path: '/login',
         component: LoginPage,
-        beforeEnter: checkNotLogin
+        beforeEnter: checkNotLogin,
+        options: {
+            animate: false,
+        }
     },
     {
         path: '/signup',
         component: SignUpPage,
-        beforeEnter: checkNotLogin
+        beforeEnter: checkNotLogin,
+        options: {
+            animate: false,
+        }
     },
     {
         path: '/unlock',
         component: UnlockPage,
-        beforeEnter: checkLocked
+        beforeEnter: checkLocked,
+        options: {
+            animate: false,
+        }
     },
     {
         path: '/transaction/details',

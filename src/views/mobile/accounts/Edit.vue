@@ -497,7 +497,7 @@ export default {
                 icon: self.account.icon,
                 color: self.account.color,
                 currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
-                balance: self.account.balance,
+                balance: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.balance : 0,
                 comment: self.account.comment,
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,
             };

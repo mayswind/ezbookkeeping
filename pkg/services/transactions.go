@@ -144,7 +144,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 	}
 
 	transaction.TransactionId = s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION)
-	transaction.TransactionTime = (transaction.TransactionTime / 1000) * 1000
+	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
 	transaction.CreatedUnixTime = time.Now().Unix()
 	transaction.UpdatedUnixTime = time.Now().Unix()
@@ -222,16 +222,16 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 
 		if err != nil || createdRows < 1 { // maybe another transaction has same time
 			sameSecondLatestTransaction := &models.Transaction{}
-			currentSecondUnixtime := (transaction.TransactionTime / 1000) * 1000
-			nextSecondUnixtime := currentSecondUnixtime + 1000
+			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+			maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
-			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", transaction.Uid, false, currentSecondUnixtime, nextSecondUnixtime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
 			if err != nil {
 				return err
 			} else if !has {
 				return errs.ErrDatabaseOperationFailed
-			} else if sameSecondLatestTransaction.TransactionTime == nextSecondUnixtime - 1 {
+			} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime - 1 {
 				return errs.ErrTooMuchTransactionInOneSecond
 			}
 
@@ -306,7 +306,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 
 	now := time.Now().Unix()
 
-	transaction.TransactionTime = (transaction.TransactionTime / 1000) * 1000
+	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 	transaction.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 
@@ -394,16 +394,16 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			updateCols = append(updateCols, "category_id")
 		}
 
-		if transaction.TransactionTime / 1000 != oldTransaction.TransactionTime / 1000 {
+		if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(oldTransaction.TransactionTime) {
 			sameSecondLatestTransaction := &models.Transaction{}
-			currentSecondUnixtime := (transaction.TransactionTime / 1000) * 1000
-			nextSecondUnixtime := currentSecondUnixtime + 1000
+			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+			maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
-			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", transaction.Uid, false, currentSecondUnixtime, nextSecondUnixtime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
-			if has && sameSecondLatestTransaction.TransactionTime < nextSecondUnixtime - 1 {
+			if has && sameSecondLatestTransaction.TransactionTime < maxTransactionTime - 1 {
 				transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
-			} else if has && sameSecondLatestTransaction.TransactionTime == nextSecondUnixtime - 1 {
+			} else if has && sameSecondLatestTransaction.TransactionTime == maxTransactionTime - 1 {
 				return errs.ErrTooMuchTransactionInOneSecond
 			}
 

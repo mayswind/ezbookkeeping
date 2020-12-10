@@ -12,6 +12,14 @@ func ParseFromLongDateTime(t string) (time.Time, error) {
 	return time.Parse(LongDateTimeFormat, t)
 }
 
-func GetTransactionTimeFromUnixTime(unixTime int64) int64 {
+func GetMinTransactionTimeFromUnixTime(unixTime int64) int64 {
 	return unixTime * 1000
+}
+
+func GetMaxTransactionTimeFromUnixTime(unixTime int64) int64 {
+	return unixTime * 1000 + 999
+}
+
+func GetUnixTimeFromTransactionTime(transactionTime int64) int64 {
+	return transactionTime / 1000
 }

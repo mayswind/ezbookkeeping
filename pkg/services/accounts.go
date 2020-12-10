@@ -121,7 +121,7 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		}
 	}
 
-	transactionTime := utils.GetTransactionTimeFromUnixTime(now)
+	transactionTime := utils.GetMinTransactionTimeFromUnixTime(now)
 
 	for i := 0; i < len(allAccounts); i++ {
 		allAccounts[i].Deleted = false

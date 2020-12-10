@@ -1,6 +1,6 @@
 <template>
     <f7-sheet class="numpad-sheet" :opened="show" @sheet:closed="onSheetClosed">
-        <f7-page-content class="no-margin no-padding">
+        <f7-page-content class="no-margin no-padding-top">
             <f7-row class="numpad-values">
                 <span class="numpad-value">{{ currentDisplay }}</span>
             </f7-row>
@@ -41,13 +41,13 @@
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
                     <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="inputDot()">
+                <f7-button class="numpad-button numpad-button-num" @click="inputDot()">
                     <span class="numpad-button-text numpad-button-text-normal">.</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="inputNum(0)">
+                <f7-button class="numpad-button numpad-button-num" @click="inputNum(0)">
                     <span class="numpad-button-text numpad-button-text-normal">0</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num no-bottom-border" @click="backspace" @taphold.native="clear()">
+                <f7-button class="numpad-button numpad-button-num" @click="backspace" @taphold.native="clear()">
                     <span class="numpad-button-text numpad-button-text-normal">
                         <f7-icon f7="delete_left"></f7-icon>
                     </span>

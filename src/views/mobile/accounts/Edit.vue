@@ -379,7 +379,8 @@ export default {
                 color: this.account.color,
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
                 balance: 0,
-                comment: ''
+                comment: '',
+                visible: true
             });
         },
         removeSubAccount(subAccount) {

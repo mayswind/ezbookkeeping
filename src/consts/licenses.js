@@ -182,6 +182,11 @@ const licenses = [
         copyright: 'Copyright (c) 2012-2019 Faisal Salman <f@faisalman.com>',
         url: 'https://github.com/faisalman/ua-parser-js',
         licenseUrl: 'https://github.com/faisalman/ua-parser-js/blob/master/license.md'
+    },
+    {
+        name: 'Icons8 Line Awesome',
+        url: 'https://icons8.com/line-awesome',
+        licenseUrl: 'https://github.com/icons8/line-awesome/blob/master/LICENSE.md'
     }
 ];
 

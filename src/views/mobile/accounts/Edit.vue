@@ -70,14 +70,23 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" key="singleTypeAccountIconSelection" link="#"
-                                  @click="showIconSelectionSheet(account)">
+                    <f7-list-item :header="$t('Account Icon')" link="#"
+                                  @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                        <IconSelectionSheet :all-icon-infos="allAccountIcons"
+                                            :show.sync="account.showIconSelectionSheet"
+                                            :color="account.color"
+                                            v-model="account.icon"
+                        ></IconSelectionSheet>
                     </f7-list-item>
 
-                    <f7-list-item :header="$t('Account Color')" key="singleTypeAccountColorSelection" link="#"
-                                  @click="showColorSelectionSheet(account)">
+                    <f7-list-item :header="$t('Account Color')" link="#"
+                                  @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
+                        <ColorSelectionSheet :all-color-infos="allAccountColors"
+                                             :show.sync="account.showColorSelectionSheet"
+                                             v-model="account.color"
+                        ></ColorSelectionSheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -97,8 +106,12 @@
                         :class="{ 'disabled': editAccountId }"
                         :header="$t('Account Balance')"
                         :after="account.balance | currency(account.currency)"
-                        @click="showBalanceInputSheet(account)"
-                    ></f7-list-item>
+                        @click="account.showBalanceSheet = true"
+                    >
+                        <NumberPadSheet :show.sync="account.showBalanceSheet"
+                                        v-model="account.balance"
+                        ></NumberPadSheet>
+                    </f7-list-item>
 
                     <f7-list-input
                         type="textarea"
@@ -127,14 +140,23 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" key="multiTypeAccountIconSelection" link="#"
-                                  @click="showIconSelectionSheet(account)">
+                    <f7-list-item :header="$t('Account Icon')" link="#"
+                                  @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
+                        <IconSelectionSheet :all-icon-infos="allAccountIcons"
+                                            :show.sync="account.showIconSelectionSheet"
+                                            :color="account.color"
+                                            v-model="account.icon"
+                        ></IconSelectionSheet>
                     </f7-list-item>
 
-                    <f7-list-item :header="$t('Account Color')" key="multiTypeAccountColorSelection" link="#"
-                                  @click="showColorSelectionSheet(account)">
+                    <f7-list-item :header="$t('Account Color')" link="#"
+                                  @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
+                        <ColorSelectionSheet :all-color-infos="allAccountColors"
+                                             :show.sync="account.showColorSelectionSheet"
+                                             v-model="account.color"
+                        ></ColorSelectionSheet>
                     </f7-list-item>
 
                     <f7-list-input
@@ -169,14 +191,23 @@
                             @input="subAccount.name = $event.target.value"
                         ></f7-list-input>
 
-                        <f7-list-item :header="$t('Sub Account Icon')" key="subAccountIconSelection" link="#"
-                                      @click="showIconSelectionSheet(subAccount)">
+                        <f7-list-item :header="$t('Sub Account Icon')" link="#"
+                                      @click="subAccount.showIconSelectionSheet = true">
                             <f7-icon slot="after" :icon="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
+                            <IconSelectionSheet :all-icon-infos="allAccountIcons"
+                                                :show.sync="subAccount.showIconSelectionSheet"
+                                                :color="subAccount.color"
+                                                v-model="subAccount.icon"
+                            ></IconSelectionSheet>
                         </f7-list-item>
 
-                        <f7-list-item :header="$t('Sub Account Color')" key="subAccountColorSelection" link="#"
-                                      @click="showColorSelectionSheet(subAccount)">
+                        <f7-list-item :header="$t('Sub Account Color')" link="#"
+                                      @click="subAccount.showColorSelectionSheet = true">
                             <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + subAccount.color }"></f7-icon>
+                            <ColorSelectionSheet :all-color-infos="allAccountColors"
+                                                 :show.sync="subAccount.showColorSelectionSheet"
+                                                 v-model="subAccount.color"
+                            ></ColorSelectionSheet>
                         </f7-list-item>
 
                         <f7-list-item
@@ -196,8 +227,12 @@
                             :class="{ 'disabled': editAccountId }"
                             :header="$t('Sub Account Balance')"
                             :after="subAccount.balance | currency(subAccount.currency)"
-                            @click="showBalanceInputSheet(subAccount)"
-                        ></f7-list-item>
+                            @click="subAccount.showBalanceSheet = true"
+                        >
+                            <NumberPadSheet :show.sync="subAccount.showBalanceSheet"
+                                            v-model="subAccount.balance"
+                            ></NumberPadSheet>
+                        </f7-list-item>
 
                         <f7-list-input
                             type="textarea"
@@ -218,29 +253,6 @@
                 </f7-card-footer>
             </f7-card>
         </f7-block>
-
-        <IconSelectionSheet :icon="accountChoosingIcon ? accountChoosingIcon.icon : null"
-                            :color="accountChoosingIcon ? accountChoosingIcon.color : null"
-                            :column-count="iconCountPerRow"
-                            :show="showIconSelection"
-                            :all-icon-infos="this.$constants.icons.allAccountIcons"
-                            @icon:change="onIconChanged"
-                            @icon:closed="onIconSelectionSheetClosed"
-        ></IconSelectionSheet>
-
-        <ColorSelectionSheet :color="accountChoosingColor ? accountChoosingColor.color : null"
-                             :column-count="iconCountPerRow"
-                             :show="showColorSelection"
-                             :all-color-infos="this.$constants.colors.allAccountColors"
-                             @color:change="onColorChanged"
-                             @color:closed="onColorSelectionSheetClosed"
-        ></ColorSelectionSheet>
-
-        <NumberPadSheet :amount="accountInputingBalance ? accountInputingBalance.balance : 0"
-                        :show="showBalanceInput"
-                        @numpad:change="onBalanceChanged"
-                        @numpad:closed="onBalanceInputSheetClosed"
-        ></NumberPadSheet>
     </f7-page>
 </template>
 
@@ -261,17 +273,13 @@ export default {
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
                 balance: 0,
                 comment: '',
-                visible: true
+                visible: true,
+                showIconSelectionSheet: false,
+                showColorSelectionSheet: false,
+                showBalanceSheet: false
             },
             subAccounts: [],
-            iconCountPerRow: 7,
-            accountChoosingIcon: null,
-            accountChoosingColor: null,
-            accountInputingBalance: null,
-            submitting: false,
-            showIconSelection: false,
-            showColorSelection: false,
-            showBalanceInput: false
+            submitting: false
         };
     },
     computed: {
@@ -291,6 +299,12 @@ export default {
         },
         allAccountCategories() {
             return this.$constants.account.allCategories;
+        },
+        allAccountIcons() {
+            return this.$constants.icons.allAccountIcons;
+        },
+        allAccountColors() {
+            return this.$constants.colors.allAccountColors;
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
@@ -342,7 +356,10 @@ export default {
                             currency: subAccount.currency,
                             balance: subAccount.balance,
                             comment: subAccount.comment,
-                            visible: !subAccount.hidden
+                            visible: !subAccount.hidden,
+                            showIconSelectionSheet: false,
+                            showColorSelectionSheet: false,
+                            showBalanceSheet: false
                         });
                     }
                 }
@@ -380,7 +397,10 @@ export default {
                 currency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
                 balance: 0,
                 comment: '',
-                visible: true
+                visible: true,
+                showIconSelectionSheet: false,
+                showColorSelectionSheet: false,
+                showBalanceSheet: false
             });
         },
         removeSubAccount(subAccount) {
@@ -389,57 +409,6 @@ export default {
                     this.subAccounts.splice(i, 1);
                 }
             }
-        },
-        showIconSelectionSheet(account) {
-            this.accountChoosingIcon = account;
-            this.showIconSelection = true;
-        },
-        onIconChanged(icon) {
-            if (!this.accountChoosingIcon) {
-                return;
-            }
-
-            this.accountChoosingIcon.icon = icon;
-            this.accountChoosingIcon = null;
-            this.showIconSelection = false;
-        },
-        onIconSelectionSheetClosed() {
-            this.accountChoosingIcon = null;
-            this.showIconSelection = false;
-        },
-        showColorSelectionSheet(account) {
-            this.accountChoosingColor = account;
-            this.showColorSelection = true;
-        },
-        onColorChanged(color) {
-            if (!this.accountChoosingColor) {
-                return;
-            }
-
-            this.accountChoosingColor.color = color;
-            this.accountChoosingColor = null;
-            this.showColorSelection = false;
-        },
-        onColorSelectionSheetClosed() {
-            this.accountChoosingColor = null;
-            this.showColorSelection = false;
-        },
-        showBalanceInputSheet(account) {
-            this.accountInputingBalance = account;
-            this.showBalanceInput = true;
-        },
-        onBalanceChanged(amount) {
-            if (!this.accountInputingBalance) {
-                return;
-            }
-
-            this.accountInputingBalance.balance = amount;
-            this.accountInputingBalance = null;
-            this.showBalanceInput = false;
-        },
-        onBalanceInputSheetClosed() {
-            this.accountInputingBalance = null;
-            this.showBalanceInput = false;
         },
         save() {
             const self = this;

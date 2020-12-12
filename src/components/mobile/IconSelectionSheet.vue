@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet :class="{ 'icon-selection-huge-sheet': hugeIconRows }" :opened="show" @sheet:closed="onSheetClosed">
+    <f7-sheet :class="{ 'icon-selection-huge-sheet': hugeIconRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="left"></div>
             <div class="right">
@@ -11,12 +11,12 @@
                 <f7-row class="padding-vertical-half padding-horizontal-half" v-for="(row, idx) in allIconRows" :key="idx">
                     <f7-col class="text-align-center" v-for="iconInfo in row" :key="iconInfo.id">
                         <f7-icon :icon="iconInfo.icon" :style="{ color: '#' + (color || '000000') }" @click.native="onIconClicked(iconInfo)">
-                            <f7-badge color="default" class="right-bottom-icon" v-if="icon && icon === iconInfo.id">
+                            <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === iconInfo.id">
                                 <f7-icon f7="checkmark_alt"></f7-icon>
                             </f7-badge>
                         </f7-icon>
                     </f7-col>
-                    <f7-col v-for="idx in (columnCount - row.length)" :key="idx"></f7-col>
+                    <f7-col v-for="idx in (itemPerRow - row.length)" :key="idx"></f7-col>
                 </f7-row>
             </f7-block>
         </f7-page-content>
@@ -26,12 +26,20 @@
 <script>
 export default {
     props: [
-        'icon',
+        'value',
         'color',
         'columnCount',
         'show',
         'allIconInfos'
     ],
+    data() {
+        const self = this;
+
+        return {
+            currentValue: self.value,
+            itemPerRow: self.columnCount || 7
+        }
+    },
     computed: {
         allIconRows() {
             const ret = [];
@@ -46,7 +54,7 @@ export default {
 
                 if (!ret[rowCount]) {
                     ret[rowCount] = [];
-                } else if (ret[rowCount] && ret[rowCount].length >= this.columnCount) {
+                } else if (ret[rowCount] && ret[rowCount].length >= this.itemPerRow) {
                     rowCount++;
                     ret[rowCount] = [];
                 }
@@ -65,10 +73,14 @@ export default {
     },
     methods: {
         onIconClicked(iconInfo) {
-            this.$emit('icon:change', iconInfo.id);
+            this.currentValue = iconInfo.id;
+            this.$emit('input', this.currentValue);
+        },
+        onSheetOpen() {
+            this.currentValue = this.value;
         },
         onSheetClosed() {
-            this.$emit('icon:closed');
+            this.$emit('update:show', false);
         }
     }
 }

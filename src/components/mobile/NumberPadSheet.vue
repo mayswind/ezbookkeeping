@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet class="numpad-sheet" :opened="show" @sheet:closed="onSheetClosed">
+    <f7-sheet class="numpad-sheet" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-page-content class="no-margin no-padding-top">
             <f7-row class="numpad-values">
                 <span class="numpad-value">{{ currentDisplay }}</span>
@@ -48,9 +48,9 @@
                     <span class="numpad-button-text numpad-button-text-normal">0</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="backspace" @taphold.native="clear()">
-                    <span class="numpad-button-text numpad-button-text-normal">
-                        <f7-icon f7="delete_left"></f7-icon>
-                    </span>
+                <span class="numpad-button-text numpad-button-text-normal">
+                    <f7-icon f7="delete_left"></f7-icon>
+                </span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-confirm no-right-border no-bottom-border" fill @click="confirm()">
                     <span :class="{ 'numpad-button-text': true, 'numpad-button-text-confirm': !currentSymbol }">{{ confirmText }}</span>
@@ -63,7 +63,7 @@
 <script>
 export default {
     props: [
-        'amount',
+        'value',
         'show'
     ],
     data() {
@@ -72,7 +72,7 @@ export default {
         return {
             previousValue: '',
             currentSymbol: '',
-            currentValue: self.getStringValue(self.amount)
+            currentValue: self.getStringValue(self.value)
         }
     },
     computed: {
@@ -92,11 +92,6 @@ export default {
             } else {
                 return this.$i18n.t('OK');
             }
-        }
-    },
-    watch: {
-        amount: function(newValue){
-            this.currentValue = this.getStringValue(newValue);
         }
     },
     methods: {
@@ -225,18 +220,17 @@ export default {
                 this.previousValue = '';
                 this.currentSymbol = '';
             } else {
-                const amount = this.$utilities.stringCurrencyToNumeric(this.currentValue);
-                this.currentValue = '';
+                const value = this.$utilities.stringCurrencyToNumeric(this.currentValue);
 
-                this.$emit('numpad:change', amount);
+                this.$emit('input', value);
+                this.$emit('update:show', false);
             }
         },
+        onSheetOpen() {
+            this.currentValue = this.getStringValue(this.value);
+        },
         onSheetClosed() {
-            this.currentValue = '';
-            this.previousValue = '';
-            this.currentSymbol = '';
-
-            this.$emit('numpad:closed');
+            this.$emit('update:show', false);
         }
     }
 }

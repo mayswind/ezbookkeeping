@@ -32,13 +32,22 @@
                     ></f7-list-input>
 
                     <f7-list-item :header="$t('Category Icon')" key="singleTypeCategoryIconSelection" link="#"
-                                  @click="showIconSelectionSheet(category)">
+                                  @click="category.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="category.icon | categoryIcon" :style="{ color: '#' + category.color }"></f7-icon>
+                        <IconSelectionSheet :all-icon-infos="allCategoryIcons"
+                                            :show.sync="category.showIconSelectionSheet"
+                                            :color="category.color"
+                                            v-model="category.icon"
+                        ></IconSelectionSheet>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Category Color')" key="singleTypeCategoryColorSelection" link="#"
-                                  @click="showColorSelectionSheet(category)">
+                                  @click="category.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + category.color }"></f7-icon>
+                        <ColorSelectionSheet :all-color-infos="allCategoryColors"
+                                             :show.sync="category.showColorSelectionSheet"
+                                             v-model="category.color"
+                        ></ColorSelectionSheet>
                     </f7-list-item>
 
                     <f7-list-input
@@ -55,23 +64,6 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
-
-        <IconSelectionSheet :icon="categoryChoosingIcon ? categoryChoosingIcon.icon : null"
-                            :color="categoryChoosingIcon ? categoryChoosingIcon.color : null"
-                            :column-count="iconCountPerRow"
-                            :show="showIconSelection"
-                            :all-icon-infos="this.$constants.icons.allCategoryIcons"
-                            @icon:change="onIconChanged"
-                            @icon:closed="onIconSelectionSheetClosed"
-        ></IconSelectionSheet>
-
-        <ColorSelectionSheet :color="categoryChoosingColor ? categoryChoosingColor.color : null"
-                             :column-count="iconCountPerRow"
-                             :show="showColorSelection"
-                             :all-color-infos="this.$constants.colors.allCategoryColors"
-                             @color:change="onColorChanged"
-                             @color:closed="onColorSelectionSheetClosed"
-        ></ColorSelectionSheet>
     </f7-page>
 </template>
 
@@ -91,14 +83,11 @@ export default {
                 icon: self.$constants.icons.defaultCategoryIconId,
                 color: self.$constants.colors.defaultCategoryColor,
                 comment: '',
-                visible: true
+                visible: true,
+                showIconSelectionSheet: false,
+                showColorSelectionSheet: false
             },
-            iconCountPerRow: 7,
-            categoryChoosingIcon: null,
-            categoryChoosingColor: null,
-            submitting: false,
-            showIconSelection: false,
-            showColorSelection: false
+            submitting: false
         };
     },
     computed: {
@@ -119,6 +108,12 @@ export default {
             } else {
                 return 'Save';
             }
+        },
+        allCategoryIcons() {
+            return this.$constants.icons.allCategoryIcons;
+        },
+        allCategoryColors() {
+            return this.$constants.colors.allCategoryColors;
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -190,40 +185,6 @@ export default {
         }
     },
     methods: {
-        showIconSelectionSheet(category) {
-            this.categoryChoosingIcon = category;
-            this.showIconSelection = true;
-        },
-        onIconChanged(icon) {
-            if (!this.categoryChoosingIcon) {
-                return;
-            }
-
-            this.categoryChoosingIcon.icon = icon;
-            this.categoryChoosingIcon = null;
-            this.showIconSelection = false;
-        },
-        onIconSelectionSheetClosed() {
-            this.categoryChoosingIcon = null;
-            this.showIconSelection = false;
-        },
-        showColorSelectionSheet(category) {
-            this.categoryChoosingColor = category;
-            this.showColorSelection = true;
-        },
-        onColorChanged(color) {
-            if (!this.categoryChoosingColor) {
-                return;
-            }
-
-            this.categoryChoosingColor.color = color;
-            this.categoryChoosingColor = null;
-            this.showColorSelection = false;
-        },
-        onColorSelectionSheetClosed() {
-            this.categoryChoosingColor = null;
-            this.showColorSelection = false;
-        },
         save() {
             const self = this;
             const router = self.$f7router;

@@ -23,7 +23,7 @@ var (
 
 func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	tokens, err := a.tokens.GetAllTokensByUid(uid)
+	tokens, err := a.tokens.GetAllUnexpiredMormalTokensByUid(uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[tokens.TokenListHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())

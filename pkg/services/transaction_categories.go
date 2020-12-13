@@ -74,21 +74,6 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 	return category, nil
 }
 
-func (s *TransactionCategoryService) GetCategoryAndSubCategoriesByCategoryId(uid int64, categoryId int64) ([]*models.TransactionCategory, error) {
-	if uid <= 0 {
-		return nil, errs.ErrUserIdInvalid
-	}
-
-	if categoryId <= 0 {
-		return nil, errs.ErrTransactionCategoryIdInvalid
-	}
-
-	var categories []*models.TransactionCategory
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (category_id=? OR parent_category_id=?)", uid, false, categoryId, categoryId).OrderBy("type asc, parent_category_id asc, display_order asc").Find(&categories)
-
-	return categories, err
-}
-
 func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid

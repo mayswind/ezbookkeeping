@@ -8,15 +8,18 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
+	"github.com/mayswind/lab/pkg/utils"
 )
 
 type TransactionsApi struct {
-	transactions *services.TransactionService
+	transactions    *services.TransactionService
+	transactionTags *services.TransactionTagService
 }
 
 var (
 	Transactions = &TransactionsApi{
-		transactions: services.Transactions,
+		transactions:    services.Transactions,
+		transactionTags: services.TransactionTags,
 	}
 )
 
@@ -43,11 +46,25 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		finalCount = len(transactions)
 	}
 
+	transactionIds := make([]int64, finalCount)
+
+	for i := 0; i < finalCount; i++ {
+		transactionIds[i] = transactions[i].TransactionId
+	}
+
+	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	transactionResps := &models.TransactionInfoPageWrapperResponse{}
 	transactionResps.Items = make(models.TransactionInfoResponseSlice, finalCount)
 
 	for i := 0; i < finalCount; i++ {
-		transactionResps.Items[i] = transactions[i].ToTransactionInfoResponse(nil)
+		transactionTagIds := allTransactionTagIds[transactions[i].TransactionId]
+		transactionResps.Items[i] = transactions[i].ToTransactionInfoResponse(transactionTagIds)
 	}
 
 	sort.Sort(transactionResps.Items)
@@ -76,10 +93,24 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		return nil, errs.ErrOperationFailed
 	}
 
+	transactionIds := make([]int64, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transactionIds[i] = transactions[i].TransactionId
+	}
+
+	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	transactionResps := make([]*models.TransactionInfoResponse, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
-		transactionResps[i] = transactions[i].ToTransactionInfoResponse(nil)
+		transactionTagIds := allTransactionTagIds[transactions[i].TransactionId]
+		transactionResps[i] = transactions[i].ToTransactionInfoResponse(transactionTagIds)
 	}
 
 	return transactionResps, nil
@@ -102,7 +133,15 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
-	transactionResp := transaction.ToTransactionInfoResponse(nil)
+	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, []int64{transaction.TransactionId})
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds)
 
 	return transactionResp, nil
 }
@@ -142,7 +181,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 	uid := c.GetCurrentUid()
 	transaction := a.createNewTransactionModel(uid, &transactionCreateReq)
 
-	err = a.transactions.CreateTransaction(transaction)
+	err = a.transactions.CreateTransaction(transaction, transactionCreateReq.TagIds)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
@@ -173,6 +212,17 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, []int64{transaction.TransactionId})
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+	addTransactionTagIds := utils.Int64SliceMinus(transactionModifyReq.TagIds, transactionTagIds)
+	removeTransactionTagIds := utils.Int64SliceMinus(transactionTagIds, transactionModifyReq.TagIds)
+
 	newTransaction := &models.Transaction{
 		TransactionId:        transaction.TransactionId,
 		Uid:                  uid,
@@ -191,11 +241,13 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		newTransaction.DestinationAccountId == transaction.DestinationAccountId &&
 		newTransaction.SourceAmount == transaction.SourceAmount &&
 		newTransaction.DestinationAmount == transaction.DestinationAmount &&
-		newTransaction.Comment == transaction.Comment {
+		newTransaction.Comment == transaction.Comment &&
+		len(addTransactionTagIds) < 1 &&
+		len(removeTransactionTagIds) < 1 {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.transactions.ModifyTransaction(newTransaction)
+	err = a.transactions.ModifyTransaction(newTransaction, addTransactionTagIds, removeTransactionTagIds)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())

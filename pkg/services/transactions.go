@@ -122,7 +122,7 @@ func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, mon
 	return s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startUnixTime, endUnixTime).Count(&models.Transaction{})
 }
 
-func (s *TransactionService) CreateTransaction(transaction *models.Transaction) error {
+func (s *TransactionService) CreateTransaction(transaction *models.Transaction, tagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -143,11 +143,26 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 		return errs.ErrTransactionTypeInvalid
 	}
 
+	now := time.Now().Unix()
+
 	transaction.TransactionId = s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION)
 	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
-	transaction.CreatedUnixTime = time.Now().Unix()
-	transaction.UpdatedUnixTime = time.Now().Unix()
+	transaction.CreatedUnixTime = now
+	transaction.UpdatedUnixTime = now
+
+	tagIds = utils.ToUniqueInt64Slice(tagIds)
+	transactionTagIndexs := make([]*models.TransactionTagIndex, len(tagIds))
+
+	for i := 0; i < len(tagIds); i++ {
+		transactionTagIndexs[i] = &models.TransactionTagIndex{
+			Uid:             transaction.Uid,
+			TagId:           tagIds[i],
+			TransactionId:   transaction.TransactionId,
+			CreatedUnixTime: now,
+			UpdatedUnixTime: now,
+		}
+	}
 
 	return s.UserDataDB(transaction.Uid).DoTransaction(func(sess *xorm.Session) error {
 		// Get and verify source and destination account
@@ -204,6 +219,28 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 			return errs.ErrTransactionCategoryTypeInvalid
 		}
 
+		// Get and verify tags
+		if len(transactionTagIndexs) > 0 {
+			var tags []*models.TransactionTag
+			err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_ids", tagIds).Find(&tags)
+
+			if err != nil {
+				return err
+			}
+
+			tagMap := make(map[int64]*models.TransactionTag)
+
+			for i := 0; i < len(tags); i++ {
+				tagMap[tags[i].TagId] = tags[i]
+			}
+
+			for i := 0; i < len(transactionTagIndexs); i++ {
+				if _, exists := tagMap[transactionTagIndexs[i].TagId]; !exists {
+					return errs.ErrTransactionTagNotFound
+				}
+			}
+		}
+
 		// Verify balance modification transaction and calculate real amount
 		if transaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
 			otherTransactionExists, err := sess.Where("uid=? AND deleted=? AND destination_account_id=?", transaction.Uid, false, destinationAccount.AccountId).Limit(1).Exist(&models.Transaction{})
@@ -242,6 +279,18 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 				return err
 			} else if createdRows < 1 {
 				return errs.ErrDatabaseOperationFailed
+			}
+		}
+
+		// Insert transaction tag index
+		if len(transactionTagIndexs) > 0 {
+			for i := 0; i < len(transactionTagIndexs); i++ {
+				transactionTagIndex := transactionTagIndexs[i]
+				_, err := sess.Insert(transactionTagIndex)
+
+				if err != nil {
+					return err
+				}
 			}
 		}
 
@@ -297,7 +346,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction) 
 	})
 }
 
-func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) error {
+func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, addTagIds []int64, removeTagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -309,6 +358,21 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 	transaction.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
+
+	addTagIds = utils.ToUniqueInt64Slice(addTagIds)
+	removeTagIds = utils.ToUniqueInt64Slice(removeTagIds)
+
+	transactionTagIndexs := make([]*models.TransactionTagIndex, len(addTagIds))
+
+	for i := 0; i < len(addTagIds); i++ {
+		transactionTagIndexs[i] = &models.TransactionTagIndex{
+			Uid:             transaction.Uid,
+			TagId:           addTagIds[i],
+			TransactionId:   transaction.TransactionId,
+			CreatedUnixTime: now,
+			UpdatedUnixTime: now,
+		}
+	}
 
 	err := s.UserDB().DoTransaction(func(sess *xorm.Session) error {
 		// Get and verify current transaction
@@ -435,6 +499,28 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			updateCols = append(updateCols, "comment")
 		}
 
+		// Get and verify tags
+		if len(transactionTagIndexs) > 0 {
+			var tags []*models.TransactionTag
+			err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_ids", addTagIds).Find(&tags)
+
+			if err != nil {
+				return err
+			}
+
+			tagMap := make(map[int64]*models.TransactionTag)
+
+			for i := 0; i < len(tags); i++ {
+				tagMap[tags[i].TagId] = tags[i]
+			}
+
+			for i := 0; i < len(transactionTagIndexs); i++ {
+				if _, exists := tagMap[transactionTagIndexs[i].TagId]; !exists {
+					return errs.ErrTransactionTagNotFound
+				}
+			}
+		}
+
 		// Update transaction row
 		updatedRows, err := sess.ID(transaction.TransactionId).Cols(updateCols...).Where("uid=? AND deleted=?", transaction.Uid, false).Update(transaction)
 
@@ -442,6 +528,30 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction) 
 			return err
 		} else if updatedRows < 1 {
 			return errs.ErrTransactionNotFound
+		}
+
+		// Update transaction tag index
+		if len(removeTagIds) > 0 {
+			deletedRows, err := sess.Where("uid=?", transaction.Uid).In("tag_id", removeTagIds).Delete(&models.TransactionTagIndex{})
+
+			if err != nil {
+				return err
+			} else if deletedRows < 1 {
+				return errs.ErrTransactionTagNotFound
+			}
+
+			return err
+		}
+
+		if len(transactionTagIndexs) > 0 {
+			for i := 0; i < len(transactionTagIndexs); i++ {
+				transactionTagIndex := transactionTagIndexs[i]
+				_, err := sess.Insert(transactionTagIndex)
+
+				if err != nil {
+					return err
+				}
+			}
 		}
 
 		// Update account table

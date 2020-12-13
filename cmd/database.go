@@ -107,5 +107,13 @@ func updateAllDatabaseTablesStructure() error {
 		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
 	}
 
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTagIndex))
+
+	if err != nil {
+		return err
+	} else {
+		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag index table maintained successfully")
+	}
+
 	return nil
 }

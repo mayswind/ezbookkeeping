@@ -203,7 +203,7 @@ func (a *TransactionTagsApi) TagDeleteHandler(c *core.Context) (interface{}, *er
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.tags.DeleteTags(uid, []int64{tagDeleteReq.Id})
+	err = a.tags.DeleteTag(uid, tagDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagDeleteHandler] failed to delete tag \"id:%d\" for user \"uid:%d\", because %s", tagDeleteReq.Id, uid, err.Error())

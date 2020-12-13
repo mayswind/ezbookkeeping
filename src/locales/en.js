@@ -329,6 +329,7 @@ export default {
         'transaction tag not found': 'Transaction tag is not found',
         'transaction tag name is empty': 'Transaction tag title is empty',
         'transaction tag name already exists': 'Transaction tag title already exists',
+        'transaction tag is in use and cannot be deleted': 'Transaction tag is in use and it cannot be deleted',
     },
     'parameter': {
         'id': 'ID',

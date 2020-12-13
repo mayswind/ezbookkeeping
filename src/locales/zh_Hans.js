@@ -329,6 +329,7 @@ export default {
         'transaction tag not found': '交易标签不存在',
         'transaction tag name is empty': '交易标签标题不能为空',
         'transaction tag name already exists': '交易标签标题已经存在',
+        'transaction tag is in use and cannot be deleted': '交易标签正在被使用，无法删除',
     },
     'parameter': {
         'id': 'ID',

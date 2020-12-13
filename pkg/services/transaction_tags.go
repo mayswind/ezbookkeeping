@@ -78,6 +78,32 @@ func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int, error) {
 	}
 }
 
+func (s *TransactionTagService) GetAllTagIdsOfTransactions(uid int64, transactionIds []int64) (map[int64][]int64, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	var tagIndexs []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).Where("uid=?", uid).In("transaction_id", transactionIds).Find(&tagIndexs)
+
+	allTransactionTagIds := make(map[int64][]int64)
+
+	for i := 0; i < len(tagIndexs); i++ {
+		tagIndex := tagIndexs[i]
+
+		var transactionTagIds []int64
+
+		if _, exists := allTransactionTagIds[tagIndex.TransactionId]; exists {
+			transactionTagIds = allTransactionTagIds[tagIndex.TransactionId]
+		}
+
+		transactionTagIds = append(transactionTagIds, tagIndex.TagId)
+		allTransactionTagIds[tagIndex.TransactionId] = transactionTagIds
+	}
+
+	return allTransactionTagIds, err
+}
+
 func (s *TransactionTagService) CreateTag(tag *models.TransactionTag) error {
 	if tag.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -180,13 +206,19 @@ func (s *TransactionTagService) ModifyTagDisplayOrders(uid int64, tags []*models
 	})
 }
 
-func (s *TransactionTagService) DeleteTags(uid int64, ids []int64) error {
+func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.In("tag_id", ids).Where("uid=?", uid).Delete(&models.TransactionTag{})
+		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND tag_id=?", uid, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
+
+		if exists {
+			return errs.ErrTransactionTagInUseCannotBeDeleted
+		}
+
+		deletedRows, err := sess.ID(tagId).Where("uid=?", uid).Delete(&models.TransactionTag{})
 
 		if err != nil {
 			return err

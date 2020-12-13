@@ -33,7 +33,7 @@ func (s *TransactionTagService) GetAllTagsByUid(uid int64) ([]*models.Transactio
 	}
 
 	var tags []*models.TransactionTag
-	err := s.UserDataDB(uid).Where("uid=?", uid).OrderBy("display_order asc").Find(&tags)
+	err := s.UserDataDB(uid).Where("uid=?", uid).Find(&tags)
 
 	return tags, err
 }

@@ -11,11 +11,11 @@ const (
 
 type Transaction struct {
 	TransactionId        int64           `xorm:"PK"`
-	Uid                  int64           `xorm:"UNIQUE(IDX_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
+	Uid                  int64           `xorm:"UNIQUE(UQE_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
 	Deleted              bool            `xorm:"INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
 	Type                 TransactionType `xorm:"INDEX(IDX_transaction_uid_deleted_type_time) NOT NULL"`
 	CategoryId           int64           `xorm:"INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
-	TransactionTime      int64           `xorm:"UNIQUE(IDX_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
+	TransactionTime      int64           `xorm:"UNIQUE(UQE_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
 	SourceAccountId      int64           `xorm:"NOT NULL"`
 	DestinationAccountId int64           `xorm:"NOT NULL"`
 	SourceAmount         int64           `xorm:"NOT NULL"`

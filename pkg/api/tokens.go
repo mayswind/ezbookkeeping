@@ -1,6 +1,8 @@
 package api
 
 import (
+	"sort"
+
 	"github.com/mayswind/lab/pkg/core"
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/log"
@@ -30,7 +32,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 		return nil, errs.ErrOperationFailed
 	}
 
-	tokenResps := make([]*models.TokenInfoResponse, len(tokens))
+	tokenResps := make(models.TokenInfoResponseSlice, len(tokens))
 	claims := c.GetTokenClaims()
 
 	for i := 0; i < len(tokens); i++ {
@@ -49,6 +51,8 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 
 		tokenResps[i] = tokenResp
 	}
+
+	sort.Sort(tokenResps)
 
 	return tokenResps, nil
 }

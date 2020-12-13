@@ -1,6 +1,8 @@
 package api
 
 import (
+	"sort"
+
 	"github.com/mayswind/lab/pkg/core"
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/log"
@@ -27,11 +29,13 @@ func (a *TransactionTagsApi) TagListHandler(c *core.Context) (interface{}, *errs
 		return nil, errs.ErrOperationFailed
 	}
 
-	tagResps := make([]*models.TransactionTagInfoResponse, len(tags))
+	tagResps := make(models.TransactionTagInfoResponseSlice, len(tags))
 
 	for i := 0; i < len(tags); i++ {
 		tagResps[i] = tags[i].ToTransactionTagInfoResponse()
 	}
+
+	sort.Sort(tagResps)
 
 	return tagResps, nil
 }

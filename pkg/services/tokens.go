@@ -41,7 +41,7 @@ func (s *TokenService) GetAllTokensByUid(uid int64) ([]*models.TokenRecord, erro
 	}
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=?", uid).OrderBy("created_unix_time desc").Find(&tokenRecords)
+	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=?", uid).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
@@ -54,7 +54,7 @@ func (s *TokenService) GetAllUnexpiredMormalTokensByUid(uid int64) ([]*models.To
 	now := time.Now().Unix()
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).OrderBy("created_unix_time desc").Find(&tokenRecords)
+	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
 
 	return tokenRecords, err
 }

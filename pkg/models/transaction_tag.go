@@ -2,8 +2,8 @@ package models
 
 type TransactionTag struct {
 	TagId           int64  `xorm:"PK"`
-	Uid             int64  `xorm:"UNIQUE(IDX_tag_uid_name) NOT NULL"`
-	Name            string `xorm:"UNIQUE(IDX_tag_uid_name) VARCHAR(32) NOT NULL"`
+	Uid             int64  `xorm:"UNIQUE(UQE_tag_uid_name) NOT NULL"`
+	Name            string `xorm:"UNIQUE(UQE_tag_uid_name) VARCHAR(32) NOT NULL"`
 	DisplayOrder    int    `xorm:"NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64

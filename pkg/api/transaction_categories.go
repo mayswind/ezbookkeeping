@@ -299,7 +299,7 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (inter
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.categories.DeleteCategories(uid, []int64{categoryDeleteReq.Id})
+	err = a.categories.DeleteCategory(uid, categoryDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] failed to delete category \"id:%d\" for user \"uid:%d\", because %s", categoryDeleteReq.Id, uid, err.Error())

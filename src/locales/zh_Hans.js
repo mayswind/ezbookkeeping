@@ -325,6 +325,7 @@ export default {
         'parent transaction category not found': '父级交易分类不存在',
         'cannot add to secondary transaction category': '不能在二级交易分类中添加',
         'cannot use primary category for transaction category': '交易分类不能使用一级分类',
+        'transaction category is in use and cannot be deleted': '交易分类正在被使用，无法删除',
         'transaction tag id is invalid': '交易标签ID无效',
         'transaction tag not found': '交易标签不存在',
         'transaction tag name is empty': '交易标签标题不能为空',

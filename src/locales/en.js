@@ -325,6 +325,7 @@ export default {
         'parent transaction category not found': 'Parent transaction category is not found',
         'cannot add to secondary transaction category': 'Cannot add transaction category to secondary transaction category',
         'cannot use primary category for transaction category': 'Cannot use primary category for transaction category',
+        'transaction category is in use and cannot be deleted': 'Transaction category is in use and it cannot be deleted',
         'transaction tag id is invalid': 'Transaction tag ID is invalid',
         'transaction tag not found': 'Transaction tag is not found',
         'transaction tag name is empty': 'Transaction tag title is empty',

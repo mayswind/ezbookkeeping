@@ -256,7 +256,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 	})
 }
 
-func (s *TransactionCategoryService) DeleteCategories(uid int64, ids []int64) error {
+func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -269,15 +269,34 @@ func (s *TransactionCategoryService) DeleteCategories(uid int64, ids []int64) er
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").In("category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		var categoryAndSubCategories []*models.TransactionCategory
+		err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (category_id=? OR parent_category_id=?)", uid, false, categoryId, categoryId).Find(&categoryAndSubCategories)
+
+		if err != nil {
+			return err
+		} else if len(categoryAndSubCategories) < 1 {
+			return errs.ErrTransactionCategoryNotFound
+		}
+
+		categoryAndSubCategoryIds := make([]int64, len(categoryAndSubCategories))
+
+		for i := 0; i < len(categoryAndSubCategories); i++ {
+			categoryAndSubCategoryIds[i] = categoryAndSubCategories[i].CategoryId
+		}
+
+		exists, err := sess.Cols("uid", "deleted", "category_id").Where("uid=? AND deleted=?", uid, false).In("category_id", categoryAndSubCategoryIds).Limit(1).Exist(&models.Transaction{})
+
+		if exists {
+			return errs.ErrTransactionCategoryInUseCannotBeDeleted
+		}
+
+		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("category_id", categoryAndSubCategoryIds).Update(updateModel)
 
 		if err != nil {
 			return err
 		} else if deletedRows < 1 {
 			return errs.ErrTransactionCategoryNotFound
 		}
-
-		_, err = sess.Cols("deleted", "deleted_unix_time").In("parent_category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		return err
 	})

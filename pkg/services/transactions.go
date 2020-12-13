@@ -243,7 +243,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 
 		// Verify balance modification transaction and calculate real amount
 		if transaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
-			otherTransactionExists, err := sess.Where("uid=? AND deleted=? AND destination_account_id=?", transaction.Uid, false, destinationAccount.AccountId).Limit(1).Exist(&models.Transaction{})
+			otherTransactionExists, err := sess.Cols("uid", "deleted", "destination_account_id").Where("uid=? AND deleted=? AND destination_account_id=?", transaction.Uid, false, destinationAccount.AccountId).Limit(1).Exist(&models.Transaction{})
 
 			if err != nil {
 				return err

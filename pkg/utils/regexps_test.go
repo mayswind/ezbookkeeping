@@ -63,3 +63,52 @@ func TestIsValidEmail_InvalidEmail(t *testing.T) {
 	actualValue = IsValidEmail(email)
 	assert.Equal(t, expectedValue, actualValue)
 }
+
+func TestIsValidHexRGBColor_ValidHexRGBColor(t *testing.T) {
+	color := "000000"
+	expectedValue := true
+	actualValue := IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "000"
+	expectedValue = true
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "e0e0e0"
+	expectedValue = true
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "ffffff"
+	expectedValue = true
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "FFFFFF"
+	expectedValue = true
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidHexRGBColor_InvalidHexRGBColor(t *testing.T) {
+	color := "f"
+	expectedValue := false
+	actualValue := IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "fffffff"
+	expectedValue = false
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "gggggg"
+	expectedValue = false
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+
+	color = "#ffffff"
+	expectedValue = false
+	actualValue = IsValidHexRGBColor(color)
+	assert.Equal(t, expectedValue, actualValue)
+}

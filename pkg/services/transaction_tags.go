@@ -169,7 +169,7 @@ func (s *TransactionTagService) HideTag(uid int64, ids []int64, hidden bool) err
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("hidden", "updated_unix_time").In("tag_id", ids).Where("uid=?", uid).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=?", uid).In("tag_id", ids).Update(updateModel)
 
 		if err != nil {
 			return err

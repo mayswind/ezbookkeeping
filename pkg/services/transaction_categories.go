@@ -219,7 +219,7 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("hidden", "updated_unix_time").In("category_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("category_id", ids).Update(updateModel)
 
 		if err != nil {
 			return err

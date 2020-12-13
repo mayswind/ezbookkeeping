@@ -211,7 +211,7 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("hidden", "updated_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("account_id", ids).Update(updateModel)
 
 		if err != nil {
 			return err
@@ -261,7 +261,7 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").In("account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("account_id", ids).Update(updateModel)
 
 		if err != nil {
 			return err
@@ -269,7 +269,7 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 			return errs.ErrAccountNotFound
 		}
 
-		_, err = sess.Cols("deleted", "deleted_unix_time").In("parent_account_id", ids).Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("parent_account_id", ids).Update(updateModel)
 
 		return err
 	})

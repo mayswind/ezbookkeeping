@@ -248,7 +248,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 	})
 }
 
-func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
+func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -261,15 +261,40 @@ func (s *AccountService) DeleteAccounts(uid int64, ids []int64) error {
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("account_id", ids).Update(updateModel)
+		var accountAndSubAccounts []*models.Account
+		err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).Find(&accountAndSubAccounts)
+
+		if err != nil {
+			return err
+		} else if len(accountAndSubAccounts) < 1 {
+			return errs.ErrAccountNotFound
+		}
+
+		accountAndSubAccountIds := make([]int64, len(accountAndSubAccounts))
+
+		for i := 0; i < len(accountAndSubAccounts); i++ {
+			accountAndSubAccountIds[i] = accountAndSubAccounts[i].AccountId
+		}
+
+		exists, err := sess.Cols("uid", "deleted", "source_account_id").Where("uid=? AND deleted=?", uid, false).In("source_account_id", accountAndSubAccountIds).Limit(1).Exist(&models.Transaction{})
+
+		if exists {
+			return errs.ErrAccountInUseCannotBeDeleted
+		}
+
+		exists, err = sess.Cols("uid", "deleted", "destination_account_id").Where("uid=? AND deleted=?", uid, false).In("destination_account_id", accountAndSubAccountIds).Limit(1).Exist(&models.Transaction{})
+
+		if exists {
+			return errs.ErrAccountInUseCannotBeDeleted
+		}
+
+		deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("account_id", accountAndSubAccountIds).Update(updateModel)
 
 		if err != nil {
 			return err
 		} else if deletedRows < 1 {
 			return errs.ErrAccountNotFound
 		}
-
-		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).In("parent_account_id", ids).Update(updateModel)
 
 		return err
 	})

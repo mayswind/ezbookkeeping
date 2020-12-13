@@ -306,6 +306,7 @@ export default {
         'cannot add or delete sub accounts when modify account': '您不能在修改账户时添加或删除子账户',
         'source account not found': '来源账户不存在',
         'destination account not found': '目标账户不存在',
+        'account is in use and cannot be deleted': '账户正在被使用，无法删除',
         'transaction id is invalid': '交易ID无效',
         'transaction not found': '交易不存',
         'transaction type is invalid': '交易类型无效',

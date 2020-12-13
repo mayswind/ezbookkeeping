@@ -306,6 +306,7 @@ export default {
         'cannot add or delete sub accounts when modify account': 'You cannot add or delete sub accounts when modify account',
         'source account not found': 'Source account is not found',
         'destination account not found': 'Destination account is not found',
+        'account is in use and cannot be deleted': 'Account is in use and it cannot be deleted',
         'transaction id is invalid': 'Transaction ID is invalid',
         'transaction not found': 'Transaction is not found',
         'transaction type is invalid': 'Transaction type is invalid',

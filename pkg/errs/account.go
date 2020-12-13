@@ -15,4 +15,5 @@ var (
 	ErrCannotAddOrDeleteSubAccountsWhenModify = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 9, http.StatusBadRequest, "cannot add or delete sub accounts when modify account")
 	ErrSourceAccountNotFound                  = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 10, http.StatusBadRequest, "source account not found")
 	ErrDestinationAccountNotFound             = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 11, http.StatusBadRequest, "destination account not found")
+	ErrAccountInUseCannotBeDeleted            = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 12, http.StatusBadRequest, "account is in use and cannot be deleted")
 )

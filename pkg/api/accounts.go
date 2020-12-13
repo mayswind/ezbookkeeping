@@ -329,7 +329,7 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.accounts.DeleteAccounts(uid, []int64{accountDeleteReq.Id})
+	err = a.accounts.DeleteAccount(uid, accountDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())

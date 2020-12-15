@@ -21,6 +21,7 @@ RUN apk --no-cache add tzdata
 COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 RUN mkdir -p /usr/local/bin/labapp && chown 1000:1000 /usr/local/bin/labapp \
+  && mkdir -p /usr/local/bin/labapp/data && chown 1000:1000 /usr/local/bin/labapp/data \
   && mkdir -p /var/log/labapp && chown 1000:1000 /var/log/labapp
 WORKDIR /usr/local/bin/labapp
 COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/lab/lab /usr/local/bin/labapp/lab

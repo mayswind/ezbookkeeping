@@ -1,5 +1,7 @@
 package models
 
+import "github.com/mayswind/lab/pkg/utils"
+
 type TransactionType byte
 
 const (
@@ -39,15 +41,15 @@ type TransactionCreateRequest struct {
 }
 
 type TransactionModifyRequest struct {
-	Id                   int64           `json:"id,string" binding:"required,min=1"`
-	CategoryId           int64           `json:"categoryId,string"`
-	Time                 int64           `json:"time" binding:"required,min=1"`
-	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"required,min=1"`
-	SourceAmount         int64           `json:"sourceAmount"`
-	DestinationAmount    int64           `json:"destinationAmount"`
-	TagIds               []int64         `json:"tagIds,string"`
-	Comment              string          `json:"comment" binding:"max=255"`
+	Id                   int64   `json:"id,string" binding:"required,min=1"`
+	CategoryId           int64   `json:"categoryId,string"`
+	Time                 int64   `json:"time" binding:"required,min=1"`
+	SourceAccountId      int64   `json:"sourceAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64   `json:"destinationAccountId,string" binding:"required,min=1"`
+	SourceAmount         int64   `json:"sourceAmount"`
+	DestinationAmount    int64   `json:"destinationAmount"`
+	TagIds               []int64 `json:"tagIds,string"`
+	Comment              string  `json:"comment" binding:"max=255"`
 }
 
 type TransactionListByMaxTimeRequest struct {
@@ -72,6 +74,7 @@ type TransactionDeleteRequest struct {
 
 type TransactionInfoResponse struct {
 	Id                   int64           `json:"id,string"`
+	TimeSequenceId       int64           `json:"timeSequenceId,string"`
 	Type                 TransactionType `json:"type"`
 	CategoryId           int64           `json:"categoryId,string"`
 	Time                 int64           `json:"time"`
@@ -84,16 +87,17 @@ type TransactionInfoResponse struct {
 }
 
 type TransactionInfoPageWrapperResponse struct {
-	Items    TransactionInfoResponseSlice `json:"items"`
-	NextTime *int64                       `json:"nextTime,string"`
+	Items              TransactionInfoResponseSlice `json:"items"`
+	NextTimeSequenceId *int64                       `json:"nextTimeSequenceId,string"`
 }
 
 func (c *Transaction) ToTransactionInfoResponse(tagIds []int64) *TransactionInfoResponse {
 	return &TransactionInfoResponse{
 		Id:                   c.TransactionId,
+		TimeSequenceId:       c.TransactionTime,
 		Type:                 c.Type,
 		CategoryId:           c.CategoryId,
-		Time:                 c.TransactionTime,
+		Time:                 utils.GetUnixTimeFromTransactionTime(c.TransactionTime),
 		SourceAccountId:      c.SourceAccountId,
 		DestinationAccountId: c.DestinationAccountId,
 		SourceAmount:         c.SourceAmount,

@@ -70,7 +70,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	sort.Sort(transactionResps.Items)
 
 	if finalCount < len(transactions) {
-		transactionResps.NextTime = &transactions[finalCount].TransactionTime
+		transactionResps.NextTimeSequenceId = &transactions[finalCount].TransactionTime
 	}
 
 	return transactionResps, nil
@@ -285,7 +285,7 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		Uid:                  uid,
 		Type:                 transactionCreateReq.Type,
 		CategoryId:           transactionCreateReq.CategoryId,
-		TransactionTime:      transactionCreateReq.Time,
+		TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
 		SourceAccountId:      transactionCreateReq.SourceAccountId,
 		DestinationAccountId: transactionCreateReq.DestinationAccountId,
 		SourceAmount:         transactionCreateReq.SourceAmount,

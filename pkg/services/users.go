@@ -151,7 +151,7 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		return false, errs.ErrUserIdInvalid
 	}
 
-	var updateCols []string
+	updateCols := make([]string, 0, 8)
 
 	now := time.Now().Unix()
 	keyProfileUpdated = false

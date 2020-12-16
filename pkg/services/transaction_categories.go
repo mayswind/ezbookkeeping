@@ -33,7 +33,7 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryTy
 	}
 
 	condition := "uid=? AND deleted=?"
-	var conditionParams []interface{}
+	conditionParams := make([]interface{}, 0, 8)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 

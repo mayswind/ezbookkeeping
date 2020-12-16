@@ -6,7 +6,7 @@ func Int64SliceMinus(s1, s2 []int64) []int64 {
 	}
 
 	s2ItemsMap := make(map[int64]bool)
-	var ret []int64
+	ret := make([]int64, 0, len(s1))
 
 	for i := 0; i < len(s2); i++ {
 		s2ItemsMap[s2[i]] = true
@@ -22,7 +22,7 @@ func Int64SliceMinus(s1, s2 []int64) []int64 {
 }
 
 func ToUniqueInt64Slice(items []int64) []int64 {
-	var uniqueItems []int64
+	uniqueItems := make([]int64, 0, len(items))
 	itemExistMap := make(map[int64]bool)
 
 	for i := 0; i < len(items); i++ {

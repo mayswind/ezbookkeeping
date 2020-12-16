@@ -351,7 +351,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		return errs.ErrUserIdInvalid
 	}
 
-	var updateCols []string
+	updateCols := make([]string, 0, 16)
 
 	now := time.Now().Unix()
 

@@ -34,8 +34,8 @@ type TransactionCreateRequest struct {
 	Time                 int64           `json:"time" binding:"required,min=1"`
 	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"required,min=1"`
-	SourceAmount         int64           `json:"sourceAmount"`
-	DestinationAmount    int64           `json:"destinationAmount"`
+	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []int64         `json:"tagIds,string"`
 	Comment              string          `json:"comment" binding:"max=255"`
 }
@@ -46,8 +46,8 @@ type TransactionModifyRequest struct {
 	Time                 int64   `json:"time" binding:"required,min=1"`
 	SourceAccountId      int64   `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64   `json:"destinationAccountId,string" binding:"required,min=1"`
-	SourceAmount         int64   `json:"sourceAmount"`
-	DestinationAmount    int64   `json:"destinationAmount"`
+	SourceAmount         int64   `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64   `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []int64 `json:"tagIds,string"`
 	Comment              string  `json:"comment" binding:"max=255"`
 }

@@ -28,8 +28,16 @@ func GetParameterMustLessThanMessage(field string, param string) string {
 	return fmt.Sprintf("parameter \"%s\" must be less than %s", field, param)
 }
 
+func GetParameterMustLessThanCharsMessage(field string, param string) string {
+	return fmt.Sprintf("parameter \"%s\" must be less than %s characters", field, param)
+}
+
 func GetParameterMustMoreThanMessage(field string, param string) string {
 	return fmt.Sprintf("parameter \"%s\" must be more than %s", field, param)
+}
+
+func GetParameterMustMoreThanCharsMessage(field string, param string) string {
+	return fmt.Sprintf("parameter \"%s\" must be more than %s characters", field, param)
 }
 
 func GetParameterLengthNotEqualMessage(field string, param string) string {

@@ -364,7 +364,9 @@ export default {
     'parameterizedError': {
         'parameter invalid': '{parameter}无效',
         'parameter required': '{parameter}为必填项',
+        'parameter too large': '{parameter}必须小于{number}',
         'parameter too long': '{parameter}必须小于{length}个字符',
+        'parameter too small': '{parameter}必须大于{number}',
         'parameter too short': '{parameter}必须大于{length}个字符',
         'parameter length not equal': '{parameter}必须等于{length}个字符',
         'parameter cannot be blank': '{parameter}不能为空',

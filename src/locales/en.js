@@ -364,7 +364,9 @@ export default {
     'parameterizedError': {
         'parameter invalid': '{parameter} is invalid',
         'parameter required': '{parameter} is required',
+        'parameter too large': '{parameter} must be at most {number}',
         'parameter too long': '{parameter} must be at most {length} characters',
+        'parameter too small': '{parameter} must be at least {number}',
         'parameter too short': '{parameter} must be at least {length} characters',
         'parameter length not equal': '{parameter} must be {length} characters',
         'parameter cannot be blank': '{parameter} cannot be blank',

@@ -25,8 +25,19 @@ const parameterizedErrors = [
         }]
     },
     {
-        localeKey: 'parameter too long',
+        localeKey: 'parameter too large',
         regex: /^parameter "(\w+)" must be less than (\d+)$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }, {
+            field: 'number',
+            localized: false
+        }]
+    },
+    {
+        localeKey: 'parameter too long',
+        regex: /^parameter "(\w+)" must be less than (\d+) characters$/,
         parameters: [{
             field: 'parameter',
             localized: true
@@ -36,8 +47,19 @@ const parameterizedErrors = [
         }]
     },
     {
-        localeKey: 'parameter too short',
+        localeKey: 'parameter too small',
         regex: /^parameter "(\w+)" must be more than (\d+)$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }, {
+            field: 'number',
+            localized: false
+        }]
+    },
+    {
+        localeKey: 'parameter too short',
+        regex: /^parameter "(\w+)" must be more than (\d+) characters$/,
         parameters: [{
             field: 'parameter',
             localized: true

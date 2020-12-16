@@ -1,5 +1,7 @@
 import CryptoJS from "crypto-js";
+import moment from 'moment';
 import uaParser from 'ua-parser-js';
+
 import accountConstants from '../consts/account.js';
 import settings from "./settings.js";
 
@@ -29,6 +31,10 @@ function isNumber(val) {
 
 function isBoolean(val) {
     return typeof(val) === 'boolean';
+}
+
+function formatDate(date, format) {
+    return moment(date).format(format);
 }
 
 function copyObjectTo(fromObject, toObject) {
@@ -340,6 +346,7 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    formatDate,
     copyObjectTo,
     copyArrayTo,
     appendThousandsSeparator,

@@ -15,7 +15,7 @@ export default function ({i18n}, value, currencyCode) {
 
     const currencyDisplayMode = settings.getCurrencyDisplayMode();
 
-    if (currencyDisplayMode === 'symbol') {
+    if (currencyCode && currencyDisplayMode === 'symbol') {
         const currencyInfo = currency.all[currencyCode];
         let currencySymbol = currency.defaultCurrencySymbol;
 
@@ -29,9 +29,9 @@ export default function ({i18n}, value, currencyCode) {
             amount: value,
             symbol: currencySymbol
         });
-    } else if (currencyDisplayMode === 'code') {
+    } else if (currencyCode && currencyDisplayMode === 'code') {
         return `${value} ${currencyCode}`;
-    } else if (currencyDisplayMode === 'name') {
+    } else if (currencyCode && currencyDisplayMode === 'name') {
         const currencyName = i18n.t(`currency.${currencyCode}`);
         return `${value} ${currencyName}`;
     } else {

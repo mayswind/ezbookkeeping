@@ -350,7 +350,7 @@ export default {
         'parentId': '父节点ID',
         'categoryId': '分类ID',
         'time': '时间',
-        'sourceAccountId': '来演账户ID',
+        'sourceAccountId': '来源账户ID',
         'destinationAccountId': '目标账户ID',
         'sourceAmount': '源金额',
         'destinationAmount': '目标金额',

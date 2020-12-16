@@ -86,7 +86,7 @@
                                   swipeout @taphold.native="setSortable()"
                     >
                         <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
+                            <div class="display-flex padding-top-half padding-bottom-half">
                                 <f7-icon slot="media" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }">
                                     <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                         <f7-icon f7="eye_slash_fill"></f7-icon>

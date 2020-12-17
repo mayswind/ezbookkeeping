@@ -509,6 +509,7 @@ export default {
     'Transaction Time': 'Transaction Time',
     'Tags': 'Tags',
     'Your transaction description (optional)': 'Your transaction description (optional)',
+    'Unable to get transaction': 'Unable to get transaction',
     'User Profile': 'User Profile',
     'Language': 'Language',
     'Auto Update Exchange Rates Data': 'Auto Update Exchange Rates Data',

@@ -20,6 +20,7 @@ import currency from './consts/currency.js';
 import colors from './consts/color.js';
 import icons from './consts/icon.js';
 import account from './consts/account.js';
+import transaction from './consts/transaction.js';
 import category from './consts/category.js';
 import licenses from './consts/licenses.js';
 import version from './lib/version.js';
@@ -62,6 +63,7 @@ Vue.prototype.$constants = {
     colors: colors,
     icons: icons,
     account: account,
+    transaction: transaction,
     category: category,
 };
 

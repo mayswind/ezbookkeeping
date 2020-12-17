@@ -6,7 +6,7 @@ import SignUpPage from '../views/mobile/Signup.vue';
 import UnlockPage from '../views/mobile/Unlock.vue';
 
 import TransactionDetailPage from '../views/mobile/transactions/Detail.vue';
-import TransactionNewPage from '../views/mobile/transactions/New.vue';
+import TransactionEditPage from '../views/mobile/transactions/Edit.vue';
 
 import AccountListPage from '../views/mobile/accounts/List.vue';
 import AccountEditPage from '../views/mobile/accounts/Edit.vue';
@@ -140,8 +140,13 @@ const routes = [
         beforeEnter: checkLogin
     },
     {
-        path: '/transaction/new',
-        component: TransactionNewPage,
+        path: '/transaction/add',
+        component: TransactionEditPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/transaction/edit',
+        component: TransactionEditPage,
         beforeEnter: checkLogin
     },
     {

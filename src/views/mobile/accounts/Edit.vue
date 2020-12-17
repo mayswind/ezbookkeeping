@@ -108,7 +108,8 @@
                         :after="account.balance | currency(account.currency)"
                         @click="account.showBalanceSheet = true"
                     >
-                        <NumberPadSheet :show.sync="account.showBalanceSheet"
+                        <NumberPadSheet min-value="-999999999.99" max-value="999999999.99"
+                                        :show.sync="account.showBalanceSheet"
                                         v-model="account.balance"
                         ></NumberPadSheet>
                     </f7-list-item>
@@ -229,7 +230,8 @@
                             :after="subAccount.balance | currency(subAccount.currency)"
                             @click="subAccount.showBalanceSheet = true"
                         >
-                            <NumberPadSheet :show.sync="subAccount.showBalanceSheet"
+                            <NumberPadSheet min-value="-999999999.99" max-value="999999999.99"
+                                            :show.sync="subAccount.showBalanceSheet"
                                             v-model="subAccount.balance"
                             ></NumberPadSheet>
                         </f7-list-item>

@@ -630,4 +630,5 @@ export default {
     'License': 'License',
     'An error has occurred': 'An error has occurred',
     'Parameter Invalid': 'Parameter Invalid',
+    'Numeric Overflow': 'Numeric Overflow',
 };

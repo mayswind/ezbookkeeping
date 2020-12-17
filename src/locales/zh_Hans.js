@@ -630,4 +630,5 @@ export default {
     'License': '许可协议',
     'An error has occurred': '发生错误',
     'Parameter Invalid': '参数错误',
+    'Numeric Overflow': '数值溢出',
 };

@@ -64,6 +64,8 @@
 export default {
     props: [
         'value',
+        'minValue',
+        'maxValue',
         'show'
     ],
     data() {
@@ -147,7 +149,27 @@ export default {
                 return;
             }
 
-            this.currentValue = this.currentValue + num.toString();
+            const newValue = this.currentValue + num.toString();
+
+            if (this.$utilities.isString(this.minValue) && this.minValue !== '') {
+                const min = this.$utilities.stringCurrencyToNumeric(this.minValue);
+                const current = this.$utilities.stringCurrencyToNumeric(newValue);
+
+                if (current < min) {
+                    return;
+                }
+            }
+
+            if (this.$utilities.isString(this.maxValue) && this.maxValue !== '') {
+                const max = this.$utilities.stringCurrencyToNumeric(this.maxValue);
+                const current = this.$utilities.stringCurrencyToNumeric(newValue);
+
+                if (current > max) {
+                    return;
+                }
+            }
+
+            this.currentValue = newValue;
         },
         inputDot() {
             if (this.currentValue.indexOf('.') >= 0) {
@@ -165,7 +187,11 @@ export default {
         setSymbol(symbol) {
             if (this.currentValue) {
                 if (this.currentSymbol) {
-                    this.confirm();
+                    const lastFormulaCalcResult = this.confirm();
+
+                    if (!lastFormulaCalcResult) {
+                        return;
+                    }
                 }
 
                 this.previousValue = this.currentValue;
@@ -212,18 +238,42 @@ export default {
                         finalValue = previousValue;
                 }
 
+                if (this.$utilities.isString(this.minValue) && this.minValue !== '') {
+                    const min = this.$utilities.stringCurrencyToNumeric(this.minValue);
+
+                    if (finalValue < min) {
+                        this.$toast('Numeric Overflow');
+                        return false;
+                    }
+                }
+
+                if (this.$utilities.isString(this.maxValue) && this.maxValue !== '') {
+                    const max = this.$utilities.stringCurrencyToNumeric(this.maxValue);
+
+                    if (finalValue > max) {
+                        this.$toast('Numeric Overflow');
+                        return false;
+                    }
+                }
+
                 this.currentValue = this.getStringValue(finalValue);
                 this.previousValue = '';
                 this.currentSymbol = '';
+
+                return true;
             } else if (this.currentSymbol && this.currentValue.length < 1) {
                 this.currentValue = this.previousValue;
                 this.previousValue = '';
                 this.currentSymbol = '';
+
+                return true;
             } else {
                 const value = this.$utilities.stringCurrencyToNumeric(this.currentValue);
 
                 this.$emit('input', value);
                 this.$emit('update:show', false);
+
+                return true;
             }
         },
         onSheetOpen() {

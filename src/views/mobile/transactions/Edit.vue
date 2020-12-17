@@ -251,11 +251,21 @@ export default {
                 }
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                    oldValue = Math.floor(this.$exchangeRates.getOtherCurrencyAmount(oldValue, sourceAccount.currency, destinationAccount.currency));
-                    newValue = Math.floor(this.$exchangeRates.getOtherCurrencyAmount(newValue, sourceAccount.currency, destinationAccount.currency));
+                    const exchangedOldValue = this.$exchangeRates.getOtherCurrencyAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedNewValue = this.$exchangeRates.getOtherCurrencyAmount(newValue, sourceAccount.currency, destinationAccount.currency);
+
+                    if (this.$utilities.isNumber(exchangedOldValue)) {
+                        oldValue = Math.floor(exchangedOldValue);
+                    }
+
+                    if (this.$utilities.isNumber(exchangedNewValue)) {
+                        newValue = Math.floor(exchangedNewValue);
+                    }
                 }
 
-                if (!sourceAccount || !destinationAccount || this.transaction.destinationAmount === oldValue) {
+                if ((!sourceAccount || !destinationAccount || this.transaction.destinationAmount === oldValue) &&
+                    (this.$utilities.stringCurrencyToNumeric(this.$constants.transaction.minAmount) <= newValue &&
+                        newValue <= this.$utilities.stringCurrencyToNumeric(this.$constants.transaction.maxAmount))) {
                     this.transaction.destinationAmount = newValue;
                 }
             }

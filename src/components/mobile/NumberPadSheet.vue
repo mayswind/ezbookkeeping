@@ -2,7 +2,7 @@
     <f7-sheet class="numpad-sheet" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-page-content class="no-margin no-padding-top">
             <f7-row class="numpad-values">
-                <span class="numpad-value">{{ currentDisplay }}</span>
+                <span class="numpad-value" :style="{ fontSize: currentDisplayFontSize + 'px' }">{{ currentDisplay }}</span>
             </f7-row>
             <f7-row class="numpad-buttons">
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
@@ -86,6 +86,17 @@ export default {
                 return `${previousValue} ${this.currentSymbol} ${currentValue}`;
             } else {
                 return currentValue;
+            }
+        },
+        currentDisplayFontSize() {
+            const currentDisplay = this.currentDisplay || '';
+
+            if (currentDisplay.length >= 24) {
+                return 20;
+            } else if (currentDisplay.length >= 16) {
+                return 22;
+            } else {
+                return 24;
             }
         },
         confirmText() {
@@ -299,7 +310,6 @@ export default {
     display: flex;
     position: relative;
     padding-left: 16px;
-    font-size: 24px;
     line-height: 1;
     height: 50px;
     justify-content: center;

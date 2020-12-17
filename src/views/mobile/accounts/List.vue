@@ -318,7 +318,7 @@ export default {
 
         self.loading = true;
 
-        self.$services.getAllAccounts().then(response => {
+        self.$services.getAllAccounts({ visibleOnly: false }).then(response => {
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
@@ -358,7 +358,7 @@ export default {
 
             const self = this;
 
-            self.$services.getAllAccounts().then(response => {
+            self.$services.getAllAccounts({ visibleOnly: false }).then(response => {
                 if (done) {
                     done();
                 }

@@ -22,6 +22,14 @@ var (
 )
 
 func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Error) {
+	var accountListReq models.AccountListRequest
+	err := c.ShouldBindQuery(&accountListReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountListHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
 	uid := c.GetCurrentUid()
 	accounts, err := a.accounts.GetAllAccountsByUid(uid)
 
@@ -41,6 +49,10 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 	for i := 0; i < len(userAllAccountResps); i++ {
 		userAccountResp := userAllAccountResps[i]
 
+		if accountListReq.VisibleOnly && userAccountResp.Hidden {
+			continue
+		}
+
 		if userAccountResp.ParentId <= models.ACCOUNT_PARENT_ID_LEVEL_ONE {
 			continue
 		}
@@ -54,10 +66,10 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 		parentAccount.SubAccounts = append(parentAccount.SubAccounts, userAccountResp)
 	}
 
-	userFinalAccountResps := make(models.AccountInfoResponseSlice, 0)
+	userFinalAccountResps := make(models.AccountInfoResponseSlice, 0, len(userAllAccountResps))
 
 	for i := 0; i < len(userAllAccountResps); i++ {
-		if userAllAccountResps[i].ParentId == models.ACCOUNT_PARENT_ID_LEVEL_ONE {
+		if userAllAccountResps[i].ParentId == models.ACCOUNT_PARENT_ID_LEVEL_ONE && (!accountListReq.VisibleOnly || !userAllAccountResps[i].Hidden) {
 			sort.Sort(userAllAccountResps[i].SubAccounts)
 			userFinalAccountResps = append(userFinalAccountResps, userAllAccountResps[i])
 		}

@@ -62,10 +62,6 @@ type Account struct {
 	DeletedUnixTime int64
 }
 
-type AccountGetRequest struct {
-	Id int64 `form:"id,string" binding:"required,min=1"`
-}
-
 type AccountCreateRequest struct {
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
 	Category    AccountCategory         `json:"category" binding:"required"`
@@ -87,6 +83,14 @@ type AccountModifyRequest struct {
 	Comment     string                  `json:"comment" binding:"max=255"`
 	Hidden      bool                    `json:"hidden"`
 	SubAccounts []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
+}
+
+type AccountListRequest struct {
+	VisibleOnly bool `form:"visible_only"`
+}
+
+type AccountGetRequest struct {
+	Id int64 `form:"id,string" binding:"required,min=1"`
 }
 
 type AccountHideRequest struct {

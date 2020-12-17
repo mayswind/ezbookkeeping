@@ -166,8 +166,8 @@ export default {
             password
         });
     },
-    getAllAccounts: () => {
-        return axios.get('v1/accounts/list.json');
+    getAllAccounts: ({ visibleOnly }) => {
+        return axios.get('v1/accounts/list.json?visible_only=' + !!visibleOnly);
     },
     getAccount: ({ id }) => {
         return axios.get('v1/accounts/get.json?id=' + id);

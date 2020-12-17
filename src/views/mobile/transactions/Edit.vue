@@ -43,7 +43,8 @@
                         :title="transaction.sourceAmount | currency"
                         @click="transaction.showSourceAmountSheet = true"
                     >
-                        <NumberPadSheet min-value="-999999999.99" max-value="999999999.99"
+                        <NumberPadSheet :min-value="$constants.transaction.minAmount"
+                                        :max-value="$constants.transaction.maxAmount"
                                         :show.sync="transaction.showSourceAmountSheet"
                                         v-model="transaction.sourceAmount"
                         ></NumberPadSheet>
@@ -57,7 +58,8 @@
                         @click="transaction.showDestinationAmountSheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
-                        <NumberPadSheet min-value="-999999999.99" max-value="999999999.99"
+                        <NumberPadSheet :min-value="$constants.transaction.minAmount"
+                                        :max-value="$constants.transaction.maxAmount"
                                         :show.sync="transaction.showDestinationAmountSheet"
                                         v-model="transaction.destinationAmount"
                         ></NumberPadSheet>

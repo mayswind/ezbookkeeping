@@ -146,6 +146,11 @@ export default {
             return `${integer}.${newDecimals}`;
         },
         inputNum(num) {
+            if (!this.previousValue && this.currentSymbol === '−') {
+                this.currentValue = '-' + this.currentValue;
+                this.currentSymbol = '';
+            }
+
             if (this.currentValue === '0') {
                 this.currentValue = num.toString();
                 return;
@@ -185,6 +190,11 @@ export default {
         inputDot() {
             if (this.currentValue.indexOf('.') >= 0) {
                 return;
+            }
+
+            if (!this.previousValue && this.currentSymbol === '−') {
+                this.currentValue = '-' + this.currentValue;
+                this.currentSymbol = '';
             }
 
             if (this.currentValue.length < 1) {

@@ -105,7 +105,7 @@
                     </f7-list-input>
 
                     <f7-list-item :header="$t('Tags')" link="#"
-                                  smart-select :smart-select-params="{ openIn: 'popup', setValueText: false, searchbar: true, searchbarPlaceholder: $t('Tag Title'), searchbarDisableText: $t('Cancel'), pageTitle: $t('Tags'), closeOnSelect: true, popupCloseLinkText: $t('Close') }">
+                                  smart-select :smart-select-params="{ openIn: 'sheet', setValueText: false, closeOnSelect: true, sheetCloseLinkText: $t('Close') }">
                         <select multiple v-model="transaction.tagIds">
                             <option v-for="tag in allTags"
                                     :key="tag.id"

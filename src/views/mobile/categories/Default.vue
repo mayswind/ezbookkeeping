@@ -52,26 +52,12 @@
             </f7-actions-group>
         </f7-actions>
 
-
-        <f7-sheet :opened="showChangeLocaleSheet" @sheet:closed="showChangeLocaleSheet = false">
-            <f7-toolbar>
-                <div class="left"></div>
-                <div class="right">
-                    <f7-link sheet-close :text="$t('Done')"></f7-link>
-                </div>
-            </f7-toolbar>
-            <f7-page-content>
-                <f7-list no-hairlines class="no-margin-top no-margin-bottom">
-                    <f7-list-item v-for="(lang, locale) in allLanguages"
-                                  :key="locale"
-                                  :value="locale"
-                                  :title="lang.displayName"
-                                  @click="currentLocale = locale; showChangeLocaleSheet = false">
-                        <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="currentLocale === locale"></f7-icon>
-                    </f7-list-item>
-                </f7-list>
-            </f7-page-content>
-        </f7-sheet>
+        <ListItemSelectionSheet value-type="index"
+                                title-field="displayName"
+                                :items="allLanguages"
+                                :show.sync="showChangeLocaleSheet"
+                                v-model="currentLocale">
+        </ListItemSelectionSheet>
     </f7-page>
 </template>
 

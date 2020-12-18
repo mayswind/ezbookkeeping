@@ -46,11 +46,14 @@
         <f7-popover class="popover-menu">
             <f7-list>
                 <f7-list-item
-                    link="#" popover-close
-                    v-for="(lang, locale) in allLanguages" :key="locale"
+                    link="#" no-chevron popover-close
+                    v-for="(lang, locale) in allLanguages"
+                    :key="locale"
                     :title="lang.displayName"
                     @click="changeLanguage(locale)"
-                ></f7-list-item>
+                >
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                </f7-list-item>
             </f7-list>
         </f7-popover>
 

@@ -37,8 +37,12 @@ import categoryIconFilter from './filters/categoryIcon.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
 
+import PasswordInputSheet from "./components/mobile/PasswordInputSheet.vue";
+import PasscodeInputSheet from "./components/mobile/PasscodeInputSheet.vue";
+import PinCodeInputSheet from "./components/mobile/PinCodeInputSheet.vue";
 import IconSelectionSheet from "./components/mobile/IconSelectionSheet.vue";
 import ColorSelectionSheet from "./components/mobile/ColorSelectionSheet.vue";
+import InformationSheet from "./components/mobile/InformationSheet.vue";
 import NumberPadSheet from "./components/mobile/NumberPadSheet.vue";
 import App from './Mobile.vue';
 
@@ -47,8 +51,12 @@ Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
 Vue.component('PincodeInput', PincodeInput);
+Vue.component('PasswordInputSheet', PasswordInputSheet);
+Vue.component('PasscodeInputSheet', PasscodeInputSheet);
+Vue.component('PinCodeInputSheet', PinCodeInputSheet);
 Vue.component('IconSelectionSheet', IconSelectionSheet);
 Vue.component('ColorSelectionSheet', ColorSelectionSheet);
+Vue.component('InformationSheet', InformationSheet);
 Vue.component('NumberPadSheet', NumberPadSheet);
 Framework7.use(Framework7Vue);
 

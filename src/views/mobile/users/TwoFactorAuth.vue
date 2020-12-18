@@ -30,119 +30,47 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet
-            style="height:auto;"
-            :opened="showInputPasscodeSheetForEnable" @sheet:closed="showInputPasscodeSheetForEnable = false; currentPasscodeForEnable = ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Passcode') }}</b></div>
+        <PasscodeInputSheet :title="$t('Passcode')"
+                            :hint="$t('Please use two factor authentication app scan the below qrcode and input current passcode')"
+                            :show.sync="showInputPasscodeSheetForEnable"
+                            :confirm-disabled="enableConfirming"
+                            :cancel-disabled="enableConfirming"
+                            v-model="currentPasscodeForEnable"
+                            @passcode:confirm="enableConfirm">
+            <div class="row">
+                <div class="col-100 text-align-center">
+                    <img alt="qrcode" width="240px" height="240px" :src="new2FAQRCode" />
                 </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}</p>
-                    <div class="row">
-                        <div class="col-100 text-align-center">
-                            <img alt="qrcode" width="240px" height="240px" :src="new2FAQRCode" />
-                        </div>
-                    </div>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-input
-                            type="number"
-                            autocomplete="one-time-code"
-                            outline
-                            clear-button
-                            :placeholder="$t('Passcode')"
-                            :value="currentPasscodeForEnable"
-                            @input="currentPasscodeForEnable = $event.target.value"
-                        ></f7-list-input>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPasscodeForEnable }" :text="$t('Continue')" @click="enableConfirm"></f7-button>
-                    <div class="margin-top text-align-center">
-                        <f7-link :class="{ 'disabled': enableConfirming }" @click="showInputPasscodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+            </div>
+        </PasscodeInputSheet>
 
-        <f7-sheet
-            style="height:auto"
-            :opened="showInputPasswordSheetForDisable" @sheet:closed="showInputPasswordSheetForDisable = false; currentPasswordForDisable = ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when disable two factor authentication') }}</p>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-input
-                            type="password"
-                            autocomplete="current-password"
-                            outline
-                            clear-button
-                            :placeholder="$t('Password')"
-                            :value="currentPasswordForDisable"
-                            @input="currentPasswordForDisable = $event.target.value"
-                        ></f7-list-input>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPasswordForDisable }" :text="$t('Continue')" @click="disable(currentPasswordForDisable)"></f7-button>
-                    <div class="margin-top text-align-center">
-                        <f7-link :class="{ 'disabled': disabling }" @click="showInputPasswordSheetForDisable = false" :text="$t('Cancel')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <PasswordInputSheet :title="$t('Current Password')"
+                            :hint="$t('Please enter your current password when disable two factor authentication')"
+                            :show.sync="showInputPasswordSheetForDisable"
+                            :confirm-disabled="disabling"
+                            :cancel-disabled="disabling"
+                            v-model="currentPasswordForDisable"
+                            @password:confirm="disable">
+        </PasswordInputSheet>
 
-        <f7-sheet
-            style="height:auto"
-            :opened="showInputPasswordSheetForRegenerate" @sheet:closed="showInputPasswordSheetForRegenerate = false; currentPasswordForRegenerate= ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}</p>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-input
-                            type="password"
-                            autocomplete="current-password"
-                            outline
-                            clear-button
-                            :placeholder="$t('Password')"
-                            :value="currentPasswordForRegenerate"
-                            @input="currentPasswordForRegenerate = $event.target.value"
-                        ></f7-list-input>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPasswordForRegenerate }" :text="$t('Continue')" @click="regenerateBackupCode(currentPasswordForRegenerate)"></f7-button>
-                    <div class="margin-top text-align-center">
-                        <f7-link :class="{ 'disabled': regenerating }" @click="showInputPasswordSheetForRegenerate = false" :text="$t('Cancel')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <PasswordInputSheet :title="$t('Current Password')"
+                            :hint="$t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.')"
+                            :show.sync="showInputPasswordSheetForRegenerate"
+                            :confirm-disabled="regenerating"
+                            :cancel-disabled="regenerating"
+                            v-model="currentPasswordForRegenerate"
+                            @password:confirm="regenerateBackupCode">
+        </PasswordInputSheet>
 
-        <f7-sheet
-            style="height:auto"
-            :opened="showBackupCodeSheet" @sheet:closed="showBackupCodeSheet = false; currentBackupCode = ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Backup Code') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">
-                        <span>{{ $t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.') }}</span>
-                        <f7-link icon-only icon-f7="doc_on_doc" icon-size="16px" class="icon-after-text"
-                                 v-clipboard:copy="currentBackupCode" v-clipboard:success="onBackupCodeCopied"></f7-link>
-                    </p>
-                    <textarea class="full-line" rows="10" readonly="readonly" v-model="currentBackupCode"></textarea>
-                    <div class="margin-top text-align-center">
-                        <f7-link @click="showBackupCodeSheet = false" :text="$t('Close')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <InformationSheet class="backup-code-sheet"
+                          :title="$t('Backup Code')"
+                          :hint="$t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.')"
+                          :information="currentBackupCode"
+                          :row-count="10"
+                          :enable-copy="true"
+                          :show.sync="showBackupCodeSheet"
+                          @info:copied="onBackupCodeCopied">
+        </InformationSheet>
     </f7-page>
 </template>
 
@@ -365,3 +293,9 @@ export default {
     }
 };
 </script>
+
+<style>
+.backup-code-sheet .information-content {
+    font-family: monospace;
+}
+</style>

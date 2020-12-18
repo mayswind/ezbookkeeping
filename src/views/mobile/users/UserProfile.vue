@@ -78,31 +78,14 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet
-            style="height:auto"
-            :opened="showInputPasswordSheet" @sheet:closed="showInputPasswordSheet = false"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Current Password') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top">{{ $t('Please enter your current password when modifying your password') }}</p>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-input
-                            type="password"
-                            autocomplete="current-password"
-                            outline
-                            clear-button
-                            :placeholder="$t('Password')"
-                            :value="currentPassword"
-                            @input="currentPassword = $event.target.value"
-                        ></f7-list-input>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPassword || saving }" :text="$t('Continue')" @click="save"></f7-button>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <PasswordInputSheet :title="$t('Current Password')"
+                            :hint="$t('Please enter your current password when modifying your password')"
+                            :show.sync="showInputPasswordSheet"
+                            :confirm-disabled="saving"
+                            :cancel-disabled="saving"
+                            v-model="currentPassword"
+                            @password:confirm="save()">
+        </PasswordInputSheet>
     </f7-page>
 </template>
 

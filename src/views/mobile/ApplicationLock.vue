@@ -27,51 +27,19 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet
-            style="height:auto;"
-            :opened="showInputPinCodeSheetForEnable" @sheet:closed="showInputPinCodeSheetForEnable = false; currentPinCodeForEnable = ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('PIN Code') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.') }}</p>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-item class="list-item-pincode-input">
-                            <PincodeInput secure :length="6" v-model="currentPinCodeForEnable" />
-                        </f7-list-item>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPinCodeForEnableValid }" :text="$t('Continue')" @click="enable(currentPinCodeForEnable)"></f7-button>
-                    <div class="margin-top text-align-center">
-                        <f7-link @click="showInputPinCodeSheetForEnable = false" :text="$t('Cancel')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <PinCodeInputSheet :title="$t('PIN Code')"
+                           :hint="$t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
+                           :show.sync="showInputPinCodeSheetForEnable"
+                           v-model="currentPinCodeForEnable"
+                           @pincode:confirm="enable">
+        </PinCodeInputSheet>
 
-        <f7-sheet
-            style="height:auto;"
-            :opened="showInputPinCodeSheetForDisable" @sheet:closed="showInputPinCodeSheetForDisable = false; currentPinCodeForDisable = ''"
-        >
-            <f7-page-content>
-                <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('PIN Code') }}</b></div>
-                </div>
-                <div class="padding-horizontal padding-bottom">
-                    <p class="no-margin-top margin-bottom-half">{{ $t('Please enter your current PIN code when disable application lock') }}</p>
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
-                        <f7-list-item class="list-item-pincode-input">
-                            <PincodeInput secure :length="6" v-model="currentPinCodeForDisable" />
-                        </f7-list-item>
-                    </f7-list>
-                    <f7-button large fill :class="{ 'disabled': !currentPinCodeForDisableValid }" :text="$t('Continue')" @click="disable(currentPinCodeForDisable)"></f7-button>
-                    <div class="margin-top text-align-center">
-                        <f7-link @click="showInputPinCodeSheetForDisable = false" :text="$t('Cancel')"></f7-link>
-                    </div>
-                </div>
-            </f7-page-content>
-        </f7-sheet>
+        <PinCodeInputSheet :title="$t('PIN Code')"
+                           :hint="$t('Please enter your current PIN code when disable application lock')"
+                           :show.sync="showInputPinCodeSheetForDisable"
+                           v-model="currentPinCodeForDisable"
+                           @pincode:confirm="disable">
+        </PinCodeInputSheet>
     </f7-page>
 </template>
 
@@ -87,14 +55,6 @@ export default {
             showInputPinCodeSheetForEnable: false,
             showInputPinCodeSheetForDisable: false
         };
-    },
-    computed: {
-        currentPinCodeForEnableValid() {
-            return this.currentPinCodeForEnable && this.currentPinCodeForEnable.length === 6;
-        },
-        currentPinCodeForDisableValid() {
-            return this.currentPinCodeForDisable && this.currentPinCodeForDisable.length === 6;
-        },
     },
     watch: {
         isEnableApplicationLockWebAuthn: function (newValue) {
@@ -155,7 +115,7 @@ export default {
                 return;
             }
 
-            if (!this.currentPinCodeForEnableValid) {
+            if (!this.currentPinCodeForEnable || this.currentPinCodeForEnable.length !== 6) {
                 this.$alert('PIN code is invalid');
                 return;
             }

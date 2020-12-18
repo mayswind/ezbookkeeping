@@ -21,10 +21,11 @@
                 <f7-list>
                     <f7-list-item
                         class="transaction-edit-amount padding-top-half padding-bottom-half"
+                        style="font-size: 40px;"
                         header="Expense Amount" title="0.00">
                     </f7-list-item>
-                    <f7-list-item header="Category" placeholder="Category"></f7-list-item>
-                    <f7-list-input label="Account" placeholder="Account Name"></f7-list-input>
+                    <f7-list-item class="transaction-edit-category" header="Category" link="#"></f7-list-item>
+                    <f7-list-item class="transaction-edit-account" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
                     <f7-list-item header="Tags" link="#"></f7-list-item>
                     <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
@@ -66,34 +67,46 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="transaction-edit-category"
+                        link="#"
                         :header="$t('Category')"
                     >
                     </f7-list-item>
 
-                    <f7-list-input
-                        type="select"
+                    <f7-list-item
+                        class="transaction-edit-account"
+                        link="#"
                         :class="{ 'disabled': !plainAllAccounts.length }"
-                        :label="$t(sourceAccountName)"
-                        :value="transaction.sourceAccountId"
-                        @input="transaction.sourceAccountId = $event.target.value"
+                        :header="$t(sourceAccountName)"
+                        :title="transaction.sourceAccountId | accountName(plainAllAccounts)"
+                        @click="transaction.showSourceAccountSheet = true"
                     >
-                        <option v-for="account in plainAllAccounts"
-                                :key="account.id"
-                                :value="account.id">{{ account.name }}</option>
-                    </f7-list-input>
+                        <ListItemSelectionSheet value-type="item"
+                                                key-field="id" value-field="id" title-field="name"
+                                                icon-field="icon" icon-type="account" color-field="color"
+                                                :items="plainAllAccounts"
+                                                :show.sync="transaction.showSourceAccountSheet"
+                                                v-model="transaction.sourceAccountId">
+                        </ListItemSelectionSheet>
+                    </f7-list-item>
 
-                    <f7-list-input
-                        type="select"
+                    <f7-list-item
+                        class="transaction-edit-account"
+                        link="#"
                         :class="{ 'disabled': !plainAllAccounts.length }"
-                        :label="$t('Destination Account')"
-                        :value="transaction.destinationAccountId"
+                        :header="$t('Destination Account')"
+                        :title="transaction.destinationAccountId | accountName(plainAllAccounts)"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
-                        @input="transaction.destinationAccountId = $event.target.value"
+                        @click="transaction.showDestinationAccountSheet = true"
                     >
-                        <option v-for="account in plainAllAccounts"
-                                :key="account.id"
-                                :value="account.id">{{ account.name }}</option>
-                    </f7-list-input>
+                        <ListItemSelectionSheet value-type="item"
+                                                key-field="id" value-field="id" title-field="name"
+                                                icon-field="icon" icon-type="account" color-field="color"
+                                                :items="plainAllAccounts"
+                                                :show.sync="transaction.showDestinationAccountSheet"
+                                                v-model="transaction.destinationAccountId">
+                        </ListItemSelectionSheet>
+                    </f7-list-item>
 
                     <f7-list-input
                         :label="$t('Transaction Time')"
@@ -153,7 +166,9 @@ export default {
                 tagIds: [],
                 comment: '',
                 showSourceAmountSheet: false,
-                showDestinationAmountSheet: false
+                showDestinationAmountSheet: false,
+                showSourceAccountSheet: false,
+                showDestinationAccountSheet: false
             },
             allAccounts: [],
             allCategories: {},
@@ -381,6 +396,15 @@ export default {
         }
     },
     filters: {
+        accountName(accountId, allAccounts) {
+            for (let i = 0; i < allAccounts.length; i++) {
+                if (allAccounts[i].id === accountId) {
+                    return allAccounts[i].name;
+                }
+            }
+
+            return '';
+        },
         tagName(tagId, allTags) {
             for (let i = 0; i < allTags.length; i++) {
                 if (allTags[i].id === tagId) {
@@ -402,6 +426,10 @@ export default {
 
 .transaction-edit-amount .item-title {
     font-weight: bolder;
+}
+
+.transaction-edit-account .item-header {
+    margin-bottom: 11px;
 }
 
 .transaction-edit-time input[type="datetime-local"] {

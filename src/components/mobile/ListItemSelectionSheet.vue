@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="left"></div>
             <div class="right">
@@ -14,6 +14,7 @@
                               :value="valueType === 'index' ? index : (valueField ? item[valueField] : item)"
                               :title="titleField ? item[titleField] : item"
                               @click="onItemClicked(item, index)">
+                    <f7-icon slot="media" :icon="item[iconField] | icon(iconType)" :style="{ color: '#' + (colorField ? item[colorField] : '000000') }" v-if="iconField"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
                 </f7-list-item>
             </f7-list>
@@ -26,9 +27,12 @@ export default {
     props: [
         'value',
         'valueType', // item or index
-        'keyField', // for value type = item
-        'valueField',
+        'keyField', // for value type == item
+        'valueField', // for value type == item
         'titleField',
+        'iconField',
+        'iconType',
+        'colorField',
         'items',
         'show'
     ],
@@ -39,12 +43,21 @@ export default {
             currentValue: self.value
         }
     },
+    computed: {
+        hugeListItemRows() {
+            return this.items.length > 10;
+        }
+    },
     methods: {
         onItemClicked(item, index) {
             if (this.valueType === 'index') {
                 this.currentValue = index;
             } else {
-                this.currentValue = item;
+                if (this.valueField) {
+                    this.currentValue = item[this.valueField];
+                } else {
+                    this.currentValue = item;
+                }
             }
 
             this.$emit('input', this.currentValue);
@@ -60,9 +73,21 @@ export default {
             if (this.valueType === 'index') {
                 return this.currentValue === index;
             } else {
-                return this.currentValue === item;
+                if (this.valueField) {
+                    return this.currentValue === item[this.valueField];
+                } else {
+                    return this.currentValue === item;
+                }
             }
         }
     }
 }
 </script>
+
+<style>
+@media (min-height: 630px) {
+    .list-item-selection-huge-sheet {
+        height: 400px;
+    }
+}
+</style>

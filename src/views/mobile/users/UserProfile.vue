@@ -10,11 +10,12 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list inline-labels>
                     <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
                     <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
                     <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
                     <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
+                    <f7-list-item title="Default Currency" after="Currency"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

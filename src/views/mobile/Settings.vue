@@ -104,6 +104,7 @@ export default {
             },
             set: function (value) {
                 this.$locale.setLanguage(value);
+                this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
             }
         },
         isAutoUpdateExchangeRatesData: {

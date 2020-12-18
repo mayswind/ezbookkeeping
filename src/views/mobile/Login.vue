@@ -66,7 +66,7 @@
                     <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list form no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list no-hairlines class="no-margin-top margin-bottom">
                         <f7-list-input
                             type="number"
                             autocomplete="one-time-code"
@@ -76,6 +76,7 @@
                             :placeholder="$t('Passcode')"
                             :value="passcode"
                             @input="passcode = $event.target.value"
+                            @keyup.enter.native="verify"
                         ></f7-list-input>
                         <f7-list-input
                             outline
@@ -84,6 +85,7 @@
                             :placeholder="$t('Backup Code')"
                             :value="backupCode"
                             @input="backupCode = $event.target.value"
+                            @keyup.enter.native="verify"
                         ></f7-list-input>
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty || verifying }" :text="$t('Verify')" @click="verify"></f7-button>
@@ -239,6 +241,10 @@ export default {
         verify() {
             const self = this;
             const router = self.$f7router;
+
+            if (self.twoFAInputIsEmpty || self.verifying) {
+                return;
+            }
 
             if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
                 self.$alert('Passcode cannot be empty');

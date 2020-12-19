@@ -79,14 +79,14 @@
             </f7-card-content>
         </f7-card>
 
-        <PasswordInputSheet :title="$t('Current Password')"
-                            :hint="$t('Please enter your current password when modifying your password')"
-                            :show.sync="showInputPasswordSheet"
-                            :confirm-disabled="saving"
-                            :cancel-disabled="saving"
-                            v-model="currentPassword"
-                            @password:confirm="save()">
-        </PasswordInputSheet>
+        <password-input-sheet :title="$t('Current Password')"
+                              :hint="$t('Please enter your current password when modifying your password')"
+                              :show.sync="showInputPasswordSheet"
+                              :confirm-disabled="saving"
+                              :cancel-disabled="saving"
+                              v-model="currentPassword"
+                              @password:confirm="save()">
+        </password-input-sheet>
     </f7-page>
 </template>
 

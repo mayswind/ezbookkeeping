@@ -9,7 +9,7 @@
                 <p class="no-margin-top margin-bottom-half">{{ hint }}</p>
                 <f7-list no-hairlines class="no-margin-top margin-bottom">
                     <f7-list-item class="list-item-pincode-input">
-                        <PincodeInput secure :length="6" v-model="currentPinCode" />
+                        <pincode-input secure :length="6" v-model="currentPinCode" />
                     </f7-list-item>
                 </f7-list>
                 <f7-button large fill

@@ -44,11 +44,11 @@
                         :title="transaction.sourceAmount | currency"
                         @click="transaction.showSourceAmountSheet = true"
                     >
-                        <NumberPadSheet :min-value="$constants.transaction.minAmount"
-                                        :max-value="$constants.transaction.maxAmount"
-                                        :show.sync="transaction.showSourceAmountSheet"
-                                        v-model="transaction.sourceAmount"
-                        ></NumberPadSheet>
+                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                          :max-value="$constants.transaction.maxAmount"
+                                          :show.sync="transaction.showSourceAmountSheet"
+                                          v-model="transaction.sourceAmount"
+                        ></number-pad-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -59,11 +59,11 @@
                         @click="transaction.showDestinationAmountSheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
-                        <NumberPadSheet :min-value="$constants.transaction.minAmount"
-                                        :max-value="$constants.transaction.maxAmount"
-                                        :show.sync="transaction.showDestinationAmountSheet"
-                                        v-model="transaction.destinationAmount"
-                        ></NumberPadSheet>
+                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                          :max-value="$constants.transaction.maxAmount"
+                                          :show.sync="transaction.showDestinationAmountSheet"
+                                          v-model="transaction.destinationAmount"
+                        ></number-pad-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -81,13 +81,13 @@
                         :title="transaction.sourceAccountId | accountName(plainAllAccounts)"
                         @click="transaction.showSourceAccountSheet = true"
                     >
-                        <ListItemSelectionSheet value-type="item"
-                                                key-field="id" value-field="id" title-field="name"
-                                                icon-field="icon" icon-type="account" color-field="color"
-                                                :items="plainAllAccounts"
-                                                :show.sync="transaction.showSourceAccountSheet"
-                                                v-model="transaction.sourceAccountId">
-                        </ListItemSelectionSheet>
+                        <list-item-selection-sheet value-type="item"
+                                                   key-field="id" value-field="id" title-field="name"
+                                                   icon-field="icon" icon-type="account" color-field="color"
+                                                   :items="plainAllAccounts"
+                                                   :show.sync="transaction.showSourceAccountSheet"
+                                                   v-model="transaction.sourceAccountId">
+                        </list-item-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -99,13 +99,13 @@
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                         @click="transaction.showDestinationAccountSheet = true"
                     >
-                        <ListItemSelectionSheet value-type="item"
-                                                key-field="id" value-field="id" title-field="name"
-                                                icon-field="icon" icon-type="account" color-field="color"
-                                                :items="plainAllAccounts"
-                                                :show.sync="transaction.showDestinationAccountSheet"
-                                                v-model="transaction.destinationAccountId">
-                        </ListItemSelectionSheet>
+                        <list-item-selection-sheet value-type="item"
+                                                   key-field="id" value-field="id" title-field="name"
+                                                   icon-field="icon" icon-type="account" color-field="color"
+                                                   :items="plainAllAccounts"
+                                                   :show.sync="transaction.showDestinationAccountSheet"
+                                                   v-model="transaction.destinationAccountId">
+                        </list-item-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-input

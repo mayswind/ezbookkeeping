@@ -52,12 +52,12 @@
             </f7-actions-group>
         </f7-actions>
 
-        <ListItemSelectionSheet value-type="index"
-                                title-field="displayName"
-                                :items="allLanguages"
-                                :show.sync="showChangeLocaleSheet"
-                                v-model="currentLocale">
-        </ListItemSelectionSheet>
+        <list-item-selection-sheet value-type="index"
+                                   title-field="displayName"
+                                   :items="allLanguages"
+                                   :show.sync="showChangeLocaleSheet"
+                                   v-model="currentLocale">
+        </list-item-selection-sheet>
     </f7-page>
 </template>
 

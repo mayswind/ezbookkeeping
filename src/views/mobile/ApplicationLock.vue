@@ -27,19 +27,19 @@
             </f7-card-content>
         </f7-card>
 
-        <PinCodeInputSheet :title="$t('PIN Code')"
-                           :hint="$t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
-                           :show.sync="showInputPinCodeSheetForEnable"
-                           v-model="currentPinCodeForEnable"
-                           @pincode:confirm="enable">
-        </PinCodeInputSheet>
+        <pin-code-input-sheet :title="$t('PIN Code')"
+                              :hint="$t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
+                              :show.sync="showInputPinCodeSheetForEnable"
+                              v-model="currentPinCodeForEnable"
+                              @pincode:confirm="enable">
+        </pin-code-input-sheet>
 
-        <PinCodeInputSheet :title="$t('PIN Code')"
-                           :hint="$t('Please enter your current PIN code when disable application lock')"
-                           :show.sync="showInputPinCodeSheetForDisable"
-                           v-model="currentPinCodeForDisable"
-                           @pincode:confirm="disable">
-        </PinCodeInputSheet>
+        <pin-code-input-sheet :title="$t('PIN Code')"
+                              :hint="$t('Please enter your current PIN code when disable application lock')"
+                              :show.sync="showInputPinCodeSheetForDisable"
+                              v-model="currentPinCodeForDisable"
+                              @pincode:confirm="disable">
+        </pin-code-input-sheet>
     </f7-page>
 </template>
 

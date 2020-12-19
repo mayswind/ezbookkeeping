@@ -34,20 +34,20 @@
                     <f7-list-item :header="$t('Category Icon')" key="singleTypeCategoryIconSelection" link="#"
                                   @click="category.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="category.icon | categoryIcon" :style="{ color: '#' + category.color }"></f7-icon>
-                        <IconSelectionSheet :all-icon-infos="allCategoryIcons"
-                                            :show.sync="category.showIconSelectionSheet"
-                                            :color="category.color"
-                                            v-model="category.icon"
-                        ></IconSelectionSheet>
+                        <icon-selection-sheet :all-icon-infos="allCategoryIcons"
+                                              :show.sync="category.showIconSelectionSheet"
+                                              :color="category.color"
+                                              v-model="category.icon"
+                        ></icon-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Category Color')" key="singleTypeCategoryColorSelection" link="#"
                                   @click="category.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + category.color }"></f7-icon>
-                        <ColorSelectionSheet :all-color-infos="allCategoryColors"
-                                             :show.sync="category.showColorSelectionSheet"
-                                             v-model="category.color"
-                        ></ColorSelectionSheet>
+                        <color-selection-sheet :all-color-infos="allCategoryColors"
+                                               :show.sync="category.showColorSelectionSheet"
+                                               v-model="category.color"
+                        ></color-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-input

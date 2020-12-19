@@ -73,20 +73,20 @@
                     <f7-list-item :header="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
-                        <IconSelectionSheet :all-icon-infos="allAccountIcons"
-                                            :show.sync="account.showIconSelectionSheet"
-                                            :color="account.color"
-                                            v-model="account.icon"
-                        ></IconSelectionSheet>
+                        <icon-selection-sheet :all-icon-infos="allAccountIcons"
+                                              :show.sync="account.showIconSelectionSheet"
+                                              :color="account.color"
+                                              v-model="account.icon"
+                        ></icon-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
-                        <ColorSelectionSheet :all-color-infos="allAccountColors"
-                                             :show.sync="account.showColorSelectionSheet"
-                                             v-model="account.color"
-                        ></ColorSelectionSheet>
+                        <color-selection-sheet :all-color-infos="allAccountColors"
+                                               :show.sync="account.showColorSelectionSheet"
+                                               v-model="account.color"
+                        ></color-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -108,11 +108,11 @@
                         :after="account.balance | currency(account.currency)"
                         @click="account.showBalanceSheet = true"
                     >
-                        <NumberPadSheet :min-value="$constants.transaction.minAmount"
-                                        :max-value="$constants.transaction.maxAmount"
-                                        :show.sync="account.showBalanceSheet"
-                                        v-model="account.balance"
-                        ></NumberPadSheet>
+                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                          :max-value="$constants.transaction.maxAmount"
+                                          :show.sync="account.showBalanceSheet"
+                                          v-model="account.balance"
+                        ></number-pad-sheet>
                     </f7-list-item>
 
                     <f7-list-input
@@ -145,20 +145,20 @@
                     <f7-list-item :header="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
-                        <IconSelectionSheet :all-icon-infos="allAccountIcons"
-                                            :show.sync="account.showIconSelectionSheet"
-                                            :color="account.color"
-                                            v-model="account.icon"
-                        ></IconSelectionSheet>
+                        <icon-selection-sheet :all-icon-infos="allAccountIcons"
+                                              :show.sync="account.showIconSelectionSheet"
+                                              :color="account.color"
+                                              v-model="account.icon"
+                        ></icon-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item :header="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
-                        <ColorSelectionSheet :all-color-infos="allAccountColors"
-                                             :show.sync="account.showColorSelectionSheet"
-                                             v-model="account.color"
-                        ></ColorSelectionSheet>
+                        <color-selection-sheet :all-color-infos="allAccountColors"
+                                               :show.sync="account.showColorSelectionSheet"
+                                               v-model="account.color"
+                        ></color-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-input
@@ -196,20 +196,20 @@
                         <f7-list-item :header="$t('Sub Account Icon')" link="#"
                                       @click="subAccount.showIconSelectionSheet = true">
                             <f7-icon slot="after" :icon="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
-                            <IconSelectionSheet :all-icon-infos="allAccountIcons"
-                                                :show.sync="subAccount.showIconSelectionSheet"
-                                                :color="subAccount.color"
-                                                v-model="subAccount.icon"
-                            ></IconSelectionSheet>
+                            <icon-selection-sheet :all-icon-infos="allAccountIcons"
+                                                  :show.sync="subAccount.showIconSelectionSheet"
+                                                  :color="subAccount.color"
+                                                  v-model="subAccount.icon"
+                            ></icon-selection-sheet>
                         </f7-list-item>
 
                         <f7-list-item :header="$t('Sub Account Color')" link="#"
                                       @click="subAccount.showColorSelectionSheet = true">
                             <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + subAccount.color }"></f7-icon>
-                            <ColorSelectionSheet :all-color-infos="allAccountColors"
-                                                 :show.sync="subAccount.showColorSelectionSheet"
-                                                 v-model="subAccount.color"
-                            ></ColorSelectionSheet>
+                            <color-selection-sheet :all-color-infos="allAccountColors"
+                                                   :show.sync="subAccount.showColorSelectionSheet"
+                                                   v-model="subAccount.color"
+                            ></color-selection-sheet>
                         </f7-list-item>
 
                         <f7-list-item
@@ -231,11 +231,11 @@
                             :after="subAccount.balance | currency(subAccount.currency)"
                             @click="subAccount.showBalanceSheet = true"
                         >
-                            <NumberPadSheet :min-value="$constants.transaction.minAmount"
-                                            :max-value="$constants.transaction.maxAmount"
-                                            :show.sync="subAccount.showBalanceSheet"
-                                            v-model="subAccount.balance"
-                            ></NumberPadSheet>
+                            <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                              :max-value="$constants.transaction.maxAmount"
+                                              :show.sync="subAccount.showBalanceSheet"
+                                              v-model="subAccount.balance"
+                            ></number-pad-sheet>
                         </f7-list-item>
 
                         <f7-list-input

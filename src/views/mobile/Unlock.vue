@@ -3,7 +3,7 @@
         <f7-login-screen-title>{{ $t('Unlock') }}</f7-login-screen-title>
         <f7-list form>
             <f7-list-item class="list-item-pincode-input">
-                <PincodeInput secure :length="6" v-model="pinCode" @keyup.native="unlockByPin" />
+                <pincode-input secure :length="6" v-model="pinCode" @keyup.native="unlockByPin" />
             </f7-list-item>
         </f7-list>
         <f7-list>

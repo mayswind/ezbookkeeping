@@ -103,13 +103,13 @@ export default {
             let title = '';
 
             switch (this.categoryType) {
-                case '1':
+                case this.$constants.category.allCategoryTypes.Income:
                     title = 'Income';
                     break;
-                case '2':
+                case this.$constants.category.allCategoryTypes.Expense:
                     title = 'Expense';
                     break;
-                case '3':
+                case this.$constants.category.allCategoryTypes.Transfer:
                     title = 'Transfer';
                     break;
                 default:
@@ -143,7 +143,9 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
-        if (query.type !== '1' && query.type !== '2' && query.type !== '3') {
+        if (query.type !== this.$constants.category.allCategoryTypes.Income &&
+            query.type !== this.$constants.category.allCategoryTypes.Expense &&
+            query.type !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             router.back();
             return;

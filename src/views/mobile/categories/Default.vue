@@ -85,7 +85,10 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
-        if (query.type !== '0' && query.type !== '1' && query.type !== '2' && query.type !== '3') {
+        if (query.type !== '0' &&
+            query.type !== this.$constants.category.allCategoryTypes.Income &&
+            query.type !== this.$constants.category.allCategoryTypes.Expense &&
+            query.type !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             router.back();
             return;
@@ -110,11 +113,11 @@ export default {
     methods: {
         getDefaultCategories(categoryType) {
             switch (categoryType) {
-                case '1':
+                case this.$constants.category.allCategoryTypes.Income:
                     return this.$constants.category.defaultIncomeCategories;
-                case '2':
+                case this.$constants.category.allCategoryTypes.Expense:
                     return this.$constants.category.defaultExpenseCategories;
-                case '3':
+                case this.$constants.category.allCategoryTypes.Transfer:
                     return this.$constants.category.defaultTransferCategories;
                 default:
                     return [];
@@ -187,11 +190,11 @@ export default {
     filters: {
         categoryTypeName(categoryType) {
             switch (categoryType) {
-                case '1':
+                case this.$constants.category.allCategoryTypes.Income:
                     return 'Income Categories';
-                case '2':
+                case this.$constants.category.allCategoryTypes.Expense:
                     return 'Expense Categories';
-                case '3':
+                case this.$constants.category.allCategoryTypes.Transfer:
                     return 'Transfer Categories';
                 default:
                     return 'Transaction Categories';

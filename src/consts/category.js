@@ -1,3 +1,9 @@
+const allCategoryTypes = {
+    Income: 1,
+    Expense: 2,
+    Transfer: 3
+};
+
 const defaultExpenseCategories = [
     {
         name: 'Food & Drink',
@@ -443,6 +449,7 @@ const defaultTransferCategories = [
 ];
 
 export default {
+    allCategoryTypes: allCategoryTypes,
     defaultExpenseCategories: defaultExpenseCategories,
     defaultIncomeCategories: defaultIncomeCategories,
     defaultTransferCategories: defaultTransferCategories,

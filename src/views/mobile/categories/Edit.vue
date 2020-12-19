@@ -175,7 +175,9 @@ export default {
                 }
             });
         } else if (query.parentId) {
-            if (query.type !== '1' && query.type !== '2' && query.type !== '3') {
+            if (query.type !== this.$constants.category.allCategoryTypes.Income &&
+                query.type !== this.$constants.category.allCategoryTypes.Expense &&
+                query.type !== this.$constants.category.allCategoryTypes.Transfer) {
                 self.$toast('Parameter Invalid');
                 router.back();
                 return;

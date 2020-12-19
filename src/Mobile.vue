@@ -61,6 +61,10 @@ export default {
 </script>
 
 <style>
+html, body {
+    position: fixed;
+}
+
 body {
     -ms-user-select: none;
     -webkit-user-select: none;

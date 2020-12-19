@@ -24,7 +24,7 @@
                         style="font-size: 40px;"
                         header="Expense Amount" title="0.00">
                     </f7-list-item>
-                    <f7-list-item class="transaction-edit-category" header="Category" link="#"></f7-list-item>
+                    <f7-list-item class="transaction-edit-category" header="Category" title="Category Names" link="#"></f7-list-item>
                     <f7-list-item class="transaction-edit-account" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
                     <f7-list-item header="Tags" link="#"></f7-list-item>
@@ -68,9 +68,77 @@
 
                     <f7-list-item
                         class="transaction-edit-category"
+                        key="expenseCategorySelection"
                         link="#"
+                        :class="{ 'disabled': !hasAvailableExpenseCategories }"
                         :header="$t('Category')"
+                        @click="transaction.showCategorySheet = true"
+                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
                     >
+                        <div slot="title">
+                            <span>{{ transaction.expenseCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                            <span>{{ transaction.expenseCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                        </div>
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                              primary-sub-items-field="subCategories"
+                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                              :items="allCategories[$constants.category.allCategoryTypes.Expense]"
+                                                              :show.sync="transaction.showCategorySheet"
+                                                              v-model="transaction.expenseCategory">
+                        </two-column-list-item-selection-sheet>
+                    </f7-list-item>
+
+                    <f7-list-item
+                        class="transaction-edit-category"
+                        key="incomeCategorySelection"
+                        link="#"
+                        :class="{ 'disabled': !hasAvailableIncomeCategories }"
+                        :header="$t('Category')"
+                        @click="transaction.showCategorySheet = true"
+                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
+                    >
+                        <div slot="title">
+                            <span>{{ transaction.incomeCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                            <span>{{ transaction.incomeCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                        </div>
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                              primary-sub-items-field="subCategories"
+                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                              :items="allCategories[$constants.category.allCategoryTypes.Income]"
+                                                              :show.sync="transaction.showCategorySheet"
+                                                              v-model="transaction.incomeCategory">
+                        </two-column-list-item-selection-sheet>
+                    </f7-list-item>
+
+                    <f7-list-item
+                        class="transaction-edit-category"
+                        key="transferCategorySelection"
+                        link="#"
+                        :class="{ 'disabled': !hasAvailableTransferCategories }"
+                        :header="$t('Category')"
+                        @click="transaction.showCategorySheet = true"
+                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+                    >
+                        <div slot="title">
+                            <span>{{ transaction.transferCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                            <span>{{ transaction.transferCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                        </div>
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                              primary-sub-items-field="subCategories"
+                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                              :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
+                                                              :show.sync="transaction.showCategorySheet"
+                                                              v-model="transaction.transferCategory">
+                        </two-column-list-item-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -159,6 +227,9 @@ export default {
                 type: 3,
                 unixTime: self.$utilities.getUnixTime(now),
                 time: self.$utilities.formatDate(now, 'YYYY-MM-DDTHH:mm'),
+                expenseCategory: '',
+                incomeCategory: '',
+                transferCategory: '',
                 sourceAccountId: '',
                 destinationAccountId: '',
                 sourceAmount: 0,
@@ -167,6 +238,7 @@ export default {
                 comment: '',
                 showSourceAmountSheet: false,
                 showDestinationAmountSheet: false,
+                showCategorySheet: false,
                 showSourceAccountSheet: false,
                 showDestinationAccountSheet: false
             },
@@ -211,6 +283,30 @@ export default {
             } else {
                 return '';
             }
+        },
+        hasAvailableExpenseCategories() {
+            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Expense] || !this.allCategories[this.$constants.category.allCategoryTypes.Expense].length) {
+                return false;
+            }
+
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Expense]);
+            return firstAvailableCategoryId !== '';
+        },
+        hasAvailableIncomeCategories() {
+            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Income] || !this.allCategories[this.$constants.category.allCategoryTypes.Income].length) {
+                return false;
+            }
+
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Income]);
+            return firstAvailableCategoryId !== '';
+        },
+        hasAvailableTransferCategories() {
+            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Transfer] || !this.allCategories[this.$constants.category.allCategoryTypes.Transfer].length) {
+                return false;
+            }
+
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Transfer]);
+            return firstAvailableCategoryId !== '';
         },
         sourceAmountFontSize() {
             return this.getFontSizeByAmount(this.transaction.sourceAmount);
@@ -345,10 +441,39 @@ export default {
             self.allCategories = categoryData.result;
             self.allTags = tagData.result;
 
+            if (self.allCategories[self.$constants.category.allCategoryTypes.Expense] &&
+                self.allCategories[self.$constants.category.allCategoryTypes.Expense].length) {
+                self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Expense]);
+            }
+
+            if (self.allCategories[self.$constants.category.allCategoryTypes.Income] &&
+                self.allCategories[self.$constants.category.allCategoryTypes.Income].length) {
+                self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Income]);
+            }
+
+            if (self.allCategories[self.$constants.category.allCategoryTypes.Transfer] &&
+                self.allCategories[self.$constants.category.allCategoryTypes.Transfer].length) {
+                self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Transfer]);
+            }
+
+            if (self.plainAllAccounts.length) {
+                self.transaction.sourceAccountId = self.plainAllAccounts[0].id;
+                self.transaction.destinationAccountId = self.plainAllAccounts[0].id;
+            }
+
             if (self.editTransactionId) {
                 const transaction = responses[3].data.result;
 
                 self.transaction.type = transaction.type;
+
+                if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
+                    self.transaction.expenseCategory = transaction.categoryId;
+                } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Income) {
+                    self.transaction.incomeCategory = transaction.categoryId;
+                } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Transfer) {
+                    self.transaction.transferCategory = transaction.categoryId;
+                }
+
                 self.transaction.unixTime = transaction.time;
                 self.transaction.time = self.$utilities.formatDate(transaction.time, 'YYYY-MM-DDTHH:mm');
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
@@ -357,9 +482,6 @@ export default {
                 self.transaction.destinationAmount = transaction.destinationAmount;
                 self.transaction.tagIds = transaction.tagIds;
                 self.transaction.comment = transaction.comment;
-            } else if (!self.editTransactionId && self.plainAllAccounts.length) {
-                self.transaction.sourceAccountId = self.plainAllAccounts[0].id;
-                self.transaction.destinationAccountId = self.plainAllAccounts[0].id;
             }
 
             self.loading = false;
@@ -385,6 +507,17 @@ export default {
         save() {
 
         },
+        getFirstAvailableCategoryId(categories) {
+            if (!categories || !categories.length) {
+                return '';
+            }
+
+            for (let i = 0; i < categories.length; i++) {
+                for (let j = 0; j < categories[i].subCategories.length; j++) {
+                    return categories[i].subCategories[j].id;
+                }
+            }
+        },
         getFontSizeByAmount(amount) {
             if (amount >= 100000000 || amount <= -100000000) {
                 return 32;
@@ -396,6 +529,30 @@ export default {
         }
     },
     filters: {
+        primaryCategoryName(categoryId, allCategories) {
+            for (let i = 0; i < allCategories.length; i++) {
+                for (let j = 0; j < allCategories[i].subCategories.length; j++) {
+                    const subCategory = allCategories[i].subCategories[j];
+                    if (subCategory.id === categoryId) {
+                        return allCategories[i].name;
+                    }
+                }
+            }
+
+            return '';
+        },
+        secondaryCategoryName(categoryId, allCategories) {
+            for (let i = 0; i < allCategories.length; i++) {
+                for (let j = 0; j < allCategories[i].subCategories.length; j++) {
+                    const subCategory = allCategories[i].subCategories[j];
+                    if (subCategory.id === categoryId) {
+                        return subCategory.name;
+                    }
+                }
+            }
+
+            return '';
+        },
         accountName(accountId, allAccounts) {
             for (let i = 0; i < allAccounts.length; i++) {
                 if (allAccounts[i].id === accountId) {
@@ -419,6 +576,14 @@ export default {
 </script>
 
 <style>
+.category-separate-icon {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 18px;
+    line-height: 16px;
+    color: var(--f7-color-gray-tint);
+}
+
 .transaction-edit-amount {
     line-height: 53px;
     color: var(--f7-theme-color);
@@ -428,7 +593,7 @@ export default {
     font-weight: bolder;
 }
 
-.transaction-edit-account .item-header {
+.transaction-edit-category .item-header, .transaction-edit-account .item-header {
     margin-bottom: 11px;
 }
 

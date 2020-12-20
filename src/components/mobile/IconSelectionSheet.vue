@@ -75,6 +75,7 @@ export default {
         onIconClicked(iconInfo) {
             this.currentValue = iconInfo.id;
             this.$emit('input', this.currentValue);
+            this.$emit('update:show', false);
         },
         onSheetOpen() {
             this.currentValue = this.value;

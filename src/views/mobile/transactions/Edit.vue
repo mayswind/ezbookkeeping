@@ -80,15 +80,15 @@
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.expenseCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
                         </div>
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                              primary-sub-items-field="subCategories"
-                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                              :items="allCategories[$constants.category.allCategoryTypes.Expense]"
-                                                              :show.sync="transaction.showCategorySheet"
-                                                              v-model="transaction.expenseCategory">
-                        </two-column-list-item-selection-sheet>
+                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   :items="allCategories[$constants.category.allCategoryTypes.Expense]"
+                                                   :show.sync="transaction.showCategorySheet"
+                                                   v-model="transaction.expenseCategory">
+                        </tree-view-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -105,15 +105,15 @@
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.incomeCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
                         </div>
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                              primary-sub-items-field="subCategories"
-                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                              :items="allCategories[$constants.category.allCategoryTypes.Income]"
-                                                              :show.sync="transaction.showCategorySheet"
-                                                              v-model="transaction.incomeCategory">
-                        </two-column-list-item-selection-sheet>
+                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   :items="allCategories[$constants.category.allCategoryTypes.Income]"
+                                                   :show.sync="transaction.showCategorySheet"
+                                                   v-model="transaction.incomeCategory">
+                        </tree-view-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
@@ -130,15 +130,15 @@
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.transferCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
                         </div>
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                              primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                              primary-sub-items-field="subCategories"
-                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                              secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                              :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
-                                                              :show.sync="transaction.showCategorySheet"
-                                                              v-model="transaction.transferCategory">
-                        </two-column-list-item-selection-sheet>
+                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
+                                                   :show.sync="transaction.showCategorySheet"
+                                                   v-model="transaction.transferCategory">
+                        </tree-view-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item

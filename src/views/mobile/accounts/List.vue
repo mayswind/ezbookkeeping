@@ -10,7 +10,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card :class="{ 'bg-color-yellow': true, 'skeleton-text': loading }">
+        <f7-card class="account-overview-card" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 100px;">
                 <small :style="{ opacity: 0.6 }">{{ loading ? 'Net assets' : $t('Net assets') }}</small><br />
                 <span class="net-assets" v-if="loading">0.00 USD</span>
@@ -636,6 +636,14 @@ export default {
 </script>
 
 <style>
+.account-overview-card {
+    background-color: var(--f7-color-yellow);
+}
+
+.theme-dark .account-overview-card {
+    background-color: var(--f7-theme-color);
+}
+
 .net-assets {
     font-size: 1.5em;
 }

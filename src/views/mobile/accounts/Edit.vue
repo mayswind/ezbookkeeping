@@ -60,10 +60,15 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-input inline-label label="Account Name" placeholder="Your account name"></f7-list-input>
-                    <f7-list-item title="Account Icon" after="Icon"></f7-list-item>
-                    <f7-list-item title="Account Color" after="Color"></f7-list-item>
-                    <f7-list-item title="Currency" after="Currency"></f7-list-item>
-                    <f7-list-item title="Account Balance" after="Balance"></f7-list-item>
+                    <f7-list-item title="Account Icon" link="#">
+                        <f7-icon f7="app_fill"></f7-icon>
+                    </f7-list-item>
+                    <f7-list-item title="Account Color" link="#">
+                        <f7-icon f7="app_fill"></f7-icon>
+                    </f7-list-item>
+                    <f7-list-item title="Currency" after="Currency" link="#"></f7-list-item>
+                    <f7-list-item title="Account Balance" after="Balance" link="#"></f7-list-item>
+                    <f7-list-item title="Visible" after="Visible"></f7-list-item>
                     <f7-list-input type="textarea" placeholder="Your account description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>

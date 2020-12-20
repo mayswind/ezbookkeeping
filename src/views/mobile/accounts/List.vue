@@ -33,30 +33,71 @@
         </f7-card>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>Account Category</f7-card-header>
+            <f7-card-header>
+                <small style="opacity: 0.6;">Account Category</small>
+            </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
+                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex padding-top-half padding-bottom-half">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                                <div class="nested-list-item-title">Account Name</div>
+                            </div>
+                        </f7-block>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>Account Category 2</f7-card-header>
+            <f7-card-header>
+                <small style="opacity: 0.6;">Account Category 2</small>
+            </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
-                    <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex padding-top-half padding-bottom-half">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                                <div class="nested-list-item-title">Account Name</div>
+                            </div>
+                        </f7-block>
+                    </f7-list-item>
+                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex padding-top-half padding-bottom-half">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                                <div class="nested-list-item-title">Account Name 2</div>
+                            </div>
+                        </f7-block>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
         <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>Account Category 3</f7-card-header>
+            <f7-card-header>
+                <small style="opacity: 0.6;">Account Category 3</small>
+            </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item title="Account Name" after="0.00 USD"></f7-list-item>
-                    <f7-list-item title="Account Name 2" after="0.00 USD"></f7-list-item>
+                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex padding-top-half padding-bottom-half">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                                <div class="nested-list-item-title">Account Name</div>
+                            </div>
+                        </f7-block>
+                    </f7-list-item>
+                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex padding-top-half padding-bottom-half">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                                <div class="nested-list-item-title">Account Name 2</div>
+                            </div>
+                        </f7-block>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

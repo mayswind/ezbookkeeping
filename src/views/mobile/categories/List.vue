@@ -13,9 +13,15 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item title="Category Name"></f7-list-item>
-                    <f7-list-item title="Category Name 2"></f7-list-item>
-                    <f7-list-item title="Category Name 3"></f7-list-item>
+                    <f7-list-item title="Category Name">
+                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                    </f7-list-item>
+                    <f7-list-item title="Category Name 2">
+                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                    </f7-list-item>
+                    <f7-list-item title="Category Name 3">
+                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

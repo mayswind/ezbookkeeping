@@ -200,6 +200,10 @@
                                 <f7-icon slot="media" f7="number"></f7-icon>
                             </f7-chip>
                         </f7-block>
+                        <f7-block class="margin-top-half no-padding" slot="footer" v-else-if="!transaction.tagIds.length">
+                            <f7-chip class="transaction-edit-tag" :text="$t('None')">
+                            </f7-chip>
+                        </f7-block>
                     </f7-list-item>
 
                     <f7-list-input

@@ -33,7 +33,9 @@
 
                     <f7-list-item :header="$t('Category Icon')" key="singleTypeCategoryIconSelection" link="#"
                                   @click="category.showIconSelectionSheet = true">
-                        <f7-icon slot="after" :icon="category.icon | categoryIcon" :style="{ color: '#' + category.color }"></f7-icon>
+                        <f7-icon slot="after"
+                                 :icon="category.icon | categoryIcon"
+                                 :style="{ color: (category.color && category.color !== '000000' ? '#' + category.color : 'var(--default-icon-color)') }"></f7-icon>
                         <icon-selection-sheet :all-icon-infos="allCategoryIcons"
                                               :show.sync="category.showIconSelectionSheet"
                                               :color="category.color"
@@ -43,7 +45,9 @@
 
                     <f7-list-item :header="$t('Category Color')" key="singleTypeCategoryColorSelection" link="#"
                                   @click="category.showColorSelectionSheet = true">
-                        <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + category.color }"></f7-icon>
+                        <f7-icon slot="after"
+                                 f7="app_fill"
+                                 :style="{ color: (category.color && category.color !== '000000' ? '#' + category.color : 'var(--default-icon-color)') }"></f7-icon>
                         <color-selection-sheet :all-color-infos="allCategoryColors"
                                                :show.sync="category.showColorSelectionSheet"
                                                v-model="category.color"

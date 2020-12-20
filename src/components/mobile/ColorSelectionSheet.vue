@@ -10,7 +10,9 @@
             <f7-block class="margin-vertical">
                 <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allColorRows" :key="idx">
                     <f7-col class="text-align-center" v-for="colorInfo in row" :key="colorInfo.color">
-                        <f7-icon f7="app_fill" :style="{ color: '#' + colorInfo.color }" @click.native="onColorClicked(colorInfo)">
+                        <f7-icon f7="app_fill"
+                                 :style="{ color: (colorInfo.color && colorInfo.color !== '000000' ? '#' + colorInfo.color : 'var(--default-icon-color)') }"
+                                 @click.native="onColorClicked(colorInfo)">
                             <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === colorInfo.color">
                                 <f7-icon f7="checkmark_alt"></f7-icon>
                             </f7-badge>

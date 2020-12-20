@@ -17,7 +17,10 @@
                                           :value="primaryValueField ? item[primaryValueField] : item"
                                           :title="primaryTitleField ? item[primaryTitleField] : item"
                                           @click="onPrimaryItemClicked(item)">
-                                <f7-icon slot="media" :icon="item[primaryIconField] | icon(primaryIconType)" :style="{ color: '#' + (primaryColorField ? item[primaryColorField] : '000000') }" v-if="primaryIconField"></f7-icon>
+                                <f7-icon slot="media"
+                                         :icon="item[primaryIconField] | icon(primaryIconType)"
+                                         :style="{ color: (primaryColorField && item[primaryColorField] && item[primaryColorField] !== '000000' ? '#' + item[primaryColorField] : 'var(--default-icon-color)') }"
+                                         v-if="primaryIconField"></f7-icon>
                                 <f7-icon slot="after" class="list-item-showing" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
                             </f7-list-item>
                         </f7-list>
@@ -32,7 +35,10 @@
                                           :value="secondaryValueField ? subItem[secondaryValueField] : subItem"
                                           :title="secondaryTitleField ? subItem[secondaryTitleField] : subItem"
                                           @click="onSecondaryItemClicked(subItem)">
-                                <f7-icon slot="media" :icon="subItem[secondaryIconField] | icon(secondaryIconType)" :style="{ color: '#' + (secondaryColorField ? subItem[secondaryColorField] : '000000') }" v-if="secondaryIconField"></f7-icon>
+                                <f7-icon slot="media"
+                                         :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
+                                         :style="{ color: (secondaryColorField && subItem[secondaryColorField] && subItem[secondaryColorField] !== '000000' ? '#' + subItem[secondaryColorField] : 'var(--default-icon-color)') }"
+                                         v-if="secondaryIconField"></f7-icon>
                                 <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
                             </f7-list-item>
                         </f7-list>

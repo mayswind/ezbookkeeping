@@ -14,7 +14,10 @@
                               :value="valueType === 'index' ? index : (valueField ? item[valueField] : item)"
                               :title="titleField ? (titleI18n ? $t(item[titleField]) : item[titleField]) : (titleI18n ? $t(item) : item)"
                               @click="onItemClicked(item, index)">
-                    <f7-icon slot="media" :icon="item[iconField] | icon(iconType)" :style="{ color: '#' + (colorField ? item[colorField] : '000000') }" v-if="iconField"></f7-icon>
+                    <f7-icon slot="media"
+                             :icon="item[iconField] | icon(iconType)"
+                             :style="{ color: (colorField && item[colorField] && item[colorField] !== '000000' ? '#' + item[colorField] : 'var(--default-icon-color)') }"
+                             v-if="iconField"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
                 </f7-list-item>
             </f7-list>

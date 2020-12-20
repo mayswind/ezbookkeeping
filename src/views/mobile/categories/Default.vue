@@ -23,7 +23,7 @@
                                   :title="$t('category.' + category.name, currentLocale)">
                         <f7-icon slot="media"
                                  :icon="category.categoryIconId | categoryIcon"
-                                 :style="{ color: '#' + category.color }">
+                                 :style="{ color: (category.color && category.color !== '000000' ? '#' + category.color : 'var(--default-icon-color)') }">
                         </f7-icon>
 
                         <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
@@ -33,7 +33,7 @@
                                               :title="$t('category.' + subCategory.name, currentLocale)">
                                     <f7-icon slot="media"
                                              :icon="subCategory.categoryIconId | categoryIcon"
-                                             :style="{ color: '#' + subCategory.color }">
+                                             :style="{ color: (subCategory.color && subCategory.color !== '000000' ? '#' + subCategory.color : 'var(--default-icon-color)') }">
                                     </f7-icon>
                                 </f7-list-item>
                             </f7-list>

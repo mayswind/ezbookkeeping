@@ -37,7 +37,9 @@
                                   :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
                                   v-show="showHidden || !category.hidden"
                                   swipeout @taphold.native="setSortable()">
-                        <f7-icon slot="media" :icon="category.icon | categoryIcon" :style="{ color: '#' + category.color }">
+                        <f7-icon slot="media"
+                                 :icon="category.icon | categoryIcon"
+                                 :style="{ color: (category.color && category.color !== '000000' ? '#' + category.color : 'var(--default-icon-color)') }">
                             <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
                                 <f7-icon f7="eye_slash_fill"></f7-icon>
                             </f7-badge>

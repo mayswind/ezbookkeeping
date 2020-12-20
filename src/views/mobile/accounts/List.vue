@@ -87,7 +87,8 @@
                     >
                         <f7-block slot="title" class="no-padding">
                             <div class="display-flex padding-top-half padding-bottom-half">
-                                <f7-icon slot="media" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }">
+                                <f7-icon slot="media" :icon="account.icon | accountIcon"
+                                         :style="{ color: (account.color && account.color !== '000000' ? '#' + account.color : 'var(--default-icon-color)') }">
                                     <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                         <f7-icon f7="eye_slash_fill"></f7-icon>
                                     </f7-badge>
@@ -101,7 +102,8 @@
                                                   :title="subAccount.name" :after="accountBalance(subAccount) | currency(subAccount.currency)"
                                                   link="#"
                                     >
-                                        <f7-icon slot="media" :icon="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }">
+                                        <f7-icon slot="media" :icon="subAccount.icon | accountIcon"
+                                                 :style="{ color: (subAccount.color && subAccount.color !== '000000' ? '#' + subAccount.color : 'var(--default-icon-color)') }">
                                             <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
                                                 <f7-icon f7="eye_slash_fill"></f7-icon>
                                             </f7-badge>

@@ -391,6 +391,11 @@ export default {
             }
         },
         'transaction.time': function (newValue) {
+            if (!newValue) {
+                newValue = this.$utilities.formatDate(new Date(), 'YYYY-MM-DDTHH:mm');
+                this.transaction.time = newValue;
+            }
+
             this.transaction.unixTime = this.$utilities.getUnixTime(newValue);
         }
     },

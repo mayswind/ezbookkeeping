@@ -15,7 +15,7 @@
                                           v-for="item in items"
                                           :key="primaryKeyField ? item[primaryKeyField] : item"
                                           :value="primaryValueField ? item[primaryValueField] : item"
-                                          :title="primaryTitleField ? item[primaryTitleField] : item"
+                                          :title="primaryTitleField ? (primaryTitleI18n ? $t(item[primaryTitleField]) : item[primaryTitleField]) : (primaryTitleI18n ? $t(item) : item)"
                                           @click="onPrimaryItemClicked(item)">
                                 <f7-icon slot="media"
                                          :icon="item[primaryIconField] | icon(primaryIconType)"
@@ -33,7 +33,7 @@
                                           v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
                                           :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                           :value="secondaryValueField ? subItem[secondaryValueField] : subItem"
-                                          :title="secondaryTitleField ? subItem[secondaryTitleField] : subItem"
+                                          :title="secondaryTitleField ? (secondaryTitleI18n ? $t(subItem[secondaryTitleField]) : subItem[secondaryTitleField]) : (secondaryTitleI18n ? $t(subItem) : subItem)"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <f7-icon slot="media"
                                          :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
@@ -56,6 +56,7 @@ export default {
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',
+        'primaryTitleI18n',
         'primaryIconField',
         'primaryIconType',
         'primaryColorField',
@@ -63,6 +64,7 @@ export default {
         'secondaryKeyField',
         'secondaryValueField',
         'secondaryTitleField',
+        'secondaryTitleI18n',
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',
@@ -80,10 +82,25 @@ export default {
     computed: {
         selectedPrimaryItem() {
             if (this.primaryValueField) {
-                for (let i = 0; i < this.items.length; i++) {
-                    const item = this.items[i];
-                    if (this.currentPrimaryValue === item[this.primaryValueField]) {
-                        return item;
+                if (this.$utilities.isArray(this.items)) {
+                    for (let i = 0; i < this.items.length; i++) {
+                        const item = this.items[i];
+
+                        if (this.currentPrimaryValue === item[this.primaryValueField]) {
+                            return item;
+                        }
+                    }
+                } else {
+                    for (let field in this.items) {
+                        if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
+                            continue;
+                        }
+
+                        const item = this.items[field];
+
+                        if (this.currentPrimaryValue === item[this.primaryValueField]) {
+                            return item;
+                        }
                     }
                 }
             } else {
@@ -125,21 +142,42 @@ export default {
                 return this.currentSecondaryValue === subItem;
             }
         },
+        isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue) {
+            for (let i = 0; i < primaryItem[this.primarySubItemsField].length; i++) {
+                const secondaryItem = primaryItem[this.primarySubItemsField][i];
+
+                if (this.secondaryValueField && secondaryItem[this.secondaryValueField] === secondaryValue) {
+                    return true;
+                } else if (!this.secondaryValueField && secondaryItem === secondaryValue) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
         getPrimaryValueBySecondaryValue(secondaryValue) {
             if (this.primarySubItemsField) {
-                for (let i = 0; i < this.items.length; i++) {
-                    const primaryItem = this.items[i];
+                if (this.$utilities.isArray(this.items)) {
+                    for (let i = 0; i < this.items.length; i++) {
+                        const primaryItem = this.items[i];
 
-                    for (let j = 0; j < primaryItem[this.primarySubItemsField].length; j++) {
-                        const secondaryItem = primaryItem[this.primarySubItemsField][j];
-
-                        if (this.secondaryValueField && secondaryItem[this.secondaryValueField] === secondaryValue) {
+                        if (this.isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue)) {
                             if (this.primaryValueField) {
                                 return primaryItem[this.primaryValueField];
                             } else {
                                 return primaryItem;
                             }
-                        } else if (!this.secondaryValueField && secondaryItem === secondaryValue) {
+                        }
+                    }
+                } else {
+                    for (let field in this.items) {
+                        if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
+                            continue;
+                        }
+
+                        const primaryItem = this.items[field];
+
+                        if (this.isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue)) {
                             if (this.primaryValueField) {
                                 return primaryItem[this.primaryValueField];
                             } else {

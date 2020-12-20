@@ -144,36 +144,40 @@
                     <f7-list-item
                         class="transaction-edit-account"
                         link="#"
-                        :class="{ 'disabled': !plainAllAccounts.length }"
+                        :class="{ 'disabled': !allAccounts.length }"
                         :header="$t(sourceAccountName)"
-                        :title="transaction.sourceAccountId | accountName(plainAllAccounts)"
+                        :title="transaction.sourceAccountId | accountName(allAccounts)"
                         @click="transaction.showSourceAccountSheet = true"
                     >
-                        <list-item-selection-sheet value-type="item"
-                                                   key-field="id" value-field="id" title-field="name"
-                                                   icon-field="icon" icon-type="account" color-field="color"
-                                                   :items="plainAllAccounts"
-                                                   :show.sync="transaction.showSourceAccountSheet"
-                                                   v-model="transaction.sourceAccountId">
-                        </list-item-selection-sheet>
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
+                                                              primary-sub-items-field="accounts"
+                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                              :items="categoriedAccounts"
+                                                              :show.sync="transaction.showSourceAccountSheet"
+                                                              v-model="transaction.sourceAccountId">
+                        </two-column-list-item-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-item
                         class="transaction-edit-account"
                         link="#"
-                        :class="{ 'disabled': !plainAllAccounts.length }"
+                        :class="{ 'disabled': !allAccounts.length }"
                         :header="$t('Destination Account')"
-                        :title="transaction.destinationAccountId | accountName(plainAllAccounts)"
+                        :title="transaction.destinationAccountId | accountName(allAccounts)"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                         @click="transaction.showDestinationAccountSheet = true"
                     >
-                        <list-item-selection-sheet value-type="item"
-                                                   key-field="id" value-field="id" title-field="name"
-                                                   icon-field="icon" icon-type="account" color-field="color"
-                                                   :items="plainAllAccounts"
-                                                   :show.sync="transaction.showDestinationAccountSheet"
-                                                   v-model="transaction.destinationAccountId">
-                        </list-item-selection-sheet>
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
+                                                              primary-sub-items-field="accounts"
+                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                              :items="categoriedAccounts"
+                                                              :show.sync="transaction.showDestinationAccountSheet"
+                                                              v-model="transaction.destinationAccountId">
+                        </two-column-list-item-selection-sheet>
                     </f7-list-item>
 
                     <f7-list-input
@@ -247,6 +251,7 @@ export default {
                 showDestinationAccountSheet: false
             },
             allAccounts: [],
+            categoriedAccounts: [],
             allCategories: {},
             allTags: [],
             loading: true,
@@ -318,25 +323,6 @@ export default {
         destinationAmountFontSize() {
             return this.getFontSizeByAmount(this.transaction.destinationAmount);
         },
-        plainAllAccounts() {
-            const ret = [];
-
-            for (let i = 0; i < this.allAccounts.length; i++) {
-                const account = this.allAccounts[i];
-
-                if (account.type === this.$constants.account.allAccountTypes.SingleAccount) {
-                    ret.push(account);
-                    continue;
-                }
-
-                for (let j = 0; j < account.subAccounts.length; j++) {
-                    const subAccount = account.subAccounts[j];
-                    ret.push(subAccount);
-                }
-            }
-
-            return ret;
-        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -351,13 +337,13 @@ export default {
             } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
                 let sourceAccount, destinationAccount = null;
 
-                for (let i = 0; i < this.plainAllAccounts.length; i++) {
-                    if (this.plainAllAccounts[i].id === this.transaction.sourceAccountId) {
-                        sourceAccount = this.plainAllAccounts[i];
+                for (let i = 0; i < this.allAccounts.length; i++) {
+                    if (this.allAccounts[i].id === this.transaction.sourceAccountId) {
+                        sourceAccount = this.allAccounts[i];
                     }
 
-                    if (this.plainAllAccounts[i].id === this.transaction.destinationAccountId) {
-                        destinationAccount = this.plainAllAccounts[i];
+                    if (this.allAccounts[i].id === this.transaction.destinationAccountId) {
+                        destinationAccount = this.allAccounts[i];
                     }
 
                     if (sourceAccount && destinationAccount) {
@@ -418,11 +404,11 @@ export default {
         }
 
         Promise.all(promises).then(function (responses) {
-            const accountDta = responses[0].data;
+            const accountData = responses[0].data;
             const categoryData = responses[1].data;
             const tagData = responses[2].data;
 
-            if (!accountDta || !accountDta.success || !accountDta.result) {
+            if (!accountData || !accountData.success || !accountData.result) {
                 self.$toast('Unable to get account list');
                 router.back();
                 return;
@@ -446,7 +432,8 @@ export default {
                 return;
             }
 
-            self.allAccounts = accountDta.result;
+            self.allAccounts = self.$utilities.getPlainAccounts(accountData.result);
+            self.categoriedAccounts = self.$utilities.getCategorizedAccounts(self.allAccounts);
             self.allCategories = categoryData.result;
             self.allTags = tagData.result;
 
@@ -465,9 +452,9 @@ export default {
                 self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Transfer]);
             }
 
-            if (self.plainAllAccounts.length) {
-                self.transaction.sourceAccountId = self.plainAllAccounts[0].id;
-                self.transaction.destinationAccountId = self.plainAllAccounts[0].id;
+            if (self.allAccounts.length) {
+                self.transaction.sourceAccountId = self.allAccounts[0].id;
+                self.transaction.destinationAccountId = self.allAccounts[0].id;
             }
 
             if (self.editTransactionId) {

@@ -265,6 +265,35 @@ function parseUserAgent(ua) {
     };
 }
 
+function getCategoryInfo(categoryId) {
+    for (let i = 0; i < accountConstants.allCategories.length; i++) {
+        if (accountConstants.allCategories[i].id === categoryId) {
+            return accountConstants.allCategories[i];
+        }
+    }
+
+    return null;
+}
+
+function getPlainAccounts(allAccounts) {
+    const ret = [];
+
+    for (let i = 0; i < allAccounts.length; i++) {
+        const account = allAccounts[i];
+
+        if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+            ret.push(account);
+        } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+            for (let j = 0; j < account.subAccounts.length; j++) {
+                const subAccount = account.subAccounts[j];
+                ret.push(subAccount);
+            }
+        }
+    }
+
+    return ret;
+}
+
 function getCategorizedAccounts(allAccounts) {
     const ret = {};
 
@@ -272,11 +301,22 @@ function getCategorizedAccounts(allAccounts) {
         const account = allAccounts[i];
 
         if (!ret[account.category]) {
-            ret[account.category] = [];
+            const categoryInfo = getCategoryInfo(account.category);
+
+            if (categoryInfo) {
+                ret[account.category] = {
+                    category: account.category,
+                    name: categoryInfo.name,
+                    icon: categoryInfo.defaultAccountIconId,
+                    accounts: []
+                };
+            }
         }
 
-        const accountList = ret[account.category];
-        accountList.push(account);
+        if (ret[account.category]) {
+            const accountList = ret[account.category].accounts;
+            accountList.push(account);
+        }
     }
 
     return ret;
@@ -288,7 +328,11 @@ function getAccountByAccountId(categorizedAccounts, accountId) {
             continue;
         }
 
-        const accountList = categorizedAccounts[category];
+        if (!categorizedAccounts[category].accounts) {
+            continue;
+        }
+
+        const accountList = categorizedAccounts[category].accounts;
 
         for (let i = 0; i < accountList.length; i++) {
             if (accountList[i].id === accountId) {
@@ -307,12 +351,12 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
     for (let categoryIdx = 0; categoryIdx < allAccountCategories.length; categoryIdx++) {
         const accountCategory = allAccountCategories[categoryIdx];
 
-        if (!categorizedAccounts[accountCategory.id]) {
+        if (!categorizedAccounts[accountCategory.id] || !categorizedAccounts[accountCategory.id].accounts) {
             continue;
         }
 
-        for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].length; accountIdx++) {
-            const account = categorizedAccounts[accountCategory.id][accountIdx];
+        for (let accountIdx = 0; accountIdx < categorizedAccounts[accountCategory.id].accounts.length; accountIdx++) {
+            const account = categorizedAccounts[accountCategory.id].accounts[accountIdx];
 
             if (account.hidden || !accountFilter(account)) {
                 continue;
@@ -362,6 +406,8 @@ export default {
     stringToArrayBuffer,
     generateRandomString,
     parseUserAgent,
+    getCategoryInfo,
+    getPlainAccounts,
     getCategorizedAccounts,
     getAccountByAccountId,
     getAllFilteredAccountsBalance,

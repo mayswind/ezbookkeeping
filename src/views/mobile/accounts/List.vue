@@ -119,7 +119,7 @@
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item v-for="account in accounts[accountCategory.id]" v-show="showHidden || !account.hidden"
+                    <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
                                   :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
                                   :after="accountBalance(account) | currency(account.currency)"
@@ -195,7 +195,7 @@
 export default {
     data() {
         return {
-            accounts: {},
+            categorizedAccounts: {},
             loading: true,
             showHidden: false,
             sortable: false,
@@ -214,12 +214,12 @@ export default {
         allAccountCount() {
             let allAccountCount = 0;
 
-            for (let category in this.accounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.accounts, category)) {
+            for (let category in this.categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
                     continue;
                 }
 
-                allAccountCount += this.accounts[category].length;
+                allAccountCount += this.categorizedAccounts[category].accounts.length;
             }
 
             return allAccountCount;
@@ -228,12 +228,12 @@ export default {
             let allAccountCount = 0;
             let shownAccountCount = 0;
 
-            for (let category in this.accounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.accounts, category)) {
+            for (let category in this.categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
                     continue;
                 }
 
-                const accountList = this.accounts[category];
+                const accountList = this.categorizedAccounts[category].accounts;
 
                 for (let i = 0; i < accountList.length; i++) {
                     if (!accountList[i].hidden) {
@@ -257,7 +257,9 @@ export default {
             for (let i = 0; i < allAccountCategories.length; i++) {
                 const accountCategory = allAccountCategories[i];
 
-                if (this.$utilities.isArray(this.accounts[accountCategory.id]) && this.accounts[accountCategory.id].length) {
+                if (this.categorizedAccounts[accountCategory.id] &&
+                    this.$utilities.isArray(this.categorizedAccounts[accountCategory.id].accounts) &&
+                    this.categorizedAccounts[accountCategory.id].accounts.length) {
                     usedAccountCategories.push(accountCategory);
                 }
             }
@@ -269,7 +271,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, () => true);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, () => true);
             let netAssets = 0;
             let hasUnCalculatedAmount = false;
 
@@ -299,7 +301,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.isAsset);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.isAsset);
             let totalAssets = 0;
             let hasUnCalculatedAmount = false;
 
@@ -329,7 +331,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.isLiability);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.isLiability);
             let totalLiabilities = 0;
             let hasUnCalculatedAmount = false;
 
@@ -370,7 +372,7 @@ export default {
                 return;
             }
 
-            self.accounts = self.$utilities.getCategorizedAccounts(data.result);
+            self.categorizedAccounts = self.$utilities.getCategorizedAccounts(data.result);
             self.loading = false;
         }).catch(error => {
             self.$logger.error('failed to load account list', error);
@@ -413,7 +415,7 @@ export default {
                     return;
                 }
 
-                self.accounts = self.$utilities.getCategorizedAccounts(data.result);
+                self.categorizedAccounts = self.$utilities.getCategorizedAccounts(data.result);
             }).catch(error => {
                 self.$logger.error('failed to reload account list', error);
 
@@ -429,14 +431,16 @@ export default {
             });
         },
         hasShownAccount(accountCategory) {
-            if (!this.accounts[accountCategory.id].length) {
+            if (!this.categorizedAccounts[accountCategory.id] ||
+                !this.categorizedAccounts[accountCategory.id].accounts ||
+                !this.categorizedAccounts[accountCategory.id].accounts.length) {
                 return false;
             }
 
             let shownCount = 0;
 
-            for (let i = 0; i < this.accounts[accountCategory.id].length; i++) {
-                const account = this.accounts[accountCategory.id][i];
+            for (let i = 0; i < this.categorizedAccounts[accountCategory.id].accounts.length; i++) {
+                const account = this.categorizedAccounts[accountCategory.id].accounts[i];
 
                 if (!account.hidden) {
                     shownCount++;
@@ -465,7 +469,7 @@ export default {
                 return '***';
             }
 
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.accounts, account => account.category === accountCategory.id);
+            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.category === accountCategory.id);
             let totalBalance = 0;
             let hasUnCalculatedAmount = false;
 
@@ -506,14 +510,17 @@ export default {
             }
 
             const id = event.el.id.substr(8); // account_
-            const account = this.$utilities.getAccountByAccountId(this.accounts, id);
+            const account = this.$utilities.getAccountByAccountId(this.categorizedAccounts, id);
 
-            if (!account || !this.accounts[account.category] || !this.accounts[account.category][event.to]) {
+            if (!account ||
+                !this.categorizedAccounts[account.category] ||
+                !this.categorizedAccounts[account.category].accounts ||
+                !this.categorizedAccounts[account.category].accounts[event.to]) {
                 this.$toast('Unable to move account');
                 return;
             }
 
-            const accountList = this.accounts[account.category];
+            const accountList = this.categorizedAccounts[account.category].accounts;
             accountList.splice(event.to, 0, accountList.splice(event.from, 1)[0]);
 
             this.displayOrderModified = true;
@@ -530,12 +537,12 @@ export default {
 
             self.displayOrderSaving = true;
 
-            for (let category in self.accounts) {
-                if (!Object.prototype.hasOwnProperty.call(self.accounts, category)) {
+            for (let category in self.categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(self.categorizedAccounts, category)) {
                     continue;
                 }
 
-                const accountList = self.accounts[category];
+                const accountList = self.categorizedAccounts[category].accounts;
 
                 for (let i = 0; i < accountList.length; i++) {
                     newDisplayOrders.push({
@@ -650,7 +657,7 @@ export default {
                 }
 
                 app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
-                    const accountList = self.accounts[account.category];
+                    const accountList = self.categorizedAccounts[account.category].accounts;
                     for (let i = 0; i < accountList.length; i++) {
                         if (accountList[i].id === account.id) {
                             accountList.splice(i, 1);

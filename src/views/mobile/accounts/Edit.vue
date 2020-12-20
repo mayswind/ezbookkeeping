@@ -4,6 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
+                <f7-link icon-f7="ellipsis" v-if="!editAccountId && account.type === $constants.account.allAccountTypes.MultiSubAccounts" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -11,8 +12,8 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-input label="Account Category" placeholder="Category"></f7-list-input>
-                    <f7-list-input label="Account Type" placeholder="Account Type"></f7-list-input>
+                    <f7-list-item link="#" title="Account Category" after="Category"></f7-list-item>
+                    <f7-list-item link="#" title="Account Type" after="Account Type"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -20,27 +21,37 @@
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
-                    <f7-list-input
-                        type="select"
-                        :label="$t('Account Category')"
-                        :value="account.category"
-                        @input="chooseSuitableIcon(account.category, $event.target.value); account.category = $event.target.value"
+                    <f7-list-item
+                        link="#"
+                        :title="$t('Account Category')"
+                        :after="account.category | accountCategoryName(allAccountCategories) | t"
+                        @click="showAccountCategorySheet = true"
                     >
-                        <option v-for="accountCategory in allAccountCategories"
-                                :key="accountCategory.id"
-                                :value="accountCategory.id">{{ $t(accountCategory.name) }}</option>
-                    </f7-list-input>
+                        <list-item-selection-sheet value-type="item"
+                                                   key-field="id" value-field="id" title-field="name"
+                                                   icon-field="defaultAccountIconId" icon-type="account"
+                                                   :title-i18n="true"
+                                                   :items="allAccountCategories"
+                                                   :show.sync="showAccountCategorySheet"
+                                                   v-model="account.category">
+                        </list-item-selection-sheet>
+                    </f7-list-item>
 
-                    <f7-list-input
-                        type="select"
+                    <f7-list-item
+                        link="#"
                         :class="{ 'disabled': editAccountId }"
-                        :label="$t('Account Type')"
-                        :value="account.type"
-                        @input="account.type = $event.target.value"
+                        :title="$t('Account Type')"
+                        :after="account.type | accountTypeName | t"
+                        @click="showAccountTypeSheet = true"
                     >
-                        <option value="1">{{ $t('Single Account') }}</option>
-                        <option value="2">{{ $t('Multi Sub Accounts') }}</option>
-                    </f7-list-input>
+                        <list-item-selection-sheet value-type="item"
+                                                   key-field="id" value-field="id" title-field="name"
+                                                   :items="[{ id: 1, name: 'Single Account' }, { id: 2, name: 'Multi Sub Accounts' }]"
+                                                   :title-i18n="true"
+                                                   :show.sync="showAccountTypeSheet"
+                                                   v-model="account.type">
+                        </list-item-selection-sheet>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -48,21 +59,22 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-input label="Account Name" placeholder="Your account name"></f7-list-input>
-                    <f7-list-item header="Account Icon" after="Icon"></f7-list-item>
-                    <f7-list-item header="Account Color" after="Color"></f7-list-item>
-                    <f7-list-input label="Currency" placeholder="Currency"></f7-list-input>
-                    <f7-list-input label="Account Balance" placeholder="Balance"></f7-list-input>
-                    <f7-list-input type="textarea" label="Description" placeholder="Your account description (optional)"></f7-list-input>
+                    <f7-list-input inline-label label="Account Name" placeholder="Your account name"></f7-list-input>
+                    <f7-list-item title="Account Icon" after="Icon"></f7-list-item>
+                    <f7-list-item title="Account Color" after="Color"></f7-list-item>
+                    <f7-list-item title="Currency" after="Currency"></f7-list-item>
+                    <f7-list-item title="Account Balance" after="Balance"></f7-list-item>
+                    <f7-list-input type="textarea" placeholder="Your account description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount.toString()">
+        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
                     <f7-list-input
                         type="text"
+                        inline-label
                         clear-button
                         :label="$t('Account Name')"
                         :placeholder="$t('Your account name')"
@@ -70,7 +82,7 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" link="#"
+                    <f7-list-item :title="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
@@ -80,7 +92,7 @@
                         ></icon-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :header="$t('Account Color')" link="#"
+                    <f7-list-item :title="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
                         <color-selection-sheet :all-color-infos="allAccountColors"
@@ -91,7 +103,7 @@
 
                     <f7-list-item
                         :class="{ 'disabled': editAccountId }"
-                        :header="$t('Currency')"
+                        :title="$t('Currency')"
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="account.currency">
@@ -104,7 +116,7 @@
                     <f7-list-item
                         link="#"
                         :class="{ 'disabled': editAccountId }"
-                        :header="$t('Account Balance')"
+                        :title="$t('Account Balance')"
                         :after="account.balance | currency(account.currency)"
                         @click="account.showBalanceSheet = true"
                     >
@@ -115,26 +127,26 @@
                         ></number-pad-sheet>
                     </f7-list-item>
 
+                    <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                    </f7-list-item>
+
                     <f7-list-input
                         type="textarea"
-                        :label="$t('Description')"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
                     ></f7-list-input>
-
-                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
-                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
-                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
+        <f7-card v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
                     <f7-list-input
                         type="text"
+                        inline-label
                         clear-button
                         :label="$t('Account Name')"
                         :placeholder="$t('Your account name')"
@@ -142,7 +154,7 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :header="$t('Account Icon')" link="#"
+                    <f7-list-item :title="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after" :icon="account.icon | accountIcon" :style="{ color: '#' + account.color }"></f7-icon>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
@@ -152,7 +164,7 @@
                         ></icon-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :header="$t('Account Color')" link="#"
+                    <f7-list-item :title="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + account.color }"></f7-icon>
                         <color-selection-sheet :all-color-infos="allAccountColors"
@@ -161,31 +173,34 @@
                         ></color-selection-sheet>
                     </f7-list-item>
 
+                    <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                    </f7-list-item>
+
                     <f7-list-input
                         type="textarea"
-                        :label="$t('Description')"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
                     ></f7-list-input>
-
-                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
-                        <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
-                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
-            <f7-card-footer v-if="!editAccountId">
-                <f7-button large fill
-                           :text="$t('Add Sub Account')" @click="addSubAccount"></f7-button>
-            </f7-card-footer>
         </f7-card>
 
-        <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts.toString()">
+        <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts">
             <f7-card v-for="(subAccount, idx) in subAccounts" :key="idx">
+                <f7-card-header v-if="!editAccountId">
+                    <f7-button rasied fill color="red"
+                               icon-f7="trash" icon-size="16px"
+                               :tooltip="$t('Remove Sub Account')"
+                               @click="removeSubAccount(subAccount)">
+                    </f7-button>
+                </f7-card-header>
                 <f7-card-content class="no-safe-areas" :padding="false">
                     <f7-list>
                         <f7-list-input
                             type="text"
+                            inline-label
                             clear-button
                             :label="$t('Sub Account Name')"
                             :placeholder="$t('Your sub account name')"
@@ -193,7 +208,7 @@
                             @input="subAccount.name = $event.target.value"
                         ></f7-list-input>
 
-                        <f7-list-item :header="$t('Sub Account Icon')" link="#"
+                        <f7-list-item :title="$t('Sub Account Icon')" link="#"
                                       @click="subAccount.showIconSelectionSheet = true">
                             <f7-icon slot="after" :icon="subAccount.icon | accountIcon" :style="{ color: '#' + subAccount.color }"></f7-icon>
                             <icon-selection-sheet :all-icon-infos="allAccountIcons"
@@ -203,7 +218,7 @@
                             ></icon-selection-sheet>
                         </f7-list-item>
 
-                        <f7-list-item :header="$t('Sub Account Color')" link="#"
+                        <f7-list-item :title="$t('Sub Account Color')" link="#"
                                       @click="subAccount.showColorSelectionSheet = true">
                             <f7-icon slot="after" f7="app_fill" :style="{ color: '#' + subAccount.color }"></f7-icon>
                             <color-selection-sheet :all-color-infos="allAccountColors"
@@ -214,7 +229,7 @@
 
                         <f7-list-item
                             :class="{ 'disabled': editAccountId }"
-                            :header="$t('Currency')"
+                            :title="$t('Currency')"
                             smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                         >
                             <select autocomplete="transaction-currency" v-model="subAccount.currency">
@@ -227,7 +242,7 @@
                         <f7-list-item
                             link="#"
                             :class="{ 'disabled': editAccountId }"
-                            :header="$t('Sub Account Balance')"
+                            :title="$t('Sub Account Balance')"
                             :after="subAccount.balance | currency(subAccount.currency)"
                             @click="subAccount.showBalanceSheet = true"
                         >
@@ -238,25 +253,39 @@
                             ></number-pad-sheet>
                         </f7-list-item>
 
+                        <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                            <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
+                        </f7-list-item>
+
                         <f7-list-input
                             type="textarea"
-                            :label="$t('Description')"
                             :placeholder="$t('Your sub account description (optional)')"
                             :value="subAccount.comment"
                             @input="subAccount.comment = $event.target.value"
                         ></f7-list-input>
-
-                        <f7-list-item :header="$t('Visible')" v-if="editAccountId">
-                            <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
-                        </f7-list-item>
                     </f7-list>
                 </f7-card-content>
-                <f7-card-footer v-if="!editAccountId">
-                    <f7-button large fill
-                               color="red" :text="$t('Remove Sub Account')" @click="removeSubAccount(subAccount)"></f7-button>
-                </f7-card-footer>
             </f7-card>
         </f7-block>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button @click="addSubAccount">{{ $t('Add Sub Account') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-label>{{ $t('Are you sure you want to remove this sub account?') }}</f7-actions-label>
+                <f7-actions-button color="red" @click="removeSubAccount(subAccountToDelete)">{{ $t('Remove') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
     </f7-page>
 </template>
 
@@ -269,8 +298,8 @@ export default {
             editAccountId: null,
             loading: false,
             account: {
-                category: '1',
-                type: self.$constants.account.allAccountTypes.SingleAccount.toString(),
+                category: 1,
+                type: self.$constants.account.allAccountTypes.SingleAccount,
                 name: '',
                 icon: self.$constants.icons.defaultAccountIconId,
                 color: self.$constants.colors.defaultAccountColor,
@@ -283,7 +312,12 @@ export default {
                 showBalanceSheet: false
             },
             subAccounts: [],
-            submitting: false
+            subAccountToDelete: null,
+            submitting: false,
+            showAccountCategorySheet: false,
+            showAccountTypeSheet: false,
+            showMoreActionSheet: false,
+            showDeleteActionSheet: false
         };
     },
     computed: {
@@ -314,6 +348,16 @@ export default {
             return this.$locale.getAllCurrencies();
         }
     },
+    watch: {
+        'account.category': function (newValue, oldValue) {
+            this.chooseSuitableIcon(oldValue, newValue);
+        },
+        'account.type': function () {
+            if (this.subAccounts.length < 1) {
+                this.addSubAccount();
+            }
+        }
+    },
     created() {
         const self = this;
         const query = self.$f7route.query;
@@ -336,8 +380,8 @@ export default {
 
                 const account = data.result;
                 self.account.id = account.id;
-                self.account.category = account.category.toString();
-                self.account.type = account.type.toString();
+                self.account.category = account.category;
+                self.account.type = account.type;
                 self.account.name = account.name;
                 self.account.icon = account.icon;
                 self.account.color = account.color;
@@ -352,8 +396,8 @@ export default {
 
                         self.subAccounts.push({
                             id: subAccount.id,
-                            category: subAccount.category.toString(),
-                            type: subAccount.type.toString(),
+                            category: subAccount.category,
+                            type: subAccount.type,
                             name: subAccount.name,
                             icon: subAccount.icon,
                             color: subAccount.color,
@@ -388,7 +432,7 @@ export default {
         addSubAccount() {
             const self = this;
 
-            if (self.account.type !== self.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
+            if (self.account.type !== self.$constants.account.allAccountTypes.MultiSubAccounts) {
                 return;
             }
 
@@ -408,6 +452,20 @@ export default {
             });
         },
         removeSubAccount(subAccount) {
+            if (!subAccount) {
+                this.$alert('An error has occurred');
+                return;
+            }
+
+            if (!this.showDeleteActionSheet) {
+                this.subAccountToDelete = subAccount;
+                this.showDeleteActionSheet = true;
+                return;
+            }
+
+            this.showDeleteActionSheet = false;
+            this.subAccountToDelete = null;
+
             for (let i = 0; i < this.subAccounts.length; i++) {
                 if (this.subAccounts[i] === subAccount) {
                     this.subAccounts.splice(i, 1);
@@ -420,7 +478,7 @@ export default {
 
             let problemMessage = self.getInputEmptyProblemMessage(self.account, false);
 
-            if (!problemMessage && self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
+            if (!problemMessage && self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     problemMessage = self.getInputEmptyProblemMessage(self.subAccounts[i], true);
 
@@ -440,11 +498,11 @@ export default {
 
             const subAccounts = [];
 
-            if (self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
+            if (self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     const subAccount = self.subAccounts[i];
                     const submitAccount = {
-                        category: parseInt(self.account.category),
+                        category: self.account.category,
                         type: self.$constants.account.allAccountTypes.SingleAccount,
                         name: subAccount.name,
                         icon: subAccount.icon,
@@ -464,15 +522,15 @@ export default {
             }
 
             const submitAccount = {
-                category: parseInt(self.account.category),
-                type: parseInt(self.account.type),
+                category: self.account.category,
+                type: self.account.type,
                 name: self.account.name,
                 icon: self.account.icon,
                 color: self.account.color,
-                currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
-                balance: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? self.account.balance : 0,
+                currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
+                balance: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? self.account.balance : 0,
                 comment: self.account.comment,
-                subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount.toString() ? null : subAccounts,
+                subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? null : subAccounts,
             };
 
             let promise = null;
@@ -527,7 +585,7 @@ export default {
             const allCategories = this.$constants.account.allCategories;
 
             for (let i = 0; i < allCategories.length; i++) {
-                if (allCategories[i].id.toString() === oldCategory) {
+                if (allCategories[i].id === oldCategory) {
                     if (this.account.icon !== allCategories[i].defaultAccountIconId) {
                         return;
                     } else {
@@ -537,7 +595,7 @@ export default {
             }
 
             for (let i = 0; i < allCategories.length; i++) {
-                if (allCategories[i].id.toString() === newCategory) {
+                if (allCategories[i].id === newCategory) {
                     this.account.icon = allCategories[i].defaultAccountIconId;
                 }
             }
@@ -549,7 +607,7 @@ export default {
                 return true;
             }
 
-            if (this.account.type === this.$constants.account.allAccountTypes.MultiSubAccounts.toString()) {
+            if (this.account.type === this.$constants.account.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < this.subAccounts.length; i++) {
                     const isSubAccountEmpty = !!this.getInputEmptyProblemMessage(this.subAccounts[i], true);
 
@@ -568,11 +626,31 @@ export default {
                 return 'Account type cannot be empty';
             } else if (!account.name) {
                 return 'Account name cannot be empty';
-            } else if (account.type === this.$constants.account.allAccountTypes.SingleAccount.toString() && !account.currency) {
+            } else if (account.type === this.$constants.account.allAccountTypes.SingleAccount && !account.currency) {
                 return 'Account currency cannot be empty';
             } else {
                 return null;
             }
+        }
+    },
+    filters: {
+        accountCategoryName(categoryId, allCategories) {
+            for (let i = 0; i < allCategories.length; i++) {
+                if (allCategories[i].id === categoryId) {
+                    return allCategories[i].name;
+                }
+            }
+
+            return '';
+        },
+        accountTypeName(type) {
+            if (type === 1) {
+                return 'Single Account';
+            } else if (type === 2) {
+                return 'Multi Sub Accounts';
+            }
+
+            return '';
         }
     }
 }

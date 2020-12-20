@@ -12,7 +12,7 @@
                               v-for="(item, index) in items"
                               :key="valueType === 'index' ? index : (keyField ? item[keyField] : item)"
                               :value="valueType === 'index' ? index : (valueField ? item[valueField] : item)"
-                              :title="titleField ? item[titleField] : item"
+                              :title="titleField ? (titleI18n ? $t(item[titleField]) : item[titleField]) : (titleI18n ? $t(item) : item)"
                               @click="onItemClicked(item, index)">
                     <f7-icon slot="media" :icon="item[iconField] | icon(iconType)" :style="{ color: '#' + (colorField ? item[colorField] : '000000') }" v-if="iconField"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
@@ -30,6 +30,7 @@ export default {
         'keyField', // for value type == item
         'valueField', // for value type == item
         'titleField',
+        'titleI18n',
         'iconField',
         'iconType',
         'colorField',

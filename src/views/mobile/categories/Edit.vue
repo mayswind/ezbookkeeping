@@ -81,7 +81,7 @@ export default {
             editCategoryId: null,
             loading: false,
             category: {
-                type: query.type,
+                type: parseInt(query.type),
                 name: '',
                 parentId: query.parentId,
                 icon: self.$constants.icons.defaultCategoryIconId,
@@ -158,7 +158,7 @@ export default {
 
                 const category = data.result;
                 self.category.id = category.id;
-                self.category.type = category.type.toString();
+                self.category.type = category.type;
                 self.category.parentId = category.type.parentId;
                 self.category.name = category.name;
                 self.category.icon = category.icon;
@@ -179,9 +179,11 @@ export default {
                 }
             });
         } else if (query.parentId) {
-            if (query.type !== this.$constants.category.allCategoryTypes.Income &&
-                query.type !== this.$constants.category.allCategoryTypes.Expense &&
-                query.type !== this.$constants.category.allCategoryTypes.Transfer) {
+            const categoryType = parseInt(query.type);
+
+            if (categoryType !== this.$constants.category.allCategoryTypes.Income &&
+                categoryType !== this.$constants.category.allCategoryTypes.Expense &&
+                categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
                 self.$toast('Parameter Invalid');
                 router.back();
                 return;
@@ -206,7 +208,7 @@ export default {
             self.$showLoading(() => self.submitting);
 
             const submitCategory = {
-                type: parseInt(self.category.type),
+                type: self.category.type,
                 name: self.category.name,
                 parentId: self.category.parentId,
                 icon: self.category.icon,

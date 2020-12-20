@@ -12,7 +12,7 @@
         <f7-card v-for="categoryInfo in allCategories" :key="categoryInfo.type">
             <f7-card-header>
                 <small :style="{ opacity: 0.6 }">
-                    <span>{{ categoryInfo.type | categoryTypeName | t }}</span>
+                    <span>{{ categoryInfo.type | categoryTypeName($constants.category.allCategoryTypes) | t }}</span>
                 </small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
@@ -68,7 +68,7 @@ export default {
 
         return {
             currentLocale: self.$i18n.locale,
-            categoryType: '',
+            categoryType: 0,
             allCategories: [],
             submitting: false,
             showMoreActionSheet: false,
@@ -85,22 +85,22 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
-        if (query.type !== '0' &&
-            query.type !== this.$constants.category.allCategoryTypes.Income &&
-            query.type !== this.$constants.category.allCategoryTypes.Expense &&
-            query.type !== this.$constants.category.allCategoryTypes.Transfer) {
+        self.categoryType = parseInt(query.type);
+
+        if (self.categoryType !== 0 &&
+            self.categoryType !== this.$constants.category.allCategoryTypes.Income &&
+            self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
+            self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             router.back();
             return;
         }
 
-        self.categoryType = query.type;
-
-        if (query.type === '0') {
+        if (self.categoryType === 0) {
             for (let i = 1; i <= 3; i++) {
                 self.allCategories.push({
-                    type: i.toString(),
-                    categories: self.$utilities.copyArrayTo(self.getDefaultCategories(i.toString()), [])
+                    type: i,
+                    categories: self.$utilities.copyArrayTo(self.getDefaultCategories(i), [])
                 });
             }
         } else {
@@ -139,7 +139,7 @@ export default {
                     const category = categoryInfo.categories[j];
                     const submitCategory = {
                         name: self.$t('category.' + category.name, self.currentLocale),
-                        type: parseInt(categoryInfo.type),
+                        type: categoryInfo.type,
                         icon: category.categoryIconId,
                         color: category.color,
                         subCategories: []
@@ -149,7 +149,7 @@ export default {
                         const subCategory = category.subCategories[k];
                         submitCategory.subCategories.push({
                             name: self.$t('category.' + subCategory.name, self.currentLocale),
-                            type: parseInt(categoryInfo.type),
+                            type: categoryInfo.type,
                             icon: subCategory.categoryIconId,
                             color: subCategory.color
                         });
@@ -188,13 +188,13 @@ export default {
         }
     },
     filters: {
-        categoryTypeName(categoryType) {
+        categoryTypeName(categoryType, allCategoryTypes) {
             switch (categoryType) {
-                case this.$constants.category.allCategoryTypes.Income:
+                case allCategoryTypes.Income:
                     return 'Income Categories';
-                case this.$constants.category.allCategoryTypes.Expense:
+                case allCategoryTypes.Expense:
                     return 'Expense Categories';
-                case this.$constants.category.allCategoryTypes.Transfer:
+                case allCategoryTypes.Transfer:
                     return 'Transfer Categories';
                 default:
                     return 'Transaction Categories';

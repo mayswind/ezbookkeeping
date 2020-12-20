@@ -88,7 +88,7 @@ export default {
         return {
             categories: [],
             hasSubCategories: false,
-            categoryType: '',
+            categoryType: 0,
             categoryId: '',
             loading: true,
             showHidden: false,
@@ -145,15 +145,15 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
-        if (query.type !== this.$constants.category.allCategoryTypes.Income &&
-            query.type !== this.$constants.category.allCategoryTypes.Expense &&
-            query.type !== this.$constants.category.allCategoryTypes.Transfer) {
+        self.categoryType = parseInt(query.type);
+
+        if (self.categoryType !== this.$constants.category.allCategoryTypes.Income &&
+            self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
+            self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             router.back();
             return;
         }
-
-        self.categoryType = query.type;
 
         if (query.id && query.id !== '0') {
             self.categoryId = query.id;

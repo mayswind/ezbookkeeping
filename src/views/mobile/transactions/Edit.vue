@@ -42,11 +42,11 @@
                         :style="{ fontSize: sourceAmountFontSize + 'px' }"
                         :header="$t(sourceAmountName)"
                         :title="transaction.sourceAmount | currency"
-                        @click="transaction.showSourceAmountSheet = true"
+                        @click="showSourceAmountSheet = true"
                     >
                         <number-pad-sheet :min-value="$constants.transaction.minAmount"
                                           :max-value="$constants.transaction.maxAmount"
-                                          :show.sync="transaction.showSourceAmountSheet"
+                                          :show.sync="showSourceAmountSheet"
                                           v-model="transaction.sourceAmount"
                         ></number-pad-sheet>
                     </f7-list-item>
@@ -56,12 +56,12 @@
                         :style="{ fontSize: destinationAmountFontSize + 'px' }"
                         :header="$t('Transfer In Amount')"
                         :title="transaction.destinationAmount | currency"
-                        @click="transaction.showDestinationAmountSheet = true"
+                        @click="showDestinationAmountSheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
                         <number-pad-sheet :min-value="$constants.transaction.minAmount"
                                           :max-value="$constants.transaction.maxAmount"
-                                          :show.sync="transaction.showDestinationAmountSheet"
+                                          :show.sync="showDestinationAmountSheet"
                                           v-model="transaction.destinationAmount"
                         ></number-pad-sheet>
                     </f7-list-item>
@@ -72,7 +72,7 @@
                         link="#"
                         :class="{ 'disabled': !hasAvailableExpenseCategories }"
                         :header="$t('Category')"
-                        @click="transaction.showCategorySheet = true"
+                        @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
                     >
                         <div slot="title">
@@ -86,7 +86,7 @@
                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                    :items="allCategories[$constants.category.allCategoryTypes.Expense]"
-                                                   :show.sync="transaction.showCategorySheet"
+                                                   :show.sync="showCategorySheet"
                                                    v-model="transaction.expenseCategory">
                         </tree-view-selection-sheet>
                     </f7-list-item>
@@ -97,7 +97,7 @@
                         link="#"
                         :class="{ 'disabled': !hasAvailableIncomeCategories }"
                         :header="$t('Category')"
-                        @click="transaction.showCategorySheet = true"
+                        @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
                     >
                         <div slot="title">
@@ -111,7 +111,7 @@
                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                    :items="allCategories[$constants.category.allCategoryTypes.Income]"
-                                                   :show.sync="transaction.showCategorySheet"
+                                                   :show.sync="showCategorySheet"
                                                    v-model="transaction.incomeCategory">
                         </tree-view-selection-sheet>
                     </f7-list-item>
@@ -122,7 +122,7 @@
                         link="#"
                         :class="{ 'disabled': !hasAvailableTransferCategories }"
                         :header="$t('Category')"
-                        @click="transaction.showCategorySheet = true"
+                        @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
                         <div slot="title">
@@ -136,7 +136,7 @@
                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                    secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                    :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
-                                                   :show.sync="transaction.showCategorySheet"
+                                                   :show.sync="showCategorySheet"
                                                    v-model="transaction.transferCategory">
                         </tree-view-selection-sheet>
                     </f7-list-item>
@@ -147,7 +147,7 @@
                         :class="{ 'disabled': !allAccounts.length }"
                         :header="$t(sourceAccountName)"
                         :title="transaction.sourceAccountId | accountName(allAccounts)"
-                        @click="transaction.showSourceAccountSheet = true"
+                        @click="showSourceAccountSheet = true"
                     >
                         <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
                                                               primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
@@ -155,7 +155,7 @@
                                                               secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                               :items="categoriedAccounts"
-                                                              :show.sync="transaction.showSourceAccountSheet"
+                                                              :show.sync="showSourceAccountSheet"
                                                               v-model="transaction.sourceAccountId">
                         </two-column-list-item-selection-sheet>
                     </f7-list-item>
@@ -167,7 +167,7 @@
                         :header="$t('Destination Account')"
                         :title="transaction.destinationAccountId | accountName(allAccounts)"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
-                        @click="transaction.showDestinationAccountSheet = true"
+                        @click="showDestinationAccountSheet = true"
                     >
                         <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
                                                               primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
@@ -175,7 +175,7 @@
                                                               secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                               :items="categoriedAccounts"
-                                                              :show.sync="transaction.showDestinationAccountSheet"
+                                                              :show.sync="showDestinationAccountSheet"
                                                               v-model="transaction.destinationAccountId">
                         </two-column-list-item-selection-sheet>
                     </f7-list-item>
@@ -232,7 +232,7 @@ export default {
         return {
             editTransactionId: null,
             transaction: {
-                type: 3,
+                type: self.$constants.transaction.allTransactionTypes.Expense,
                 unixTime: self.$utilities.getUnixTime(now),
                 time: self.$utilities.formatDate(now, 'YYYY-MM-DDTHH:mm'),
                 expenseCategory: '',
@@ -243,19 +243,19 @@ export default {
                 sourceAmount: 0,
                 destinationAmount: 0,
                 tagIds: [],
-                comment: '',
-                showSourceAmountSheet: false,
-                showDestinationAmountSheet: false,
-                showCategorySheet: false,
-                showSourceAccountSheet: false,
-                showDestinationAccountSheet: false
+                comment: ''
             },
             allAccounts: [],
             categoriedAccounts: [],
             allCategories: {},
             allTags: [],
             loading: true,
-            submitting: false
+            submitting: false,
+            showSourceAmountSheet: false,
+            showDestinationAmountSheet: false,
+            showCategorySheet: false,
+            showSourceAccountSheet: false,
+            showDestinationAccountSheet: false
         };
     },
     computed: {

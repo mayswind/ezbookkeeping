@@ -33,8 +33,11 @@ import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
 import currencyFilter from './filters/currency.js';
 import iconFilter from './filters/icon.js';
+import iconStyleFilter from './filters/iconStyle.js';
 import accountIconFilter from './filters/accountIcon.js';
+import accountIconStyleFilter from './filters/accountIconStyle.js';
 import categoryIconFilter from './filters/categoryIcon.js';
+import categoryIconStyleFilter from './filters/categoryIconStyle.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
 
@@ -207,8 +210,11 @@ Vue.prototype.$user = userstate;
 
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
+Vue.filter('iconStyle', (value, iconType, defaultColor) => iconStyleFilter(value, iconType, defaultColor));
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
+Vue.filter('accountIconStyle', (value, defaultColor) => accountIconStyleFilter(value, defaultColor));
 Vue.filter('categoryIcon', (value) => categoryIconFilter(value));
+Vue.filter('categoryIconStyle', (value, defaultColor) => categoryIconStyleFilter(value, defaultColor));
 Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
 Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 

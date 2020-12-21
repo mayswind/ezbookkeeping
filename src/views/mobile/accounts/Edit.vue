@@ -91,7 +91,7 @@
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after"
                                  :icon="account.icon | accountIcon"
-                                 :style="{ color: (account.color && account.color !== '000000' ? '#' + account.color : 'var(--default-icon-color)') }"></f7-icon>
+                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                               :show.sync="account.showIconSelectionSheet"
                                               :color="account.color"
@@ -103,7 +103,7 @@
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after"
                                  f7="app_fill"
-                                 :style="{ color: (account.color && account.color !== '000000' ? '#' + account.color : 'var(--default-icon-color)') }"></f7-icon>
+                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                         <color-selection-sheet :all-color-infos="allAccountColors"
                                                :show.sync="account.showColorSelectionSheet"
                                                v-model="account.color"
@@ -167,7 +167,7 @@
                                   @click="account.showIconSelectionSheet = true">
                         <f7-icon slot="after"
                                  :icon="account.icon | accountIcon"
-                                 :style="{ color: (account.color && account.color !== '000000' ? '#' + account.color : 'var(--default-icon-color)') }"></f7-icon>
+                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                               :show.sync="account.showIconSelectionSheet"
                                               :color="account.color"
@@ -179,7 +179,7 @@
                                   @click="account.showColorSelectionSheet = true">
                         <f7-icon slot="after"
                                  f7="app_fill"
-                                 :style="{ color: (account.color && account.color !== '000000' ? '#' + account.color : 'var(--default-icon-color)') }"></f7-icon>
+                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                         <color-selection-sheet :all-color-infos="allAccountColors"
                                                :show.sync="account.showColorSelectionSheet"
                                                v-model="account.color"
@@ -225,7 +225,7 @@
                                       @click="subAccount.showIconSelectionSheet = true">
                             <f7-icon slot="after"
                                      :icon="subAccount.icon | accountIcon"
-                                     :style="{ color: (subAccount.color && subAccount.color !== '000000' ? '#' + subAccount.color : 'var(--default-icon-color)') }"></f7-icon>
+                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                             <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                                   :show.sync="subAccount.showIconSelectionSheet"
                                                   :color="subAccount.color"
@@ -237,7 +237,7 @@
                                       @click="subAccount.showColorSelectionSheet = true">
                             <f7-icon slot="after"
                                      f7="app_fill"
-                                     :style="{ color: (subAccount.color && subAccount.color !== '000000' ? '#' + subAccount.color : 'var(--default-icon-color)') }"></f7-icon>
+                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
                             <color-selection-sheet :all-color-infos="allAccountColors"
                                                    :show.sync="subAccount.showColorSelectionSheet"
                                                    v-model="subAccount.color"

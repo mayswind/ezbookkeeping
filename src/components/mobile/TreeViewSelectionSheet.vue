@@ -15,7 +15,7 @@
                                   :label="primaryTitleField ? (primaryTitleI18n ? $t(item[primaryTitleField]) : item[primaryTitleField]) : (primaryTitleI18n ? $t(item) : item)">
                     <f7-icon slot="media"
                              :icon="item[primaryIconField] | icon(primaryIconType)"
-                             :style="{ color: (primaryColorField && item[primaryColorField] && item[primaryColorField] !== '000000' ? '#' + item[primaryColorField] : 'var(--default-icon-color)') }"
+                             :style="item[primaryColorField] | iconStyle(primaryIconType, 'var(--default-icon-color)')"
                              v-if="primaryIconField"></f7-icon>
 
                     <f7-treeview-item v-for="subItem in item[primarySubItemsField]"
@@ -26,7 +26,7 @@
                                       @click="onSecondaryItemClicked(subItem)">
                         <f7-icon slot="media"
                                  :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
-                                 :style="{ color: (secondaryColorField && subItem[secondaryColorField] && subItem[secondaryColorField] !== '000000' ? '#' + subItem[secondaryColorField] : 'var(--default-icon-color)') }"
+                                 :style="subItem[secondaryColorField] | iconStyle(secondaryIconType, 'var(--default-icon-color)')"
                                  v-if="secondaryIconField"></f7-icon>
                     </f7-treeview-item>
                 </f7-treeview-item>

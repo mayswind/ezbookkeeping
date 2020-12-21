@@ -17,6 +17,7 @@ const allAvailableColors = [
 ];
 
 export default {
+    defaultColor: defaultColor,
     allAccountColors: allAvailableColors,
     defaultAccountColor: defaultColor,
     allCategoryColors: allAvailableColors,

@@ -12,7 +12,7 @@
                               v-for="(item, index) in items"
                               :key="item | itemKeyValue(index, keyField, valueType)"
                               :value="item | itemKeyValue(index, valueField, valueType)"
-                              :title="item | itemFieldContentOrItem(titleField, titleI18n)"
+                              :title="item | itemFieldContent(titleField, item, titleI18n)"
                               @click="onItemClicked(item, index)">
                     <f7-icon slot="media"
                              :icon="item[iconField] | icon(iconType)"

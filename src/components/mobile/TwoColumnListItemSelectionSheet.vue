@@ -13,9 +13,9 @@
                         <f7-list no-hairlines class="primary-list no-margin-top no-margin-bottom">
                             <f7-list-item link="#" no-chevron
                                           v-for="item in items"
-                                          :key="item | itemFieldContentOrItem(primaryKeyField, false)"
-                                          :value="item | itemFieldContentOrItem(primaryValueField, false)"
-                                          :title="item | itemFieldContentOrItem(primaryTitleField, primaryTitleI18n)"
+                                          :key="item | itemFieldContent(primaryKeyField, item, false)"
+                                          :value="item | itemFieldContent(primaryValueField, item, false)"
+                                          :title="item | itemFieldContent(primaryTitleField, null, primaryTitleI18n)"
                                           @click="onPrimaryItemClicked(item)">
                                 <f7-icon slot="media"
                                          :icon="item[primaryIconField] | icon(primaryIconType)"
@@ -31,9 +31,9 @@
                         <f7-list no-hairlines class="secondary-list no-margin-top no-margin-bottom" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                             <f7-list-item link="#" no-chevron
                                           v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
-                                          :key="subItem | itemFieldContentOrItem(secondaryKeyField, false)"
-                                          :value="subItem | itemFieldContentOrItem(secondaryValueField, false)"
-                                          :title="subItem | itemFieldContentOrItem(secondaryTitleField, secondaryTitleI18n)"
+                                          :key="subItem | itemFieldContent(secondaryKeyField, subItem, false)"
+                                          :value="subItem | itemFieldContent(secondaryValueField, subItem, false)"
+                                          :title="subItem | itemFieldContent(secondaryTitleField, null, secondaryTitleI18n)"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <f7-icon slot="media"
                                          :icon="subItem[secondaryIconField] | icon(secondaryIconType)"

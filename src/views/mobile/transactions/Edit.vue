@@ -149,10 +149,13 @@
                         :title="transaction.sourceAccountId | accountName(allAccounts)"
                         @click="showSourceAccountSheet = true"
                     >
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
-                                                              primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
+                                                              primary-title-field="name" primary-footer-field="displayBalance"
+                                                              primary-icon-field="icon" primary-icon-type="account"
                                                               primary-sub-items-field="accounts"
-                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              :primary-title-i18n="true"
+                                                              secondary-key-field="id" secondary-value-field="id"
+                                                              secondary-title-field="name" secondary-footer-field="displayBalance"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                               :items="categoriedAccounts"
                                                               :show.sync="showSourceAccountSheet"
@@ -169,10 +172,13 @@
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                         @click="showDestinationAccountSheet = true"
                     >
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category" primary-title-field="name"
-                                                              primary-icon-field="icon" primary-icon-type="account" :primary-title-i18n="true"
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
+                                                              primary-title-field="name" primary-footer-field="displayBalance"
+                                                              primary-icon-field="icon" primary-icon-type="account"
                                                               primary-sub-items-field="accounts"
-                                                              secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                              :primary-title-i18n="true"
+                                                              secondary-key-field="id" secondary-value-field="id"
+                                                              secondary-title-field="name" secondary-footer-field="displayBalance"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                               :items="categoriedAccounts"
                                                               :show.sync="showDestinationAccountSheet"
@@ -251,6 +257,7 @@ export default {
             allTags: [],
             loading: true,
             submitting: false,
+            showAccountBalance: self.$settings.isShowAccountBalance(),
             showSourceAmountSheet: false,
             showDestinationAmountSheet: false,
             showCategorySheet: false,
@@ -292,6 +299,9 @@ export default {
             } else {
                 return '';
             }
+        },
+        defaultCurrency() {
+            return this.$user.getUserInfo() ? this.$user.getUserInfo().defaultCurrency : this.$t('default.currency');
         },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Expense] || !this.allCategories[this.$constants.category.allCategoryTypes.Expense].length) {
@@ -433,7 +443,11 @@ export default {
             }
 
             self.allAccounts = self.$utilities.getPlainAccounts(accountData.result);
+            self.setAccountsDisplayBalance(self.allAccounts);
+
             self.categoriedAccounts = self.$utilities.getCategorizedAccounts(self.allAccounts);
+            self.setCategoriesDisplayBalance(self.categoriedAccounts);
+
             self.allCategories = categoryData.result;
             self.allTags = tagData.result;
 
@@ -511,6 +525,55 @@ export default {
             for (let i = 0; i < categories.length; i++) {
                 for (let j = 0; j < categories[i].subCategories.length; j++) {
                     return categories[i].subCategories[j].id;
+                }
+            }
+        },
+        setAccountsDisplayBalance(accounts) {
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+
+                if (this.showAccountBalance) {
+                    account.displayBalance = this.$options.filters.currency(account.balance, account.currency);
+                } else {
+                    account.displayBalance = '***';
+                }
+            }
+        },
+        setCategoriesDisplayBalance(categorizedAccounts) {
+            for (let category in categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
+                    continue;
+                }
+
+                const accountCategory = categorizedAccounts[category];
+
+                if (this.showAccountBalance) {
+                    const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+                    let totalBalance = 0;
+                    let hasUnCalculatedAmount = false;
+
+                    for (let i = 0; i < accountsBalance.length; i++) {
+                        if (accountsBalance[i].currency === this.defaultCurrency) {
+                            totalBalance += accountsBalance[i].balance;
+                        } else {
+                            const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                            if (!this.$utilities.isNumber(balance)) {
+                                hasUnCalculatedAmount = true;
+                                continue;
+                            }
+
+                            totalBalance += Math.floor(balance);
+                        }
+                    }
+
+                    if (hasUnCalculatedAmount) {
+                        totalBalance = totalBalance + '+';
+                    }
+
+                    accountCategory.displayBalance = this.$options.filters.currency(totalBalance, this.defaultCurrency);
+                } else {
+                    accountCategory.displayBalance = '***';
                 }
             }
         },

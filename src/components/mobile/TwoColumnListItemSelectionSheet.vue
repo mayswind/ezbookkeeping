@@ -16,6 +16,8 @@
                                           :key="item | itemFieldContent(primaryKeyField, item, false)"
                                           :value="item | itemFieldContent(primaryValueField, item, false)"
                                           :title="item | itemFieldContent(primaryTitleField, null, primaryTitleI18n)"
+                                          :header="item | itemFieldContent(primaryHeaderField, null, primaryHeaderI18n)"
+                                          :footer="item | itemFieldContent(primaryFooterField, null, primaryFooterI18n)"
                                           @click="onPrimaryItemClicked(item)">
                                 <f7-icon slot="media"
                                          :icon="item[primaryIconField] | icon(primaryIconType)"
@@ -34,6 +36,8 @@
                                           :key="subItem | itemFieldContent(secondaryKeyField, subItem, false)"
                                           :value="subItem | itemFieldContent(secondaryValueField, subItem, false)"
                                           :title="subItem | itemFieldContent(secondaryTitleField, null, secondaryTitleI18n)"
+                                          :header="subItem | itemFieldContent(secondaryHeaderField, null, secondaryHeaderI18n)"
+                                          :footer="subItem | itemFieldContent(secondaryFooterField, null, secondaryFooterI18n)"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <f7-icon slot="media"
                                          :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
@@ -57,6 +61,10 @@ export default {
         'primaryValueField',
         'primaryTitleField',
         'primaryTitleI18n',
+        'primaryHeaderField',
+        'primaryHeaderI18n',
+        'primaryFooterField',
+        'primaryFooterI18n',
         'primaryIconField',
         'primaryIconType',
         'primaryColorField',
@@ -65,6 +73,10 @@ export default {
         'secondaryValueField',
         'secondaryTitleField',
         'secondaryTitleI18n',
+        'secondaryHeaderField',
+        'secondaryHeaderI18n',
+        'secondaryFooterField',
+        'secondaryFooterI18n',
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',

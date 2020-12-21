@@ -12,23 +12,29 @@
 
         <f7-card class="account-overview-card" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 100px;">
-                <small :style="{ opacity: 0.6 }">{{ loading ? 'Net assets' : $t('Net assets') }}</small><br />
-                <span class="net-assets" v-if="loading">0.00 USD</span>
-                <span class="net-assets" v-else-if="!loading">{{ netAssets | currency(defaultCurrency) }}</span>
-                <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
-                    <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
-                </f7-link>
-                <br />
-                <small class="account-overview-info" :style="{ opacity: 0.6 }" v-if="loading">
-                    <span>Total assets | Total liabilities</span>
-                </small>
-                <small class="account-overview-info" :style="{ opacity: 0.6 }" v-else-if="!loading">
-                    <span>{{ $t('Total assets') }}</span>
-                    <span>{{ totalAssets | currency(defaultCurrency) }}</span>
-                    <span>|</span>
-                    <span>{{ $t('Total liabilities') }}</span>
-                    <span>{{ totalLiabilities | currency(defaultCurrency) }}</span>
-                </small>
+                <p class="no-margin">
+                    <small :style="{ opacity: 0.6 }" v-if="loading">Net assets</small>
+                    <small :style="{ opacity: 0.6 }" v-else-if="!loading">{{ $t('Net assets') }}</small>
+                </p>
+                <p class="no-margin">
+                    <span class="net-assets" v-if="loading">0.00 USD</span>
+                    <span class="net-assets" v-else-if="!loading">{{ netAssets | currency(defaultCurrency) }}</span>
+                    <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
+                        <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
+                    </f7-link>
+                </p>
+                <p class="no-margin">
+                    <small class="account-overview-info" :style="{ opacity: 0.6 }" v-if="loading">
+                        <span>Total assets | Total liabilities</span>
+                    </small>
+                    <small class="account-overview-info" :style="{ opacity: 0.6 }" v-else-if="!loading">
+                        <span>{{ $t('Total assets') }}</span>
+                        <span>{{ totalAssets | currency(defaultCurrency) }}</span>
+                        <span>|</span>
+                        <span>{{ $t('Total liabilities') }}</span>
+                        <span>{{ totalLiabilities | currency(defaultCurrency) }}</span>
+                    </small>
+                </p>
             </f7-card-header>
         </f7-card>
 

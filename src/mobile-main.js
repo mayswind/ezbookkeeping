@@ -31,6 +31,7 @@ import userstate from './lib/userstate.js';
 import exchangeRates from './lib/exchangeRates.js';
 import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
+import itemFieldContentOrItemFilter from './filters/itemFieldContentOrItem.js';
 import currencyFilter from './filters/currency.js';
 import iconFilter from './filters/icon.js';
 import iconStyleFilter from './filters/iconStyle.js';
@@ -208,6 +209,7 @@ Vue.prototype.$services = services;
 Vue.prototype.$exchangeRates = exchangeRates;
 Vue.prototype.$user = userstate;
 
+Vue.filter('itemFieldContentOrItem', (value, fieldName, translate) => itemFieldContentOrItemFilter({ i18n }, value, fieldName, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
 Vue.filter('iconStyle', (value, iconType, defaultColor) => iconStyleFilter(value, iconType, defaultColor));

@@ -11,8 +11,8 @@
                 <f7-treeview-item v-for="item in items"
                                   item-toggle
                                   :opened="isPrimaryItemHasSecondaryValue(item)"
-                                  :key="primaryKeyField ? item[primaryKeyField] : item"
-                                  :label="primaryTitleField ? (primaryTitleI18n ? $t(item[primaryTitleField]) : item[primaryTitleField]) : (primaryTitleI18n ? $t(item) : item)">
+                                  :key="item | itemFieldContentOrItem(primaryKeyField, false)"
+                                  :label="item | itemFieldContentOrItem(primaryTitleField, primaryTitleI18n)">
                     <f7-icon slot="media"
                              :icon="item[primaryIconField] | icon(primaryIconType)"
                              :style="item[primaryColorField] | iconStyle(primaryIconType, 'var(--default-icon-color)')"
@@ -21,8 +21,8 @@
                     <f7-treeview-item v-for="subItem in item[primarySubItemsField]"
                                       selectable
                                       :selected="isSecondarySelected(subItem)"
-                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
-                                      :label="secondaryTitleField ? (secondaryTitleI18n ? $t(subItem[secondaryTitleField]) : subItem[secondaryTitleField]) : (secondaryTitleI18n ? $t(subItem) : subItem)"
+                                      :key="subItem | itemFieldContentOrItem(secondaryKeyField, false)"
+                                      :label="subItem | itemFieldContentOrItem(secondaryTitleField, secondaryTitleI18n)"
                                       @click="onSecondaryItemClicked(subItem)">
                         <f7-icon slot="media"
                                  :icon="subItem[secondaryIconField] | icon(secondaryIconType)"

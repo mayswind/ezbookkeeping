@@ -10,9 +10,9 @@
             <f7-list no-hairlines class="no-margin-top no-margin-bottom">
                 <f7-list-item link="#" no-chevron
                               v-for="(item, index) in items"
-                              :key="valueType === 'index' ? index : (keyField ? item[keyField] : item)"
-                              :value="valueType === 'index' ? index : (valueField ? item[valueField] : item)"
-                              :title="titleField ? (titleI18n ? $t(item[titleField]) : item[titleField]) : (titleI18n ? $t(item) : item)"
+                              :key="item | itemKeyValue(index, keyField, valueType)"
+                              :value="item | itemKeyValue(index, valueField, valueType)"
+                              :title="item | itemFieldContentOrItem(titleField, titleI18n)"
                               @click="onItemClicked(item, index)">
                     <f7-icon slot="media"
                              :icon="item[iconField] | icon(iconType)"
@@ -82,6 +82,17 @@ export default {
                 } else {
                     return this.currentValue === item;
                 }
+            }
+        }
+    },
+    filters: {
+        itemKeyValue(item, index, fieldName, valueType) {
+            if (valueType === 'index') {
+                return index;
+            } else if (fieldName) {
+                return item[fieldName];
+            } else {
+                return item;
             }
         }
     }

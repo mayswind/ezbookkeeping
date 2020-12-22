@@ -1,6 +1,7 @@
 # lab
 [![License](https://img.shields.io/github/license/mayswind/lab.svg?style=flat)](https://github.com/mayswind/lab/blob/master/LICENSE)
 [![Latest Build](https://img.shields.io/docker/cloud/build/mayswind/lab.svg?style=flat)](https://hub.docker.com/r/mayswind/lab/builds)
+[![Go Report](https://goreportcard.com/badge/github.com/mayswind/lab)](https://goreportcard.com/report/github.com/mayswind/lab)
 [![Latest Docker Image Size](https://img.shields.io/docker/image-size/mayswind/lab.svg?style=flat)](https://hub.docker.com/r/mayswind/lab)
 [![Latest Release](https://img.shields.io/github/release/mayswind/lab.svg?style=flat)](https://github.com/mayswind/lab/releases)
 

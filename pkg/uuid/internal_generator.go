@@ -7,6 +7,7 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
+// Length and mask of all information in uuid
 const (
 	INTERNAL_UUID_UNIX_TIME_BITS = 32
 	INTERNAL_UUID_UNIX_TIME_MASK = (1 << INTERNAL_UUID_UNIX_TIME_BITS) - 1
@@ -24,6 +25,7 @@ const (
 	SEQ_NUMBER_ID_MASK = (1 << SEQ_NUMBER_ID_BITS) - 1
 )
 
+// InternalUuidInfo represents a struct which has all information in uuid
 type InternalUuidInfo struct {
 	UnixTime     uint32
 	UuidType     uint8
@@ -31,11 +33,13 @@ type InternalUuidInfo struct {
 	SequentialId uint32
 }
 
+// InternalUuidGenerator represents internal bundled uuid generator
 type InternalUuidGenerator struct {
 	uuidServerId   uint8
 	uuidSeqNumbers [1 << INTERNAL_UUID_TYPE_BITS]uint64
 }
 
+// NewInternalUuidGenerator returns a new internal uuid generator
 func NewInternalUuidGenerator(config *settings.Config) (*InternalUuidGenerator, error) {
 	generator := &InternalUuidGenerator{
 		uuidServerId: config.UuidServerId,
@@ -44,6 +48,7 @@ func NewInternalUuidGenerator(config *settings.Config) (*InternalUuidGenerator, 
 	return generator, nil
 }
 
+// GenerateUuid returns a new uuid
 func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 	// 63bits = unixTime(32bits) + uuidType(4bits) + uuidServerId(8bits) + sequentialNumber(19bits)
 
@@ -79,6 +84,7 @@ func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 	return uuid
 }
 
+// ParseUuidInfo returns a info struct which contains all information in uuid
 func (u *InternalUuidGenerator) ParseUuidInfo(uuid int64) *InternalUuidInfo {
 	seqId := uint32(uuid & INTERNAL_UUID_SEQ_ID_MASK)
 	uuid = uuid >> INTERNAL_UUID_SEQ_ID_BITS

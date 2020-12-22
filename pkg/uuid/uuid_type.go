@@ -2,6 +2,7 @@ package uuid
 
 type UuidType uint8
 
+// Types of uuid
 const (
 	UUID_TYPE_DEFAULT     UuidType = 0
 	UUID_TYPE_USER        UuidType = 1

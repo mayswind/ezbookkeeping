@@ -17,16 +17,20 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
-const REQUEST_ID_LENGTH = 36
-const SECONDS_TODAY_BITS = 17
-const SECONDS_TODAY_BITS_MASK = (1 << SECONDS_TODAY_BITS) - 1
-const RANDOM_NUMBER_BITS = 15
-const RANDOM_NUMBER_BITS_MASK = (1 << RANDOM_NUMBER_BITS) - 1
-const REQ_SEQ_NUMBER_BITS = 31
-const REQ_SEQ_NUMBER_BITS_MASK = (1 << REQ_SEQ_NUMBER_BITS) - 1
-const CLIENT_IPV6_BIT = 1
-const CLIENT_IPV6_BIT_MASK = 1
+// Length and mask of all information in request id
+const (
+	REQUEST_ID_LENGTH        = 36
+	SECONDS_TODAY_BITS       = 17
+	SECONDS_TODAY_BITS_MASK  = (1 << SECONDS_TODAY_BITS) - 1
+	RANDOM_NUMBER_BITS       = 15
+	RANDOM_NUMBER_BITS_MASK  = (1 << RANDOM_NUMBER_BITS) - 1
+	REQ_SEQ_NUMBER_BITS      = 31
+	REQ_SEQ_NUMBER_BITS_MASK = (1 << REQ_SEQ_NUMBER_BITS) - 1
+	CLIENT_IPV6_BIT          = 1
+	CLIENT_IPV6_BIT_MASK     = 1
+)
 
+// RequestIdInfo represents a struct which has all information in request id
 type RequestIdInfo struct {
 	ServerUniqId        uint16
 	InstanceUniqId      uint16
@@ -37,12 +41,14 @@ type RequestIdInfo struct {
 	ClientIp            uint32
 }
 
+// DefaultRequestIdGenerator represents default request id generator
 type DefaultRequestIdGenerator struct {
 	serverUniqId   uint16
 	instanceUniqId uint16
 	requestSeqId   uint32
 }
 
+// NewDefaultRequestIdGenerator returns a new default request id generator
 func NewDefaultRequestIdGenerator(config *settings.Config) (*DefaultRequestIdGenerator, error) {
 	serverUniqId, err := getServerUniqId(config)
 
@@ -94,6 +100,7 @@ func getInstanceUniqId(config *settings.Config) uint16 {
 
 }
 
+// ParseRequestIdInfo returns a info struct which contains all information in request id
 func (r *DefaultRequestIdGenerator) ParseRequestIdInfo(requestId string) (*RequestIdInfo, error) {
 	if requestId == "" || len(requestId) != REQUEST_ID_LENGTH {
 		return nil, errs.ErrRequestIdInvalid
@@ -103,14 +110,17 @@ func (r *DefaultRequestIdGenerator) ParseRequestIdInfo(requestId string) (*Reque
 	return r.parseRequestIdInfo(requestIdData), nil
 }
 
+// GetCurrentServerUniqId returns current server unique id
 func (r *DefaultRequestIdGenerator) GetCurrentServerUniqId() uint16 {
 	return r.serverUniqId
 }
 
+// GetCurrentInstanceUniqId returns current application instance unique id
 func (r *DefaultRequestIdGenerator) GetCurrentInstanceUniqId() uint16 {
 	return r.instanceUniqId
 }
 
+// GenerateRequestId returns a new request id
 func (r *DefaultRequestIdGenerator) GenerateRequestId(clientIpAddr string) string {
 	ip := net.ParseIP(clientIpAddr)
 	isClientIpv6 := ip.To4() == nil

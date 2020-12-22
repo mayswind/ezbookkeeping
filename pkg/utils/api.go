@@ -11,6 +11,7 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 )
 
+// PrintSuccessResult writes success response to current http context
 func PrintSuccessResult(c *core.Context, result interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -18,6 +19,7 @@ func PrintSuccessResult(c *core.Context, result interface{}) {
 	})
 }
 
+// PrintErrorResult writes error response to current http context
 func PrintErrorResult(c *core.Context, err *errs.Error) {
 	c.SetResponseError(err)
 

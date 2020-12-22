@@ -5,6 +5,7 @@ import (
 	"math/big"
 )
 
+// GetRandomInteger returns a random number, the max parameter represents upper limit
 func GetRandomInteger(max int) (int, error) {
 	result, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
 

@@ -86,7 +86,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models
 	}
 
 	var err error
-	twoFactor.Secret, err = utils.EncyptSecret(twoFactor.Secret, s.CurrentConfig().SecretKey)
+	twoFactor.Secret, err = utils.EncryptSecret(twoFactor.Secret, s.CurrentConfig().SecretKey)
 
 	if err != nil {
 		return err

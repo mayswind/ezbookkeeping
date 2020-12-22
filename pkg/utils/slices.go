@@ -1,5 +1,6 @@
 package utils
 
+// Int64SliceMinus returns a int64 array which contains items in s1 but not in s2
 func Int64SliceMinus(s1, s2 []int64) []int64 {
 	if s1 == nil {
 		return nil
@@ -21,6 +22,7 @@ func Int64SliceMinus(s1, s2 []int64) []int64 {
 	return ret
 }
 
+// ToUniqueInt64Slice returns a int64 array which does not have duplicated items
 func ToUniqueInt64Slice(items []int64) []int64 {
 	uniqueItems := make([]int64, 0, len(items))
 	itemExistMap := make(map[int64]bool)

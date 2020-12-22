@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 )
 
+// Clone deep-clones src object to dst object
 func Clone(src, dst interface{}) error {
 	var buf bytes.Buffer
 

@@ -22,6 +22,7 @@ const (
 	NUMBER_AND_LETTERS_LENGTH = len(NUMBER_AND_LETTERS)
 )
 
+// SubString returns part of the source string according to start index and length
 func SubString(str string, start int, length int) string {
 	chars := []rune(str)
 	realLength := len(chars)
@@ -55,6 +56,7 @@ func SubString(str string, start int, length int) string {
 	return string(chars[start:end])
 }
 
+// GetFirstLowerCharString returns the source string parameter, but makes the first character lower case
 func GetFirstLowerCharString(s string) string {
 	if s == "" {
 		return s
@@ -70,6 +72,7 @@ func GetFirstLowerCharString(s string) string {
 	return string(chars)
 }
 
+// GetRandomString returns a random string of which length is n
 func GetRandomString(n int) (string, error) {
 	var result = make([]byte, n)
 
@@ -86,6 +89,7 @@ func GetRandomString(n int) (string, error) {
 	return string(result), nil
 }
 
+// GetRandomNumberOrLetter returns a random string which only contains number or letter characters
 func GetRandomNumberOrLetter(n int) (string, error) {
 	var result = make([]byte, n)
 
@@ -102,12 +106,14 @@ func GetRandomNumberOrLetter(n int) (string, error) {
 	return string(result), nil
 }
 
+// MD5Encode returns a hashed string by md5
 func MD5Encode(data []byte) []byte {
 	m := md5.New()
 	m.Write(data)
 	return m.Sum(nil)
 }
 
+// AESGCMEncrypt returns a encrypted string by aes-gcm
 func AESGCMEncrypt(key []byte, plainText []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 
@@ -133,6 +139,7 @@ func AESGCMEncrypt(key []byte, plainText []byte) ([]byte, error) {
 	return result, nil
 }
 
+// AESGCMEncrypt returns a decrypted string by aes-gcm
 func AESGCMDecrypt(key []byte, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 
@@ -164,21 +171,24 @@ func AESGCMDecrypt(key []byte, ciphertext []byte) ([]byte, error) {
 	return plainText, nil
 }
 
+// EncodePassword returns a encoded password
 func EncodePassword(password string, salt string) string {
 	encodedPassword := pbkdf2.Key([]byte(password), []byte(salt), 10000, 48, sha256.New) // 256^48 = 64^64
 	return strings.TrimRight(base64.StdEncoding.EncodeToString(encodedPassword), "=")
 }
 
-func EncyptSecret(secret string, key string) (string, error) {
-	encyptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
+// EncryptSecret returns a encrypted secret
+func EncryptSecret(secret string, key string) (string, error) {
+	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
 
 	if err != nil {
 		return "", err
 	}
 
-	return base64.StdEncoding.EncodeToString(encyptedSecret), nil
+	return base64.StdEncoding.EncodeToString(encryptedSecret), nil
 }
 
+// DecryptSecret returns a decrypted secret
 func DecryptSecret(encyptedSecret string, key string) (string, error) {
 	encyptedData, err := base64.StdEncoding.DecodeString(encyptedSecret)
 

@@ -148,7 +148,7 @@ func AESGCMDecrypt(key []byte, ciphertext []byte) ([]byte, error) {
 
 	nonceSize := aesgcm.NonceSize()
 
-	if len(ciphertext) - nonceSize <= 0 {
+	if len(ciphertext)-nonceSize <= 0 {
 		return nil, errs.ErrCiphertextInvalid
 	}
 

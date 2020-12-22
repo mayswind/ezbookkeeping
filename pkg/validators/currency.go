@@ -7,7 +7,7 @@ import (
 const PARENT_ACCOUNT_CURRENCY_PLACEHODLER = "---"
 
 // ISO 4217
-var ALL_CURRENCY_NAMES = map[string]bool {
+var ALL_CURRENCY_NAMES = map[string]bool{
 	"AED": true, //UAE Dirham
 	"AFN": true, //Afghani
 	"ALL": true, //Lek

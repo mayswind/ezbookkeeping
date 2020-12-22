@@ -13,7 +13,7 @@ import (
 
 const EuroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
 
-type ExchangeRatesApi struct {}
+type ExchangeRatesApi struct{}
 
 var (
 	ExchangeRates = &ExchangeRatesApi{}
@@ -52,7 +52,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 
 	latestExchangeRateResponse.ExchangeRates = append(latestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "EUR",
-		Rate: "1",
+		Rate:     "1",
 	})
 
 	return latestExchangeRateResponse, nil

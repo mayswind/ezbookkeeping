@@ -22,7 +22,7 @@ func (s *DataStore) DoTransaction(key int64, fn func(sess *xorm.Session) error) 
 	return s.Choose(key).DoTransaction(fn)
 }
 
-func (s *DataStore) SyncStructs(beans... interface{}) error {
+func (s *DataStore) SyncStructs(beans ...interface{}) error {
 	var err error
 
 	for i := 0; i < len(s.databases); i++ {
@@ -36,7 +36,7 @@ func (s *DataStore) SyncStructs(beans... interface{}) error {
 	return err
 }
 
-func NewDataStore(databases... *Database) (*DataStore, error) {
+func NewDataStore(databases ...*Database) (*DataStore, error) {
 	if len(databases) < 1 {
 		return nil, errs.ErrDatabaseIsNull
 	}

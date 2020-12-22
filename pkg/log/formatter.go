@@ -12,7 +12,7 @@ import (
 )
 
 type LogFormatter struct {
-	Prefix string
+	Prefix       string
 	DisableLevel bool
 }
 

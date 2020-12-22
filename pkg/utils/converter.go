@@ -10,7 +10,7 @@ func StringToInt32(str string) (int, error) {
 	return strconv.Atoi(str)
 }
 
-func StringTryToInt32(str string,  defaultValue int) int {
+func StringTryToInt32(str string, defaultValue int) int {
 	num, err := StringToInt32(str)
 
 	if err != nil {

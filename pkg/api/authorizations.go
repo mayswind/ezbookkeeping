@@ -187,10 +187,10 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	return authResp, nil
 }
 
-func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) (*models.AuthResponse) {
+func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) *models.AuthResponse {
 	return &models.AuthResponse{
-		Token : token,
+		Token:   token,
 		Need2FA: need2FA,
-		User: user.ToUserBasicInfo(),
+		User:    user.ToUserBasicInfo(),
 	}
 }

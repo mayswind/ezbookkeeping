@@ -8,7 +8,7 @@ import (
 )
 
 type XOrmLoggerAdapter struct {
-	enable bool
+	enable   bool
 	logLevel settings.Level
 }
 
@@ -82,7 +82,7 @@ func (logger XOrmLoggerAdapter) IsShowSQL() bool {
 
 func NewXOrmLoggerAdapter(showSql bool, logLevel settings.Level) xorm.Logger {
 	return XOrmLoggerAdapter{
-		enable: showSql,
+		enable:   showSql,
 		logLevel: logLevel,
 	}
 }

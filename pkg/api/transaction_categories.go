@@ -156,9 +156,9 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		}
 
 		category := a.createNewCategoryModel(uid, &models.TransactionCategoryCreateRequest{
-			Name: categoryCreateReq.Name,
-			Type: categoryCreateReq.Type,
-			Icon: categoryCreateReq.Icon,
+			Name:  categoryCreateReq.Name,
+			Type:  categoryCreateReq.Type,
+			Icon:  categoryCreateReq.Icon,
 			Color: categoryCreateReq.Color,
 		}, maxOrderId+1)
 
@@ -171,7 +171,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		}
 
 		categoriesMap[nil][i] = category
-		categoryTypeMaxOrderMap[categoryCreateReq.Type] = maxOrderId+1
+		categoryTypeMaxOrderMap[categoryCreateReq.Type] = maxOrderId + 1
 		totalCount++
 	}
 

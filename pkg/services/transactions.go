@@ -69,7 +69,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	endUnixTime := endTime.Unix()
 
 	var transactions []*models.Transaction
-	err = s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startUnixTime, endUnixTime).Limit(count, count * (page - 1)).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startUnixTime, endUnixTime).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
@@ -268,7 +268,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 				return err
 			} else if !has {
 				return errs.ErrDatabaseOperationFailed
-			} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime - 1 {
+			} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
 				return errs.ErrTooMuchTransactionInOneSecond
 			}
 
@@ -465,9 +465,9 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 
 			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
-			if has && sameSecondLatestTransaction.TransactionTime < maxTransactionTime - 1 {
+			if has && sameSecondLatestTransaction.TransactionTime < maxTransactionTime-1 {
 				transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
-			} else if has && sameSecondLatestTransaction.TransactionTime == maxTransactionTime - 1 {
+			} else if has && sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
 				return errs.ErrTooMuchTransactionInOneSecond
 			}
 
@@ -634,7 +634,7 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 	now := time.Now().Unix()
 
 	updateModel := &models.Transaction{
-		Deleted: true,
+		Deleted:         true,
 		DeletedUnixTime: now,
 	}
 

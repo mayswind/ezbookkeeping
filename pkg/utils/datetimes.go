@@ -17,7 +17,7 @@ func GetMinTransactionTimeFromUnixTime(unixTime int64) int64 {
 }
 
 func GetMaxTransactionTimeFromUnixTime(unixTime int64) int64 {
-	return unixTime * 1000 + 999
+	return unixTime*1000 + 999
 }
 
 func GetUnixTimeFromTransactionTime(transactionTime int64) int64 {

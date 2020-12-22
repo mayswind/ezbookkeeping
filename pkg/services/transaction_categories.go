@@ -214,7 +214,7 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 	now := time.Now().Unix()
 
 	updateModel := &models.TransactionCategory{
-		Hidden: hidden,
+		Hidden:          hidden,
 		UpdatedUnixTime: now,
 	}
 
@@ -264,7 +264,7 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 	now := time.Now().Unix()
 
 	updateModel := &models.TransactionCategory{
-		Deleted: true,
+		Deleted:         true,
 		DeletedUnixTime: now,
 	}
 

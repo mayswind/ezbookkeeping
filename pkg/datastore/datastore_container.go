@@ -17,8 +17,8 @@ import (
 )
 
 type DataStoreContainer struct {
-	UserStore *DataStore
-	TokenStore *DataStore
+	UserStore     *DataStore
+	TokenStore    *DataStore
 	UserDataStore *DataStore
 }
 

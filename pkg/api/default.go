@@ -5,7 +5,7 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 )
 
-type DefaultApi struct {}
+type DefaultApi struct{}
 
 var (
 	Default = &DefaultApi{}

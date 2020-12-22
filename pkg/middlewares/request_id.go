@@ -9,7 +9,7 @@ import (
 const REQUEST_ID_HEADER = "X-Request-ID"
 
 func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
-	return func (c *core.Context) {
+	return func(c *core.Context) {
 		if requestid.Container.Current == nil {
 			c.Next()
 			return

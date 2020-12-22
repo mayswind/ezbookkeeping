@@ -33,7 +33,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.Count + 1)
+	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.Count+1)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
@@ -236,7 +236,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	}
 
 	if newTransaction.CategoryId == transaction.CategoryId &&
-		newTransaction.TransactionTime / 1000 == transaction.TransactionTime / 1000 &&
+		newTransaction.TransactionTime/1000 == transaction.TransactionTime/1000 &&
 		newTransaction.SourceAccountId == transaction.SourceAccountId &&
 		newTransaction.DestinationAccountId == transaction.DestinationAccountId &&
 		newTransaction.SourceAmount == transaction.SourceAmount &&

@@ -63,7 +63,7 @@ func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenC
 	claims := &core.UserTokenClaims{}
 
 	token, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor,
-		func (token *jwt.Token) (interface{}, error) {
+		func(token *jwt.Token) (interface{}, error) {
 			uid, err := utils.StringToInt64(claims.Id)
 			now := time.Now().Unix()
 
@@ -205,8 +205,8 @@ func (s *TokenService) ParseFromTokenId(tokenId string) (*models.TokenRecord, er
 	}
 
 	tokenRecord := &models.TokenRecord{
-		Uid: uid,
-		UserTokenId: userTokenId,
+		Uid:             uid,
+		UserTokenId:     userTokenId,
 		CreatedUnixTime: createdUnixTime,
 	}
 
@@ -222,10 +222,10 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 	now := time.Now()
 
 	tokenRecord := &models.TokenRecord{
-		Uid: user.Uid,
-		UserTokenId: s.getUserTokenId(),
-		TokenType: tokenType,
-		UserAgent: userAgent,
+		Uid:             user.Uid,
+		UserTokenId:     s.getUserTokenId(),
+		TokenType:       tokenType,
+		UserAgent:       userAgent,
 		CreatedUnixTime: now.Unix(),
 		ExpiredUnixTime: now.Add(expiryDate).Unix(),
 	}
@@ -236,11 +236,11 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 
 	claims := &core.UserTokenClaims{
 		UserTokenId: utils.Int64ToString(tokenRecord.UserTokenId),
-		Username: user.Username,
-		Type: tokenRecord.TokenType,
+		Username:    user.Username,
+		Type:        tokenRecord.TokenType,
 		StandardClaims: jwt.StandardClaims{
-			Id: utils.Int64ToString(tokenRecord.Uid),
-			IssuedAt: tokenRecord.CreatedUnixTime,
+			Id:        utils.Int64ToString(tokenRecord.Uid),
+			IssuedAt:  tokenRecord.CreatedUnixTime,
 			ExpiresAt: tokenRecord.ExpiredUnixTime,
 		},
 	}

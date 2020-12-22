@@ -114,9 +114,9 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.Context) (interface{}, *er
 	}
 
 	newTag := &models.TransactionTag{
-		TagId:  tag.TagId,
-		Uid:    uid,
-		Name:   tagModifyReq.Name,
+		TagId: tag.TagId,
+		Uid:   uid,
+		Name:  tagModifyReq.Name,
 	}
 
 	if newTag.Name == tag.Name {

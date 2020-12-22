@@ -3,9 +3,9 @@ package services
 import (
 	"time"
 
-	"xorm.io/xorm"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
+	"xorm.io/xorm"
 
 	"github.com/mayswind/lab/pkg/datastore"
 	"github.com/mayswind/lab/pkg/errs"

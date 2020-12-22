@@ -12,13 +12,13 @@ import (
 )
 
 type UsersApi struct {
-	users *services.UserService
+	users  *services.UserService
 	tokens *services.TokenService
 }
 
 var (
 	Users = &UsersApi{
-		users: services.Users,
+		users:  services.Users,
 		tokens: services.Tokens,
 	}
 )
@@ -37,10 +37,10 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	userRegisterReq.Nickname = strings.TrimSpace(userRegisterReq.Nickname)
 
 	user := &models.User{
-		Username: userRegisterReq.Username,
-		Email:    userRegisterReq.Email,
-		Nickname: userRegisterReq.Nickname,
-		Password: userRegisterReq.Password,
+		Username:        userRegisterReq.Username,
+		Email:           userRegisterReq.Email,
+		Nickname:        userRegisterReq.Nickname,
+		Password:        userRegisterReq.Password,
 		DefaultCurrency: userRegisterReq.DefaultCurrency,
 	}
 
@@ -55,7 +55,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 
 	authResp := &models.AuthResponse{
 		Need2FA: false,
-		User: user.ToUserBasicInfo(),
+		User:    user.ToUserBasicInfo(),
 	}
 
 	token, claims, err := a.tokens.CreateToken(user, c)
@@ -114,8 +114,8 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 	anythingUpdate := false
 	userNew := &models.User{
-		Uid: user.Uid,
-		Salt: user.Salt,
+		Uid:   user.Uid,
+		Salt:  user.Salt,
 		Rands: user.Rands,
 	}
 
@@ -161,7 +161,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 	log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" has updated successfully", user.Uid)
 
-	resp := &models.UserProfileUpdateResponse {
+	resp := &models.UserProfileUpdateResponse{
 		User: user.ToUserBasicInfo(),
 	}
 

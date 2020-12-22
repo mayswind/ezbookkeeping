@@ -19,8 +19,8 @@ type TransactionTagCreateRequest struct {
 }
 
 type TransactionTagModifyRequest struct {
-	Id     int64  `json:"id,string" binding:"required,min=1"`
-	Name   string `json:"name" binding:"required,notBlank,max=32"`
+	Id   int64  `json:"id,string" binding:"required,min=1"`
+	Name string `json:"name" binding:"required,notBlank,max=32"`
 }
 
 type TransactionTagHideRequest struct {

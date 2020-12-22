@@ -164,7 +164,7 @@ func (s *TransactionTagService) HideTag(uid int64, ids []int64, hidden bool) err
 	now := time.Now().Unix()
 
 	updateModel := &models.TransactionTag{
-		Hidden: hidden,
+		Hidden:          hidden,
 		UpdatedUnixTime: now,
 	}
 

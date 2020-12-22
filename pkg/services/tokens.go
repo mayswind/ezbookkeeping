@@ -46,7 +46,7 @@ func (s *TokenService) GetAllTokensByUid(uid int64) ([]*models.TokenRecord, erro
 	return tokenRecords, err
 }
 
-func (s *TokenService) GetAllUnexpiredMormalTokensByUid(uid int64) ([]*models.TokenRecord, error) {
+func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}

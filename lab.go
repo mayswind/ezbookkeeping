@@ -12,9 +12,9 @@ import (
 const LAB_VERSION = "0.1.0"
 
 func main() {
-	app := &cli.App {
-		Name: "lab",
-		Usage: "A lightweight account book app hosted by yourself.",
+	app := &cli.App{
+		Name:    "lab",
+		Usage:   "A lightweight account book app hosted by yourself.",
 		Version: LAB_VERSION,
 		Commands: []*cli.Command{
 			cmd.WebServer,

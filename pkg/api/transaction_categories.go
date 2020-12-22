@@ -335,7 +335,7 @@ func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(cate
 	for i := 0; i < len(categoryResps); i++ {
 		categoryResp := categoryResps[i]
 
-		if categoryResp.ParentId <= models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+		if categoryResp.ParentId <= models.LevelOneTransactionParentId {
 			continue
 		}
 
@@ -351,7 +351,7 @@ func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(cate
 	finalCategoryResps := make(models.TransactionCategoryInfoResponseSlice, 0)
 
 	for i := 0; i < len(categoryResps); i++ {
-		if parentId <= 0 && categoryResps[i].ParentId == models.TRANSACTION_PARENT_ID_LEVEL_ONE {
+		if parentId <= 0 && categoryResps[i].ParentId == models.LevelOneTransactionParentId {
 			sort.Sort(categoryResps[i].SubCategories)
 			finalCategoryResps = append(finalCategoryResps, categoryResps[i])
 		} else if parentId > 0 && categoryResps[i].ParentId == parentId {

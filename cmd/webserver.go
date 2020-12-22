@@ -62,7 +62,7 @@ func startWebServer(c *cli.Context) error {
 
 	serverInfo := fmt.Sprintf("current server id is %d, current instance id is %d", requestid.Container.Current.GetCurrentServerUniqId(), requestid.Container.Current.GetCurrentInstanceUniqId())
 	uuidServerInfo := ""
-	if config.UuidGeneratorType == settings.UUID_GENERATOR_TYPE_INTERNAL {
+	if config.UuidGeneratorType == settings.InternalUuidGeneratorType {
 		uuidServerInfo = fmt.Sprintf(", current uuid server id is %d", config.UuidServerId)
 	}
 

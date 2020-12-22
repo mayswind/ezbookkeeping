@@ -60,7 +60,7 @@ func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 	var connStr string
 	var err error
 
-	if dbConfig.DatabaseType == settings.DBTYPE_SQLITE3 {
+	if dbConfig.DatabaseType == settings.Sqlite3DbType {
 		if _, err = os.Stat(dbConfig.DatabasePath); err != nil {
 			file, err := os.Create(dbConfig.DatabasePath)
 
@@ -72,11 +72,11 @@ func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 		}
 	}
 
-	if dbConfig.DatabaseType == settings.DBTYPE_MYSQL {
+	if dbConfig.DatabaseType == settings.MySqlDbType {
 		connStr, err = getMysqlConnectionString(dbConfig)
-	} else if dbConfig.DatabaseType == settings.DBTYPE_POSTGRES {
+	} else if dbConfig.DatabaseType == settings.PostgresDbType {
 		connStr, err = getPostgresConnectionString(dbConfig)
-	} else if dbConfig.DatabaseType == settings.DBTYPE_SQLITE3 {
+	} else if dbConfig.DatabaseType == settings.Sqlite3DbType {
 		connStr, err = getSqlite3ConnectionString(dbConfig)
 	} else {
 		return nil, errs.ErrDatabaseTypeInvalid

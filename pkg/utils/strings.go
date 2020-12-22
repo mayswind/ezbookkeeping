@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	CHARACTERS                = "!#$&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
-	NUMBER_AND_LETTERS        = "0123456789abcdefghijklmnopqrstuvwxyz"
-	CHARACTERS_LENGTH         = len(CHARACTERS)
-	NUMBER_AND_LETTERS_LENGTH = len(NUMBER_AND_LETTERS)
+	availableCharacters             = "!#$&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
+	availableNumberAndLetters       = "0123456789abcdefghijklmnopqrstuvwxyz"
+	availableCharactersLength       = len(availableCharacters)
+	availableNumberAndLettersLength = len(availableNumberAndLetters)
 )
 
 // SubString returns part of the source string according to start index and length
@@ -77,13 +77,13 @@ func GetRandomString(n int) (string, error) {
 	var result = make([]byte, n)
 
 	for i := 0; i < n; i++ {
-		index, err := GetRandomInteger(CHARACTERS_LENGTH)
+		index, err := GetRandomInteger(availableCharactersLength)
 
 		if err != nil {
 			return "", err
 		}
 
-		result[i] = CHARACTERS[index]
+		result[i] = availableCharacters[index]
 	}
 
 	return string(result), nil
@@ -94,13 +94,13 @@ func GetRandomNumberOrLetter(n int) (string, error) {
 	var result = make([]byte, n)
 
 	for i := 0; i < n; i++ {
-		index, err := GetRandomInteger(NUMBER_AND_LETTERS_LENGTH)
+		index, err := GetRandomInteger(availableNumberAndLettersLength)
 
 		if err != nil {
 			return "", err
 		}
 
-		result[i] = NUMBER_AND_LETTERS[index]
+		result[i] = availableNumberAndLetters[index]
 	}
 
 	return string(result), nil

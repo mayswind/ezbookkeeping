@@ -8,9 +8,9 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 )
 
-const FIELD_REQUEST_ID_KEY = "REQUEST_ID"
-const FIELD_TOKEN_CLAIMS_KEY = "TOKEN_CLAIMS"
-const FIELD_RESPONSE_ERROR = "RESPONSE_ERROR"
+const requestIdFieldKey = "REQUEST_ID"
+const tokenClaimsFieldKey = "TOKEN_CLAIMS"
+const responseErrorFieldKey = "RESPONSE_ERROR"
 
 type Context struct {
 	*gin.Context
@@ -18,11 +18,11 @@ type Context struct {
 }
 
 func (c *Context) SetRequestId(requestId string) {
-	c.Set(FIELD_REQUEST_ID_KEY, requestId)
+	c.Set(requestIdFieldKey, requestId)
 }
 
 func (c *Context) GetRequestId() string {
-	requestId, exists := c.Get(FIELD_REQUEST_ID_KEY)
+	requestId, exists := c.Get(requestIdFieldKey)
 
 	if !exists {
 		return ""
@@ -32,11 +32,11 @@ func (c *Context) GetRequestId() string {
 }
 
 func (c *Context) SetTokenClaims(claims *UserTokenClaims) {
-	c.Set(FIELD_TOKEN_CLAIMS_KEY, claims)
+	c.Set(tokenClaimsFieldKey, claims)
 }
 
 func (c *Context) GetTokenClaims() *UserTokenClaims {
-	claims, exists := c.Get(FIELD_TOKEN_CLAIMS_KEY)
+	claims, exists := c.Get(tokenClaimsFieldKey)
 
 	if !exists {
 		return nil
@@ -62,11 +62,11 @@ func (c *Context) GetCurrentUid() int64 {
 }
 
 func (c *Context) SetResponseError(error *errs.Error) {
-	c.Set(FIELD_RESPONSE_ERROR, error)
+	c.Set(responseErrorFieldKey, error)
 }
 
 func (c *Context) GetResponseError() *errs.Error {
-	err, exists := c.Get(FIELD_RESPONSE_ERROR)
+	err, exists := c.Get(responseErrorFieldKey)
 
 	if !exists {
 		return nil

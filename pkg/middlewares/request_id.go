@@ -6,7 +6,7 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
-const REQUEST_ID_HEADER = "X-Request-ID"
+const requestIdHeader = "X-Request-ID"
 
 func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.Context) {
@@ -19,7 +19,7 @@ func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
 		c.SetRequestId(requestId)
 
 		if config.EnableRequestIdHeader {
-			c.Header(REQUEST_ID_HEADER, requestId)
+			c.Header(requestIdHeader, requestId)
 		}
 
 		c.Next()

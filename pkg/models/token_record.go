@@ -2,8 +2,8 @@ package models
 
 import "github.com/mayswind/lab/pkg/core"
 
-// The maximum size of user agent stored in database
-const TOKEN_USER_AGENT_MAX_LENGTH = 255
+// TokenMaxUserAgentLength represents the maximum size of user agent stored in database
+const TokenMaxUserAgentLength = 255
 
 // TokenRecord represents token data stored in database
 type TokenRecord struct {

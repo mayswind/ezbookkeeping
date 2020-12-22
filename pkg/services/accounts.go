@@ -60,7 +60,7 @@ func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCa
 	}
 
 	account := &models.Account{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, models.ACCOUNT_PARENT_ID_LEVEL_ONE, category).OrderBy("display_order desc").Limit(1).Get(account)
+	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, models.LevelOneAccountParentId, category).OrderBy("display_order desc").Limit(1).Get(account)
 
 	if err != nil {
 		return 0, err

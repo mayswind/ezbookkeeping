@@ -17,7 +17,7 @@ var (
 
 // InitializeUuidGenerator initialized the current uuid generator according to the config
 func InitializeUuidGenerator(config *settings.Config) error {
-	if config.UuidGeneratorType == settings.UUID_GENERATOR_TYPE_INTERNAL {
+	if config.UuidGeneratorType == settings.InternalUuidGeneratorType {
 		generator, err := NewInternalUuidGenerator(config)
 		Container.Current = generator
 

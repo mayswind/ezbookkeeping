@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	LAB_WORK_DIR               = "LAB_WORK_DIR"
-	LAB_ENVIRONMENT_KEY_PREFIX = "LAB"
-	DEFAULT_CONFIG_PATH        = "/conf/lab.ini"
-	DEFAULT_STATIC_ROOT_PATH   = "public"
+	labWorkDirEnvName     = "LAB_WORK_DIR"
+	labEnvNamePrefix      = "LAB"
+	defaultConfigPath     = "/conf/lab.ini"
+	defaultStaticRootPath = "public"
 )
 
 type SystemMode string
@@ -45,34 +45,34 @@ const (
 )
 
 const (
-	DBTYPE_MYSQL    string = "mysql"
-	DBTYPE_POSTGRES string = "postgres"
-	DBTYPE_SQLITE3  string = "sqlite3"
+	MySqlDbType    string = "mysql"
+	PostgresDbType string = "postgres"
+	Sqlite3DbType  string = "sqlite3"
 )
 
 const (
-	UUID_GENERATOR_TYPE_INTERNAL string = "internal"
+	InternalUuidGeneratorType string = "internal"
 )
 
 const (
-	DEFAULT_APP_NAME string = "lab"
+	defaultAppName string = "lab"
 
-	DEFAULT_HTTP_ADDR string = "0.0.0.0"
-	DEFAULT_HTTP_PORT int    = 8080
-	DEFAULT_DOMAIN    string = "localhost"
+	defaultHttpAddr string = "0.0.0.0"
+	defaultHttpPort int    = 8080
+	defaultDomain   string = "localhost"
 
-	DEFAULT_DATABASE_HOST              string = "127.0.0.1:3306"
-	DEFAULT_DATABASE_NAME              string = "lab"
-	DEFAULT_DATABASE_MAX_IDLE_CONN     int    = 2
-	DEFAULT_DATABASE_MAX_OPEN_CONN     int    = 0
-	DEFAULT_DATABASE_CONN_MAX_LIFETIME int    = 14400
+	defaultDatabaseHost            string = "127.0.0.1:3306"
+	defaultDatabaseName            string = "lab"
+	defaultDatabaseMaxIdleConn     int    = 2
+	defaultDatabaseMaxOpenConn     int    = 0
+	defaultDatabaseConnMaxLifetime int    = 14400
 
-	DEFAULT_LOG_MODE  string = "console"
-	DEFAULT_LOG_LEVEL Level  = LOGLEVEL_INFO
+	defaultLogMode  string = "console"
+	defaultLoglevel Level  = LOGLEVEL_INFO
 
-	DEFAULT_SECRET_KEY                   string = "lab"
-	DEFAULT_TOKEN_EXPIRED_TIME           int    = 604800 // 7 days
-	DEFAULT_TEMPORARY_TOKEN_EXPIRED_TIME int    = 300    // 5 minutes
+	defaultSecretKey                 string = "lab"
+	defaultTokenExpiredTime          int    = 604800 // 7 days
+	defaultTemporaryTokenExpiredTime int    = 300    // 5 minutes
 )
 
 type DatabaseConfig struct {
@@ -213,7 +213,7 @@ func GetDefaultConfigFilePath() (string, error) {
 		return "", err
 	}
 
-	cfgFilePath := filepath.Join(workingPath, DEFAULT_CONFIG_PATH)
+	cfgFilePath := filepath.Join(workingPath, defaultConfigPath)
 	_, err = os.Stat(cfgFilePath)
 
 	if err != nil {
@@ -224,7 +224,7 @@ func GetDefaultConfigFilePath() (string, error) {
 }
 
 func loadGlobalConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.AppName = getConfigItemStringValue(configFile, sectionName, "app_name", DEFAULT_APP_NAME)
+	config.AppName = getConfigItemStringValue(configFile, sectionName, "app_name", defaultAppName)
 	config.Mode = MODE_PRODUCTION
 
 	if getConfigItemStringValue(configFile, sectionName, "mode") == "development" {
@@ -238,13 +238,13 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 	if getConfigItemStringValue(configFile, sectionName, "protocol") == "http" {
 		config.Protocol = SCHEME_HTTP
 
-		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", DEFAULT_HTTP_ADDR)
-		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", DEFAULT_HTTP_PORT)
+		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", defaultHttpAddr)
+		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", defaultHttpPort)
 	} else if getConfigItemStringValue(configFile, sectionName, "protocol") == "https" {
 		config.Protocol = SCHEME_HTTPS
 
-		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", DEFAULT_HTTP_ADDR)
-		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", DEFAULT_HTTP_PORT)
+		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", defaultHttpAddr)
+		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", defaultHttpPort)
 
 		config.CertFile = getConfigItemStringValue(configFile, sectionName, "cert_file")
 		config.CertKeyFile = getConfigItemStringValue(configFile, sectionName, "cert_key_file")
@@ -256,14 +256,14 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 		return errs.ErrInvalidProtocol
 	}
 
-	config.Domain = getConfigItemStringValue(configFile, sectionName, "domain", DEFAULT_DOMAIN)
+	config.Domain = getConfigItemStringValue(configFile, sectionName, "domain", defaultDomain)
 	config.RootUrl = getConfigItemStringValue(configFile, sectionName, "root_url", fmt.Sprintf("%s://%s:%d/", string(config.Protocol), config.Domain, config.HttpPort))
 
 	if config.RootUrl[len(config.RootUrl)-1] != '/' {
 		config.RootUrl += "/"
 	}
 
-	staticRootPath := getConfigItemStringValue(configFile, sectionName, "static_root_path", DEFAULT_STATIC_ROOT_PATH)
+	staticRootPath := getConfigItemStringValue(configFile, sectionName, "static_root_path", defaultStaticRootPath)
 	finalStaticRootPath, err := getFinalPath(config.WorkingPath, staticRootPath)
 
 	if err != nil {
@@ -281,25 +281,25 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	dbConfig := &DatabaseConfig{}
 
-	dbConfig.DatabaseType = getConfigItemStringValue(configFile, sectionName, "type", DBTYPE_MYSQL)
-	dbConfig.DatabaseHost = getConfigItemStringValue(configFile, sectionName, "host", DEFAULT_DATABASE_HOST)
-	dbConfig.DatabaseName = getConfigItemStringValue(configFile, sectionName, "name", DEFAULT_DATABASE_NAME)
+	dbConfig.DatabaseType = getConfigItemStringValue(configFile, sectionName, "type", MySqlDbType)
+	dbConfig.DatabaseHost = getConfigItemStringValue(configFile, sectionName, "host", defaultDatabaseHost)
+	dbConfig.DatabaseName = getConfigItemStringValue(configFile, sectionName, "name", defaultDatabaseName)
 	dbConfig.DatabaseUser = getConfigItemStringValue(configFile, sectionName, "user")
 	dbConfig.DatabasePassword = getConfigItemStringValue(configFile, sectionName, "passwd")
 
-	if dbConfig.DatabaseType == DBTYPE_POSTGRES {
+	if dbConfig.DatabaseType == PostgresDbType {
 		dbConfig.DatabaseSSLMode = getConfigItemStringValue(configFile, sectionName, "ssl_mode")
 	}
 
-	if dbConfig.DatabaseType == DBTYPE_SQLITE3 {
+	if dbConfig.DatabaseType == Sqlite3DbType {
 		staticDBPath := getConfigItemStringValue(configFile, sectionName, "db_path")
 		finalStaticDBPath, _ := getFinalPath(config.WorkingPath, staticDBPath)
 		dbConfig.DatabasePath = finalStaticDBPath
 	}
 
-	dbConfig.MaxIdleConnection = getConfigItemIntValue(configFile, sectionName, "max_idle_conn", DEFAULT_DATABASE_MAX_IDLE_CONN)
-	dbConfig.MaxOpenConnection = getConfigItemIntValue(configFile, sectionName, "max_open_conn", DEFAULT_DATABASE_MAX_OPEN_CONN)
-	dbConfig.ConnectionMaxLifeTime = getConfigItemIntValue(configFile, sectionName, "conn_max_lifetime", DEFAULT_DATABASE_CONN_MAX_LIFETIME)
+	dbConfig.MaxIdleConnection = getConfigItemIntValue(configFile, sectionName, "max_idle_conn", defaultDatabaseMaxIdleConn)
+	dbConfig.MaxOpenConnection = getConfigItemIntValue(configFile, sectionName, "max_open_conn", defaultDatabaseMaxOpenConn)
+	dbConfig.ConnectionMaxLifeTime = getConfigItemIntValue(configFile, sectionName, "conn_max_lifetime", defaultDatabaseConnMaxLifetime)
 
 	config.DatabaseConfig = dbConfig
 	config.EnableQueryLog = getConfigItemBoolValue(configFile, sectionName, "log_query", false)
@@ -309,7 +309,7 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 }
 
 func loadLogConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.LogModes = strings.Split(getConfigItemStringValue(configFile, sectionName, "mode", DEFAULT_LOG_MODE), " ")
+	config.LogModes = strings.Split(getConfigItemStringValue(configFile, sectionName, "mode", defaultLogMode), " ")
 
 	for i := 0; i < len(config.LogModes); i++ {
 		logMode := config.LogModes[i]
@@ -323,7 +323,7 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 		}
 	}
 
-	config.LogLevel = getLogLevel(getConfigItemStringValue(configFile, sectionName, "level"), DEFAULT_LOG_LEVEL)
+	config.LogLevel = getLogLevel(getConfigItemStringValue(configFile, sectionName, "level"), defaultLoglevel)
 
 	if config.EnableFileLog {
 		config.FileLogPath = getConfigItemStringValue(configFile, sectionName, "log_path")
@@ -333,8 +333,8 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 }
 
 func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	if getConfigItemStringValue(configFile, sectionName, "generator_type") == UUID_GENERATOR_TYPE_INTERNAL {
-		config.UuidGeneratorType = UUID_GENERATOR_TYPE_INTERNAL
+	if getConfigItemStringValue(configFile, sectionName, "generator_type") == InternalUuidGeneratorType {
+		config.UuidGeneratorType = InternalUuidGeneratorType
 	} else {
 		return errs.ErrInvalidUuidMode
 	}
@@ -345,13 +345,13 @@ func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.SecretKey = getConfigItemStringValue(configFile, sectionName, "secret_key", DEFAULT_SECRET_KEY)
+	config.SecretKey = getConfigItemStringValue(configFile, sectionName, "secret_key", defaultSecretKey)
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 
-	config.TokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "token_expired_time", DEFAULT_TOKEN_EXPIRED_TIME)
+	config.TokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "token_expired_time", defaultTokenExpiredTime)
 	config.TokenExpiredTimeDuration = time.Duration(config.TokenExpiredTime) * time.Second
 
-	config.TemporaryTokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "temporary_token_expired_time", DEFAULT_TEMPORARY_TOKEN_EXPIRED_TIME)
+	config.TemporaryTokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
 	config.TemporaryTokenExpiredTimeDuration = time.Duration(config.TemporaryTokenExpiredTime) * time.Second
 
 	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
@@ -366,7 +366,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func getWorkingPath() (string, error) {
-	workingPath := os.Getenv(LAB_WORK_DIR)
+	workingPath := os.Getenv(labWorkDirEnvName)
 
 	if workingPath != "" {
 		return workingPath, nil
@@ -445,7 +445,7 @@ func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName s
 }
 
 func getEnvironmentKey(sectionName string, itemName string) string {
-	return fmt.Sprintf("%s_%s_%s", LAB_ENVIRONMENT_KEY_PREFIX, strings.ToUpper(sectionName), strings.ToUpper(itemName))
+	return fmt.Sprintf("%s_%s_%s", labEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
 }
 
 func getLogLevel(logLevelStr string, defaultLogLevel Level) Level {

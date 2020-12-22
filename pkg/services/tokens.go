@@ -314,8 +314,8 @@ func (s *TokenService) getUserAgent(ctx *core.Context) string {
 		userAgent = ctx.Request.UserAgent()
 	}
 
-	if len(userAgent) > models.TOKEN_USER_AGENT_MAX_LENGTH {
-		userAgent = utils.SubString(userAgent, 0, models.TOKEN_USER_AGENT_MAX_LENGTH)
+	if len(userAgent) > models.TokenMaxUserAgentLength {
+		userAgent = utils.SubString(userAgent, 0, models.TokenMaxUserAgentLength)
 	}
 
 	return userAgent

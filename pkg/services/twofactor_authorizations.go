@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	TWOFACTOR_PERIOD               uint = 30 // seconds
-	TWOFACTOR_SECRET_SIZE          uint = 20 // bytes
-	TWOFACTOR_RECOVERY_CODE_COUNT  int  = 10
-	TWOFACTOR_RECOVERY_CODE_LENGTH int  = 10 // bytes
+	twoFactorPeriod             uint = 30 // seconds
+	twoFactorSecretSize         uint = 20 // bytes
+	twoFactorRecoveryCodeCount  int  = 10
+	twoFactorRecoveryCodeLength int  = 10 // bytes
 )
 
 type TwoFactorAuthorizationService struct {
@@ -73,8 +73,8 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(user *models.Use
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      s.CurrentConfig().AppName,
 		AccountName: user.Username,
-		Period:      TWOFACTOR_PERIOD,
-		SecretSize:  TWOFACTOR_SECRET_SIZE,
+		Period:      twoFactorPeriod,
+		SecretSize:  twoFactorSecretSize,
 	})
 
 	return key, err
@@ -147,10 +147,10 @@ func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid i
 }
 
 func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]string, error) {
-	recoveryCodes := make([]string, TWOFACTOR_RECOVERY_CODE_COUNT)
+	recoveryCodes := make([]string, twoFactorRecoveryCodeCount)
 
-	for i := 0; i < TWOFACTOR_RECOVERY_CODE_COUNT; i++ {
-		recoveryCode, err := utils.GetRandomNumberOrLetter(TWOFACTOR_RECOVERY_CODE_LENGTH)
+	for i := 0; i < twoFactorRecoveryCodeCount; i++ {
+		recoveryCode, err := utils.GetRandomNumberOrLetter(twoFactorRecoveryCodeLength)
 
 		if err != nil {
 			return nil, err

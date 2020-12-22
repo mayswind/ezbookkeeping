@@ -9,20 +9,20 @@ import (
 
 // Length and mask of all information in uuid
 const (
-	INTERNAL_UUID_UNIX_TIME_BITS = 32
-	INTERNAL_UUID_UNIX_TIME_MASK = (1 << INTERNAL_UUID_UNIX_TIME_BITS) - 1
+	internalUuidUnixTimeBits = 32
+	internalUuidUnixTimeMask = (1 << internalUuidUnixTimeBits) - 1
 
-	INTERNAL_UUID_TYPE_BITS = 4
-	INTERNAL_UUID_TYPE_MASK = (1 << INTERNAL_UUID_TYPE_BITS) - 1
+	internalUuidTypeBits = 4
+	internalUuidTypeMask = (1 << internalUuidTypeBits) - 1
 
-	INTERNAL_UUID_SERVER_ID_BITS = 8
-	INTERNAL_UUID_SERVER_ID_MASK = (1 << INTERNAL_UUID_SERVER_ID_BITS) - 1
+	internalUuidServerIdBits = 8
+	internalUuidServerIdMask = (1 << internalUuidServerIdBits) - 1
 
-	INTERNAL_UUID_SEQ_ID_BITS = 19
-	INTERNAL_UUID_SEQ_ID_MASK = (1 << INTERNAL_UUID_SEQ_ID_BITS) - 1
+	internalUuidSeqIdBits = 19
+	internalUuidSeqIdMask = (1 << internalUuidSeqIdBits) - 1
 
-	SEQ_NUMBER_ID_BITS = 32
-	SEQ_NUMBER_ID_MASK = (1 << SEQ_NUMBER_ID_BITS) - 1
+	seqNumberIdBits = 32
+	seqNumberIdMask = (1 << seqNumberIdBits) - 1
 )
 
 // InternalUuidInfo represents a struct which has all information in uuid
@@ -36,7 +36,7 @@ type InternalUuidInfo struct {
 // InternalUuidGenerator represents internal bundled uuid generator
 type InternalUuidGenerator struct {
 	uuidServerId   uint8
-	uuidSeqNumbers [1 << INTERNAL_UUID_TYPE_BITS]uint64
+	uuidSeqNumbers [1 << internalUuidTypeBits]uint64
 }
 
 // NewInternalUuidGenerator returns a new internal uuid generator
@@ -60,24 +60,24 @@ func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 		unixTime = uint64(time.Now().Unix())
 		newSeqId = atomic.AddUint64(&u.uuidSeqNumbers[uuidType], 1)
 
-		if newSeqId>>SEQ_NUMBER_ID_BITS == unixTime {
+		if newSeqId>>seqNumberIdBits == unixTime {
 			break
 		}
 
 		currentSeqId := newSeqId
-		newSeqId = unixTime << SEQ_NUMBER_ID_BITS
+		newSeqId = unixTime << seqNumberIdBits
 
 		if atomic.CompareAndSwapUint64(&u.uuidSeqNumbers[uuidType], currentSeqId, newSeqId) {
 			break
 		}
 	}
 
-	seqId := newSeqId & SEQ_NUMBER_ID_MASK
+	seqId := newSeqId & seqNumberIdMask
 
-	unixTimePart := (int64(unixTime) & INTERNAL_UUID_UNIX_TIME_MASK) << (INTERNAL_UUID_TYPE_BITS + INTERNAL_UUID_SERVER_ID_BITS + INTERNAL_UUID_SEQ_ID_BITS)
-	uuidTypePart := (int64(uuidType) & INTERNAL_UUID_TYPE_MASK) << (INTERNAL_UUID_SERVER_ID_BITS + INTERNAL_UUID_SEQ_ID_BITS)
-	uuidServerIdPart := (int64(u.uuidServerId) & INTERNAL_UUID_SERVER_ID_MASK) << INTERNAL_UUID_SEQ_ID_BITS
-	seqIdPart := int64(seqId) & INTERNAL_UUID_SEQ_ID_MASK
+	unixTimePart := (int64(unixTime) & internalUuidUnixTimeMask) << (internalUuidTypeBits + internalUuidServerIdBits + internalUuidSeqIdBits)
+	uuidTypePart := (int64(uuidType) & internalUuidTypeMask) << (internalUuidServerIdBits + internalUuidSeqIdBits)
+	uuidServerIdPart := (int64(u.uuidServerId) & internalUuidServerIdMask) << internalUuidSeqIdBits
+	seqIdPart := int64(seqId) & internalUuidSeqIdMask
 
 	uuid := unixTimePart | uuidTypePart | uuidServerIdPart | seqIdPart
 
@@ -86,16 +86,16 @@ func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 
 // ParseUuidInfo returns a info struct which contains all information in uuid
 func (u *InternalUuidGenerator) ParseUuidInfo(uuid int64) *InternalUuidInfo {
-	seqId := uint32(uuid & INTERNAL_UUID_SEQ_ID_MASK)
-	uuid = uuid >> INTERNAL_UUID_SEQ_ID_BITS
+	seqId := uint32(uuid & internalUuidSeqIdMask)
+	uuid = uuid >> internalUuidSeqIdBits
 
-	uuidServerId := uint8(uuid & INTERNAL_UUID_SERVER_ID_MASK)
-	uuid = uuid >> INTERNAL_UUID_SERVER_ID_BITS
+	uuidServerId := uint8(uuid & internalUuidServerIdMask)
+	uuid = uuid >> internalUuidServerIdBits
 
-	uuidType := uint8(uuid & INTERNAL_UUID_TYPE_MASK)
-	uuid = uuid >> INTERNAL_UUID_TYPE_BITS
+	uuidType := uint8(uuid & internalUuidTypeMask)
+	uuid = uuid >> internalUuidTypeBits
 
-	unixTime := uint32(uuid & INTERNAL_UUID_UNIX_TIME_MASK)
+	unixTime := uint32(uuid & internalUuidUnixTimeMask)
 
 	return &InternalUuidInfo{
 		UnixTime:     unixTime,

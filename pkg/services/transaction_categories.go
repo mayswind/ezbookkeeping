@@ -80,7 +80,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType 
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.TRANSACTION_PARENT_ID_LEVEL_ONE).OrderBy("display_order desc").Limit(1).Get(category)
+	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionParentId).OrderBy("display_order desc").Limit(1).Get(category)
 
 	if err != nil {
 		return 0, err

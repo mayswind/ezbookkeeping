@@ -1,7 +1,7 @@
 package models
 
-// Level-One Account
-const ACCOUNT_PARENT_ID_LEVEL_ONE = 0
+// LevelOneAccountParentId represents the parent id of level-one account
+const LevelOneAccountParentId = 0
 
 // AccountCategory represents account category
 type AccountCategory byte

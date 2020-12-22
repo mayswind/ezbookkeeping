@@ -53,7 +53,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 			continue
 		}
 
-		if userAccountResp.ParentId <= models.ACCOUNT_PARENT_ID_LEVEL_ONE {
+		if userAccountResp.ParentId <= models.LevelOneAccountParentId {
 			continue
 		}
 
@@ -69,7 +69,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 	userFinalAccountResps := make(models.AccountInfoResponseSlice, 0, len(userAllAccountResps))
 
 	for i := 0; i < len(userAllAccountResps); i++ {
-		if userAllAccountResps[i].ParentId == models.ACCOUNT_PARENT_ID_LEVEL_ONE && (!accountListReq.VisibleOnly || !userAllAccountResps[i].Hidden) {
+		if userAllAccountResps[i].ParentId == models.LevelOneAccountParentId && (!accountListReq.VisibleOnly || !userAllAccountResps[i].Hidden) {
 			sort.Sort(userAllAccountResps[i].SubAccounts)
 			userFinalAccountResps = append(userFinalAccountResps, userAllAccountResps[i])
 		}
@@ -142,7 +142,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 			return nil, errs.ErrAccountHaveNoSubAccount
 		}
 
-		if accountCreateReq.Currency != validators.PARENT_ACCOUNT_CURRENCY_PLACEHODLER {
+		if accountCreateReq.Currency != validators.ParentAccountCurrencyPlaceholder {
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parent account cannot set currency")
 			return nil, errs.ErrParentAccountCannotSetCurrency
 		}

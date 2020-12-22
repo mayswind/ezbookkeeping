@@ -4,10 +4,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const PARENT_ACCOUNT_CURRENCY_PLACEHODLER = "---"
+// ParentAccountCurrencyPlaceholder represents the currency field of parent account stored in database
+const ParentAccountCurrencyPlaceholder = "---"
 
 // ISO 4217
-var ALL_CURRENCY_NAMES = map[string]bool{
+var allCurrencyNames = map[string]bool{
 	"AED": true, //UAE Dirham
 	"AFN": true, //Afghani
 	"ALL": true, //Lek
@@ -169,11 +170,11 @@ var ALL_CURRENCY_NAMES = map[string]bool{
 
 func ValidCurrency(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
-		if value == PARENT_ACCOUNT_CURRENCY_PLACEHODLER {
+		if value == ParentAccountCurrencyPlaceholder {
 			return true
 		}
 
-		_, ok := ALL_CURRENCY_NAMES[value]
+		_, ok := allCurrencyNames[value]
 		return ok
 	}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
-const SETTINGS_COOKIE_NAME = "ACP_SETTINGS"
+const settingsCookieName = "ACP_SETTINGS"
 
 func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.Context) {
@@ -17,7 +17,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 		}
 
 		bundledSettings := strings.Join(settingsArr, "_")
-		c.SetCookie(SETTINGS_COOKIE_NAME, bundledSettings, config.TokenExpiredTime, "", "", false, false)
+		c.SetCookie(settingsCookieName, bundledSettings, config.TokenExpiredTime, "", "", false, false)
 
 		c.Next()
 	}

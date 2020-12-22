@@ -7,14 +7,14 @@ import (
 
 // General error codes
 var (
-	ErrIncompleteOrIncorrectSubmission = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 0, http.StatusBadRequest, "incomplete or incorrect submission")
-	ErrOperationFailed                 = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 1, http.StatusInternalServerError, "operation failed")
-	ErrRequestIdInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 2, http.StatusInternalServerError, "request id is invalid")
-	ErrCiphertextInvalid               = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 3, http.StatusInternalServerError, "ciphertext is invalid")
-	ErrNothingWillBeUpdated            = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 4, http.StatusBadRequest, "nothing will be updated")
-	ErrFailedToRequestRemoteApi        = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 5, http.StatusBadRequest, "failed to request third party api")
-	ErrPageIndexInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 6, http.StatusBadRequest, "page index is invalid")
-	ErrPageCountInvalid                = NewNormalError(NORMAL_SUBCATEGORY_GLOBAL, 7, http.StatusBadRequest, "page count is invalid")
+	ErrIncompleteOrIncorrectSubmission = NewNormalError(NormalSubcategoryGlobal, 0, http.StatusBadRequest, "incomplete or incorrect submission")
+	ErrOperationFailed                 = NewNormalError(NormalSubcategoryGlobal, 1, http.StatusInternalServerError, "operation failed")
+	ErrRequestIdInvalid                = NewNormalError(NormalSubcategoryGlobal, 2, http.StatusInternalServerError, "request id is invalid")
+	ErrCiphertextInvalid               = NewNormalError(NormalSubcategoryGlobal, 3, http.StatusInternalServerError, "ciphertext is invalid")
+	ErrNothingWillBeUpdated            = NewNormalError(NormalSubcategoryGlobal, 4, http.StatusBadRequest, "nothing will be updated")
+	ErrFailedToRequestRemoteApi        = NewNormalError(NormalSubcategoryGlobal, 5, http.StatusBadRequest, "failed to request third party api")
+	ErrPageIndexInvalid                = NewNormalError(NormalSubcategoryGlobal, 6, http.StatusBadRequest, "page index is invalid")
+	ErrPageCountInvalid                = NewNormalError(NormalSubcategoryGlobal, 7, http.StatusBadRequest, "page count is invalid")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

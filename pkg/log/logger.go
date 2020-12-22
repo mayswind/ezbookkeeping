@@ -12,8 +12,8 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
-const LOG_FIELD_REQUEST_ID = "REQUEST_ID"
-const LOG_FIELD_EXTRA = "EXTRA"
+const logFieldRequestId = "REQUEST_ID"
+const logFieldExtra = "EXTRA"
 
 var bootLogger = logrus.New()
 var defaultLogger = logrus.New()
@@ -97,7 +97,7 @@ func Debugf(format string, args ...interface{}) {
 }
 
 func DebugfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).Debugf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debugf(getFinalLog(format, args...))
 }
 
 func Infof(format string, args ...interface{}) {
@@ -105,7 +105,7 @@ func Infof(format string, args ...interface{}) {
 }
 
 func InfofWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).Infof(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
 }
 
 func Warnf(format string, args ...interface{}) {
@@ -113,7 +113,7 @@ func Warnf(format string, args ...interface{}) {
 }
 
 func WarnfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).Warnf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warnf(getFinalLog(format, args...))
 }
 
 func Errorf(format string, args ...interface{}) {
@@ -121,11 +121,11 @@ func Errorf(format string, args ...interface{}) {
 }
 
 func ErrorfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).Errorf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Errorf(getFinalLog(format, args...))
 }
 
 func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...interface{}) {
-	defaultLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).WithField(LOG_FIELD_EXTRA, extraString).Errorf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Errorf(getFinalLog(format, args...))
 }
 
 func BootInfof(format string, args ...interface{}) {
@@ -148,7 +148,7 @@ func BootErrorf(format string, args ...interface{}) {
 
 func Requestf(c *core.Context, format string, args ...interface{}) {
 	if requestLogger != nil {
-		requestLogger.WithField(LOG_FIELD_REQUEST_ID, c.GetRequestId()).Infof(getFinalLog(format, args...))
+		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
 	}
 }
 

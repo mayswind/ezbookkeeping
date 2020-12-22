@@ -11,21 +11,21 @@ const (
 
 // Sub categories of system error
 const (
-	SYSTEM_SUBCATEGORY_DEFAULT  = 0
-	SYSTEM_SUBCATEGORY_SETTING  = 1
-	SYSTEM_SUBCATEGORY_DATABASE = 2
+	SystemSubcategoryDefault  = 0
+	SystemSubcategorySetting  = 1
+	SystemSubcategoryDatabase = 2
 )
 
 // Sub categories of normal error
 const (
-	NORMAL_SUBCATEGORY_GLOBAL      = 0
-	NORMAL_SUBCATEGORY_USER        = 1
-	NORMAL_SUBCATEGORY_TOKEN       = 2
-	NORMAL_SUBCATEGORY_TWOFACTOR   = 3
-	NORMAL_SUBCATEGORY_ACCOUNT     = 4
-	NORMAL_SUBCATEGORY_TRANSACTION = 5
-	NORMAL_SUBCATEGORY_CATEGORY    = 6
-	NORMAL_SUBCATEGORY_TAG         = 7
+	NormalSubcategoryGlobal      = 0
+	NormalSubcategoryUser        = 1
+	NormalSubcategoryToken       = 2
+	NormalSubcategoryTwofactor   = 3
+	NormalSubcategoryAccount     = 4
+	NormalSubcategoryTransaction = 5
+	NormalSubcategoryCategory    = 6
+	NormalSubcategoryTag         = 7
 )
 
 // Error represents the specific error returned to user

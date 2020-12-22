@@ -2,6 +2,7 @@ package errs
 
 import "net/http"
 
+// Error codes related to transaction
 var (
 	ErrTransactionIdInvalid                                = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 0, http.StatusBadRequest, "transaction id is invalid")
 	ErrTransactionNotFound                                 = NewNormalError(NORMAL_SUBCATEGORY_TRANSACTION, 1, http.StatusBadRequest, "transaction not found")

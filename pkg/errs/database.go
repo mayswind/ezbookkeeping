@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Error codes related to database
 var (
 	ErrDatabaseTypeInvalid     = NewSystemError(SYSTEM_SUBCATEGORY_DATABASE, 0, http.StatusInternalServerError, "database type is invalid")
 	ErrDatabaseHostInvalid     = NewSystemError(SYSTEM_SUBCATEGORY_DATABASE, 1, http.StatusInternalServerError, "database host is invalid")

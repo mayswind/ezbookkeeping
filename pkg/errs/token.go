@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Error codes related to tokens
 var (
 	ErrTokenGenerating           = NewNormalError(NORMAL_SUBCATEGORY_TOKEN, 0, http.StatusInternalServerError, "failed to generate token")
 	ErrUnauthorizedAccess        = NewNormalError(NORMAL_SUBCATEGORY_TOKEN, 1, http.StatusUnauthorized, "unauthorized access")

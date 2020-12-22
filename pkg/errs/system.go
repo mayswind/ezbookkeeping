@@ -2,6 +2,7 @@ package errs
 
 import "net/http"
 
+// Error codes related to transaction categories
 var (
 	ErrSystemError      = NewSystemError(SYSTEM_SUBCATEGORY_DEFAULT, 0, http.StatusInternalServerError, "system error")
 	ErrApiNotFound      = NewSystemError(SYSTEM_SUBCATEGORY_DEFAULT, 1, http.StatusNotFound, "api not found")

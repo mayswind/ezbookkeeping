@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Error codes related to users
 var (
 	ErrLoginNameInvalid           = NewNormalError(NORMAL_SUBCATEGORY_USER, 0, http.StatusUnauthorized, "login name is invalid")
 	ErrLoginNameOrPasswordInvalid = NewNormalError(NORMAL_SUBCATEGORY_USER, 1, http.StatusUnauthorized, "login name or password is invalid")

@@ -2,6 +2,7 @@ package errs
 
 import "net/http"
 
+// Error codes related to accounts
 var (
 	ErrAccountIdInvalid                       = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 0, http.StatusBadRequest, "account id is invalid")
 	ErrAccountNotFound                        = NewNormalError(NORMAL_SUBCATEGORY_ACCOUNT, 1, http.StatusBadRequest, "account not found")

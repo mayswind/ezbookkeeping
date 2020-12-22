@@ -2,6 +2,7 @@ package errs
 
 import "net/http"
 
+// Error codes related to transaction tags
 var (
 	ErrTransactionTagIdInvalid            = NewNormalError(NORMAL_SUBCATEGORY_TAG, 0, http.StatusBadRequest, "transaction tag id is invalid")
 	ErrTransactionTagNotFound             = NewNormalError(NORMAL_SUBCATEGORY_TAG, 1, http.StatusBadRequest, "transaction tag not found")

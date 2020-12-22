@@ -139,7 +139,7 @@ func AESGCMEncrypt(key []byte, plainText []byte) ([]byte, error) {
 	return result, nil
 }
 
-// AESGCMEncrypt returns a decrypted string by aes-gcm
+// AESGCMDecrypt returns a decrypted string by aes-gcm
 func AESGCMDecrypt(key []byte, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 

@@ -248,6 +248,10 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := jwtToken.SignedString([]byte(tokenRecord.Secret))
 
+	if err != nil {
+		return "", nil, err
+	}
+
 	err = s.createTokenRecord(tokenRecord)
 
 	if err != nil {

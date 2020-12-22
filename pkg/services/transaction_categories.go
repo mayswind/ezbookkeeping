@@ -286,7 +286,9 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 
 		exists, err := sess.Cols("uid", "deleted", "category_id").Where("uid=? AND deleted=?", uid, false).In("category_id", categoryAndSubCategoryIds).Limit(1).Exist(&models.Transaction{})
 
-		if exists {
+		if err != nil {
+			return err
+		} else if exists {
 			return errs.ErrTransactionCategoryInUseCannotBeDeleted
 		}
 

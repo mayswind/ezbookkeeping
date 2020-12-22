@@ -214,7 +214,9 @@ func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND tag_id=?", uid, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
 
-		if exists {
+		if err != nil {
+			return err
+		} else if exists {
 			return errs.ErrTransactionTagInUseCannotBeDeleted
 		}
 

@@ -465,6 +465,10 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 
 			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
+			if err != nil {
+				return err
+			}
+
 			if has && sameSecondLatestTransaction.TransactionTime < maxTransactionTime-1 {
 				transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
 			} else if has && sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {

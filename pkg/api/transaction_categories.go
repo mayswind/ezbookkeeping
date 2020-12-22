@@ -97,7 +97,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 		}
 	}
 
-	var maxOrderId = 0
+	var maxOrderId int
 
 	if categoryCreateReq.ParentId <= 0 {
 		maxOrderId, err = a.categories.GetMaxDisplayOrder(uid, categoryCreateReq.Type)

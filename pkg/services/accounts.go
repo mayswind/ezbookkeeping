@@ -278,13 +278,17 @@ func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 
 		exists, err := sess.Cols("uid", "deleted", "source_account_id").Where("uid=? AND deleted=?", uid, false).In("source_account_id", accountAndSubAccountIds).Limit(1).Exist(&models.Transaction{})
 
-		if exists {
+		if err != nil {
+			return err
+		} else if exists {
 			return errs.ErrAccountInUseCannotBeDeleted
 		}
 
 		exists, err = sess.Cols("uid", "deleted", "destination_account_id").Where("uid=? AND deleted=?", uid, false).In("destination_account_id", accountAndSubAccountIds).Limit(1).Exist(&models.Transaction{})
 
-		if exists {
+		if err != nil {
+			return err
+		} else if exists {
 			return errs.ErrAccountInUseCannotBeDeleted
 		}
 

@@ -2,9 +2,10 @@ package models
 
 import "encoding/xml"
 
-const EuroCentralBankDataSource = "European Central Bank"
-const EuroCentralBankBaseCurrency = "EUR"
+const euroCentralBankDataSource = "European Central Bank"
+const euroCentralBankBaseCurrency = "EUR"
 
+// LatestExchangeRateResponse returns a view-object which contains latest exchange rate
 type LatestExchangeRateResponse struct {
 	DataSource    string                `json:"dataSource"`
 	Date          string                `json:"date"`
@@ -12,26 +13,31 @@ type LatestExchangeRateResponse struct {
 	ExchangeRates []*LatestExchangeRate `json:"exchangeRates"`
 }
 
+// LatestExchangeRate represents a data pair of currency and exchange rate
 type LatestExchangeRate struct {
 	Currency string `json:"currency"`
 	Rate     string `json:"rate"`
 }
 
+// EuroCentralBankExchangeRateData represents the whole data from euro central bank
 type EuroCentralBankExchangeRateData struct {
 	XMLName          xml.Name                        `xml:"Envelope"`
 	AllExchangeRates []*EuroCentralBankExchangeRates `xml:"Cube>Cube"`
 }
 
+// EuroCentralBankExchangeRates represents the exchange rates data from euro central bank
 type EuroCentralBankExchangeRates struct {
 	Date          string                         `xml:"time,attr"`
 	ExchangeRates []*EuroCentralBankExchangeRate `xml:"Cube"`
 }
 
+// EuroCentralBankExchangeRate represents the exchange rate data from euro central bank
 type EuroCentralBankExchangeRate struct {
 	Currency string `xml:"currency,attr"`
 	Rate     string `xml:"rate,attr"`
 }
 
+// ToLatestExchangeRateResponse returns a view-object according to original data from euro central bank
 func (e EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *LatestExchangeRateResponse {
 	if len(e.AllExchangeRates) < 1 {
 		return nil
@@ -50,15 +56,16 @@ func (e EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *LatestE
 	}
 
 	latestExchangeRateResp := &LatestExchangeRateResponse{
-		DataSource:    EuroCentralBankDataSource,
+		DataSource:    euroCentralBankDataSource,
 		Date:          latestEuroCentralBankExchangeRate.Date,
-		BaseCurrency:  EuroCentralBankBaseCurrency,
+		BaseCurrency:  euroCentralBankBaseCurrency,
 		ExchangeRates: exchangeRates,
 	}
 
 	return latestExchangeRateResp
 }
 
+// ToLatestExchangeRate returns a data pair according to original data from euro central bank
 func (e EuroCentralBankExchangeRate) ToLatestExchangeRate() *LatestExchangeRate {
 	return &LatestExchangeRate{
 		Currency: e.Currency,

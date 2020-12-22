@@ -1,13 +1,16 @@
 package models
 
+// UserType represents user type
 type UserType byte
 
+// User types
 const (
 	USER_TYPE_NORMAL      UserType = 0
 	USER_TYPE_ADMIN       UserType = 63
 	USER_TYPE_SUPER_ADMIN UserType = 127
 )
 
+// User represents user data stored in database
 type User struct {
 	Uid               int64    `xorm:"PK"`
 	Username          string   `xorm:"VARCHAR(32) UNIQUE NOT NULL"`
@@ -27,6 +30,7 @@ type User struct {
 	LastLoginUnixTime int64
 }
 
+// UserBasicInfo represents a view-object of user basic info
 type UserBasicInfo struct {
 	Username        string `json:"username"`
 	Email           string `json:"email"`
@@ -34,11 +38,13 @@ type UserBasicInfo struct {
 	DefaultCurrency string `json:"defaultCurrency"`
 }
 
+// UserLoginRequest represents all parameters of user login request
 type UserLoginRequest struct {
 	LoginName string `json:"loginName" binding:"required,notBlank,max=100,validUsername|validEmail"`
 	Password  string `json:"password" binding:"required,min=6,max=128"`
 }
 
+// UserRegisterRequest represents all parameters of user registering request
 type UserRegisterRequest struct {
 	Username        string `json:"username" binding:"required,notBlank,max=32,validUsername"`
 	Email           string `json:"email" binding:"required,notBlank,max=100,validEmail"`
@@ -47,6 +53,7 @@ type UserRegisterRequest struct {
 	DefaultCurrency string `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
 }
 
+// UserProfileUpdateRequest represents all parameters of user updating profile request
 type UserProfileUpdateRequest struct {
 	Email           string `json:"email" binding:"omitempty,notBlank,max=100,validEmail"`
 	Nickname        string `json:"nickname" binding:"omitempty,notBlank,max=64"`
@@ -55,11 +62,13 @@ type UserProfileUpdateRequest struct {
 	DefaultCurrency string `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
 }
 
+// UserProfileUpdateResponse represents the data returns to frontend after updating profile
 type UserProfileUpdateResponse struct {
 	User     *UserBasicInfo `json:"user"`
 	NewToken string         `json:"newToken,omitempty"`
 }
 
+// UserProfileResponse represents a view-object of user profile
 type UserProfileResponse struct {
 	Username        string   `json:"username"`
 	Email           string   `json:"email"`
@@ -69,6 +78,7 @@ type UserProfileResponse struct {
 	LastLoginAt     int64    `json:"lastLoginAt"`
 }
 
+// ToUserBasicInfo returns a user basic view-object according to database model
 func (u User) ToUserBasicInfo() *UserBasicInfo {
 	return &UserBasicInfo{
 		Username:        u.Username,
@@ -78,6 +88,7 @@ func (u User) ToUserBasicInfo() *UserBasicInfo {
 	}
 }
 
+// ToUserProfileResponse returns a user profile view-object according to database model
 func (u User) ToUserProfileResponse() *UserProfileResponse {
 	return &UserProfileResponse{
 		Username:        u.Username,

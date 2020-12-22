@@ -3,8 +3,10 @@ package models
 // Level-One Account
 const ACCOUNT_PARENT_ID_LEVEL_ONE = 0
 
+// AccountCategory represents account category
 type AccountCategory byte
 
+// Account categories
 const (
 	ACCOUNT_CATEGORY_CASH        AccountCategory = 1
 	ACCOUNT_CATEGORY_DEBIT_CARD  AccountCategory = 2
@@ -15,7 +17,7 @@ const (
 	ACCOUNT_CATEGORY_INVESTMENT  AccountCategory = 7
 )
 
-var AssetAccountCategory = map[AccountCategory]bool{
+var assetAccountCategory = map[AccountCategory]bool{
 	ACCOUNT_CATEGORY_CASH:        true,
 	ACCOUNT_CATEGORY_DEBIT_CARD:  true,
 	ACCOUNT_CATEGORY_CREDIT_CARD: false,
@@ -25,7 +27,7 @@ var AssetAccountCategory = map[AccountCategory]bool{
 	ACCOUNT_CATEGORY_INVESTMENT:  true,
 }
 
-var LiabilityAccountCategory = map[AccountCategory]bool{
+var liabilityAccountCategory = map[AccountCategory]bool{
 	ACCOUNT_CATEGORY_CASH:        false,
 	ACCOUNT_CATEGORY_DEBIT_CARD:  false,
 	ACCOUNT_CATEGORY_CREDIT_CARD: true,
@@ -35,13 +37,16 @@ var LiabilityAccountCategory = map[AccountCategory]bool{
 	ACCOUNT_CATEGORY_INVESTMENT:  false,
 }
 
+// AccountType represents account type
 type AccountType byte
 
+// Account types
 const (
 	ACCOUNT_TYPE_SINGLE_ACCOUNT     AccountType = 1
 	ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS AccountType = 2
 )
 
+// Account represents account data stored in database
 type Account struct {
 	AccountId       int64           `xorm:"PK"`
 	Uid             int64           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
@@ -62,6 +67,7 @@ type Account struct {
 	DeletedUnixTime int64
 }
 
+// AccountCreateRequest represents all parameters of account creation request
 type AccountCreateRequest struct {
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
 	Category    AccountCategory         `json:"category" binding:"required"`
@@ -74,6 +80,7 @@ type AccountCreateRequest struct {
 	SubAccounts []*AccountCreateRequest `json:"subAccounts" binding:"omitempty"`
 }
 
+// AccountModifyRequest represents all parameters of account modification request
 type AccountModifyRequest struct {
 	Id          int64                   `json:"id,string" binding:"required,min=1"`
 	Name        string                  `json:"name" binding:"required,notBlank,max=32"`
@@ -85,32 +92,39 @@ type AccountModifyRequest struct {
 	SubAccounts []*AccountModifyRequest `json:"subAccounts" binding:"omitempty"`
 }
 
+// AccountListRequest represents all parameters of account listing request
 type AccountListRequest struct {
 	VisibleOnly bool `form:"visible_only"`
 }
 
+// AccountGetRequest represents all parameters of account getting request
 type AccountGetRequest struct {
 	Id int64 `form:"id,string" binding:"required,min=1"`
 }
 
+// AccountHideRequest represents all parameters of account hiding request
 type AccountHideRequest struct {
 	Id     int64 `json:"id,string" binding:"required,min=1"`
 	Hidden bool  `json:"hidden"`
 }
 
+// AccountMoveRequest represents all parameters of account moving request
 type AccountMoveRequest struct {
 	NewDisplayOrders []*AccountNewDisplayOrderRequest `json:"newDisplayOrders"`
 }
 
+// AccountNewDisplayOrderRequest represents a data pair of id and display order
 type AccountNewDisplayOrderRequest struct {
 	Id           int64 `json:"id,string" binding:"required,min=1"`
 	DisplayOrder int   `json:"displayOrder"`
 }
 
+// AccountDeleteRequest represents all parameters of account deleting request
 type AccountDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
 }
 
+// AccountInfoResponse represents a view-object of account
 type AccountInfoResponse struct {
 	Id           int64                    `json:"id,string"`
 	Name         string                   `json:"name"`
@@ -129,6 +143,7 @@ type AccountInfoResponse struct {
 	SubAccounts  AccountInfoResponseSlice `json:"subAccounts,omitempty"`
 }
 
+// ToAccountInfoResponse returns a view-object according to database model
 func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 	return &AccountInfoResponse{
 		Id:           a.AccountId,
@@ -142,22 +157,26 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 		Balance:      a.Balance,
 		Comment:      a.Comment,
 		DisplayOrder: a.DisplayOrder,
-		IsAsset:      AssetAccountCategory[a.Category],
-		IsLiability:  LiabilityAccountCategory[a.Category],
+		IsAsset:      assetAccountCategory[a.Category],
+		IsLiability:  liabilityAccountCategory[a.Category],
 		Hidden:       a.Hidden,
 	}
 }
 
+// AccountInfoResponseSlice represents the slice data structure of AccountInfoResponse
 type AccountInfoResponseSlice []*AccountInfoResponse
 
+// Len returns the count of items
 func (a AccountInfoResponseSlice) Len() int {
 	return len(a)
 }
 
+// Swap swaps two items
 func (a AccountInfoResponseSlice) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 
+// Less reports whether the first item is less than the second one
 func (a AccountInfoResponseSlice) Less(i, j int) bool {
 	if a[i].Category != a[j].Category {
 		return a[i].Category < a[j].Category

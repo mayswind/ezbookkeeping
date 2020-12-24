@@ -11,11 +11,13 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// TokensApi represents token api
 type TokensApi struct {
 	tokens *services.TokenService
 	users  *services.UserService
 }
 
+// Initialize a token api singleton instance
 var (
 	Tokens = &TokensApi{
 		tokens: services.Tokens,
@@ -23,6 +25,7 @@ var (
 	}
 )
 
+// TokenListHandler returns available token list of current user
 func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	tokens, err := a.tokens.GetAllUnexpiredNormalTokensByUid(uid)
@@ -57,6 +60,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 	return tokenResps, nil
 }
 
+// TokenRevokeCurrentHandler revokes current token of current user
 func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *errs.Error) {
 	_, claims, err := a.tokens.ParseToken(c)
 
@@ -96,6 +100,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	return true, nil
 }
 
+// TokenRevokeHandler revokes specific token of current user
 func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Error) {
 	var tokenRevokeReq models.TokenRevokeRequest
 	err := c.ShouldBindJSON(&tokenRevokeReq)
@@ -133,6 +138,7 @@ func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Erro
 	return true, nil
 }
 
+// TokenRevokeAllHandler revokes all tokens of current user except current token
 func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	tokens, err := a.tokens.GetAllTokensByUid(uid)
@@ -167,6 +173,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 	return true, nil
 }
 
+// TokenRefreshHandler refresh current token of current user
 func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(uid)

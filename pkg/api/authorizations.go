@@ -10,12 +10,14 @@ import (
 	"github.com/mayswind/lab/pkg/services"
 )
 
+// AuthorizationsApi represents authorization api
 type AuthorizationsApi struct {
 	users                   *services.UserService
 	tokens                  *services.TokenService
 	twoFactorAuthorizations *services.TwoFactorAuthorizationService
 }
 
+// Initialize a authorization api singleton instance
 var (
 	Authorizations = &AuthorizationsApi{
 		users:                   services.Users,
@@ -24,6 +26,7 @@ var (
 	}
 )
 
+// AuthorizeHandler verifies and authorizes current login request
 func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *errs.Error) {
 	var credential models.UserLoginRequest
 	err := c.ShouldBindJSON(&credential)
@@ -79,6 +82,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 	return authResp, nil
 }
 
+// TwoFactorAuthorizeHandler verifies and authorizes current 2fa login by passcode
 func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interface{}, *errs.Error) {
 	var credential models.TwoFactorLoginRequest
 	err := c.ShouldBindJSON(&credential)
@@ -130,6 +134,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 	return authResp, nil
 }
 
+// TwoFactorAuthorizeByRecoveryCodeHandler verifies and authorizes current 2fa login by recovery code
 func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Context) (interface{}, *errs.Error) {
 	var credential models.TwoFactorRecoveryCodeLoginRequest
 	err := c.ShouldBindJSON(&credential)

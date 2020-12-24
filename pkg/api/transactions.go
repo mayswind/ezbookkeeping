@@ -11,11 +11,13 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// TransactionsApi represents transaction api
 type TransactionsApi struct {
 	transactions    *services.TransactionService
 	transactionTags *services.TransactionTagService
 }
 
+// Initialize a transaction api singleton instance
 var (
 	Transactions = &TransactionsApi{
 		transactions:    services.Transactions,
@@ -23,6 +25,7 @@ var (
 	}
 )
 
+// TransactionListHandler returns transaction list of current user
 func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionListReq models.TransactionListByMaxTimeRequest
 	err := c.ShouldBindQuery(&transactionListReq)
@@ -76,6 +79,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	return transactionResps, nil
 }
 
+// TransactionMonthListHandler returns transaction list of current user by month
 func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionListReq models.TransactionListInMonthByPageRequest
 	err := c.ShouldBindQuery(&transactionListReq)
@@ -116,6 +120,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	return transactionResps, nil
 }
 
+// TransactionGetHandler returns one specific transaction of current user
 func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionGetReq models.TransactionGetRequest
 	err := c.ShouldBindQuery(&transactionGetReq)
@@ -146,6 +151,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	return transactionResp, nil
 }
 
+// TransactionCreateHandler saves a new transaction by request parameters for current user
 func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionCreateReq models.TransactionCreateRequest
 	err := c.ShouldBindJSON(&transactionCreateReq)
@@ -195,6 +201,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 	return transactionResp, nil
 }
 
+// TransactionModifyHandler saves an existed transaction by request parameters for current user
 func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionModifyReq models.TransactionModifyRequest
 	err := c.ShouldBindJSON(&transactionModifyReq)
@@ -259,6 +266,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	return true, nil
 }
 
+// TransactionDeleteHandler deletes an existed transaction by request parameters for current user
 func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionDeleteReq models.TransactionDeleteRequest
 	err := c.ShouldBindJSON(&transactionDeleteReq)

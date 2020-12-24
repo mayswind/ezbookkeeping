@@ -11,14 +11,18 @@ import (
 	"github.com/mayswind/lab/pkg/models"
 )
 
+// EuroCentralBankExchangeRateUrl represents euro central bank exchange rate date url
 const EuroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
 
+// ExchangeRatesApi represents exchange rate api
 type ExchangeRatesApi struct{}
 
+// Initialize a exchange rate api singleton instance
 var (
 	ExchangeRates = &ExchangeRatesApi{}
 )
 
+// LatestExchangeRateHandler returns latest exchange rate data
 func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	resp, err := http.Get(EuroCentralBankExchangeRateUrl)

@@ -11,11 +11,13 @@ import (
 	"github.com/mayswind/lab/pkg/services"
 )
 
+// UsersApi represents user api
 type UsersApi struct {
 	users  *services.UserService
 	tokens *services.TokenService
 }
 
+// Initialize a user api singleton instance
 var (
 	Users = &UsersApi{
 		users:  services.Users,
@@ -23,6 +25,7 @@ var (
 	}
 )
 
+// UserRegisterHandler saves a new user by request parameters
 func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Error) {
 	var userRegisterReq models.UserRegisterRequest
 	err := c.ShouldBindJSON(&userRegisterReq)
@@ -73,6 +76,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	return authResp, nil
 }
 
+// UserProfileHandler returns user profile of current user
 func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(uid)
@@ -89,6 +93,7 @@ func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error
 	return userResp, nil
 }
 
+// UserUpdateProfileHandler saves user profile by request parameters for current user
 func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs.Error) {
 	var userUpdateReq models.UserProfileUpdateRequest
 	err := c.ShouldBindJSON(&userUpdateReq)

@@ -172,6 +172,7 @@ func SqlQuery(args ...interface{}) {
 		sqlQueryLogger.Info(args...)
 	}
 }
+
 // SqlQueryf logs sql query log with custom format
 func SqlQueryf(format string, args ...interface{}) {
 	if sqlQueryLogger != nil {

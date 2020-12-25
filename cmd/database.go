@@ -48,73 +48,73 @@ func updateAllDatabaseTablesStructure() error {
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] user table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] user table maintained successfully")
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactor))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor table maintained successfully")
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactorRecoveryCode))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor recovery code table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor recovery code table maintained successfully")
 
 	err = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] token record table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] token record table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.Account))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] account table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] account table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.Transaction))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionCategory))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTag))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTagIndex))
 
 	if err != nil {
 		return err
-	} else {
-		log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag index table maintained successfully")
 	}
+
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag index table maintained successfully")
 
 	return nil
 }

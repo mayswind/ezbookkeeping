@@ -14,7 +14,7 @@ var (
 	Container = &RequestIdContainer{}
 )
 
-// InitializeRequestIdGenerator initialized the current request id generator according to the config
+// InitializeRequestIdGenerator initializes the current request id generator according to the config
 func InitializeRequestIdGenerator(config *settings.Config) error {
 	generator, err := NewDefaultRequestIdGenerator(config)
 

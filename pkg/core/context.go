@@ -12,15 +12,18 @@ const requestIdFieldKey = "REQUEST_ID"
 const tokenClaimsFieldKey = "TOKEN_CLAIMS"
 const responseErrorFieldKey = "RESPONSE_ERROR"
 
+// Context represents the request and response context
 type Context struct {
 	*gin.Context
 	// DO NOT ADD ANY FIELD IN THIS CONTEXT, THIS CONTEXT IS JUST A WRAPPER
 }
 
+// SetRequestId sets the given request id to context
 func (c *Context) SetRequestId(requestId string) {
 	c.Set(requestIdFieldKey, requestId)
 }
 
+// GetRequestId returns the current request id
 func (c *Context) GetRequestId() string {
 	requestId, exists := c.Get(requestIdFieldKey)
 
@@ -31,10 +34,12 @@ func (c *Context) GetRequestId() string {
 	return requestId.(string)
 }
 
+// SetTokenClaims sets the given user token id to context
 func (c *Context) SetTokenClaims(claims *UserTokenClaims) {
 	c.Set(tokenClaimsFieldKey, claims)
 }
 
+// GetTokenClaims returns the current user token
 func (c *Context) GetTokenClaims() *UserTokenClaims {
 	claims, exists := c.Get(tokenClaimsFieldKey)
 
@@ -45,6 +50,7 @@ func (c *Context) GetTokenClaims() *UserTokenClaims {
 	return claims.(*UserTokenClaims)
 }
 
+// GetCurrentUid returns the current user uid by the current user token
 func (c *Context) GetCurrentUid() int64 {
 	claims := c.GetTokenClaims()
 
@@ -61,10 +67,12 @@ func (c *Context) GetCurrentUid() int64 {
 	return uid
 }
 
+// SetResponseError sets the response error
 func (c *Context) SetResponseError(error *errs.Error) {
 	c.Set(responseErrorFieldKey, error)
 }
 
+// GetResponseError returns the response error
 func (c *Context) GetResponseError() *errs.Error {
 	err, exists := c.Get(responseErrorFieldKey)
 
@@ -75,6 +83,7 @@ func (c *Context) GetResponseError() *errs.Error {
 	return err.(*errs.Error)
 }
 
+// WrapContext returns a context wrapped by this file
 func WrapContext(ginCtx *gin.Context) *Context {
 	return &Context{
 		Context: ginCtx,

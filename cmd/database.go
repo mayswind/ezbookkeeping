@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/lab/pkg/models"
 )
 
+// Database represents the database command
 var Database = &cli.Command{
 	Name:  "database",
 	Usage: "lab database maintenance",

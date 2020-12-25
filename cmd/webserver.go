@@ -23,6 +23,7 @@ import (
 	"github.com/mayswind/lab/pkg/validators"
 )
 
+// WebServer represents the server command
 var WebServer = &cli.Command{
 	Name:  "server",
 	Usage: "lab web server operation",

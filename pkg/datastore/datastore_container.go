@@ -16,16 +16,19 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
+// DataStoreContainer contains all data storages
 type DataStoreContainer struct {
 	UserStore     *DataStore
 	TokenStore    *DataStore
 	UserDataStore *DataStore
 }
 
+// Initialize a data storage container singleton instance
 var (
 	Container = &DataStoreContainer{}
 )
 
+// InitializeDataStore initializes data storage according to the config
 func InitializeDataStore(config *settings.Config) error {
 	database, err := initializeDatabase(config.DatabaseConfig)
 

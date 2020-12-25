@@ -1,5 +1,6 @@
 package uuid
 
+// UuidType represents uuid type
 type UuidType uint8
 
 // Types of uuid

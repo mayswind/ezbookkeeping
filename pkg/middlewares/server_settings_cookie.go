@@ -10,6 +10,7 @@ import (
 
 const settingsCookieName = "ACP_SETTINGS"
 
+// ServerSettingsCookie adds server settings to cookies in response
 func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.Context) {
 		settingsArr := []string{

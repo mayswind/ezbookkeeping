@@ -19,6 +19,7 @@ var (
 	slash     = []byte("/")
 )
 
+// Recovery logs error message when error occurs
 func Recovery(c *core.Context) {
 	defer func() {
 		if err := recover(); err != nil {

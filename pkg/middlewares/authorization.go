@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// JWTAuthorization verifies whether current request is valid by jwt token
 func JWTAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c)
 
@@ -34,6 +35,7 @@ func JWTAuthorization(c *core.Context) {
 	c.Next()
 }
 
+// JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func JWTTwoFactorAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c)
 

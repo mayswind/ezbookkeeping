@@ -7,6 +7,7 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 )
 
+// RequestLog logs the http request log
 func RequestLog(c *core.Context) {
 	start := time.Now()
 	path := c.Request.URL.Path

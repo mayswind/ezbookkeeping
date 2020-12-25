@@ -8,6 +8,7 @@ import (
 
 const requestIdHeader = "X-Request-ID"
 
+// RequestId generates a new request id and add it to context and response header
 func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.Context) {
 		if requestid.Container.Current == nil {

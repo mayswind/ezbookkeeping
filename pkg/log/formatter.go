@@ -11,11 +11,13 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// LogFormatter represents a log formatter
 type LogFormatter struct {
 	Prefix       string
 	DisableLevel bool
 }
 
+// Format writes to log according to the log entry
 func (f *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var b *bytes.Buffer
 

@@ -38,6 +38,7 @@ func init() {
 	sqlQueryLogger.SetLevel(logrus.InfoLevel)
 }
 
+// SetLoggerConfiguration sets the logger according to the config
 func SetLoggerConfiguration(config *settings.Config) error {
 	var bootWriters []io.Writer
 	var writers []io.Writer
@@ -92,72 +93,86 @@ func SetLoggerConfiguration(config *settings.Config) error {
 	return nil
 }
 
+// Debugf logs debug log with custom format
 func Debugf(format string, args ...interface{}) {
 	defaultLogger.Debugf(getFinalLog(format, args...))
 }
 
+// DebugfWithRequestId logs debug log with custom format and request id
 func DebugfWithRequestId(c *core.Context, format string, args ...interface{}) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debugf(getFinalLog(format, args...))
 }
 
+// Infof logs info log with custom format
 func Infof(format string, args ...interface{}) {
 	defaultLogger.Infof(getFinalLog(format, args...))
 }
 
+// InfofWithRequestId logs info log with custom format and request id
 func InfofWithRequestId(c *core.Context, format string, args ...interface{}) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
 }
 
+// Warnf logs warn log with custom format
 func Warnf(format string, args ...interface{}) {
 	defaultLogger.Warnf(getFinalLog(format, args...))
 }
 
+// WarnfWithRequestId logs warn log with custom format and request id
 func WarnfWithRequestId(c *core.Context, format string, args ...interface{}) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warnf(getFinalLog(format, args...))
 }
 
+// Errorf logs error log with custom format
 func Errorf(format string, args ...interface{}) {
 	defaultLogger.Errorf(getFinalLog(format, args...))
 }
 
+// ErrorfWithRequestId logs error log with custom format and request id
 func ErrorfWithRequestId(c *core.Context, format string, args ...interface{}) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Errorf(getFinalLog(format, args...))
 }
 
+// ErrorfWithRequestIdAndExtra logs error log with custom format and request id and extra info
 func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...interface{}) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Errorf(getFinalLog(format, args...))
 }
 
+// BootInfof logs boot info log
 func BootInfof(format string, args ...interface{}) {
 	if bootLogger != nil {
 		bootLogger.Infof(getFinalLog(format, args...))
 	}
 }
 
+// BootWarnf logs boot warn log
 func BootWarnf(format string, args ...interface{}) {
 	if bootLogger != nil {
 		bootLogger.Warnf(getFinalLog(format, args...))
 	}
 }
 
+// BootErrorf logs boot error log
 func BootErrorf(format string, args ...interface{}) {
 	if bootLogger != nil {
 		bootLogger.Errorf(getFinalLog(format, args...))
 	}
 }
 
+// Requestf logs http request log with custom format
 func Requestf(c *core.Context, format string, args ...interface{}) {
 	if requestLogger != nil {
 		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
 	}
 }
 
+// SqlQuery logs sql query log
 func SqlQuery(args ...interface{}) {
 	if sqlQueryLogger != nil {
 		sqlQueryLogger.Info(args...)
 	}
 }
-
+// SqlQueryf logs sql query log with custom format
 func SqlQueryf(format string, args ...interface{}) {
 	if sqlQueryLogger != nil {
 		sqlQueryLogger.Infof(getFinalLog(format, args...))

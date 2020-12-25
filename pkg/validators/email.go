@@ -6,6 +6,7 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// ValidEmail returns whether the given email is valid
 func ValidEmail(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
 		if utils.IsValidEmail(value) {

@@ -6,6 +6,7 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// ValidUsername returns whether the given user name is valid
 func ValidUsername(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
 		if utils.IsValidUsername(value) {

@@ -168,6 +168,7 @@ var allCurrencyNames = map[string]bool{
 	"ZWL": true, //Zimbabwe Dollar
 }
 
+// ValidCurrency returns whether the given currency is valid
 func ValidCurrency(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
 		if value == ParentAccountCurrencyPlaceholder {

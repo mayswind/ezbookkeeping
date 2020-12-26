@@ -230,7 +230,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 		// Get and verify tags
 		if len(transactionTagIndexs) > 0 {
 			var tags []*models.TransactionTag
-			err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_ids", tagIds).Find(&tags)
+			err := sess.Where("uid=?", transaction.Uid).In("tag_id", tagIds).Find(&tags)
 
 			if err != nil {
 				return err
@@ -515,7 +515,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		// Get and verify tags
 		if len(transactionTagIndexs) > 0 {
 			var tags []*models.TransactionTag
-			err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_ids", addTagIds).Find(&tags)
+			err := sess.Where("uid=?", transaction.Uid).In("tag_id", addTagIds).Find(&tags)
 
 			if err != nil {
 				return err

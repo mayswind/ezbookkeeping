@@ -12,11 +12,13 @@ import (
 	"github.com/mayswind/lab/pkg/uuid"
 )
 
+// UserService represents user service
 type UserService struct {
 	ServiceUsingDB
 	ServiceUsingUuid
 }
 
+// Initialize a user service singleton instance
 var (
 	Users = &UserService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -28,6 +30,7 @@ var (
 	}
 )
 
+// GetUserByUsernameOrEmailAndPassword returns the user model according to login name and password
 func (s *UserService) GetUserByUsernameOrEmailAndPassword(loginname string, password string) (*models.User, error) {
 	var user *models.User
 	var err error
@@ -51,6 +54,7 @@ func (s *UserService) GetUserByUsernameOrEmailAndPassword(loginname string, pass
 	return user, nil
 }
 
+// GetUserById returns the user model according to user uid
 func (s *UserService) GetUserById(uid int64) (*models.User, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -68,6 +72,7 @@ func (s *UserService) GetUserById(uid int64) (*models.User, error) {
 	return user, nil
 }
 
+// GetUserByUsername returns the user model according to user name
 func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
 	if username == "" {
 		return nil, errs.ErrUsernameIsEmpty
@@ -85,6 +90,7 @@ func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
 	return user, nil
 }
 
+// GetUserByEmail returns the user model according to user email
 func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 	if email == "" {
 		return nil, errs.ErrEmailIsEmpty
@@ -102,6 +108,7 @@ func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
+// CreateUser saves a new user model to database
 func (s *UserService) CreateUser(user *models.User) error {
 	exists, err := s.ExistsUsername(user.Username)
 
@@ -146,6 +153,7 @@ func (s *UserService) CreateUser(user *models.User) error {
 	})
 }
 
+// UpdateUser saves an existed user model to database
 func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err error) {
 	if user.Uid <= 0 {
 		return false, errs.ErrUserIdInvalid
@@ -208,6 +216,7 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 	return keyProfileUpdated, nil
 }
 
+// UpdateUserLastLoginTime updates the last login time field
 func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -219,6 +228,7 @@ func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
 	})
 }
 
+// ExistsUsername returns whether the given user name exists
 func (s *UserService) ExistsUsername(username string) (bool, error) {
 	if username == "" {
 		return false, errs.ErrUsernameIsEmpty
@@ -227,6 +237,7 @@ func (s *UserService) ExistsUsername(username string) (bool, error) {
 	return s.UserDB().Cols("username").Where("username=? AND deleted=?", username, false).Exist(&models.User{})
 }
 
+// ExistsEmail returns whether the given user email exists
 func (s *UserService) ExistsEmail(email string) (bool, error) {
 	if email == "" {
 		return false, errs.ErrEmailIsEmpty
@@ -235,6 +246,7 @@ func (s *UserService) ExistsEmail(email string) (bool, error) {
 	return s.UserDB().Cols("email").Where("email=? AND deleted=?", email, false).Exist(&models.User{})
 }
 
+// IsPasswordEqualsUserPassword returns whether the given password is correct
 func (s *UserService) IsPasswordEqualsUserPassword(password string, user *models.User) bool {
 	return user.Password == utils.EncodePassword(password, user.Salt)
 }

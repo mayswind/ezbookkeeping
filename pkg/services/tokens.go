@@ -19,11 +19,13 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+// TokenService represents user token service
 type TokenService struct {
 	ServiceUsingDB
 	ServiceUsingConfig
 }
 
+// Initialize a user token service singleton instance
 var (
 	Tokens = &TokenService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -35,6 +37,7 @@ var (
 	}
 )
 
+// GetAllTokensByUid returns all token models of given user
 func (s *TokenService) GetAllTokensByUid(uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -46,6 +49,7 @@ func (s *TokenService) GetAllTokensByUid(uid int64) ([]*models.TokenRecord, erro
 	return tokenRecords, err
 }
 
+// GetAllUnexpiredNormalTokensByUid returns all available token models of given user
 func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -59,6 +63,7 @@ func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.To
 	return tokenRecords, err
 }
 
+// ParseToken returns the token model according to request data
 func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenClaims, error) {
 	claims := &core.UserTokenClaims{}
 
@@ -101,14 +106,17 @@ func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenC
 	return token, claims, err
 }
 
+// CreateToken generates a new normal token and saves to database
 func (s *TokenService) CreateToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
 	return s.createToken(user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(ctx), s.CurrentConfig().TokenExpiredTimeDuration)
 }
 
+// CreateRequire2FAToken generates a new token requiring user to verify 2fa passcode and saves to database
 func (s *TokenService) CreateRequire2FAToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
 	return s.createToken(user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(ctx), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 }
 
+// DeleteToken deletes given token from database
 func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 	if tokenRecord.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -131,6 +139,7 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 	})
 }
 
+// DeleteTokens deletes given tokens from database
 func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecord) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -152,6 +161,7 @@ func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecor
 	})
 }
 
+// DeleteTokenByClaims deletes given token from database
 func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
 	uid, err := utils.StringToInt64(claims.Id)
 
@@ -168,6 +178,7 @@ func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
 	return s.DeleteToken(&models.TokenRecord{Uid: uid, UserTokenId: userTokenId, CreatedUnixTime: claims.IssuedAt})
 }
 
+// DeleteTokensBeforeTime deletes tokens that is created before specific tim
 func (s *TokenService) DeleteTokensBeforeTime(uid int64, expireTime int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -179,6 +190,7 @@ func (s *TokenService) DeleteTokensBeforeTime(uid int64, expireTime int64) error
 	})
 }
 
+// ParseFromTokenId returns token model according to token id
 func (s *TokenService) ParseFromTokenId(tokenId string) (*models.TokenRecord, error) {
 	pairs := strings.Split(tokenId, ":")
 
@@ -213,6 +225,7 @@ func (s *TokenService) ParseFromTokenId(tokenId string) (*models.TokenRecord, er
 	return tokenRecord, nil
 }
 
+// GenerateTokenId generates token id according to token model
 func (s *TokenService) GenerateTokenId(tokenRecord *models.TokenRecord) string {
 	return fmt.Sprintf("%d:%d:%d", tokenRecord.Uid, tokenRecord.CreatedUnixTime, tokenRecord.UserTokenId)
 }

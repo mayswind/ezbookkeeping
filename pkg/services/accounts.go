@@ -12,11 +12,13 @@ import (
 	"github.com/mayswind/lab/pkg/uuid"
 )
 
+// AccountService represents account service
 type AccountService struct {
 	ServiceUsingDB
 	ServiceUsingUuid
 }
 
+// Initialize a account service singleton instance
 var (
 	Accounts = &AccountService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -28,6 +30,7 @@ var (
 	}
 )
 
+// GetAllAccountsByUid returns all account models of user
 func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -39,6 +42,7 @@ func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, erro
 	return accounts, err
 }
 
+// GetAccountAndSubAccountsByAccountId returns account model and sub account models according to account id
 func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -54,6 +58,7 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountI
 	return accounts, err
 }
 
+// GetMaxDisplayOrder returns the max display order according to account category
 func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -73,6 +78,7 @@ func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCa
 	}
 }
 
+// GetMaxSubAccountDisplayOrder returns the max display order of sub account according to account category and parent account id
 func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models.AccountCategory, parentAccountId int64) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -96,6 +102,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models
 	}
 }
 
+// CreateAccounts saves a new account model to database
 func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAccounts []*models.Account) error {
 	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -171,6 +178,7 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 	})
 }
 
+// ModifyAccounts saves an existed account model to database
 func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -198,6 +206,7 @@ func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) e
 	})
 }
 
+// HideAccount updates hidden field of given accounts
 func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -223,6 +232,7 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 	})
 }
 
+// ModifyAccountDisplayOrders updates display order of given accounts
 func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -248,6 +258,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 	})
 }
 
+// DeleteAccount deletes an existed account from database
 func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

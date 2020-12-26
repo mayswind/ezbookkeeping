@@ -22,12 +22,14 @@ const (
 	twoFactorRecoveryCodeLength int  = 10 // bytes
 )
 
+// TwoFactorAuthorizationService represents 2fa service
 type TwoFactorAuthorizationService struct {
 	ServiceUsingDB
 	ServiceUsingConfig
 	ServiceUsingUuid
 }
 
+// Initialize a 2fa service singleton instance
 var (
 	TwoFactorAuthorizations = &TwoFactorAuthorizationService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -42,6 +44,7 @@ var (
 	}
 )
 
+// GetUserTwoFactorSettingByUid returns the 2fa setting model according to user uid
 func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(uid int64) (*models.TwoFactor, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -65,6 +68,7 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(uid int64) 
 	return twoFactor, nil
 }
 
+// GenerateTwoFactorSecret generates a new 2fa secret
 func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(user *models.User) (*otp.Key, error) {
 	if user == nil {
 		return nil, errs.ErrUserNotFound
@@ -80,6 +84,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(user *models.Use
 	return key, err
 }
 
+// CreateTwoFactorSetting saves a new 2fa setting to database
 func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models.TwoFactor) error {
 	if twoFactor.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -100,6 +105,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models
 	})
 }
 
+// DeleteTwoFactorSetting deletes an existed 2fa setting from database
 func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -118,6 +124,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error 
 	})
 }
 
+// ExistsTwoFactorSetting returns whether the given user has existed 2fa setting
 func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(uid int64) (bool, error) {
 	if uid <= 0 {
 		return false, errs.ErrUserIdInvalid
@@ -126,6 +133,7 @@ func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(uid int64) (bool,
 	return s.UserDB().Cols("uid").Where("uid=?", uid).Exist(&models.TwoFactor{})
 }
 
+// GetAndUseUserTwoFactorRecoveryCode checks whether the given 2fa recovery code exists and marks it used
 func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid int64, recoveryCode string, salt string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -146,6 +154,7 @@ func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid i
 	})
 }
 
+// GenerateTwoFactorRecoveryCodes generates new 2fa recovery codes
 func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]string, error) {
 	recoveryCodes := make([]string, twoFactorRecoveryCodeCount)
 
@@ -162,6 +171,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]stri
 	return recoveryCodes, nil
 }
 
+// CreateTwoFactorRecoveryCodes saves new 2fa recovery codes to database
 func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, recoveryCodes []string, salt string) error {
 	twoFactorRecoveryCodes := make([]*models.TwoFactorRecoveryCode, len(recoveryCodes))
 
@@ -194,6 +204,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, 
 	})
 }
 
+// DeleteTwoFactorRecoveryCodes deletes existed 2fa recovery codes from database
 func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

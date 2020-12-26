@@ -13,11 +13,13 @@ import (
 	"github.com/mayswind/lab/pkg/uuid"
 )
 
+// TransactionService represents transaction service
 type TransactionService struct {
 	ServiceUsingDB
 	ServiceUsingUuid
 }
 
+// Initialize a transaction service singleton instance
 var (
 	Transactions = &TransactionService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -29,6 +31,7 @@ var (
 	}
 )
 
+// GetTransactionsByMaxTime returns transactions before given time
 func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -44,6 +47,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 	return transactions, err
 }
 
+// GetTransactionsInMonthByPage returns transactions in given year and month
 func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, page int, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -74,6 +78,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	return transactions, err
 }
 
+// GetTransactionByTransactionId returns a transaction model according to transaction id
 func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactionId int64) (*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -95,6 +100,7 @@ func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactio
 	return transaction, nil
 }
 
+// GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -103,6 +109,7 @@ func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
 	return s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Transaction{})
 }
 
+// GetMonthTransactionCount returns total count of transactions in given year and month
 func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, month int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -122,6 +129,7 @@ func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, mon
 	return s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startUnixTime, endUnixTime).Count(&models.Transaction{})
 }
 
+// CreateTransaction saves a new transaction to database
 func (s *TransactionService) CreateTransaction(transaction *models.Transaction, tagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -346,6 +354,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 	})
 }
 
+// ModifyTransaction saves an existed transaction to database
 func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, addTagIds []int64, removeTagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -630,6 +639,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 	return nil
 }
 
+// DeleteTransaction deletes an existed transaction from database
 func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

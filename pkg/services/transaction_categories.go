@@ -11,11 +11,13 @@ import (
 	"github.com/mayswind/lab/pkg/uuid"
 )
 
+// TransactionCategoryService represents transaction category service
 type TransactionCategoryService struct {
 	ServiceUsingDB
 	ServiceUsingUuid
 }
 
+// Initialize a transaction category service singleton instance
 var (
 	TransactionCategories = &TransactionCategoryService{
 		ServiceUsingDB: ServiceUsingDB{
@@ -27,6 +29,7 @@ var (
 	}
 )
 
+// GetAllCategoriesByUid returns all transaction category models of user
 func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -53,6 +56,7 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryTy
 	return categories, err
 }
 
+// GetCategoryByCategoryId returns a transaction category model according to transaction category id
 func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, categoryId int64) (*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -74,6 +78,7 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 	return category, nil
 }
 
+// GetMaxDisplayOrder returns the max display order according to transaction category type
 func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -93,6 +98,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType 
 	}
 }
 
+// GetMaxSubCategoryDisplayOrder returns the max display order of sub transaction category according to transaction category type and parent transaction category id
 func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
@@ -116,6 +122,7 @@ func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, ca
 	}
 }
 
+// CreateCategory saves a new transaction category model to database
 func (s *TransactionCategoryService) CreateCategory(category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -133,6 +140,7 @@ func (s *TransactionCategoryService) CreateCategory(category *models.Transaction
 	})
 }
 
+// CreateCategories saves a few transaction category models to database
 func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -186,6 +194,7 @@ func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[
 	return allCategories, nil
 }
 
+// ModifyCategory saves an existed transaction category model to database
 func (s *TransactionCategoryService) ModifyCategory(category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -206,6 +215,7 @@ func (s *TransactionCategoryService) ModifyCategory(category *models.Transaction
 	})
 }
 
+// HideCategory updates hidden field of given transaction categories
 func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -231,6 +241,7 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 	})
 }
 
+// ModifyCategoryDisplayOrders updates display order of given transaction categories
 func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, categories []*models.TransactionCategory) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
@@ -256,6 +267,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 	})
 }
 
+// DeleteCategory deletes an existed transaction category from database
 func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

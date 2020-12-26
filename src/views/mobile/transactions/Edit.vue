@@ -7,7 +7,7 @@
                 <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
 
-            <f7-subnavbar>
+            <f7-subnavbar :class="{ 'disabled': editTransactionId }">
                 <f7-segmented strong>
                     <f7-button :text="$t('Expense')" :active="transaction.type === $constants.transaction.allTransactionTypes.Expense" @click="transaction.type = $constants.transaction.allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === $constants.transaction.allTransactionTypes.Income" @click="transaction.type = $constants.transaction.allTransactionTypes.Income"></f7-button>
@@ -202,7 +202,7 @@
                                     :key="tag.id"
                                     :value="tag.id">{{ tag.name }}</option>
                         </select>
-                        <f7-block class="margin-top-half no-padding" slot="footer" v-if="transaction.tagIds.length">
+                        <f7-block class="margin-top-half no-padding" slot="footer" v-if="transaction.tagIds && transaction.tagIds.length">
                             <f7-chip class="transaction-edit-tag" media-bg-color="black"
                                      v-for="tagId in transaction.tagIds"
                                      :key="tagId"
@@ -210,7 +210,7 @@
                                 <f7-icon slot="media" f7="number"></f7-icon>
                             </f7-chip>
                         </f7-block>
-                        <f7-block class="margin-top-half no-padding" slot="footer" v-else-if="!transaction.tagIds.length">
+                        <f7-block class="margin-top-half no-padding" slot="footer" v-else-if="!transaction.tagIds || !transaction.tagIds.length">
                             <f7-chip class="transaction-edit-tag" :text="$t('None')">
                             </f7-chip>
                         </f7-block>
@@ -474,6 +474,7 @@ export default {
             if (self.editTransactionId) {
                 const transaction = responses[3].data.result;
 
+                self.transaction.id = transaction.id;
                 self.transaction.type = transaction.type;
 
                 if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
@@ -485,12 +486,12 @@ export default {
                 }
 
                 self.transaction.unixTime = transaction.time;
-                self.transaction.time = self.$utilities.formatDate(transaction.time, 'YYYY-MM-DDTHH:mm');
+                self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
                 self.transaction.destinationAccountId = transaction.destinationAccountId;
                 self.transaction.sourceAmount = transaction.sourceAmount;
                 self.transaction.destinationAmount = transaction.destinationAmount;
-                self.transaction.tagIds = transaction.tagIds;
+                self.transaction.tagIds = transaction.tagIds || [];
                 self.transaction.comment = transaction.comment;
             }
 
@@ -515,7 +516,82 @@ export default {
     },
     methods: {
         save() {
+            const self = this;
+            const router = self.$f7router;
 
+            self.submitting = true;
+            self.$showLoading(() => self.submitting);
+
+            const submitTransaction = {
+                type: self.transaction.type,
+                time: self.transaction.unixTime,
+                sourceAccountId: self.transaction.sourceAccountId,
+                destinationAccountId: self.transaction.sourceAccountId,
+                sourceAmount: self.transaction.sourceAmount,
+                destinationAmount: self.transaction.sourceAmount,
+                tagIds: self.transaction.tagIds,
+                comment: self.transaction.comment
+            };
+
+            if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
+                submitTransaction.categoryId = self.transaction.expenseCategory;
+            } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Income) {
+                submitTransaction.categoryId = self.transaction.incomeCategory;
+            } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Transfer) {
+                submitTransaction.categoryId = self.transaction.transferCategory;
+                submitTransaction.destinationAccountId = self.transaction.destinationAccountId;
+                submitTransaction.destinationAmount = self.transaction.destinationAmount;
+            } else {
+                self.$toast('An error has occurred');
+                return;
+            }
+
+            let promise = null;
+
+            if (!self.editTransactionId) {
+                promise = self.$services.addTransaction(submitTransaction);
+            } else {
+                submitTransaction.id = self.transaction.id;
+                promise = self.$services.modifyTransaction(submitTransaction);
+            }
+
+            promise.then(response => {
+                self.submitting = false;
+                self.$hideLoading();
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    if (!self.editTransactionId) {
+                        self.$toast('Unable to add transaction');
+                    } else {
+                        self.$toast('Unable to save transaction');
+                    }
+                    return;
+                }
+
+                if (!self.editTransactionId) {
+                    self.$toast('You have added a new transaction');
+                } else {
+                    self.$toast('You have saved this transaction');
+                }
+
+                router.back();
+            }).catch(error => {
+                self.$logger.error('failed to save transaction', error);
+
+                self.submitting = false;
+                self.$hideLoading();
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    self.$toast({ error: error.response.data });
+                } else if (!error.processed) {
+                    if (!self.editAccountId) {
+                        self.$toast('Unable to add transaction');
+                    } else {
+                        self.$toast('Unable to save transaction');
+                    }
+                }
+            });
         },
         getFirstAvailableCategoryId(categories) {
             if (!categories || !categories.length) {

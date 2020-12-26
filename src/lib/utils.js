@@ -37,6 +37,10 @@ function formatDate(date, format) {
     return moment(date).format(format);
 }
 
+function formatUnixTime(unixTime, format) {
+    return moment.unix(unixTime).format(format);
+}
+
 function getUnixTime(date) {
     return moment(date).unix();
 }
@@ -395,6 +399,7 @@ export default {
     isNumber,
     isBoolean,
     formatDate,
+    formatUnixTime,
     getUnixTime,
     copyObjectTo,
     copyArrayTo,

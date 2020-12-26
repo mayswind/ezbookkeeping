@@ -216,6 +216,38 @@ export default {
     getTransaction: ({ id }) => {
         return axios.get('v1/transactions/get.json?id=' + id);
     },
+    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+        return axios.post('v1/transactions/add.json', {
+            type,
+            categoryId,
+            time,
+            sourceAccountId,
+            destinationAccountId,
+            sourceAmount,
+            destinationAmount,
+            tagIds,
+            comment
+        });
+    },
+    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+        return axios.post('v1/transactions/modify.json', {
+            id,
+            type,
+            categoryId,
+            time,
+            sourceAccountId,
+            destinationAccountId,
+            sourceAmount,
+            destinationAmount,
+            tagIds,
+            comment
+        });
+    },
+    deleteTransaction: ({ id }) => {
+        return axios.post('v1/transactions/delete.json', {
+            id
+        });
+    },
     getAllTransactionCategories: ({ type, parentId }) => {
         return axios.get('v1/transaction/categories/list.json?type=' + (type || '0') + '&parent_id=' + (parentId || parentId === 0 ? parentId : '-1'));
     },

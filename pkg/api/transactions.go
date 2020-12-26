@@ -248,7 +248,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		TransactionId:        transaction.TransactionId,
 		Uid:                  uid,
 		CategoryId:           transactionModifyReq.CategoryId,
-		TransactionTime:      transactionModifyReq.Time,
+		TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
 		SourceAccountId:      transactionModifyReq.SourceAccountId,
 		DestinationAccountId: transactionModifyReq.DestinationAccountId,
 		SourceAmount:         transactionModifyReq.SourceAmount,
@@ -257,7 +257,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	}
 
 	if newTransaction.CategoryId == transaction.CategoryId &&
-		newTransaction.TransactionTime/1000 == transaction.TransactionTime/1000 &&
+		utils.GetUnixTimeFromTransactionTime(newTransaction.TransactionTime) == utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) &&
 		newTransaction.SourceAccountId == transaction.SourceAccountId &&
 		newTransaction.DestinationAccountId == transaction.DestinationAccountId &&
 		newTransaction.SourceAmount == transaction.SourceAmount &&

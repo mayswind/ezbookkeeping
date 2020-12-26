@@ -20,23 +20,29 @@ const (
 	defaultStaticRootPath = "public"
 )
 
+// SystemMode represents running mode of system
 type SystemMode string
 
+// System running modes
 const (
 	MODE_DEVELOPMENT SystemMode = "development"
 	MODE_PRODUCTION  SystemMode = "production"
 )
 
+// Scheme represents how the web backend service exposes
 type Scheme string
 
+// Scheme types
 const (
 	SCHEME_HTTP   Scheme = "http"
 	SCHEME_HTTPS  Scheme = "https"
 	SCHEME_SOCKET Scheme = "socket"
 )
 
+// Level represents log level
 type Level string
 
+// Log levels
 const (
 	LOGLEVEL_DEBUG Level = "debug"
 	LOGLEVEL_INFO  Level = "info"
@@ -44,12 +50,14 @@ const (
 	LOGLEVEL_ERROR Level = "error"
 )
 
+// Database types
 const (
 	MySqlDbType    string = "mysql"
 	PostgresDbType string = "postgres"
 	Sqlite3DbType  string = "sqlite3"
 )
 
+// Uuid generator types
 const (
 	InternalUuidGeneratorType string = "internal"
 )
@@ -75,6 +83,7 @@ const (
 	defaultTemporaryTokenExpiredTime int    = 300    // 5 minutes
 )
 
+// DatabaseConfig represents the database setting config
 type DatabaseConfig struct {
 	DatabaseType     string
 	DatabaseHost     string
@@ -91,6 +100,7 @@ type DatabaseConfig struct {
 	ConnectionMaxLifeTime int
 }
 
+// Config represents the global setting config
 type Config struct {
 	// Global
 	AppName     string
@@ -145,6 +155,7 @@ type Config struct {
 	EnableUserRegister bool
 }
 
+// LoadConfiguration loads setting config from given config file path
 func LoadConfiguration(configFilePath string) (*Config, error) {
 	var err error
 
@@ -206,6 +217,7 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	return config, nil
 }
 
+// GetDefaultConfigFilePath returns the defaule config file path
 func GetDefaultConfigFilePath() (string, error) {
 	workingPath, err := getWorkingPath()
 

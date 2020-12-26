@@ -552,8 +552,6 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			} else if deletedRows < 1 {
 				return errs.ErrTransactionTagNotFound
 			}
-
-			return err
 		}
 
 		if len(transactionTagIndexs) > 0 {

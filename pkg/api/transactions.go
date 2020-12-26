@@ -161,6 +161,13 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] parse tag ids failed, because %s", err.Error())
+		return nil, errs.ErrTransactionTagIdInvalid
+	}
+
 	if transactionCreateReq.Type < models.TRANSACTION_TYPE_MODIFY_BALANCE || transactionCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
 		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] transaction type is invalid")
 		return nil, errs.ErrTransactionTypeInvalid
@@ -187,7 +194,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 	uid := c.GetCurrentUid()
 	transaction := a.createNewTransactionModel(uid, &transactionCreateReq)
 
-	err = a.transactions.CreateTransaction(transaction, transactionCreateReq.TagIds)
+	err = a.transactions.CreateTransaction(transaction, tagIds)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
@@ -211,6 +218,13 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	tagIds, err := utils.StringArrayToInt64Array(transactionModifyReq.TagIds)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionModifyHandler] parse tag ids failed, because %s", err.Error())
+		return nil, errs.ErrTransactionTagIdInvalid
+	}
+
 	uid := c.GetCurrentUid()
 	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionModifyReq.Id)
 
@@ -227,8 +241,8 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	}
 
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-	addTransactionTagIds := utils.Int64SliceMinus(transactionModifyReq.TagIds, transactionTagIds)
-	removeTransactionTagIds := utils.Int64SliceMinus(transactionTagIds, transactionModifyReq.TagIds)
+	addTransactionTagIds := utils.Int64SliceMinus(tagIds, transactionTagIds)
+	removeTransactionTagIds := utils.Int64SliceMinus(transactionTagIds, tagIds)
 
 	newTransaction := &models.Transaction{
 		TransactionId:        transaction.TransactionId,

@@ -40,21 +40,21 @@ type TransactionCreateRequest struct {
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"required,min=1"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
-	TagIds               []int64         `json:"tagIds,string"`
+	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment" binding:"max=255"`
 }
 
 // TransactionModifyRequest represents all parameters of transaction modification request
 type TransactionModifyRequest struct {
-	Id                   int64   `json:"id,string" binding:"required,min=1"`
-	CategoryId           int64   `json:"categoryId,string"`
-	Time                 int64   `json:"time" binding:"required,min=1"`
-	SourceAccountId      int64   `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64   `json:"destinationAccountId,string" binding:"required,min=1"`
-	SourceAmount         int64   `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
-	DestinationAmount    int64   `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
-	TagIds               []int64 `json:"tagIds,string"`
-	Comment              string  `json:"comment" binding:"max=255"`
+	Id                   int64    `json:"id,string" binding:"required,min=1"`
+	CategoryId           int64    `json:"categoryId,string"`
+	Time                 int64    `json:"time" binding:"required,min=1"`
+	SourceAccountId      int64    `json:"sourceAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"required,min=1"`
+	SourceAmount         int64    `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64    `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	TagIds               []string `json:"tagIds"`
+	Comment              string   `json:"comment" binding:"max=255"`
 }
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
@@ -92,7 +92,7 @@ type TransactionInfoResponse struct {
 	DestinationAccountId int64           `json:"destinationAccountId,string"`
 	SourceAmount         int64           `json:"sourceAmount"`
 	DestinationAmount    int64           `json:"destinationAmount"`
-	TagIds               []int64         `json:"tagIds,string"`
+	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment"`
 }
 
@@ -114,7 +114,7 @@ func (c *Transaction) ToTransactionInfoResponse(tagIds []int64) *TransactionInfo
 		DestinationAccountId: c.DestinationAccountId,
 		SourceAmount:         c.SourceAmount,
 		DestinationAmount:    c.DestinationAmount,
-		TagIds:               tagIds,
+		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              c.Comment,
 	}
 }

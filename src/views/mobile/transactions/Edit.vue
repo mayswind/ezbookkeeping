@@ -500,21 +500,15 @@ export default {
             }
 
             self.loading = false;
-        }).catch(errors => {
-            self.$logger.error('failed to load essential data for editing transaction', errors);
+        }).catch(error => {
+            self.$logger.error('failed to load essential data for editing transaction', error);
 
-            for (let i = 0; i < errors.length; i++) {
-                const error = errors[i];
-
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                    router.back();
-                    return;
-                } else if (!error.processed) {
-                    self.$toast('An error has occurred');
-                    router.back();
-                    return;
-                }
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                self.$toast({ error: error.response.data });
+                router.back();
+            } else if (!error.processed) {
+                self.$toast('An error has occurred');
+                router.back();
             }
         });
     },

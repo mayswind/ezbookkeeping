@@ -17,4 +17,5 @@ var (
 	ErrCannotAddTransactionToHiddenAccount                 = NewNormalError(NormalSubcategoryTransaction, 10, http.StatusBadRequest, "cannot add transaction to hidden account")
 	ErrCannotModifyTransactionInHiddenAccount              = NewNormalError(NormalSubcategoryTransaction, 11, http.StatusBadRequest, "cannot modify transaction of hidden account")
 	ErrCannotDeleteTransactionInHiddenAccount              = NewNormalError(NormalSubcategoryTransaction, 12, http.StatusBadRequest, "cannot delete transaction in hidden account")
+	ErrCannotModifyTransactionType                         = NewNormalError(NormalSubcategoryTransaction, 13, http.StatusBadRequest, "cannot modify transaction type")
 )

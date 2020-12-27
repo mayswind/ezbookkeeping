@@ -394,6 +394,10 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			return errs.ErrTransactionNotFound
 		}
 
+		if transaction.Type != oldTransaction.Type {
+			return errs.ErrCannotModifyTransactionType
+		}
+
 		if oldTransaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE ||
 			oldTransaction.Type == models.TRANSACTION_TYPE_INCOME ||
 			oldTransaction.Type == models.TRANSACTION_TYPE_EXPENSE {
@@ -413,6 +417,8 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		// Get and verify source and destination account (if necessary)
 		sourceAccount := &models.Account{}
 		destinationAccount := &models.Account{}
+		oldSourceAccount := &models.Account{}
+		oldDestinationAccount := &models.Account{}
 		has, err = sess.ID(transaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceAccount)
 
 		if err != nil {
@@ -433,6 +439,34 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			} else if !has {
 				return errs.ErrDestinationAccountNotFound
 			} else if destinationAccount.Hidden {
+				return errs.ErrCannotModifyTransactionInHiddenAccount
+			}
+		}
+
+		if transaction.SourceAccountId == oldTransaction.SourceAccountId {
+			oldSourceAccount = sourceAccount
+		} else {
+			has, err = sess.ID(oldTransaction.SourceAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldSourceAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrSourceAccountNotFound
+			} else if oldSourceAccount.Hidden {
+				return errs.ErrCannotModifyTransactionInHiddenAccount
+			}
+		}
+
+		if transaction.DestinationAccountId == oldTransaction.DestinationAccountId {
+			oldDestinationAccount = destinationAccount
+		} else {
+			has, err = sess.ID(oldTransaction.DestinationAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldDestinationAccount)
+
+			if err != nil {
+				return err
+			} else if !has {
+				return errs.ErrDestinationAccountNotFound
+			} else if oldDestinationAccount.Hidden {
 				return errs.ErrCannotModifyTransactionInHiddenAccount
 			}
 		}

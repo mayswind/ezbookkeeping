@@ -9,13 +9,40 @@ export default {
     },
     'format': {
         'date': {
-            'long': 'YYYY年MM月DD日'
+            'long': 'YYYY年MM月DD日',
+            'yearMonth': 'YYYY年MM月'
         },
         'datetime': {
             'long': 'YYYY年MM月DD日 HH:mm:ss',
         },
+        'time': {
+            'hourMinute': 'HH:mm'
+        },
         'currency': {
             'symbol': '{symbol} {amount}'
+        }
+    },
+    'datetime': {
+        'Monday': {
+            'short': '周一'
+        },
+        'Tuesday': {
+            'short': '周二'
+        },
+        'Wednesday': {
+            'short': '周三'
+        },
+        'Thursday': {
+            'short': '周四'
+        },
+        'Friday': {
+            'short': '周五'
+        },
+        'Saturday': {
+            'short': '周六'
+        },
+        'Sunday': {
+            'short': '周日'
         }
     },
     'currency': {
@@ -498,8 +525,10 @@ export default {
     'Unable to move account': '无法移动账户',
     'Are you sure you want to delete this account?': '您确定要删除该账户？',
     'Unable to delete this account': '无法删除该账户',
+    'Transaction': '交易',
     'Add Transaction': '添加交易',
     'Edit Transaction': '编辑交易',
+    'Modify Balance': '修改余额',
     'Expense Amount': '支出金额',
     'Income Amount': '收入金额',
     'Transfer Out Amount': '转出金额',
@@ -516,6 +545,10 @@ export default {
     'Unable to save transaction': '无法保存交易',
     'You have added a new transaction': '您已经添加新交易',
     'You have saved this transaction': '您已经保存该交易',
+    'Unable to get transaction list': '无法获取交易列表',
+    'No transaction data': '没有交易数据',
+    'Are you sure you want to delete this transaction?': '您确定要删除该交易？',
+    'Unable to delete this transaction': '无法删除该交易',
     'User Profile': '用户信息',
     'Language': '语言',
     'Auto Update Exchange Rates Data': '自动更新汇率数据',

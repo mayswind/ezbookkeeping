@@ -59,7 +59,7 @@ type TransactionModifyRequest struct {
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
-	MaxTime int64 `form:"max_time" binding:"required,min=1"`
+	MaxTime int64 `form:"max_time" binding:"min=0"`
 	Count   int   `form:"count" binding:"required,min=1,max=50"`
 }
 
@@ -134,5 +134,9 @@ func (c TransactionInfoResponseSlice) Swap(i, j int) {
 
 // Less reports whether the first item is less than the second one
 func (c TransactionInfoResponseSlice) Less(i, j int) bool {
-	return c[i].Time < c[j].Time
+	if c[i].Time != c[j].Time {
+		return c[i].Time > c[j].Time
+	}
+
+	return c[i].Id > c[j].Id
 }

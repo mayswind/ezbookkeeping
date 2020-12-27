@@ -8,7 +8,6 @@ import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
 
 import moment from 'moment';
-import 'moment/min/locales';
 
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';

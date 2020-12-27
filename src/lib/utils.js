@@ -33,6 +33,10 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+function parseDateFromUnixtime(unixTime) {
+    return moment.unix(unixTime);
+}
+
 function formatDate(date, format) {
     return moment(date).format(format);
 }
@@ -43,6 +47,22 @@ function formatUnixTime(unixTime, format) {
 
 function getUnixTime(date) {
     return moment(date).unix();
+}
+
+function getYear(date) {
+    return moment(date).year();
+}
+
+function getMonth(date) {
+    return moment(date).month() + 1;
+}
+
+function getDay(date) {
+    return moment(date).date();
+}
+
+function getDayOfWeek(date) {
+    return moment(date).format('dddd');
 }
 
 function copyObjectTo(fromObject, toObject) {
@@ -369,6 +389,8 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
             if (account.type === accountConstants.allAccountTypes.SingleAccount) {
                 ret.push({
                     balance: account.balance,
+                    isAsset: account.isAsset,
+                    isLiability: account.isLiability,
                     currency: account.currency
                 });
             } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
@@ -381,6 +403,8 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
 
                     ret.push({
                         balance: subAccount.balance,
+                        isAsset: subAccount.isAsset,
+                        isLiability: subAccount.isLiability,
                         currency: subAccount.currency
                     });
                 }
@@ -398,9 +422,14 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    parseDateFromUnixtime,
     formatDate,
     formatUnixTime,
     getUnixTime,
+    getYear,
+    getMonth,
+    getDay,
+    getDayOfWeek,
     copyObjectTo,
     copyArrayTo,
     appendThousandsSeparator,

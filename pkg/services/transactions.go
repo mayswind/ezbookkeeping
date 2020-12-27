@@ -42,7 +42,13 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 	}
 
 	var transactions []*models.Transaction
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time<=?", uid, false, maxTime).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
+	var err error
+
+	if maxTime > 0 {
+		err = s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time<=?", uid, false, maxTime).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
+	} else {
+		err = s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
+	}
 
 	return transactions, err
 }

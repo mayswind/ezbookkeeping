@@ -9,13 +9,40 @@ export default {
     },
     'format': {
         'date': {
-            'long': 'MM/DD/YYYY'
+            'long': 'MM/DD/YYYY',
+            'yearMonth': 'YYYY-MM'
         },
         'datetime': {
             'long': 'MM/DD/YYYY HH:mm:ss',
         },
+        'time': {
+            'hourMinute': 'HH:mm'
+        },
         'currency': {
             'symbol': '{amount} {symbol}'
+        }
+    },
+    'datetime': {
+        'Monday': {
+            'short': 'Mon'
+        },
+        'Tuesday': {
+            'short': 'Tue'
+        },
+        'Wednesday': {
+            'short': 'Wed'
+        },
+        'Thursday': {
+            'short': 'Thu'
+        },
+        'Friday': {
+            'short': 'Fri'
+        },
+        'Saturday': {
+            'short': 'Sat'
+        },
+        'Sunday': {
+            'short': 'Sun'
         }
     },
     'currency': {
@@ -498,8 +525,10 @@ export default {
     'Unable to move account': 'Unable to move account',
     'Are you sure you want to delete this account?': 'Are you sure you want to delete this account?',
     'Unable to delete this account': 'Unable to delete this account',
+    'Transaction': 'Transaction',
     'Add Transaction': 'Add Transaction',
     'Edit Transaction': 'Edit Transaction',
+    'Modify Balance': 'Modify Balance',
     'Expense Amount': 'Expense Amount',
     'Income Amount': 'Income Amount',
     'Transfer Out Amount': 'Transfer Out Amount',
@@ -516,6 +545,10 @@ export default {
     'Unable to save transaction': 'Unable to save transaction',
     'You have added a new transaction': 'You have added a new transaction',
     'You have saved this transaction': 'You have saved this transaction',
+    'Unable to get transaction list': 'Unable to get transaction list',
+    'No transaction data': 'No transaction data',
+    'Are you sure you want to delete this transaction?': 'Are you sure you want to delete this transaction?',
+    'Unable to delete this transaction': 'Unable to delete this transaction',
     'User Profile': 'User Profile',
     'Language': 'Language',
     'Auto Update Exchange Rates Data': 'Auto Update Exchange Rates Data',

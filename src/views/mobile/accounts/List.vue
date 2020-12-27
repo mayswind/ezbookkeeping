@@ -343,7 +343,7 @@ export default {
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
-                    totalLiabilities += accountsBalance[i].balance;
+                    totalLiabilities -= accountsBalance[i].balance;
                 } else {
                     const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
@@ -352,7 +352,7 @@ export default {
                         continue;
                     }
 
-                    totalLiabilities += Math.floor(balance);
+                    totalLiabilities -= Math.floor(balance);
                 }
             }
 
@@ -465,7 +465,13 @@ export default {
             }
 
             if (this.showAccountBalance) {
-                return account.balance;
+                if (account.isAsset) {
+                    return account.balance;
+                } else if (account.isLiability) {
+                    return -account.balance;
+                } else {
+                    return account.balance;
+                }
             } else {
                 return '***';
             }
@@ -481,7 +487,13 @@ export default {
 
             for (let i = 0; i < accountsBalance.length; i++) {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
-                    totalBalance += accountsBalance[i].balance;
+                    if (accountsBalance[i].isAsset) {
+                        totalBalance += accountsBalance[i].balance;
+                    } else if (accountsBalance[i].isLiability) {
+                        totalBalance -= accountsBalance[i].balance;
+                    } else {
+                        totalBalance += accountsBalance[i].balance;
+                    }
                 } else {
                     const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
@@ -490,7 +502,13 @@ export default {
                         continue;
                     }
 
-                    totalBalance += Math.floor(balance);
+                    if (accountsBalance[i].isAsset) {
+                        totalBalance += Math.floor(balance);
+                    } else if (accountsBalance[i].isLiability) {
+                        totalBalance -= Math.floor(balance);
+                    } else {
+                        totalBalance += Math.floor(balance);
+                    }
                 }
             }
 

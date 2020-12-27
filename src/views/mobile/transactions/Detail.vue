@@ -154,7 +154,7 @@
                                 </div>
                                 <f7-swipeout-actions right>
                                     <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(transaction)"></f7-swipeout-button>
-                                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(transaction)">
+                                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(transaction, false)">
                                         <f7-icon f7="trash"></f7-icon>
                                     </f7-swipeout-button>
                                 </f7-swipeout-actions>
@@ -174,7 +174,7 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
                 <f7-actions-label>{{ $t('Are you sure you want to delete this transaction?') }}</f7-actions-label>
-                <f7-actions-button color="red" @click="remove(transactionToDelete)">{{ $t('Delete') }}</f7-actions-button>
+                <f7-actions-button color="red" @click="remove(transactionToDelete, true)">{{ $t('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -367,7 +367,7 @@ export default {
         edit(transaction) {
             this.$f7router.navigate('/transaction/edit?id=' + transaction.id);
         },
-        remove(transaction) {
+        remove(transaction, confirm) {
             const self = this;
             const app = self.$f7;
             const $$ = app.$;
@@ -377,7 +377,7 @@ export default {
                 return;
             }
 
-            if (!self.showDeleteActionSheet) {
+            if (!confirm) {
                 self.transactionToDelete = transaction;
                 self.showDeleteActionSheet = true;
                 return;

@@ -206,7 +206,7 @@
                     <f7-button rasied fill color="red"
                                icon-f7="trash" icon-size="16px"
                                :tooltip="$t('Remove Sub Account')"
-                               @click="removeSubAccount(subAccount)">
+                               @click="removeSubAccount(subAccount, false)">
                     </f7-button>
                 </f7-card-header>
                 <f7-card-content class="no-safe-areas" :padding="false">
@@ -297,7 +297,7 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
                 <f7-actions-label>{{ $t('Are you sure you want to remove this sub account?') }}</f7-actions-label>
-                <f7-actions-button color="red" @click="removeSubAccount(subAccountToDelete)">{{ $t('Remove') }}</f7-actions-button>
+                <f7-actions-button color="red" @click="removeSubAccount(subAccountToDelete, true)">{{ $t('Remove') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -468,13 +468,13 @@ export default {
                 showBalanceSheet: false
             });
         },
-        removeSubAccount(subAccount) {
+        removeSubAccount(subAccount, confirm) {
             if (!subAccount) {
                 this.$alert('An error has occurred');
                 return;
             }
 
-            if (!this.showDeleteActionSheet) {
+            if (!confirm) {
                 this.subAccountToDelete = subAccount;
                 this.showDeleteActionSheet = true;
                 return;

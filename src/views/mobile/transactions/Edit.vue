@@ -27,7 +27,11 @@
                     <f7-list-item class="transaction-edit-category" header="Category" title="Category Names" link="#"></f7-list-item>
                     <f7-list-item class="transaction-edit-account" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
-                    <f7-list-item header="Tags" link="#"></f7-list-item>
+                    <f7-list-item header="Tags" link="#">
+                        <f7-block class="margin-top-half no-padding" slot="footer">
+                            <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
+                        </f7-block>
+                    </f7-list-item>
                     <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>

@@ -320,7 +320,6 @@ export default {
         'cannot add transaction to hidden account': '您不能在隐藏账户中添加交易',
         'cannot modify transaction of hidden account': '您不能修改隐藏账户中的交易',
         'cannot delete transaction in hidden account': '您不能删除隐藏账户中的交易',
-        'cannot modify transaction type': '您不能修改交易类型',
         'transaction category id is invalid': '交易分类ID无效',
         'transaction category not found': '交易分类不存在',
         'transaction category type is invalid': '交易分类类型无效',

@@ -320,7 +320,6 @@ export default {
         'cannot add transaction to hidden account': 'You cannot add transaction to an hidden account',
         'cannot modify transaction of hidden account': 'You cannot modify transaction of an hidden account',
         'cannot delete transaction in hidden account': 'You cannot delete transaction in an hidden account',
-        'cannot modify transaction type': 'You cannot modify transaction type',
         'transaction category id is invalid': 'Transaction category ID is invalid',
         'transaction category not found': 'Transaction category is not found',
         'transaction category type is invalid': 'Transaction category type is invalid',

@@ -338,10 +338,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			return errs.ErrTransactionNotFound
 		}
 
-		// Cannot change transaction type
-		if transaction.Type != oldTransaction.Type {
-			return errs.ErrCannotModifyTransactionType
-		}
+		transaction.Type = oldTransaction.Type
 
 		// Check whether account id is valid
 		err = s.isAccountIdValid(transaction)
@@ -472,11 +469,11 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 
 		// Update account table
 		if oldTransaction.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
-			if transaction.SourceAccountId != oldTransaction.SourceAccountId {
+			if transaction.DestinationAccountId != oldTransaction.DestinationAccountId {
 				return errs.ErrBalanceModificationTransactionCannotChangeAccountId
 			}
 
-			if transaction.SourceAmount != oldTransaction.SourceAmount {
+			if transaction.DestinationAmount != oldTransaction.DestinationAmount {
 				destinationAccount.UpdatedUnixTime = time.Now().Unix()
 				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.DestinationAmount, transaction.DestinationAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
 
@@ -487,48 +484,128 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 				}
 			}
 		} else if oldTransaction.Type == models.TRANSACTION_TYPE_INCOME {
-			if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.DestinationAmount == oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId == oldTransaction.SourceAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			}
-		} else if oldTransaction.Type == models.TRANSACTION_TYPE_EXPENSE {
-			if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.DestinationAmount == oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId == oldTransaction.SourceAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			}
-		} else if oldTransaction.Type == models.TRANSACTION_TYPE_TRANSFER {
-			if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.SourceAmount != oldTransaction.SourceAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId != oldTransaction.SourceAccountId && transaction.SourceAmount == oldTransaction.SourceAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.SourceAccountId == oldTransaction.SourceAccountId && transaction.SourceAmount != oldTransaction.SourceAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
+			var oldAccountNewAmount int64 = 0
+			var newAccountNewAmount int64 = 0
+
+			if transaction.DestinationAccountId == oldTransaction.DestinationAccountId {
+				oldAccountNewAmount = transaction.DestinationAmount
+			} else if transaction.DestinationAccountId != oldTransaction.DestinationAccountId {
+				newAccountNewAmount = transaction.DestinationAmount
 			}
 
-			if transaction.DestinationAccountId != oldTransaction.DestinationAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.DestinationAccountId != oldTransaction.DestinationAccountId && transaction.DestinationAmount == oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
-			} else if transaction.DestinationAccountId == oldTransaction.DestinationAccountId && transaction.DestinationAmount != oldTransaction.DestinationAmount {
-				// TODO: implement
-				return errs.ErrNotImplemented
+			if oldAccountNewAmount != oldTransaction.DestinationAmount {
+				oldDestinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(oldDestinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.DestinationAmount, oldAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldDestinationAccount.Uid, false).Update(oldDestinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+
+			if newAccountNewAmount != 0 {
+				destinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", newAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+		} else if oldTransaction.Type == models.TRANSACTION_TYPE_EXPENSE {
+			var oldAccountNewAmount int64 = 0
+			var newAccountNewAmount int64 = 0
+
+			if transaction.DestinationAccountId == oldTransaction.DestinationAccountId {
+				oldAccountNewAmount = transaction.DestinationAmount
+			} else if transaction.DestinationAccountId != oldTransaction.DestinationAccountId {
+				newAccountNewAmount = transaction.DestinationAmount
+			}
+
+			if oldAccountNewAmount != oldTransaction.DestinationAmount {
+				oldDestinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(oldDestinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)-(%d)", oldTransaction.DestinationAmount, oldAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldDestinationAccount.Uid, false).Update(oldDestinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+
+			if newAccountNewAmount != 0 {
+				destinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", newAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+		} else if oldTransaction.Type == models.TRANSACTION_TYPE_TRANSFER {
+			var oldSourceAccountNewAmount int64 = 0
+			var newSourceAccountNewAmount int64 = 0
+
+			if transaction.SourceAccountId == oldTransaction.SourceAccountId {
+				oldSourceAccountNewAmount = transaction.SourceAmount
+			} else if transaction.SourceAccountId != oldTransaction.SourceAccountId {
+				newSourceAccountNewAmount = transaction.SourceAmount
+			}
+
+			if oldSourceAccountNewAmount != oldTransaction.SourceAmount {
+				oldSourceAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(oldSourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)-(%d)", oldTransaction.SourceAmount, oldSourceAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldSourceAccount.Uid, false).Update(oldSourceAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+
+			if newSourceAccountNewAmount != 0 {
+				sourceAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", newSourceAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+
+			var oldDestinationAccountNewAmount int64 = 0
+			var newDestinationAccountNewAmount int64 = 0
+
+			if transaction.DestinationAccountId == oldTransaction.DestinationAccountId {
+				oldDestinationAccountNewAmount = transaction.DestinationAmount
+			} else if transaction.DestinationAccountId != oldTransaction.DestinationAccountId {
+				newDestinationAccountNewAmount = transaction.DestinationAmount
+			}
+
+			if oldDestinationAccountNewAmount != oldTransaction.DestinationAmount {
+				oldDestinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(oldDestinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)+(%d)", oldTransaction.DestinationAmount, oldDestinationAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", oldDestinationAccount.Uid, false).Update(oldDestinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
+			}
+
+			if newDestinationAccountNewAmount != 0 {
+				destinationAccount.UpdatedUnixTime = time.Now().Unix()
+				updatedRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", newDestinationAccountNewAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
+
+				if err != nil {
+					return err
+				} else if updatedRows < 1 {
+					return errs.ErrDatabaseOperationFailed
+				}
 			}
 		}
 

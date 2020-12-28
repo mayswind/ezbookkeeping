@@ -102,7 +102,15 @@
                 <f7-card-header>
                     <f7-accordion-toggle class="full-line">
                         <small :style="{ opacity: 0.6 }">
-                            {{ transactionMonthList.yearMonth | moment($t('format.date.yearMonth')) }}
+                            <span>{{ transactionMonthList.yearMonth | moment($t('format.date.yearMonth')) }}</span>
+                        </small>
+                        <small class="transaction-amount-statistics" v-if="transactionMonthList.totalAmount">
+                            <span class="text-color-red">
+                                {{ transactionMonthList.totalAmount.income | currency(defaultCurrency) | income(transactionMonthList.totalAmount.incompleteIncome) }}
+                            </span>
+                            <span class="text-color-teal">
+                                {{ transactionMonthList.totalAmount.expense | currency(defaultCurrency) | expense(transactionMonthList.totalAmount.incompleteExpense) }}
+                            </span>
                         </small>
                         <f7-icon class="transaction-month-card-chevron-icon float-right" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                     </f7-accordion-toggle>
@@ -204,6 +212,9 @@ export default {
         };
     },
     computed: {
+        defaultCurrency() {
+            return this.$user.getUserInfo() ? this.$user.getUserInfo().defaultCurrency : this.$t('default.currency');
+        },
         noTransaction() {
             for (let i = 0; i < this.transactions.length; i++) {
                 const transactionMonthList = this.transactions[i];
@@ -476,6 +487,7 @@ export default {
 
                     if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                         currentMonthList.items.push(transaction);
+                        this.calculateMonthTotalAmount(currentMonthList, true);
                         continue;
                     }
 
@@ -483,11 +495,22 @@ export default {
                         if (this.transactions[j].year === transactionYear && this.transactions[j].month === transactionMonth) {
                             currentMonthListIndex = j;
                             currentMonthList = this.transactions[j];
+
+                            if (j > 0) {
+                                this.calculateMonthTotalAmount(this.transactions[j - 1], false);
+                            }
+
                             break;
                         }
                     }
 
+                    if (!currentMonthList && this.transactions.length > 0) {
+                        this.calculateMonthTotalAmount(this.transactions[this.transactions.length - 1], false);
+                    }
+
                     if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
+                        this.calculateMonthTotalAmount(currentMonthList, false);
+
                         this.transactions.push({
                             year: transactionYear,
                             month: transactionMonth,
@@ -501,14 +524,65 @@ export default {
                     }
 
                     currentMonthList.items.push(transaction);
+                    this.calculateMonthTotalAmount(currentMonthList, true);
                 }
             }
 
             if (result.nextTimeSequenceId) {
                 this.maxTime = result.nextTimeSequenceId;
             } else {
+                this.calculateMonthTotalAmount(this.transactions[this.transactions.length - 1], false);
                 this.maxTime = -1;
             }
+        },
+        calculateMonthTotalAmount(transactionMonthList, incomplete) {
+            if (!transactionMonthList) {
+                return;
+            }
+
+            let totalExpense = 0;
+            let totalIncome = 0;
+            let hasUnCalculatedTotalExpense = false;
+            let hasUnCalculatedTotalIncome = false;
+
+            for (let i = 0; i < transactionMonthList.items.length; i++) {
+                const transaction = transactionMonthList.items[i];
+
+                if (!transaction.destinationAccount) {
+                    continue;
+                }
+
+                let amount = transaction.destinationAmount;
+
+                if (transaction.destinationAccount.currency !== this.defaultCurrency) {
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(amount, transaction.destinationAccount.currency, this.defaultCurrency);
+
+                    if (!this.$utilities.isNumber(balance)) {
+                        if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {
+                            hasUnCalculatedTotalExpense = true;
+                        } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+                            hasUnCalculatedTotalIncome = true;
+                        }
+
+                        continue;
+                    }
+
+                    amount = Math.floor(balance);
+                }
+
+                if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {
+                    totalExpense += amount;
+                } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+                    totalIncome += amount;
+                }
+            }
+
+            transactionMonthList.totalAmount = {
+                expense: totalExpense,
+                incompleteExpense: incomplete || hasUnCalculatedTotalExpense,
+                income: totalIncome,
+                incompleteIncome: incomplete || hasUnCalculatedTotalIncome
+            };
         }
     },
     filters: {
@@ -534,6 +608,12 @@ export default {
             return {
                 color: 'transparent'
             }
+        },
+        income(value, incomplete) {
+            return '+' + value + (incomplete ? '+' : '');
+        },
+        expense(value, incomplete) {
+            return '-' + value + (incomplete ? '+' : '');
         }
     }
 };
@@ -544,6 +624,10 @@ export default {
     color: var(--f7-list-chevron-icon-color);
     font-size: var(--f7-list-chevron-icon-font-size);
     font-weight: bolder;
+}
+
+.transaction-amount-statistics > span {
+    margin-right: 4px;
 }
 
 .transaction-info .item-media {

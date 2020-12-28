@@ -240,6 +240,8 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 			}
 		}
 
+		err = nil
+
 		// Insert transaction tag index
 		if len(transactionTagIndexs) > 0 {
 			for i := 0; i < len(transactionTagIndexs); i++ {

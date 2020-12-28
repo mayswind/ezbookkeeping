@@ -409,9 +409,13 @@ export default {
                         }
 
                         for (let j = 0; j < transactionMonthList.items.length; j++) {
-                            if (transactionMonthList.items[j].id === transactionMonthList.items.id) {
+                            if (transactionMonthList.items[j].id === transaction.id) {
                                 transactionMonthList.items.splice(j, 1);
                             }
+                        }
+
+                        if (transactionMonthList.items.length < 1) {
+                            self.transactions.splice(i, 1);
                         }
                     }
                 });

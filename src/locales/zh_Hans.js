@@ -431,6 +431,7 @@ export default {
     'Statistics': '统计',
     'Settings': '设置',
     'Back': '返回',
+    'Load More': '加载更多',
     'Change Language': '修改语言',
     'Unlock': '解锁',
     'Re-login': '重新登陆',

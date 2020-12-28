@@ -1,5 +1,5 @@
 <template>
-    <f7-page @infinite="loadMore">
+    <f7-page ptr infinite :infinite-preloader="loadingMore" @ptr:refresh="reload" @infinite="loadMore">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction Details')"></f7-nav-title>
@@ -165,6 +165,10 @@
             </f7-accordion-item>
         </f7-card>
 
+        <f7-block class="text-align-center" v-if="!loading && maxTime > 0">
+            <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore">{{ $t('Load More') }}</f7-link>
+        </f7-block>
+
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -193,6 +197,7 @@ export default {
             allTags: {},
             maxTime: 0,
             loading: true,
+            loadingMore: false,
             transactionToDelete: null,
             showMoreActionSheet: false,
             showDeleteActionSheet: false
@@ -343,9 +348,17 @@ export default {
                 return;
             }
 
+            if (self.loadingMore) {
+                return;
+            }
+
+            self.loadingMore = true;
+
             self.$services.getTransactions({
                 maxTime: self.maxTime
             }).then(response => {
+                self.loadingMore = false;
+
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -355,6 +368,8 @@ export default {
 
                 self.setResult(data.result);
             }).catch(error => {
+                self.loadingMore = false;
+
                 self.$logger.error('failed to reload transaction list', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -472,7 +487,7 @@ export default {
                         }
                     }
 
-                    if (!currentMonthList || !currentMonthList.year !== transactionYear || !currentMonthList.month === transactionMonth) {
+                    if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
                         this.transactions.push({
                             year: transactionYear,
                             month: transactionMonth,

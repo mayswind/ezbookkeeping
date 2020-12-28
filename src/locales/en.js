@@ -431,6 +431,7 @@ export default {
     'Statistics': 'Statistics',
     'Settings': 'Settings',
     'Back': 'Back',
+    'Load More': 'Load More',
     'Change Language': 'Change Language',
     'Unlock': 'Unlock',
     'Re-login': 'Re-login',

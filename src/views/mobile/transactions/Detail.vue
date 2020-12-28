@@ -155,7 +155,7 @@
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                 </div>
-                                <div slot="content-end" class="padding-right transaction-amount">
+                                <div slot="content-end" class="padding-right transaction-amount" v-if="transaction.sourceAccount">
                                     <span :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">
                                         {{ transaction.sourceAmount | currency(transaction.sourceAccount.currency) }}
                                     </span>
@@ -241,7 +241,7 @@ export default {
             self.maxTime = 0;
 
             const promises = [
-                self.$services.getAllAccounts({ visibleOnly: true }),
+                self.$services.getAllAccounts({ visibleOnly: false }),
                 self.$services.getAllTransactionCategories({}),
                 self.$services.getAllTransactionTags(),
                 self.$services.getTransactions({

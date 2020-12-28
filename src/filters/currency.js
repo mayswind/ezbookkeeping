@@ -11,7 +11,17 @@ export default function ({i18n}, value, currencyCode) {
         value = value.toString();
     }
 
+    const hasIncompleteFlag = utils.isString(value) && value.charAt(value.length - 1) === '+';
+
+    if (hasIncompleteFlag) {
+        value = value.substr(0, value.length - 1);
+    }
+
     value = utils.numericCurrencyToString(value);
+
+    if (hasIncompleteFlag) {
+        value = value + '+';
+    }
 
     const currencyDisplayMode = settings.getCurrencyDisplayMode();
 

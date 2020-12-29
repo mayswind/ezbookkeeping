@@ -237,7 +237,10 @@ export default {
             const self = this;
             const router = self.$f7router;
 
-            self.loading = true;
+            if (!done) {
+                self.loading = true;
+            }
+
             self.maxTime = 0;
 
             const promises = [

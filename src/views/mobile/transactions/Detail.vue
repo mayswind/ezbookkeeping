@@ -17,6 +17,10 @@
             <f7-card-header>
                 <div class="full-line">
                     <small :style="{ opacity: 0.6 }">YYYY-MM</small>
+                    <small class="transaction-amount-statistics">
+                        <span>0.00 USD</span>
+                        <span>0.00 USD</span>
+                    </small>
                     <f7-icon class="transaction-month-card-chevron-icon float-right" f7="chevron_up"></f7-icon>
                 </div>
             </f7-card-header>
@@ -635,7 +639,7 @@ export default {
 }
 
 .transaction-amount-statistics > span {
-    margin-right: 4px;
+    margin-left: 4px;
 }
 
 .transaction-info .item-media {

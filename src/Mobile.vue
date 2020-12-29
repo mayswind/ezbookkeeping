@@ -175,7 +175,13 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .list .item-content .list-item-showing {
+    color: rgba(0, 0, 0, 0.2);
     font-size: 16px;
+    font-weight: bold;
+}
+
+.theme-dark .list .item-content .list-item-showing {
+    color: rgba(255, 255, 255, 0.2);
 }
 
 .list .item-content .list-item-checked {

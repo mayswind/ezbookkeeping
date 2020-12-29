@@ -5,7 +5,7 @@ import LoginPage from '../views/mobile/Login.vue';
 import SignUpPage from '../views/mobile/Signup.vue';
 import UnlockPage from '../views/mobile/Unlock.vue';
 
-import TransactionDetailPage from '../views/mobile/transactions/Detail.vue';
+import TransactionListPage from '../views/mobile/transactions/List.vue';
 import TransactionEditPage from '../views/mobile/transactions/Edit.vue';
 
 import AccountListPage from '../views/mobile/accounts/List.vue';
@@ -135,8 +135,8 @@ const routes = [
         }
     },
     {
-        path: '/transaction/details',
-        component: TransactionDetailPage,
+        path: '/transaction/list',
+        component: TransactionListPage,
         beforeEnter: checkLogin
     },
     {
@@ -146,6 +146,11 @@ const routes = [
     },
     {
         path: '/transaction/edit',
+        component: TransactionEditPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/transaction/detail',
         component: TransactionEditPage,
         beforeEnter: checkLogin
     },

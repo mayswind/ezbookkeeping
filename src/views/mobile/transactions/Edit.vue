@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save" v-if="!readonly"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :class="{ 'disabled': editTransactionId }">
@@ -39,7 +39,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
+                <f7-list form :class="{ 'disabled': readonly }">
                     <f7-list-item
                         class="transaction-edit-amount padding-top-half padding-bottom-half"
                         :class="{ 'color-theme-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-theme-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
@@ -259,6 +259,7 @@ export default {
             categoriedAccounts: [],
             allCategories: {},
             allTags: [],
+            readonly: false,
             loading: true,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
@@ -271,7 +272,9 @@ export default {
     },
     computed: {
         title() {
-            if (!this.editTransactionId) {
+            if (this.readonly) {
+                return 'Transaction Detail';
+            } else if (!this.editTransactionId) {
                 return 'Add Transaction';
             } else {
                 return 'Edit Transaction';
@@ -404,6 +407,7 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
+        self.readonly = self.$f7route.path === '/transaction/detail';
         self.loading = true;
 
         const promises = [
@@ -516,6 +520,10 @@ export default {
         save() {
             const self = this;
             const router = self.$f7router;
+
+            if (self.readonly) {
+                return;
+            }
 
             self.submitting = true;
             self.$showLoading(() => self.submitting);

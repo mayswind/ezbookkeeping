@@ -9,7 +9,7 @@
         </f7-list>
 
         <f7-toolbar tabbar labels bottom>
-            <f7-link href="/transaction/details">
+            <f7-link href="/transaction/list">
                 <f7-icon f7="square_list"></f7-icon>
                 <span class="tabbar-label">{{ $t('Details') }}</span>
             </f7-link>

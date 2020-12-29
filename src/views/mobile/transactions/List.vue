@@ -7,7 +7,7 @@
              @infinite="loadMore(true)">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Transaction Details')"></f7-nav-title>
+            <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right v-if="false">
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
@@ -26,7 +26,7 @@
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list media-list>
-                    <f7-list-item class="transaction-info">
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
                         <div slot="media" class="display-flex no-padding-horizontal">
                             <div class="display-flex flex-direction-column transaction-date">
                                 <span class="transaction-day full-line flex-direction-column">DD</span>
@@ -44,11 +44,11 @@
                             <span>·</span>
                             <span>Source Account</span>
                         </div>
-                        <div slot="content-end" class="padding-right transaction-amount">
+                        <div slot="after" class="no-padding transaction-amount">
                             <span>0.00 USD</span>
                         </div>
                     </f7-list-item>
-                    <f7-list-item class="transaction-info">
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
                         <div slot="media" class="display-flex no-padding-horizontal">
                             <div class="display-flex flex-direction-column transaction-date">
                                 <span class="transaction-day full-line flex-direction-column">DD</span>
@@ -66,11 +66,11 @@
                             <span>·</span>
                             <span>Source Account</span>
                         </div>
-                        <div slot="content-end" class="padding-right transaction-amount">
+                        <div slot="after" class="no-padding transaction-amount">
                             <span>0.00 USD</span>
                         </div>
                     </f7-list-item>
-                    <f7-list-item class="transaction-info">
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
                         <div slot="media" class="display-flex no-padding-horizontal">
                             <div class="display-flex flex-direction-column transaction-date">
                                 <span class="transaction-day full-line flex-direction-column">DD</span>
@@ -88,7 +88,7 @@
                             <span>·</span>
                             <span>Source Account</span>
                         </div>
-                        <div slot="content-end" class="padding-right transaction-amount">
+                        <div slot="after" class="no-padding transaction-amount">
                             <span>0.00 USD</span>
                         </div>
                     </f7-list-item>
@@ -127,9 +127,10 @@
                 <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
                     <f7-accordion-content :style="{ height: transactionMonthList.opened ? 'auto' : '' }">
                         <f7-list media-list>
-                            <f7-list-item class="transaction-info"
+                            <f7-list-item class="transaction-info" chevron-center
                                           v-for="(transaction, idx) in transactionMonthList.items"
                                           :key="transaction.id" :id="transaction | transactionDomId"
+                                          :link="'/transaction/detail?id=' + transaction.id"
                                           swipeout
                             >
                                 <div slot="media" class="display-flex no-padding-horizontal">
@@ -164,7 +165,7 @@
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                 </div>
-                                <div slot="content-end" class="padding-right transaction-amount" v-if="transaction.sourceAccount">
+                                <div slot="after" class="no-padding transaction-amount" v-if="transaction.sourceAccount">
                                     <span :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">
                                         {{ transaction.sourceAmount | currency(transaction.sourceAccount.currency) }}
                                     </span>

@@ -160,12 +160,15 @@
                                         {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) }}
                                     </span>
                                 </div>
-                                <div slot="footer" class="no-padding-horizontal transaction-footer">
+                                <div slot="text" class="transaction-comment" v-if="transaction.comment">
+                                    <span>{{ transaction.comment }}</span>
+                                </div>
+                                <div slot="footer" class="transaction-footer">
                                     <span>{{ transaction.time | moment($t('format.time.hourMinute')) }}</span>
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                 </div>
-                                <div slot="after" class="no-padding transaction-amount" v-if="transaction.sourceAccount">
+                                <div slot="after" class="transaction-amount" v-if="transaction.sourceAccount">
                                     <span :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">
                                         {{ transaction.sourceAmount | currency(transaction.sourceAccount.currency) }}
                                     </span>
@@ -455,6 +458,8 @@ export default {
 
                         if (transactionMonthList.items.length < 1) {
                             self.transactions.splice(i, 1);
+                        } else {
+                            self.calculateMonthTotalAmount(transactionMonthList, i >= self.transactions.length - 1 && self.maxTime > 0);
                         }
                     }
                 });
@@ -643,10 +648,6 @@ export default {
     margin-left: 4px;
 }
 
-.transaction-info .item-media {
-    height: 64px;
-}
-
 .transaction-info .item-media + .item-inner {
     margin-left: 10px;
 }
@@ -668,8 +669,19 @@ export default {
     text-align: center;
 }
 
+.transaction-comment {
+    font-size: 13px;
+    line-height: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
 .transaction-footer {
     padding-top: 4px;
+}
+
+.transaction-info .item-text + .item-footer .transaction-footer {
+    padding-top: 2px;
 }
 
 .transaction-footer > span {
@@ -678,7 +690,6 @@ export default {
 
 .transaction-amount {
     color: var(--f7-list-item-after-text-color);
-    white-space: nowrap;
 }
 
 .transaction-info .item-inner:after {

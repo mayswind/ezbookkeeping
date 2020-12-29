@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr infinite :infinite-preloader="loadingMore" @ptr:refresh="reload" @infinite="loadMore">
+    <f7-page ptr infinite :infinite-preloader="loadingMore" @ptr:refresh="reload" @infinite="loadMore(true)">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction Details')"></f7-nav-title>
@@ -116,7 +116,7 @@
                     </f7-accordion-toggle>
                 </f7-card-header>
                 <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
-                    <f7-accordion-content style="height: auto">
+                    <f7-accordion-content :style="{ height: transactionMonthList.opened ? 'auto' : '' }">
                         <f7-list media-list>
                             <f7-list-item class="transaction-info"
                                           v-for="(transaction, idx) in transactionMonthList.items"
@@ -174,7 +174,7 @@
         </f7-card>
 
         <f7-block class="text-align-center" v-if="!loading && maxTime > 0">
-            <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore">{{ $t('Load More') }}</f7-link>
+            <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
         </f7-block>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
@@ -332,7 +332,7 @@ export default {
                 }
 
                 self.transactions = [];
-                self.setResult(transactionListData.result);
+                self.setResult(transactionListData.result, true);
 
                 self.loading = false;
             }).catch(error => {
@@ -355,7 +355,7 @@ export default {
                 }
             });
         },
-        loadMore() {
+        loadMore(autoExpand) {
             const self = this;
 
             if (self.maxTime <= 0) {
@@ -380,7 +380,7 @@ export default {
                     return;
                 }
 
-                self.setResult(data.result);
+                self.setResult(data.result, autoExpand);
             }).catch(error => {
                 self.loadingMore = false;
 
@@ -460,7 +460,7 @@ export default {
                 }
             });
         },
-        setResult(result) {
+        setResult(result, autoExpand) {
             if (result.items && result.items.length) {
                 let currentMonthListIndex = -1;
                 let currentMonthList = null;
@@ -518,7 +518,7 @@ export default {
                             year: transactionYear,
                             month: transactionMonth,
                             yearMonth: `${transactionYear}-${transactionMonth}`,
-                            opened: true,
+                            opened: autoExpand,
                             items: []
                         });
 

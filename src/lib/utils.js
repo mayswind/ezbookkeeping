@@ -57,6 +57,17 @@ function getMonth(date) {
     return moment(date).month() + 1;
 }
 
+function getYearAndMonth(date) {
+    const year = getYear(date);
+    let month = getMonth(date);
+
+    if (month < 10) {
+        month = '0' + month;
+    }
+
+    return `${year}-${month}`;
+}
+
 function getDay(date) {
     return moment(date).date();
 }
@@ -428,6 +439,7 @@ export default {
     getUnixTime,
     getYear,
     getMonth,
+    getYearAndMonth,
     getDay,
     getDayOfWeek,
     copyObjectTo,

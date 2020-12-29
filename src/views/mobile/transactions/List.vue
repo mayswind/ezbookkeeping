@@ -504,6 +504,7 @@ export default {
 
                     const transactionYear = this.$utilities.getYear(transactionTime);
                     const transactionMonth = this.$utilities.getMonth(transactionTime);
+                    const transactionYearMonth = this.$utilities.getYearAndMonth(transactionTime);
 
                     if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                         currentMonthList.items.push(transaction);
@@ -534,7 +535,7 @@ export default {
                         this.transactions.push({
                             year: transactionYear,
                             month: transactionMonth,
-                            yearMonth: `${transactionYear}-${transactionMonth}`,
+                            yearMonth: transactionYearMonth,
                             opened: autoExpand,
                             items: []
                         });

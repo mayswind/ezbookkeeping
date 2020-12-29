@@ -1,5 +1,10 @@
 <template>
-    <f7-page ptr infinite :infinite-preloader="loadingMore" @ptr:refresh="reload" @infinite="loadMore(true)">
+    <f7-page ptr
+             infinite
+             :infinite-preloader="loadingMore"
+             :infinite-distance="400"
+             @ptr:refresh="reload"
+             @infinite="loadMore(true)">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction Details')"></f7-nav-title>

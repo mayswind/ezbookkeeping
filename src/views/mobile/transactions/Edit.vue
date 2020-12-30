@@ -532,9 +532,9 @@ export default {
                 type: self.transaction.type,
                 time: self.transaction.unixTime,
                 sourceAccountId: self.transaction.sourceAccountId,
-                destinationAccountId: self.transaction.sourceAccountId,
                 sourceAmount: self.transaction.sourceAmount,
-                destinationAmount: self.transaction.sourceAmount,
+                destinationAccountId: '0',
+                destinationAmount: 0,
                 tagIds: self.transaction.tagIds,
                 comment: self.transaction.comment
             };

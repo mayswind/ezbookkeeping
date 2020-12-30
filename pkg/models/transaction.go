@@ -13,19 +13,32 @@ const (
 	TRANSACTION_TYPE_TRANSFER       TransactionType = 4
 )
 
+// TransactionDbType represents transaction type in database
+type TransactionDbType byte
+
+// Transaction db types
+const (
+	TRANSACTION_DB_TYPE_MODIFY_BALANCE TransactionDbType = 1
+	TRANSACTION_DB_TYPE_INCOME         TransactionDbType = 2
+	TRANSACTION_DB_TYPE_EXPENSE        TransactionDbType = 3
+	TRANSACTION_DB_TYPE_TRANSFER_OUT   TransactionDbType = 4
+	TRANSACTION_DB_TYPE_TRANSFER_IN    TransactionDbType = 5
+)
+
 // Transaction represents transaction data stored in database
 type Transaction struct {
-	TransactionId        int64           `xorm:"PK"`
-	Uid                  int64           `xorm:"UNIQUE(UQE_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
-	Deleted              bool            `xorm:"INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
-	Type                 TransactionType `xorm:"INDEX(IDX_transaction_uid_deleted_type_time) NOT NULL"`
-	CategoryId           int64           `xorm:"INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
-	TransactionTime      int64           `xorm:"UNIQUE(UQE_transaction_uid_transaction_time) INDEX(IDX_transaction_uid_deleted_transaction_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
-	SourceAccountId      int64           `xorm:"NOT NULL"`
-	DestinationAccountId int64           `xorm:"NOT NULL"`
-	SourceAmount         int64           `xorm:"NOT NULL"`
-	DestinationAmount    int64           `xorm:"NOT NULL"`
-	Comment              string          `xorm:"VARCHAR(255) NOT NULL"`
+	TransactionId        int64             `xorm:"PK"`
+	Uid                  int64             `xorm:"UNIQUE(UQE_transaction_uid_time) INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	Deleted              bool              `xorm:"INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	Type                 TransactionDbType `xorm:"INDEX(IDX_transaction_uid_deleted_type_time) NOT NULL"`
+	CategoryId           int64             `xorm:"INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
+	AccountId            int64             `xorm:"INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	TransactionTime      int64             `xorm:"UNIQUE(UQE_transaction_uid_time) INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	Amount               int64             `xorm:"NOT NULL"`
+	RelatedId            int64             `xorm:"NOT NULL"`
+	RelatedAccountId     int64             `xorm:"NOT NULL"`
+	RelatedAccountAmount int64             `xorm:"NOT NULL"`
+	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
 	DeletedUnixTime      int64
@@ -37,7 +50,7 @@ type TransactionCreateRequest struct {
 	CategoryId           int64           `json:"categoryId,string"`
 	Time                 int64           `json:"time" binding:"required,min=1"`
 	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []string        `json:"tagIds"`
@@ -50,7 +63,7 @@ type TransactionModifyRequest struct {
 	CategoryId           int64    `json:"categoryId,string"`
 	Time                 int64    `json:"time" binding:"required,min=1"`
 	SourceAccountId      int64    `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64    `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64    `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []string `json:"tagIds"`
@@ -89,9 +102,9 @@ type TransactionInfoResponse struct {
 	CategoryId           int64           `json:"categoryId,string"`
 	Time                 int64           `json:"time"`
 	SourceAccountId      int64           `json:"sourceAccountId,string"`
-	DestinationAccountId int64           `json:"destinationAccountId,string"`
+	DestinationAccountId int64           `json:"destinationAccountId,string,omitempty"`
 	SourceAmount         int64           `json:"sourceAmount"`
-	DestinationAmount    int64           `json:"destinationAmount"`
+	DestinationAmount    int64           `json:"destinationAmount,omitempty"`
 	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment"`
 }
@@ -104,16 +117,49 @@ type TransactionInfoPageWrapperResponse struct {
 
 // ToTransactionInfoResponse returns a view-object according to database model
 func (c *Transaction) ToTransactionInfoResponse(tagIds []int64) *TransactionInfoResponse {
+	var transactionType TransactionType
+
+	if c.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+		transactionType = TRANSACTION_TYPE_MODIFY_BALANCE
+	} else if c.Type == TRANSACTION_DB_TYPE_EXPENSE {
+		transactionType = TRANSACTION_TYPE_EXPENSE
+	} else if c.Type == TRANSACTION_DB_TYPE_INCOME {
+		transactionType = TRANSACTION_TYPE_INCOME
+	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		transactionType = TRANSACTION_TYPE_TRANSFER
+	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		transactionType = TRANSACTION_TYPE_TRANSFER
+	} else {
+		return nil
+	}
+
+	sourceAccountId := c.AccountId
+	sourceAmount := c.Amount
+
+	destinationAccountId := int64(0)
+	destinationAmount := int64(0)
+
+	if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		destinationAccountId = c.RelatedAccountId
+		destinationAmount = c.RelatedAccountAmount
+	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		sourceAccountId = c.RelatedAccountId
+		sourceAmount = c.RelatedAccountAmount
+
+		destinationAccountId = c.AccountId
+		destinationAmount = c.Amount
+	}
+
 	return &TransactionInfoResponse{
 		Id:                   c.TransactionId,
 		TimeSequenceId:       c.TransactionTime,
-		Type:                 c.Type,
+		Type:                 transactionType,
 		CategoryId:           c.CategoryId,
 		Time:                 utils.GetUnixTimeFromTransactionTime(c.TransactionTime),
-		SourceAccountId:      c.SourceAccountId,
-		DestinationAccountId: c.DestinationAccountId,
-		SourceAmount:         c.SourceAmount,
-		DestinationAmount:    c.DestinationAmount,
+		SourceAccountId:      sourceAccountId,
+		DestinationAccountId: destinationAccountId,
+		SourceAmount:         sourceAmount,
+		DestinationAmount:    destinationAmount,
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              c.Comment,
 	}

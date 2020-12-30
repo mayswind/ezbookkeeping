@@ -140,12 +140,12 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 				TransactionId:        s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION),
 				Uid:                  allAccounts[i].Uid,
 				Deleted:              false,
-				Type:                 models.TRANSACTION_TYPE_MODIFY_BALANCE,
+				Type:                 models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,
 				TransactionTime:      transactionTime,
-				SourceAccountId:      allAccounts[i].AccountId,
-				DestinationAccountId: allAccounts[i].AccountId,
-				SourceAmount:         allAccounts[i].Balance,
-				DestinationAmount:    allAccounts[i].Balance,
+				AccountId:            allAccounts[i].AccountId,
+				Amount:               allAccounts[i].Balance,
+				RelatedAccountId:     allAccounts[i].AccountId,
+				RelatedAccountAmount: allAccounts[i].Balance,
 				CreatedUnixTime:      now,
 				UpdatedUnixTime:      now,
 			}
@@ -287,49 +287,26 @@ func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 			accountAndSubAccountIds[i] = accountAndSubAccounts[i].AccountId
 		}
 
-		var relatedTransactionsBySourceAccount []*models.Transaction
-		err = sess.Cols("uid", "deleted", "source_account_id", "type").Where("uid=? AND deleted=?", uid, false).In("source_account_id", accountAndSubAccountIds).Limit(len(accountAndSubAccounts) + 1).Find(&relatedTransactionsBySourceAccount)
+		var relatedTransactionsByAccount []*models.Transaction
+		err = sess.Cols("uid", "deleted", "account_id", "type").Where("uid=? AND deleted=?", uid, false).In("account_id", accountAndSubAccountIds).Limit(len(accountAndSubAccounts) + 1).Find(&relatedTransactionsByAccount)
 
 		if err != nil {
 			return err
-		} else if len(relatedTransactionsBySourceAccount) > len(accountAndSubAccountIds) {
+		} else if len(relatedTransactionsByAccount) > len(accountAndSubAccountIds) {
 			return errs.ErrAccountInUseCannotBeDeleted
-		} else if len(relatedTransactionsBySourceAccount) > 0 {
+		} else if len(relatedTransactionsByAccount) > 0 {
 			accountTransactionExists := make(map[int64]bool)
 
-			for i := 0; i < len(relatedTransactionsBySourceAccount); i++ {
-				transaction := relatedTransactionsBySourceAccount[i]
+			for i := 0; i < len(relatedTransactionsByAccount); i++ {
+				transaction := relatedTransactionsByAccount[i]
 
-				if transaction.Type != models.TRANSACTION_TYPE_MODIFY_BALANCE {
+				if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 					return errs.ErrAccountInUseCannotBeDeleted
-				} else if _, exists := accountTransactionExists[transaction.SourceAccountId]; exists {
+				} else if _, exists := accountTransactionExists[transaction.AccountId]; exists {
 					return errs.ErrAccountInUseCannotBeDeleted
 				}
 
-				accountTransactionExists[transaction.SourceAccountId] = true
-			}
-		}
-
-		var relatedTransactionsByDestinationAccount []*models.Transaction
-		err = sess.Cols("uid", "deleted", "destination_account_id", "type").Where("uid=? AND deleted=?", uid, false).In("destination_account_id", accountAndSubAccountIds).Limit(len(accountAndSubAccounts) + 1).Find(&relatedTransactionsByDestinationAccount)
-
-		if err != nil {
-			return err
-		} else if len(relatedTransactionsByDestinationAccount) > len(accountAndSubAccountIds) {
-			return errs.ErrAccountInUseCannotBeDeleted
-		} else if len(relatedTransactionsByDestinationAccount) > 0 {
-			accountTransactionExists := make(map[int64]bool)
-
-			for i := 0; i < len(relatedTransactionsByDestinationAccount); i++ {
-				transaction := relatedTransactionsByDestinationAccount[i]
-
-				if transaction.Type != models.TRANSACTION_TYPE_MODIFY_BALANCE {
-					return errs.ErrAccountInUseCannotBeDeleted
-				} else if _, exists := accountTransactionExists[transaction.DestinationAccountId]; exists {
-					return errs.ErrAccountInUseCannotBeDeleted
-				}
-
-				accountTransactionExists[transaction.DestinationAccountId] = true
+				accountTransactionExists[transaction.AccountId] = true
 			}
 		}
 

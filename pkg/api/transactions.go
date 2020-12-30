@@ -36,7 +36,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.Count+1)
+	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, nil, 0, 0, transactionListReq.Count+1)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
@@ -47,6 +47,12 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 
 	if len(transactions) < finalCount {
 		finalCount = len(transactions)
+	}
+
+	hasMore := false
+
+	if finalCount < len(transactions) {
+		hasMore = true
 	}
 
 	transactionIds := make([]int64, finalCount)
@@ -72,7 +78,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 
 	sort.Sort(transactionResps.Items)
 
-	if finalCount < len(transactions) {
+	if hasMore {
 		transactionResps.NextTimeSequenceId = &transactions[finalCount].TransactionTime
 	}
 
@@ -90,7 +96,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Page, transactionListReq.Count)
+	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, nil, 0, 0, transactionListReq.Page, transactionListReq.Count)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
@@ -138,6 +144,10 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+	}
+
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, []int64{transaction.TransactionId})
 
 	if err != nil {
@@ -178,17 +188,17 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
 	}
 
-	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId != transactionCreateReq.DestinationAccountId {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction source account is not destination account")
-		return nil, errs.ErrTransactionSourceAndDestinationIdNotEqual
+	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAccountId != 0 {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination account cannot be set")
+		return nil, errs.ErrTransactionDestinationAccountCannotBeSet
 	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId == transactionCreateReq.DestinationAccountId {
 		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] transfer transaction source account must not be destination account")
 		return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
 	}
 
-	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAmount != transactionCreateReq.DestinationAmount {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction source amount is not destination amount")
-		return nil, errs.ErrTransactionSourceAndDestinationAmountNotEqual
+	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAmount != 0 {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination amount cannot be set")
+		return nil, errs.ErrTransactionDestinationAmountCannotBeSet
 	}
 
 	uid := c.GetCurrentUid()
@@ -233,6 +243,11 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionModifyReq.Id, uid)
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, []int64{transaction.TransactionId})
 
 	if err != nil {
@@ -249,19 +264,22 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		Uid:                  uid,
 		CategoryId:           transactionModifyReq.CategoryId,
 		TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
-		SourceAccountId:      transactionModifyReq.SourceAccountId,
-		DestinationAccountId: transactionModifyReq.DestinationAccountId,
-		SourceAmount:         transactionModifyReq.SourceAmount,
-		DestinationAmount:    transactionModifyReq.DestinationAmount,
+		AccountId:            transactionModifyReq.SourceAccountId,
+		Amount:               transactionModifyReq.SourceAmount,
 		Comment:              transactionModifyReq.Comment,
+	}
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		newTransaction.RelatedAccountId = transactionModifyReq.DestinationAccountId
+		newTransaction.RelatedAccountAmount = transactionModifyReq.DestinationAmount
 	}
 
 	if newTransaction.CategoryId == transaction.CategoryId &&
 		utils.GetUnixTimeFromTransactionTime(newTransaction.TransactionTime) == utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) &&
-		newTransaction.SourceAccountId == transaction.SourceAccountId &&
-		newTransaction.DestinationAccountId == transaction.DestinationAccountId &&
-		newTransaction.SourceAmount == transaction.SourceAmount &&
-		newTransaction.DestinationAmount == transaction.DestinationAmount &&
+		newTransaction.AccountId == transaction.AccountId &&
+		newTransaction.Amount == transaction.Amount &&
+		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
+		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
 		newTransaction.Comment == transaction.Comment &&
 		len(addTransactionTagIds) < 1 &&
 		len(removeTransactionTagIds) < 1 {
@@ -303,15 +321,32 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}
 }
 
 func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest) *models.Transaction {
-	return &models.Transaction{
-		Uid:                  uid,
-		Type:                 transactionCreateReq.Type,
-		CategoryId:           transactionCreateReq.CategoryId,
-		TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
-		SourceAccountId:      transactionCreateReq.SourceAccountId,
-		DestinationAccountId: transactionCreateReq.DestinationAccountId,
-		SourceAmount:         transactionCreateReq.SourceAmount,
-		DestinationAmount:    transactionCreateReq.DestinationAmount,
-		Comment:              transactionCreateReq.Comment,
+	var transactionDbType models.TransactionDbType
+
+	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
+		transactionDbType = models.TRANSACTION_DB_TYPE_MODIFY_BALANCE
+	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_EXPENSE {
+		transactionDbType = models.TRANSACTION_DB_TYPE_EXPENSE
+	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_INCOME {
+		transactionDbType = models.TRANSACTION_DB_TYPE_INCOME
+	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {
+		transactionDbType = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
 	}
+
+	transaction := &models.Transaction{
+		Uid:             uid,
+		Type:            transactionDbType,
+		CategoryId:      transactionCreateReq.CategoryId,
+		TransactionTime: utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
+		AccountId:       transactionCreateReq.SourceAccountId,
+		Amount:          transactionCreateReq.SourceAmount,
+		Comment:         transactionCreateReq.Comment,
+	}
+
+	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {
+		transaction.RelatedAccountId = transactionCreateReq.DestinationAccountId
+		transaction.RelatedAccountAmount = transactionCreateReq.DestinationAmount
+	}
+
+	return transaction
 }

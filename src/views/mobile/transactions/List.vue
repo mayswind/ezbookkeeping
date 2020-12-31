@@ -167,8 +167,8 @@
                                     <span>{{ transaction.time | moment($t('format.time.hourMinute')) }}</span>
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                    <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.name !== transaction.destinationAccount.name">→</span>
-                                    <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.name !== transaction.destinationAccount.name">{{ transaction.destinationAccount.name }}</span>
+                                    <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>
+                                    <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                 </div>
                                 <div slot="after" class="transaction-amount" v-if="transaction.sourceAccount">
                                     <span :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">

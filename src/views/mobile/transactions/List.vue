@@ -569,14 +569,14 @@ export default {
             for (let i = 0; i < transactionMonthList.items.length; i++) {
                 const transaction = transactionMonthList.items[i];
 
-                if (!transaction.destinationAccount) {
+                if (!transaction.sourceAccount) {
                     continue;
                 }
 
-                let amount = transaction.destinationAmount;
+                let amount = transaction.sourceAmount;
 
-                if (transaction.destinationAccount.currency !== this.defaultCurrency) {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(amount, transaction.destinationAccount.currency, this.defaultCurrency);
+                if (transaction.sourceAccount.currency !== this.defaultCurrency) {
+                    const balance = this.$exchangeRates.getOtherCurrencyAmount(amount, transaction.sourceAccount.currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {

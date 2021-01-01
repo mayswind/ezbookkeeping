@@ -226,12 +226,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 		return nil, errs.ErrOperationFailed
 	}
 
-	accountMap := make(map[int64]*models.Account)
-
-	for i := 0; i < len(accountAndSubAccounts); i++ {
-		acccount := accountAndSubAccounts[i]
-		accountMap[acccount.AccountId] = acccount
-	}
+	accountMap := a.accounts.GetAccountMapByList(accountAndSubAccounts)
 
 	if _, exists := accountMap[accountModifyReq.Id]; !exists {
 		return nil, errs.ErrAccountNotFound

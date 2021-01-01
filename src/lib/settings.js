@@ -95,5 +95,6 @@ export default {
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),
     setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1',
+    isDataExportingEnabled: () => getServerSetting('e') === '1',
     clearSettings: clearSettings
 };

@@ -19,6 +19,7 @@ import ExchangeRatesPage from "../views/mobile/ExchangeRates.vue";
 import AboutPage from "../views/mobile/About.vue";
 
 import UserProfilePage from "../views/mobile/users/UserProfile.vue";
+import DataManagementPage from "../views/mobile/users/DataManagement.vue";
 import TwoFactorAuthPage from "../views/mobile/users/TwoFactorAuth.vue";
 import SessionListPage from "../views/mobile/users/SessionList.vue";
 
@@ -197,6 +198,11 @@ const routes = [
     {
         path: '/user/profile',
         component: UserProfilePage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/user/data/management',
+        component: DataManagementPage,
         beforeEnter: checkLogin
     },
     {

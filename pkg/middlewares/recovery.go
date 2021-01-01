@@ -26,7 +26,7 @@ func Recovery(c *core.Context) {
 			stack := stack(3)
 
 			log.ErrorfWithRequestIdAndExtra(c, string(stack), "System Error! because %s", err)
-			utils.PrintErrorResult(c, errs.ErrSystemError)
+			utils.PrintJsonErrorResult(c, errs.ErrSystemError)
 		}
 	}()
 

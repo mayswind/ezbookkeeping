@@ -574,6 +574,8 @@ export default {
     'Nothing has been modified': '没有修改的项目',
     'Your profile has been successfully updated': '您的用户信息更新成功',
     'Unable to update user profile': '无法更新用户信息',
+    'Data Management': '数据管理',
+    'Export Data': '导出数据',
     'Device & Sessions': '设备和会话',
     'Logout All': '注销全部',
     'Unable to get session list': '无法获取会话列表',

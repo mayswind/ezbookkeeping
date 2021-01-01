@@ -574,6 +574,8 @@ export default {
     'Nothing has been modified': 'Nothing has been modified',
     'Your profile has been successfully updated': 'Your profile has been successfully updated',
     'Unable to update user profile': 'Unable to update user profile',
+    'Data Management': 'Data Management',
+    'Export Data': 'Export Data',
     'Device & Sessions': 'Device & Sessions',
     'Logout All': 'Logout All',
     'Unable to get session list': 'Unable to get session list',

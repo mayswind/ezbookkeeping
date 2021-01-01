@@ -10,24 +10,26 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
+const tokenQueryStringParam = "token"
+
 // JWTAuthorization verifies whether current request is valid by jwt token
 func JWTAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c)
 
 	if err != nil {
-		utils.PrintErrorResult(c, err)
+		utils.PrintJsonErrorResult(c, err)
 		return
 	}
 
 	if claims.Type == core.USER_TOKEN_TYPE_REQUIRE_2FA {
 		log.WarnfWithRequestId(c, "[authorization.JWTAuthorization] user \"uid:%s\" token requires 2fa", claims.Id)
-		utils.PrintErrorResult(c, errs.ErrCurrentTokenRequire2FA)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenRequire2FA)
 		return
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
 		log.WarnfWithRequestId(c, "[authorization.JWTAuthorization] user \"uid:%s\" token type is invalid", claims.Id)
-		utils.PrintErrorResult(c, errs.ErrCurrentInvalidTokenType)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
 		return
 	}
 
@@ -35,18 +37,33 @@ func JWTAuthorization(c *core.Context) {
 	c.Next()
 }
 
+// JWTAuthorizationByQueryString verifies whether current request is valid by jwt token
+func JWTAuthorizationByQueryString(c *core.Context)  {
+	token, exists := c.GetQuery(tokenQueryStringParam)
+
+	if !exists {
+		log.ErrorfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] no token provided")
+		utils.PrintJsonErrorResult(c, errs.ErrUnauthorizedAccess)
+		return
+	}
+
+	c.Request.Header.Set("Authorization", token)
+
+	JWTAuthorization(c)
+}
+
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func JWTTwoFactorAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c)
 
 	if err != nil {
-		utils.PrintErrorResult(c, err)
+		utils.PrintJsonErrorResult(c, err)
 		return
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_REQUIRE_2FA {
 		log.WarnfWithRequestId(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%s\" token is not need two factor authorization", claims.Id)
-		utils.PrintErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
 		return
 	}
 

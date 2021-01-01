@@ -83,6 +83,20 @@ func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int, error) {
 	}
 }
 
+// GetAllTagIdsOfAllTransactions returns all transaction tag ids
+func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(uid int64) (map[int64][]int64, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	var tagIndexs []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).Where("uid=?", uid).Find(&tagIndexs)
+
+	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
+
+	return allTransactionTagIds, err
+}
+
 // GetAllTagIdsOfTransactions returns transaction tag ids for given transactions
 func (s *TransactionTagService) GetAllTagIdsOfTransactions(uid int64, transactionIds []int64) (map[int64][]int64, error) {
 	if uid <= 0 {
@@ -92,20 +106,7 @@ func (s *TransactionTagService) GetAllTagIdsOfTransactions(uid int64, transactio
 	var tagIndexs []*models.TransactionTagIndex
 	err := s.UserDataDB(uid).Where("uid=?", uid).In("transaction_id", transactionIds).Find(&tagIndexs)
 
-	allTransactionTagIds := make(map[int64][]int64)
-
-	for i := 0; i < len(tagIndexs); i++ {
-		tagIndex := tagIndexs[i]
-
-		var transactionTagIds []int64
-
-		if _, exists := allTransactionTagIds[tagIndex.TransactionId]; exists {
-			transactionTagIds = allTransactionTagIds[tagIndex.TransactionId]
-		}
-
-		transactionTagIds = append(transactionTagIds, tagIndex.TagId)
-		allTransactionTagIds[tagIndex.TransactionId] = transactionTagIds
-	}
+	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
 
 	return allTransactionTagIds, err
 }
@@ -250,4 +251,33 @@ func (s *TransactionTagService) ExistsTagName(uid int64, name string) (bool, err
 	}
 
 	return s.UserDB().Cols("name").Where("uid=? AND name=?", uid, name).Exist(&models.TransactionTag{})
+}
+
+// GetTagMapByList returns a transaction tag map by a list
+func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) map[int64]*models.TransactionTag {
+	tagMap := make(map[int64]*models.TransactionTag)
+
+	for i := 0; i < len(tags); i++ {
+		tag := tags[i]
+		tagMap[tag.TagId] = tag
+	}
+	return tagMap
+}
+
+func (s *TransactionTagService) getGroupedTransactionTagIds(tagIndexs []*models.TransactionTagIndex) map[int64][]int64 {
+	allTransactionTagIds := make(map[int64][]int64)
+
+	for i := 0; i < len(tagIndexs); i++ {
+		tagIndex := tagIndexs[i]
+
+		var transactionTagIds []int64
+
+		if _, exists := allTransactionTagIds[tagIndex.TransactionId]; exists {
+			transactionTagIds = allTransactionTagIds[tagIndex.TransactionId]
+		}
+
+		transactionTagIds = append(transactionTagIds, tagIndex.TagId)
+		allTransactionTagIds[tagIndex.TransactionId] = transactionTagIds
+	}
+	return allTransactionTagIds
 }

@@ -11,16 +11,25 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 )
 
-// PrintSuccessResult writes success response to current http context
-func PrintSuccessResult(c *core.Context, result interface{}) {
+// PrintJsonSuccessResult writes success response in json format to current http context
+func PrintJsonSuccessResult(c *core.Context, result interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  result,
 	})
 }
 
-// PrintErrorResult writes error response to current http context
-func PrintErrorResult(c *core.Context, err *errs.Error) {
+// PrintDataSuccessResult writes success response in custom content type to current http context
+func PrintDataSuccessResult(c *core.Context, contentType string, fileName string, result []byte) {
+	if fileName != "" {
+		c.Header("Content-Disposition", "attachment;filename=" + fileName)
+	}
+
+	c.Data(http.StatusOK, contentType, result)
+}
+
+// PrintJsonErrorResult writes error response in json format to current http context
+func PrintJsonErrorResult(c *core.Context, err *errs.Error) {
 	c.SetResponseError(err)
 
 	errorMessage := err.Error()
@@ -42,6 +51,27 @@ func PrintErrorResult(c *core.Context, err *errs.Error) {
 		"errorMessage": errorMessage,
 		"path":         c.Request.URL.Path,
 	})
+}
+
+// PrintDataErrorResult writes error response in custom content type to current http context
+func PrintDataErrorResult(c *core.Context, contentType string, err *errs.Error) {
+	c.SetResponseError(err)
+
+	errorMessage := err.Error()
+
+	if err.Code() == errs.ErrIncompleteOrIncorrectSubmission.Code() && len(err.BaseError) > 0 {
+		validationErrors, ok := err.BaseError[0].(validator.ValidationErrors)
+
+		if ok {
+			for _, err := range validationErrors {
+				errorMessage = getValidationErrorText(err)
+				break
+			}
+		}
+	}
+
+	c.Data(err.HttpStatusCode, contentType, []byte(errorMessage))
+	c.Abort()
 }
 
 func getValidationErrorText(err validator.FieldError) string {

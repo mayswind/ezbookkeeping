@@ -18,14 +18,15 @@ const (
 
 // Sub categories of normal error
 const (
-	NormalSubcategoryGlobal      = 0
-	NormalSubcategoryUser        = 1
-	NormalSubcategoryToken       = 2
-	NormalSubcategoryTwofactor   = 3
-	NormalSubcategoryAccount     = 4
-	NormalSubcategoryTransaction = 5
-	NormalSubcategoryCategory    = 6
-	NormalSubcategoryTag         = 7
+	NormalSubcategoryGlobal         = 0
+	NormalSubcategoryUser           = 1
+	NormalSubcategoryToken          = 2
+	NormalSubcategoryTwofactor      = 3
+	NormalSubcategoryAccount        = 4
+	NormalSubcategoryTransaction    = 5
+	NormalSubcategoryCategory       = 6
+	NormalSubcategoryTag            = 7
+	NormalSubcategoryDataManagement = 8
 )
 
 // Error represents the specific error returned to user

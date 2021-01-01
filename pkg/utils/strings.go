@@ -29,8 +29,9 @@ func SubString(str string, start int, length int) string {
 	end := 0
 
 	if start < 0 {
-		start = realLength - 1 + start
+		start = realLength + start
 	}
+
 	end = start + length
 
 	if start > end {

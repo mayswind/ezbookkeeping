@@ -3,10 +3,12 @@ import moment from 'moment';
 import userState from "./userstate.js";
 import exchangeRates from "./exchangeRates.js";
 
+const baseUrlPath = '/api';
+
 let needBlockRequest = false;
 let blockedRequests = [];
 
-axios.defaults.baseURL = '/api';
+axios.defaults.baseURL = baseUrlPath;
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 
@@ -120,6 +122,10 @@ export default {
             blockedRequests.forEach(func => func(newToken));
             blockedRequests.length = 0;
         });
+    },
+    getDataExportUrl: () => {
+        const token = userState.getToken();
+        return `${baseUrlPath}/data/export.csv?token=${token}`;
     },
     getTokens: () => {
         return axios.get('v1/tokens/list.json');

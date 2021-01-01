@@ -321,3 +321,14 @@ func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 		return err
 	})
 }
+
+// GetAccountMapByList returns an account map by a list
+func (s *AccountService) GetAccountMapByList(accounts []*models.Account) map[int64]*models.Account {
+	accountMap := make(map[int64]*models.Account)
+
+	for i := 0; i < len(accounts); i++ {
+		account := accounts[i]
+		accountMap[account.AccountId] = account
+	}
+	return accountMap
+}

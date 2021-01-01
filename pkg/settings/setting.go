@@ -153,6 +153,9 @@ type Config struct {
 
 	// User
 	EnableUserRegister bool
+
+	// Data
+	EnableDataExport bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -209,6 +212,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadUserConfiguration(config, cfgFile, "user")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadDataConfiguration(config, cfgFile, "data")
 
 	if err != nil {
 		return nil, err
@@ -373,6 +382,12 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 
 func loadUserConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableUserRegister = getConfigItemBoolValue(configFile, sectionName, "enable_register", false)
+
+	return nil
+}
+
+func loadDataConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableDataExport = getConfigItemBoolValue(configFile, sectionName, "enable_export", false)
 
 	return nil
 }

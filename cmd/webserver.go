@@ -155,6 +155,14 @@ func startWebServer(c *cli.Context) error {
 			apiRoute.POST("/register.json", bindApi(api.Users.UserRegistrationNotAllowed))
 		}
 
+		if config.EnableDataExport {
+			dataRoute := apiRoute.Group("/data")
+			dataRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
+			{
+				dataRoute.GET("/export.csv", bindCsv(api.DataManagements.ExportDataHandler))
+			}
+		}
+
 		apiRoute.GET("/logout.json", bindApi(api.Tokens.TokenRevokeCurrentHandler))
 
 		apiV1Route := apiRoute.Group("/v1")
@@ -255,9 +263,22 @@ func bindApi(fn core.ApiHandlerFunc) gin.HandlerFunc {
 		result, err := fn(c)
 
 		if err != nil {
-			utils.PrintErrorResult(c, err)
+			utils.PrintJsonErrorResult(c, err)
 		} else {
-			utils.PrintSuccessResult(c, result)
+			utils.PrintJsonSuccessResult(c, result)
+		}
+	}
+}
+
+func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		result, fileName, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			utils.PrintDataSuccessResult(c, "text/csv", fileName, result)
 		}
 	}
 }

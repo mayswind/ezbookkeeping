@@ -315,3 +315,14 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 		return err
 	})
 }
+
+// GetCategoryMapByList returns a transaction category map by a list
+func (s *TransactionCategoryService) GetCategoryMapByList(categories []*models.TransactionCategory) map[int64]*models.TransactionCategory {
+	categoryMap := make(map[int64]*models.TransactionCategory)
+
+	for i := 0; i < len(categories); i++ {
+		category := categories[i]
+		categoryMap[category.CategoryId] = category
+	}
+	return categoryMap
+}

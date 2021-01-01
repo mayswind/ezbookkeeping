@@ -302,6 +302,7 @@ export default {
         'password is wrong': '密码错误',
         'username already exists': '用户名已经存在',
         'email already exists': '邮箱已经存在',
+        'user registration not allowed': '不允许用户注册',
         'login name is invalid': '登录名无效',
         'login name or password is invalid': '登录名或密码无效',
         'login name or password is wrong': '登录名或密码错误',

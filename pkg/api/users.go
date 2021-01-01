@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
+	"github.com/mayswind/lab/pkg/settings"
 )
 
 // UsersApi represents user api
@@ -27,6 +28,10 @@ var (
 
 // UserRegisterHandler saves a new user by request parameters
 func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Error) {
+	if !settings.Container.Current.EnableUserRegister {
+		return a.UserRegistrationNotAllowed(c)
+	}
+
 	var userRegisterReq models.UserRegisterRequest
 	err := c.ShouldBindJSON(&userRegisterReq)
 
@@ -74,6 +79,11 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	return authResp, nil
+}
+
+// UserRegistrationNotAllowed returns user registration not allowed error
+func (a *UsersApi) UserRegistrationNotAllowed(c *core.Context) (interface{}, *errs.Error) {
+	return nil, errs.ErrUserRegistrationNotAllowed
 }
 
 // UserProfileHandler returns user profile of current user

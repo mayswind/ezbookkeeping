@@ -151,6 +151,8 @@ func startWebServer(c *cli.Context) error {
 
 		if config.EnableUserRegister {
 			apiRoute.POST("/register.json", bindApi(api.Users.UserRegisterHandler))
+		} else {
+			apiRoute.POST("/register.json", bindApi(api.Users.UserRegistrationNotAllowed))
 		}
 
 		apiRoute.GET("/logout.json", bindApi(api.Tokens.TokenRevokeCurrentHandler))

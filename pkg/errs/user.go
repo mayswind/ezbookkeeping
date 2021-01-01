@@ -17,4 +17,5 @@ var (
 	ErrUserPasswordWrong          = NewNormalError(NormalSubcategoryUser, 8, http.StatusBadRequest, "password is wrong")
 	ErrUsernameAlreadyExists      = NewNormalError(NormalSubcategoryUser, 9, http.StatusBadRequest, "username already exists")
 	ErrUserEmailAlreadyExists     = NewNormalError(NormalSubcategoryUser, 10, http.StatusBadRequest, "email already exists")
+	ErrUserRegistrationNotAllowed = NewNormalError(NormalSubcategoryUser, 11, http.StatusBadRequest, "user registration not allowed")
 )

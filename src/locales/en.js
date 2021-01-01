@@ -302,6 +302,7 @@ export default {
         'password is wrong': 'Password is wrong',
         'username already exists': 'Username already exists',
         'email already exists': 'Email already exists',
+        'user registration not allowed': 'User registration is not allowed',
         'login name is invalid': 'Login name is invalid',
         'login name or password is invalid': 'Login name or password is invalid',
         'login name or password is wrong': 'Login name or password is wrong',

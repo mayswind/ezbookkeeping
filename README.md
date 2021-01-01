@@ -6,21 +6,30 @@
 [![Latest Release](https://img.shields.io/github/release/mayswind/lab.svg?style=flat)](https://github.com/mayswind/lab/releases)
 
 ## Introduction
-lab is a lightweight account book app hosted by yourself. This project is now **under construction**.
+The lab is a lightweight account book app hosted by yourself. It can be deployed on almost all platforms, including Windows, macOS and Linux on x86, amd64 and ARM architectures. You can even deploy it on an raspberry device. It also supports many different databases, including sqlite and mysql. With docker, you can just deploy it via one command without complicated configuration.
+
+This project is still **under construction**.
 
 ## Features
 1. Open source & Self-hosted
 2. Lightweight & Fast
 3. Easy to install
+    * Docker support
+    * Multiple database support (sqlite, mysql, etc.)
+    * Multiple os & architecture support (Windows, macOS, Linux & x86, amd64, ARM)
 4. User-friendly interface
-    * Almost native app experience
-    * Two-level account support
-    * Two-level category support
-    * Preset various categories
-5. Two-factor authentication
-6. Application lock (WebAuthn support)
-7. Multi-language support
-8. Dark theme
+    * Desktop (planning) and mobile support
+    * Almost native app experience (for mobile device)
+    * Two-level account & two-level category support
+    * Plentiful preset categories
+    * Searching & filtering history records
+    * Data statistics
+    * Dark theme
+5. Multiple currency support & automatically updating exchange rates
+6. Two-factor authentication
+7. Application lock (WebAuthn support)
+8. Data export
+9. Multi-language support
 
 ## Screenshots
 ### Mobile Device
@@ -44,7 +53,7 @@ Latest release: [https://github.com/mayswind/lab/releases](https://github.com/ma
 
     $ ./lab server run
 
-lab will listen at port 8080 as default. You can visit http://<YOUR_HOST_ADDRESS>:8080/ .
+The lab will listen at port 8080 as default. Then you can visit http://<YOUR_HOST_ADDRESS>:8080/ .
 
 ### Build from source
 

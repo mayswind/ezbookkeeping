@@ -702,6 +702,9 @@ const allCategoryIcons = {
     '3010': {
         icon: 'las la-plus-circle'
     },
+    '3100': {
+        icon: 'las la-recycle'
+    },
     // 4000 - 4099 : Transfer
     '4000': {
         icon: 'las la-exchange-alt'

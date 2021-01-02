@@ -886,6 +886,7 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 	})
 }
 
+// GetRelatedTransferTransaction returns the related transaction for transfer transaction
 func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *models.Transaction, relatedTransactionId int64) *models.Transaction {
 	var relatedType models.TransactionDbType
 	var relatedTransactionTime int64

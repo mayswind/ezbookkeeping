@@ -84,7 +84,7 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 	var allTransactions []*models.Transaction
 
 	for maxTime > 0 {
-		transactions, err := a.transactions.GetTransactionsByMaxTime(uid, maxTime, nil, 0, 0, pageCountForDataExport)
+		transactions, err := a.transactions.GetAllTransactionsByMaxTime(uid, maxTime, pageCountForDataExport)
 
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", maxTime, uid, err.Error())

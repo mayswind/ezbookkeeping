@@ -130,7 +130,7 @@
                             <f7-list-item class="transaction-info" chevron-center
                                           v-for="(transaction, idx) in transactionMonthList.items"
                                           :key="transaction.id" :id="transaction | transactionDomId"
-                                          :link="'/transaction/detail?id=' + transaction.id"
+                                          :link="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance ? '/transaction/detail?id=' + transaction.id : null"
                                           swipeout
                             >
                                 <div slot="media" class="display-flex no-padding-horizontal">
@@ -146,6 +146,9 @@
                                         <f7-icon v-if="transaction.category && transaction.category.color"
                                                  :icon="transaction.category.icon | categoryIcon"
                                                  :style="transaction.category.color | categoryIconStyle('var(--category-icon-color)')">
+                                        </f7-icon>
+                                        <f7-icon v-else-if="!transaction.category || !transaction.category.color"
+                                                 f7="pencil_ellipsis_rectangle">
                                         </f7-icon>
                                     </div>
                                 </div>
@@ -176,7 +179,10 @@
                                     </span>
                                 </div>
                                 <f7-swipeout-actions right>
-                                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(transaction)"></f7-swipeout-button>
+                                    <f7-swipeout-button color="orange" close
+                                                        :text="$t('Edit')"
+                                                        v-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
+                                                        @click="edit(transaction)"></f7-swipeout-button>
                                     <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(transaction, false)">
                                         <f7-icon f7="trash"></f7-icon>
                                     </f7-swipeout-button>
@@ -215,6 +221,11 @@ export default {
     data() {
         return {
             transactions: [],
+            query: {
+                type: 0,
+                categoryId: 0,
+                accountId: 0
+            },
             allAccounts: {},
             allCategories: {},
             allTags: {},
@@ -245,6 +256,21 @@ export default {
         }
     },
     created() {
+        const self = this;
+        const query = self.$f7route.query;
+
+        if (query.type) {
+            self.query.type = query.type;
+        }
+
+        if (query.categoryId) {
+            self.query.categoryId = query.categoryId;
+        }
+
+        if (query.accountId) {
+            self.query.accountId = query.accountId;
+        }
+
         this.reload(null);
     },
     methods: {
@@ -263,7 +289,10 @@ export default {
                 self.$services.getAllTransactionCategories({}),
                 self.$services.getAllTransactionTags(),
                 self.$services.getTransactions({
-                    maxTime: self.maxTime
+                    maxTime: self.maxTime,
+                    type: self.query.type,
+                    categoryId: self.query.categoryId,
+                    accountId: self.query.accountId
                 })
             ];
 
@@ -384,7 +413,10 @@ export default {
             self.loadingMore = true;
 
             self.$services.getTransactions({
-                maxTime: self.maxTime
+                maxTime: self.maxTime,
+                type: self.query.type,
+                categoryId: self.query.categoryId,
+                accountId: self.query.accountId
             }).then(response => {
                 self.loadingMore = false;
 
@@ -595,6 +627,12 @@ export default {
                     totalExpense += amount;
                 } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
                     totalIncome += amount;
+                } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Transfer && this.query.accountId) {
+                    if (this.query.accountId === transaction.sourceAccountId) {
+                        totalExpense += amount;
+                    } else if (this.query.accountId === transaction.destinationAccountId) {
+                        totalIncome += amount;
+                    }
                 }
             }
 

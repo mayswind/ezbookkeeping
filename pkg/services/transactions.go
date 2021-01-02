@@ -31,8 +31,13 @@ var (
 	}
 )
 
+// GetAllTransactionsByMaxTime returns all transactions before given time
+func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int) ([]*models.Transaction, error) {
+	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, count)
+}
+
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, transactionType *models.TransactionDbType, categoryId int64, accountId int64, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -49,15 +54,26 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 
-	if transactionType != nil {
+	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
 		condition = condition + " AND type=?"
 		conditionParams = append(conditionParams, transactionType)
-	} else if accountId == 0 {
-		condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		if accountId == 0 {
+			condition = condition + " AND type=?"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		} else {
+			condition = condition + " AND (type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+		}
+	} else {
+		if accountId == 0 {
+			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		}
 	}
 
 	if categoryId > 0 {
@@ -81,7 +97,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType *models.TransactionDbType, categoryId int64, accountId int64, page int, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryId int64, accountId int64, page int, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -114,15 +130,26 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	conditionParams = append(conditionParams, startUnixTime)
 	conditionParams = append(conditionParams, endUnixTime)
 
-	if transactionType != nil {
+	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
 		condition = condition + " AND type=?"
 		conditionParams = append(conditionParams, transactionType)
-	} else if accountId == 0 {
-		condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-		conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		if accountId == 0 {
+			condition = condition + " AND type=?"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		} else {
+			condition = condition + " AND (type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+		}
+	} else {
+		if accountId == 0 {
+			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		}
 	}
 
 	if categoryId > 0 {

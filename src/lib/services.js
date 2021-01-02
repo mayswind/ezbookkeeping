@@ -219,8 +219,8 @@ export default {
             id
         });
     },
-    getTransactions: ({ maxTime }) => {
-        return axios.get('v1/transactions/list.json?max_time=' + maxTime + '&count=20');
+    getTransactions: ({ maxTime, type, categoryId, accountId }) => {
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&count=20`);
     },
     getTransaction: ({ id }) => {
         return axios.get('v1/transactions/get.json?id=' + id);

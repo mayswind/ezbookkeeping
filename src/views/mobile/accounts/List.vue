@@ -129,7 +129,7 @@
                                   :key="account.id" :id="account | accountDomId"
                                   :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
                                   :after="accountBalance(account) | currency(account.currency)"
-                                  :link="account.type === $constants.account.allAccountTypes.SingleAccount ? '#' : null"
+                                  :link="account.type === $constants.account.allAccountTypes.SingleAccount ? '/transaction/list?accountId=' + account.id : null"
                                   swipeout @taphold.native="setSortable()"
                     >
                         <f7-block slot="title" class="no-padding">
@@ -147,7 +147,7 @@
                                     <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
                                                   :key="subAccount.id" :id="subAccount | accountDomId"
                                                   :title="subAccount.name" :after="accountBalance(subAccount) | currency(subAccount.currency)"
-                                                  link="#"
+                                                  :link="'/transaction/list?accountId=' + subAccount.id"
                                     >
                                         <f7-icon slot="media" :icon="subAccount.icon | accountIcon"
                                                  :style="subAccount.color | accountIconStyle('var(--default-icon-color)')">

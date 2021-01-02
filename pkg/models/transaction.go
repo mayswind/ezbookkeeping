@@ -72,16 +72,22 @@ type TransactionModifyRequest struct {
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
-	MaxTime int64 `form:"max_time" binding:"min=0"`
-	Count   int   `form:"count" binding:"required,min=1,max=50"`
+	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
+	CategoryId int64             `form:"category_id" binding:"min=0"`
+	AccountId  int64             `form:"account_id" binding:"min=0"`
+	MaxTime    int64             `form:"max_time" binding:"min=0"`
+	Count      int               `form:"count" binding:"required,min=1,max=50"`
 }
 
 // TransactionListInMonthByPageRequest represents all parameters of transaction listing by month request
 type TransactionListInMonthByPageRequest struct {
-	Year  int `form:"year" binding:"required,min=1"`
-	Month int `form:"month" binding:"required,min=1"`
-	Page  int `form:"page" binding:"required,min=1"`
-	Count int `form:"count" binding:"required,min=1,max=50"`
+	Year       int               `form:"year" binding:"required,min=1"`
+	Month      int               `form:"month" binding:"required,min=1"`
+	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
+	CategoryId int64             `form:"category_id" binding:"min=0"`
+	AccountId  int64             `form:"account_id" binding:"min=0"`
+	Page       int               `form:"page" binding:"required,min=1"`
+	Count      int               `form:"count" binding:"required,min=1,max=50"`
 }
 
 // TransactionGetRequest represents all parameters of transaction getting request

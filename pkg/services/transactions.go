@@ -33,11 +33,11 @@ var (
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, count)
+	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, 0, "", count)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -50,7 +50,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 	var err error
 
 	condition := "uid=? AND deleted=?"
-	conditionParams := make([]interface{}, 0, 10)
+	conditionParams := make([]interface{}, 0, 16)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 
@@ -86,9 +86,19 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 		conditionParams = append(conditionParams, accountId)
 	}
 
+	if keyword != "" {
+		condition = condition + " AND comment LIKE ?"
+		conditionParams = append(conditionParams, "%%" + keyword + "%%")
+	}
+
 	if maxTime > 0 {
 		condition = condition + " AND transaction_time<=?"
 		conditionParams = append(conditionParams, maxTime)
+	}
+
+	if minTime > 0 {
+		condition = condition + " AND transaction_time>=?"
+		conditionParams = append(conditionParams, minTime)
 	}
 
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
@@ -97,7 +107,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryId int64, accountId int64, page int, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, page int, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -124,7 +134,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	var transactions []*models.Transaction
 
 	condition := "uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?"
-	conditionParams := make([]interface{}, 0, 12)
+	conditionParams := make([]interface{}, 0, 16)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 	conditionParams = append(conditionParams, startUnixTime)
@@ -160,6 +170,11 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	if accountId > 0 {
 		condition = condition + " AND account_id=?"
 		conditionParams = append(conditionParams, accountId)
+	}
+
+	if keyword != "" {
+		condition = condition + " AND comment LIKE ?"
+		conditionParams = append(conditionParams, "%%" + keyword + "%%")
 	}
 
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)

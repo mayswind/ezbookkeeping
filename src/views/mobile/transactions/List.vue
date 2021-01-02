@@ -8,10 +8,35 @@
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
-            <f7-nav-right v-if="false">
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
+            <f7-nav-right class="navbar-compact-icons">
+                <f7-link icon-f7="search" class="searchbar-enable" data-searchbar=".searchbar-keyword"></f7-link>
+                <f7-link icon-f7="plus" :href="'/transaction/add?type=' + query.type + '&categoryId=' + query.categoryId + '&accountId=' + query.accountId"></f7-link>
             </f7-nav-right>
+
+            <f7-searchbar
+                expandable custom-search
+                class="searchbar-keyword"
+                :value="query.keyword"
+                :placeholder="$t('Search')"
+                :disable-button-text="$t('Cancel')"
+                @change="changeKeywordFilter($event.target.value)"
+            ></f7-searchbar>
         </f7-navbar>
+
+        <f7-toolbar tabbar bottom>
+            <f7-link popover-open=".date-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ $t('Date') }}</span>
+            </f7-link>
+            <f7-link popover-open=".type-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ $t('Type') }}</span>
+            </f7-link>
+            <f7-link popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
+                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ $t('Category') }}</span>
+            </f7-link>
+            <f7-link popover-open=".account-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ $t('Account') }}</span>
+            </f7-link>
+        </f7-toolbar>
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
@@ -198,11 +223,133 @@
             <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
         </f7-block>
 
-        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
-            <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
-            </f7-actions-group>
-        </f7-actions>
+        <f7-popover class="date-popover-menu" :opened="showDatePopover"
+                    @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
+            <f7-list>
+                <f7-list-item :title="$t('All')" @click="changeDateFilter(0)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 0"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Today')" @click="changeDateFilter(1)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 1"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Yesterday')" @click="changeDateFilter(2)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 2"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Recent 7 days')" @click="changeDateFilter(3)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 3"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Recent 30 days')" @click="changeDateFilter(4)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 4"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('This week')" @click="changeDateFilter(5)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 5"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Last week')" @click="changeDateFilter(6)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 6"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('This month')" @click="changeDateFilter(7)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 7"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Last month')" @click="changeDateFilter(8)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 8"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('This year')" @click="changeDateFilter(9)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 9"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Last year')" @click="changeDateFilter(10)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 10"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Custom')" @click="changeDateFilter(11)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 11"></f7-icon>
+                    <div slot="footer" v-if="query.dateType === 11 && query.minTime && query.maxTime">
+                        <span>{{ query.minTime | moment($t('format.datetime.long-without-second')) }}</span>
+                        <span>&nbsp;-&nbsp;</span>
+                        <br/>
+                        <span>{{ query.maxTime | moment($t('format.datetime.long-without-second')) }}</span>
+                    </div>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <date-range-selection-sheet :title="$t('Custom Date Range')"
+                                    :show.sync="showCustomDateRangeSheet"
+                                    :min-time="query.minTime"
+                                    :max-time="query.maxTime"
+                                    @dateRange:change="changeCustomDateFilter">
+        </date-range-selection-sheet>
+
+        <f7-popover class="type-popover-menu" :opened="showTypePopover"
+                    @popover:opened="showTypePopover = true" @popover:closed="showTypePopover = false">
+            <f7-list>
+                <f7-list-item :title="$t('All')" @click="changeTypeFilter(0)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Income')" @click="changeTypeFilter(2)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Expense')" @click="changeTypeFilter(3)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
+                </f7-list-item>
+                <f7-list-item :title="$t('Transfer')" @click="changeTypeFilter(4)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <f7-popover class="category-popover-menu" :opened="showCategoryPopover"
+                    @popover:opened="showCategoryPopover = true" @popover:closed="showCategoryPopover = false">
+            <f7-list>
+                <f7-list-item :title="$t('All')" @click="changeCategoryFilter('0')">
+                    <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
+                </f7-list-item>
+                <f7-list-item v-for="category in allCategories"
+                              v-show="category.parentId > 0 && (!query.type || category.type === query.type - 1)"
+                              :key="category.id"
+                              :title="category.name"
+                              @click="changeCategoryFilter(category.id)"
+                >
+                    <f7-icon slot="media"
+                             :icon="category.icon | categoryIcon"
+                             :style="category.color | categoryIconStyle('var(--default-icon-color)')">
+                    </f7-icon>
+                    <f7-icon slot="after"
+                             class="list-item-checked"
+                             f7="checkmark_alt"
+                             v-if="query.categoryId === category.id">
+                    </f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <f7-popover class="account-popover-menu" :opened="showAccountPopover"
+                    @popover:opened="showAccountPopover = true" @popover:closed="showAccountPopover = false">
+            <f7-list>
+                <f7-list-item :title="$t('All')" @click="changeAccountFilter('0')">
+                    <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
+                </f7-list-item>
+                <f7-list-item v-for="account in allAccounts"
+                              v-show="!account.hidden"
+                              :key="account.id"
+                              :title="account.name"
+                              @click="changeAccountFilter(account.id)"
+                >
+                    <f7-icon slot="media"
+                             :icon="account.icon | accountIcon"
+                             :style="account.color | accountIconStyle('var(--default-icon-color)')">
+                    </f7-icon>
+                    <f7-icon slot="after"
+                             class="list-item-checked"
+                             f7="checkmark_alt"
+                             v-if="query.accountId === account.id">
+                    </f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
@@ -222,9 +369,13 @@ export default {
         return {
             transactions: [],
             query: {
+                dateType: 0,
+                maxTime: 0,
+                minTime: 0,
                 type: 0,
-                categoryId: 0,
-                accountId: 0
+                categoryId: '0',
+                accountId: '0',
+                keyword: ''
             },
             allAccounts: {},
             allCategories: {},
@@ -233,7 +384,11 @@ export default {
             loading: true,
             loadingMore: false,
             transactionToDelete: null,
-            showMoreActionSheet: false,
+            showDatePopover: false,
+            showTypePopover: false,
+            showCategoryPopover: false,
+            showAccountPopover: false,
+            showCustomDateRangeSheet: false,
             showDeleteActionSheet: false
         };
     },
@@ -282,7 +437,11 @@ export default {
                 self.loading = true;
             }
 
-            self.maxTime = 0;
+            if (self.query.maxTime > 0) {
+                self.maxTime = self.query.maxTime * 1000 + 999;
+            } else {
+                self.maxTime = 0;
+            }
 
             const promises = [
                 self.$services.getAllAccounts({ visibleOnly: false }),
@@ -290,9 +449,11 @@ export default {
                 self.$services.getAllTransactionTags(),
                 self.$services.getTransactions({
                     maxTime: self.maxTime,
+                    minTime: self.query.minTime * 1000,
                     type: self.query.type,
                     categoryId: self.query.categoryId,
-                    accountId: self.query.accountId
+                    accountId: self.query.accountId,
+                    keyword: self.query.keyword
                 })
             ];
 
@@ -406,7 +567,7 @@ export default {
                 return;
             }
 
-            if (self.loadingMore) {
+            if (self.loadingMore || self.loading) {
                 return;
             }
 
@@ -414,9 +575,11 @@ export default {
 
             self.$services.getTransactions({
                 maxTime: self.maxTime,
+                minTime: self.query.minTime * 1000,
                 type: self.query.type,
                 categoryId: self.query.categoryId,
-                accountId: self.query.accountId
+                accountId: self.query.accountId,
+                keyword: self.query.keyword
             }).then(response => {
                 self.loadingMore = false;
 
@@ -439,6 +602,123 @@ export default {
                     self.$toast('Unable to get account list');
                 }
             });
+        },
+        changeDateFilter(dateType) {
+            if (dateType === 11) { // Custom
+                this.showCustomDateRangeSheet = true;
+                this.showDatePopover = false;
+                return;
+            } else if (this.query.dateType === dateType) {
+                return;
+            }
+
+            if (dateType === 0) { // All
+                this.query.maxTime = 0;
+                this.query.minTime = 0;
+            } else if (dateType === 1) { // Today
+                this.query.maxTime = this.$utilities.getTodayLastUnixTime();
+                this.query.minTime = this.$utilities.getTodayFirstUnixTime();
+            } else if (dateType === 2) { // Yesterday
+                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
+            } else if (dateType === 3) { // Last 7 days
+                this.query.maxTime = this.$utilities.getUnixTime(new Date());
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.query.maxTime, 7, 'days');
+            } else if (dateType === 4) { // Last 30 days
+                this.query.maxTime = this.$utilities.getUnixTime(new Date());
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.query.maxTime, 30, 'days');
+            } else if (dateType === 5) { // This week
+                this.query.maxTime = this.$utilities.getThisWeekLastUnixTime();
+                this.query.minTime = this.$utilities.getThisWeekFirstUnixTime();
+            } else if (dateType === 6) { // Last week
+                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
+            } else if (dateType === 7) { // This month
+                this.query.maxTime = this.$utilities.getThisMonthLastUnixTime();
+                this.query.minTime = this.$utilities.getThisMonthFirstUnixTime();
+            } else if (dateType === 8) { // Last month
+                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
+            } else if (dateType === 9) { // This year
+                this.query.maxTime = this.$utilities.getThisYearLastUnixTime();
+                this.query.minTime = this.$utilities.getThisYearFirstUnixTime();
+            } else if (dateType === 10) { // Last year
+                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
+                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
+            } else {
+                return;
+            }
+
+            this.transactions = [];
+            this.query.dateType = dateType;
+
+            this.showDatePopover = false;
+            this.reload(null);
+        },
+        changeCustomDateFilter(minTime, maxTime) {
+            if (!minTime || !maxTime) {
+                return;
+            }
+
+            this.query.maxTime = maxTime;
+            this.query.minTime = minTime;
+
+            console.log(this.$utilities.formatUnixTime(this.query.maxTime, 'YYYY-MM-DD HH:mm:ss'));
+            console.log(this.$utilities.formatUnixTime(this.query.minTime, 'YYYY-MM-DD HH:mm:ss'));
+
+            this.transactions = [];
+            this.query.dateType = 11;
+
+            this.showCustomDateRangeSheet = false;
+
+            this.reload(null);
+        },
+        changeTypeFilter(type) {
+            if (this.query.type === type) {
+                return;
+            }
+
+            if (type && this.query.categoryId) {
+                const category = this.allCategories[this.query.categoryId];
+
+                if (category && category.type !== type - 1) {
+                    this.query.categoryId = 0;
+                }
+            }
+
+            this.transactions = [];
+            this.query.type = type;
+            this.showTypePopover = false;
+            this.reload(null);
+        },
+        changeCategoryFilter(categoryId) {
+            if (this.query.categoryId === categoryId) {
+                return;
+            }
+
+            this.transactions = [];
+            this.query.categoryId = categoryId;
+            this.showCategoryPopover = false;
+            this.reload(null);
+        },
+        changeAccountFilter(accountId) {
+            if (this.query.accountId === accountId) {
+                return;
+            }
+
+            this.transactions = [];
+            this.query.accountId = accountId;
+            this.showAccountPopover = false;
+            this.reload(null);
+        },
+        changeKeywordFilter(keyword) {
+            if (this.query.keyword === keyword) {
+                return;
+            }
+
+            this.transactions = [];
+            this.query.keyword = keyword;
+            this.reload(null);
         },
         edit(transaction) {
             this.$f7router.navigate('/transaction/edit?id=' + transaction.id);
@@ -516,7 +796,7 @@ export default {
 
                 for (let i = 0; i < result.items.length; i++) {
                     const transaction = result.items[i];
-                    const transactionTime = this.$utilities.parseDateFromUnixtime(transaction.time);
+                    const transactionTime = this.$utilities.parseDateFromUnixTime(transaction.time);
                     transaction.day = this.$utilities.getDay(transactionTime);
                     transaction.dayOfWeek = this.$t(`datetime.${this.$utilities.getDayOfWeek(transactionTime)}.short`);
                     transaction.sourceAccount = this.allAccounts[transaction.sourceAccountId];
@@ -750,5 +1030,14 @@ export default {
     width: 100%;
     transform-origin: 50% 100%;
     transform: scaleY(calc(1 / var(--f7-device-pixel-ratio)));
+}
+
+.tabbar-item-changed {
+    color: var(--f7-theme-color);
+}
+
+.date-popover-menu .popover-inner, .category-popover-menu .popover-inner, .account-popover-menu .popover-inner {
+    max-height: 400px;
+    overflow-Y: auto;
 }
 </style>

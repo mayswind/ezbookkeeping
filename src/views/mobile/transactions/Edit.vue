@@ -421,6 +421,12 @@ export default {
             promises.push(self.$services.getTransaction({ id: self.editTransactionId }));
         }
 
+        if (query.type && query.type !== '0' &&
+            query.type >= self.$constants.transaction.allTransactionTypes.Income &&
+            query.type <= self.$constants.transaction.allTransactionTypes.Transfer) {
+            self.transaction.type = parseInt(query.type);
+        }
+
         Promise.all(promises).then(function (responses) {
             const accountData = responses[0].data;
             const categoryData = responses[1].data;
@@ -461,22 +467,55 @@ export default {
 
             if (self.allCategories[self.$constants.category.allCategoryTypes.Expense] &&
                 self.allCategories[self.$constants.category.allCategoryTypes.Expense].length) {
-                self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Expense]);
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Expense], query.categoryId)) {
+                    self.transaction.expenseCategory = query.categoryId;
+                }
+
+                if (!self.transaction.expenseCategory) {
+                    self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Expense]);
+                }
             }
 
             if (self.allCategories[self.$constants.category.allCategoryTypes.Income] &&
                 self.allCategories[self.$constants.category.allCategoryTypes.Income].length) {
-                self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Income]);
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Income], query.categoryId)) {
+                    self.transaction.incomeCategory = query.categoryId;
+                }
+
+                if (!self.transaction.incomeCategory) {
+                    self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Income]);
+                }
             }
 
             if (self.allCategories[self.$constants.category.allCategoryTypes.Transfer] &&
                 self.allCategories[self.$constants.category.allCategoryTypes.Transfer].length) {
-                self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Transfer]);
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Transfer], query.categoryId)) {
+                    self.transaction.transferCategory = query.categoryId;
+                }
+
+                if (!self.transaction.transferCategory) {
+                    self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Transfer]);
+                }
             }
 
             if (self.allAccounts.length) {
-                self.transaction.sourceAccountId = self.allAccounts[0].id;
-                self.transaction.destinationAccountId = self.allAccounts[0].id;
+                if (query.accountId && query.accountId !== '0') {
+                    for (let i = 0; i < self.allAccounts.length; i++) {
+                        if (self.allAccounts[i].id === query.accountId) {
+                            self.transaction.sourceAccountId = query.accountId;
+                            self.transaction.destinationAccountId = query.accountId;
+                            break;
+                        }
+                    }
+                }
+
+                if (!self.transaction.sourceAccountId) {
+                    self.transaction.sourceAccountId = self.allAccounts[0].id;
+                }
+
+                if (!self.transaction.destinationAccountId) {
+                    self.transaction.destinationAccountId = self.allAccounts[0].id;
+                }
             }
 
             if (self.editTransactionId) {
@@ -598,6 +637,21 @@ export default {
                     }
                 }
             });
+        },
+        isCategoryIdAvailable(categories, categoryId) {
+            if (!categories || !categories.length) {
+                return false;
+            }
+
+            for (let i = 0; i < categories.length; i++) {
+                for (let j = 0; j < categories[i].subCategories.length; j++) {
+                    if (categories[i].subCategories[j].id === categoryId) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         },
         getFirstAvailableCategoryId(categories) {
             if (!categories || !categories.length) {

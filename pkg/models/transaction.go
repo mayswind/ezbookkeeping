@@ -75,7 +75,9 @@ type TransactionListByMaxTimeRequest struct {
 	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryId int64             `form:"category_id" binding:"min=0"`
 	AccountId  int64             `form:"account_id" binding:"min=0"`
+	Keyword    string            `form:"keyword"`
 	MaxTime    int64             `form:"max_time" binding:"min=0"`
+	MinTime    int64             `form:"min_time" binding:"min=0"`
 	Count      int               `form:"count" binding:"required,min=1,max=50"`
 }
 
@@ -86,6 +88,7 @@ type TransactionListInMonthByPageRequest struct {
 	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryId int64             `form:"category_id" binding:"min=0"`
 	AccountId  int64             `form:"account_id" binding:"min=0"`
+	Keyword    string            `form:"keyword"`
 	Page       int               `form:"page" binding:"required,min=1"`
 	Count      int               `form:"count" binding:"required,min=1,max=50"`
 }

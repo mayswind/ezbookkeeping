@@ -33,7 +33,7 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
-function parseDateFromUnixtime(unixTime) {
+function parseDateFromUnixTime(unixTime) {
     return moment.unix(unixTime);
 }
 
@@ -74,6 +74,54 @@ function getDay(date) {
 
 function getDayOfWeek(date) {
     return moment(date).format('dddd');
+}
+
+function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {
+    return moment.unix(unixTime).subtract(amount, unit).unix();
+}
+
+function getMinuteFirstUnixTime(date) {
+    const datetime = moment(date);
+    return datetime.set({ second: 0, millisecond: 0 }).unix();
+}
+
+function getMinuteLastUnixTime(date) {
+    return moment.unix(getMinuteFirstUnixTime(date)).add(1, 'minutes').subtract(1, 'seconds').unix();
+}
+
+function getTodayFirstUnixTime() {
+    return moment({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+function getTodayLastUnixTime() {
+    return moment.unix(getTodayFirstUnixTime()).add(1, 'days').subtract(1, 'seconds').unix();
+}
+
+function getThisWeekFirstUnixTime() {
+    const today = moment.unix(getTodayFirstUnixTime());
+    return today.subtract(today.day(), 'days').unix();
+}
+
+function getThisWeekLastUnixTime() {
+    return moment.unix(getThisWeekFirstUnixTime()).add(7, 'days').subtract(1, 'seconds').unix();
+}
+
+function getThisMonthFirstUnixTime() {
+    const today = moment.unix(getTodayFirstUnixTime());
+    return today.subtract(today.date() - 1, 'days').unix();
+}
+
+function getThisMonthLastUnixTime() {
+    return moment.unix(getThisMonthFirstUnixTime()).add(1, 'months').subtract(1, 'seconds').unix();
+}
+
+function getThisYearFirstUnixTime() {
+    const today = moment.unix(getTodayFirstUnixTime());
+    return today.subtract(today.dayOfYear() - 1, 'days').unix();
+}
+
+function getThisYearLastUnixTime() {
+    return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
 }
 
 function copyObjectTo(fromObject, toObject) {
@@ -433,7 +481,7 @@ export default {
     isString,
     isNumber,
     isBoolean,
-    parseDateFromUnixtime,
+    parseDateFromUnixTime,
     formatDate,
     formatUnixTime,
     getUnixTime,
@@ -442,6 +490,17 @@ export default {
     getYearAndMonth,
     getDay,
     getDayOfWeek,
+    getUnixTimeBeforeUnixTime,
+    getMinuteFirstUnixTime,
+    getMinuteLastUnixTime,
+    getTodayFirstUnixTime,
+    getTodayLastUnixTime,
+    getThisWeekFirstUnixTime,
+    getThisWeekLastUnixTime,
+    getThisMonthFirstUnixTime,
+    getThisMonthLastUnixTime,
+    getThisYearFirstUnixTime,
+    getThisYearLastUnixTime,
     copyObjectTo,
     copyArrayTo,
     appendThousandsSeparator,

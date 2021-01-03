@@ -115,7 +115,7 @@ export default {
     },
     computed: {
         version() {
-            return 'v' + this.$version();
+            return 'v' + this.$version;
         },
         allLanguages() {
             return this.$locale.getAllLanguages();

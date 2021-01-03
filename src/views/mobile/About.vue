@@ -66,10 +66,10 @@
 export default {
     computed: {
         version() {
-            return 'v' + this.$version();
+            return 'v' + this.$version;
         },
         buildTime() {
-            return this.$buildTime();
+            return this.$buildTime;
         },
         licenses() {
             return this.$licenses;

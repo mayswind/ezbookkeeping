@@ -1,6 +1,6 @@
 <template>
     <f7-app :params="f7params">
-        <f7-view id="main-view" class="safe-areas" main url="/" :push-state="true" :push-state-animate="false"></f7-view>
+        <f7-view id="main-view" class="safe-areas" main url="/"></f7-view>
     </f7-app>
 </template>
 
@@ -51,9 +51,22 @@ export default {
                     disableContextMenu: true
                 },
                 view: {
-                    animate: self.$settings.isEnableAnimate()
+                    animate: self.$settings.isEnableAnimate(),
+                    pushState: !self.isiOSHomeScreenMode(),
+                    pushStateAnimate: false
                 }
             }
+        }
+    },
+    methods: {
+        isiOSHomeScreenMode() {
+            if ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion) &&
+                window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
+            ) {
+                return true;
+            }
+
+            return false;
         }
     }
 }

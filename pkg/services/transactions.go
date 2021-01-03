@@ -88,7 +88,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 
 	if keyword != "" {
 		condition = condition + " AND comment LIKE ?"
-		conditionParams = append(conditionParams, "%%" + keyword + "%%")
+		conditionParams = append(conditionParams, "%%"+keyword+"%%")
 	}
 
 	if maxTime > 0 {
@@ -174,7 +174,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 
 	if keyword != "" {
 		condition = condition + " AND comment LIKE ?"
-		conditionParams = append(conditionParams, "%%" + keyword + "%%")
+		conditionParams = append(conditionParams, "%%"+keyword+"%%")
 	}
 
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)

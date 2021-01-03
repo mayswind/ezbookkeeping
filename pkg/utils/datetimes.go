@@ -3,8 +3,8 @@ package utils
 import "time"
 
 const (
-	unixTimeFormat = "1136239445"
-	longDateTimeFormat = "2006-01-02 15:04:05"
+	unixTimeFormat                  = "1136239445"
+	longDateTimeFormat              = "2006-01-02 15:04:05"
 	longDateTimeWithoutSecondFormat = "2006-01-02 15:04"
 )
 

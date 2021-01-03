@@ -38,7 +38,7 @@ func JWTAuthorization(c *core.Context) {
 }
 
 // JWTAuthorizationByQueryString verifies whether current request is valid by jwt token
-func JWTAuthorizationByQueryString(c *core.Context)  {
+func JWTAuthorizationByQueryString(c *core.Context) {
 	token, exists := c.GetQuery(tokenQueryStringParam)
 
 	if !exists {

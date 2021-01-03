@@ -260,13 +260,13 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	removeTransactionTagIds := utils.Int64SliceMinus(transactionTagIds, tagIds)
 
 	newTransaction := &models.Transaction{
-		TransactionId:        transaction.TransactionId,
-		Uid:                  uid,
-		CategoryId:           transactionModifyReq.CategoryId,
-		TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
-		AccountId:            transactionModifyReq.SourceAccountId,
-		Amount:               transactionModifyReq.SourceAmount,
-		Comment:              transactionModifyReq.Comment,
+		TransactionId:   transaction.TransactionId,
+		Uid:             uid,
+		CategoryId:      transactionModifyReq.CategoryId,
+		TransactionTime: utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
+		AccountId:       transactionModifyReq.SourceAccountId,
+		Amount:          transactionModifyReq.SourceAmount,
+		Comment:         transactionModifyReq.Comment,
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {

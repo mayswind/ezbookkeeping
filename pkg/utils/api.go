@@ -22,7 +22,7 @@ func PrintJsonSuccessResult(c *core.Context, result interface{}) {
 // PrintDataSuccessResult writes success response in custom content type to current http context
 func PrintDataSuccessResult(c *core.Context, contentType string, fileName string, result []byte) {
 	if fileName != "" {
-		c.Header("Content-Disposition", "attachment;filename=" + fileName)
+		c.Header("Content-Disposition", "attachment;filename="+fileName)
 	}
 
 	c.Data(http.StatusOK, contentType, result)

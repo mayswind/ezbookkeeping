@@ -104,8 +104,8 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 	accountRespMap := make(map[int64]*models.AccountInfoResponse)
 
 	for i := 0; i < len(accountAndSubAccounts); i++ {
-		acccountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
-		accountRespMap[acccountResp.Id] = acccountResp
+		accountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
+		accountRespMap[accountResp.Id] = accountResp
 	}
 
 	accountResp, exists := accountRespMap[accountGetReq.Id]
@@ -247,13 +247,13 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
-		subAcccountReq := accountModifyReq.SubAccounts[i]
+		subAccountReq := accountModifyReq.SubAccounts[i]
 
-		if _, exists := accountMap[subAcccountReq.Id]; !exists {
+		if _, exists := accountMap[subAccountReq.Id]; !exists {
 			return nil, errs.ErrAccountNotFound
 		}
 
-		toUpdateSubAccount := a.getToUpdateAccount(uid, subAcccountReq, accountMap[subAcccountReq.Id])
+		toUpdateSubAccount := a.getToUpdateAccount(uid, subAccountReq, accountMap[subAccountReq.Id])
 
 		if toUpdateSubAccount != nil {
 			anythingUpdate = true

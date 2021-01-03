@@ -53,7 +53,9 @@ export default {
                 view: {
                     animate: self.$settings.isEnableAnimate(),
                     pushState: !self.isiOSHomeScreenMode(),
-                    pushStateAnimate: false
+                    pushStateAnimate: false,
+                    iosSwipeBackAnimateShadow: false,
+                    mdSwipeBackAnimateShadow: false
                 }
             }
         }

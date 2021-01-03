@@ -220,7 +220,7 @@ export default {
         });
     },
     getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=20`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50`);
     },
     getTransaction: ({ id }) => {
         return axios.get('v1/transactions/get.json?id=' + id);

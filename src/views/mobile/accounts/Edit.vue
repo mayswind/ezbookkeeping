@@ -384,18 +384,10 @@ export default {
             self.loading = true;
 
             self.editAccountId = query.id;
-            self.$services.getAccount({
-                id: self.editAccountId
-            }).then(response => {
-                const data = response.data;
 
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get account');
-                    router.back();
-                    return;
-                }
-
-                const account = data.result;
+            self.$store.dispatch('getAccount', {
+                accountId: self.editAccountId
+            }).then(account => {
                 self.account.id = account.id;
                 self.account.category = account.category;
                 self.account.type = account.type;
@@ -406,6 +398,7 @@ export default {
                 self.account.balance = account.balance;
                 self.account.comment = account.comment;
                 self.account.visible = !account.hidden;
+                self.subAccounts = [];
 
                 if (account.subAccounts && account.subAccounts.length > 0) {
                     for (let i = 0; i < account.subAccounts.length; i++) {
@@ -431,13 +424,10 @@ export default {
 
                 self.loading = false;
             }).catch(error => {
-                self.$logger.error('failed to load account info', error);
+                self.loading = false;
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                    router.back();
-                } else if (!error.processed) {
-                    self.$toast('Unable to get account');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                     router.back();
                 }
             });
@@ -550,29 +540,16 @@ export default {
                 subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? null : subAccounts,
             };
 
-            let promise = null;
-
-            if (!self.editAccountId) {
-                promise = self.$services.addAccount(submitAccount);
-            } else {
+            if (self.editAccountId) {
                 submitAccount.id = self.account.id;
                 submitAccount.hidden = !self.account.visible;
-                promise = self.$services.modifyAccount(submitAccount);
             }
 
-            promise.then(response => {
+            self.$store.dispatch('saveAccount', {
+                account: submitAccount
+            }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (!self.editAccountId) {
-                        self.$toast('Unable to add account');
-                    } else {
-                        self.$toast('Unable to save account');
-                    }
-                    return;
-                }
 
                 if (!self.editAccountId) {
                     self.$toast('You have added a new account');
@@ -582,19 +559,11 @@ export default {
 
                 router.back();
             }).catch(error => {
-                self.$logger.error('failed to save account', error);
-
                 self.submitting = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (!self.editAccountId) {
-                        self.$toast('Unable to add account');
-                    } else {
-                        self.$toast('Unable to save account');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },

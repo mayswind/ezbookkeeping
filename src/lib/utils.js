@@ -405,28 +405,6 @@ function getCategorizedAccounts(allAccounts) {
     return ret;
 }
 
-function getAccountByAccountId(categorizedAccounts, accountId) {
-    for (let category in categorizedAccounts) {
-        if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
-            continue;
-        }
-
-        if (!categorizedAccounts[category].accounts) {
-            continue;
-        }
-
-        const accountList = categorizedAccounts[category].accounts;
-
-        for (let i = 0; i < accountList.length; i++) {
-            if (accountList[i].id === accountId) {
-                return accountList[i];
-            }
-        }
-    }
-
-    return null;
-}
-
 function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
     const allAccountCategories = accountConstants.allCategories;
     const ret = [];
@@ -514,6 +492,5 @@ export default {
     getCategoryInfo,
     getPlainAccounts,
     getCategorizedAccounts,
-    getAccountByAccountId,
     getAllFilteredAccountsBalance,
 };

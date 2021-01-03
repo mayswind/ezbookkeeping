@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import Vuex from 'vuex';
 import VueI18n from 'vue-i18n';
 import VueI18nFilter from 'vue-i18n-filter';
 import Framework7 from 'framework7/framework7.esm.bundle.js';
@@ -30,6 +31,7 @@ import userstate from './lib/userstate.js';
 import exchangeRates from './lib/exchangeRates.js';
 import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
+import stores from './store/index.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
 import iconFilter from './filters/icon.js';
@@ -54,6 +56,7 @@ import InformationSheet from "./components/mobile/InformationSheet.vue";
 import NumberPadSheet from "./components/mobile/NumberPadSheet.vue";
 import App from './Mobile.vue';
 
+Vue.use(Vuex);
 Vue.use(VueI18n);
 Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
@@ -72,6 +75,7 @@ Vue.component('InformationSheet', InformationSheet);
 Vue.component('NumberPadSheet', NumberPadSheet);
 Framework7.use(Framework7Vue);
 
+const store = new Vuex.Store(stores);
 const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion();
@@ -238,6 +242,7 @@ if (userstate.isUserLogined()) {
 new Vue({
     el: '#app',
     i18n: i18n,
+    store: store,
     render: h => h(App),
     mounted: function () {
         const app = this.$f7;

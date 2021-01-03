@@ -62,15 +62,15 @@
                                 </f7-icon>
 
                                 <div class="list-item-valign-middle padding-left-half"
-                                     v-if="!tag.editing">
+                                     v-if="editingTag.id !== tag.id">
                                     {{ tag.name }}
                                 </div>
                                 <f7-input class="list-title-input padding-left-half"
                                           type="text"
                                           :placeholder="$t('Tag Title')"
-                                          :value="tag.newName"
-                                          v-else-if="tag.editing"
-                                          @input="tag.newName = $event.target.value"
+                                          :value="editingTag.name"
+                                          v-else-if="editingTag.id === tag.id"
+                                          @input="editingTag.name = $event.target.value"
                                           @keyup.enter.native="save(tag)">
                                 </f7-input>
                             </div>
@@ -80,29 +80,58 @@
                                    raised fill
                                    icon-f7="checkmark_alt"
                                    color="blue"
-                                   v-if="tag.editing"
-                                   @click="save(tag)">
+                                   v-if="editingTag.id === tag.id"
+                                   @click="save(editingTag)">
                         </f7-button>
                         <f7-button slot="after"
                                    class="no-padding margin-left-half"
                                    raised fill
                                    icon-f7="xmark"
                                    color="gray"
-                                   v-if="tag.editing"
-                                   @click="cancelSave(tag)">
+                                   v-if="editingTag.id === tag.id"
+                                   @click="cancelSave(editingTag)">
                         </f7-button>
-                        <f7-swipeout-actions left v-if="sortable && !tag.editing">
+                        <f7-swipeout-actions left v-if="sortable && editingTag.id !== tag.id">
                             <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
                                                 overswipe close @click="hide(tag, !tag.hidden)">
                                 <f7-icon :f7="tag.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                             </f7-swipeout-button>
                         </f7-swipeout-actions>
-                        <f7-swipeout-actions right v-if="!sortable && !tag.editing">
+                        <f7-swipeout-actions right v-if="!sortable && editingTag.id !== tag.id">
                             <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(tag)"></f7-swipeout-button>
                             <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(tag, false)">
                                 <f7-icon f7="trash"></f7-icon>
                             </f7-swipeout-button>
                         </f7-swipeout-actions>
+                    </f7-list-item>
+
+                    <f7-list-item v-if="newTag">
+                        <f7-block slot="title" class="no-padding">
+                            <div class="display-flex">
+                                <f7-icon slot="media" f7="number"></f7-icon>
+                                <f7-input class="list-title-input padding-left-half"
+                                          type="text"
+                                          :placeholder="$t('Tag Title')"
+                                          :value="newTag.name"
+                                          @input="newTag.name = $event.target.value"
+                                          @keyup.enter.native="save(newTag)">
+                                </f7-input>
+                            </div>
+                        </f7-block>
+                        <f7-button slot="after"
+                                   :class="{ 'no-padding': true, 'disabled': !isTagModified(newTag) }"
+                                   raised fill
+                                   icon-f7="checkmark_alt"
+                                   color="blue"
+                                   @click="save(newTag)">
+                        </f7-button>
+                        <f7-button slot="after"
+                                   class="no-padding margin-left-half"
+                                   raised fill
+                                   icon-f7="xmark"
+                                   color="gray"
+                                   @click="cancelSave(newTag)">
+                        </f7-button>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -133,7 +162,11 @@
 export default {
     data() {
         return {
-            tags: [],
+            newTag: null,
+            editingTag: {
+                id: '',
+                name: ''
+            },
             loading: true,
             showHidden: false,
             sortable: false,
@@ -146,6 +179,9 @@ export default {
         };
     },
     computed: {
+        tags() {
+            return this.$store.state.allTransactionTags;
+        },
         noAvailableTag() {
             for (let i = 0; i < this.tags.length; i++) {
                 if (this.showHidden || !this.tags[i].hidden) {
@@ -156,13 +192,7 @@ export default {
             return true;
         },
         hasEditingTag() {
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.tags[i].editing) {
-                    return true;
-                }
-            }
-
-            return false;
+            return this.newTag || (this.editingTag.id && this.editingTag.id !== '');
         }
     },
     created() {
@@ -171,30 +201,15 @@ export default {
 
         self.loading = true;
 
-        self.$services.getAllTransactionTags().then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get tag list');
-                router.back();
-                return;
-            }
-
-            for (let i = 0; i < data.result.length; i++) {
-                data.result[i].editing = false;
-                data.result[i].newName = data.result[i].name;
-            }
-
-            self.tags = data.result;
+        self.$store.dispatch('loadAllTags', {
+            force: false
+        }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to load tag list', error);
+            self.loading = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get tag list');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
@@ -208,35 +223,19 @@ export default {
 
             const self = this;
 
-            self.$services.getAllTransactionTags().then(response => {
+            self.$store.dispatch('loadAllTags', {
+                force: true
+            }).then(() => {
                 if (done) {
                     done();
                 }
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get tag list');
-                    return;
-                }
-
-                for (let i = 0; i < data.result.length; i++) {
-                    data.result[i].editing = false;
-                    data.result[i].newName = data.result[i].name;
-                }
-
-                self.tags = data.result;
             }).catch(error => {
-                self.$logger.error('failed to reload tag list', error);
-
                 if (done) {
                     done();
                 }
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get category list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -250,33 +249,27 @@ export default {
             this.displayOrderModified = false;
         },
         onSort(event) {
+            const self = this;
+
             if (!event || !event.el || !event.el.id || event.el.id.indexOf('tag_') !== 0) {
-                this.$toast('Unable to move tag');
+                self.$toast('Unable to move tag');
                 return;
             }
 
             const id = event.el.id.substr(4); // tag_
-            let tag = null;
 
-            for (let i = 0; i < this.tags.length; i++) {
-                if (this.tags[i].id === id) {
-                    tag = this.tags[i];
-                    break;
-                }
-            }
-
-            if (!tag || !this.tags[event.to]) {
-                this.$toast('Unable to move tag');
-                return;
-            }
-
-            this.tags.splice(event.to, 0, this.tags.splice(event.from, 1)[0]);
-
-            this.displayOrderModified = true;
+            self.$store.dispatch('changeTagDisplayOrder', {
+                tagId: id,
+                from: event.from,
+                to: event.to
+            }).then(() => {
+                self.displayOrderModified = true;
+            }).catch(error => {
+                self.$toast(error.message || error);
+            });
         },
         saveSortResult() {
             const self = this;
-            const newDisplayOrders = [];
 
             if (!self.displayOrderModified) {
                 self.showHidden = false;
@@ -285,158 +278,87 @@ export default {
             }
 
             self.displayOrderSaving = true;
-
-            for (let i = 0; i < self.tags.length; i++) {
-                newDisplayOrders.push({
-                    id: self.tags[i].id,
-                    displayOrder: i + 1
-                });
-            }
-
             self.$showLoading();
 
-            self.$services.moveTransactionTag({
-                newDisplayOrders: newDisplayOrders
-            }).then(response => {
+            self.$store.dispatch('updateTagDisplayOrders').then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to move tag');
-                    return;
-                }
 
                 self.showHidden = false;
                 self.sortable = false;
                 self.displayOrderModified = false;
             }).catch(error => {
-                self.$logger.error('failed to save tags display order', error);
-
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to move tag');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
         add() {
-            this.tags.push({
-                id: '',
-                name: '',
-                newName: '',
-                hidden: false,
-                editing: true
-            });
+            this.newTag = {
+                name: ''
+            };
         },
         edit(tag) {
-            tag.newName = tag.name;
-            tag.editing = true;
+            this.editingTag.id = tag.id;
+            this.editingTag.name = tag.name;
         },
         save(tag) {
-            if (tag.newName === tag.name) {
-                return;
-            }
-
             const self = this;
 
             self.$showLoading();
 
-            let promise = null;
-
-            if (tag.id) {
-                promise = self.$services.modifyTransactionTag({
-                    id: tag.id,
-                    name: tag.newName
-                });
-            } else {
-                promise = self.$services.addTransactionTag({
-                    name: tag.newName
-                });
-            }
-
-            promise.then(response => {
+            self.$store.dispatch('saveTag', {
+                tag: tag
+            }).then(() => {
                 self.$hideLoading();
-                const data = response.data;
 
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to save this tag');
-                    return;
+                if (tag.id) {
+                    this.editingTag.id = '';
+                    this.editingTag.name = '';
+                } else {
+                    this.newTag = null;
                 }
-
-                tag.id = data.result.id;
-                tag.name = data.result.name;
-                tag.hidden = data.result.hidden;
-                tag.editing = false;
             }).catch(error => {
-                self.$logger.error('failed to save tag', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to save this tag');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
         cancelSave(tag) {
             if (tag.id) {
-                tag.newName = '';
+                this.editingTag.id = '';
+                this.editingTag.name = '';
             } else {
-                for (let i = 0; i < this.tags.length; i++) {
-                    if (this.tags[i] === tag) {
-                        this.tags.splice(i, 1);
-                        break;
-                    }
-                }
+                this.newTag = null;
             }
-
-            tag.editing = false;
         },
         isTagModified(tag) {
-            return tag.newName !== tag.name;
+            if (tag.id) {
+                return this.editingTag.name !== '' && this.editingTag.name !== tag.name;
+            } else {
+                return tag.name !== '';
+            }
         },
         hide(tag, hidden) {
             const self = this;
 
             self.$showLoading();
 
-            self.$services.hideTransactionTag({
-                id: tag.id,
+            self.$store.dispatch('hideTag', {
+                tag: tag,
                 hidden: hidden
-            }).then(response => {
+            }).then(() => {
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this tag');
-                    } else {
-                        self.$toast('Unable to unhide this tag');
-                    }
-
-                    return;
-                }
-
-                tag.hidden = hidden;
             }).catch(error => {
-                self.$logger.error('failed to change tag visibility', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this tag');
-                    } else {
-                        self.$toast('Unable to unhide this tag');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -460,33 +382,20 @@ export default {
             self.tagToDelete = null;
             self.$showLoading();
 
-            self.$services.deleteTransactionTag({
-                id: tag.id
-            }).then(response => {
-                self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to delete this tag');
-                    return;
+            self.$store.dispatch('deleteTag', {
+                tag: tag,
+                beforeResolve: (done) => {
+                    app.swipeout.delete($$(`#${self.$options.filters.tagDomId(tag)}`), () => {
+                        done();
+                    });
                 }
-
-                app.swipeout.delete($$(`#${self.$options.filters.tagDomId(tag)}`), () => {
-                    for (let i = 0; i < self.tags.length; i++) {
-                        if (self.tags[i].id === tag.id) {
-                            self.tags.splice(i, 1);
-                        }
-                    }
-                });
+            }).then(() => {
+                self.$hideLoading();
             }).catch(error => {
-                self.$logger.error('failed to delete tag', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to delete this tag');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

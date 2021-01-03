@@ -116,7 +116,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-for="accountCategory in usedAccountCategories" :key="accountCategory.id" v-show="showHidden || hasShownAccount(accountCategory)">
+        <f7-card v-for="accountCategory in allAccountCategories" :key="accountCategory.id" v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
             <f7-card-header>
                 <small :style="{ opacity: 0.6 }">
                     <span>{{ $t(accountCategory.name) }}</span>
@@ -124,12 +124,12 @@
                 </small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
+                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort" v-if="categorizedAccounts[accountCategory.id]">
                     <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
                                   :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
                                   :after="accountBalance(account) | currency(account.currency)"
-                                  :link="account.type === $constants.account.allAccountTypes.SingleAccount ? '/transaction/list?accountId=' + account.id : null"
+                                  :link="!sortable && account.type === $constants.account.allAccountTypes.SingleAccount ? '/transaction/list?accountId=' + account.id : null"
                                   swipeout @taphold.native="setSortable()"
                     >
                         <f7-block slot="title" class="no-padding">
@@ -147,7 +147,7 @@
                                     <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
                                                   :key="subAccount.id" :id="subAccount | accountDomId"
                                                   :title="subAccount.name" :after="accountBalance(subAccount) | currency(subAccount.currency)"
-                                                  :link="'/transaction/list?accountId=' + subAccount.id"
+                                                  :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
                                     >
                                         <f7-icon slot="media" :icon="subAccount.icon | accountIcon"
                                                  :style="subAccount.color | accountIconStyle('var(--default-icon-color)')">
@@ -201,7 +201,6 @@
 export default {
     data() {
         return {
-            categorizedAccounts: {},
             loading: true,
             showHidden: false,
             sortable: false,
@@ -217,60 +216,21 @@ export default {
         defaultCurrency() {
             return this.$user.getUserInfo() ? this.$user.getUserInfo().defaultCurrency : this.$t('default.currency');
         },
+        allAccountCategories() {
+            return this.$constants.account.allCategories;
+        },
+        categorizedAccounts() {
+            return this.$store.state.allCategorizedAccounts;
+        },
         allAccountCount() {
-            let allAccountCount = 0;
-
-            for (let category in this.categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
-                    continue;
-                }
-
-                allAccountCount += this.categorizedAccounts[category].accounts.length;
-            }
-
-            return allAccountCount;
+            return this.$store.getters.allAvailableAccountsCount;
         },
         noAvailableAccount() {
-            let allAccountCount = 0;
-            let shownAccountCount = 0;
-
-            for (let category in this.categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
-                    continue;
-                }
-
-                const accountList = this.categorizedAccounts[category].accounts;
-
-                for (let i = 0; i < accountList.length; i++) {
-                    if (!accountList[i].hidden) {
-                        shownAccountCount++;
-                    }
-
-                    allAccountCount++;
-                }
-            }
-
             if (this.showHidden) {
-                return allAccountCount < 1;
+                return this.$store.getters.allAvailableAccountsCount < 1;
             } else {
-                return shownAccountCount < 1;
+                return this.$store.getters.allVisibleAccountsCount < 1;
             }
-        },
-        usedAccountCategories() {
-            const allAccountCategories = this.$constants.account.allCategories;
-            const usedAccountCategories = [];
-
-            for (let i = 0; i < allAccountCategories.length; i++) {
-                const accountCategory = allAccountCategories[i];
-
-                if (this.categorizedAccounts[accountCategory.id] &&
-                    this.$utilities.isArray(this.categorizedAccounts[accountCategory.id].accounts) &&
-                    this.categorizedAccounts[accountCategory.id].accounts.length) {
-                    usedAccountCategories.push(accountCategory);
-                }
-            }
-
-            return usedAccountCategories;
         },
         netAssets() {
             if (!this.showAccountBalance) {
@@ -369,36 +329,23 @@ export default {
 
         self.loading = true;
 
-        self.$services.getAllAccounts({ visibleOnly: false }).then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get account list');
-                router.back();
-                return;
-            }
-
-            self.categorizedAccounts = self.$utilities.getCategorizedAccounts(data.result);
+        self.$store.dispatch('loadAllAccounts', {
+            force: false
+        }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to load account list', error);
+            self.loading = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get account list');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
     },
     methods: {
         onPageAfterIn() {
-            const self = this;
-            const previousRoute = self.$f7router.previousRoute;
-
-            if (previousRoute && (previousRoute.path === '/account/add' || previousRoute.path === '/account/edit') && !self.loading) {
-                self.reload(null);
+            if (this.$store.state.accountListStateInvalid && !this.loading) {
+                this.reload(null);
             }
         },
         reload(done) {
@@ -409,34 +356,23 @@ export default {
 
             const self = this;
 
-            self.$services.getAllAccounts({ visibleOnly: false }).then(response => {
+            self.$store.dispatch('loadAllAccounts', {
+                force: true
+            }).then(() => {
                 if (done) {
                     done();
                 }
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get account list');
-                    return;
-                }
-
-                self.categorizedAccounts = self.$utilities.getCategorizedAccounts(data.result);
             }).catch(error => {
-                self.$logger.error('failed to reload account list', error);
-
                 if (done) {
                     done();
                 }
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get account list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
-        hasShownAccount(accountCategory) {
+        hasAccount(accountCategory, visibleOnly) {
             if (!this.categorizedAccounts[accountCategory.id] ||
                 !this.categorizedAccounts[accountCategory.id].accounts ||
                 !this.categorizedAccounts[accountCategory.id].accounts.length) {
@@ -448,7 +384,7 @@ export default {
             for (let i = 0; i < this.categorizedAccounts[accountCategory.id].accounts.length; i++) {
                 const account = this.categorizedAccounts[accountCategory.id].accounts[i];
 
-                if (!account.hidden) {
+                if (!visibleOnly || !account.hidden) {
                     shownCount++;
                 }
             }
@@ -528,30 +464,27 @@ export default {
             this.displayOrderModified = false;
         },
         onSort(event) {
+            const self = this;
+
             if (!event || !event.el || !event.el.id || event.el.id.indexOf('account_') !== 0) {
-                this.$toast('Unable to move account');
+                self.$toast('Unable to move account');
                 return;
             }
 
             const id = event.el.id.substr(8); // account_
-            const account = this.$utilities.getAccountByAccountId(this.categorizedAccounts, id);
 
-            if (!account ||
-                !this.categorizedAccounts[account.category] ||
-                !this.categorizedAccounts[account.category].accounts ||
-                !this.categorizedAccounts[account.category].accounts[event.to]) {
-                this.$toast('Unable to move account');
-                return;
-            }
-
-            const accountList = this.categorizedAccounts[account.category].accounts;
-            accountList.splice(event.to, 0, accountList.splice(event.from, 1)[0]);
-
-            this.displayOrderModified = true;
+            self.$store.dispatch('changeAccountDisplayOrder', {
+                accountId: id,
+                from: event.from,
+                to: event.to
+            }).then(() => {
+                self.displayOrderModified = true;
+            }).catch(error => {
+                self.$toast(error.message || error);
+            });
         },
         saveSortResult() {
             const self = this;
-            const newDisplayOrders = [];
 
             if (!self.displayOrderModified) {
                 self.showHidden = false;
@@ -560,50 +493,21 @@ export default {
             }
 
             self.displayOrderSaving = true;
-
-            for (let category in self.categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(self.categorizedAccounts, category)) {
-                    continue;
-                }
-
-                const accountList = self.categorizedAccounts[category].accounts;
-
-                for (let i = 0; i < accountList.length; i++) {
-                    newDisplayOrders.push({
-                        id: accountList[i].id,
-                        displayOrder: i + 1
-                    });
-                }
-            }
-
             self.$showLoading();
 
-            self.$services.moveAccount({
-                newDisplayOrders: newDisplayOrders
-            }).then(response => {
+            self.$store.dispatch('updateAccountDisplayOrders').then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to move account');
-                    return;
-                }
 
                 self.showHidden = false;
                 self.sortable = false;
                 self.displayOrderModified = false;
             }).catch(error => {
-                self.$logger.error('failed to save accounts display order', error);
-
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to move account');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -615,37 +519,16 @@ export default {
 
             self.$showLoading();
 
-            self.$services.hideAccount({
-                id: account.id,
+            self.$store.dispatch('hideAccount', {
+                account: account,
                 hidden: hidden
-            }).then(response => {
+            }).then(() => {
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this account');
-                    } else {
-                        self.$toast('Unable to unhide this account');
-                    }
-
-                    return;
-                }
-
-                account.hidden = hidden;
             }).catch(error => {
-                self.$logger.error('failed to change account visibility', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this account');
-                    } else {
-                        self.$toast('Unable to unhide this account');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -669,34 +552,20 @@ export default {
             self.accountToDelete = null;
             self.$showLoading();
 
-            self.$services.deleteAccount({
-                id: account.id
-            }).then(response => {
-                self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to delete this account');
-                    return;
+            self.$store.dispatch('deleteAccount', {
+                account: account,
+                beforeResolve: (done) => {
+                    app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
+                        done();
+                    });
                 }
-
-                app.swipeout.delete($$(`#${self.$options.filters.accountDomId(account)}`), () => {
-                    const accountList = self.categorizedAccounts[account.category].accounts;
-                    for (let i = 0; i < accountList.length; i++) {
-                        if (accountList[i].id === account.id) {
-                            accountList.splice(i, 1);
-                        }
-                    }
-                });
+            }).then(() => {
+                self.$hideLoading();
             }).catch(error => {
-                self.$logger.error('failed to delete account', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to delete this account');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

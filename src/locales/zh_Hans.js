@@ -642,6 +642,8 @@ export default {
     'Tag Title': '标签标题',
     'No available tag': '没有可用的标签',
     'Unable to get tag list': '无法获取标签列表',
+    'Unable to add tag': '无法添加标签',
+    'Unable to save tag': '无法保存标签',
     'Unable to move tag': '无法移动标签',
     'Unable to hide this tag': '无法隐藏该标签',
     'Unable to unhide this tag': '无法取消隐藏该标签',

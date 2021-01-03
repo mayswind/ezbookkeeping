@@ -642,6 +642,8 @@ export default {
     'Tag Title': 'Tag Title',
     'No available tag': 'No available tag',
     'Unable to get tag list': 'Unable to get tag list',
+    'Unable to add tag': 'Unable to add tag',
+    'Unable to save tag': 'Unable to save tag',
     'Unable to move tag': 'Unable to move tag',
     'Unable to hide this tag': 'Unable to hide this tag',
     'Unable to unhide this tag': 'Unable to unhide this tag',

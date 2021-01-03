@@ -238,7 +238,12 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (inter
 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryModifyHandler] user \"uid:%d\" has updated category \"id:%d\" successfully", uid, categoryModifyReq.Id)
 
-	return true, nil
+	newCategory.Type = category.Type
+	newCategory.ParentCategoryId = category.ParentCategoryId
+	newCategory.DisplayOrder = category.DisplayOrder
+	categoryResp := newCategory.ToTransactionCategoryInfoResponse()
+
+	return categoryResp, nil
 }
 
 // CategoryHideHandler hides an existed transaction category by request parameters for current user

@@ -295,7 +295,10 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 
 	log.InfofWithRequestId(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
-	return true, nil
+	newTransaction.Type = transaction.Type
+	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds)
+
+	return newTransactionResp, nil
 }
 
 // TransactionDeleteHandler deletes an existed transaction by request parameters for current user

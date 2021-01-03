@@ -274,7 +274,44 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 
 	log.InfofWithRequestId(c, "[accounts.AccountModifyHandler] user \"uid:%d\" has updated account \"id:%d\" successfully", uid, accountModifyReq.Id)
 
-	return true, nil
+	accountRespMap := make(map[int64]*models.AccountInfoResponse)
+
+	for i := 0; i < len(toUpdateAccounts); i++ {
+		account := toUpdateAccounts[i]
+		oldAccount := accountMap[account.AccountId]
+
+		account.Type = oldAccount.Type
+		account.ParentAccountId = oldAccount.ParentAccountId
+		account.DisplayOrder = oldAccount.DisplayOrder
+		account.Currency = oldAccount.Currency
+		account.Balance = oldAccount.Balance
+
+		accountResp := account.ToAccountInfoResponse()
+		accountRespMap[accountResp.Id] = accountResp
+	}
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		oldAccount := accountAndSubAccounts[i]
+		_, exists := accountRespMap[oldAccount.AccountId]
+
+		if !exists {
+			oldAccountResp := oldAccount.ToAccountInfoResponse()
+			accountRespMap[oldAccountResp.Id] = oldAccountResp
+		}
+	}
+
+	accountResp := accountRespMap[accountModifyReq.Id]
+
+	for i := 0; i < len(accountAndSubAccounts); i++ {
+		if accountAndSubAccounts[i].ParentAccountId == accountResp.Id {
+			subAccountResp := accountRespMap[accountAndSubAccounts[i].AccountId]
+			accountResp.SubAccounts = append(accountResp.SubAccounts, subAccountResp)
+		}
+	}
+
+	sort.Sort(accountResp.SubAccounts)
+
+	return accountResp, nil
 }
 
 // AccountHideHandler hides an existed account by request parameters for current user

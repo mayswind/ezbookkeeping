@@ -132,6 +132,20 @@ i.icon.la, i.icon.las, i.icon.lab {
     height: 13px;
 }
 
+.tabbar-text-with-ellipsis > span {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    white-space: nowrap;
+}
+
+.tabbar-item-changed {
+    color: var(--f7-theme-color);
+}
+
 .nested-list-item .item-title {
     width: 100%;
 }

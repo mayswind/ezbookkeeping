@@ -440,6 +440,7 @@ export default {
     'Last month': 'Last month',
     'This year': 'This year',
     'Last year': 'Last year',
+    'Custom Date': 'Custom Date',
     'Begin Time': 'Begin Time',
     'End Time': 'End Time',
     'Custom': 'Custom',

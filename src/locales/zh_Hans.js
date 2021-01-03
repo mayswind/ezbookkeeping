@@ -440,6 +440,7 @@ export default {
     'Last month': '上月',
     'This year': '今年',
     'Last year': '去年',
+    'Custom Date': '自定义日期',
     'Begin Time': '开始时间',
     'End Time': '结束时间',
     'Custom': '自定义',

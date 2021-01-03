@@ -24,17 +24,17 @@
         </f7-navbar>
 
         <f7-toolbar tabbar bottom>
-            <f7-link popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ $t('Date') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateName('Date') | t }}</span>
             </f7-link>
-            <f7-link popover-open=".type-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ $t('Type') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | t }}</span>
             </f7-link>
-            <f7-link popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
-                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ $t('Category') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
+                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ query.categoryId | categoryName(allCategories, $t('Category')) }}</span>
             </f7-link>
-            <f7-link popover-open=".account-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ $t('Account') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" popover-open=".account-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ query.accountId | accountName(allAccounts, $t('Account')) }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -948,6 +948,62 @@ export default {
                 color: 'transparent'
             }
         },
+        dateName(dateType, defaultName) {
+            switch (dateType){
+                case 1:
+                    return 'Today';
+                case 2:
+                    return 'Yesterday';
+                case 3:
+                    return 'Recent 7 days';
+                case 4:
+                    return 'Recent 30 days';
+                case 5:
+                    return 'This week';
+                case 6:
+                    return 'Last week';
+                case 7:
+                    return 'This month';
+                case 8:
+                    return 'Last month';
+                case 9:
+                    return 'This year';
+                case 10:
+                    return 'Last year';
+                case 11:
+                    return 'Custom Date';
+                default:
+                    return defaultName;
+            }
+        },
+        typeName(type, defaultName) {
+            switch (type){
+                case 1:
+                    return 'Modify Balance';
+                case 2:
+                    return 'Income';
+                case 3:
+                    return 'Expense';
+                case 4:
+                    return 'Transfer';
+                default:
+                    return defaultName;
+            }
+        },
+        categoryName(categoryId, allCategories, defaultName) {
+            if (allCategories[categoryId]) {
+                return allCategories[categoryId].name;
+            }
+
+            return defaultName;
+        },
+        accountName(accountId, allAccounts, defaultName) {
+            if (allAccounts[accountId]) {
+                return allAccounts[accountId].name;
+            }
+
+            return defaultName;
+        },
         income(value, incomplete) {
             return '+' + value + (incomplete ? '+' : '');
         },
@@ -1030,10 +1086,6 @@ export default {
     width: 100%;
     transform-origin: 50% 100%;
     transform: scaleY(calc(1 / var(--f7-device-pixel-ratio)));
-}
-
-.tabbar-item-changed {
-    color: var(--f7-theme-color);
 }
 
 .date-popover-menu .popover-inner, .category-popover-menu .popover-inner, .account-popover-menu .popover-inner {

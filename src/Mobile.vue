@@ -51,8 +51,7 @@ export default {
                     disableContextMenu: true
                 },
                 view: {
-                    animate: self.$settings.isEnableAnimate(),
-                    stackPages: true
+                    animate: self.$settings.isEnableAnimate()
                 }
             }
         }

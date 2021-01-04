@@ -96,31 +96,22 @@ export default {
         return axios.get('logout.json');
     },
     refreshToken: () => {
-        needBlockRequest = true;
+        return new Promise((resolve) => {
+            needBlockRequest = true;
 
-        return axios.post('v1/tokens/refresh.json', {} , {
-            ignoreBlocked: true
-        }).then(response => {
-            const data = response.data;
+            axios.post('v1/tokens/refresh.json', {}, {
+                ignoreBlocked: true
+            }).then(response => {
+                const data = response.data;
 
-            if (data && data.success && data.result && data.result.newToken) {
-                userState.updateToken(data.result.newToken);
-                userState.updateUserInfo(data.result.user);
+                resolve(response);
+                needBlockRequest = false;
 
-                if (data.result.oldTokenId) {
-                    axios.post('v1/tokens/revoke.json', {
-                        tokenId: data.result.oldTokenId
-                    }, {
-                        ignoreError: true
-                    });
-                }
-            }
-
-            needBlockRequest = false;
-            return data.result.newToken;
-        }).then(newToken => {
-            blockedRequests.forEach(func => func(newToken));
-            blockedRequests.length = 0;
+                return data.result.newToken;
+            }).then(newToken => {
+                blockedRequests.forEach(func => func(newToken));
+                blockedRequests.length = 0;
+            });
         });
     },
     getDataExportUrl: () => {
@@ -130,9 +121,11 @@ export default {
     getTokens: () => {
         return axios.get('v1/tokens/list.json');
     },
-    revokeToken: ({ tokenId }) => {
+    revokeToken: ({ tokenId, ignoreError }) => {
         return axios.post('v1/tokens/revoke.json', {
             tokenId
+        }, {
+            ignoreError: !!ignoreError
         });
     },
     revokeAllTokens: () => {

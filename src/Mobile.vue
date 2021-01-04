@@ -60,6 +60,19 @@ export default {
             }
         }
     },
+    created() {
+        if (this.$user.isUserLogined()) {
+            if (!this.$settings.isEnableApplicationLock()) {
+                // refresh token if user is logined
+                this.$store.dispatch('refreshTokenAndRevokeOldToken');
+
+                // auto refresh exchange rates data
+                if (this.$settings.isAutoUpdateExchangeRatesData()) {
+                    this.$services.autoRefreshLatestExchangeRates();
+                }
+            }
+        }
+    },
     methods: {
         isiOSHomeScreenMode() {
             if ((/iphone|ipod|ipad/gi).test(navigator.platform) && (/Safari/i).test(navigator.appVersion) &&

@@ -65,7 +65,7 @@ export default {
 
                 self.$webauthn.registerCredential(
                     self.$user.getUserAppLockState(),
-                    self.$user.getUserInfo(),
+                    self.$store.state.currentUserInfo,
                 ).then(({ id }) => {
                     self.$hideLoading();
 
@@ -120,7 +120,7 @@ export default {
                 return;
             }
 
-            const user = this.$user.getUserInfo();
+            const user = this.$store.state.currentUserInfo;
 
             if (!user || !user.username) {
                 this.$alert('An error has occurred');

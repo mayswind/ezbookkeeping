@@ -1,6 +1,12 @@
+import userState from "../lib/userstate.js";
 import utils from "../lib/utils.js";
 
 import {
+    RESET_STATE,
+
+    STORE_USER_INFO,
+    CLEAR_USER_INFO,
+
     LOAD_ACCOUNT_LIST,
     ADD_ACCOUNT_TO_ACCOUNT_LIST,
     SAVE_ACCOUNT_IN_ACCOUNT_LIST,
@@ -20,12 +26,15 @@ import {
     UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE
 } from './mutations.js';
 
+import user from './user.js';
+import token from './token.js';
 import account from './account.js';
 import transactionTag from './transactionTag.js';
 
 const stores = {
     strict: process.env.NODE_ENV !== 'production',
     state: {
+        currentUserInfo: userState.getUserInfo(),
         allAccounts: [],
         allAccountsMap: {},
         allCategorizedAccounts: {},
@@ -38,10 +47,32 @@ const stores = {
         transactions: [],
     },
     getters: {
+        currentUserNickname: user.currentUserNickname,
+        currentUserDefaultCurrency: user.currentUserDefaultCurrency,
         allAvailableAccountsCount: account.allAvailableAccountsCount,
         allVisibleAccountsCount: account.allVisibleAccountsCount,
     },
     mutations: {
+        [RESET_STATE] (state) {
+            state.allAccounts = [];
+            state.allAccountsMap = {};
+            state.allCategorizedAccounts = {};
+            state.accountListStateInvalid = true;
+            state.allTransactionCategories = [];
+            state.allTransactionCategoriesMap = {};
+            state.allTransactionTags = [];
+            state.allTransactionTagsMap = {};
+            state.transactionTagListStateInvalid = true;
+            state.transactions = [];
+        },
+        [STORE_USER_INFO] (state, userInfo) {
+            state.currentUserInfo = userInfo;
+            userState.updateUserInfo(userInfo);
+        },
+        [CLEAR_USER_INFO] (state) {
+            state.currentUserInfo = null;
+            userState.clearUserInfo();
+        },
         [LOAD_ACCOUNT_LIST] (state, accounts) {
             state.allAccounts = accounts;
             state.allAccountsMap = {};
@@ -212,6 +243,17 @@ const stores = {
         },
     },
     actions: {
+        authorize: user.authorize,
+        authorize2FA: user.authorize2FA,
+        register: user.register,
+        logout: user.logout,
+        getCurrentUserProfile: user.getCurrentUserProfile,
+        updateUserProfile: user.updateUserProfile,
+        clearUserInfoState: user.clearUserInfoState,
+        getAllTokens: token.getAllTokens,
+        refreshTokenAndRevokeOldToken: token.refreshTokenAndRevokeOldToken,
+        revokeToken: token.revokeToken,
+        revokeAllTokens: token.revokeAllTokens,
         loadAllAccounts: account.loadAllAccounts,
         saveAccount: account.saveAccount,
         getAccount: account.getAccount,

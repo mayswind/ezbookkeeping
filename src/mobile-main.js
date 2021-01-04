@@ -227,18 +227,6 @@ Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
 Vue.prototype.$locale.init();
 
-if (userstate.isUserLogined()) {
-    if (!settings.isEnableApplicationLock()) {
-        // refresh token if user is logined
-        services.refreshToken();
-
-        // auto refresh exchange rates data
-        if (settings.isAutoUpdateExchangeRatesData()) {
-            services.autoRefreshLatestExchangeRates();
-        }
-    }
-}
-
 new Vue({
     el: '#app',
     i18n: i18n,

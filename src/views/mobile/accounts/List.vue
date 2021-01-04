@@ -214,7 +214,7 @@ export default {
     },
     computed: {
         defaultCurrency() {
-            return this.$user.getUserInfo() ? this.$user.getUserInfo().defaultCurrency : this.$t('default.currency');
+            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
         allAccountCategories() {
             return this.$constants.account.allCategories;

@@ -158,31 +158,21 @@ export default {
 
         self.loading = true;
 
-        self.$services.getProfile().then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get user profile');
-                router.back();
-                return;
-            }
-
-            self.oldProfile.email = data.result.email;
-            self.oldProfile.nickname = data.result.nickname;
-            self.oldProfile.defaultCurrency = data.result.defaultCurrency;
+        self.$store.dispatch('getCurrentUserProfile').then(profile => {
+            self.oldProfile.email = profile.email;
+            self.oldProfile.nickname = profile.nickname;
+            self.oldProfile.defaultCurrency = profile.defaultCurrency;
 
             self.newProfile.email = self.oldProfile.email
             self.newProfile.nickname = self.oldProfile.nickname;
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
+
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to get user profile', error);
+            self.loading = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get user profile');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
@@ -209,45 +199,23 @@ export default {
             self.saving = true;
             self.$showLoading(() => self.saving);
 
-            self.$services.updateProfile({
-                password: self.newProfile.password,
-                oldPassword: self.currentPassword,
-                email: self.newProfile.email,
-                nickname: self.newProfile.nickname,
-                defaultCurrency: self.newProfile.defaultCurrency
-            }).then(response => {
+            self.$store.dispatch('updateUserProfile', {
+                profile: self.newProfile,
+                currentPassword: self.currentPassword
+            }).then(() => {
                 self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to update user profile');
-                    return;
-                }
-
-                if (self.$utilities.isString(data.result.newToken)) {
-                    self.$user.updateToken(data.result.newToken);
-                }
-
-                if (self.$utilities.isObject(data.result.user)) {
-                    self.$user.updateUserInfo(data.result.user);
-                }
 
                 self.$toast('Your profile has been successfully updated');
                 router.back();
             }).catch(error => {
-                self.$logger.error('failed to save user profile', error);
-
                 self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to update user profile');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

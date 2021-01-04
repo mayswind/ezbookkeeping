@@ -152,31 +152,13 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            self.$services.register({
-                username: self.user.username,
-                password: self.user.password,
-                email: self.user.email,
-                nickname: self.user.nickname,
-                defaultCurrency: self.user.defaultCurrency
-            }).then(response => {
+            self.$store.dispatch('register', {
+                user: self.user
+            }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
-                const data = response.data;
 
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to sign up');
-                    return;
-                }
-
-                if (self.$settings.isEnableApplicationLock()) {
-                    self.$settings.setEnableApplicationLock(false);
-                    self.$settings.setEnableApplicationLockWebAuthn(false);
-                    self.$user.clearWebAuthnConfig();
-                }
-
-                if (self.$utilities.isString(data.result.token)) {
-                    self.$user.updateTokenAndUserInfo(data.result);
-
+                if (self.$user.isUserLogined()) {
                     if (self.$settings.isAutoUpdateExchangeRatesData()) {
                         self.$services.autoRefreshLatestExchangeRates();
                     }
@@ -189,15 +171,11 @@ export default {
                     router.navigate('/category/default?type=0');
                 });
             }).catch(error => {
-                self.$logger.error('failed to sign up', error);
-
                 self.submitting = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to sign up');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

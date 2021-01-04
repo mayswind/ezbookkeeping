@@ -174,37 +174,18 @@ export default {
             self.logining = true;
             self.$showLoading(() => self.logining);
 
-            self.$services.authorize({
+            self.$store.dispatch('authorize', {
                 loginName: self.username,
                 password: self.password
-            }).then(response => {
+            }).then(authResponse => {
                 self.logining = false;
                 self.$hideLoading();
-                const data = response.data;
 
-                if (!data || !data.success || !data.result || !data.result.token) {
-                    self.$toast('Unable to login');
-                    return;
-                }
-
-                if (data.result.need2FA) {
-                    self.tempToken = data.result.token;
+                if (authResponse.need2FA) {
+                    self.tempToken = authResponse.token;
                     self.show2faSheet = true;
                     return;
                 }
-
-                if (self.$settings.isEnableApplicationLock() || self.$user.getUserAppLockState()) {
-                    const appLockState = self.$user.getUserAppLockState();
-
-                    if (!appLockState || appLockState.username !== data.result.user.username) {
-                        self.$user.clearTokenAndUserInfo(true);
-                        self.$settings.setEnableApplicationLock(false);
-                        self.$settings.setEnableApplicationLockWebAuthn(false);
-                        self.$user.clearWebAuthnConfig();
-                    }
-                }
-
-                self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$services.autoRefreshLatestExchangeRates();
@@ -212,19 +193,11 @@ export default {
 
                 router.refreshPage();
             }).catch(error => {
-                self.$logger.error('failed to login', error);
-
                 self.logining = false;
                 self.$hideLoading();
 
-                if (error && error.processed) {
-                    return;
-                }
-
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to login');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -257,42 +230,13 @@ export default {
             self.verifying = true;
             self.$showLoading(() => self.verifying);
 
-            let promise = null;
-
-            if (self.twoFAVerifyType === 'backupcode') {
-                promise = self.$services.authorize2FAByBackupCode({
-                    recoveryCode: self.backupCode,
-                    token: self.tempToken
-                });
-            } else {
-                promise = self.$services.authorize2FA({
-                    passcode: self.passcode,
-                    token: self.tempToken
-                });
-            }
-
-            promise.then(response => {
+            self.$store.dispatch('authorize2FA', {
+                token: self.tempToken,
+                passcode: self.twoFAVerifyType === 'passcode' ? self.passcode : null,
+                recoveryCode: self.twoFAVerifyType === 'backupcode' ? self.backupCode : null
+            }).then(() => {
                 self.verifying = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result || !data.result.token) {
-                    self.$toast('Unable to verify');
-                    return;
-                }
-
-                if (self.$settings.isEnableApplicationLock() || self.$user.getUserAppLockState()) {
-                    const appLockState = self.$user.getUserAppLockState();
-
-                    if (!appLockState || appLockState.username !== data.result.user.username) {
-                        self.$user.clearTokenAndUserInfo(true);
-                        self.$settings.setEnableApplicationLock(false);
-                        self.$settings.setEnableApplicationLockWebAuthn(false);
-                        self.$user.clearWebAuthnConfig();
-                    }
-                }
-
-                self.$user.updateTokenAndUserInfo(data.result);
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$services.autoRefreshLatestExchangeRates();
@@ -301,17 +245,13 @@ export default {
                 self.show2faSheet = false;
                 router.refreshPage();
             }).catch(error => {
-                self.$logger.error('failed to verify 2fa', error);
-
                 self.verifying = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to verify');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
-            })
+            });
         },
         switch2FAVerifyType() {
             if (this.twoFAVerifyType === 'passcode') {

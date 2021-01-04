@@ -86,7 +86,6 @@ export default {
         const self = this;
 
         return {
-            currentNickName: self.getCurrentUserNickName(),
             isEnableApplicationLock: this.$settings.isEnableApplicationLock(),
             exchangeRatesLastUpdateDate: self.getExchangeRatesLastUpdateDate(),
             logouting: false
@@ -107,6 +106,9 @@ export default {
                 this.$locale.setLanguage(value);
                 this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
             }
+        },
+        currentNickName() {
+            return this.$store.getters.currentUserNickname || this.$t('User');
         },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
@@ -168,13 +170,8 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.currentNickName = this.getCurrentUserNickName();
             this.isEnableApplicationLock = this.$settings.isEnableApplicationLock();
             this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
-        },
-        getCurrentUserNickName() {
-            const userInfo = this.$user.getUserInfo() || {};
-            return userInfo.nickname || userInfo.username || this.$t('User');
         },
         getExchangeRatesLastUpdateDate() {
             const exchangeRates = this.$exchangeRates.getExchangeRates();
@@ -188,37 +185,21 @@ export default {
                 self.logouting = true;
                 self.$showLoading(() => self.logouting);
 
-                self.$services.logout().then(response => {
+                self.$store.dispatch('logout').then(() => {
                     self.logouting = false;
                     self.$hideLoading();
-                    const data = response.data;
 
-                    if (!data || !data.success || !data.result) {
-                        self.$toast('Unable to logout');
-                        return;
-                    }
-
-                    self.$user.clearTokenAndUserInfo(true);
-                    self.$user.clearWebAuthnConfig();
                     self.$exchangeRates.clearExchangeRates();
                     self.$settings.clearSettings();
                     self.$locale.init();
 
                     router.navigate('/');
                 }).catch(error => {
-                    self.$logger.error('failed to log out', error);
-
                     self.logouting = false;
                     self.$hideLoading();
 
-                    if (error && error.processed) {
-                        return;
-                    }
-
-                    if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$toast({ error: error.response.data });
-                    } else if (!error.processed) {
-                        self.$toast('Unable to logout');
+                    if (!error.processed) {
+                        self.$toast(error.message || error);
                     }
                 });
             });

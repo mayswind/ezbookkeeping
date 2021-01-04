@@ -51,13 +51,13 @@ export default {
             self.$showLoading();
 
             self.$webauthn.verifyCredential(
-                self.$user.getUserInfo(),
+                self.$store.state.currentUserInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
                 self.$hideLoading();
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
-                self.$services.refreshToken();
+                self.$store.dispatch('refreshTokenAndRevokeOldToken');
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$services.autoRefreshLatestExchangeRates();
@@ -92,7 +92,7 @@ export default {
             }
 
             const router = this.$f7router;
-            const user = this.$user.getUserInfo();
+            const user = this.$store.state.currentUserInfo;
 
             if (!user || !user.username) {
                 this.$alert('An error has occurred');
@@ -101,7 +101,7 @@ export default {
 
             try {
                 this.$user.unlockTokenByPinCode(user.username, this.pinCode);
-                this.$services.refreshToken();
+                this.$store.dispatch('refreshTokenAndRevokeOldToken');
 
                 if (this.$settings.isAutoUpdateExchangeRatesData()) {
                     this.$services.autoRefreshLatestExchangeRates();
@@ -120,6 +120,7 @@ export default {
             self.$confirm('Are you sure you want to re-login?', () => {
                 self.$user.clearTokenAndUserInfo(true);
                 self.$user.clearWebAuthnConfig();
+                self.$store.dispatch('clearUserInfoState');
                 self.$exchangeRates.clearExchangeRates();
                 self.$settings.clearSettings();
                 self.$locale.init();

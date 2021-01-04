@@ -56,25 +56,14 @@ export default {
 
         self.loading = true;
 
-        self.$services.getTokens().then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get session list');
-                router.back();
-                return;
-            }
-
-            self.tokens = data.result;
+        self.$store.dispatch('getAllTokens').then(tokens => {
+            self.tokens = tokens;
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to load token list', error);
+            self.loading = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get session list');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
@@ -83,26 +72,19 @@ export default {
         reload(done) {
             const self = this;
 
-            self.$services.getTokens().then(response => {
-                done();
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get session list');
-                    return;
+            self.$store.dispatch('getAllTokens').then(tokens => {
+                if (done) {
+                    done();
                 }
 
-                self.tokens = data.result;
+                self.tokens = tokens;
             }).catch(error => {
-                self.$logger.error('failed to reload token list', error);
+                if (done) {
+                    done();
+                }
 
-                done();
-
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get session list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -114,16 +96,10 @@ export default {
             self.$confirm('Are you sure you want to logout from this session?', () => {
                 self.$showLoading();
 
-                self.$services.revokeToken({
+                self.$store.dispatch('revokeToken', {
                     tokenId: token.tokenId
-                }).then(response => {
+                }).then(() => {
                     self.$hideLoading();
-                    const data = response.data;
-
-                    if (!data || !data.success || !data.result) {
-                        self.$toast('Unable to logout from this session');
-                        return;
-                    }
 
                     app.swipeout.delete($$(`#${self.$options.filters.tokenDomId(token)}`), () => {
                         for (let i = 0; i < self.tokens.length; i++) {
@@ -133,14 +109,10 @@ export default {
                         }
                     });
                 }).catch(error => {
-                    self.$logger.error('failed to revoke token', error);
-
                     self.$hideLoading();
 
-                    if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$toast({error: error.response.data});
-                    } else if (!error.processed) {
-                        self.$toast('Unable to logout from this session');
+                    if (!error.processed) {
+                        self.$toast(error.message || error);
                     }
                 });
             });
@@ -155,14 +127,8 @@ export default {
             self.$confirm('Are you sure you want to logout all other sessions?', () => {
                 self.$showLoading();
 
-                self.$services.revokeAllTokens().then(response => {
+                self.$store.dispatch('revokeAllTokens').then(() => {
                     self.$hideLoading();
-                    const data = response.data;
-
-                    if (!data || !data.success || !data.result) {
-                        self.$toast('Unable to logout all other sessions');
-                        return;
-                    }
 
                     for (let i = self.tokens.length - 1; i >= 0; i--) {
                         if (!self.tokens[i].isCurrent) {
@@ -172,14 +138,10 @@ export default {
 
                     self.$toast('You have logged out all other sessions');
                 }).catch(error => {
-                    self.$logger.error('failed to revoke all tokens', error);
-
                     self.$hideLoading();
 
-                    if (error.response && error.response.data && error.response.data.errorMessage) {
-                        self.$toast({error: error.response.data});
-                    } else if (!error.processed) {
-                        self.$toast('Unable to logout all other sessions');
+                    if (!error.processed) {
+                        self.$toast(error.message || error);
                     }
                 });
             });

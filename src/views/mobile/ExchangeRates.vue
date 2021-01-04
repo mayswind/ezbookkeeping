@@ -55,7 +55,7 @@ export default {
         const self = this;
 
         return {
-            baseCurrency: self.$user.getUserInfo() ? self.$user.getUserInfo().defaultCurrency : self.$t('default.currency'),
+            baseCurrency: self.$store.getters.currentUserDefaultCurrency || self.$t('default.currency'),
             exchangeRatesData: self.$exchangeRates.getExchangeRates(),
             updating: false
         };

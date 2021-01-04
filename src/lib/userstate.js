@@ -160,16 +160,8 @@ function updateUserInfo(user) {
     }
 }
 
-function updateTokenAndUserInfo(item) {
-    if (utils.isObject(item)) {
-        if (item.token) {
-            updateToken(item.token);
-        }
-
-        if (item.user) {
-            updateUserInfo(item.user);
-        }
-    }
+function clearUserInfo() {
+    localStorage.removeItem(userInfoLocalStorageKey);
 }
 
 function clearTokenAndUserInfo(clearAppLockState) {
@@ -179,7 +171,7 @@ function clearTokenAndUserInfo(clearAppLockState) {
 
     sessionStorage.removeItem(tokenSessionStorageKey);
     localStorage.removeItem(tokenLocalStorageKey);
-    localStorage.removeItem(userInfoLocalStorageKey);
+    clearUserInfo();
 }
 
 export default {
@@ -198,6 +190,6 @@ export default {
     isCorrectPinCode,
     updateToken,
     updateUserInfo,
-    updateTokenAndUserInfo,
+    clearUserInfo,
     clearTokenAndUserInfo
 };

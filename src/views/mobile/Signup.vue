@@ -160,7 +160,7 @@ export default {
 
                 if (self.$user.isUserLogined()) {
                     if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                        self.$services.autoRefreshLatestExchangeRates();
+                        self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                     }
                 }
 

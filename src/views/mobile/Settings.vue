@@ -86,8 +86,7 @@ export default {
         const self = this;
 
         return {
-            isEnableApplicationLock: this.$settings.isEnableApplicationLock(),
-            exchangeRatesLastUpdateDate: self.getExchangeRatesLastUpdateDate(),
+            isEnableApplicationLock: self.$settings.isEnableApplicationLock(),
             logouting: false
         };
     },
@@ -104,7 +103,6 @@ export default {
             },
             set: function (value) {
                 this.$locale.setLanguage(value);
-                this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
             }
         },
         currentNickName() {
@@ -112,6 +110,10 @@ export default {
         },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
+        },
+        exchangeRatesLastUpdateDate() {
+            const exchangeRatesLastUpdateDate = this.$store.getters.exchangeRatesLastUpdateDate;
+            return exchangeRatesLastUpdateDate ? this.$utilities.formatDate(exchangeRatesLastUpdateDate, this.$t('format.date.long')) : '';
         },
         isAutoUpdateExchangeRatesData: {
             get: function () {
@@ -171,11 +173,6 @@ export default {
     methods: {
         onPageAfterIn() {
             this.isEnableApplicationLock = this.$settings.isEnableApplicationLock();
-            this.exchangeRatesLastUpdateDate = this.getExchangeRatesLastUpdateDate();
-        },
-        getExchangeRatesLastUpdateDate() {
-            const exchangeRates = this.$exchangeRates.getExchangeRates();
-            return exchangeRates && exchangeRates.date ? this.$moment(exchangeRates.date).format(this.$t('format.date.long')) : '';
         },
         logout() {
             const self = this;
@@ -189,7 +186,6 @@ export default {
                     self.logouting = false;
                     self.$hideLoading();
 
-                    self.$exchangeRates.clearExchangeRates();
                     self.$settings.clearSettings();
                     self.$locale.init();
 

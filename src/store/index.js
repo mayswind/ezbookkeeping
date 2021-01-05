@@ -7,6 +7,8 @@ import {
     STORE_USER_INFO,
     CLEAR_USER_INFO,
 
+    STORE_LATEST_EXCHANGE_RATES,
+
     LOAD_ACCOUNT_LIST,
     ADD_ACCOUNT_TO_ACCOUNT_LIST,
     SAVE_ACCOUNT_IN_ACCOUNT_LIST,
@@ -28,6 +30,7 @@ import {
 
 import user from './user.js';
 import token from './token.js';
+import exchangeRates from './exchangeRates.js';
 import account from './account.js';
 import transactionTag from './transactionTag.js';
 
@@ -35,6 +38,7 @@ const stores = {
     strict: process.env.NODE_ENV !== 'production',
     state: {
         currentUserInfo: userState.getUserInfo(),
+        latestExchangeRates: exchangeRates.getExchangeRatesFromLocalStorage(),
         allAccounts: [],
         allAccountsMap: {},
         allCategorizedAccounts: {},
@@ -49,11 +53,14 @@ const stores = {
     getters: {
         currentUserNickname: user.currentUserNickname,
         currentUserDefaultCurrency: user.currentUserDefaultCurrency,
+        exchangeRatesLastUpdateDate: exchangeRates.exchangeRatesLastUpdateDate,
+        getExchangedAmount: exchangeRates.getExchangedAmount,
         allAvailableAccountsCount: account.allAvailableAccountsCount,
         allVisibleAccountsCount: account.allVisibleAccountsCount,
     },
     mutations: {
         [RESET_STATE] (state) {
+            state.latestExchangeRates = {};
             state.allAccounts = [];
             state.allAccountsMap = {};
             state.allCategorizedAccounts = {};
@@ -64,6 +71,8 @@ const stores = {
             state.allTransactionTagsMap = {};
             state.transactionTagListStateInvalid = true;
             state.transactions = [];
+
+            exchangeRates.clearExchangeRatesFromLocalStorage();
         },
         [STORE_USER_INFO] (state, userInfo) {
             state.currentUserInfo = userInfo;
@@ -72,6 +81,10 @@ const stores = {
         [CLEAR_USER_INFO] (state) {
             state.currentUserInfo = null;
             userState.clearUserInfo();
+        },
+        [STORE_LATEST_EXCHANGE_RATES] (state, latestExchangeRates) {
+            state.latestExchangeRates = latestExchangeRates;
+            exchangeRates.setExchangeRatesToLocalStorage(latestExchangeRates);
         },
         [LOAD_ACCOUNT_LIST] (state, accounts) {
             state.allAccounts = accounts;
@@ -250,10 +263,12 @@ const stores = {
         getCurrentUserProfile: user.getCurrentUserProfile,
         updateUserProfile: user.updateUserProfile,
         clearUserInfoState: user.clearUserInfoState,
+        resetState: user.resetState,
         getAllTokens: token.getAllTokens,
         refreshTokenAndRevokeOldToken: token.refreshTokenAndRevokeOldToken,
         revokeToken: token.revokeToken,
         revokeAllTokens: token.revokeAllTokens,
+        getLatestExchangeRates: exchangeRates.getLatestExchangeRates,
         loadAllAccounts: account.loadAllAccounts,
         saveAccount: account.saveAccount,
         getAccount: account.getAccount,

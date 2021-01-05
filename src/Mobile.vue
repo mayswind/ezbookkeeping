@@ -68,7 +68,7 @@ export default {
 
                 // auto refresh exchange rates data
                 if (this.$settings.isAutoUpdateExchangeRatesData()) {
-                    this.$services.autoRefreshLatestExchangeRates();
+                    this.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
             }
         }

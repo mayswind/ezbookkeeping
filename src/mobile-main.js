@@ -28,7 +28,6 @@ import logger from './lib/logger.js';
 import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
-import exchangeRates from './lib/exchangeRates.js';
 import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
 import stores from './store/index.js';
@@ -211,7 +210,6 @@ Vue.prototype.$hideLoading = function () {
 };
 
 Vue.prototype.$services = services;
-Vue.prototype.$exchangeRates = exchangeRates;
 Vue.prototype.$user = userstate;
 
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));

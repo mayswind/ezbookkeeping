@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item
                         :title="$t('Base Currency')"
@@ -25,12 +25,12 @@
         </f7-card>
 
         <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="!exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
                 </f7-list>
             </f7-card-content>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
                                   :title="exchangeRate.currencyDisplayName"
@@ -56,11 +56,13 @@ export default {
 
         return {
             baseCurrency: self.$store.getters.currentUserDefaultCurrency || self.$t('default.currency'),
-            exchangeRatesData: self.$exchangeRates.getExchangeRates(),
             updating: false
         };
     },
     computed: {
+        exchangeRatesData() {
+            return this.$store.state.latestExchangeRates.data;
+        },
         availableExchangeRates() {
             if (!this.exchangeRatesData || !this.exchangeRatesData.exchangeRates) {
                 return [];
@@ -117,28 +119,19 @@ export default {
                 self.$showLoading();
             }
 
-            self.$services.getLatestExchangeRates().then(response => {
+            self.$store.dispatch('getLatestExchangeRates', {
+                silent: false,
+                force: true
+            }).then(() => {
                 if (done) {
                     done();
                 }
 
                 self.updating = false;
                 self.$hideLoading();
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get exchange rates data');
-                    return;
-                }
-
-                self.exchangeRatesData = data.result;
-                self.$exchangeRates.setExchangeRates(data.result);
 
                 self.$toast('Exchange rates data has been updated');
             }).catch(error => {
-                self.$logger.error('failed to get latest exchange rates data', error);
-
                 if (done) {
                     done();
                 }
@@ -146,10 +139,8 @@ export default {
                 self.updating = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get exchange rates data');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

@@ -369,8 +369,8 @@ export default {
                 }
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                    const exchangedOldValue = this.$exchangeRates.getOtherCurrencyAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
-                    const exchangedNewValue = this.$exchangeRates.getOtherCurrencyAmount(newValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedOldValue = this.$store.getters.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedNewValue = this.$store.getters.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
 
                     if (this.$utilities.isNumber(exchangedOldValue)) {
                         oldValue = Math.floor(exchangedOldValue);
@@ -704,7 +704,7 @@ export default {
                                 totalBalance += accountsBalance[i].balance;
                             }
                         } else {
-                            const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                            const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
                             if (!this.$utilities.isNumber(balance)) {
                                 hasUnCalculatedAmount = true;

@@ -60,7 +60,7 @@ export default {
                 self.$store.dispatch('refreshTokenAndRevokeOldToken');
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$services.autoRefreshLatestExchangeRates();
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
 
                 router.refreshPage();
@@ -104,7 +104,7 @@ export default {
                 this.$store.dispatch('refreshTokenAndRevokeOldToken');
 
                 if (this.$settings.isAutoUpdateExchangeRatesData()) {
-                    this.$services.autoRefreshLatestExchangeRates();
+                    this.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
 
                 router.refreshPage();
@@ -121,7 +121,7 @@ export default {
                 self.$user.clearTokenAndUserInfo(true);
                 self.$user.clearWebAuthnConfig();
                 self.$store.dispatch('clearUserInfoState');
-                self.$exchangeRates.clearExchangeRates();
+                self.$store.dispatch('resetState');
                 self.$settings.clearSettings();
                 self.$locale.init();
 

@@ -245,7 +245,7 @@ export default {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     netAssets += accountsBalance[i].balance;
                 } else {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         hasUnCalculatedAmount = true;
@@ -275,7 +275,7 @@ export default {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     totalAssets += accountsBalance[i].balance;
                 } else {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         hasUnCalculatedAmount = true;
@@ -305,7 +305,7 @@ export default {
                 if (accountsBalance[i].currency === this.defaultCurrency) {
                     totalLiabilities -= accountsBalance[i].balance;
                 } else {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         hasUnCalculatedAmount = true;
@@ -431,7 +431,7 @@ export default {
                         totalBalance += accountsBalance[i].balance;
                     }
                 } else {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         hasUnCalculatedAmount = true;

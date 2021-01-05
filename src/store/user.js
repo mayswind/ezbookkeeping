@@ -264,6 +264,10 @@ function clearUserInfoState(context) {
     context.commit(CLEAR_USER_INFO);
 }
 
+function resetState(context) {
+    context.commit(RESET_STATE);
+}
+
 function currentUserNickname(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.nickname || userInfo.username || null;
@@ -282,6 +286,7 @@ export default {
     getCurrentUserProfile,
     updateUserProfile,
     clearUserInfoState,
+    resetState,
     currentUserNickname,
     currentUserDefaultCurrency
 }

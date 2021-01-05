@@ -1,7 +1,6 @@
 import axios from 'axios';
-import moment from 'moment';
+
 import userState from "./userstate.js";
-import exchangeRates from "./exchangeRates.js";
 
 const baseUrlPath = '/api';
 
@@ -330,26 +329,9 @@ export default {
             id
         });
     },
-    getLatestExchangeRates: () => {
-        return axios.get('v1/exchange_rates/latest.json');
-    },
-    autoRefreshLatestExchangeRates: () => {
-        const currentExchangeRateData = exchangeRates.getExchangeRates();
-
-        if (currentExchangeRateData && currentExchangeRateData.date === moment().format('YYYY-MM-DD')) {
-            return;
-        }
-
+    getLatestExchangeRates: ({ ignoreError }) => {
         return axios.get('v1/exchange_rates/latest.json', {
-            ignoreError: true
-        }).then(response => {
-            const data = response.data;
-
-            if (data && data.success && data.result && data.result.exchangeRates) {
-                exchangeRates.setExchangeRates(data.result);
-            }
-
-            return data.result;
+            ignoreError: !!ignoreError
         });
     },
 };

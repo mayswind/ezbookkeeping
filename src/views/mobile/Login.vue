@@ -188,7 +188,7 @@ export default {
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$services.autoRefreshLatestExchangeRates();
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
 
                 router.refreshPage();
@@ -239,7 +239,7 @@ export default {
                 self.$hideLoading();
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$services.autoRefreshLatestExchangeRates();
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
 
                 self.show2faSheet = false;

@@ -888,7 +888,7 @@ export default {
                 let amount = transaction.sourceAmount;
 
                 if (transaction.sourceAccount.currency !== this.defaultCurrency) {
-                    const balance = this.$exchangeRates.getOtherCurrencyAmount(amount, transaction.sourceAccount.currency, this.defaultCurrency);
+                    const balance = this.$store.getters.getExchangedAmount(amount, transaction.sourceAccount.currency, this.defaultCurrency);
 
                     if (!this.$utilities.isNumber(balance)) {
                         if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {

@@ -8,7 +8,7 @@ import (
 	"github.com/mayswind/lab/pkg/settings"
 )
 
-const settingsCookieName = "ACP_SETTINGS"
+const settingsCookieName = "lab_server_settings"
 
 // ServerSettingsCookie adds server settings to cookies in response
 func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {

@@ -102,25 +102,14 @@ export default {
 
         self.loading = true;
 
-        self.$services.get2FAStatus().then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result || !self.$utilities.isBoolean(data.result.enable)) {
-                self.$toast('Unable to get current two factor authentication status');
-                router.back();
-                return;
-            }
-
-            self.status = data.result.enable;
+        self.$store.dispatch('get2FAStatus').then(response => {
+            self.status = response.enable;
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to get 2fa status', error);
+            self.loading = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get current two factor authentication status');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
@@ -135,30 +124,20 @@ export default {
             self.enabling = true;
             self.$showLoading(() => self.enabling);
 
-            self.$services.enable2FA().then(response => {
+            self.$store.dispatch('enable2FA').then(response => {
                 self.enabling = false;
                 self.$hideLoading();
-                const data = response.data;
 
-                if (!data || !data.success || !data.result || !data.result.qrcode || !data.result.secret) {
-                    self.$toast('Unable to enable two factor authentication');
-                    return;
-                }
-
-                self.new2FAQRCode = data.result.qrcode;
-                self.new2FASecret = data.result.secret;
+                self.new2FAQRCode = response.qrcode;
+                self.new2FASecret = response.secret;
 
                 self.showInputPasscodeSheetForEnable = true;
             }).catch(error => {
-                self.$logger.error('failed to request to enable 2fa', error);
-
                 self.enabling = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({error: error.response.data});
-                } else if (!error.processed) {
-                    self.$toast('Unable to enable two factor authentication');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -168,18 +147,12 @@ export default {
             self.enableConfirming = true;
             self.$showLoading(() => self.enableConfirming);
 
-            self.$services.confirmEnable2FA({
+            self.$store.dispatch('confirmEnable2FA', {
                 secret: self.new2FASecret,
                 passcode: self.currentPasscodeForEnable
             }).then(response => {
                 self.enableConfirming = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result || !data.result.token) {
-                    self.$toast('Unable to enable two factor authentication');
-                    return;
-                }
 
                 self.new2FAQRCode = '';
                 self.new2FASecret = '';
@@ -187,22 +160,16 @@ export default {
                 self.status = true;
                 self.showInputPasscodeSheetForEnable = false;
 
-                self.$user.updateToken(data.result.token);
-
-                if (data.result.recoveryCodes && data.result.recoveryCodes.length) {
-                    self.currentBackupCode = data.result.recoveryCodes.join('\n');
+                if (response.recoveryCodes && response.recoveryCodes.length) {
+                    self.currentBackupCode = response.recoveryCodes.join('\n');
                     self.showBackupCodeSheet = true;
                 }
             }).catch(error => {
-                self.$logger.error('failed to confirm to enable 2fa', error);
-
                 self.enableConfirming = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({error: error.response.data});
-                } else if (!error.processed) {
-                    self.$toast('Unable to enable two factor authentication');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -218,31 +185,21 @@ export default {
             self.disabling = true;
             self.$showLoading(() => self.disabling);
 
-            self.$services.disable2FA({
+            self.$store.dispatch('disable2FA', {
                 password: password
-            }).then(response => {
+            }).then(() => {
                 self.disabling = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to disable two factor authentication');
-                    return;
-                }
 
                 self.status = false;
                 self.showInputPasswordSheetForDisable = false;
                 self.$toast('Two factor authentication has been disabled');
             }).catch(error => {
-                self.$logger.error('failed to disable 2fa', error);
-
                 self.disabling = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({error: error.response.data});
-                } else if (!error.processed) {
-                    self.$toast('Unable to disable two factor authentication');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -258,32 +215,22 @@ export default {
             self.regenerating = true;
             self.$showLoading(() => self.regenerating);
 
-            self.$services.regenerate2FARecoveryCode({
+            self.$store.dispatch('regenerate2FARecoveryCode', {
                 password: password
             }).then(response => {
                 self.regenerating = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result || !data.result.recoveryCodes || !data.result.recoveryCodes.length) {
-                    self.$toast('Unable to regenerate two factor authentication backup codes');
-                    return;
-                }
 
                 self.showInputPasswordSheetForRegenerate = false;
 
-                self.currentBackupCode = data.result.recoveryCodes.join('\n');
+                self.currentBackupCode = response.recoveryCodes.join('\n');
                 self.showBackupCodeSheet = true;
             }).catch(error => {
-                self.$logger.error('failed to regenerate 2fa recovery code', error);
-
                 self.regenerating = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({error: error.response.data});
-                } else if (!error.processed) {
-                    self.$toast('Unable to regenerate two factor authentication backup codes');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },

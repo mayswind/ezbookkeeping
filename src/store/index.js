@@ -29,6 +29,7 @@ import {
 } from './mutations.js';
 
 import user from './user.js';
+import twoFactorAuth from './twoFactorAuth.js';
 import token from './token.js';
 import exchangeRates from './exchangeRates.js';
 import account from './account.js';
@@ -264,6 +265,11 @@ const stores = {
         updateUserProfile: user.updateUserProfile,
         clearUserInfoState: user.clearUserInfoState,
         resetState: user.resetState,
+        get2FAStatus: twoFactorAuth.get2FAStatus,
+        enable2FA: twoFactorAuth.enable2FA,
+        confirmEnable2FA: twoFactorAuth.confirmEnable2FA,
+        disable2FA: twoFactorAuth.disable2FA,
+        regenerate2FARecoveryCode: twoFactorAuth.regenerate2FARecoveryCode,
         getAllTokens: token.getAllTokens,
         refreshTokenAndRevokeOldToken: token.refreshTokenAndRevokeOldToken,
         revokeToken: token.revokeToken,

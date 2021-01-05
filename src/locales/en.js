@@ -541,6 +541,8 @@ export default {
     'You have saved this account': 'You have saved this account',
     'Unable to add account': 'Unable to add account',
     'Unable to save account': 'Unable to save account',
+    'Show Hidden Account': 'Show Hidden Account',
+    'Hide Hidden Account': 'Hide Hidden Account',
     'Unable to get account': 'Unable to get account',
     'Unable to hide this account': 'Unable to hide this account',
     'Unable to unhide this account': 'Unable to unhide this account',

@@ -541,6 +541,8 @@ export default {
     'You have saved this account': '您已经保存该账户',
     'Unable to add account': '无法添加账户',
     'Unable to save account': '无法保存账户',
+    'Show Hidden Account': '显示隐藏账户',
+    'Hide Hidden Account': '隐藏隐藏账户',
     'Unable to get account': '无法获取账户',
     'Unable to hide this account': '无法隐藏账户',
     'Unable to unhide this account': '无法取消隐藏账户',

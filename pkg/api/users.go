@@ -29,7 +29,7 @@ var (
 // UserRegisterHandler saves a new user by request parameters
 func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Error) {
 	if !settings.Container.Current.EnableUserRegister {
-		return a.UserRegistrationNotAllowed(c)
+		return nil, errs.ErrUserRegistrationNotAllowed
 	}
 
 	var userRegisterReq models.UserRegisterRequest
@@ -79,11 +79,6 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	return authResp, nil
-}
-
-// UserRegistrationNotAllowed returns user registration not allowed error
-func (a *UsersApi) UserRegistrationNotAllowed(c *core.Context) (interface{}, *errs.Error) {
-	return nil, errs.ErrUserRegistrationNotAllowed
 }
 
 // UserProfileHandler returns user profile of current user

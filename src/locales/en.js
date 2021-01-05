@@ -425,6 +425,7 @@ export default {
     'Edit': 'Edit',
     'Remove': 'Remove',
     'Delete': 'Delete',
+    'Duplicate': 'Duplicate',
     'Search': 'Search',
     'Sort': 'Sort',
     'Date': 'Date',

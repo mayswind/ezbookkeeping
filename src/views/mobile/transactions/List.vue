@@ -204,6 +204,10 @@
                                     </span>
                                 </div>
                                 <f7-swipeout-actions right>
+                                    <f7-swipeout-button color="primary" close
+                                                        :text="$t('Duplicate')"
+                                                        v-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
+                                                        @click="duplicate(transaction)"></f7-swipeout-button>
                                     <f7-swipeout-button color="orange" close
                                                         :text="$t('Edit')"
                                                         v-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
@@ -719,6 +723,9 @@ export default {
             this.transactions = [];
             this.query.keyword = keyword;
             this.reload(null);
+        },
+        duplicate(transaction) {
+            this.$f7router.navigate('/transaction/add?id=' + transaction.id);
         },
         edit(transaction) {
             this.$f7router.navigate('/transaction/edit?id=' + transaction.id);

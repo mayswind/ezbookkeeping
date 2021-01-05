@@ -7,7 +7,7 @@
                 <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save" v-if="!readonly"></f7-link>
             </f7-nav-right>
 
-            <f7-subnavbar :class="{ 'disabled': editTransactionId }">
+            <f7-subnavbar :class="{ 'disabled': readonly || edit }">
                 <f7-segmented strong>
                     <f7-button :text="$t('Expense')" :active="transaction.type === $constants.transaction.allTransactionTypes.Expense" @click="transaction.type = $constants.transaction.allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === $constants.transaction.allTransactionTypes.Income" @click="transaction.type = $constants.transaction.allTransactionTypes.Income"></f7-button>
@@ -260,6 +260,7 @@ export default {
             allCategories: {},
             allTags: [],
             readonly: false,
+            edit: false,
             loading: true,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
@@ -274,14 +275,14 @@ export default {
         title() {
             if (this.readonly) {
                 return 'Transaction Detail';
-            } else if (!this.editTransactionId) {
+            } else if (!this.edit) {
                 return 'Add Transaction';
             } else {
                 return 'Edit Transaction';
             }
         },
         saveButtonTitle() {
-            if (!this.editTransactionId) {
+            if (!this.edit) {
                 return 'Add';
             } else {
                 return 'Save';
@@ -408,6 +409,7 @@ export default {
         const router = self.$f7router;
 
         self.readonly = self.$f7route.path === '/transaction/detail';
+        self.edit = self.$f7route.path === '/transaction/edit';
         self.loading = true;
 
         const promises = [
@@ -417,8 +419,11 @@ export default {
         ];
 
         if (query.id) {
-            self.editTransactionId = query.id;
-            promises.push(self.$services.getTransaction({ id: self.editTransactionId }));
+            if (self.edit) {
+                self.editTransactionId = query.id;
+            }
+
+            promises.push(self.$services.getTransaction({ id: query.id }));
         }
 
         if (query.type && query.type !== '0' &&
@@ -450,7 +455,7 @@ export default {
                 return;
             }
 
-            if (self.editTransactionId && (!responses[3] || !responses[3].data || !responses[3].data.success || !responses[3].data.result)) {
+            if (query.id && (!responses[3] || !responses[3].data || !responses[3].data.success || !responses[3].data.result)) {
                 self.$toast('Unable to get transaction');
                 router.back();
                 return;
@@ -518,10 +523,13 @@ export default {
                 }
             }
 
-            if (self.editTransactionId) {
+            if (query.id) {
                 const transaction = responses[3].data.result;
 
-                self.transaction.id = transaction.id;
+                if (self.edit) {
+                    self.transaction.id = transaction.id;
+                }
+
                 self.transaction.type = transaction.type;
 
                 if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
@@ -532,8 +540,11 @@ export default {
                     self.transaction.transferCategory = transaction.categoryId;
                 }
 
-                self.transaction.unixTime = transaction.time;
-                self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
+                if (self.edit) {
+                    self.transaction.unixTime = transaction.time;
+                    self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
+                }
+
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
                 self.transaction.destinationAccountId = transaction.destinationAccountId;
                 self.transaction.sourceAmount = transaction.sourceAmount;
@@ -593,7 +604,7 @@ export default {
 
             let promise = null;
 
-            if (!self.editTransactionId) {
+            if (!self.edit) {
                 promise = self.$services.addTransaction(submitTransaction);
             } else {
                 submitTransaction.id = self.transaction.id;
@@ -606,7 +617,7 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (!self.editTransactionId) {
+                    if (!self.edit) {
                         self.$toast('Unable to add transaction');
                     } else {
                         self.$toast('Unable to save transaction');
@@ -614,7 +625,7 @@ export default {
                     return;
                 }
 
-                if (!self.editTransactionId) {
+                if (!self.edit) {
                     self.$toast('You have added a new transaction');
                 } else {
                     self.$toast('You have saved this transaction');

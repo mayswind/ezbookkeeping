@@ -425,6 +425,7 @@ export default {
     'Edit': '编辑',
     'Remove': '移除',
     'Delete': '删除',
+    'Duplicate': '复制',
     'Search': '搜索',
     'Sort': '排序',
     'Date': '日期',

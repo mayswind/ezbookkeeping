@@ -1,6 +1,9 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
-        <f7-login-screen-title>{{ $t('global.app.title') }}</f7-login-screen-title>
+        <f7-login-screen-title>
+            <img class="login-page-logo" src="/img/lab-192.png" />
+            <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
+        </f7-login-screen-title>
         <f7-list form>
             <f7-list-input
                 type="text"
@@ -33,7 +36,7 @@
             <f7-block-footer>
             </f7-block-footer>
         </f7-list>
-        <f7-button small popover-open=".popover-menu" :text="currentLanguageName"></f7-button>
+        <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
         <f7-list>
             <f7-block-footer>
                 <span>Powered by </span>
@@ -43,7 +46,8 @@
             <f7-block-footer>
             </f7-block-footer>
         </f7-list>
-        <f7-popover class="popover-menu">
+
+        <f7-popover class="lang-popover-menu">
             <f7-list>
                 <f7-list-item
                     link="#" no-chevron popover-close
@@ -266,3 +270,15 @@ export default {
     }
 };
 </script>
+
+<style>
+.login-page-logo {
+    width: 80px;
+    height: 80px;
+}
+
+.lang-popover-menu .popover-inner {
+    max-height: 300px;
+    overflow-Y: auto;
+}
+</style>

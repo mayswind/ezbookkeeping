@@ -222,10 +222,11 @@
 
                     <f7-list-input
                         type="textarea"
+                        style="height: auto"
                         :label="$t('Description')"
-                        :placeholder="$t('Your transaction description (optional)')"
+                        :placeholder="mode !== 'view' ? $t('Your transaction description (optional)') : ''"
                         :value="transaction.comment"
-                        @input="transaction.comment = $event.target.value"
+                        @input="transaction.comment = $event.target.value; changeSize($event)"
                     ></f7-list-input>
                 </f7-list>
             </f7-card-content>
@@ -660,6 +661,16 @@ export default {
                     }
                 }
             });
+        },
+        changeSize(event) {
+            const textarea = event.target;
+
+            if (!textarea) {
+                return;
+            }
+
+            textarea.scrollTop = 0;
+            textarea.style.height = textarea.scrollHeight + 'px';
         },
         isCategoryIdAvailable(categories, categoryId) {
             if (!categories || !categories.length) {

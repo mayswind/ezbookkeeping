@@ -4,10 +4,10 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save" v-if="!readonly"></f7-link>
+                <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save" v-if="mode !== 'view'"></f7-link>
             </f7-nav-right>
 
-            <f7-subnavbar :class="{ 'disabled': readonly || edit }">
+            <f7-subnavbar :class="{ 'disabled': mode !== 'add' }">
                 <f7-segmented strong>
                     <f7-button :text="$t('Expense')" :active="transaction.type === $constants.transaction.allTransactionTypes.Expense" @click="transaction.type = $constants.transaction.allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === $constants.transaction.allTransactionTypes.Income" @click="transaction.type = $constants.transaction.allTransactionTypes.Income"></f7-button>
@@ -39,7 +39,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form :class="{ 'disabled': readonly }">
+                <f7-list form :class="{ 'disabled': mode === 'view' }">
                     <f7-list-item
                         class="transaction-edit-amount padding-top-half padding-bottom-half"
                         :class="{ 'color-theme-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-theme-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
@@ -240,6 +240,7 @@ export default {
         const now = new Date();
 
         return {
+            mode: 'add',
             editTransactionId: null,
             transaction: {
                 type: self.$constants.transaction.allTransactionTypes.Expense,
@@ -259,8 +260,6 @@ export default {
             categoriedAccounts: [],
             allCategories: {},
             allTags: [],
-            readonly: false,
-            edit: false,
             loading: true,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
@@ -273,16 +272,16 @@ export default {
     },
     computed: {
         title() {
-            if (this.readonly) {
-                return 'Transaction Detail';
-            } else if (!this.edit) {
+            if (this.mode === 'add') {
                 return 'Add Transaction';
-            } else {
+            } else if (this.mode === 'edit') {
                 return 'Edit Transaction';
+            } else {
+                return 'Transaction Detail';
             }
         },
         saveButtonTitle() {
-            if (!this.edit) {
+            if (this.mode === 'add') {
                 return 'Add';
             } else {
                 return 'Save';
@@ -408,8 +407,12 @@ export default {
         const query = self.$f7route.query;
         const router = self.$f7router;
 
-        self.readonly = self.$f7route.path === '/transaction/detail';
-        self.edit = self.$f7route.path === '/transaction/edit';
+        if (self.$f7route.path === '/transaction/edit') {
+            self.mode = 'edit';
+        } else if (self.$f7route.path === '/transaction/detail') {
+            self.mode = 'view';
+        }
+
         self.loading = true;
 
         const promises = [
@@ -419,7 +422,7 @@ export default {
         ];
 
         if (query.id) {
-            if (self.edit) {
+            if (self.mode === 'edit') {
                 self.editTransactionId = query.id;
             }
 
@@ -526,7 +529,7 @@ export default {
             if (query.id) {
                 const transaction = responses[3].data.result;
 
-                if (self.edit) {
+                if (self.mode === 'edit') {
                     self.transaction.id = transaction.id;
                 }
 
@@ -540,7 +543,7 @@ export default {
                     self.transaction.transferCategory = transaction.categoryId;
                 }
 
-                if (self.edit) {
+                if (self.mode === 'edit') {
                     self.transaction.unixTime = transaction.time;
                     self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
                 }
@@ -571,7 +574,7 @@ export default {
             const self = this;
             const router = self.$f7router;
 
-            if (self.readonly) {
+            if (self.mode === 'view') {
                 return;
             }
 
@@ -604,9 +607,9 @@ export default {
 
             let promise = null;
 
-            if (!self.edit) {
+            if (self.mode === 'add') {
                 promise = self.$services.addTransaction(submitTransaction);
-            } else {
+            } else if (self.mode === 'edit') {
                 submitTransaction.id = self.transaction.id;
                 promise = self.$services.modifyTransaction(submitTransaction);
             }
@@ -617,17 +620,17 @@ export default {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    if (!self.edit) {
+                    if (self.mode === 'add') {
                         self.$toast('Unable to add transaction');
-                    } else {
+                    } else if (self.mode === 'edit') {
                         self.$toast('Unable to save transaction');
                     }
                     return;
                 }
 
-                if (!self.edit) {
+                if (self.mode === 'add') {
                     self.$toast('You have added a new transaction');
-                } else {
+                } else if (self.mode === 'edit') {
                     self.$toast('You have saved this transaction');
                 }
 
@@ -641,9 +644,9 @@ export default {
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     self.$toast({ error: error.response.data });
                 } else if (!error.processed) {
-                    if (!self.editAccountId) {
+                    if (self.mode === 'add') {
                         self.$toast('Unable to add transaction');
-                    } else {
+                    } else if (self.mode === 'edit') {
                         self.$toast('Unable to save transaction');
                     }
                 }

@@ -237,13 +237,22 @@
 export default {
     data() {
         const self = this;
+        const query = self.$f7route.query;
         const now = new Date();
+
+        let defaultType = self.$constants.transaction.allTransactionTypes.Expense;
+
+        if (query.type === self.$constants.transaction.allTransactionTypes.Income.toString()) {
+            defaultType = self.$constants.transaction.allTransactionTypes.Income;
+        } else if (query.type === self.$constants.transaction.allTransactionTypes.Transfer.toString()) {
+            defaultType = self.$constants.transaction.allTransactionTypes.Transfer;
+        }
 
         return {
             mode: 'add',
             editTransactionId: null,
             transaction: {
-                type: self.$constants.transaction.allTransactionTypes.Expense,
+                type: defaultType,
                 unixTime: self.$utilities.getUnixTime(now),
                 time: self.$utilities.formatDate(now, 'YYYY-MM-DDTHH:mm'),
                 expenseCategory: '',

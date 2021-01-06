@@ -10,7 +10,7 @@
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="search" class="searchbar-enable" data-searchbar=".searchbar-keyword"></f7-link>
-                <f7-link icon-f7="plus" :href="'/transaction/add?type=' + query.type + '&categoryId=' + query.categoryId + '&accountId=' + query.accountId"></f7-link>
+                <f7-link icon-f7="plus" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryId}&accountId=${query.accountId}`"></f7-link>
             </f7-nav-right>
 
             <f7-searchbar
@@ -155,7 +155,7 @@
                             <f7-list-item class="transaction-info" chevron-center
                                           v-for="(transaction, idx) in transactionMonthList.items"
                                           :key="transaction.id" :id="transaction | transactionDomId"
-                                          :link="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance ? '/transaction/detail?id=' + transaction.id : null"
+                                          :link="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
                                           swipeout
                             >
                                 <div slot="media" class="display-flex no-padding-horizontal">
@@ -725,10 +725,10 @@ export default {
             this.reload(null);
         },
         duplicate(transaction) {
-            this.$f7router.navigate('/transaction/add?id=' + transaction.id);
+            this.$f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
         },
         edit(transaction) {
-            this.$f7router.navigate('/transaction/edit?id=' + transaction.id);
+            this.$f7router.navigate(`/transaction/edit?id=${transaction.id}&type=${transaction.type}`);
         },
         remove(transaction, confirm) {
             const self = this;

@@ -559,9 +559,17 @@ export default {
                 }
 
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
-                self.transaction.destinationAccountId = transaction.destinationAccountId;
+
+                if (transaction.destinationAccountId) {
+                    self.transaction.destinationAccountId = transaction.destinationAccountId;
+                }
+
                 self.transaction.sourceAmount = transaction.sourceAmount;
-                self.transaction.destinationAmount = transaction.destinationAmount;
+
+                if (transaction.destinationAmount) {
+                    self.transaction.destinationAmount = transaction.destinationAmount;
+                }
+
                 self.transaction.tagIds = transaction.tagIds || [];
                 self.transaction.comment = transaction.comment;
             }

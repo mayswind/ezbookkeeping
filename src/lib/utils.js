@@ -358,25 +358,6 @@ function getCategoryInfo(categoryId) {
     return null;
 }
 
-function getPlainAccounts(allAccounts) {
-    const ret = [];
-
-    for (let i = 0; i < allAccounts.length; i++) {
-        const account = allAccounts[i];
-
-        if (account.type === accountConstants.allAccountTypes.SingleAccount) {
-            ret.push(account);
-        } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
-            for (let j = 0; j < account.subAccounts.length; j++) {
-                const subAccount = account.subAccounts[j];
-                ret.push(subAccount);
-            }
-        }
-    }
-
-    return ret;
-}
-
 function getCategorizedAccounts(allAccounts) {
     const ret = {};
 
@@ -490,7 +471,6 @@ export default {
     generateRandomString,
     parseUserAgent,
     getCategoryInfo,
-    getPlainAccounts,
     getCategorizedAccounts,
     getAllFilteredAccountsBalance,
 };

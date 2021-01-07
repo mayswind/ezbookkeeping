@@ -313,6 +313,9 @@ export default {
                 return '';
             }
         },
+        defaultCurrency() {
+            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
         allAccounts() {
             return this.$store.getters.allPlainAccounts;
         },
@@ -388,9 +391,6 @@ export default {
         },
         allTags() {
             return this.$store.state.allTransactionTags;
-        },
-        defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Expense] || !this.allCategories[this.$constants.category.allCategoryTypes.Expense].length) {

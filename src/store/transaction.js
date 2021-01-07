@@ -1,10 +1,67 @@
+import transactionConstants from '../consts/transaction.js';
+import exchangeRates from "./exchangeRates.js";
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
+import utils from '../lib/utils.js';
 
 import {
-    LOAD_TRANSACTION_LIST, UPDATE_ACCOUNT_LIST_INVALID_STATE,
-    UPDATE_TRANSACTION_LIST_INVALID_STATE
+    LOAD_TRANSACTION_LIST,
+    REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
+    UPDATE_TRANSACTION_LIST_INVALID_STATE,
+    UPDATE_ACCOUNT_LIST_INVALID_STATE,
 } from './mutations.js';
+
+function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime, minTime, type, categoryId, accountId, keyword }) {
+    let actualMaxTime = context.state.transactionsNextTimeId;
+
+    if (reload && maxTime > 0) {
+        actualMaxTime = maxTime * 1000 + 999;
+    } else if (reload && maxTime <= 0) {
+        actualMaxTime = 0;
+    }
+
+    return new Promise((resolve, reject) => {
+        services.getTransactions({
+            maxTime: actualMaxTime,
+            minTime: minTime,
+            type: type,
+            categoryId: categoryId,
+            accountId: accountId,
+            keyword: keyword
+        }).then(response => {
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                reject({ message: 'Unable to get transaction list' });
+                return;
+            }
+
+            context.commit(LOAD_TRANSACTION_LIST, {
+                transactions: data.result,
+                reload: reload,
+                autoExpand: autoExpand,
+                defaultCurrency: defaultCurrency,
+                accountId: accountId
+            });
+
+            if (reload) {
+                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, false);
+            }
+
+            resolve(data.result);
+        }).catch(error => {
+            logger.error('failed to load transaction list', error);
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                reject({ error: error.response.data });
+            } else if (!error.processed) {
+                reject({ message: 'Unable to get transaction list' });
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
 
 function getTransaction(context, { transactionId }) {
     return new Promise((resolve, reject) => {
@@ -17,9 +74,6 @@ function getTransaction(context, { transactionId }) {
                 reject({ message: 'Unable to get transaction' });
                 return;
             }
-
-            context.commit(LOAD_TRANSACTION_LIST, data.result);
-            context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, false);
 
             resolve(data.result);
         }).catch(error => {
@@ -58,7 +112,12 @@ function saveTransaction(context, { transaction }) {
                 return;
             }
 
-            context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+            if (!transaction.id) {
+                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+            } else {
+                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+            }
+
             context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
 
             resolve(data.result);
@@ -80,7 +139,131 @@ function saveTransaction(context, { transaction }) {
     });
 }
 
+function deleteTransaction(context, { transaction, defaultCurrency, accountId, beforeResolve }) {
+    return new Promise((resolve, reject) => {
+        services.deleteTransaction({
+            id: transaction.id
+        }).then(response => {
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                reject({ message: 'Unable to delete this transaction' });
+                return;
+            }
+
+            if (beforeResolve) {
+                beforeResolve(() => {
+                    context.commit(REMOVE_TRANSACTION_FROM_TRANSACTION_LIST, {
+                        transaction: transaction,
+                        defaultCurrency: defaultCurrency,
+                        accountId: accountId
+                    });
+                });
+            } else {
+                context.commit(REMOVE_TRANSACTION_FROM_TRANSACTION_LIST, {
+                    transaction: transaction,
+                    defaultCurrency: defaultCurrency,
+                    accountId: accountId
+                });
+            }
+
+            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+
+            resolve(data.result);
+        }).catch(error => {
+            logger.error('failed to delete transaction', error);
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                reject({ error: error.response.data });
+            } else if (!error.processed) {
+                reject({ message: 'Unable to delete this transaction' });
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
+
+function noTransaction(state) {
+    for (let i = 0; i < state.transactions.length; i++) {
+        const transactionMonthList = state.transactions[i];
+
+        for (let j = 0; j < transactionMonthList.items.length; j++) {
+            if (transactionMonthList.items[j]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function hasMoreTransaction(state) {
+    return state.transactionsNextTimeId > 0;
+}
+
+function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, incomplete) {
+    if (!transactionMonthList) {
+        return;
+    }
+
+    let totalExpense = 0;
+    let totalIncome = 0;
+    let hasUnCalculatedTotalExpense = false;
+    let hasUnCalculatedTotalIncome = false;
+
+    for (let i = 0; i < transactionMonthList.items.length; i++) {
+        const transaction = transactionMonthList.items[i];
+
+        if (!transaction.sourceAccount) {
+            continue;
+        }
+
+        let amount = transaction.sourceAmount;
+
+        if (transaction.sourceAccount.currency !== defaultCurrency) {
+            const balance = exchangeRates.getExchangedAmount(state)(amount, transaction.sourceAccount.currency, defaultCurrency);
+
+            if (!utils.isNumber(balance)) {
+                if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                    hasUnCalculatedTotalExpense = true;
+                } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                    hasUnCalculatedTotalIncome = true;
+                }
+
+                continue;
+            }
+
+            amount = Math.floor(balance);
+        }
+
+        if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+            totalExpense += amount;
+        } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+            totalIncome += amount;
+        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountId) {
+            if (accountId === transaction.sourceAccountId) {
+                totalExpense += amount;
+            } else if (accountId === transaction.destinationAccountId) {
+                totalIncome += amount;
+            }
+        }
+    }
+
+    transactionMonthList.totalAmount = {
+        expense: totalExpense,
+        incompleteExpense: incomplete || hasUnCalculatedTotalExpense,
+        income: totalIncome,
+        incompleteIncome: incomplete || hasUnCalculatedTotalIncome
+    };
+}
+
 export default {
+    getTransactions,
     getTransaction,
-    saveTransaction
+    saveTransaction,
+    deleteTransaction,
+    noTransaction,
+    hasMoreTransaction,
+    calculateMonthTotalAmount
 }

@@ -211,7 +211,6 @@ Vue.prototype.$hideLoading = function () {
     return this.$f7.preloader.hide();
 };
 
-Vue.prototype.$services = services;
 Vue.prototype.$user = userstate;
 
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));

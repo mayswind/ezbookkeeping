@@ -4,6 +4,7 @@
              :infinite-preloader="loadingMore"
              :infinite-distance="400"
              @ptr:refresh="reload"
+             @page:afterin="onPageAfterIn"
              @infinite="loadMore(true)">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
@@ -164,7 +165,7 @@
                                             {{ transaction.day }}
                                         </span>
                                         <span class="transaction-day-of-week full-line flex-direction-column">
-                                            {{ transaction.dayOfWeek }}
+                                            {{ `datetime.${transaction.dayOfWeek}.short` | t }}
                                         </span>
                                     </div>
                                     <div class="transaction-icon display-flex align-items-center">
@@ -223,7 +224,7 @@
             </f7-accordion-item>
         </f7-card>
 
-        <f7-block class="text-align-center" v-if="!loading && maxTime > 0">
+        <f7-block class="text-align-center" v-if="!loading && hasMoreTransaction">
             <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
         </f7-block>
 
@@ -371,7 +372,6 @@
 export default {
     data() {
         return {
-            transactions: [],
             query: {
                 dateType: 0,
                 maxTime: 0,
@@ -381,10 +381,6 @@ export default {
                 accountId: '0',
                 keyword: ''
             },
-            allAccounts: {},
-            allCategories: {},
-            allTags: {},
-            maxTime: 0,
             loading: true,
             loadingMore: false,
             transactionToDelete: null,
@@ -400,18 +396,27 @@ export default {
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
-        noTransaction() {
-            for (let i = 0; i < this.transactions.length; i++) {
-                const transactionMonthList = this.transactions[i];
-
-                for (let j = 0; j < transactionMonthList.items.length; j++) {
-                    if (transactionMonthList.items[j]) {
-                        return false;
-                    }
-                }
+        transactions() {
+            if (this.loading) {
+                return [];
             }
 
-            return true;
+            return this.$store.state.transactions;
+        },
+        noTransaction() {
+            return this.$store.getters.noTransaction;
+        },
+        hasMoreTransaction() {
+            return this.$store.getters.hasMoreTransaction;
+        },
+        allAccounts() {
+            return this.$store.state.allAccountsMap;
+        },
+        allCategories() {
+            return this.$store.state.allTransactionCategoriesMap;
+        },
+        allTags() {
+            return this.$store.state.allTransactionTagsMap;
         }
     },
     created() {
@@ -433,6 +438,11 @@ export default {
         this.reload(null);
     },
     methods: {
+        onPageAfterIn() {
+            if (this.$store.state.transactionListStateInvalid && !this.loading) {
+                this.reload(null);
+            }
+        },
         reload(done) {
             const self = this;
             const router = self.$f7router;
@@ -441,18 +451,15 @@ export default {
                 self.loading = true;
             }
 
-            if (self.query.maxTime > 0) {
-                self.maxTime = self.query.maxTime * 1000 + 999;
-            } else {
-                self.maxTime = 0;
-            }
-
             const promises = [
-                self.$services.getAllAccounts({ visibleOnly: false }),
-                self.$services.getAllTransactionCategories({}),
-                self.$services.getAllTransactionTags(),
-                self.$services.getTransactions({
-                    maxTime: self.maxTime,
+                self.$store.dispatch('loadAllAccounts', { force: false }),
+                self.$store.dispatch('loadAllCategories', { force: false }),
+                self.$store.dispatch('loadAllTags', { force: false }),
+                self.$store.dispatch('getTransactions', {
+                    reload: true,
+                    autoExpand: true,
+                    defaultCurrency: self.defaultCurrency,
+                    maxTime: self.query.maxTime > 0 ? self.query.maxTime * 1000 + 999 : 0,
                     minTime: self.query.minTime * 1000,
                     type: self.query.type,
                     categoryId: self.query.categoryId,
@@ -461,103 +468,22 @@ export default {
                 })
             ];
 
-            Promise.all(promises).then(responses => {
+            Promise.all(promises).then(() => {
                 if (done) {
                     done();
                 }
-
-                const accountData = responses[0].data;
-                const categoryData = responses[1].data;
-                const tagData = responses[2].data;
-                const transactionListData = responses[3].data;
-
-                if (!accountData || !accountData.success || !accountData.result) {
-                    self.$toast('Unable to get account list');
-                    if (!done) {
-                        router.back();
-                    }
-                    return;
-                }
-
-                if (!categoryData || !categoryData.success || !categoryData.result) {
-                    self.$toast('Unable to get category list');
-                    if (!done) {
-                        router.back();
-                    }
-                    return;
-                }
-
-                if (!tagData || !tagData.success || !tagData.result) {
-                    self.$toast('Unable to get tag list');
-                    if (!done) {
-                        router.back();
-                    }
-                    return;
-                }
-
-                if (!transactionListData || !transactionListData.success || !transactionListData.result) {
-                    self.$toast('Unable to get transaction list');
-                    if (!done) {
-                        router.back();
-                    }
-                    return;
-                }
-
-                const allAccounts = self.$utilities.getPlainAccounts(accountData.result);
-                self.allAccounts = {};
-
-                for (let i = 0; i < allAccounts.length; i++) {
-                    const account = allAccounts[i];
-                    self.allAccounts[account.id] = account;
-                }
-
-                const allCategories = categoryData.result;
-                self.allCategories = {};
-
-                for (let categoryType in allCategories) {
-                    if (!Object.prototype.hasOwnProperty.call(allCategories, categoryType)) {
-                        continue;
-                    }
-
-                    const categoryList = allCategories[categoryType];
-
-                    for (let i = 0; i < categoryList.length; i++) {
-                        const category = categoryList[i];
-                        self.allCategories[category.id] = category;
-
-                        for (let j = 0; j < category.subCategories.length; j++) {
-                            const subCategory = category.subCategories[j];
-                            self.allCategories[subCategory.id] = subCategory;
-                        }
-                    }
-                }
-
-                const allTags = tagData.result;
-                self.allTags = {};
-
-                for (let i = 0; i < allTags.length; i++) {
-                    const tag = allTags[i];
-                    self.allTags[tag.id] = tag;
-                }
-
-                self.transactions = [];
-                self.setResult(transactionListData.result, true);
 
                 self.loading = false;
             }).catch(error => {
-                self.$logger.error('failed to load transaction list', error);
+                self.loading = false;
 
                 if (done) {
                     done();
                 }
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                    if (!done) {
-                        router.back();
-                    }
-                } else if (!error.processed) {
-                    self.$toast('Unable to get transaction list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+
                     if (!done) {
                         router.back();
                     }
@@ -567,7 +493,7 @@ export default {
         loadMore(autoExpand) {
             const self = this;
 
-            if (self.maxTime <= 0) {
+            if (!self.hasMoreTransaction) {
                 return;
             }
 
@@ -577,33 +503,21 @@ export default {
 
             self.loadingMore = true;
 
-            self.$services.getTransactions({
-                maxTime: self.maxTime,
+            self.$store.dispatch('getTransactions', {
+                autoExpand: autoExpand,
+                defaultCurrency: self.defaultCurrency,
                 minTime: self.query.minTime * 1000,
                 type: self.query.type,
                 categoryId: self.query.categoryId,
                 accountId: self.query.accountId,
                 keyword: self.query.keyword
-            }).then(response => {
+            }).then(() => {
                 self.loadingMore = false;
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get transaction list');
-                    return;
-                }
-
-                self.setResult(data.result, autoExpand);
             }).catch(error => {
                 self.loadingMore = false;
 
-                self.$logger.error('failed to reload transaction list', error);
-
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get account list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -666,9 +580,6 @@ export default {
 
             this.query.maxTime = maxTime;
             this.query.minTime = minTime;
-
-            console.log(this.$utilities.formatUnixTime(this.query.maxTime, 'YYYY-MM-DD HH:mm:ss'));
-            console.log(this.$utilities.formatUnixTime(this.query.minTime, 'YYYY-MM-DD HH:mm:ss'));
 
             this.transactions = [];
             this.query.dateType = 11;
@@ -750,185 +661,24 @@ export default {
             self.transactionToDelete = null;
             self.$showLoading();
 
-            self.$services.deleteTransaction({
-                id: transaction.id
-            }).then(response => {
-                self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to delete this transaction');
-                    return;
+            self.$store.dispatch('deleteTransaction', {
+                transaction: transaction,
+                defaultCurrency: self.defaultCurrency,
+                accountId: self.query.accountId,
+                beforeResolve: (done) => {
+                    app.swipeout.delete($$(`#${self.$options.filters.transactionDomId(transaction)}`), () => {
+                        done();
+                    });
                 }
-
-                app.swipeout.delete($$(`#${self.$options.filters.transactionDomId(transaction)}`), () => {
-                    for (let i = 0; i < self.transactions.length; i++) {
-                        const transactionMonthList = self.transactions[i];
-
-                        if (!transactionMonthList.items ||
-                            transactionMonthList.items[0].time < transaction.time ||
-                            transactionMonthList.items[transactionMonthList.items.length - 1].time > transaction.time) {
-                            continue;
-                        }
-
-                        for (let j = 0; j < transactionMonthList.items.length; j++) {
-                            if (transactionMonthList.items[j].id === transaction.id) {
-                                transactionMonthList.items.splice(j, 1);
-                            }
-                        }
-
-                        if (transactionMonthList.items.length < 1) {
-                            self.transactions.splice(i, 1);
-                        } else {
-                            self.calculateMonthTotalAmount(transactionMonthList, i >= self.transactions.length - 1 && self.maxTime > 0);
-                        }
-                    }
-                });
+            }).then(() => {
+                self.$hideLoading();
             }).catch(error => {
-                self.$logger.error('failed to delete transaction', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to delete this transaction');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
-        },
-        setResult(result, autoExpand) {
-            if (result.items && result.items.length) {
-                let currentMonthListIndex = -1;
-                let currentMonthList = null;
-
-                for (let i = 0; i < result.items.length; i++) {
-                    const transaction = result.items[i];
-                    const transactionTime = this.$utilities.parseDateFromUnixTime(transaction.time);
-                    transaction.day = this.$utilities.getDay(transactionTime);
-                    transaction.dayOfWeek = this.$t(`datetime.${this.$utilities.getDayOfWeek(transactionTime)}.short`);
-                    transaction.sourceAccount = this.allAccounts[transaction.sourceAccountId];
-                    transaction.destinationAccount = this.allAccounts[transaction.destinationAccountId];
-                    transaction.category = this.allCategories[transaction.categoryId];
-                    transaction.tags = [];
-
-                    if (transaction.tagIds && transaction.tagIds.length) {
-                        for (let j = 0; j < transaction.tagIds.length; j++) {
-                            const tag = this.allTags[transaction.tagIds[j]];
-
-                            if (tag) {
-                                transaction.tags.push(tag);
-                            }
-                        }
-                    }
-
-                    const transactionYear = this.$utilities.getYear(transactionTime);
-                    const transactionMonth = this.$utilities.getMonth(transactionTime);
-                    const transactionYearMonth = this.$utilities.getYearAndMonth(transactionTime);
-
-                    if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
-                        currentMonthList.items.push(transaction);
-                        this.calculateMonthTotalAmount(currentMonthList, true);
-                        continue;
-                    }
-
-                    for (let j = currentMonthListIndex + 1; j < this.transactions.length; j++) {
-                        if (this.transactions[j].year === transactionYear && this.transactions[j].month === transactionMonth) {
-                            currentMonthListIndex = j;
-                            currentMonthList = this.transactions[j];
-
-                            if (j > 0) {
-                                this.calculateMonthTotalAmount(this.transactions[j - 1], false);
-                            }
-
-                            break;
-                        }
-                    }
-
-                    if (!currentMonthList && this.transactions.length > 0) {
-                        this.calculateMonthTotalAmount(this.transactions[this.transactions.length - 1], false);
-                    }
-
-                    if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
-                        this.calculateMonthTotalAmount(currentMonthList, false);
-
-                        this.transactions.push({
-                            year: transactionYear,
-                            month: transactionMonth,
-                            yearMonth: transactionYearMonth,
-                            opened: autoExpand,
-                            items: []
-                        });
-
-                        currentMonthListIndex = this.transactions.length - 1;
-                        currentMonthList = this.transactions[this.transactions.length - 1];
-                    }
-
-                    currentMonthList.items.push(transaction);
-                    this.calculateMonthTotalAmount(currentMonthList, true);
-                }
-            }
-
-            if (result.nextTimeSequenceId) {
-                this.maxTime = result.nextTimeSequenceId;
-            } else {
-                this.calculateMonthTotalAmount(this.transactions[this.transactions.length - 1], false);
-                this.maxTime = -1;
-            }
-        },
-        calculateMonthTotalAmount(transactionMonthList, incomplete) {
-            if (!transactionMonthList) {
-                return;
-            }
-
-            let totalExpense = 0;
-            let totalIncome = 0;
-            let hasUnCalculatedTotalExpense = false;
-            let hasUnCalculatedTotalIncome = false;
-
-            for (let i = 0; i < transactionMonthList.items.length; i++) {
-                const transaction = transactionMonthList.items[i];
-
-                if (!transaction.sourceAccount) {
-                    continue;
-                }
-
-                let amount = transaction.sourceAmount;
-
-                if (transaction.sourceAccount.currency !== this.defaultCurrency) {
-                    const balance = this.$store.getters.getExchangedAmount(amount, transaction.sourceAccount.currency, this.defaultCurrency);
-
-                    if (!this.$utilities.isNumber(balance)) {
-                        if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {
-                            hasUnCalculatedTotalExpense = true;
-                        } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
-                            hasUnCalculatedTotalIncome = true;
-                        }
-
-                        continue;
-                    }
-
-                    amount = Math.floor(balance);
-                }
-
-                if (transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {
-                    totalExpense += amount;
-                } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
-                    totalIncome += amount;
-                } else if (transaction.type === this.$constants.transaction.allTransactionTypes.Transfer && this.query.accountId) {
-                    if (this.query.accountId === transaction.sourceAccountId) {
-                        totalExpense += amount;
-                    } else if (this.query.accountId === transaction.destinationAccountId) {
-                        totalIncome += amount;
-                    }
-                }
-            }
-
-            transactionMonthList.totalAmount = {
-                expense: totalExpense,
-                incompleteExpense: incomplete || hasUnCalculatedTotalExpense,
-                income: totalIncome,
-                incompleteIncome: incomplete || hasUnCalculatedTotalIncome
-            };
         }
     },
     filters: {

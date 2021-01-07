@@ -18,6 +18,8 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_LIST,
+    SAVE_TRANSACTION_IN_TRANSACTION_LIST,
+    REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_CATEGORY_LIST,
@@ -34,7 +36,7 @@ import {
     CHANGE_TAG_DISPLAY_ORDER_IN_TRANSACTION_TAG_LIST,
     UPDATE_TAG_VISIBILITY_IN_TRANSACTION_TAG_LIST,
     REMOVE_TAG_FROM_TRANSACTION_TAG_LIST,
-    UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE
+    UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE,
 } from './mutations.js';
 
 import user from './user.js';
@@ -56,6 +58,7 @@ const stores = {
         allCategorizedAccounts: {},
         accountListStateInvalid: true,
         transactions: [],
+        transactionsNextTimeId: 0,
         transactionListStateInvalid: true,
         allTransactionCategories: {},
         allTransactionCategoriesMap: {},
@@ -73,6 +76,8 @@ const stores = {
         allVisiblePlainAccounts: account.allVisiblePlainAccounts,
         allAvailableAccountsCount: account.allAvailableAccountsCount,
         allVisibleAccountsCount: account.allVisibleAccountsCount,
+        noTransaction: transaction.noTransaction,
+        hasMoreTransaction: transaction.hasMoreTransaction,
     },
     mutations: {
         [RESET_STATE] (state) {
@@ -84,6 +89,7 @@ const stores = {
             state.accountListStateInvalid = true;
 
             state.transactions = [];
+            state.transactionsNextTimeId = 0;
             state.transactionListStateInvalid = true;
 
             state.allTransactionCategories = {};
@@ -115,6 +121,13 @@ const stores = {
             for (let i = 0; i < accounts.length; i++) {
                 const account = accounts[i];
                 state.allAccountsMap[account.id] = account;
+
+                if (account.subAccounts) {
+                    for (let j = 0; j < account.subAccounts.length; j++) {
+                        const subAccount = account.subAccounts[j];
+                        state.allAccountsMap[subAccount.id] = subAccount;
+                    }
+                }
             }
 
             state.allCategorizedAccounts = utils.getCategorizedAccounts(accounts);
@@ -133,6 +146,13 @@ const stores = {
 
             state.allAccountsMap[account.id] = account;
 
+            if (account.subAccounts) {
+                for (let i = 0; i < account.subAccounts.length; i++) {
+                    const subAccount = account.subAccounts[i];
+                    state.allAccountsMap[subAccount.id] = subAccount;
+                }
+            }
+
             if (state.allCategorizedAccounts[account.category]) {
                 const accountList = state.allCategorizedAccounts[account.category].accounts;
                 accountList.push(account);
@@ -149,6 +169,13 @@ const stores = {
             }
 
             state.allAccountsMap[account.id] = account;
+
+            if (account.subAccounts) {
+                for (let i = 0; i < account.subAccounts.length; i++) {
+                    const subAccount = account.subAccounts[i];
+                    state.allAccountsMap[subAccount.id] = subAccount;
+                }
+            }
 
             if (state.allCategorizedAccounts[account.category]) {
                 const accountList = state.allCategorizedAccounts[account.category].accounts;
@@ -203,6 +230,17 @@ const stores = {
                 }
             }
 
+            if (state.allAccountsMap[account.id] && state.allAccountsMap[account.id].subAccounts) {
+                const subAccounts = state.allAccountsMap[account.id].subAccounts;
+
+                for (let i = 0; i < subAccounts.length; i++) {
+                    const subAccount = subAccounts[i];
+                    if (state.allAccountsMap[subAccount.id]) {
+                        delete state.allAccountsMap[subAccount.id];
+                    }
+                }
+            }
+
             if (state.allAccountsMap[account.id]) {
                 delete state.allAccountsMap[account.id];
             }
@@ -221,8 +259,131 @@ const stores = {
         [UPDATE_ACCOUNT_LIST_INVALID_STATE] (state, invalidState) {
             state.accountListStateInvalid = invalidState;
         },
-        [LOAD_TRANSACTION_LIST] (state, transactions) {
-            state.transactions = transactions;
+        [LOAD_TRANSACTION_LIST] (state, { transactions, reload, autoExpand, defaultCurrency, accountId }) {
+            if (reload) {
+                state.transactions = [];
+            }
+
+            if (transactions.items && transactions.items.length) {
+                let currentMonthListIndex = -1;
+                let currentMonthList = null;
+
+                for (let i = 0; i < transactions.items.length; i++) {
+                    const item = transactions.items[i];
+                    const transactionTime = utils.parseDateFromUnixTime(item.time);
+
+                    item.day = utils.getDay(transactionTime);
+                    item.dayOfWeek = utils.getDayOfWeek(transactionTime);
+                    item.sourceAccount = state.allAccountsMap[item.sourceAccountId];
+                    item.destinationAccount = state.allAccountsMap[item.destinationAccountId];
+                    item.category = state.allTransactionCategoriesMap[item.categoryId];
+                    item.tags = [];
+
+                    if (item.tagIds && item.tagIds.length) {
+                        for (let j = 0; j < item.tagIds.length; j++) {
+                            const tag = state.allTransactionTagsMap[item.tagIds[j]];
+
+                            if (tag) {
+                                item.tags.push(tag);
+                            }
+                        }
+                    }
+
+                    const transactionYear = utils.getYear(transactionTime);
+                    const transactionMonth = utils.getMonth(transactionTime);
+                    const transactionYearMonth = utils.getYearAndMonth(transactionTime);
+
+                    if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
+                        currentMonthList.items.push(item);
+                        transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                        continue;
+                    }
+
+                    for (let j = currentMonthListIndex + 1; j < state.transactions.length; j++) {
+                        if (state.transactions[j].year === transactionYear && state.transactions[j].month === transactionMonth) {
+                            currentMonthListIndex = j;
+                            currentMonthList = state.transactions[j];
+
+                            if (j > 0) {
+                                transaction.calculateMonthTotalAmount(state, state.transactions[j - 1], defaultCurrency, accountId, false);
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if (!currentMonthList && state.transactions.length > 0) {
+                        transaction.calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
+                    }
+
+                    if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
+                        transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, false);
+
+                        state.transactions.push({
+                            year: transactionYear,
+                            month: transactionMonth,
+                            yearMonth: transactionYearMonth,
+                            opened: autoExpand,
+                            items: []
+                        });
+
+                        currentMonthListIndex = state.transactions.length - 1;
+                        currentMonthList = state.transactions[state.transactions.length - 1];
+                    }
+
+                    currentMonthList.items.push(item);
+                    transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                }
+            }
+
+            if (transactions.nextTimeSequenceId) {
+                state.transactionsNextTimeId = transactions.nextTimeSequenceId;
+            } else {
+                transaction.calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
+                state.transactionsNextTimeId = -1;
+            }
+        },
+        [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency, accountId }) {
+            for (let i = 0; i < state.transactions.length; i++) {
+                const transactionMonthList = state.transactions[i];
+
+                if (!transactionMonthList.items ||
+                    transactionMonthList.items[0].time < transaction.time ||
+                    transactionMonthList.items[transactionMonthList.items.length - 1].time > transaction.time) {
+                    continue;
+                }
+
+                for (let j = 0; j < transactionMonthList.items.length; j++) {
+                    if (transactionMonthList.items[j].id === transaction.id) {
+                        transactionMonthList.items.splice(j, 1, transaction);
+                        transaction.calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                        return;
+                    }
+                }
+            }
+        },
+        [REMOVE_TRANSACTION_FROM_TRANSACTION_LIST] (state, { transaction, defaultCurrency, accountId }) {
+            for (let i = 0; i < state.transactions.length; i++) {
+                const transactionMonthList = state.transactions[i];
+
+                if (!transactionMonthList.items ||
+                    transactionMonthList.items[0].time < transaction.time ||
+                    transactionMonthList.items[transactionMonthList.items.length - 1].time > transaction.time) {
+                    continue;
+                }
+
+                for (let j = 0; j < transactionMonthList.items.length; j++) {
+                    if (transactionMonthList.items[j].id === transaction.id) {
+                        transactionMonthList.items.splice(j, 1);
+                    }
+                }
+
+                if (transactionMonthList.items.length < 1) {
+                    state.transactions.splice(i, 1);
+                } else {
+                    transaction.calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                }
+            }
         },
         [UPDATE_TRANSACTION_LIST_INVALID_STATE] (state, invalidState) {
             state.transactionListStateInvalid = invalidState;
@@ -320,6 +481,17 @@ const stores = {
                 }
             }
 
+            if (state.allTransactionCategoriesMap[category.id] && state.allTransactionCategoriesMap[category.id].subCategories) {
+                const subCategories = state.allTransactionCategoriesMap[category.id].subCategories;
+
+                for (let i = 0; i < subCategories.length; i++) {
+                    const subCategory = subCategories[i];
+                    if (state.allTransactionCategoriesMap[subCategory.id]) {
+                        delete state.allTransactionCategoriesMap[subCategory.id];
+                    }
+                }
+            }
+
             if (state.allTransactionCategoriesMap[category.id]) {
                 delete state.allTransactionCategoriesMap[category.id];
             }
@@ -405,8 +577,10 @@ const stores = {
         hideAccount: account.hideAccount,
         deleteAccount: account.deleteAccount,
 
+        getTransactions: transaction.getTransactions,
         getTransaction: transaction.getTransaction,
         saveTransaction: transaction.saveTransaction,
+        deleteTransaction: transaction.deleteTransaction,
 
         loadAllCategories: transactionCategory.loadAllCategories,
         getCategory: transactionCategory.getCategory,

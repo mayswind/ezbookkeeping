@@ -159,30 +159,20 @@ export default {
                 }
             }
 
-            self.$services.addTransactionCategoryBatch({
+            self.$store.dispatch('addTransactionCategoryBatch', {
                 categories: categories
-            }).then(response => {
+            }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
-                const data = response.data;
 
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to add category');
-                    return;
-                }
-
-                self.$toast('You have added default categories');
+                self.$toast('You have added preset categories');
                 router.back();
             }).catch(error => {
-                self.$logger.error('failed to save default categories', error);
-
                 self.submitting = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to add category');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

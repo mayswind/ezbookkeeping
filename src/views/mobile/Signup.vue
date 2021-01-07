@@ -70,7 +70,20 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
                     <f7-list-item
-                        :header="$t('Default Currency')"
+                        :key="currentLocale + '_lang'"
+                        :title="$t('Language')"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                    >
+                        <select v-model="currentLocale">
+                            <option v-for="(lang, locale) in allLanguages"
+                                    :key="locale"
+                                    :value="locale">{{ lang.displayName }}</option>
+                        </select>
+                    </f7-list-item>
+
+                    <f7-list-item
+                        :key="currentLocale + '_currency'"
+                        :title="$t('Default Currency')"
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
@@ -82,6 +95,78 @@
                 </f7-list>
             </f7-card-content>
         </f7-card>
+
+        <f7-card>
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list form>
+                    <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
+                        <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
+                    </f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-popup :opened="showPresetCategories" @popup:closed="showPresetCategories = false">
+            <f7-page>
+                <f7-navbar :title="$t('Preset Categories')">
+                    <f7-nav-right>
+                        <f7-link icon-f7="ellipsis" @click="showPresetCategoriesMoreActionSheet = true"></f7-link>
+                        <f7-link popup-close :text="$t('Close')"></f7-link>
+                    </f7-nav-right>
+                </f7-navbar>
+                <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
+                    <f7-card-header>
+                        <small :style="{ opacity: 0.6 }">
+                            <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | t }}</span>
+                        </small>
+                    </f7-card-header>
+                    <f7-card-content class="no-safe-areas" :padding="false">
+                        <f7-list v-if="showPresetCategories">
+                            <f7-list-item v-for="(category, idx) in categories"
+                                          :key="idx"
+                                          :accordion-item="!!category.subCategories.length"
+                                          :title="$t('category.' + category.name, currentLocale)">
+                                <f7-icon slot="media"
+                                         :icon="category.categoryIconId | categoryIcon"
+                                         :style="category.color | categoryIconStyle('var(--default-icon-color)')">
+                                </f7-icon>
+
+                                <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
+                                    <f7-list>
+                                        <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
+                                                      :key="subIdx"
+                                                      :title="$t('category.' + subCategory.name, currentLocale)">
+                                            <f7-icon slot="media"
+                                                     :icon="subCategory.categoryIconId | categoryIcon"
+                                                     :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
+                                            </f7-icon>
+                                        </f7-list-item>
+                                    </f7-list>
+                                </f7-accordion-content>
+                            </f7-list-item>
+                        </f7-list>
+                    </f7-card-content>
+                </f7-card>
+            </f7-page>
+
+            <f7-actions close-by-outside-click close-on-escape :opened="showPresetCategoriesMoreActionSheet" @actions:closed="showPresetCategoriesMoreActionSheet = false">
+                <f7-actions-group>
+                    <f7-actions-button close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ $t('Enable') }}</f7-actions-button>
+                    <f7-actions-button close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-actions-button>
+                    <f7-actions-button @click="showPresetCategoriesChangeLocaleSheet = true">{{ $t('Change Language') }}</f7-actions-button>
+                </f7-actions-group>
+                <f7-actions-group>
+                    <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+                </f7-actions-group>
+            </f7-actions>
+
+            <list-item-selection-sheet value-type="index"
+                                       title-field="displayName"
+                                       :items="allLanguages"
+                                       :show.sync="showPresetCategoriesChangeLocaleSheet"
+                                       v-model="currentLocale">
+            </list-item-selection-sheet>
+        </f7-popup>
     </f7-page>
 </template>
 
@@ -99,12 +184,38 @@ export default {
                 nickname: '',
                 defaultCurrency: self.$t('default.currency')
             },
-            submitting: false
+            submitting: false,
+            presetCategories: {
+                [self.$constants.category.allCategoryTypes.Income]: self.$utilities.copyArrayTo(self.$constants.category.defaultIncomeCategories, []),
+                [self.$constants.category.allCategoryTypes.Expense]: self.$utilities.copyArrayTo(self.$constants.category.defaultExpenseCategories, []),
+                [self.$constants.category.allCategoryTypes.Transfer]: self.$utilities.copyArrayTo(self.$constants.category.defaultTransferCategories, [])
+            },
+            usePresetCategories: false,
+            showPresetCategories: false,
+            showPresetCategoriesMoreActionSheet: false,
+            showPresetCategoriesChangeLocaleSheet: false
         };
     },
     computed: {
+        allLanguages() {
+            return this.$locale.getAllLanguages();
+        },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        currentLocale: {
+            get: function () {
+                return this.$i18n.locale;
+            },
+            set: function (value) {
+                const isCurrencyDefault = this.user.defaultCurrency === this.$t('default.currency');
+
+                this.$locale.setLanguage(value);
+
+                if (isCurrencyDefault) {
+                    this.user.defaultCurrency = this.$t('default.currency');
+                }
+            }
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -152,23 +263,85 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
+            const allCategories = [];
+
+            if (self.usePresetCategories) {
+                for (let categoryType in self.presetCategories) {
+                    if (!Object.prototype.hasOwnProperty.call(self.presetCategories, categoryType)) {
+                        continue;
+                    }
+
+                    const categories = self.presetCategories[categoryType];
+
+                    for (let j = 0; j < categories.length; j++) {
+                        const category = categories[j];
+                        const submitCategory = {
+                            name: self.$t('category.' + category.name, self.currentLocale),
+                            type: parseInt(categoryType),
+                            icon: category.categoryIconId,
+                            color: category.color,
+                            subCategories: []
+                        }
+
+                        for (let k = 0; k < category.subCategories.length; k++) {
+                            const subCategory = category.subCategories[k];
+                            submitCategory.subCategories.push({
+                                name: self.$t('category.' + subCategory.name, self.currentLocale),
+                                type: parseInt(categoryType),
+                                icon: subCategory.categoryIconId,
+                                color: subCategory.color
+                            });
+                        }
+
+                        allCategories.push(submitCategory);
+                    }
+                }
+            }
+
             self.$store.dispatch('register', {
                 user: self.user
             }).then(() => {
-                self.submitting = false;
-                self.$hideLoading();
+                if (!self.$user.isUserLogined()) {
+                    self.submitting = false;
+                    self.$hideLoading();
 
-                if (self.$user.isUserLogined()) {
-                    if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                        self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    if (self.usePresetCategories) {
+                        self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    } else {
+                        self.$toast('You have been successfully registered');
                     }
+
+                    router.navigate('/');
+                    return;
                 }
 
-                self.$toast('You have been successfully registered');
-                router.navigate('/');
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                }
 
-                self.$confirm('Do you want to initialize transaction categories now?', () => {
-                    router.navigate('/category/default?type=0');
+                if (!self.usePresetCategories) {
+                    self.submitting = false;
+                    self.$hideLoading();
+
+                    self.$toast('You have been successfully registered');
+                    router.navigate('/');
+                    return;
+                }
+
+                self.$store.dispatch('addTransactionCategoryBatch', {
+                    categories: allCategories
+                }).then(() => {
+                    self.submitting = false;
+                    self.$hideLoading();
+
+                    self.$toast('You have been successfully registered');
+                    router.navigate('/');
+                }).catch(() => {
+                    self.submitting = false;
+                    self.$hideLoading();
+
+                    self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    router.navigate('/');
                 });
             }).catch(error => {
                 self.submitting = false;
@@ -178,6 +351,20 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        }
+    },
+    filters: {
+        categoryTypeName(categoryType, allCategoryTypes) {
+            switch (categoryType) {
+                case allCategoryTypes.Income.toString():
+                    return 'Income Categories';
+                case allCategoryTypes.Expense.toString():
+                    return 'Expense Categories';
+                case allCategoryTypes.Transfer.toString():
+                    return 'Transfer Categories';
+                default:
+                    return 'Transaction Categories';
+            }
         }
     }
 };

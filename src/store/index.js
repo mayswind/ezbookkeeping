@@ -18,6 +18,7 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_CATEGORY_LIST,
+    UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_TAG_LIST,
     ADD_TAG_TO_TRANSACTION_TAG_LIST,
@@ -33,6 +34,7 @@ import twoFactorAuth from './twoFactorAuth.js';
 import token from './token.js';
 import exchangeRates from './exchangeRates.js';
 import account from './account.js';
+import transactionCategory from './transactionCategory.js';
 import transactionTag from './transactionTag.js';
 
 const stores = {
@@ -46,6 +48,7 @@ const stores = {
         accountListStateInvalid: true,
         allTransactionCategories: [],
         allTransactionCategoriesMap: {},
+        transactionCategoryListStateInvalid: true,
         allTransactionTags: [],
         allTransactionTagsMap: {},
         transactionTagListStateInvalid: true,
@@ -209,6 +212,9 @@ const stores = {
                 state.allTransactionCategoriesMap[category.id] = category;
             }
         },
+        [UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE] (state, invalidState) {
+            state.transactionCategoryListStateInvalid = invalidState;
+        },
         [LOAD_TRANSACTION_TAG_LIST] (state, tags) {
             state.allTransactionTags = tags;
             state.allTransactionTagsMap = {};
@@ -265,16 +271,20 @@ const stores = {
         updateUserProfile: user.updateUserProfile,
         clearUserInfoState: user.clearUserInfoState,
         resetState: user.resetState,
+
         get2FAStatus: twoFactorAuth.get2FAStatus,
         enable2FA: twoFactorAuth.enable2FA,
         confirmEnable2FA: twoFactorAuth.confirmEnable2FA,
         disable2FA: twoFactorAuth.disable2FA,
         regenerate2FARecoveryCode: twoFactorAuth.regenerate2FARecoveryCode,
+
         getAllTokens: token.getAllTokens,
         refreshTokenAndRevokeOldToken: token.refreshTokenAndRevokeOldToken,
         revokeToken: token.revokeToken,
         revokeAllTokens: token.revokeAllTokens,
+
         getLatestExchangeRates: exchangeRates.getLatestExchangeRates,
+
         loadAllAccounts: account.loadAllAccounts,
         saveAccount: account.saveAccount,
         getAccount: account.getAccount,
@@ -282,6 +292,9 @@ const stores = {
         updateAccountDisplayOrders: account.updateAccountDisplayOrders,
         hideAccount: account.hideAccount,
         deleteAccount: account.deleteAccount,
+
+        addTransactionCategoryBatch: transactionCategory.addTransactionCategoryBatch,
+
         loadAllTags: transactionTag.loadAllTags,
         saveTag: transactionTag.saveTag,
         changeTagDisplayOrder: transactionTag.changeTagDisplayOrder,

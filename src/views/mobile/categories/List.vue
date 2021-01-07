@@ -32,7 +32,7 @@
                     <f7-list-item :title="$t('No available category')"></f7-list-item>
                     <f7-list-button v-if="hasSubCategories"
                         :title="$t('Add Default Categories')"
-                        :href="'/category/default?type=' + categoryType"></f7-list-button>
+                        :href="'/category/preset?type=' + categoryType"></f7-list-button>
                 </f7-list>
 
                 <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
@@ -207,7 +207,7 @@ export default {
             const self = this;
             const previousRoute = self.$f7router.previousRoute;
 
-            if (previousRoute && (previousRoute.path === '/category/add' || previousRoute.path === '/category/edit' || previousRoute.path === '/category/default') && !self.loading) {
+            if (previousRoute && (previousRoute.path === '/category/add' || previousRoute.path === '/category/edit' || previousRoute.path === '/category/preset') && !self.loading) {
                 self.reload(null);
             }
         },

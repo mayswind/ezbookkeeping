@@ -26,7 +26,7 @@ import SessionListPage from "../views/mobile/users/SessionList.vue";
 import CategoryAllPage from "../views/mobile/categories/All.vue";
 import CategoryListPage from "../views/mobile/categories/List.vue";
 import CategoryEditPage from "../views/mobile/categories/Edit.vue";
-import CategoryDefaultPage from "../views/mobile/categories/Default.vue";
+import CategoryPresetPage from "../views/mobile/categories/Preset.vue";
 
 import TagListPage from "../views/mobile/tags/List.vue";
 
@@ -236,8 +236,8 @@ const routes = [
         beforeEnter: checkLogin
     },
     {
-        path: '/category/default',
-        component: CategoryDefaultPage,
+        path: '/category/preset',
+        component: CategoryPresetPage,
         beforeEnter: checkLogin
     },
     {

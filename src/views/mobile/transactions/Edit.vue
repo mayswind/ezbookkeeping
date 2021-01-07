@@ -148,7 +148,7 @@
                     <f7-list-item
                         class="transaction-edit-account"
                         link="#"
-                        :class="{ 'disabled': !allAccounts.length }"
+                        :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t(sourceAccountName)"
                         :title="transaction.sourceAccountId | accountName(allAccounts)"
                         @click="showSourceAccountSheet = true"
@@ -161,7 +161,7 @@
                                                               secondary-key-field="id" secondary-value-field="id"
                                                               secondary-title-field="name" secondary-footer-field="displayBalance"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                              :items="categoriedAccounts"
+                                                              :items="categorizedAccounts"
                                                               :show.sync="showSourceAccountSheet"
                                                               v-model="transaction.sourceAccountId">
                         </two-column-list-item-selection-sheet>
@@ -170,7 +170,7 @@
                     <f7-list-item
                         class="transaction-edit-account"
                         link="#"
-                        :class="{ 'disabled': !allAccounts.length }"
+                        :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t('Destination Account')"
                         :title="transaction.destinationAccountId | accountName(allAccounts)"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
@@ -184,7 +184,7 @@
                                                               secondary-key-field="id" secondary-value-field="id"
                                                               secondary-title-field="name" secondary-footer-field="displayBalance"
                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                              :items="categoriedAccounts"
+                                                              :items="categorizedAccounts"
                                                               :show.sync="showDestinationAccountSheet"
                                                               v-model="transaction.destinationAccountId">
                         </two-column-list-item-selection-sheet>
@@ -266,10 +266,6 @@ export default {
                 tagIds: [],
                 comment: ''
             },
-            allAccounts: [],
-            categoriedAccounts: [],
-            allCategories: {},
-            allTags: [],
             loading: true,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
@@ -316,6 +312,82 @@ export default {
             } else {
                 return '';
             }
+        },
+        allAccounts() {
+            return this.$store.getters.allPlainAccounts;
+        },
+        allVisibleAccounts() {
+            return this.$store.getters.allVisiblePlainAccounts;
+        },
+        categorizedAccounts() {
+            const categorizedAccounts = this.$utilities.copyObjectTo(this.$utilities.getCategorizedAccounts(this.allVisibleAccounts), {});
+
+            for (let category in categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
+                    continue;
+                }
+
+                const accountCategory = categorizedAccounts[category];
+
+                if (accountCategory.accounts) {
+                    for (let i = 0; i < accountCategory.accounts.length; i++) {
+                        const account = accountCategory.accounts[i];
+
+                        if (this.showAccountBalance && account.isAsset) {
+                            account.displayBalance = this.$options.filters.currency(account.balance, account.currency);
+                        } else if (this.showAccountBalance && account.isLiability) {
+                            account.displayBalance = this.$options.filters.currency(-account.balance, account.currency);
+                        } else {
+                            account.displayBalance = '***';
+                        }
+                    }
+                }
+
+                if (this.showAccountBalance) {
+                    const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+                    let totalBalance = 0;
+                    let hasUnCalculatedAmount = false;
+
+                    for (let i = 0; i < accountsBalance.length; i++) {
+                        if (accountsBalance[i].currency === this.defaultCurrency) {
+                            if (accountsBalance[i].isAsset) {
+                                totalBalance += accountsBalance[i].balance;
+                            } else if (accountsBalance[i].isLiability) {
+                                totalBalance -= accountsBalance[i].balance;
+                            }
+                        } else {
+                            const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+
+                            if (!this.$utilities.isNumber(balance)) {
+                                hasUnCalculatedAmount = true;
+                                continue;
+                            }
+
+                            if (accountsBalance[i].isAsset) {
+                                totalBalance += Math.floor(balance);
+                            } else if (accountsBalance[i].isLiability) {
+                                totalBalance -= Math.floor(balance);
+                            }
+                        }
+                    }
+
+                    if (hasUnCalculatedAmount) {
+                        totalBalance = totalBalance + '+';
+                    }
+
+                    accountCategory.displayBalance = this.$options.filters.currency(totalBalance, this.defaultCurrency);
+                } else {
+                    accountCategory.displayBalance = '***';
+                }
+            }
+
+            return categorizedAccounts;
+        },
+        allCategories() {
+            return this.$store.state.allTransactionCategories;
+        },
+        allTags() {
+            return this.$store.state.allTransactionTags;
         },
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
@@ -364,13 +436,13 @@ export default {
             } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
                 let sourceAccount, destinationAccount = null;
 
-                for (let i = 0; i < this.allAccounts.length; i++) {
-                    if (this.allAccounts[i].id === this.transaction.sourceAccountId) {
-                        sourceAccount = this.allAccounts[i];
+                for (let i = 0; i < this.allVisibleAccounts.length; i++) {
+                    if (this.allVisibleAccounts[i].id === this.transaction.sourceAccountId) {
+                        sourceAccount = this.allVisibleAccounts[i];
                     }
 
-                    if (this.allAccounts[i].id === this.transaction.destinationAccountId) {
-                        destinationAccount = this.allAccounts[i];
+                    if (this.allVisibleAccounts[i].id === this.transaction.destinationAccountId) {
+                        destinationAccount = this.allVisibleAccounts[i];
                     }
 
                     if (sourceAccount && destinationAccount) {
@@ -426,9 +498,9 @@ export default {
         self.loading = true;
 
         const promises = [
-            self.$services.getAllAccounts({ visibleOnly: true }),
-            self.$services.getAllTransactionCategories({}),
-            self.$services.getAllTransactionTags()
+            self.$store.dispatch('loadAllAccounts', { force: false }),
+            self.$store.dispatch('loadAllCategories', { force: false }),
+            self.$store.dispatch('loadAllTags', { force: false })
         ];
 
         if (query.id) {
@@ -436,7 +508,7 @@ export default {
                 self.editTransactionId = query.id;
             }
 
-            promises.push(self.$services.getTransaction({ id: query.id }));
+            promises.push(self.$store.dispatch('getTransaction', { transactionId: query.id }));
         }
 
         if (query.type && query.type !== '0' &&
@@ -446,42 +518,11 @@ export default {
         }
 
         Promise.all(promises).then(function (responses) {
-            const accountData = responses[0].data;
-            const categoryData = responses[1].data;
-            const tagData = responses[2].data;
-
-            if (!accountData || !accountData.success || !accountData.result) {
-                self.$toast('Unable to get account list');
-                router.back();
-                return;
-            }
-
-            if (!categoryData || !categoryData.success || !categoryData.result) {
-                self.$toast('Unable to get category list');
-                router.back();
-                return;
-            }
-
-            if (!tagData || !tagData.success || !tagData.result) {
-                self.$toast('Unable to get tag list');
-                router.back();
-                return;
-            }
-
-            if (query.id && (!responses[3] || !responses[3].data || !responses[3].data.success || !responses[3].data.result)) {
+            if (query.id && !responses[3]) {
                 self.$toast('Unable to get transaction');
                 router.back();
                 return;
             }
-
-            self.allAccounts = self.$utilities.getPlainAccounts(accountData.result);
-            self.setAccountsDisplayBalance(self.allAccounts);
-
-            self.categoriedAccounts = self.$utilities.getCategorizedAccounts(self.allAccounts);
-            self.setCategoriesDisplayBalance(self.categoriedAccounts);
-
-            self.allCategories = categoryData.result;
-            self.allTags = tagData.result;
 
             if (self.allCategories[self.$constants.category.allCategoryTypes.Expense] &&
                 self.allCategories[self.$constants.category.allCategoryTypes.Expense].length) {
@@ -516,10 +557,10 @@ export default {
                 }
             }
 
-            if (self.allAccounts.length) {
+            if (self.allVisibleAccounts.length) {
                 if (query.accountId && query.accountId !== '0') {
-                    for (let i = 0; i < self.allAccounts.length; i++) {
-                        if (self.allAccounts[i].id === query.accountId) {
+                    for (let i = 0; i < self.allVisibleAccounts.length; i++) {
+                        if (self.allVisibleAccounts[i].id === query.accountId) {
                             self.transaction.sourceAccountId = query.accountId;
                             self.transaction.destinationAccountId = query.accountId;
                             break;
@@ -528,16 +569,16 @@ export default {
                 }
 
                 if (!self.transaction.sourceAccountId) {
-                    self.transaction.sourceAccountId = self.allAccounts[0].id;
+                    self.transaction.sourceAccountId = self.allVisibleAccounts[0].id;
                 }
 
                 if (!self.transaction.destinationAccountId) {
-                    self.transaction.destinationAccountId = self.allAccounts[0].id;
+                    self.transaction.destinationAccountId = self.allVisibleAccounts[0].id;
                 }
             }
 
             if (query.id) {
-                const transaction = responses[3].data.result;
+                const transaction = responses[3];
 
                 if (self.mode === 'edit') {
                     self.transaction.id = transaction.id;
@@ -578,11 +619,8 @@ export default {
         }).catch(error => {
             self.$logger.error('failed to load essential data for editing transaction', error);
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('An error has occurred');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
@@ -623,28 +661,15 @@ export default {
                 return;
             }
 
-            let promise = null;
-
-            if (self.mode === 'add') {
-                promise = self.$services.addTransaction(submitTransaction);
-            } else if (self.mode === 'edit') {
+            if (self.mode === 'edit') {
                 submitTransaction.id = self.transaction.id;
-                promise = self.$services.modifyTransaction(submitTransaction);
             }
 
-            promise.then(response => {
+            self.$store.dispatch('saveTransaction', {
+                transaction: submitTransaction
+            }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (self.mode === 'add') {
-                        self.$toast('Unable to add transaction');
-                    } else if (self.mode === 'edit') {
-                        self.$toast('Unable to save transaction');
-                    }
-                    return;
-                }
 
                 if (self.mode === 'add') {
                     self.$toast('You have added a new transaction');
@@ -654,19 +679,11 @@ export default {
 
                 router.back();
             }).catch(error => {
-                self.$logger.error('failed to save transaction', error);
-
                 self.submitting = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (self.mode === 'add') {
-                        self.$toast('Unable to add transaction');
-                    } else if (self.mode === 'edit') {
-                        self.$toast('Unable to save transaction');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -703,73 +720,6 @@ export default {
             for (let i = 0; i < categories.length; i++) {
                 for (let j = 0; j < categories[i].subCategories.length; j++) {
                     return categories[i].subCategories[j].id;
-                }
-            }
-        },
-        setAccountsDisplayBalance(accounts) {
-            for (let i = 0; i < accounts.length; i++) {
-                const account = accounts[i];
-
-                if (this.showAccountBalance) {
-                    if (account.isAsset) {
-                        account.displayBalance = this.$options.filters.currency(account.balance, account.currency);
-                    } else if (account.isLiability) {
-                        account.displayBalance = this.$options.filters.currency(-account.balance, account.currency);
-                    } else {
-                        account.displayBalance = this.$options.filters.currency(account.balance, account.currency);
-                    }
-                } else {
-                    account.displayBalance = '***';
-                }
-            }
-        },
-        setCategoriesDisplayBalance(categorizedAccounts) {
-            for (let category in categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
-                    continue;
-                }
-
-                const accountCategory = categorizedAccounts[category];
-
-                if (this.showAccountBalance) {
-                    const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
-                    let totalBalance = 0;
-                    let hasUnCalculatedAmount = false;
-
-                    for (let i = 0; i < accountsBalance.length; i++) {
-                        if (accountsBalance[i].currency === this.defaultCurrency) {
-                            if (accountsBalance[i].isAsset) {
-                                totalBalance += accountsBalance[i].balance;
-                            } else if (accountsBalance[i].isLiability) {
-                                totalBalance -= accountsBalance[i].balance;
-                            } else {
-                                totalBalance += accountsBalance[i].balance;
-                            }
-                        } else {
-                            const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                            if (!this.$utilities.isNumber(balance)) {
-                                hasUnCalculatedAmount = true;
-                                continue;
-                            }
-
-                            if (accountsBalance[i].isAsset) {
-                                totalBalance += Math.floor(balance);
-                            } else if (accountsBalance[i].isLiability) {
-                                totalBalance -= Math.floor(balance);
-                            } else {
-                                totalBalance += Math.floor(balance);
-                            }
-                        }
-                    }
-
-                    if (hasUnCalculatedAmount) {
-                        totalBalance = totalBalance + '+';
-                    }
-
-                    accountCategory.displayBalance = this.$options.filters.currency(totalBalance, this.defaultCurrency);
-                } else {
-                    accountCategory.displayBalance = '***';
                 }
             }
         },

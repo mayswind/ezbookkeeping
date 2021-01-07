@@ -1,3 +1,4 @@
+import accountConstants from '../consts/account.js';
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
 
@@ -271,6 +272,48 @@ function deleteAccount(context, { account, beforeResolve }) {
     });
 }
 
+function allPlainAccounts(state) {
+    const allAccounts = [];
+
+    for (let i = 0; i < state.allAccounts.length; i++) {
+        const account = state.allAccounts[i];
+
+        if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+            allAccounts.push(account);
+        } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+            for (let j = 0; j < account.subAccounts.length; j++) {
+                const subAccount = account.subAccounts[j];
+                allAccounts.push(subAccount);
+            }
+        }
+    }
+
+    return allAccounts;
+}
+
+function allVisiblePlainAccounts(state) {
+    const allVisibleAccounts = [];
+
+    for (let i = 0; i < state.allAccounts.length; i++) {
+        const account = state.allAccounts[i];
+
+        if (account.hidden) {
+            continue;
+        }
+
+        if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+            allVisibleAccounts.push(account);
+        } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+            for (let j = 0; j < account.subAccounts.length; j++) {
+                const subAccount = account.subAccounts[j];
+                allVisibleAccounts.push(subAccount);
+            }
+        }
+    }
+
+    return allVisibleAccounts;
+}
+
 function allAvailableAccountsCount(state) {
     let allAccountCount = 0;
 
@@ -313,6 +356,8 @@ export default {
     updateAccountDisplayOrders,
     hideAccount,
     deleteAccount,
+    allPlainAccounts,
+    allVisiblePlainAccounts,
     allAvailableAccountsCount,
     allVisibleAccountsCount,
 }

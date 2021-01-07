@@ -17,6 +17,9 @@ import {
     REMOVE_ACCOUNT_FROM_ACCOUNT_LIST,
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
+    LOAD_TRANSACTION_LIST,
+    UPDATE_TRANSACTION_LIST_INVALID_STATE,
+
     LOAD_TRANSACTION_CATEGORY_LIST,
     ADD_CATEGORY_TO_TRANSACTION_CATEGORY_LIST,
     SAVE_CATEGORY_IN_TRANSACTION_CATEGORY_LIST,
@@ -39,6 +42,7 @@ import twoFactorAuth from './twoFactorAuth.js';
 import token from './token.js';
 import exchangeRates from './exchangeRates.js';
 import account from './account.js';
+import transaction from './transaction.js';
 import transactionCategory from './transactionCategory.js';
 import transactionTag from './transactionTag.js';
 
@@ -51,35 +55,44 @@ const stores = {
         allAccountsMap: {},
         allCategorizedAccounts: {},
         accountListStateInvalid: true,
+        transactions: [],
+        transactionListStateInvalid: true,
         allTransactionCategories: {},
         allTransactionCategoriesMap: {},
         transactionCategoryListStateInvalid: true,
         allTransactionTags: [],
         allTransactionTagsMap: {},
         transactionTagListStateInvalid: true,
-        transactions: [],
     },
     getters: {
         currentUserNickname: user.currentUserNickname,
         currentUserDefaultCurrency: user.currentUserDefaultCurrency,
         exchangeRatesLastUpdateDate: exchangeRates.exchangeRatesLastUpdateDate,
         getExchangedAmount: exchangeRates.getExchangedAmount,
+        allPlainAccounts: account.allPlainAccounts,
+        allVisiblePlainAccounts: account.allVisiblePlainAccounts,
         allAvailableAccountsCount: account.allAvailableAccountsCount,
         allVisibleAccountsCount: account.allVisibleAccountsCount,
     },
     mutations: {
         [RESET_STATE] (state) {
             state.latestExchangeRates = {};
+
             state.allAccounts = [];
             state.allAccountsMap = {};
             state.allCategorizedAccounts = {};
             state.accountListStateInvalid = true;
+
+            state.transactions = [];
+            state.transactionListStateInvalid = true;
+
             state.allTransactionCategories = {};
             state.allTransactionCategoriesMap = {};
+            state.transactionCategoryListStateInvalid = true;
+
             state.allTransactionTags = [];
             state.allTransactionTagsMap = {};
             state.transactionTagListStateInvalid = true;
-            state.transactions = [];
 
             exchangeRates.clearExchangeRatesFromLocalStorage();
         },
@@ -207,6 +220,12 @@ const stores = {
         },
         [UPDATE_ACCOUNT_LIST_INVALID_STATE] (state, invalidState) {
             state.accountListStateInvalid = invalidState;
+        },
+        [LOAD_TRANSACTION_LIST] (state, transactions) {
+            state.transactions = transactions;
+        },
+        [UPDATE_TRANSACTION_LIST_INVALID_STATE] (state, invalidState) {
+            state.transactionListStateInvalid = invalidState;
         },
         [LOAD_TRANSACTION_CATEGORY_LIST] (state, allCategories) {
             state.allTransactionCategories = allCategories;
@@ -385,6 +404,9 @@ const stores = {
         updateAccountDisplayOrders: account.updateAccountDisplayOrders,
         hideAccount: account.hideAccount,
         deleteAccount: account.deleteAccount,
+
+        getTransaction: transaction.getTransaction,
+        saveTransaction: transaction.saveTransaction,
 
         loadAllCategories: transactionCategory.loadAllCategories,
         getCategory: transactionCategory.getCategory,

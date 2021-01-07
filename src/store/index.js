@@ -18,6 +18,11 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_CATEGORY_LIST,
+    ADD_CATEGORY_TO_TRANSACTION_CATEGORY_LIST,
+    SAVE_CATEGORY_IN_TRANSACTION_CATEGORY_LIST,
+    CHANGE_CATEGORY_DISPLAY_ORDER_IN_CATEGORY_LIST,
+    UPDATE_CATEGORY_VISIBILITY_IN_TRANSACTION_CATEGORY_LIST,
+    REMOVE_CATEGORY_FROM_TRANSACTION_CATEGORYLIST,
     UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_TAG_LIST,
@@ -46,7 +51,7 @@ const stores = {
         allAccountsMap: {},
         allCategorizedAccounts: {},
         accountListStateInvalid: true,
-        allTransactionCategories: [],
+        allTransactionCategories: {},
         allTransactionCategoriesMap: {},
         transactionCategoryListStateInvalid: true,
         allTransactionTags: [],
@@ -69,7 +74,7 @@ const stores = {
             state.allAccountsMap = {};
             state.allCategorizedAccounts = {};
             state.accountListStateInvalid = true;
-            state.allTransactionCategories = [];
+            state.allTransactionCategories = {};
             state.allTransactionCategoriesMap = {};
             state.allTransactionTags = [];
             state.allTransactionTagsMap = {};
@@ -203,13 +208,101 @@ const stores = {
         [UPDATE_ACCOUNT_LIST_INVALID_STATE] (state, invalidState) {
             state.accountListStateInvalid = invalidState;
         },
-        [LOAD_TRANSACTION_CATEGORY_LIST] (state, categories) {
-            state.allTransactionCategories = categories;
+        [LOAD_TRANSACTION_CATEGORY_LIST] (state, allCategories) {
+            state.allTransactionCategories = allCategories;
             state.allTransactionCategoriesMap = {};
 
-            for (let i = 0; i < categories.length; i++) {
-                const category = categories[i];
-                state.allTransactionCategoriesMap[category.id] = category;
+            for (let categoryType in allCategories) {
+                if (!Object.prototype.hasOwnProperty.call(allCategories, categoryType)) {
+                    continue;
+                }
+
+                const categories = allCategories[categoryType];
+
+                for (let i = 0; i < categories.length; i++) {
+                    const category = categories[i];
+                    state.allTransactionCategoriesMap[category.id] = category;
+
+                    for (let j = 0; j < category.subCategories.length; j++) {
+                        const subCategory = category.subCategories[j];
+                        state.allTransactionCategoriesMap[subCategory.id] = subCategory;
+                    }
+                }
+            }
+        },
+        [ADD_CATEGORY_TO_TRANSACTION_CATEGORY_LIST] (state, category) {
+            let categoryList = null;
+
+            if (!category.parentId || category.parentId === '0') {
+                categoryList = state.allTransactionCategories[category.type];
+            } else if (state.allTransactionCategoriesMap[category.parentId]) {
+                categoryList = state.allTransactionCategoriesMap[category.parentId].subCategories;
+            }
+
+            if (categoryList) {
+                categoryList.push(category);
+            }
+
+            state.allTransactionCategoriesMap[category.id] = category;
+        },
+        [SAVE_CATEGORY_IN_TRANSACTION_CATEGORY_LIST] (state, category) {
+            let categoryList = null;
+
+            if (!category.parentId || category.parentId === '0') {
+                categoryList = state.allTransactionCategories[category.type];
+            } else if (state.allTransactionCategoriesMap[category.parentId]) {
+                categoryList = state.allTransactionCategoriesMap[category.parentId].subCategories;
+            }
+
+            if (categoryList) {
+                for (let i = 0; i < categoryList.length; i++) {
+                    if (categoryList[i].id === category.id) {
+                        categoryList.splice(i, 1, category);
+                        break;
+                    }
+                }
+            }
+
+            state.allTransactionCategoriesMap[category.id] = category;
+        },
+        [CHANGE_CATEGORY_DISPLAY_ORDER_IN_CATEGORY_LIST] (state, { category, from, to }) {
+            let categoryList = null;
+
+            if (!category.parentId || category.parentId === '0') {
+                categoryList = state.allTransactionCategories[category.type];
+            } else if (state.allTransactionCategoriesMap[category.parentId]) {
+                categoryList = state.allTransactionCategoriesMap[category.parentId].subCategories;
+            }
+
+            if (categoryList) {
+                categoryList.splice(to, 0, categoryList.splice(from, 1)[0]);
+            }
+        },
+        [UPDATE_CATEGORY_VISIBILITY_IN_TRANSACTION_CATEGORY_LIST] (state, { category, hidden }) {
+            if (state.allTransactionCategoriesMap[category.id]) {
+                state.allTransactionCategoriesMap[category.id].hidden = hidden;
+            }
+        },
+        [REMOVE_CATEGORY_FROM_TRANSACTION_CATEGORYLIST] (state, category) {
+            let categoryList = null;
+
+            if (!category.parentId || category.parentId === '0') {
+                categoryList = state.allTransactionCategories[category.type];
+            } else if (state.allTransactionCategoriesMap[category.parentId]) {
+                categoryList = state.allTransactionCategoriesMap[category.parentId].subCategories;
+            }
+
+            if (categoryList) {
+                for (let i = 0; i < categoryList.length; i++) {
+                    if (categoryList[i].id === category.id) {
+                        categoryList.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            if (state.allTransactionCategoriesMap[category.id]) {
+                delete state.allTransactionCategoriesMap[category.id];
             }
         },
         [UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE] (state, invalidState) {
@@ -293,7 +386,14 @@ const stores = {
         hideAccount: account.hideAccount,
         deleteAccount: account.deleteAccount,
 
-        addTransactionCategoryBatch: transactionCategory.addTransactionCategoryBatch,
+        loadAllCategories: transactionCategory.loadAllCategories,
+        getCategory: transactionCategory.getCategory,
+        saveCategory: transactionCategory.saveCategory,
+        addCategories: transactionCategory.addCategories,
+        changeCategoryDisplayOrder: transactionCategory.changeCategoryDisplayOrder,
+        updateCategoryDisplayOrders: transactionCategory.updateCategoryDisplayOrders,
+        hideCategory: transactionCategory.hideCategory,
+        deleteCategory: transactionCategory.deleteCategory,
 
         loadAllTags: transactionTag.loadAllTags,
         saveTag: transactionTag.saveTag,

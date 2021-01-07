@@ -244,8 +244,8 @@ export default {
             id
         });
     },
-    getAllTransactionCategories: ({ type, parentId }) => {
-        return axios.get('v1/transaction/categories/list.json?type=' + (type || '0') + '&parent_id=' + (parentId || parentId === 0 ? parentId : '-1'));
+    getAllTransactionCategories: () => {
+        return axios.get('v1/transaction/categories/list.json');
     },
     getTransactionCategory: ({ id }) => {
         return axios.get('v1/transaction/categories/get.json?id=' + id);

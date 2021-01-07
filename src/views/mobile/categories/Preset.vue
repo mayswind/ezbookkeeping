@@ -159,7 +159,7 @@ export default {
                 }
             }
 
-            self.$store.dispatch('addTransactionCategoryBatch', {
+            self.$store.dispatch('addCategories', {
                 categories: categories
             }).then(() => {
                 self.submitting = false;

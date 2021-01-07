@@ -328,7 +328,7 @@ export default {
                     return;
                 }
 
-                self.$store.dispatch('addTransactionCategoryBatch', {
+                self.$store.dispatch('addCategories', {
                     categories: allCategories
                 }).then(() => {
                     self.submitting = false;

@@ -92,7 +92,6 @@
 export default {
     data() {
         return {
-            categories: [],
             hasSubCategories: false,
             categoryType: 0,
             categoryId: '',
@@ -107,6 +106,23 @@ export default {
         };
     },
     computed: {
+        categories() {
+            if (!this.categoryId || this.categoryId === '' || this.categoryId === '0') {
+                if (!this.$store.state.allTransactionCategories || !this.$store.state.allTransactionCategories[this.categoryType]) {
+                    return [];
+                }
+
+                return this.$store.state.allTransactionCategories[this.categoryType];
+            } else if (this.categoryId && this.categoryId !== '' && this.categoryId !== '0') {
+                if (!this.$store.state.allTransactionCategoriesMap || !this.$store.state.allTransactionCategoriesMap[this.categoryId]) {
+                    return [];
+                }
+
+                return this.$store.state.allTransactionCategoriesMap[this.categoryId].subCategories;
+            } else {
+                return [];
+            }
+        },
         title() {
             let title = '';
 
@@ -171,44 +187,23 @@ export default {
 
         self.loading = true;
 
-        self.$services.getAllTransactionCategories({
-            type: self.categoryType,
-            parentId: self.categoryId
-        }).then(response => {
-            const data = response.data;
-
-            if (!data || !data.success || !data.result) {
-                self.$toast('Unable to get category list');
-                router.back();
-                return;
-            }
-
-            if (data.result[self.categoryType]) {
-                self.categories = data.result[self.categoryType];
-            } else {
-                self.categories = [];
-            }
-
+        self.$store.dispatch('loadAllCategories', {
+            force: false
+        }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to load category list', error);
+            self.logining = false;
 
-            if (error.response && error.response.data && error.response.data.errorMessage) {
-                self.$toast({ error: error.response.data });
-                router.back();
-            } else if (!error.processed) {
-                self.$toast('Unable to get category list');
+            if (!error.processed) {
+                self.$toast(error.message || error);
                 router.back();
             }
         });
     },
     methods: {
         onPageAfterIn() {
-            const self = this;
-            const previousRoute = self.$f7router.previousRoute;
-
-            if (previousRoute && (previousRoute.path === '/category/add' || previousRoute.path === '/category/edit' || previousRoute.path === '/category/preset') && !self.loading) {
-                self.reload(null);
+            if (this.$store.state.transactionCategoryListStateInvalid && !this.loading) {
+                this.reload(null);
             }
         },
         reload(done) {
@@ -219,37 +214,19 @@ export default {
 
             const self = this;
 
-            self.$services.getAllTransactionCategories({
-                type: self.categoryType,
-                parentId: self.categoryId
-            }).then(response => {
+            self.$store.dispatch('loadAllCategories', {
+                force: true
+            }).then(() => {
                 if (done) {
                     done();
-                }
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get category list');
-                    return;
-                }
-
-                if (data.result[self.categoryType]) {
-                    self.categories = data.result[self.categoryType];
-                } else {
-                    self.categories = [];
                 }
             }).catch(error => {
-                self.$logger.error('failed to reload category list', error);
-
                 if (done) {
                     done();
                 }
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to get category list');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -263,33 +240,27 @@ export default {
             this.displayOrderModified = false;
         },
         onSort(event) {
+            const self = this;
+
             if (!event || !event.el || !event.el.id || event.el.id.indexOf('category_') !== 0) {
                 this.$toast('Unable to move category');
                 return;
             }
 
             const id = event.el.id.substr(9); // category_
-            let category = null;
 
-            for (let i = 0; i < this.categories.length; i++) {
-                if (this.categories[i].id === id) {
-                    category = this.categories[i];
-                    break;
-                }
-            }
-
-            if (!category || !this.categories[event.to]) {
-                this.$toast('Unable to move category');
-                return;
-            }
-
-            this.categories.splice(event.to, 0, this.categories.splice(event.from, 1)[0]);
-
-            this.displayOrderModified = true;
+            self.$store.dispatch('changeCategoryDisplayOrder', {
+                categoryId: id,
+                from: event.from,
+                to: event.to
+            }).then(() => {
+                self.displayOrderModified = true;
+            }).catch(error => {
+                self.$toast(error.message || error);
+            });
         },
         saveSortResult() {
             const self = this;
-            const newDisplayOrders = [];
 
             if (!self.displayOrderModified) {
                 self.showHidden = false;
@@ -298,42 +269,24 @@ export default {
             }
 
             self.displayOrderSaving = true;
-
-            for (let i = 0; i < self.categories.length; i++) {
-                newDisplayOrders.push({
-                    id: self.categories[i].id,
-                    displayOrder: i + 1
-                });
-            }
-
             self.$showLoading();
 
-            self.$services.moveTransactionCategory({
-                newDisplayOrders: newDisplayOrders
-            }).then(response => {
+            self.$store.dispatch('updateCategoryDisplayOrders', {
+                type: self.categoryType,
+                parentId: self.categoryId,
+            }).then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();
-
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to move category');
-                    return;
-                }
 
                 self.showHidden = false;
                 self.sortable = false;
                 self.displayOrderModified = false;
             }).catch(error => {
-                self.$logger.error('failed to save categories display order', error);
-
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to move category');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -345,37 +298,16 @@ export default {
 
             self.$showLoading();
 
-            self.$services.hideTransactionCategory({
-                id: category.id,
+            self.$store.dispatch('hideCategory', {
+                category: category,
                 hidden: hidden
-            }).then(response => {
+            }).then(() => {
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this category');
-                    } else {
-                        self.$toast('Unable to unhide this category');
-                    }
-
-                    return;
-                }
-
-                category.hidden = hidden;
             }).catch(error => {
-                self.$logger.error('failed to change category visibility', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (hidden) {
-                        self.$toast('Unable to hide this category');
-                    } else {
-                        self.$toast('Unable to unhide this category');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         },
@@ -399,33 +331,20 @@ export default {
             self.categoryToDelete = null;
             self.$showLoading();
 
-            self.$services.deleteTransactionCategory({
-                id: category.id
-            }).then(response => {
-                self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to delete this category');
-                    return;
+            self.$store.dispatch('deleteCategory', {
+                category: category,
+                beforeResolve: (done) => {
+                    app.swipeout.delete($$(`#${self.$options.filters.categoryDomId(category)}`), () => {
+                        done();
+                    });
                 }
-
-                app.swipeout.delete($$(`#${self.$options.filters.categoryDomId(category)}`), () => {
-                    for (let i = 0; i < self.categories.length; i++) {
-                        if (self.categories[i].id === category.id) {
-                            self.categories.splice(i, 1);
-                        }
-                    }
-                });
+            }).then(() => {
+                self.$hideLoading();
             }).catch(error => {
-                self.$logger.error('failed to delete category', error);
-
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    self.$toast('Unable to delete this category');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

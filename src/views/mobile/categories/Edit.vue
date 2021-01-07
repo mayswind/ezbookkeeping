@@ -150,18 +150,9 @@ export default {
             self.loading = true;
 
             self.editCategoryId = query.id;
-            self.$services.getTransactionCategory({
-                id: self.editCategoryId
-            }).then(response => {
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    self.$toast('Unable to get category');
-                    router.back();
-                    return;
-                }
-
-                const category = data.result;
+            self.$store.dispatch('getCategory', {
+                categoryId: self.editCategoryId
+            }).then(category => {
                 self.category.id = category.id;
                 self.category.type = category.type;
                 self.category.parentId = category.type.parentId;
@@ -173,13 +164,10 @@ export default {
 
                 self.loading = false;
             }).catch(error => {
-                self.$logger.error('failed to load category info', error);
+                self.loading = false;
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                    router.back();
-                } else if (!error.processed) {
-                    self.$toast('Unable to get category');
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                     router.back();
                 }
             });
@@ -221,29 +209,16 @@ export default {
                 comment: self.category.comment
             };
 
-            let promise = null;
-
-            if (!self.editCategoryId) {
-                promise = self.$services.addTransactionCategory(submitCategory);
-            } else {
+            if (self.editCategoryId) {
                 submitCategory.id = self.category.id;
                 submitCategory.hidden = !self.category.visible;
-                promise = self.$services.modifyTransactionCategory(submitCategory);
             }
 
-            promise.then(response => {
+            self.$store.dispatch('saveCategory', {
+                category: submitCategory
+            }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
-                const data = response.data;
-
-                if (!data || !data.success || !data.result) {
-                    if (!self.editCategoryId) {
-                        self.$toast('Unable to add category');
-                    } else {
-                        self.$toast('Unable to save category');
-                    }
-                    return;
-                }
 
                 if (!self.editCategoryId) {
                     self.$toast('You have added a new category');
@@ -253,19 +228,11 @@ export default {
 
                 router.back();
             }).catch(error => {
-                self.$logger.error('failed to save category', error);
-
                 self.submitting = false;
                 self.$hideLoading();
 
-                if (error.response && error.response.data && error.response.data.errorMessage) {
-                    self.$toast({ error: error.response.data });
-                } else if (!error.processed) {
-                    if (!self.editCategoryId) {
-                        self.$toast('Unable to add category');
-                    } else {
-                        self.$toast('Unable to save category');
-                    }
+                if (!error.processed) {
+                    self.$toast(error.message || error);
                 }
             });
         }

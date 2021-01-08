@@ -132,8 +132,8 @@
 
         <f7-card v-for="transactionMonthList in transactions" :key="transactionMonthList.yearMonth">
             <f7-accordion-item :opened="transactionMonthList.opened"
-                               @accordion:open="transactionMonthList.opened = true"
-                               @accordion:close="transactionMonthList.opened = false">
+                               @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
+                               @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
                 <f7-card-header>
                     <f7-accordion-toggle class="full-line">
                         <small :style="{ opacity: 0.6 }">
@@ -521,6 +521,12 @@ export default {
                 }
             });
         },
+        collapseTransactionMonthList(month, collapse) {
+            this.$store.dispatch('collapseMonthInTransactionList', {
+                month: month,
+                collapse: collapse
+            });
+        },
         changeDateFilter(dateType) {
             if (dateType === 11) { // Custom
                 this.showCustomDateRangeSheet = true;
@@ -567,7 +573,6 @@ export default {
                 return;
             }
 
-            this.transactions = [];
             this.query.dateType = dateType;
 
             this.showDatePopover = false;
@@ -581,7 +586,6 @@ export default {
             this.query.maxTime = maxTime;
             this.query.minTime = minTime;
 
-            this.transactions = [];
             this.query.dateType = 11;
 
             this.showCustomDateRangeSheet = false;
@@ -601,7 +605,6 @@ export default {
                 }
             }
 
-            this.transactions = [];
             this.query.type = type;
             this.showTypePopover = false;
             this.reload(null);
@@ -611,7 +614,6 @@ export default {
                 return;
             }
 
-            this.transactions = [];
             this.query.categoryId = categoryId;
             this.showCategoryPopover = false;
             this.reload(null);
@@ -621,7 +623,6 @@ export default {
                 return;
             }
 
-            this.transactions = [];
             this.query.accountId = accountId;
             this.showAccountPopover = false;
             this.reload(null);
@@ -631,7 +632,6 @@ export default {
                 return;
             }
 
-            this.transactions = [];
             this.query.keyword = keyword;
             this.reload(null);
         },

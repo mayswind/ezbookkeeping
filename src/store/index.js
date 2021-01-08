@@ -18,6 +18,7 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_LIST,
+    COLLAPSE_MONTH_IN_TRANSACTION_LIST,
     SAVE_TRANSACTION_IN_TRANSACTION_LIST,
     REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
@@ -343,6 +344,11 @@ const stores = {
                 state.transactionsNextTimeId = -1;
             }
         },
+        [COLLAPSE_MONTH_IN_TRANSACTION_LIST] (state, { month, collapse }) {
+            if (month) {
+                month.opened = !collapse;
+            }
+        },
         [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency, accountId }) {
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
@@ -581,6 +587,7 @@ const stores = {
         getTransaction: transaction.getTransaction,
         saveTransaction: transaction.saveTransaction,
         deleteTransaction: transaction.deleteTransaction,
+        collapseMonthInTransactionList: transaction.collapseMonthInTransactionList,
 
         loadAllCategories: transactionCategory.loadAllCategories,
         getCategory: transactionCategory.getCategory,

@@ -6,16 +6,22 @@ import utils from '../lib/utils.js';
 
 import {
     LOAD_TRANSACTION_LIST,
+    COLLAPSE_MONTH_IN_TRANSACTION_LIST,
     REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 } from './mutations.js';
 
+const emptyTransactionResult = {
+    items: [],
+    transactionsNextTimeId: 0
+};
+
 function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime, minTime, type, categoryId, accountId, keyword }) {
     let actualMaxTime = context.state.transactionsNextTimeId;
 
     if (reload && maxTime > 0) {
-        actualMaxTime = maxTime * 1000 + 999;
+        actualMaxTime = maxTime;
     } else if (reload && maxTime <= 0) {
         actualMaxTime = 0;
     }
@@ -32,6 +38,17 @@ function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime
             const data = response.data;
 
             if (!data || !data.success || !data.result) {
+                if (reload) {
+                    context.commit(LOAD_TRANSACTION_LIST, {
+                        transactions: emptyTransactionResult,
+                        reload: reload,
+                        autoExpand: autoExpand,
+                        defaultCurrency: defaultCurrency,
+                        accountId: accountId
+                    });
+                    context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                }
+
                 reject({ message: 'Unable to get transaction list' });
                 return;
             }
@@ -51,6 +68,17 @@ function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime
             resolve(data.result);
         }).catch(error => {
             logger.error('failed to load transaction list', error);
+
+            if (reload) {
+                context.commit(LOAD_TRANSACTION_LIST, {
+                    transactions: emptyTransactionResult,
+                    reload: reload,
+                    autoExpand: autoExpand,
+                    defaultCurrency: defaultCurrency,
+                    accountId: accountId
+                });
+                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+            }
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
                 reject({ error: error.response.data });
@@ -184,6 +212,13 @@ function deleteTransaction(context, { transaction, defaultCurrency, accountId, b
     });
 }
 
+function collapseMonthInTransactionList(context, { month, collapse }) {
+    context.commit(COLLAPSE_MONTH_IN_TRANSACTION_LIST, {
+        month: month,
+        collapse: collapse
+    });
+}
+
 function noTransaction(state) {
     for (let i = 0; i < state.transactions.length; i++) {
         const transactionMonthList = state.transactions[i];
@@ -263,6 +298,7 @@ export default {
     getTransaction,
     saveTransaction,
     deleteTransaction,
+    collapseMonthInTransactionList,
     noTransaction,
     hasMoreTransaction,
     calculateMonthTotalAmount

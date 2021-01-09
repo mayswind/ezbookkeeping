@@ -62,6 +62,11 @@ const (
 	InternalUuidGeneratorType string = "internal"
 )
 
+// Exchange rates data source types
+const (
+	EuroCentralBankDataSource string = "euro_central_bank"
+)
+
 const (
 	defaultAppName string = "lab"
 
@@ -81,6 +86,8 @@ const (
 	defaultSecretKey                 string = "lab"
 	defaultTokenExpiredTime          int    = 604800 // 7 days
 	defaultTemporaryTokenExpiredTime int    = 300    // 5 minutes
+
+	defaultExchangeRatesDataRequestTimeout int = 10000 // 10 seconds
 )
 
 // DatabaseConfig represents the database setting config
@@ -156,6 +163,10 @@ type Config struct {
 
 	// Data
 	EnableDataExport bool
+
+	// Exchange Rates
+	ExchangeRatesDataSource     string
+	ExchangeRatesRequestTimeout int
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -218,6 +229,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadDataConfiguration(config, cfgFile, "data")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadExchangeRatesConfiguration(config, cfgFile, "exchange_rates")
 
 	if err != nil {
 		return nil, err
@@ -388,6 +405,18 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 
 func loadDataConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableDataExport = getConfigItemBoolValue(configFile, sectionName, "enable_export", false)
+
+	return nil
+}
+
+func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	if getConfigItemStringValue(configFile, sectionName, "data_source") == EuroCentralBankDataSource {
+		config.ExchangeRatesDataSource = EuroCentralBankDataSource
+	} else {
+		return errs.ErrInvalidExchangeRatesDataSource
+	}
+
+	config.ExchangeRatesRequestTimeout = getConfigItemIntValue(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
 
 	return nil
 }

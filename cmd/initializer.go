@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/datastore"
+	"github.com/mayswind/lab/pkg/exchangerates"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/settings"
 	"github.com/mayswind/lab/pkg/utils"
@@ -62,6 +63,13 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		log.BootErrorf("[initializer.initializeSystem] initializes uuid generator failed, because %s", err.Error())
+		return nil, err
+	}
+
+	err = exchangerates.InitializeExchangeRatesDataSource(config)
+
+	if err != nil {
+		log.BootErrorf("[initializer.initializeSystem] initializes exchange rates data source failed, because %s", err.Error())
 		return nil, err
 	}
 

@@ -1,18 +1,16 @@
 package api
 
 import (
-	"encoding/xml"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/mayswind/lab/pkg/core"
 	"github.com/mayswind/lab/pkg/errs"
+	"github.com/mayswind/lab/pkg/exchangerates"
 	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/models"
+	"github.com/mayswind/lab/pkg/settings"
 )
-
-// EuroCentralBankExchangeRateUrl represents euro central bank exchange rate date url
-const EuroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
 
 // ExchangeRatesApi represents exchange rate api
 type ExchangeRatesApi struct{}
@@ -24,8 +22,19 @@ var (
 
 // LatestExchangeRateHandler returns latest exchange rate data
 func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface{}, *errs.Error) {
+	dataSource := exchangerates.Container.Current
+
+	if dataSource == nil {
+		return nil, errs.ErrInvalidExchangeRatesDataSource
+	}
+
 	uid := c.GetCurrentUid()
-	resp, err := http.Get(EuroCentralBankExchangeRateUrl)
+
+	client := &http.Client{
+		Timeout: time.Duration(settings.Container.Current.ExchangeRatesRequestTimeout) * time.Millisecond,
+	}
+
+	resp, err := client.Get(dataSource.GetRequestUrl())
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
@@ -39,25 +48,12 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	euroCentralBankData := &models.EuroCentralBankExchangeRateData{}
-	err = xml.Unmarshal(body, euroCentralBankData)
+	latestExchangeRateResponse, err := dataSource.Parse(c, body)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse xml data for user \"uid:%d\", response is %s, because %s", uid, string(body), err.Error())
-		return nil, errs.ErrFailedToRequestRemoteApi
+		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrFailedToRequestRemoteApi)
 	}
-
-	latestExchangeRateResponse := euroCentralBankData.ToLatestExchangeRateResponse()
-
-	if latestExchangeRateResponse == nil {
-		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse latest exchange rate data for user \"uid:%d\", response is %s,", uid, string(body))
-		return nil, errs.ErrFailedToRequestRemoteApi
-	}
-
-	latestExchangeRateResponse.ExchangeRates = append(latestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
-		Currency: "EUR",
-		Rate:     "1",
-	})
 
 	return latestExchangeRateResponse, nil
 }

@@ -358,25 +358,13 @@ const stores = {
                     item.sourceAccount = state.allAccountsMap[item.sourceAccountId];
                     item.destinationAccount = state.allAccountsMap[item.destinationAccountId];
                     item.category = state.allTransactionCategoriesMap[item.categoryId];
-                    item.tags = [];
-
-                    if (item.tagIds && item.tagIds.length) {
-                        for (let j = 0; j < item.tagIds.length; j++) {
-                            const tag = state.allTransactionTagsMap[item.tagIds[j]];
-
-                            if (tag) {
-                                item.tags.push(tag);
-                            }
-                        }
-                    }
 
                     const transactionYear = utils.getYear(transactionTime);
                     const transactionMonth = utils.getMonth(transactionTime);
                     const transactionYearMonth = utils.getYearAndMonth(transactionTime);
 
                     if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
-                        currentMonthList.items.push(item);
-                        calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                        currentMonthList.items.push(Object.freeze(item));
                         continue;
                     }
 
@@ -384,17 +372,8 @@ const stores = {
                         if (state.transactions[j].year === transactionYear && state.transactions[j].month === transactionMonth) {
                             currentMonthListIndex = j;
                             currentMonthList = state.transactions[j];
-
-                            if (j > 0) {
-                                calculateMonthTotalAmount(state, state.transactions[j - 1], defaultCurrency, accountId, false);
-                            }
-
                             break;
                         }
-                    }
-
-                    if (!currentMonthList && state.transactions.length > 0) {
-                        calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
                     }
 
                     if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
@@ -412,7 +391,7 @@ const stores = {
                         currentMonthList = state.transactions[state.transactions.length - 1];
                     }
 
-                    currentMonthList.items.push(item);
+                    currentMonthList.items.push(Object.freeze(item));
                     calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
                 }
             }

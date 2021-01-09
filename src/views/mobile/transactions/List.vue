@@ -186,7 +186,7 @@
                                         {{ transaction.category.name }}
                                     </span>
                                     <span v-else-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance && !transaction.category">
-                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) }}
+                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) | t }}
                                     </span>
                                 </div>
                                 <div slot="text" class="transaction-comment" v-if="transaction.comment">
@@ -414,9 +414,6 @@ export default {
         },
         allCategories() {
             return this.$store.state.allTransactionCategoriesMap;
-        },
-        allTags() {
-            return this.$store.state.allTransactionTagsMap;
         }
     },
     created() {
@@ -454,7 +451,6 @@ export default {
             const promises = [
                 self.$store.dispatch('loadAllAccounts', { force: false }),
                 self.$store.dispatch('loadAllCategories', { force: false }),
-                self.$store.dispatch('loadAllTags', { force: false }),
                 self.$store.dispatch('getTransactions', {
                     reload: true,
                     autoExpand: true,
@@ -687,7 +683,7 @@ export default {
                 return 'Income';
             } else if (type === allTransactionTypes.Expense) {
                 return 'Expense';
-            } else if (type === allTransactionTypes.Income) {
+            } else if (type === allTransactionTypes.Transfer) {
                 return 'Transfer';
             } else {
                 return 'Transaction';

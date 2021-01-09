@@ -57,7 +57,10 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency }
                         autoExpand: autoExpand,
                         defaultCurrency: defaultCurrency
                     });
-                    context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+
+                    if (!context.state.transactionListStateInvalid) {
+                        context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                    }
                 }
 
                 reject({ message: 'Unable to get transaction list' });
@@ -72,7 +75,9 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency }
             });
 
             if (reload) {
-                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, false);
+                if (context.state.transactionListStateInvalid) {
+                    context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, false);
+                }
             }
 
             resolve(data.result);
@@ -86,7 +91,10 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency }
                     autoExpand: autoExpand,
                     defaultCurrency: defaultCurrency
                 });
-                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+
+                if (!context.state.transactionListStateInvalid) {
+                    context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                }
             }
 
             if (error.response && error.response.data && error.response.data.errorMessage) {
@@ -150,7 +158,9 @@ export function saveTransaction(context, { transaction, defaultCurrency }) {
             }
 
             if (!transaction.id) {
-                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                if (!context.state.transactionListStateInvalid) {
+                    context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                }
             } else {
                 context.commit(SAVE_TRANSACTION_IN_TRANSACTION_LIST, {
                     transaction: data.result,

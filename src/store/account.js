@@ -31,7 +31,10 @@ export function loadAllAccounts(context, { force }) {
             }
 
             context.commit(LOAD_ACCOUNT_LIST, data.result);
-            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, false);
+
+            if (context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {
@@ -138,7 +141,10 @@ export function changeAccountDisplayOrder(context, { accountId, from, to }) {
             return;
         }
 
-        context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+        if (!context.state.accountListStateInvalid) {
+            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+        }
+
         context.commit(CHANGE_ACCOUNT_DISPLAY_ORDER_IN_ACCOUNT_LIST, {
             account: account,
             from: from,
@@ -178,7 +184,9 @@ export function updateAccountDisplayOrders(context) {
                 return;
             }
 
-            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, false);
+            if (context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {

@@ -28,7 +28,10 @@ export function loadAllTags(context, { force }) {
             }
 
             context.commit(LOAD_TRANSACTION_TAG_LIST, data.result);
-            context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, false);
+
+            if (context.state.transactionTagListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {
@@ -112,7 +115,10 @@ export function changeTagDisplayOrder(context, { tagId, from, to }) {
             return;
         }
 
-        context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, true);
+        if (!context.state.transactionTagListStateInvalid) {
+            context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, true);
+        }
+
         context.commit(CHANGE_TAG_DISPLAY_ORDER_IN_TRANSACTION_TAG_LIST, {
             tag: tag,
             from: from,
@@ -144,7 +150,9 @@ export function updateTagDisplayOrders(context) {
                 return;
             }
 
-            context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, false);
+            if (context.state.transactionTagListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {

@@ -57,7 +57,10 @@ export function loadAllCategories(context, { force }) {
             }
 
             context.commit(LOAD_TRANSACTION_CATEGORY_LIST, data.result);
-            context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, false);
+
+            if (context.state.transactionCategoryListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {
@@ -168,7 +171,9 @@ export function addCategories(context, { categories }) {
                 return;
             }
 
-            context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, true);
+            if (!context.state.transactionCategoryListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, true);
+            }
 
             resolve(data.result);
         }).catch(error => {
@@ -208,7 +213,10 @@ export function changeCategoryDisplayOrder(context, { categoryId, from, to }) {
             }
         }
 
-        context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, true);
+        if (!context.state.transactionCategoryListStateInvalid) {
+            context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, true);
+        }
+
         context.commit(CHANGE_CATEGORY_DISPLAY_ORDER_IN_CATEGORY_LIST, {
             category: category,
             from: from,
@@ -250,7 +258,9 @@ export function updateCategoryDisplayOrders(context, { type, parentId }) {
                 return;
             }
 
-            context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, false);
+            if (context.state.transactionCategoryListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, false);
+            }
 
             resolve(data.result);
         }).catch(error => {

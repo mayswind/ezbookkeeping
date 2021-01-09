@@ -18,7 +18,7 @@
                 <span class="tabbar-label">{{ $t('Accounts') }}</span>
             </f7-link>
             <f7-link href="/transaction/add">
-                <f7-icon f7="plus_square" size="42px" class="lab-tarbar-big-icon"></f7-icon>
+                <f7-icon f7="plus_square" class="lab-tarbar-big-icon"></f7-icon>
             </f7-link>
             <f7-link href="/statistic/overview">
                 <f7-icon f7="chart_pie"></f7-icon>
@@ -37,8 +37,10 @@ export default {}
 </script>
 
 <style>
-.lab-tarbar-big-icon {
-    margin-top: 7px;
-    margin-left: 0;
+.tabbar-labels i.lab-tarbar-big-icon {
+    font-size: 42px;
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
 }
 </style>

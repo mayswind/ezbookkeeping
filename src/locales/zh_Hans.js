@@ -565,6 +565,7 @@ export default {
     'Transaction Time': '交易时间',
     'Tags': '标签',
     'Your transaction description (optional)': '你的交易描述 (可选)',
+    'Are you sure you want to save this transaction whose amount is 0?': '您确定要保存这个金额为0的交易？',
     'Unable to get transaction': '无法获取交易',
     'Unable to add transaction': '无法添加交易',
     'Unable to save transaction': '无法保存交易',

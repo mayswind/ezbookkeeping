@@ -640,9 +640,6 @@ export default {
                 return;
             }
 
-            self.submitting = true;
-            self.$showLoading(() => self.submitting);
-
             const submitTransaction = {
                 type: self.transaction.type,
                 time: self.transaction.unixTime,
@@ -671,27 +668,40 @@ export default {
                 submitTransaction.id = self.transaction.id;
             }
 
-            self.$store.dispatch('saveTransaction', {
-                transaction: submitTransaction
-            }).then(() => {
-                self.submitting = false;
-                self.$hideLoading();
+            const doSubmit = function () {
+                self.submitting = true;
+                self.$showLoading(() => self.submitting);
 
-                if (self.mode === 'add') {
-                    self.$toast('You have added a new transaction');
-                } else if (self.mode === 'edit') {
-                    self.$toast('You have saved this transaction');
-                }
+                self.$store.dispatch('saveTransaction', {
+                    transaction: submitTransaction
+                }).then(() => {
+                    self.submitting = false;
+                    self.$hideLoading();
 
-                router.back();
-            }).catch(error => {
-                self.submitting = false;
-                self.$hideLoading();
+                    if (self.mode === 'add') {
+                        self.$toast('You have added a new transaction');
+                    } else if (self.mode === 'edit') {
+                        self.$toast('You have saved this transaction');
+                    }
 
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
+                    router.back();
+                }).catch(error => {
+                    self.submitting = false;
+                    self.$hideLoading();
+
+                    if (!error.processed) {
+                        self.$toast(error.message || error);
+                    }
+                });
+            };
+
+            if (submitTransaction.sourceAmount === 0) {
+                self.$confirm('Are you sure you want to save this transaction whose amount is 0?', () => {
+                    doSubmit();
+                });
+            } else {
+                doSubmit();
+            }
         },
         autoChangeCommentTextareaSize() {
             const app = this.$f7;

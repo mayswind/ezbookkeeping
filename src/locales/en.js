@@ -565,6 +565,7 @@ export default {
     'Transaction Time': 'Transaction Time',
     'Tags': 'Tags',
     'Your transaction description (optional)': 'Your transaction description (optional)',
+    'Are you sure you want to save this transaction whose amount is 0?': 'Are you sure you want to save this transaction whose amount is 0?',
     'Unable to get transaction': 'Unable to get transaction',
     'Unable to add transaction': 'Unable to add transaction',
     'Unable to save transaction': 'Unable to save transaction',

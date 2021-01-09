@@ -20,7 +20,7 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item
-                        class="transaction-edit-amount padding-top-half padding-bottom-half"
+                        class="transaction-edit-amount"
                         style="font-size: 40px;"
                         header="Expense Amount" title="0.00">
                     </f7-list-item>
@@ -41,7 +41,8 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form :class="{ 'disabled': mode === 'view' }">
                     <f7-list-item
-                        class="transaction-edit-amount padding-top-half padding-bottom-half"
+                        class="transaction-edit-amount"
+                        link="#" no-chevron
                         :class="{ 'color-theme-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-theme-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
                         :style="{ fontSize: sourceAmountFontSize + 'px' }"
                         :header="$t(sourceAmountName)"
@@ -56,7 +57,8 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-amount padding-top-half padding-bottom-half"
+                        class="transaction-edit-amount"
+                        link="#" no-chevron
                         :style="{ fontSize: destinationAmountFontSize + 'px' }"
                         :header="$t('Transfer In Amount')"
                         :title="transaction.destinationAmount | currency"
@@ -222,11 +224,12 @@
 
                     <f7-list-input
                         type="textarea"
+                        class="transaction-edit-comment textarea-auto-size"
                         style="height: auto"
                         :label="$t('Description')"
                         :placeholder="mode !== 'view' ? $t('Your transaction description (optional)') : ''"
                         :value="transaction.comment"
-                        @input="transaction.comment = $event.target.value; changeSize($event)"
+                        @input="transaction.comment = $event.target.value"
                     ></f7-list-input>
                 </f7-list>
             </f7-card-content>
@@ -625,6 +628,9 @@ export default {
             }
         });
     },
+    updated: function () {
+        this.autoChangeCommentTextareaSize();
+    },
     methods: {
         save() {
             const self = this;
@@ -687,15 +693,15 @@ export default {
                 }
             });
         },
-        changeSize(event) {
-            const textarea = event.target;
+        autoChangeCommentTextareaSize() {
+            const app = this.$f7;
+            const $$ = app.$;
 
-            if (!textarea) {
-                return;
-            }
-
-            textarea.scrollTop = 0;
-            textarea.style.height = textarea.scrollHeight + 'px';
+            $$('.textarea-auto-size textarea').each((idx, el) => {
+                el.scrollTop = 0;
+                el.style.height = '';
+                el.style.height = el.scrollHeight + 'px';
+            });
         },
         isCategoryIdAvailable(categories, categoryId) {
             if (!categories || !categories.length) {
@@ -796,6 +802,10 @@ export default {
 
 .transaction-edit-amount .item-title {
     font-weight: bolder;
+}
+
+.transaction-edit-amount .item-header {
+    padding-top: calc(var(--f7-typography-padding) / 2);
 }
 
 .transaction-edit-category .item-header, .transaction-edit-account .item-header {

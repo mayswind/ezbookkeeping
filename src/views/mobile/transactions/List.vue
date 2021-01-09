@@ -372,15 +372,6 @@
 export default {
     data() {
         return {
-            query: {
-                dateType: 0,
-                maxTime: 0,
-                minTime: 0,
-                type: 0,
-                categoryId: '0',
-                accountId: '0',
-                keyword: ''
-            },
             loading: true,
             loadingMore: false,
             transactionToDelete: null,
@@ -395,6 +386,9 @@ export default {
     computed: {
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
+        query() {
+            return this.$store.state.transactionsFilter;
         },
         transactions() {
             if (this.loading) {
@@ -420,17 +414,11 @@ export default {
         const self = this;
         const query = self.$f7route.query;
 
-        if (query.type) {
-            self.query.type = query.type;
-        }
-
-        if (query.categoryId) {
-            self.query.categoryId = query.categoryId;
-        }
-
-        if (query.accountId) {
-            self.query.accountId = query.accountId;
-        }
+        this.$store.dispatch('initTransactionListFilter', {
+            type: query.type,
+            categoryId: query.categoryId,
+            accountId: query.accountId
+        });
 
         this.reload(null);
     },
@@ -454,13 +442,7 @@ export default {
                 self.$store.dispatch('getTransactions', {
                     reload: true,
                     autoExpand: true,
-                    defaultCurrency: self.defaultCurrency,
-                    maxTime: self.query.maxTime > 0 ? self.query.maxTime * 1000 + 999 : 0,
-                    minTime: self.query.minTime * 1000,
-                    type: self.query.type,
-                    categoryId: self.query.categoryId,
-                    accountId: self.query.accountId,
-                    keyword: self.query.keyword
+                    defaultCurrency: self.defaultCurrency
                 })
             ];
 
@@ -500,13 +482,9 @@ export default {
             self.loadingMore = true;
 
             self.$store.dispatch('getTransactions', {
+                reload: false,
                 autoExpand: autoExpand,
-                defaultCurrency: self.defaultCurrency,
-                minTime: self.query.minTime * 1000,
-                type: self.query.type,
-                categoryId: self.query.categoryId,
-                accountId: self.query.accountId,
-                keyword: self.query.keyword
+                defaultCurrency: self.defaultCurrency
             }).then(() => {
                 self.loadingMore = false;
             }).catch(error => {
@@ -532,44 +510,51 @@ export default {
                 return;
             }
 
+            let maxTime = 0;
+            let minTime = 0;
+
             if (dateType === 0) { // All
-                this.query.maxTime = 0;
-                this.query.minTime = 0;
+                maxTime = 0;
+                minTime = 0;
             } else if (dateType === 1) { // Today
-                this.query.maxTime = this.$utilities.getTodayLastUnixTime();
-                this.query.minTime = this.$utilities.getTodayFirstUnixTime();
+                maxTime = this.$utilities.getTodayLastUnixTime();
+                minTime = this.$utilities.getTodayFirstUnixTime();
             } else if (dateType === 2) { // Yesterday
-                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
             } else if (dateType === 3) { // Last 7 days
-                this.query.maxTime = this.$utilities.getUnixTime(new Date());
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.query.maxTime, 7, 'days');
+                maxTime = this.$utilities.getUnixTime(new Date());
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 7, 'days');
             } else if (dateType === 4) { // Last 30 days
-                this.query.maxTime = this.$utilities.getUnixTime(new Date());
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.query.maxTime, 30, 'days');
+                maxTime = this.$utilities.getUnixTime(new Date());
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 30, 'days');
             } else if (dateType === 5) { // This week
-                this.query.maxTime = this.$utilities.getThisWeekLastUnixTime();
-                this.query.minTime = this.$utilities.getThisWeekFirstUnixTime();
+                maxTime = this.$utilities.getThisWeekLastUnixTime();
+                minTime = this.$utilities.getThisWeekFirstUnixTime();
             } else if (dateType === 6) { // Last week
-                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
             } else if (dateType === 7) { // This month
-                this.query.maxTime = this.$utilities.getThisMonthLastUnixTime();
-                this.query.minTime = this.$utilities.getThisMonthFirstUnixTime();
+                maxTime = this.$utilities.getThisMonthLastUnixTime();
+                minTime = this.$utilities.getThisMonthFirstUnixTime();
             } else if (dateType === 8) { // Last month
-                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
             } else if (dateType === 9) { // This year
-                this.query.maxTime = this.$utilities.getThisYearLastUnixTime();
-                this.query.minTime = this.$utilities.getThisYearFirstUnixTime();
+                maxTime = this.$utilities.getThisYearLastUnixTime();
+                minTime = this.$utilities.getThisYearFirstUnixTime();
             } else if (dateType === 10) { // Last year
-                this.query.maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
-                this.query.minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
             } else {
                 return;
             }
 
-            this.query.dateType = dateType;
+            this.$store.dispatch('updateTransactionListFilter', {
+                dateType: dateType,
+                maxTime: maxTime,
+                minTime: minTime
+            });
 
             this.showDatePopover = false;
             this.reload(null);
@@ -579,10 +564,11 @@ export default {
                 return;
             }
 
-            this.query.maxTime = maxTime;
-            this.query.minTime = minTime;
-
-            this.query.dateType = 11;
+            this.$store.dispatch('updateTransactionListFilter', {
+                dateType: 11,
+                maxTime: maxTime,
+                minTime: minTime
+            });
 
             this.showCustomDateRangeSheet = false;
 
@@ -593,15 +579,21 @@ export default {
                 return;
             }
 
+            let removeCategoryFilter = false;
+
             if (type && this.query.categoryId) {
                 const category = this.allCategories[this.query.categoryId];
 
                 if (category && category.type !== type - 1) {
-                    this.query.categoryId = 0;
+                    removeCategoryFilter = true;
                 }
             }
 
-            this.query.type = type;
+            this.$store.dispatch('updateTransactionListFilter', {
+                type: type,
+                categoryId: removeCategoryFilter ? '0' : undefined
+            });
+
             this.showTypePopover = false;
             this.reload(null);
         },
@@ -610,7 +602,10 @@ export default {
                 return;
             }
 
-            this.query.categoryId = categoryId;
+            this.$store.dispatch('updateTransactionListFilter', {
+                categoryId: categoryId
+            });
+
             this.showCategoryPopover = false;
             this.reload(null);
         },
@@ -619,7 +614,10 @@ export default {
                 return;
             }
 
-            this.query.accountId = accountId;
+            this.$store.dispatch('updateTransactionListFilter', {
+                accountId: accountId
+            });
+
             this.showAccountPopover = false;
             this.reload(null);
         },
@@ -628,7 +626,10 @@ export default {
                 return;
             }
 
-            this.query.keyword = keyword;
+            this.$store.dispatch('updateTransactionListFilter', {
+                keyword: keyword
+            });
+
             this.reload(null);
         },
         duplicate(transaction) {
@@ -660,7 +661,6 @@ export default {
             self.$store.dispatch('deleteTransaction', {
                 transaction: transaction,
                 defaultCurrency: self.defaultCurrency,
-                accountId: self.query.accountId,
                 beforeResolve: (done) => {
                     app.swipeout.delete($$(`#${self.$options.filters.transactionDomId(transaction)}`), () => {
                         done();

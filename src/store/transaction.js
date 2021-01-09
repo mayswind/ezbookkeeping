@@ -7,7 +7,10 @@ import { getExchangedAmount } from "./exchangeRates.js";
 
 import {
     LOAD_TRANSACTION_LIST,
+    INIT_TRANSACTION_LIST_FILTER,
+    UPDATE_TRANSACTION_LIST_FILTER,
     COLLAPSE_MONTH_IN_TRANSACTION_LIST,
+    SAVE_TRANSACTION_IN_TRANSACTION_LIST,
     REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
@@ -18,23 +21,31 @@ const emptyTransactionResult = {
     transactionsNextTimeId: 0
 };
 
-export function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime, minTime, type, categoryId, accountId, keyword }) {
+export function initTransactionListFilter(context, filter) {
+    context.commit(INIT_TRANSACTION_LIST_FILTER, filter);
+}
+
+export function updateTransactionListFilter(context, filter) {
+    context.commit(UPDATE_TRANSACTION_LIST_FILTER, filter);
+}
+
+export function getTransactions(context, { reload, autoExpand, defaultCurrency }) {
     let actualMaxTime = context.state.transactionsNextTimeId;
 
-    if (reload && maxTime > 0) {
-        actualMaxTime = maxTime;
-    } else if (reload && maxTime <= 0) {
+    if (reload && context.state.transactionsFilter.maxTime > 0) {
+        actualMaxTime = context.state.transactionsFilter.maxTime * 1000 + 999;
+    } else if (reload && context.state.transactionsFilter.maxTime <= 0) {
         actualMaxTime = 0;
     }
 
     return new Promise((resolve, reject) => {
         services.getTransactions({
             maxTime: actualMaxTime,
-            minTime: minTime,
-            type: type,
-            categoryId: categoryId,
-            accountId: accountId,
-            keyword: keyword
+            minTime: context.state.transactionsFilter.minTime * 1000,
+            type: context.state.transactionsFilter.type,
+            categoryId: context.state.transactionsFilter.categoryId,
+            accountId: context.state.transactionsFilter.accountId,
+            keyword: context.state.transactionsFilter.keyword
         }).then(response => {
             const data = response.data;
 
@@ -44,8 +55,7 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency, 
                         transactions: emptyTransactionResult,
                         reload: reload,
                         autoExpand: autoExpand,
-                        defaultCurrency: defaultCurrency,
-                        accountId: accountId
+                        defaultCurrency: defaultCurrency
                     });
                     context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
                 }
@@ -58,8 +68,7 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency, 
                 transactions: data.result,
                 reload: reload,
                 autoExpand: autoExpand,
-                defaultCurrency: defaultCurrency,
-                accountId: accountId
+                defaultCurrency: defaultCurrency
             });
 
             if (reload) {
@@ -75,8 +84,7 @@ export function getTransactions(context, { reload, autoExpand, defaultCurrency, 
                     transactions: emptyTransactionResult,
                     reload: reload,
                     autoExpand: autoExpand,
-                    defaultCurrency: defaultCurrency,
-                    accountId: accountId
+                    defaultCurrency: defaultCurrency
                 });
                 context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
             }
@@ -119,7 +127,7 @@ export function getTransaction(context, { transactionId }) {
     });
 }
 
-export function saveTransaction(context, { transaction }) {
+export function saveTransaction(context, { transaction, defaultCurrency }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -144,7 +152,10 @@ export function saveTransaction(context, { transaction }) {
             if (!transaction.id) {
                 context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
             } else {
-                context.commit(UPDATE_TRANSACTION_LIST_INVALID_STATE, true);
+                context.commit(SAVE_TRANSACTION_IN_TRANSACTION_LIST, {
+                    transaction: data.result,
+                    defaultCurrency: defaultCurrency
+                });
             }
 
             context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
@@ -168,7 +179,7 @@ export function saveTransaction(context, { transaction }) {
     });
 }
 
-export function deleteTransaction(context, { transaction, defaultCurrency, accountId, beforeResolve }) {
+export function deleteTransaction(context, { transaction, defaultCurrency, beforeResolve }) {
     return new Promise((resolve, reject) => {
         services.deleteTransaction({
             id: transaction.id
@@ -184,15 +195,13 @@ export function deleteTransaction(context, { transaction, defaultCurrency, accou
                 beforeResolve(() => {
                     context.commit(REMOVE_TRANSACTION_FROM_TRANSACTION_LIST, {
                         transaction: transaction,
-                        defaultCurrency: defaultCurrency,
-                        accountId: accountId
+                        defaultCurrency: defaultCurrency
                     });
                 });
             } else {
                 context.commit(REMOVE_TRANSACTION_FROM_TRANSACTION_LIST, {
                     transaction: transaction,
-                    defaultCurrency: defaultCurrency,
-                    accountId: accountId
+                    defaultCurrency: defaultCurrency
                 });
             }
 
@@ -236,6 +245,31 @@ export function noTransaction(state) {
 
 export function hasMoreTransaction(state) {
     return state.transactionsNextTimeId > 0;
+}
+
+export function fillTransactionObject(state, transaction) {
+    if (!transaction) {
+        return;
+    }
+
+    const transactionTime = utils.parseDateFromUnixTime(transaction.time);
+
+    transaction.day = utils.getDay(transactionTime);
+    transaction.dayOfWeek = utils.getDayOfWeek(transactionTime);
+
+    if (transaction.sourceAccountId) {
+        transaction.sourceAccount = state.allAccountsMap[transaction.sourceAccountId];
+    }
+
+    if (transaction.destinationAccountId) {
+        transaction.destinationAccount = state.allAccountsMap[transaction.destinationAccountId];
+    }
+
+    if (transaction.categoryId) {
+        transaction.category = state.allTransactionCategoriesMap[transaction.categoryId];
+    }
+
+    return transaction;
 }
 
 export function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, incomplete) {

@@ -18,6 +18,8 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
 
     LOAD_TRANSACTION_LIST,
+    INIT_TRANSACTION_LIST_FILTER,
+    UPDATE_TRANSACTION_LIST_FILTER,
     COLLAPSE_MONTH_IN_TRANSACTION_LIST,
     SAVE_TRANSACTION_IN_TRANSACTION_LIST,
     REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
@@ -92,6 +94,8 @@ import {
 } from './account.js';
 
 import {
+    initTransactionListFilter,
+    updateTransactionListFilter,
     getTransactions,
     getTransaction,
     saveTransaction,
@@ -99,6 +103,7 @@ import {
     collapseMonthInTransactionList,
     noTransaction,
     hasMoreTransaction,
+    fillTransactionObject,
     calculateMonthTotalAmount,
 } from './transaction.js';
 
@@ -131,6 +136,15 @@ const stores = {
         allAccountsMap: {},
         allCategorizedAccounts: {},
         accountListStateInvalid: true,
+        transactionsFilter: {
+            dateType: 0,
+            maxTime: 0,
+            minTime: 0,
+            type: 0,
+            categoryId: '0',
+            accountId: '0',
+            keyword: ''
+        },
         transactions: [],
         transactionsNextTimeId: 0,
         transactionListStateInvalid: true,
@@ -169,6 +183,13 @@ const stores = {
             state.allCategorizedAccounts = {};
             state.accountListStateInvalid = true;
 
+            state.transactionsFilter.dateType = 0;
+            state.transactionsFilter.maxTime = 0;
+            state.transactionsFilter.minTime = 0;
+            state.transactionsFilter.type = 0;
+            state.transactionsFilter.categoryId = '0';
+            state.transactionsFilter.accountId = '0';
+            state.transactionsFilter.keyword = '';
             state.transactions = [];
             state.transactionsNextTimeId = 0;
             state.transactionListStateInvalid = true;
@@ -340,7 +361,7 @@ const stores = {
         [UPDATE_ACCOUNT_LIST_INVALID_STATE] (state, invalidState) {
             state.accountListStateInvalid = invalidState;
         },
-        [LOAD_TRANSACTION_LIST] (state, { transactions, reload, autoExpand, defaultCurrency, accountId }) {
+        [LOAD_TRANSACTION_LIST] (state, { transactions, reload, autoExpand, defaultCurrency }) {
             if (reload) {
                 state.transactions = [];
             }
@@ -351,14 +372,9 @@ const stores = {
 
                 for (let i = 0; i < transactions.items.length; i++) {
                     const item = transactions.items[i];
+                    fillTransactionObject(state, item);
+
                     const transactionTime = utils.parseDateFromUnixTime(item.time);
-
-                    item.day = utils.getDay(transactionTime);
-                    item.dayOfWeek = utils.getDayOfWeek(transactionTime);
-                    item.sourceAccount = state.allAccountsMap[item.sourceAccountId];
-                    item.destinationAccount = state.allAccountsMap[item.destinationAccountId];
-                    item.category = state.allTransactionCategoriesMap[item.categoryId];
-
                     const transactionYear = utils.getYear(transactionTime);
                     const transactionMonth = utils.getMonth(transactionTime);
                     const transactionYearMonth = utils.getYearAndMonth(transactionTime);
@@ -377,7 +393,7 @@ const stores = {
                     }
 
                     if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
-                        calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, false);
+                        calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, state.transactionsFilter.accountId, false);
 
                         state.transactions.push({
                             year: transactionYear,
@@ -392,15 +408,87 @@ const stores = {
                     }
 
                     currentMonthList.items.push(Object.freeze(item));
-                    calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                    calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, state.transactionsFilter.accountId, true);
                 }
             }
 
             if (transactions.nextTimeSequenceId) {
                 state.transactionsNextTimeId = transactions.nextTimeSequenceId;
             } else {
-                calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
+                calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, state.transactionsFilter.accountId, false);
                 state.transactionsNextTimeId = -1;
+            }
+        },
+        [INIT_TRANSACTION_LIST_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionsFilter.dateType = filter.dateType;
+            } else {
+                state.transactionsFilter.dateType = 0;
+            }
+
+            if (filter && utils.isNumber(filter.maxTime)) {
+                state.transactionsFilter.maxTime = filter.maxTime;
+            } else {
+                state.transactionsFilter.maxTime = 0;
+            }
+
+            if (filter && utils.isNumber(filter.minTime)) {
+                state.transactionsFilter.minTime = filter.minTime;
+            } else {
+                state.transactionsFilter.minTime = 0;
+            }
+
+            if (filter && utils.isNumber(filter.type)) {
+                state.transactionsFilter.type = filter.type;
+            } else {
+                state.transactionsFilter.type = 0;
+            }
+
+            if (filter && utils.isString(filter.categoryId)) {
+                state.transactionsFilter.categoryId = filter.categoryId;
+            } else {
+                state.transactionsFilter.categoryId = '0';
+            }
+
+            if (filter && utils.isString(filter.accountId)) {
+                state.transactionsFilter.accountId = filter.accountId;
+            } else {
+                state.transactionsFilter.accountId = '0';
+            }
+
+            if (filter && utils.isString(filter.keyword)) {
+                state.transactionsFilter.keyword = filter.keyword;
+            } else {
+                state.transactionsFilter.keyword = '';
+            }
+        },
+        [UPDATE_TRANSACTION_LIST_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionsFilter.dateType = filter.dateType;
+            }
+
+            if (filter && utils.isNumber(filter.maxTime)) {
+                state.transactionsFilter.maxTime = filter.maxTime;
+            }
+
+            if (filter && utils.isNumber(filter.minTime)) {
+                state.transactionsFilter.minTime = filter.minTime;
+            }
+
+            if (filter && utils.isNumber(filter.type)) {
+                state.transactionsFilter.type = filter.type;
+            }
+
+            if (filter && utils.isString(filter.categoryId)) {
+                state.transactionsFilter.categoryId = filter.categoryId;
+            }
+
+            if (filter && utils.isString(filter.accountId)) {
+                state.transactionsFilter.accountId = filter.accountId;
+            }
+
+            if (filter && utils.isString(filter.keyword)) {
+                state.transactionsFilter.keyword = filter.keyword;
             }
         },
         [COLLAPSE_MONTH_IN_TRANSACTION_LIST] (state, { month, collapse }) {
@@ -408,7 +496,7 @@ const stores = {
                 month.opened = !collapse;
             }
         },
-        [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency, accountId }) {
+        [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency }) {
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
 
@@ -420,14 +508,22 @@ const stores = {
 
                 for (let j = 0; j < transactionMonthList.items.length; j++) {
                     if (transactionMonthList.items[j].id === transaction.id) {
-                        transactionMonthList.items.splice(j, 1, transaction);
-                        calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                        fillTransactionObject(state, transaction);
+
+                        if ((state.transactionsFilter.categoryId && state.transactionsFilter.categoryId !== '0' && state.transactionsFilter.categoryId !== transaction.categoryId) ||
+                            (state.transactionsFilter.accountId && state.transactionsFilter.accountId !== '0' && state.transactionsFilter.accountId !== transaction.sourceAccountId && state.transactionsFilter.accountId !== transaction.destinationAccountId)) {
+                            transactionMonthList.items.splice(j, 1);
+                        } else {
+                            transactionMonthList.items.splice(j, 1, transaction);
+                        }
+
+                        calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                         return;
                     }
                 }
             }
         },
-        [REMOVE_TRANSACTION_FROM_TRANSACTION_LIST] (state, { transaction, defaultCurrency, accountId }) {
+        [REMOVE_TRANSACTION_FROM_TRANSACTION_LIST] (state, { transaction, defaultCurrency }) {
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
 
@@ -446,7 +542,7 @@ const stores = {
                 if (transactionMonthList.items.length < 1) {
                     state.transactions.splice(i, 1);
                 } else {
-                    calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                    calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                 }
             }
         },
@@ -648,6 +744,8 @@ const stores = {
         deleteAccount,
 
         // transaction
+        initTransactionListFilter,
+        updateTransactionListFilter,
         getTransactions,
         getTransaction,
         saveTransaction,

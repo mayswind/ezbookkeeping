@@ -673,7 +673,8 @@ export default {
                 self.$showLoading(() => self.submitting);
 
                 self.$store.dispatch('saveTransaction', {
-                    transaction: submitTransaction
+                    transaction: submitTransaction,
+                    defaultCurrency: self.defaultCurrency
                 }).then(() => {
                     self.submitting = false;
                     self.$hideLoading();

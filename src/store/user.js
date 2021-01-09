@@ -11,7 +11,7 @@ import {
     CLEAR_USER_INFO
 } from './mutations.js';
 
-function authorize(context, { loginName, password }) {
+export function authorize(context, { loginName, password }) {
     return new Promise((resolve, reject) => {
         services.authorize({
             loginName: loginName,
@@ -61,7 +61,7 @@ function authorize(context, { loginName, password }) {
     });
 }
 
-function authorize2FA(context, { token, passcode, recoveryCode }) {
+export function authorize2FA(context, { token, passcode, recoveryCode }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -120,7 +120,7 @@ function authorize2FA(context, { token, passcode, recoveryCode }) {
     });
 }
 
-function register(context, { user }) {
+export function register(context, { user }) {
     return new Promise((resolve, reject) => {
         services.register({
             username: user.username,
@@ -165,7 +165,7 @@ function register(context, { user }) {
     });
 }
 
-function logout(context) {
+export function logout(context) {
     return new Promise((resolve, reject) => {
         services.logout().then(response => {
             const data = response.data;
@@ -196,7 +196,7 @@ function logout(context) {
     });
 }
 
-function getCurrentUserProfile() {
+export function getCurrentUserProfile() {
     return new Promise((resolve, reject) => {
         services.getProfile().then(response => {
             const data = response.data;
@@ -221,7 +221,7 @@ function getCurrentUserProfile() {
     });
 }
 
-function updateUserProfile(context, { profile, currentPassword }) {
+export function updateUserProfile(context, { profile, currentPassword }) {
     return new Promise((resolve, reject) => {
         services.updateProfile({
             password: profile.password,
@@ -260,33 +260,20 @@ function updateUserProfile(context, { profile, currentPassword }) {
     });
 }
 
-function clearUserInfoState(context) {
+export function clearUserInfoState(context) {
     context.commit(CLEAR_USER_INFO);
 }
 
-function resetState(context) {
+export function resetState(context) {
     context.commit(RESET_STATE);
 }
 
-function currentUserNickname(state) {
+export function currentUserNickname(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.nickname || userInfo.username || null;
 }
 
-function currentUserDefaultCurrency(state) {
+export function currentUserDefaultCurrency(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.defaultCurrency || null;
-}
-
-export default {
-    authorize,
-    authorize2FA,
-    register,
-    logout,
-    getCurrentUserProfile,
-    updateUserProfile,
-    clearUserInfoState,
-    resetState,
-    currentUserNickname,
-    currentUserDefaultCurrency
 }

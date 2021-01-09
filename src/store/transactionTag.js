@@ -11,7 +11,7 @@ import {
     UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE,
 } from './mutations.js';
 
-function loadAllTags(context, { force }) {
+export function loadAllTags(context, { force }) {
     if (!force && !context.state.transactionTagListStateInvalid) {
         return new Promise((resolve) => {
             resolve(context.state.allTransactionTags);
@@ -49,7 +49,7 @@ function loadAllTags(context, { force }) {
     });
 }
 
-function saveTag(context, { tag }) {
+export function saveTag(context, { tag }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -96,7 +96,7 @@ function saveTag(context, { tag }) {
     });
 }
 
-function changeTagDisplayOrder(context, { tagId, from, to }) {
+export function changeTagDisplayOrder(context, { tagId, from, to }) {
     return new Promise((resolve, reject) => {
         let tag = null;
 
@@ -123,7 +123,7 @@ function changeTagDisplayOrder(context, { tagId, from, to }) {
     });
 }
 
-function updateTagDisplayOrders(context) {
+export function updateTagDisplayOrders(context) {
     const newDisplayOrders = [];
 
     for (let i = 0; i < context.state.allTransactionTags.length; i++) {
@@ -161,7 +161,7 @@ function updateTagDisplayOrders(context) {
     });
 }
 
-function hideTag(context, { tag, hidden }) {
+export function hideTag(context, { tag, hidden }) {
     return new Promise((resolve, reject) => {
         services.hideTransactionTag({
             id: tag.id,
@@ -203,7 +203,7 @@ function hideTag(context, { tag, hidden }) {
     });
 }
 
-function deleteTag(context, { tag, beforeResolve }) {
+export function deleteTag(context, { tag, beforeResolve }) {
     return new Promise((resolve, reject) => {
         services.deleteTransactionTag({
             id: tag.id
@@ -236,13 +236,4 @@ function deleteTag(context, { tag, beforeResolve }) {
             }
         });
     });
-}
-
-export default {
-    loadAllTags,
-    saveTag,
-    changeTagDisplayOrder,
-    updateTagDisplayOrders,
-    hideTag,
-    deleteTag,
 }

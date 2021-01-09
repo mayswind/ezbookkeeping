@@ -7,7 +7,7 @@ import {
     STORE_USER_INFO
 } from './mutations.js';
 
-function getAllTokens() {
+export function getAllTokens() {
     return new Promise((resolve, reject) => {
         services.getTokens().then(response => {
             const data = response.data;
@@ -32,7 +32,7 @@ function getAllTokens() {
     });
 }
 
-function refreshTokenAndRevokeOldToken(context) {
+export function refreshTokenAndRevokeOldToken(context) {
     return new Promise((resolve) => {
         services.refreshToken().then(response => {
             const data = response.data;
@@ -57,7 +57,7 @@ function refreshTokenAndRevokeOldToken(context) {
     });
 }
 
-function revokeToken(context, { tokenId, ignoreError }) {
+export function revokeToken(context, { tokenId, ignoreError }) {
     return new Promise((resolve, reject) => {
         services.revokeToken({
             tokenId: tokenId,
@@ -85,7 +85,7 @@ function revokeToken(context, { tokenId, ignoreError }) {
     });
 }
 
-function revokeAllTokens() {
+export function revokeAllTokens() {
     return new Promise((resolve, reject) => {
         services.revokeAllTokens().then(response => {
             const data = response.data;
@@ -108,11 +108,4 @@ function revokeAllTokens() {
             }
         });
     });
-}
-
-export default {
-    getAllTokens,
-    refreshTokenAndRevokeOldToken,
-    revokeToken,
-    revokeAllTokens
 }

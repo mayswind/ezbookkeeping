@@ -3,7 +3,7 @@ import services from '../lib/services.js';
 import logger from '../lib/logger.js';
 import utils from '../lib/utils.js';
 
-function get2FAStatus() {
+export function get2FAStatus() {
     return new Promise((resolve, reject) => {
         services.get2FAStatus().then(response => {
             const data = response.data;
@@ -28,7 +28,7 @@ function get2FAStatus() {
     });
 }
 
-function enable2FA() {
+export function enable2FA() {
     return new Promise((resolve, reject) => {
         services.enable2FA().then(response => {
             const data = response.data;
@@ -53,7 +53,7 @@ function enable2FA() {
     });
 }
 
-function confirmEnable2FA(context, { secret, passcode }) {
+export function confirmEnable2FA(context, { secret, passcode }) {
     return new Promise((resolve, reject) => {
         services.confirmEnable2FA({
             secret: secret,
@@ -85,7 +85,7 @@ function confirmEnable2FA(context, { secret, passcode }) {
     });
 }
 
-function disable2FA(context, { password }) {
+export function disable2FA(context, { password }) {
     return new Promise((resolve, reject) => {
         services.disable2FA({
             password: password
@@ -112,7 +112,7 @@ function disable2FA(context, { password }) {
     });
 }
 
-function regenerate2FARecoveryCode(context, { password }) {
+export function regenerate2FARecoveryCode(context, { password }) {
     return new Promise((resolve, reject) => {
         services.regenerate2FARecoveryCode({
             password: password
@@ -137,12 +137,4 @@ function regenerate2FARecoveryCode(context, { password }) {
             }
         });
     });
-}
-
-export default {
-    get2FAStatus,
-    enable2FA,
-    confirmEnable2FA,
-    disable2FA,
-    regenerate2FARecoveryCode
 }

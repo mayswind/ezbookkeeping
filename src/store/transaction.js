@@ -1,8 +1,9 @@
 import transactionConstants from '../consts/transaction.js';
-import exchangeRates from "./exchangeRates.js";
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
 import utils from '../lib/utils.js';
+
+import { getExchangedAmount } from "./exchangeRates.js";
 
 import {
     LOAD_TRANSACTION_LIST,
@@ -17,7 +18,7 @@ const emptyTransactionResult = {
     transactionsNextTimeId: 0
 };
 
-function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime, minTime, type, categoryId, accountId, keyword }) {
+export function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime, minTime, type, categoryId, accountId, keyword }) {
     let actualMaxTime = context.state.transactionsNextTimeId;
 
     if (reload && maxTime > 0) {
@@ -91,7 +92,7 @@ function getTransactions(context, { reload, autoExpand, defaultCurrency, maxTime
     });
 }
 
-function getTransaction(context, { transactionId }) {
+export function getTransaction(context, { transactionId }) {
     return new Promise((resolve, reject) => {
         services.getTransaction({
             id: transactionId
@@ -118,7 +119,7 @@ function getTransaction(context, { transactionId }) {
     });
 }
 
-function saveTransaction(context, { transaction }) {
+export function saveTransaction(context, { transaction }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -167,7 +168,7 @@ function saveTransaction(context, { transaction }) {
     });
 }
 
-function deleteTransaction(context, { transaction, defaultCurrency, accountId, beforeResolve }) {
+export function deleteTransaction(context, { transaction, defaultCurrency, accountId, beforeResolve }) {
     return new Promise((resolve, reject) => {
         services.deleteTransaction({
             id: transaction.id
@@ -212,14 +213,14 @@ function deleteTransaction(context, { transaction, defaultCurrency, accountId, b
     });
 }
 
-function collapseMonthInTransactionList(context, { month, collapse }) {
+export function collapseMonthInTransactionList(context, { month, collapse }) {
     context.commit(COLLAPSE_MONTH_IN_TRANSACTION_LIST, {
         month: month,
         collapse: collapse
     });
 }
 
-function noTransaction(state) {
+export function noTransaction(state) {
     for (let i = 0; i < state.transactions.length; i++) {
         const transactionMonthList = state.transactions[i];
 
@@ -233,11 +234,11 @@ function noTransaction(state) {
     return true;
 }
 
-function hasMoreTransaction(state) {
+export function hasMoreTransaction(state) {
     return state.transactionsNextTimeId > 0;
 }
 
-function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, incomplete) {
+export function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, incomplete) {
     if (!transactionMonthList) {
         return;
     }
@@ -257,7 +258,7 @@ function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency,
         let amount = transaction.sourceAmount;
 
         if (transaction.sourceAccount.currency !== defaultCurrency) {
-            const balance = exchangeRates.getExchangedAmount(state)(amount, transaction.sourceAccount.currency, defaultCurrency);
+            const balance = getExchangedAmount(state)(amount, transaction.sourceAccount.currency, defaultCurrency);
 
             if (!utils.isNumber(balance)) {
                 if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
@@ -291,15 +292,4 @@ function calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency,
         income: totalIncome,
         incompleteIncome: incomplete || hasUnCalculatedTotalIncome
     };
-}
-
-export default {
-    getTransactions,
-    getTransaction,
-    saveTransaction,
-    deleteTransaction,
-    collapseMonthInTransactionList,
-    noTransaction,
-    hasMoreTransaction,
-    calculateMonthTotalAmount
 }

@@ -12,7 +12,7 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE
 } from './mutations.js';
 
-function loadAllAccounts(context, { force }) {
+export function loadAllAccounts(context, { force }) {
     if (!force && !context.state.accountListStateInvalid) {
         return new Promise((resolve) => {
             resolve(context.state.allAccounts);
@@ -52,7 +52,7 @@ function loadAllAccounts(context, { force }) {
     });
 }
 
-function getAccount(context, { accountId }) {
+export function getAccount(context, { accountId }) {
     return new Promise((resolve, reject) => {
         services.getAccount({
             id: accountId
@@ -79,7 +79,7 @@ function getAccount(context, { accountId }) {
     });
 }
 
-function saveAccount(context, { account }) {
+export function saveAccount(context, { account }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -126,7 +126,7 @@ function saveAccount(context, { account }) {
     });
 }
 
-function changeAccountDisplayOrder(context, { accountId, from, to }) {
+export function changeAccountDisplayOrder(context, { accountId, from, to }) {
     const account = context.state.allAccountsMap[accountId];
 
     return new Promise((resolve, reject) => {
@@ -149,7 +149,7 @@ function changeAccountDisplayOrder(context, { accountId, from, to }) {
     });
 }
 
-function updateAccountDisplayOrders(context) {
+export function updateAccountDisplayOrders(context) {
     const newDisplayOrders = [];
 
     for (let category in context.state.allCategorizedAccounts) {
@@ -195,7 +195,7 @@ function updateAccountDisplayOrders(context) {
     });
 }
 
-function hideAccount(context, { account, hidden }) {
+export function hideAccount(context, { account, hidden }) {
     return new Promise((resolve, reject) => {
         services.hideAccount({
             id: account.id,
@@ -237,7 +237,7 @@ function hideAccount(context, { account, hidden }) {
     });
 }
 
-function deleteAccount(context, { account, beforeResolve }) {
+export function deleteAccount(context, { account, beforeResolve }) {
     return new Promise((resolve, reject) => {
         services.deleteAccount({
             id: account.id
@@ -272,7 +272,7 @@ function deleteAccount(context, { account, beforeResolve }) {
     });
 }
 
-function allPlainAccounts(state) {
+export function allPlainAccounts(state) {
     const allAccounts = [];
 
     for (let i = 0; i < state.allAccounts.length; i++) {
@@ -291,7 +291,7 @@ function allPlainAccounts(state) {
     return allAccounts;
 }
 
-function allVisiblePlainAccounts(state) {
+export function allVisiblePlainAccounts(state) {
     const allVisibleAccounts = [];
 
     for (let i = 0; i < state.allAccounts.length; i++) {
@@ -314,7 +314,7 @@ function allVisiblePlainAccounts(state) {
     return allVisibleAccounts;
 }
 
-function allAvailableAccountsCount(state) {
+export function allAvailableAccountsCount(state) {
     let allAccountCount = 0;
 
     for (let category in state.allCategorizedAccounts) {
@@ -328,7 +328,7 @@ function allAvailableAccountsCount(state) {
     return allAccountCount;
 }
 
-function allVisibleAccountsCount(state) {
+export function allVisibleAccountsCount(state) {
     let shownAccountCount = 0;
 
     for (let category in state.allCategorizedAccounts) {
@@ -346,18 +346,4 @@ function allVisibleAccountsCount(state) {
     }
 
     return shownAccountCount;
-}
-
-export default {
-    loadAllAccounts,
-    getAccount,
-    saveAccount,
-    changeAccountDisplayOrder,
-    updateAccountDisplayOrders,
-    hideAccount,
-    deleteAccount,
-    allPlainAccounts,
-    allVisiblePlainAccounts,
-    allAvailableAccountsCount,
-    allVisibleAccountsCount,
 }

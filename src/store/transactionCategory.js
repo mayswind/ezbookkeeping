@@ -12,7 +12,7 @@ import {
     UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE,
 } from './mutations.js';
 
-function loadAllCategories(context, { force }) {
+export function loadAllCategories(context, { force }) {
     if (!force && !context.state.transactionCategoryListStateInvalid) {
         return new Promise((resolve) => {
             resolve(context.state.allTransactionCategories);
@@ -78,7 +78,7 @@ function loadAllCategories(context, { force }) {
     });
 }
 
-function getCategory(context, { categoryId }) {
+export function getCategory(context, { categoryId }) {
     return new Promise((resolve, reject) => {
         services.getTransactionCategory({
             id: categoryId
@@ -105,7 +105,7 @@ function getCategory(context, { categoryId }) {
     });
 }
 
-function saveCategory(context, { category }) {
+export function saveCategory(context, { category }) {
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -156,7 +156,7 @@ function saveCategory(context, { category }) {
     });
 }
 
-function addCategories(context, { categories }) {
+export function addCategories(context, { categories }) {
     return new Promise((resolve, reject) => {
         services.addTransactionCategoryBatch({
             categories: categories
@@ -185,7 +185,7 @@ function addCategories(context, { categories }) {
     });
 }
 
-function changeCategoryDisplayOrder(context, { categoryId, from, to }) {
+export function changeCategoryDisplayOrder(context, { categoryId, from, to }) {
     const category = context.state.allTransactionCategoriesMap[categoryId];
 
     return new Promise((resolve, reject) => {
@@ -219,7 +219,7 @@ function changeCategoryDisplayOrder(context, { categoryId, from, to }) {
     });
 }
 
-function updateCategoryDisplayOrders(context, { type, parentId }) {
+export function updateCategoryDisplayOrders(context, { type, parentId }) {
     const newDisplayOrders = [];
 
     let categoryList = null;
@@ -267,7 +267,7 @@ function updateCategoryDisplayOrders(context, { type, parentId }) {
     });
 }
 
-function hideCategory(context, { category, hidden }) {
+export function hideCategory(context, { category, hidden }) {
     return new Promise((resolve, reject) => {
         services.hideTransactionCategory({
             id: category.id,
@@ -309,7 +309,7 @@ function hideCategory(context, { category, hidden }) {
     });
 }
 
-function deleteCategory(context, { category, beforeResolve }) {
+export function deleteCategory(context, { category, beforeResolve }) {
     return new Promise((resolve, reject) => {
         services.deleteTransactionCategory({
             id: category.id
@@ -342,15 +342,4 @@ function deleteCategory(context, { category, beforeResolve }) {
             }
         });
     });
-}
-
-export default {
-    loadAllCategories,
-    getCategory,
-    saveCategory,
-    addCategories,
-    changeCategoryDisplayOrder,
-    updateCategoryDisplayOrders,
-    hideCategory,
-    deleteCategory,
 }

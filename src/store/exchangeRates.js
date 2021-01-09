@@ -8,7 +8,7 @@ import {
 
 const exchangeRatesLocalStorageKey = 'lab_app_exchange_rates';
 
-function getLatestExchangeRates(context, { silent, force }) {
+export function getLatestExchangeRates(context, { silent, force }) {
     const currentExchangeRateData = context.state.latestExchangeRates;
     const now = new Date();
 
@@ -55,12 +55,12 @@ function getLatestExchangeRates(context, { silent, force }) {
     });
 }
 
-function exchangeRatesLastUpdateDate(state) {
+export function exchangeRatesLastUpdateDate(state) {
     const exchangeRates = state.latestExchangeRates || {};
     return exchangeRates && exchangeRates.data ? exchangeRates.data.date : null;
 }
 
-function getExchangedAmount(state) {
+export function getExchangedAmount(state) {
     return (amount, fromCurrency, toCurrency) => {
         if (!state.latestExchangeRates || !state.latestExchangeRates.data || !state.latestExchangeRates.data.exchangeRates) {
             return null;
@@ -91,25 +91,16 @@ function getExchangedAmount(state) {
     };
 }
 
-function getExchangeRatesFromLocalStorage() {
+export function getExchangeRatesFromLocalStorage() {
     const storageData = localStorage.getItem(exchangeRatesLocalStorageKey) || '{}';
     return JSON.parse(storageData);
 }
 
-function setExchangeRatesToLocalStorage(value) {
+export function setExchangeRatesToLocalStorage(value) {
     const storageData = JSON.stringify(value);
     localStorage.setItem(exchangeRatesLocalStorageKey, storageData);
 }
 
-function clearExchangeRatesFromLocalStorage() {
+export function clearExchangeRatesFromLocalStorage() {
     localStorage.removeItem(exchangeRatesLocalStorageKey);
-}
-
-export default {
-    getLatestExchangeRates,
-    exchangeRatesLastUpdateDate,
-    getExchangedAmount,
-    getExchangeRatesFromLocalStorage,
-    setExchangeRatesToLocalStorage,
-    clearExchangeRatesFromLocalStorage,
 }

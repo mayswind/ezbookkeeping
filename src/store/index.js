@@ -40,20 +40,93 @@ import {
     UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE,
 } from './mutations.js';
 
-import user from './user.js';
-import twoFactorAuth from './twoFactorAuth.js';
-import token from './token.js';
-import exchangeRates from './exchangeRates.js';
-import account from './account.js';
-import transaction from './transaction.js';
-import transactionCategory from './transactionCategory.js';
-import transactionTag from './transactionTag.js';
+import {
+    authorize,
+    authorize2FA,
+    register,
+    logout,
+    getCurrentUserProfile,
+    updateUserProfile,
+    clearUserInfoState,
+    resetState,
+    currentUserNickname,
+    currentUserDefaultCurrency,
+} from './user.js';
+
+import {
+    get2FAStatus,
+    enable2FA,
+    confirmEnable2FA,
+    disable2FA,
+    regenerate2FARecoveryCode,
+} from './twoFactorAuth.js';
+
+import {
+    getAllTokens,
+    refreshTokenAndRevokeOldToken,
+    revokeToken,
+    revokeAllTokens,
+} from './token.js';
+
+import {
+    getLatestExchangeRates,
+    exchangeRatesLastUpdateDate,
+    getExchangedAmount,
+    getExchangeRatesFromLocalStorage,
+    setExchangeRatesToLocalStorage,
+    clearExchangeRatesFromLocalStorage,
+} from './exchangeRates.js';
+
+import {
+    loadAllAccounts,
+    getAccount,
+    saveAccount,
+    changeAccountDisplayOrder,
+    updateAccountDisplayOrders,
+    hideAccount,
+    deleteAccount,
+    allPlainAccounts,
+    allVisiblePlainAccounts,
+    allAvailableAccountsCount,
+    allVisibleAccountsCount,
+} from './account.js';
+
+import {
+    getTransactions,
+    getTransaction,
+    saveTransaction,
+    deleteTransaction,
+    collapseMonthInTransactionList,
+    noTransaction,
+    hasMoreTransaction,
+    calculateMonthTotalAmount,
+} from './transaction.js';
+
+import {
+    loadAllCategories,
+    getCategory,
+    saveCategory,
+    addCategories,
+    changeCategoryDisplayOrder,
+    updateCategoryDisplayOrders,
+    hideCategory,
+    deleteCategory,
+} from './transactionCategory.js';
+
+import {
+    loadAllTags,
+    saveTag,
+    changeTagDisplayOrder,
+    updateTagDisplayOrders,
+    hideTag,
+    deleteTag,
+} from './transactionTag.js';
 
 const stores = {
     strict: process.env.NODE_ENV !== 'production',
     state: {
         currentUserInfo: userState.getUserInfo(),
-        latestExchangeRates: exchangeRates.getExchangeRatesFromLocalStorage(),
+        latestExchangeRates: getExchangeRatesFromLocalStorage(),
         allAccounts: [],
         allAccountsMap: {},
         allCategorizedAccounts: {},
@@ -69,16 +142,23 @@ const stores = {
         transactionTagListStateInvalid: true,
     },
     getters: {
-        currentUserNickname: user.currentUserNickname,
-        currentUserDefaultCurrency: user.currentUserDefaultCurrency,
-        exchangeRatesLastUpdateDate: exchangeRates.exchangeRatesLastUpdateDate,
-        getExchangedAmount: exchangeRates.getExchangedAmount,
-        allPlainAccounts: account.allPlainAccounts,
-        allVisiblePlainAccounts: account.allVisiblePlainAccounts,
-        allAvailableAccountsCount: account.allAvailableAccountsCount,
-        allVisibleAccountsCount: account.allVisibleAccountsCount,
-        noTransaction: transaction.noTransaction,
-        hasMoreTransaction: transaction.hasMoreTransaction,
+        // user
+        currentUserNickname,
+        currentUserDefaultCurrency,
+
+        // exchange rates
+        exchangeRatesLastUpdateDate,
+        getExchangedAmount,
+
+        // account
+        allPlainAccounts,
+        allVisiblePlainAccounts,
+        allAvailableAccountsCount,
+        allVisibleAccountsCount,
+
+        // transaction
+        noTransaction,
+        hasMoreTransaction,
     },
     mutations: {
         [RESET_STATE] (state) {
@@ -101,7 +181,7 @@ const stores = {
             state.allTransactionTagsMap = {};
             state.transactionTagListStateInvalid = true;
 
-            exchangeRates.clearExchangeRatesFromLocalStorage();
+            clearExchangeRatesFromLocalStorage();
         },
         [STORE_USER_INFO] (state, userInfo) {
             state.currentUserInfo = userInfo;
@@ -113,7 +193,7 @@ const stores = {
         },
         [STORE_LATEST_EXCHANGE_RATES] (state, latestExchangeRates) {
             state.latestExchangeRates = latestExchangeRates;
-            exchangeRates.setExchangeRatesToLocalStorage(latestExchangeRates);
+            setExchangeRatesToLocalStorage(latestExchangeRates);
         },
         [LOAD_ACCOUNT_LIST] (state, accounts) {
             state.allAccounts = accounts;
@@ -296,7 +376,7 @@ const stores = {
 
                     if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                         currentMonthList.items.push(item);
-                        transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                        calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
                         continue;
                     }
 
@@ -306,7 +386,7 @@ const stores = {
                             currentMonthList = state.transactions[j];
 
                             if (j > 0) {
-                                transaction.calculateMonthTotalAmount(state, state.transactions[j - 1], defaultCurrency, accountId, false);
+                                calculateMonthTotalAmount(state, state.transactions[j - 1], defaultCurrency, accountId, false);
                             }
 
                             break;
@@ -314,11 +394,11 @@ const stores = {
                     }
 
                     if (!currentMonthList && state.transactions.length > 0) {
-                        transaction.calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
+                        calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
                     }
 
                     if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
-                        transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, false);
+                        calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, false);
 
                         state.transactions.push({
                             year: transactionYear,
@@ -333,14 +413,14 @@ const stores = {
                     }
 
                     currentMonthList.items.push(item);
-                    transaction.calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
+                    calculateMonthTotalAmount(state, currentMonthList, defaultCurrency, accountId, true);
                 }
             }
 
             if (transactions.nextTimeSequenceId) {
                 state.transactionsNextTimeId = transactions.nextTimeSequenceId;
             } else {
-                transaction.calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
+                calculateMonthTotalAmount(state, state.transactions[state.transactions.length - 1], defaultCurrency, accountId, false);
                 state.transactionsNextTimeId = -1;
             }
         },
@@ -362,7 +442,7 @@ const stores = {
                 for (let j = 0; j < transactionMonthList.items.length; j++) {
                     if (transactionMonthList.items[j].id === transaction.id) {
                         transactionMonthList.items.splice(j, 1, transaction);
-                        transaction.calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                        calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                         return;
                     }
                 }
@@ -387,7 +467,7 @@ const stores = {
                 if (transactionMonthList.items.length < 1) {
                     state.transactions.splice(i, 1);
                 } else {
-                    transaction.calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                    calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                 }
             }
         },
@@ -553,57 +633,65 @@ const stores = {
         },
     },
     actions: {
-        authorize: user.authorize,
-        authorize2FA: user.authorize2FA,
-        register: user.register,
-        logout: user.logout,
-        getCurrentUserProfile: user.getCurrentUserProfile,
-        updateUserProfile: user.updateUserProfile,
-        clearUserInfoState: user.clearUserInfoState,
-        resetState: user.resetState,
+        // user
+        authorize,
+        authorize2FA,
+        register,
+        logout,
+        getCurrentUserProfile,
+        updateUserProfile,
+        clearUserInfoState,
+        resetState,
 
-        get2FAStatus: twoFactorAuth.get2FAStatus,
-        enable2FA: twoFactorAuth.enable2FA,
-        confirmEnable2FA: twoFactorAuth.confirmEnable2FA,
-        disable2FA: twoFactorAuth.disable2FA,
-        regenerate2FARecoveryCode: twoFactorAuth.regenerate2FARecoveryCode,
+        // 2fa
+        get2FAStatus,
+        enable2FA,
+        confirmEnable2FA,
+        disable2FA,
+        regenerate2FARecoveryCode,
 
-        getAllTokens: token.getAllTokens,
-        refreshTokenAndRevokeOldToken: token.refreshTokenAndRevokeOldToken,
-        revokeToken: token.revokeToken,
-        revokeAllTokens: token.revokeAllTokens,
+        // token
+        getAllTokens,
+        refreshTokenAndRevokeOldToken,
+        revokeToken,
+        revokeAllTokens,
 
-        getLatestExchangeRates: exchangeRates.getLatestExchangeRates,
+        // exchange rates
+        getLatestExchangeRates,
 
-        loadAllAccounts: account.loadAllAccounts,
-        saveAccount: account.saveAccount,
-        getAccount: account.getAccount,
-        changeAccountDisplayOrder: account.changeAccountDisplayOrder,
-        updateAccountDisplayOrders: account.updateAccountDisplayOrders,
-        hideAccount: account.hideAccount,
-        deleteAccount: account.deleteAccount,
+        // account
+        loadAllAccounts,
+        saveAccount,
+        getAccount,
+        changeAccountDisplayOrder,
+        updateAccountDisplayOrders,
+        hideAccount,
+        deleteAccount,
 
-        getTransactions: transaction.getTransactions,
-        getTransaction: transaction.getTransaction,
-        saveTransaction: transaction.saveTransaction,
-        deleteTransaction: transaction.deleteTransaction,
-        collapseMonthInTransactionList: transaction.collapseMonthInTransactionList,
+        // transaction
+        getTransactions,
+        getTransaction,
+        saveTransaction,
+        deleteTransaction,
+        collapseMonthInTransactionList,
 
-        loadAllCategories: transactionCategory.loadAllCategories,
-        getCategory: transactionCategory.getCategory,
-        saveCategory: transactionCategory.saveCategory,
-        addCategories: transactionCategory.addCategories,
-        changeCategoryDisplayOrder: transactionCategory.changeCategoryDisplayOrder,
-        updateCategoryDisplayOrders: transactionCategory.updateCategoryDisplayOrders,
-        hideCategory: transactionCategory.hideCategory,
-        deleteCategory: transactionCategory.deleteCategory,
+        // transaction category
+        loadAllCategories,
+        getCategory,
+        saveCategory,
+        addCategories,
+        changeCategoryDisplayOrder,
+        updateCategoryDisplayOrders,
+        hideCategory,
+        deleteCategory,
 
-        loadAllTags: transactionTag.loadAllTags,
-        saveTag: transactionTag.saveTag,
-        changeTagDisplayOrder: transactionTag.changeTagDisplayOrder,
-        updateTagDisplayOrders: transactionTag.updateTagDisplayOrders,
-        hideTag: transactionTag.hideTag,
-        deleteTag: transactionTag.deleteTag,
+        // transaction tag
+        loadAllTags,
+        saveTag,
+        changeTagDisplayOrder,
+        updateTagDisplayOrders,
+        hideTag,
+        deleteTag,
     }
 };
 

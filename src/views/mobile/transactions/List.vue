@@ -441,17 +441,16 @@ export default {
                 self.loading = true;
             }
 
-            const promises = [
+            Promise.all([
                 self.$store.dispatch('loadAllAccounts', { force: false }),
-                self.$store.dispatch('loadAllCategories', { force: false }),
-                self.$store.dispatch('getTransactions', {
+                self.$store.dispatch('loadAllCategories', { force: false })
+            ]).then(() => {
+                return self.$store.dispatch('getTransactions', {
                     reload: true,
                     autoExpand: true,
                     defaultCurrency: self.defaultCurrency
-                })
-            ];
-
-            Promise.all(promises).then(() => {
+                });
+            }).then(() => {
                 if (done) {
                     done();
                 }

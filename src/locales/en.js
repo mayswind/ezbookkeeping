@@ -22,7 +22,7 @@ export default {
             'hourMinute': 'HH:mm'
         },
         'currency': {
-            'symbol': '{amount} {symbol}'
+            'symbol': '{symbol} {amount}'
         }
     },
     'datetime': {

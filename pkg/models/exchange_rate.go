@@ -3,6 +3,7 @@ package models
 // LatestExchangeRateResponse returns a view-object which contains latest exchange rate
 type LatestExchangeRateResponse struct {
 	DataSource    string                `json:"dataSource"`
+	ReferenceUrl  string                `json:"referenceUrl"`
 	Date          string                `json:"date"`
 	BaseCurrency  string                `json:"baseCurrency"`
 	ExchangeRates []*LatestExchangeRate `json:"exchangeRates"`

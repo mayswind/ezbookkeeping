@@ -43,7 +43,8 @@
             </f7-card-footer>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <span>{{ $t('Data source') }}</span>
-                <span>{{ exchangeRatesData.dataSource }}</span>
+                <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
+                <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
             </f7-card-footer>
         </f7-card>
     </f7-page>

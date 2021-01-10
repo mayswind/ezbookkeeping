@@ -10,6 +10,7 @@ import (
 )
 
 const euroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+const euroCentralBankExchangeRateReferenceUrl = "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
 const euroCentralBankDataSource = "European Central Bank"
 const euroCentralBankBaseCurrency = "EUR"
 
@@ -56,6 +57,7 @@ func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *models
 
 	latestExchangeRateResp := &models.LatestExchangeRateResponse{
 		DataSource:    euroCentralBankDataSource,
+		ReferenceUrl:  euroCentralBankExchangeRateReferenceUrl,
 		Date:          latestEuroCentralBankExchangeRate.Date,
 		BaseCurrency:  euroCentralBankBaseCurrency,
 		ExchangeRates: exchangeRates,

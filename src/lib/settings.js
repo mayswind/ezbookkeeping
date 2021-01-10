@@ -11,6 +11,7 @@ const defaultSettings = {
     autoUpdateExchangeRatesData: true,
     thousandsSeparator: true,
     currencyDisplayMode: 'symbol', // or 'none' or 'code' or 'name'
+    showAmountInHomePage: true,
     showAccountBalance: true,
     animate: true,
     autoDarkMode: true
@@ -88,6 +89,8 @@ export default {
     setEnableThousandsSeparator: value => setOption('thousandsSeparator', value),
     getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
     setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
+    isShowAmountInHomePage: () => getOption('showAmountInHomePage'),
+    setShowAmountInHomePage: value => setOption('showAmountInHomePage', value),
     isShowAccountBalance: () => getOption('showAccountBalance'),
     setShowAccountBalance: value => setOption('showAccountBalance', value),
     isEnableAnimate: () => getOption('animate'),

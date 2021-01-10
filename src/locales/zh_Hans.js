@@ -593,6 +593,7 @@ export default {
     'Currency Code': '货币代码',
     'Currency Name': '货币名称',
     'Currency Symbol': '货币符号',
+    'Show Amount In Home Page': '首页显示金额',
     'Show Account Balance': '显示账户余额',
     'Enable Animate': '启用动画',
     'Enable Auto Dark Mode': '启用自动深色模式',

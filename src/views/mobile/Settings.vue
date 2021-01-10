@@ -59,6 +59,11 @@
                     </f7-list-item>
 
                     <f7-list-item>
+                        <span>{{ $t('Show Amount In Home Page') }}</span>
+                        <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
+                    </f7-list-item>
+
+                    <f7-list-item>
                         <span>{{ $t('Show Account Balance') }}</span>
                         <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
                     </f7-list-item>
@@ -137,6 +142,14 @@ export default {
             },
             set: function (value) {
                 this.$settings.setCurrencyDisplayMode(value);
+            }
+        },
+        showAmountInHomePage: {
+            get: function () {
+                return this.$settings.isShowAmountInHomePage();
+            },
+            set: function (value) {
+                this.$settings.setShowAmountInHomePage(value);
             }
         },
         showAccountBalance: {

@@ -593,6 +593,7 @@ export default {
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',
     'Currency Symbol': 'Currency Symbol',
+    'Show Amount In Home Page': 'Show Amount In Home Page',
     'Show Account Balance': 'Show Account Balance',
     'Enable Animate': 'Enable Animate',
     'Enable Auto Dark Mode': 'Enable Auto Dark Mode',

@@ -22,11 +22,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -49,11 +49,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -76,11 +76,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -100,11 +100,11 @@
                          <div slot="after">
                             <div class="text-color-red">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | currency(defaultCurrency) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                             </div>
                             <div class="text-color-teal">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | currency(defaultCurrency) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
                             </div>
                         </div>
                     </f7-list-item>
@@ -143,7 +143,8 @@ export default {
 
         return {
             dateRange: self.getCurrentDateRange(),
-            loading: true
+            loading: true,
+            showAmountInHomePage: this.$settings.isShowAmountInHomePage()
         };
     },
     computed: {
@@ -174,6 +175,8 @@ export default {
     },
     methods: {
         onPageAfterIn() {
+            this.showAmountInHomePage = this.$settings.isShowAmountInHomePage();
+
             const newDateRange = this.getCurrentDateRange();
 
             if (newDateRange.today.startTime !== this.dateRange.today.startTime ||
@@ -205,6 +208,10 @@ export default {
                 }
             });
         },
+        toggleShowAmountInHomePage() {
+            this.showAmountInHomePage = !this.showAmountInHomePage;
+            this.$settings.setShowAmountInHomePage(this.showAmountInHomePage);
+        },
         getCurrentDateRange() {
             const self = this;
 
@@ -226,6 +233,15 @@ export default {
                     endTime: self.$utilities.getThisYearLastUnixTime()
                 }
             };
+        }
+    },
+    filters: {
+        amount(amount, showAmount) {
+            if (!showAmount) {
+                return '***';
+            }
+
+            return amount;
         }
     }
 }

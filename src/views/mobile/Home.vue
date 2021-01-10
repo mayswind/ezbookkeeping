@@ -4,93 +4,7 @@
             <f7-nav-title :title="$t('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item link="#" chevron-center>
-                        <div slot="media">
-                            <f7-icon f7="calendar_today"></f7-icon>
-                        </div>
-                        <div slot="title" class="padding-top-half">
-                            <span>Today</span>
-                        </div>
-                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>MM/DD/YYYY</span>
-                        </div>
-                         <div slot="after">
-                            <div class="text-color-red">
-                                <small>0.00 USD</small>
-                            </div>
-                            <div class="text-color-teal">
-                                <small>0.00 USD</small>
-                            </div>
-                        </div>
-                    </f7-list-item>
-
-                    <f7-list-item link="#" chevron-center>
-                        <div slot="media">
-                            <f7-icon f7="calendar"></f7-icon>
-                        </div>
-                        <div slot="title" class="padding-top-half">
-                            <span>This week</span>
-                        </div>
-                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>MM/DD - MM/DD</span>
-                        </div>
-                         <div slot="after">
-                            <div class="text-color-red">
-                                <small>0.00 USD</small>
-                            </div>
-                            <div class="text-color-teal">
-                                <small>0.00 USD</small>
-                            </div>
-                        </div>
-                    </f7-list-item>
-
-                    <f7-list-item link="#" chevron-center>
-                        <div slot="media">
-                            <f7-icon f7="calendar"></f7-icon>
-                        </div>
-                        <div slot="title" class="padding-top-half">
-                            <span>This month</span>
-                        </div>
-                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>MM/DD - MM/DD</span>
-                        </div>
-                         <div slot="after">
-                            <div class="text-color-red">
-                                <small>0.00 USD</small>
-                            </div>
-                            <div class="text-color-teal">
-                                <small>0.00 USD</small>
-                            </div>
-                        </div>
-                    </f7-list-item>
-
-                    <f7-list-item link="#" chevron-center>
-                        <div slot="media">
-                            <f7-icon f7="square_stack_3d_up"></f7-icon>
-                        </div>
-                        <div slot="title" class="padding-top-half">
-                            <span>This year</span>
-                        </div>
-                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>YYYY</span>
-                        </div>
-                         <div slot="after">
-                            <div class="text-color-red">
-                                <small>0.00 USD</small>
-                            </div>
-                            <div class="text-color-teal">
-                                <small>0.00 USD</small>
-                            </div>
-                        </div>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
-
-        <f7-card v-else-if="!loading">
+        <f7-card :class="{ 'skeleton-text': loading }">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item link="/transaction/list?dateType=1" chevron-center>
@@ -98,17 +12,21 @@
                             <f7-icon f7="calendar_today"></f7-icon>
                         </div>
                         <div slot="title" class="padding-top-half">
-                            <span>{{ $t('Today' )}}</span>
+                            <span v-if="loading">Today</span>
+                            <span v-else-if="!loading">{{ $t('Today' )}}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>{{ dateRange.today.startTime | moment($t('format.date.long')) }}</span>
+                            <span v-if="loading">MM/DD/YYYY</span>
+                            <span v-else-if="!loading">{{ dateRange.today.startTime | moment($t('format.date.long')) }}</span>
                         </div>
                          <div slot="after">
                              <div class="text-color-red">
-                                 <small v-if="transactionOverview.today">{{ transactionOverview.today.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
-                                 <small v-if="transactionOverview.today">{{ transactionOverview.today.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -118,19 +36,24 @@
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
                         <div slot="title" class="padding-top-half">
-                            <span>{{ $t('This Week' )}}</span>
+                            <span v-if="loading">This Week</span>
+                            <span v-else-if="!loading">{{ $t('This Week' )}}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>{{ dateRange.thisWeek.startTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-if="loading">MM/DD</span>
+                            <span v-else-if="!loading">{{ dateRange.thisWeek.startTime | moment($t('format.date.monthDay')) }}</span>
                             <span>-</span>
-                            <span>{{ dateRange.thisWeek.endTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-if="loading">MM/DD</span>
+                            <span v-else-if="!loading">{{ dateRange.thisWeek.endTime | moment($t('format.date.monthDay')) }}</span>
                         </div>
                          <div slot="after">
                              <div class="text-color-red">
-                                 <small v-if="transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
-                                 <small v-if="transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -140,19 +63,24 @@
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
                         <div slot="title" class="padding-top-half">
-                            <span>{{ $t('This Month' )}}</span>
+                            <span v-if="loading">This Month</span>
+                            <span v-else-if="!loading">{{ $t('This Month' )}}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>{{ dateRange.thisMonth.startTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-if="loading">MM/DD</span>
+                            <span v-else-if="!loading">{{ dateRange.thisMonth.startTime | moment($t('format.date.monthDay')) }}</span>
                             <span>-</span>
-                            <span>{{ dateRange.thisMonth.endTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-if="loading">MM/DD</span>
+                            <span v-else-if="!loading">{{ dateRange.thisMonth.endTime | moment($t('format.date.monthDay')) }}</span>
                         </div>
                          <div slot="after">
                              <div class="text-color-red">
-                                 <small v-if="transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | currency(defaultCurrency) }}</small>
                              </div>
                              <div class="text-color-teal">
-                                 <small v-if="transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | currency(defaultCurrency) }}</small>
+                                 <small v-if="loading">0.00 USD</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | currency(defaultCurrency) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -162,17 +90,21 @@
                             <f7-icon f7="square_stack_3d_up"></f7-icon>
                         </div>
                         <div slot="title" class="padding-top-half">
-                            <span>{{ $t('This Year' )}}</span>
+                            <span v-if="loading">This Year</span>
+                            <span v-else-if="!loading">{{ $t('This Year' )}}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
-                            <span>{{ dateRange.thisYear.startTime | moment($t('format.date.year')) }}</span>
+                            <span v-if="loading">YYYY</span>
+                            <span v-else-if="!loading">{{ dateRange.thisYear.startTime | moment($t('format.date.year')) }}</span>
                         </div>
                          <div slot="after">
                             <div class="text-color-red">
-                                <small v-if="transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | currency(defaultCurrency) }}</small>
+                                <small v-if="loading">0.00 USD</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | currency(defaultCurrency) }}</small>
                             </div>
                             <div class="text-color-teal">
-                                <small v-if="transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | currency(defaultCurrency) }}</small>
+                                <small v-if="loading">0.00 USD</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | currency(defaultCurrency) }}</small>
                             </div>
                         </div>
                     </f7-list-item>

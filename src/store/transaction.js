@@ -14,6 +14,7 @@ import {
     REMOVE_TRANSACTION_FROM_TRANSACTION_LIST,
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
+    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
 } from './mutations.js';
 
 const emptyTransactionResult = {
@@ -169,6 +170,7 @@ export function saveTransaction(context, { transaction, defaultCurrency }) {
             }
 
             context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
 
             resolve(data.result);
         }).catch(error => {
@@ -216,6 +218,7 @@ export function deleteTransaction(context, { transaction, defaultCurrency, befor
             }
 
             context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
 
             resolve(data.result);
         }).catch(error => {

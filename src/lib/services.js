@@ -159,6 +159,27 @@ export default {
             password
         });
     },
+    getTransactionOverview: ( { today, thisWeek, thisMonth, thisYear } ) => {
+        const queryParams = [];
+
+        if (today) {
+            queryParams.push(`today_${today.startTime}_${today.endTime}`);
+        }
+
+        if (thisWeek) {
+            queryParams.push(`thisWeek_${thisWeek.startTime}_${thisWeek.endTime}`);
+        }
+
+        if (thisMonth) {
+            queryParams.push(`thisMonth_${thisMonth.startTime}_${thisMonth.endTime}`);
+        }
+
+        if (thisYear) {
+            queryParams.push(`thisYear_${thisYear.startTime}_${thisYear.endTime}`);
+        }
+
+        return axios.get('v1/overviews/transaction.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));
+    },
     getAllAccounts: ({ visibleOnly }) => {
         return axios.get('v1/accounts/list.json?visible_only=' + !!visibleOnly);
     },

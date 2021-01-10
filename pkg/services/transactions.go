@@ -922,6 +922,38 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 	return relatedTransaction
 }
 
+// GetTotalIncomeAndExpenseByDateRange returns the total income and expense amount by specific date range
+func (s *TransactionService) GetTotalIncomeAndExpenseByDateRange(uid int64, startUnixTime int64, endUnixTime int64) (int64, int64, error) {
+	if uid <= 0 {
+		return 0, 0, errs.ErrUserIdInvalid
+	}
+
+	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
+	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+
+	var transactionTotalAmounts []*models.Transaction
+	err := s.UserDataDB(uid).Select("uid, type, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("type").Find(&transactionTotalAmounts)
+
+	if err != nil {
+		return 0, 0, err
+	}
+
+	var incomeAmount int64
+	var expenseAmount int64
+
+	for i := 0; i < len(transactionTotalAmounts); i++ {
+		transactionTotalAmount := transactionTotalAmounts[i]
+
+		if transactionTotalAmount.Type == models.TRANSACTION_DB_TYPE_INCOME {
+			incomeAmount = transactionTotalAmount.Amount
+		} else if transactionTotalAmount.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+			expenseAmount = transactionTotalAmount.Amount
+		}
+	}
+
+	return incomeAmount, expenseAmount, nil
+}
+
 func (s *TransactionService) isAccountIdValid(transaction *models.Transaction) error {
 	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		if transaction.RelatedAccountId != 0 && transaction.RelatedAccountId != transaction.AccountId {

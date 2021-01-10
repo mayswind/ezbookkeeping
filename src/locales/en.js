@@ -10,7 +10,9 @@ export default {
     'format': {
         'date': {
             'long': 'MM/DD/YYYY',
-            'yearMonth': 'YYYY-MM'
+            'year': 'YYYY',
+            'yearMonth': 'YYYY-M',
+            'monthDay': 'M/D'
         },
         'datetime': {
             'long': 'MM/DD/YYYY HH:mm:ss',
@@ -362,6 +364,8 @@ export default {
         'transaction tag name is empty': 'Transaction tag title is empty',
         'transaction tag name already exists': 'Transaction tag title already exists',
         'transaction tag is in use and cannot be deleted': 'Transaction tag is in use and it cannot be deleted',
+        'query items cannot be empty': 'There are no query items',
+        'query items too much': 'There are too many query items',
     },
     'parameter': {
         'id': 'ID',
@@ -496,6 +500,10 @@ export default {
     'Sign Up': 'Sign Up',
     'Transaction List': 'Transaction List',
     'Account List': 'Account List',
+    'This Week': 'This Week',
+    'This Month': 'This Month',
+    'This Year': 'This Year',
+    'Unable to get transaction overview': 'Unable to get transaction overview',
     'Net assets': 'Net assets',
     'Total assets': 'Total assets',
     'Total liabilities': 'Total liabilities',

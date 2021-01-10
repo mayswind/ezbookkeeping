@@ -40,6 +40,9 @@ import {
     UPDATE_TAG_VISIBILITY_IN_TRANSACTION_TAG_LIST,
     REMOVE_TAG_FROM_TRANSACTION_TAG_LIST,
     UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE,
+
+    LOAD_TRANSACTION_OVERVIEW,
+    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
 } from './mutations.js';
 
 import {
@@ -78,6 +81,10 @@ import {
     setExchangeRatesToLocalStorage,
     clearExchangeRatesFromLocalStorage,
 } from './exchangeRates.js';
+
+import {
+    loadTransactionOverview
+} from './overview.js';
 
 import {
     loadAllAccounts,
@@ -154,6 +161,8 @@ const stores = {
         allTransactionTags: [],
         allTransactionTagsMap: {},
         transactionTagListStateInvalid: true,
+        transactionOverview: {},
+        transactionOverviewStateInvalid: true,
     },
     getters: {
         // user
@@ -706,6 +715,12 @@ const stores = {
         [UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE] (state, invalidState) {
             state.transactionTagListStateInvalid = invalidState;
         },
+        [LOAD_TRANSACTION_OVERVIEW] (state, transactionOverview) {
+            state.transactionOverview = transactionOverview;
+        },
+        [UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE] (state, invalidState) {
+            state.transactionOverviewStateInvalid = invalidState;
+        },
     },
     actions: {
         // user
@@ -733,6 +748,9 @@ const stores = {
 
         // exchange rates
         getLatestExchangeRates,
+
+        // overview
+        loadTransactionOverview,
 
         // account
         loadAllAccounts,

@@ -10,7 +10,9 @@ export default {
     'format': {
         'date': {
             'long': 'YYYY年MM月DD日',
-            'yearMonth': 'YYYY年MM月'
+            'year': 'YYYY年',
+            'yearMonth': 'YYYY年M月',
+            'monthDay': 'M月D日'
         },
         'datetime': {
             'long': 'YYYY年MM月DD日 HH:mm:ss',
@@ -362,6 +364,8 @@ export default {
         'transaction tag name is empty': '交易标签标题不能为空',
         'transaction tag name already exists': '交易标签标题已经存在',
         'transaction tag is in use and cannot be deleted': '交易标签正在被使用，无法删除',
+        'query items cannot be empty': '请求项目不能为空',
+        'query items too much': '请求项目过多',
     },
     'parameter': {
         'id': 'ID',
@@ -496,6 +500,10 @@ export default {
     'Sign Up': '注册',
     'Transaction List': '交易列表',
     'Account List': '账户列表',
+    'This Week': '本周',
+    'This Month': '本月',
+    'This Year': '今年',
+    'Unable to get transaction overview': '无法获取交易概要',
     'Net assets': '净资产',
     'Total assets': '总资产',
     'Total liabilities': '总负债',

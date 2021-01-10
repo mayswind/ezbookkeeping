@@ -185,6 +185,9 @@ func startWebServer(c *cli.Context) error {
 				apiV1Route.POST("/users/2fa/recovery/regenerate.json", bindApi(api.TwoFactorAuthorizations.TwoFactorRecoveryCodeRegenerateHandler))
 			}
 
+			// Overview
+			apiV1Route.GET("/overviews/transaction.json", bindApi(api.Overviews.TransactionOverviewHandler))
+
 			// Accounts
 			apiV1Route.GET("/accounts/list.json", bindApi(api.Accounts.AccountListHandler))
 			apiV1Route.GET("/accounts/get.json", bindApi(api.Accounts.AccountGetHandler))

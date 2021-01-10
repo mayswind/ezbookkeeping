@@ -128,8 +128,8 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 
 	endTime := startTime.AddDate(0, 1, 0)
 
-	startUnixTime := startTime.Unix()
-	endUnixTime := endTime.Unix()
+	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
+	endTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix())
 
 	var transactions []*models.Transaction
 
@@ -137,8 +137,8 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	conditionParams := make([]interface{}, 0, 16)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
-	conditionParams = append(conditionParams, startUnixTime)
-	conditionParams = append(conditionParams, endUnixTime)
+	conditionParams = append(conditionParams, startTransactionTime)
+	conditionParams = append(conditionParams, endTransactionTime)
 
 	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
 		condition = condition + " AND type=?"
@@ -227,10 +227,10 @@ func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, mon
 
 	endTime := startTime.AddDate(0, 1, 0)
 
-	startUnixTime := startTime.Unix()
-	endUnixTime := endTime.Unix()
+	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
+	endTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix())
 
-	return s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startUnixTime, endUnixTime).Count(&models.Transaction{})
+	return s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startTransactionTime, endTransactionTime).Count(&models.Transaction{})
 }
 
 // CreateTransaction saves a new transaction to database

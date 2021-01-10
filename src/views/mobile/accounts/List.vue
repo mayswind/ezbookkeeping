@@ -589,6 +589,11 @@ export default {
     background-color: var(--f7-theme-color);
 }
 
+.theme-dark .account-overview-card a {
+    color: var(--f7-text-color);
+    opacity: 0.6;
+}
+
 .net-assets {
     font-size: 1.5em;
 }

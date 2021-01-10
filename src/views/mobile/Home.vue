@@ -301,7 +301,7 @@ export default {
 }
 
 .home-summary-misc > span {
-     margin-right: 4px;
+    margin-right: 4px;
  }
 
 .home-summary-misc > span:last-child {
@@ -310,6 +310,11 @@ export default {
 
 .theme-dark .home-summary-card {
     background-color: var(--f7-theme-color);
+}
+
+.theme-dark .home-summary-card a {
+    color: var(--f7-text-color);
+    opacity: 0.6;
 }
 
 .overview-transaction-footer {

@@ -800,6 +800,7 @@ export default {
 }
 
 .transaction-date {
+    width: 25px;
     margin-right: 6px;
 }
 
@@ -813,7 +814,6 @@ export default {
 .transaction-day-of-week {
     opacity: 0.6;
     font-size: 12px;
-    text-align: center;
 }
 
 .transaction-comment {

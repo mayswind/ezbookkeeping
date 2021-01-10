@@ -4,6 +4,33 @@
             <f7-nav-title :title="$t('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
+        <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
+            <f7-card-header class="display-block" style="padding-top: 120px;">
+                <p class="no-margin">
+                    <span :style="{ opacity: 0.6 }" v-if="loading">MM·Expense</span>
+                    <span :style="{ opacity: 0.6 }" v-else-if="!loading">
+                        <span>{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | t }}</span>
+                        <span>·</span>
+                        <span>{{ $t('Expense') }}</span>
+                    </span>
+                </p>
+                <p class="no-margin">
+                    <span class="month-expense" v-if="loading">0.00 USD</span>
+                    <span class="month-expense" v-else-if="!loading">{{ thisMonthExpense | amount(showAmountInHomePage) | currency(defaultCurrency) }}</span>
+                    <f7-link class="margin-left-half" @click="toggleShowAmountInHomePage()">
+                        <f7-icon :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
+                    </f7-link>
+                </p>
+                <p class="no-margin">
+                    <small class="home-summary-misc" :style="{ opacity: 0.6 }" v-if="loading">Income of this month 0.00 USD</small>
+                    <small class="home-summary-misc" :style="{ opacity: 0.6 }" v-else-if="!loading">
+                        <span>{{ $t('Income of this month') }}</span>
+                        <span>{{ thisMonthIncome | amount(showAmountInHomePage) | currency(defaultCurrency) }}</span>
+                    </small>
+                </p>
+            </f7-card-header>
+        </f7-card>
+
         <f7-card :class="{ 'skeleton-text': loading }">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
@@ -153,6 +180,20 @@ export default {
         },
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
+        thisMonthExpense() {
+            if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
+                return 0;
+            }
+
+            return this.$store.state.transactionOverview.thisMonth.expenseAmount;
+        },
+        thisMonthIncome() {
+            if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
+                return 0;
+            }
+
+            return this.$store.state.transactionOverview.thisMonth.incomeAmount;
         }
     },
     created() {
@@ -242,18 +283,32 @@ export default {
             }
 
             return amount;
+        },
+        monthNameLocalizedKey(monthName) {
+            return `datetime.${monthName}.long`;
         }
     }
 }
 </script>
 
 <style>
-.home-overview-card {
+.home-summary-card {
     background-color: var(--f7-color-yellow);
-    height: 300px;
 }
 
-.theme-dark .home-overview-card {
+.home-summary-card .month-expense {
+    font-size: 1.5em;
+}
+
+.home-summary-misc > span {
+     margin-right: 4px;
+ }
+
+.home-summary-misc > span:last-child {
+    margin-right: 0;
+}
+
+.theme-dark .home-summary-card {
     background-color: var(--f7-theme-color);
 }
 

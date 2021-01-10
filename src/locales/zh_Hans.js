@@ -46,6 +46,42 @@ export default {
         },
         'Sunday': {
             'short': '周日'
+        },
+        'January': {
+            'long': '1月'
+        },
+        'February': {
+            'long': '2月'
+        },
+        'March': {
+            'long': '3月'
+        },
+        'April': {
+            'long': '4月'
+        },
+        'May': {
+            'long': '5月'
+        },
+        'June': {
+            'long': '6月'
+        },
+        'July': {
+            'long': '7月'
+        },
+        'August': {
+            'long': '8月'
+        },
+        'September': {
+            'long': '9月'
+        },
+        'October': {
+            'long': '10月'
+        },
+        'November': {
+            'long': '11月'
+        },
+        'December': {
+            'long': '12月'
         }
     },
     'currency': {
@@ -503,6 +539,7 @@ export default {
     'This Week': '本周',
     'This Month': '本月',
     'This Year': '今年',
+    'Income of this month': '当月收入',
     'Unable to get transaction overview': '无法获取交易概要',
     'Net assets': '净资产',
     'Total assets': '总资产',

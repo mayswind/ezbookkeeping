@@ -46,6 +46,42 @@ export default {
         },
         'Sunday': {
             'short': 'Sun'
+        },
+        'January': {
+            'long': 'January'
+        },
+        'February': {
+            'long': 'February'
+        },
+        'March': {
+            'long': 'March'
+        },
+        'April': {
+            'long': 'April'
+        },
+        'May': {
+            'long': 'May'
+        },
+        'June': {
+            'long': 'June'
+        },
+        'July': {
+            'long': 'July'
+        },
+        'August': {
+            'long': 'August'
+        },
+        'September': {
+            'long': 'September'
+        },
+        'October': {
+            'long': 'October'
+        },
+        'November': {
+            'long': 'November'
+        },
+        'December': {
+            'long': 'December'
         }
     },
     'currency': {
@@ -503,6 +539,7 @@ export default {
     'This Week': 'This Week',
     'This Month': 'This Month',
     'This Year': 'This Year',
+    'Income of this month': 'Income of this month',
     'Unable to get transaction overview': 'Unable to get transaction overview',
     'Net assets': 'Net assets',
     'Total assets': 'Total assets',

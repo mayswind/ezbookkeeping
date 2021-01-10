@@ -11,10 +11,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar_today"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>Today</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>MM/DD/YYYY</span>
                         </div>
                          <div slot="after">
@@ -31,10 +31,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>This week</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>MM/DD - MM/DD</span>
                         </div>
                          <div slot="after">
@@ -51,10 +51,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>This month</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>MM/DD - MM/DD</span>
                         </div>
                          <div slot="after">
@@ -71,10 +71,10 @@
                         <div slot="media">
                             <f7-icon f7="square_stack_3d_up"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>This year</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>YYYY</span>
                         </div>
                          <div slot="after">
@@ -97,10 +97,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar_today"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>{{ $t('Today' )}}</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>{{ dateRange.today.startTime | moment($t('format.date.long')) }}</span>
                         </div>
                          <div slot="after">
@@ -117,10 +117,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>{{ $t('This Week' )}}</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>{{ dateRange.thisWeek.startTime | moment($t('format.date.monthDay')) }}</span>
                             <span>-</span>
                             <span>{{ dateRange.thisWeek.endTime | moment($t('format.date.monthDay')) }}</span>
@@ -139,10 +139,10 @@
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>{{ $t('This Month' )}}</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>{{ dateRange.thisMonth.startTime | moment($t('format.date.monthDay')) }}</span>
                             <span>-</span>
                             <span>{{ dateRange.thisMonth.endTime | moment($t('format.date.monthDay')) }}</span>
@@ -161,10 +161,10 @@
                         <div slot="media">
                             <f7-icon f7="square_stack_3d_up"></f7-icon>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="padding-top-half">
                             <span>{{ $t('This Year' )}}</span>
                         </div>
-                        <div slot="footer" class="overview-transaction-footer">
+                        <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span>{{ dateRange.thisYear.startTime | moment($t('format.date.year')) }}</span>
                         </div>
                          <div slot="after">
@@ -310,7 +310,7 @@ export default {
 }
 
 .overview-transaction-footer {
-    padding-top: 2px;
+    padding-top: 6px;
 }
 
 .overview-transaction-footer > span {

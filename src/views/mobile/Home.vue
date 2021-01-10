@@ -7,11 +7,15 @@
         <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
-                    <span :style="{ opacity: 0.6 }" v-if="loading">MM·Expense</span>
-                    <span :style="{ opacity: 0.6 }" v-else-if="!loading">
-                        <span>{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | t }}</span>
+                    <span :style="{ opacity: 0.6 }" v-if="loading">
+                        <span class="home-summary-month">MM</span>
                         <span>·</span>
-                        <span>{{ $t('Expense') }}</span>
+                        <small>Expense</small>
+                    </span>
+                    <span :style="{ opacity: 0.6 }" v-else-if="!loading">
+                        <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | t }}</span>
+                        <span>·</span>
+                        <small>{{ $t('Expense') }}</small>
                     </span>
                 </p>
                 <p class="no-margin">
@@ -296,11 +300,15 @@ export default {
     background-color: var(--f7-color-yellow);
 }
 
+.home-summary-card .home-summary-month {
+    font-size: 1.3em;
+}
+
 .home-summary-card .month-expense {
     font-size: 1.5em;
 }
 
-.home-summary-misc {
+.home-summary-card .home-summary-misc {
     opacity: 0.6;
 }
 

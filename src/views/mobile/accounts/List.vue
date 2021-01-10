@@ -24,10 +24,10 @@
                     </f7-link>
                 </p>
                 <p class="no-margin">
-                    <small class="account-overview-info" :style="{ opacity: 0.6 }" v-if="loading">
+                    <small class="account-overview-info" v-if="loading">
                         <span>Total assets | Total liabilities</span>
                     </small>
-                    <small class="account-overview-info" :style="{ opacity: 0.6 }" v-else-if="!loading">
+                    <small class="account-overview-info" v-else-if="!loading">
                         <span>{{ $t('Total assets') }}</span>
                         <span>{{ totalAssets | currency(defaultCurrency) }}</span>
                         <span>|</span>
@@ -596,6 +596,10 @@ export default {
 
 .net-assets {
     font-size: 1.5em;
+}
+
+.account-overview-info {
+    opacity: 0.6;
 }
 
 .account-overview-info > span {

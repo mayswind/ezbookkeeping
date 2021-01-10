@@ -22,8 +22,8 @@
                     </f7-link>
                 </p>
                 <p class="no-margin">
-                    <small class="home-summary-misc" :style="{ opacity: 0.6 }" v-if="loading">Income of this month 0.00 USD</small>
-                    <small class="home-summary-misc" :style="{ opacity: 0.6 }" v-else-if="!loading">
+                    <small class="home-summary-misc" v-if="loading">Income of this month 0.00 USD</small>
+                    <small class="home-summary-misc" v-else-if="!loading">
                         <span>{{ $t('Income of this month') }}</span>
                         <span>{{ thisMonthIncome | amount(showAmountInHomePage) | currency(defaultCurrency) }}</span>
                     </small>
@@ -298,6 +298,10 @@ export default {
 
 .home-summary-card .month-expense {
     font-size: 1.5em;
+}
+
+.home-summary-misc {
+    opacity: 0.6;
 }
 
 .home-summary-misc > span {

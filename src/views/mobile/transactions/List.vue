@@ -414,7 +414,12 @@ export default {
         const self = this;
         const query = self.$f7route.query;
 
+        const dateParam = self.getDateParamByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+
         this.$store.dispatch('initTransactionListFilter', {
+            dateType: dateParam ? dateParam.dateType : undefined,
+            maxTime: dateParam ? dateParam.maxTime : undefined,
+            minTime: dateParam ? dateParam.minTime : undefined,
             type: query.type,
             categoryId: query.categoryId,
             accountId: query.accountId
@@ -510,50 +515,16 @@ export default {
                 return;
             }
 
-            let maxTime = 0;
-            let minTime = 0;
+            const dateParam = this.getDateParamByDateType(dateType);
 
-            if (dateType === 0) { // All
-                maxTime = 0;
-                minTime = 0;
-            } else if (dateType === 1) { // Today
-                maxTime = this.$utilities.getTodayLastUnixTime();
-                minTime = this.$utilities.getTodayFirstUnixTime();
-            } else if (dateType === 2) { // Yesterday
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
-            } else if (dateType === 3) { // Last 7 days
-                maxTime = this.$utilities.getUnixTime(new Date());
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 7, 'days');
-            } else if (dateType === 4) { // Last 30 days
-                maxTime = this.$utilities.getUnixTime(new Date());
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 30, 'days');
-            } else if (dateType === 5) { // This week
-                maxTime = this.$utilities.getThisWeekLastUnixTime();
-                minTime = this.$utilities.getThisWeekFirstUnixTime();
-            } else if (dateType === 6) { // Last week
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
-            } else if (dateType === 7) { // This month
-                maxTime = this.$utilities.getThisMonthLastUnixTime();
-                minTime = this.$utilities.getThisMonthFirstUnixTime();
-            } else if (dateType === 8) { // Last month
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
-            } else if (dateType === 9) { // This year
-                maxTime = this.$utilities.getThisYearLastUnixTime();
-                minTime = this.$utilities.getThisYearFirstUnixTime();
-            } else if (dateType === 10) { // Last year
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
-            } else {
+            if (!dateParam) {
                 return;
             }
 
             this.$store.dispatch('updateTransactionListFilter', {
-                dateType: dateType,
-                maxTime: maxTime,
-                minTime: minTime
+                dateType: dateParam.dateType,
+                maxTime: dateParam.maxTime,
+                minTime: dateParam.minTime
             });
 
             this.showDatePopover = false;
@@ -675,6 +646,53 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getDateParamByDateType(dateType) {
+            let maxTime = 0;
+            let minTime = 0;
+
+            if (dateType === 0) { // All
+                maxTime = 0;
+                minTime = 0;
+            } else if (dateType === 1) { // Today
+                maxTime = this.$utilities.getTodayLastUnixTime();
+                minTime = this.$utilities.getTodayFirstUnixTime();
+            } else if (dateType === 2) { // Yesterday
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
+            } else if (dateType === 3) { // Last 7 days
+                maxTime = this.$utilities.getUnixTime(new Date());
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 7, 'days');
+            } else if (dateType === 4) { // Last 30 days
+                maxTime = this.$utilities.getUnixTime(new Date());
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 30, 'days');
+            } else if (dateType === 5) { // This week
+                maxTime = this.$utilities.getThisWeekLastUnixTime();
+                minTime = this.$utilities.getThisWeekFirstUnixTime();
+            } else if (dateType === 6) { // Last week
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
+            } else if (dateType === 7) { // This month
+                maxTime = this.$utilities.getThisMonthLastUnixTime();
+                minTime = this.$utilities.getThisMonthFirstUnixTime();
+            } else if (dateType === 8) { // Last month
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
+            } else if (dateType === 9) { // This year
+                maxTime = this.$utilities.getThisYearLastUnixTime();
+                minTime = this.$utilities.getThisYearFirstUnixTime();
+            } else if (dateType === 10) { // Last year
+                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
+                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
+            } else {
+                return null;
+            }
+
+            return {
+                dateType: dateType,
+                maxTime: maxTime,
+                minTime: minTime
+            }
         }
     },
     filters: {

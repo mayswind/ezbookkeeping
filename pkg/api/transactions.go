@@ -58,7 +58,13 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	transactionIds := make([]int64, finalCount)
 
 	for i := 0; i < finalCount; i++ {
-		transactionIds[i] = transactions[i].TransactionId
+		transactionId := transactions[i].TransactionId
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transactionId = transactions[i].RelatedId
+		}
+
+		transactionIds[i] = transactionId
 	}
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
@@ -72,8 +78,14 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	transactionResps.Items = make(models.TransactionInfoResponseSlice, finalCount)
 
 	for i := 0; i < finalCount; i++ {
-		transactionTagIds := allTransactionTagIds[transactions[i].TransactionId]
-		transactionResps.Items[i] = transactions[i].ToTransactionInfoResponse(transactionTagIds)
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+		}
+
+		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds)
 	}
 
 	sort.Sort(transactionResps.Items)
@@ -106,7 +118,13 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	transactionIds := make([]int64, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
-		transactionIds[i] = transactions[i].TransactionId
+		transactionId := transactions[i].TransactionId
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transactionId = transactions[i].RelatedId
+		}
+
+		transactionIds[i] = transactionId
 	}
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
@@ -119,8 +137,14 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	transactionResps := make([]*models.TransactionInfoResponse, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
-		transactionTagIds := allTransactionTagIds[transactions[i].TransactionId]
-		transactionResps[i] = transactions[i].ToTransactionInfoResponse(transactionTagIds)
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+		}
+
+		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds)
 	}
 
 	return transactionResps, nil

@@ -298,14 +298,20 @@ export function calculateMonthTotalAmount(state, transactionMonthList, defaultCu
     for (let i = 0; i < transactionMonthList.items.length; i++) {
         const transaction = transactionMonthList.items[i];
 
-        if (!transaction.sourceAccount) {
+        let amount = transaction.sourceAmount;
+        let account = transaction.sourceAccount;
+
+        if (accountId && transaction.destinationAccount && transaction.destinationAccount.id === accountId) {
+            amount = transaction.destinationAmount;
+            account = transaction.destinationAccount;
+        }
+
+        if (!account) {
             continue;
         }
 
-        let amount = transaction.sourceAmount;
-
-        if (transaction.sourceAccount.currency !== defaultCurrency) {
-            const balance = getExchangedAmount(state)(amount, transaction.sourceAccount.currency, defaultCurrency);
+        if (account.currency !== defaultCurrency) {
+            const balance = getExchangedAmount(state)(amount, account.currency, defaultCurrency);
 
             if (!utils.isNumber(balance)) {
                 if (transaction.type === transactionConstants.allTransactionTypes.Expense) {

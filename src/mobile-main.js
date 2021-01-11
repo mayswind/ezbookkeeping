@@ -23,7 +23,7 @@ import icons from './consts/icon.js';
 import account from './consts/account.js';
 import transaction from './consts/transaction.js';
 import category from './consts/category.js';
-import licenses from './consts/licenses.js';
+import licenses from './lib/licenses.js';
 import version from './lib/version.js';
 import logger from './lib/logger.js';
 import settings from './lib/settings.js';
@@ -81,7 +81,7 @@ const i18n = new VueI18n(getI18nOptions());
 Vue.prototype.$version = version.getVersion();
 Vue.prototype.$buildTime = version.getBuildTime();
 
-Vue.prototype.$licenses = licenses;
+Vue.prototype.$licenses = licenses.getLicenses();
 Vue.prototype.$constants = {
     api: api,
     currency: currency,

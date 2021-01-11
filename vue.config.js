@@ -1,5 +1,6 @@
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const pkgFile = require('./package.json');
+const licenseFile = require('./third-patry-licenses.json');
 
 module.exports = {
     pages: {
@@ -52,6 +53,7 @@ module.exports = {
             definitions[0]['process.env']['VERSION'] = JSON.stringify(pkgFile.version);
             definitions[0]['process.env']['COMMIT_HASH'] = JSON.stringify(gitRevisionPlugin.commithash());
             definitions[0]['process.env']['BUILD_UNIXTIME'] = JSON.stringify(parseInt((new Date().getTime() / 1000).toString()));
+            definitions[0]['process.env']['LICENSES'] = JSON.stringify(licenseFile);
 
             return definitions;
         });

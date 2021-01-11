@@ -593,7 +593,8 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 				return errs.ErrTooMuchTransactionInOneSecond
 			}
 
-			updatedRows, err := sess.ID(relatedTransaction.TransactionId).Cols(updateCols...).Where("uid=? AND deleted=?", relatedTransaction.Uid, false).Update(relatedTransaction)
+			relatedUpdateCols := s.getRelatedUpdateColumns(updateCols)
+			updatedRows, err := sess.ID(relatedTransaction.TransactionId).Cols(relatedUpdateCols...).Where("uid=? AND deleted=?", relatedTransaction.Uid, false).Update(relatedTransaction)
 
 			if err != nil {
 				return err
@@ -1048,6 +1049,26 @@ func (s *TransactionService) getOldAccountModels(sess *xorm.Session, transaction
 		}
 	}
 	return oldSourceAccount, oldDestinationAccount, nil
+}
+
+func (s *TransactionService) getRelatedUpdateColumns(updateCols []string) []string {
+	relatedUpdateCols := make([]string, len(updateCols))
+
+	for i := 0; i < len(updateCols); i++ {
+		if updateCols[i] == "account_id" {
+			relatedUpdateCols[i] = "related_account_id"
+		} else if updateCols[i] == "related_account_id" {
+			relatedUpdateCols[i] = "account_id"
+		} else if updateCols[i] == "amount" {
+			relatedUpdateCols[i] = "related_account_amount"
+		} else if updateCols[i] == "related_account_amount" {
+			relatedUpdateCols[i] = "amount"
+		} else {
+			relatedUpdateCols[i] = updateCols[i]
+		}
+	}
+
+	return relatedUpdateCols
 }
 
 func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *models.Transaction) error {

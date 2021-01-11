@@ -1,9 +1,14 @@
 # Build backend binary file
 FROM golang:1.14.10-alpine3.12 AS be-builder
-RUN apk add gcc g++ libc-dev
+RUN apk add git gcc g++ libc-dev
 WORKDIR /go/src/github.com/mayswind/lab
 COPY . .
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -a -v -i -trimpath -o lab lab.go
+RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d ' ' | tr -d ',' | tr -d '"'` \
+  && COMMIT_HASH=$(git rev-parse --short HEAD) \
+  && GOOS=linux \
+  && GOARCH=amd64 \
+  && CGO_ENABLED=1 \
+  && go build -a -v -i -trimpath -ldflags "-X main.version=${VERSION} -X main.commitHash=${COMMIT_HASH}" -o lab lab.go
 RUN chmod +x lab
 
 # Build frontend files

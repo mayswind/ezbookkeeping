@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -9,13 +10,14 @@ import (
 	"github.com/mayswind/lab/cmd"
 )
 
-const labVersion = "0.1.0"
+var version string
+var commitHash string
 
 func main() {
 	app := &cli.App{
 		Name:    "lab",
 		Usage:   "A lightweight account book app hosted by yourself.",
-		Version: labVersion,
+		Version: getVersion(),
 		Commands: []*cli.Command{
 			cmd.WebServer,
 			cmd.Database,
@@ -33,4 +35,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to run lab app with %s: %v", os.Args, err)
 	}
+}
+
+func getVersion() string {
+	fullVersion := "Local Build"
+
+	if version != "" {
+		fullVersion = version
+	}
+
+	if commitHash != "" {
+		fullVersion = fmt.Sprintf("%s (%s)", fullVersion, commitHash)
+	}
+
+	return fullVersion
 }

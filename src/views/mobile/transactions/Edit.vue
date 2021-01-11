@@ -482,7 +482,9 @@ export default {
                 this.transaction.time = newValue;
             }
 
-            this.transaction.unixTime = this.$utilities.getUnixTime(newValue);
+            if (this.$utilities.formatUnixTime(this.transaction.unixTime, 'YYYY-MM-DDTHH:mm') !== newValue) {
+                this.transaction.unixTime = this.$utilities.getUnixTime(newValue);
+            }
         }
     },
     created() {

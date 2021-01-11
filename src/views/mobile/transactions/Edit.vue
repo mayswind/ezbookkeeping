@@ -325,6 +325,9 @@ export default {
         allVisibleAccounts() {
             return this.$store.getters.allVisiblePlainAccounts;
         },
+        allAccountsMap() {
+            return this.$store.state.allAccountsMap;
+        },
         categorizedAccounts() {
             const categorizedAccounts = this.$utilities.copyObjectTo(this.$utilities.getCategorizedAccounts(this.allVisibleAccounts), {});
 
@@ -434,24 +437,15 @@ export default {
     },
     watch: {
         'transaction.sourceAmount': function (newValue, oldValue) {
+            if (this.mode === 'view') {
+                return;
+            }
+
             if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense || this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
                 this.transaction.destinationAmount = newValue;
             } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
-                let sourceAccount, destinationAccount = null;
-
-                for (let i = 0; i < this.allVisibleAccounts.length; i++) {
-                    if (this.allVisibleAccounts[i].id === this.transaction.sourceAccountId) {
-                        sourceAccount = this.allVisibleAccounts[i];
-                    }
-
-                    if (this.allVisibleAccounts[i].id === this.transaction.destinationAccountId) {
-                        destinationAccount = this.allVisibleAccounts[i];
-                    }
-
-                    if (sourceAccount && destinationAccount) {
-                        break;
-                    }
-                }
+                const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId]
+                const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId]
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
                     const exchangedOldValue = this.$store.getters.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
@@ -474,6 +468,10 @@ export default {
             }
         },
         'transaction.destinationAmount': function (newValue) {
+            if (this.mode === 'view') {
+                return;
+            }
+
             if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense || this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
                 this.transaction.sourceAmount = newValue;
             }

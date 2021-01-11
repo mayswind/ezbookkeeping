@@ -526,7 +526,12 @@ const stores = {
                             transactionMonthList.items.splice(j, 1, transaction);
                         }
 
-                        calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                        if (transactionMonthList.items.length < 1) {
+                            state.transactions.splice(i, 1);
+                        } else {
+                            calculateMonthTotalAmount(state, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                        }
+
                         return;
                     }
                 }

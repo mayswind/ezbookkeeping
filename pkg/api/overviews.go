@@ -59,9 +59,9 @@ func (a *OverviewApi) TransactionOverviewHandler(c *core.Context) (interface{}, 
 		}
 
 		requestItem := &models.TransactionOverviewRequestItem{
-			Name: itemValues[0],
+			Name:      itemValues[0],
 			StartTime: startTime,
-			EndTime: endTime,
+			EndTime:   endTime,
 		}
 
 		requestItems = append(requestItems, requestItem)
@@ -92,9 +92,9 @@ func (a *OverviewApi) TransactionOverviewHandler(c *core.Context) (interface{}, 
 		}
 
 		overviewResp[requestItem.Name] = &models.TransactionOverviewResponseItem{
-			StartTime: requestItem.StartTime,
-			EndTime: requestItem.EndTime,
-			IncomeAmount: incomeAmount,
+			StartTime:     requestItem.StartTime,
+			EndTime:       requestItem.EndTime,
+			IncomeAmount:  incomeAmount,
 			ExpenseAmount: expenseAmount,
 		}
 	}

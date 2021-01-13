@@ -20,7 +20,7 @@
                 </p>
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
-                    <span class="month-expense" v-else-if="!loading">{{ thisMonthExpense | amount(showAmountInHomePage) | currency(defaultCurrency) }}</span>
+                    <span class="month-expense" v-else-if="!loading">{{ thisMonthAmount.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(thisMonthAmount.incompleteExpenseAmount) }}</span>
                     <f7-link class="margin-left-half" @click="toggleShowAmountInHomePage()">
                         <f7-icon :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                     </f7-link>
@@ -29,7 +29,7 @@
                     <small class="home-summary-misc" v-if="loading">Income of this month 0.00 USD</small>
                     <small class="home-summary-misc" v-else-if="!loading">
                         <span>{{ $t('Income of this month') }}</span>
-                        <span>{{ thisMonthIncome | amount(showAmountInHomePage) | currency(defaultCurrency) }}</span>
+                        <span>{{ thisMonthAmount.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(thisMonthAmount.incompleteIncomeAmount) }}</span>
                     </small>
                 </p>
             </f7-card-header>
@@ -53,11 +53,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.today.incompleteIncomeAmount) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.today.incompleteExpenseAmount) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -80,11 +80,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisWeek.incompleteIncomeAmount) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisWeek.incompleteExpenseAmount) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -107,11 +107,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisMonth.incompleteIncomeAmount) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisMonth.incompleteExpenseAmount) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -131,11 +131,11 @@
                          <div slot="after">
                             <div class="text-color-red">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisYear.incompleteIncomeAmount) }}</small>
                             </div>
                             <div class="text-color-teal">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisYear.incompleteExpenseAmount) }}</small>
                             </div>
                         </div>
                     </f7-list-item>
@@ -185,19 +185,17 @@ export default {
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
-        thisMonthExpense() {
+        thisMonthAmount() {
             if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
-                return 0;
+                return {
+                    incomeAmount : 0,
+                    expenseAmount : 0,
+                    incompleteIncomeAmount: false,
+                    incompleteExpenseAmount : false
+                };
             }
 
-            return this.$store.state.transactionOverview.thisMonth.expenseAmount;
-        },
-        thisMonthIncome() {
-            if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
-                return 0;
-            }
-
-            return this.$store.state.transactionOverview.thisMonth.incomeAmount;
+            return this.$store.state.transactionOverview.thisMonth;
         }
     },
     created() {
@@ -206,6 +204,7 @@ export default {
         self.loading = true;
 
         self.$store.dispatch('loadTransactionOverview', {
+            defaultCurrency: self.defaultCurrency,
             dateRange: self.dateRange,
             force: false
         }).then(() => {
@@ -237,6 +236,7 @@ export default {
             const self = this;
 
             self.$store.dispatch('loadTransactionOverview', {
+                defaultCurrency: self.defaultCurrency,
                 dateRange: self.dateRange,
                 force: true
             }).then(() => {
@@ -287,6 +287,9 @@ export default {
             }
 
             return amount;
+        },
+        completeAmount(amount, incomplete) {
+            return amount + (incomplete ? '+' : '');
         },
         monthNameLocalizedKey(monthName) {
             return `datetime.${monthName}.long`;

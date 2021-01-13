@@ -14,12 +14,14 @@ import (
 // OverviewApi represents overview api
 type OverviewApi struct {
 	transactions *services.TransactionService
+	accounts     *services.AccountService
 }
 
 // Initialize an overview api singleton instance
 var (
 	Overviews = &OverviewApi{
 		transactions: services.Transactions,
+		accounts:     services.Accounts,
 	}
 )
 
@@ -79,23 +81,82 @@ func (a *OverviewApi) TransactionOverviewHandler(c *core.Context) (interface{}, 
 
 	uid := c.GetCurrentUid()
 
+	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+	accountMap := a.accounts.GetAccountMapByList(accounts)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[overviews.TransactionOverviewHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	overviewResp := make(map[string]*models.TransactionOverviewResponseItem)
 
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
 
-		incomeAmount, expenseAmount, err := a.transactions.GetTotalIncomeAndExpenseByDateRange(uid, requestItem.StartTime, requestItem.EndTime)
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(uid, requestItem.StartTime, requestItem.EndTime)
 
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[overviews.TransactionOverviewHandler] failed to get transaction overview item for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.ErrOperationFailed
 		}
 
+		amountsMap := make(map[string]*models.TransactionOverviewResponseItemAmount)
+
+		for accountId, incomeAmount := range incomeAmounts {
+			account, exists := accountMap[accountId]
+
+			if !exists {
+				log.WarnfWithRequestId(c, "[overviews.TransactionOverviewHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				continue
+			}
+
+			totalAmounts, exists := amountsMap[account.Currency]
+
+			if !exists {
+				totalAmounts = &models.TransactionOverviewResponseItemAmount{
+					Currency:      account.Currency,
+					IncomeAmount:  0,
+					ExpenseAmount: 0,
+				}
+			}
+
+			totalAmounts.IncomeAmount += incomeAmount
+			amountsMap[account.Currency] = totalAmounts
+		}
+
+		for accountId, expenseAmount := range expenseAmounts {
+			account, exists := accountMap[accountId]
+
+			if !exists {
+				log.WarnfWithRequestId(c, "[overviews.TransactionOverviewHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				continue
+			}
+
+			totalAmounts, exists := amountsMap[account.Currency]
+
+			if !exists {
+				totalAmounts = &models.TransactionOverviewResponseItemAmount{
+					Currency:      account.Currency,
+					IncomeAmount:  0,
+					ExpenseAmount: 0,
+				}
+			}
+
+			totalAmounts.ExpenseAmount += expenseAmount
+			amountsMap[account.Currency] = totalAmounts
+		}
+
+		allTotalAmounts := make([]*models.TransactionOverviewResponseItemAmount, 0)
+
+		for _, totalAmounts := range amountsMap {
+			allTotalAmounts = append(allTotalAmounts, totalAmounts)
+		}
+
 		overviewResp[requestItem.Name] = &models.TransactionOverviewResponseItem{
-			StartTime:     requestItem.StartTime,
-			EndTime:       requestItem.EndTime,
-			IncomeAmount:  incomeAmount,
-			ExpenseAmount: expenseAmount,
+			StartTime: requestItem.StartTime,
+			EndTime:   requestItem.EndTime,
+			Amounts:   allTotalAmounts,
 		}
 	}
 

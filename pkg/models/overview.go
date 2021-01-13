@@ -14,8 +14,14 @@ type TransactionOverviewRequestItem struct {
 
 // TransactionOverviewResponseItem represents an item of transaction overview
 type TransactionOverviewResponseItem struct {
-	StartTime     int64 `json:"startTime"`
-	EndTime       int64 `json:"endTime"`
-	IncomeAmount  int64 `json:"incomeAmount"`
-	ExpenseAmount int64 `json:"expenseAmount"`
+	StartTime int64                                    `json:"startTime"`
+	EndTime   int64                                    `json:"endTime"`
+	Amounts   []*TransactionOverviewResponseItemAmount `json:"amounts"`
+}
+
+// TransactionOverviewResponseItemAmount represents amount info for an response item
+type TransactionOverviewResponseItemAmount struct {
+	Currency      string `json:"currency"`
+	IncomeAmount  int64  `json:"incomeAmount"`
+	ExpenseAmount int64  `json:"expenseAmount"`
 }

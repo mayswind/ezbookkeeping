@@ -131,7 +131,11 @@ i.icon.la, i.icon.las, i.icon.lab {
 .vue-pincode-input {
     margin: 3px !important;
     padding: 5px !important;
-    box-shadow: 0 0 3px rgba(0,0,0,.5) !important;
+    box-shadow: 0 0 2px rgba(0,0,0,.5) !important;
+}
+
+.theme-dark .vue-pincode-input {
+    box-shadow: 0 0 2px rgba(255,255,255,.5) !important;
 }
 
 .work-break-all {

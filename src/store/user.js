@@ -8,7 +8,10 @@ import {
     RESET_STATE,
 
     STORE_USER_INFO,
-    CLEAR_USER_INFO
+    CLEAR_USER_INFO,
+
+    UPDATE_ACCOUNT_LIST_INVALID_STATE,
+    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE
 } from './mutations.js';
 
 export function authorize(context, { loginName, password }) {
@@ -243,6 +246,14 @@ export function updateUserProfile(context, { profile, currentPassword }) {
 
             if (data.result.user && utils.isObject(data.result.user)) {
                 context.commit(STORE_USER_INFO, data.result.user);
+            }
+
+            if (!context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionOverviewStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
             }
 
             resolve(data.result);

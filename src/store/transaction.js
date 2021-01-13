@@ -169,8 +169,13 @@ export function saveTransaction(context, { transaction, defaultCurrency }) {
                 });
             }
 
-            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
-            context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            if (!context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionOverviewStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            }
 
             resolve(data.result);
         }).catch(error => {
@@ -217,8 +222,13 @@ export function deleteTransaction(context, { transaction, defaultCurrency, befor
                 });
             }
 
-            context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
-            context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            if (!context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionOverviewStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            }
 
             resolve(data.result);
         }).catch(error => {

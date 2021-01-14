@@ -20,7 +20,7 @@
                 </p>
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
-                    <span class="month-expense" v-else-if="!loading">{{ thisMonthAmount.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(thisMonthAmount.incompleteExpenseAmount) }}</span>
+                    <span class="month-expense" v-else-if="!loading">{{ thisMonthAmount.expenseAmount | currency(defaultCurrency) | amount(thisMonthAmount.incompleteExpenseAmount, showAmountInHomePage) }}</span>
                     <f7-link class="margin-left-half" @click="toggleShowAmountInHomePage()">
                         <f7-icon :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                     </f7-link>
@@ -29,7 +29,7 @@
                     <small class="home-summary-misc" v-if="loading">Income of this month 0.00 USD</small>
                     <small class="home-summary-misc" v-else-if="!loading">
                         <span>{{ $t('Income of this month') }}</span>
-                        <span>{{ thisMonthAmount.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(thisMonthAmount.incompleteIncomeAmount) }}</span>
+                        <span>{{ thisMonthAmount.incomeAmount | currency(defaultCurrency) | amount(thisMonthAmount.incompleteIncomeAmount, showAmountInHomePage) }}</span>
                     </small>
                 </p>
             </f7-card-header>
@@ -53,11 +53,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.today.incompleteIncomeAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | currency(defaultCurrency) | amount(transactionOverview.today.incompleteIncomeAmount, showAmountInHomePage) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.today.incompleteExpenseAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | currency(defaultCurrency) | amount(transactionOverview.today.incompleteExpenseAmount, showAmountInHomePage) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -80,11 +80,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisWeek.incompleteIncomeAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | currency(defaultCurrency) | amount(transactionOverview.thisWeek.incompleteIncomeAmount, showAmountInHomePage) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisWeek.incompleteExpenseAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | currency(defaultCurrency) | amount(transactionOverview.thisWeek.incompleteExpenseAmount, showAmountInHomePage) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -107,11 +107,11 @@
                          <div slot="after">
                              <div class="text-color-red">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisMonth.incompleteIncomeAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | currency(defaultCurrency) | amount(transactionOverview.thisMonth.incompleteIncomeAmount, showAmountInHomePage) }}</small>
                              </div>
                              <div class="text-color-teal">
                                  <small v-if="loading">0.00 USD</small>
-                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisMonth.incompleteExpenseAmount) }}</small>
+                                 <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | currency(defaultCurrency) | amount(transactionOverview.thisMonth.incompleteExpenseAmount, showAmountInHomePage) }}</small>
                              </div>
                         </div>
                     </f7-list-item>
@@ -131,11 +131,11 @@
                          <div slot="after">
                             <div class="text-color-red">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisYear.incompleteIncomeAmount) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | currency(defaultCurrency) | amount(transactionOverview.thisYear.incompleteIncomeAmount, showAmountInHomePage) }}</small>
                             </div>
                             <div class="text-color-teal">
                                 <small v-if="loading">0.00 USD</small>
-                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | amount(showAmountInHomePage) | currency(defaultCurrency) | completeAmount(transactionOverview.thisYear.incompleteExpenseAmount) }}</small>
+                                <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.expenseAmount | currency(defaultCurrency) | amount(transactionOverview.thisYear.incompleteExpenseAmount, showAmountInHomePage) }}</small>
                             </div>
                         </div>
                     </f7-list-item>
@@ -281,14 +281,11 @@ export default {
         }
     },
     filters: {
-        amount(amount, showAmount) {
+        amount(amount, incomplete, showAmount) {
             if (!showAmount) {
                 return '***';
             }
 
-            return amount;
-        },
-        completeAmount(amount, incomplete) {
             return amount + (incomplete ? '+' : '');
         },
         monthNameLocalizedKey(monthName) {

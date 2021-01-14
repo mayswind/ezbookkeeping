@@ -385,6 +385,14 @@ export default {
     },
     computed: {
         defaultCurrency() {
+            if (this.query.accountId && this.query.accountId !== '0') {
+                const account = this.allAccounts[this.query.accountId];
+
+                if (account && account.currency && account.currency !== this.$constants.currency.parentAccountCurrencyPlaceholder) {
+                    return account.currency;
+                }
+            }
+
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
         query() {

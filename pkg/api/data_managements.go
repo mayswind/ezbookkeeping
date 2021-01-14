@@ -114,7 +114,6 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 }
 
 func (a *DataManagementsApi) getCSVFormatData(c *core.Context, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) (string, error) {
-
 	var ret strings.Builder
 
 	ret.Grow(len(transactions) * 100)

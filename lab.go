@@ -21,6 +21,7 @@ func main() {
 		Commands: []*cli.Command{
 			cmd.WebServer,
 			cmd.Database,
+			cmd.UserData,
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

@@ -32,12 +32,12 @@ var (
 )
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, 0, "", count)
+func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
+	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, 0, "", count, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -67,7 +67,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
 		}
 	} else {
-		if accountId == 0 {
+		if noDuplicated && accountId == 0 {
 			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
@@ -308,7 +308,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 				return errs.ErrBalanceModificationTransactionCannotAddWhenNotEmpty
 			}
 
-			transaction.RelatedAccountId = transaction.TransactionId
+			transaction.RelatedAccountId = transaction.AccountId
 			transaction.RelatedAccountAmount = transaction.Amount - sourceAccount.Balance
 		}
 
@@ -953,6 +953,18 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUn
 	}
 
 	return incomeAmounts, expenseAmounts, nil
+}
+
+// GetTransactionMapByList returns a transaction map by a list
+func (s *TransactionService) GetTransactionMapByList(transactions []*models.Transaction) map[int64]*models.Transaction {
+	transactionMap := make(map[int64]*models.Transaction)
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+		transactionMap[transaction.TransactionId] = transaction
+	}
+
+	return transactionMap
 }
 
 func (s *TransactionService) isAccountIdValid(transaction *models.Transaction) error {

@@ -36,7 +36,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, transactionListReq.CategoryId, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Count+1)
+	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, transactionListReq.CategoryId, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Count+1, true)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())

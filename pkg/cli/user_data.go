@@ -148,7 +148,7 @@ func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (boo
 			balance = balance - transaction.Amount
 		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			balance = balance - transaction.Amount
-		} else if  transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			balance = balance + transaction.Amount
 		} else {
 			log.BootErrorf("[user_data.CheckAccountBalance] transaction type of transaction \"id:%d\" is invalid", transaction.TransactionId)

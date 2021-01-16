@@ -44,6 +44,7 @@ type Transaction struct {
 	DeletedUnixTime      int64
 }
 
+// TransactionTotalAmount represents total amount for specific transaction type
 type TransactionTotalAmount struct {
 	Uid         int64
 	Type        TransactionDbType

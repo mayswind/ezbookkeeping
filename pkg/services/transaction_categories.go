@@ -282,7 +282,7 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		var categoryAndSubCategories []*models.TransactionCategory
-		err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (category_id=? OR parent_category_id=?)", uid, false, categoryId, categoryId).Find(&categoryAndSubCategories)
+		err := sess.Where("uid=? AND deleted=? AND (category_id=? OR parent_category_id=?)", uid, false, categoryId, categoryId).Find(&categoryAndSubCategories)
 
 		if err != nil {
 			return err

@@ -290,7 +290,7 @@ func (s *TransactionTagService) ExistsTagName(uid int64, name string) (bool, err
 		return false, errs.ErrTransactionTagNameIsEmpty
 	}
 
-	return s.UserDB().Cols("name").Where("uid=? AND deleted=? AND name=?", uid, false, name).Exist(&models.TransactionTag{})
+	return s.UserDataDB(uid).Cols("name").Where("uid=? AND deleted=? AND name=?", uid, false, name).Exist(&models.TransactionTag{})
 }
 
 // GetTagMapByList returns a transaction tag map by a list

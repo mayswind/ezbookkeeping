@@ -274,7 +274,7 @@ func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		var accountAndSubAccounts []*models.Account
-		err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).Find(&accountAndSubAccounts)
+		err := sess.Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).Find(&accountAndSubAccounts)
 
 		if err != nil {
 			return err

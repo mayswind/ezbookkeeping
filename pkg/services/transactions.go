@@ -464,7 +464,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		}
 	}
 
-	err := s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	err := s.UserDataDB(transaction.Uid).DoTransaction(func(sess *xorm.Session) error {
 		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
 		has, err := sess.ID(transaction.TransactionId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldTransaction)

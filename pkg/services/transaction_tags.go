@@ -36,7 +36,7 @@ func (s *TransactionTagService) GetAllTagsByUid(uid int64) ([]*models.Transactio
 	}
 
 	var tags []*models.TransactionTag
-	err := s.UserDataDB(uid).Where("uid=?", uid).Find(&tags)
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Find(&tags)
 
 	return tags, err
 }
@@ -52,7 +52,7 @@ func (s *TransactionTagService) GetTagByTagId(uid int64, tagId int64) (*models.T
 	}
 
 	tag := &models.TransactionTag{}
-	has, err := s.UserDataDB(uid).ID(tagId).Where("uid=?", uid).Get(tag)
+	has, err := s.UserDataDB(uid).ID(tagId).Where("uid=? AND deleted=?", uid, false).Get(tag)
 
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int, error) {
 	}
 
 	tag := &models.TransactionTag{}
-	has, err := s.UserDataDB(uid).Cols("uid", "display_order").Where("uid=?", uid).OrderBy("display_order desc").Limit(1).Get(tag)
+	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "display_order").Where("uid=? AND deleted=?", uid, false).OrderBy("display_order desc").Limit(1).Get(tag)
 
 	if err != nil {
 		return 0, err
@@ -127,6 +127,7 @@ func (s *TransactionTagService) CreateTag(tag *models.TransactionTag) error {
 
 	tag.TagId = s.GenerateUuid(uuid.UUID_TYPE_TAG)
 
+	tag.Deleted = false
 	tag.CreatedUnixTime = time.Now().Unix()
 	tag.UpdatedUnixTime = time.Now().Unix()
 
@@ -153,7 +154,7 @@ func (s *TransactionTagService) ModifyTag(tag *models.TransactionTag) error {
 	tag.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(tag.Uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.ID(tag.TagId).Cols("name", "updated_unix_time").Where("uid=?", tag.Uid).Update(tag)
+		updatedRows, err := sess.ID(tag.TagId).Cols("name", "updated_unix_time").Where("uid=? AND deleted=?", tag.Uid, false).Update(tag)
 
 		if err != nil {
 			return err
@@ -179,7 +180,7 @@ func (s *TransactionTagService) HideTag(uid int64, ids []int64, hidden bool) err
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=?", uid).In("tag_id", ids).Update(updateModel)
+		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("tag_id", ids).Update(updateModel)
 
 		if err != nil {
 			return err
@@ -204,7 +205,7 @@ func (s *TransactionTagService) ModifyTagDisplayOrders(uid int64, tags []*models
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		for i := 0; i < len(tags); i++ {
 			tag := tags[i]
-			updatedRows, err := sess.ID(tag.TagId).Cols("display_order", "updated_unix_time").Where("uid=?", uid).Update(tag)
+			updatedRows, err := sess.ID(tag.TagId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tag)
 
 			if err != nil {
 				return err
@@ -223,6 +224,13 @@ func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 		return errs.ErrUserIdInvalid
 	}
 
+	now := time.Now().Unix()
+
+	updateModel := &models.TransactionTag{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND tag_id=?", uid, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
 
@@ -232,7 +240,7 @@ func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 			return errs.ErrTransactionTagInUseCannotBeDeleted
 		}
 
-		deletedRows, err := sess.ID(tagId).Where("uid=?", uid).Delete(&models.TransactionTag{})
+		deletedRows, err := sess.ID(tagId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {
 			return err
@@ -250,7 +258,7 @@ func (s *TransactionTagService) ExistsTagName(uid int64, name string) (bool, err
 		return false, errs.ErrTransactionTagNameIsEmpty
 	}
 
-	return s.UserDB().Cols("name").Where("uid=? AND name=?", uid, name).Exist(&models.TransactionTag{})
+	return s.UserDB().Cols("name").Where("uid=? AND deleted=? AND name=?", uid, false, name).Exist(&models.TransactionTag{})
 }
 
 // GetTagMapByList returns a transaction tag map by a list

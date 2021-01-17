@@ -87,7 +87,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 		parentCategory, err := a.categories.GetCategoryByCategoryId(uid, categoryCreateReq.ParentId)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
+			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 

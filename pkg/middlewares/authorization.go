@@ -42,7 +42,7 @@ func JWTAuthorizationByQueryString(c *core.Context) {
 	token, exists := c.GetQuery(tokenQueryStringParam)
 
 	if !exists {
-		log.ErrorfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] no token provided")
+		log.WarnfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] no token provided")
 		utils.PrintJsonErrorResult(c, errs.ErrUnauthorizedAccess)
 		return
 	}

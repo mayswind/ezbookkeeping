@@ -43,7 +43,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list v-if="noAvailableTag">
+                <f7-list v-if="noAvailableTag && !newTag">
                     <f7-list-item :title="$t('No available tag')"></f7-list-item>
                 </f7-list>
 

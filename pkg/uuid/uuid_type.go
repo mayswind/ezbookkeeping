@@ -11,4 +11,5 @@ const (
 	UUID_TYPE_TRANSACTION UuidType = 3
 	UUID_TYPE_CATEGORY    UuidType = 4
 	UUID_TYPE_TAG         UuidType = 5
+	UUID_TYPE_TAG_INDEX   UuidType = 6
 )

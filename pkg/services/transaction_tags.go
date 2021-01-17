@@ -90,7 +90,7 @@ func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(uid int64) (map[in
 	}
 
 	var tagIndexs []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).Where("uid=?", uid).Find(&tagIndexs)
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexs)
 
 	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
 
@@ -104,7 +104,7 @@ func (s *TransactionTagService) GetAllTagIdsOfTransactions(uid int64, transactio
 	}
 
 	var tagIndexs []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).Where("uid=?", uid).In("transaction_id", transactionIds).Find(&tagIndexs)
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&tagIndexs)
 
 	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
 
@@ -232,7 +232,7 @@ func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 	}
 
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
-		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND tag_id=?", uid, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
+		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND deleted=? AND tag_id=?", uid, false, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
 
 		if err != nil {
 			return err

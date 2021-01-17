@@ -259,7 +259,9 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 
 	for i := 0; i < len(tagIds); i++ {
 		transactionTagIndexs[i] = &models.TransactionTagIndex{
+			TagIndexId:      s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX),
 			Uid:             transaction.Uid,
+			Deleted:         false,
 			TagId:           tagIds[i],
 			TransactionId:   transaction.TransactionId,
 			CreatedUnixTime: now,
@@ -452,7 +454,9 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 
 	for i := 0; i < len(addTagIds); i++ {
 		transactionTagIndexs[i] = &models.TransactionTagIndex{
+			TagIndexId:      s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX),
 			Uid:             transaction.Uid,
+			Deleted:         false,
 			TagId:           addTagIds[i],
 			TransactionId:   transaction.TransactionId,
 			CreatedUnixTime: now,
@@ -605,7 +609,12 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 
 		// Update transaction tag index
 		if len(removeTagIds) > 0 {
-			deletedRows, err := sess.Where("uid=?", transaction.Uid).In("tag_id", removeTagIds).Delete(&models.TransactionTagIndex{})
+			tagIndexUpdateModel := &models.TransactionTagIndex{
+				Deleted:         true,
+				DeletedUnixTime: now,
+			}
+
+			deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).In("tag_id", removeTagIds).Update(tagIndexUpdateModel)
 
 			if err != nil {
 				return err
@@ -792,6 +801,11 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 		DeletedUnixTime: now,
 	}
 
+	tagIndexUpdateModel := &models.TransactionTagIndex{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
 	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
 		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
@@ -831,6 +845,13 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 			} else if deletedRows < 1 {
 				return errs.ErrTransactionNotFound
 			}
+		}
+
+		// Update transaction tag index
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", uid, false, oldTransaction.TransactionId).Update(tagIndexUpdateModel)
+
+		if err != nil {
+			return err
 		}
 
 		// Update account table
@@ -1134,7 +1155,7 @@ func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *mo
 func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models.Transaction, transactionTagIndexs []*models.TransactionTagIndex, tagIds []int64) error {
 	if len(transactionTagIndexs) > 0 {
 		var tags []*models.TransactionTag
-		err := sess.Where("uid=?", transaction.Uid).In("tag_id", tagIds).Find(&tags)
+		err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_id", tagIds).Find(&tags)
 
 		if err != nil {
 			return err

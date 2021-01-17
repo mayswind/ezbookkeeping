@@ -159,6 +159,11 @@ export default {
             password
         });
     },
+    clearData: ({ password }) => {
+        return axios.post('v1/data/clear.json', {
+            password
+        });
+    },
     getTransactionOverview: ( { today, thisWeek, thisMonth, thisYear } ) => {
         const queryParams = [];
 

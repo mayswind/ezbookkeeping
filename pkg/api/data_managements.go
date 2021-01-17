@@ -113,6 +113,56 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 	return []byte(result), fileName, nil
 }
 
+// ClearDataHandler deletes all user data
+func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *errs.Error) {
+	var clearDataReq models.ClearDataRequest
+	err := c.ShouldBindJSON(&clearDataReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[data_managements.ClearDataHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.WarnfWithRequestId(c, "[data_managements.ClearDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !a.users.IsPasswordEqualsUserPassword(clearDataReq.Password, user) {
+		return nil, errs.ErrUserPasswordWrong
+	}
+
+	err = a.transactions.DeleteAllTransactions(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transactions, because %s", err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	err = a.categories.DeleteAllCategories(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction categories, because %s", err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	err = a.tags.DeleteAllTags(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	log.InfofWithRequestId(c, "[data_managements.ClearDataHandler] user \"uid:%d\" has cleared all data", uid)
+	return true, nil
+}
+
 func (a *DataManagementsApi) getCSVFormatData(c *core.Context, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) (string, error) {
 	var ret strings.Builder
 

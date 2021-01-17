@@ -316,6 +316,38 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 	})
 }
 
+// DeleteAllCategories deletes all existed transaction categories from database
+func (s *TransactionCategoryService) DeleteAllCategories(uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.TransactionCategory{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		exists, err := sess.Cols("uid", "deleted", "category_id").Where("uid=? AND deleted=? AND category_id<>?", uid, false, 0).Limit(1).Exist(&models.Transaction{})
+
+		if err != nil {
+			return err
+		} else if exists {
+			return errs.ErrTransactionCategoryInUseCannotBeDeleted
+		}
+
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 // GetCategoryMapByList returns a transaction category map by a list
 func (s *TransactionCategoryService) GetCategoryMapByList(categories []*models.TransactionCategory) map[int64]*models.TransactionCategory {
 	categoryMap := make(map[int64]*models.TransactionCategory)

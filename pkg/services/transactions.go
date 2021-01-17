@@ -908,6 +908,56 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 	})
 }
 
+// DeleteAllTransactions deletes all existed transactions from database
+func (s *TransactionService) DeleteAllTransactions(uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.Transaction{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	tagIndexUpdateModel := &models.TransactionTagIndex{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	accountUpdateModel := &models.Account{
+		Balance:         0,
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		// Update all transaction to deleted
+		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
+		if err != nil {
+			return err
+		}
+
+		// Update all transaction tag index to deleted
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagIndexUpdateModel)
+
+		if err != nil {
+			return err
+		}
+
+		// Update all account table to deleted
+		_, err = sess.Cols("balance", "deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(accountUpdateModel)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 // GetRelatedTransferTransaction returns the related transaction for transfer transaction
 func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *models.Transaction, relatedTransactionId int64) *models.Transaction {
 	var relatedType models.TransactionDbType

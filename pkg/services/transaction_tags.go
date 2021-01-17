@@ -252,6 +252,38 @@ func (s *TransactionTagService) DeleteTag(uid int64, tagId int64) error {
 	})
 }
 
+// DeleteAllTags deletes all existed transaction tags from database
+func (s *TransactionTagService) DeleteAllTags(uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.TransactionTag{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+		exists, err := sess.Cols("uid", "deleted").Where("uid=? AND deleted=?", uid, false).Limit(1).Exist(&models.TransactionTagIndex{})
+
+		if err != nil {
+			return err
+		} else if exists {
+			return errs.ErrTransactionTagInUseCannotBeDeleted
+		}
+
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 // ExistsTagName returns whether the given tag name exists
 func (s *TransactionTagService) ExistsTagName(uid int64, name string) (bool, error) {
 	if name == "" {

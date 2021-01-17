@@ -955,6 +955,25 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUn
 	return incomeAmounts, expenseAmounts, nil
 }
 
+// GetAccountsAndCategoriesTotalIncomeAndExpense returns the every accounts and categories total income and expense amount by specific date range
+func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(uid int64, startUnixTime int64, endUnixTime int64) ([]*models.Transaction, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
+	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+
+	var transactionTotalAmounts []*models.Transaction
+	err := s.UserDataDB(uid).Select("uid, category_id, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transactionTotalAmounts, nil
+}
+
 // GetTransactionMapByList returns a transaction map by a list
 func (s *TransactionService) GetTransactionMapByList(transactions []*models.Transaction) map[int64]*models.Transaction {
 	transactionMap := make(map[int64]*models.Transaction)

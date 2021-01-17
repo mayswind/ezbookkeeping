@@ -224,6 +224,9 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.POST("/transaction/tags/move.json", bindApi(api.TransactionTags.TagMoveHandler))
 			apiV1Route.POST("/transaction/tags/delete.json", bindApi(api.TransactionTags.TagDeleteHandler))
 
+			// Statistics
+			apiV1Route.GET("/statistics/transaction.json", bindApi(api.Statistics.TransactionStatisticsHandler))
+
 			// Exchange Rates
 			apiV1Route.GET("/exchange_rates/latest.json", bindApi(api.ExchangeRates.LatestExchangeRateHandler))
 		}

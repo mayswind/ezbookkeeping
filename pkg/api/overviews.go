@@ -25,7 +25,7 @@ var (
 	}
 )
 
-// TransactionOverviewHandler returns transaction over of current user
+// TransactionOverviewHandler returns transaction overview of current user
 func (a *OverviewApi) TransactionOverviewHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionOverviewReq models.TransactionOverviewRequest
 	err := c.ShouldBindQuery(&transactionOverviewReq)

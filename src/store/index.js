@@ -1,3 +1,4 @@
+import datetimeConstants from "../consts/datetime.js";
 import userState from "../lib/userstate.js";
 import utils from "../lib/utils.js";
 
@@ -145,7 +146,7 @@ const stores = {
         allCategorizedAccounts: {},
         accountListStateInvalid: true,
         transactionsFilter: {
-            dateType: 0,
+            dateType: datetimeConstants.allDateRanges.All.type,
             maxTime: 0,
             minTime: 0,
             type: 0,
@@ -193,7 +194,7 @@ const stores = {
             state.allCategorizedAccounts = {};
             state.accountListStateInvalid = true;
 
-            state.transactionsFilter.dateType = 0;
+            state.transactionsFilter.dateType = datetimeConstants.allDateRanges.All.type;
             state.transactionsFilter.maxTime = 0;
             state.transactionsFilter.minTime = 0;
             state.transactionsFilter.type = 0;
@@ -436,7 +437,7 @@ const stores = {
             if (filter && utils.isNumber(filter.dateType)) {
                 state.transactionsFilter.dateType = filter.dateType;
             } else {
-                state.transactionsFilter.dateType = 0;
+                state.transactionsFilter.dateType = datetimeConstants.allDateRanges.All.type;
             }
 
             if (filter && utils.isNumber(filter.maxTime)) {

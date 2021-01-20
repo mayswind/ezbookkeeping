@@ -2,6 +2,7 @@ import CryptoJS from "crypto-js";
 import moment from 'moment';
 import uaParser from 'ua-parser-js';
 
+import dateTimeConstants from '../consts/datetime.js';
 import accountConstants from '../consts/account.js';
 import settings from "./settings.js";
 
@@ -122,6 +123,54 @@ function getThisYearFirstUnixTime() {
 
 function getThisYearLastUnixTime() {
     return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
+}
+
+function getDateRangeByDateType(dateType) {
+    let maxTime = 0;
+    let minTime = 0;
+
+    if (dateType === dateTimeConstants.allDateRanges.All.type) { // All
+        maxTime = 0;
+        minTime = 0;
+    } else if (dateType === dateTimeConstants.allDateRanges.Today.type) { // Today
+        maxTime = getTodayLastUnixTime();
+        minTime = getTodayFirstUnixTime();
+    } else if (dateType === dateTimeConstants.allDateRanges.Yesterday.type) { // Yesterday
+        maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
+        minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 1, 'days');
+    } else if (dateType === dateTimeConstants.allDateRanges.LastSevenDays.type) { // Last 7 days
+        maxTime = getUnixTime(new Date());
+        minTime = getUnixTimeBeforeUnixTime(maxTime, 7, 'days');
+    } else if (dateType === dateTimeConstants.allDateRanges.LastThirtyDays.type) { // Last 30 days
+        maxTime = getUnixTime(new Date());
+        minTime = getUnixTimeBeforeUnixTime(maxTime, 30, 'days');
+    } else if (dateType === dateTimeConstants.allDateRanges.ThisWeek.type) { // This week
+        maxTime = getThisWeekLastUnixTime();
+        minTime = getThisWeekFirstUnixTime();
+    } else if (dateType === dateTimeConstants.allDateRanges.LastWeek.type) { // Last week
+        maxTime = getUnixTimeBeforeUnixTime(getThisWeekLastUnixTime(), 7, 'days');
+        minTime = getUnixTimeBeforeUnixTime(getThisWeekFirstUnixTime(), 7, 'days');
+    } else if (dateType === dateTimeConstants.allDateRanges.ThisMonth.type) { // This month
+        maxTime = getThisMonthLastUnixTime();
+        minTime = getThisMonthFirstUnixTime();
+    } else if (dateType === dateTimeConstants.allDateRanges.LastMonth.type) { // Last month
+        maxTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 1, 'months');
+        minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months');
+    } else if (dateType === dateTimeConstants.allDateRanges.ThisYear.type) { // This year
+        maxTime = getThisYearLastUnixTime();
+        minTime = getThisYearFirstUnixTime();
+    } else if (dateType === dateTimeConstants.allDateRanges.LastYear.type) { // Last year
+        maxTime = getUnixTimeBeforeUnixTime(getThisYearLastUnixTime(), 1, 'years');
+        minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 1, 'years');
+    } else {
+        return null;
+    }
+
+    return {
+        dateType: dateType,
+        maxTime: maxTime,
+        minTime: minTime
+    };
 }
 
 function copyObjectTo(fromObject, toObject) {
@@ -460,6 +509,7 @@ export default {
     getThisMonthLastUnixTime,
     getThisYearFirstUnixTime,
     getThisYearLastUnixTime,
+    getDateRangeByDateType,
     copyObjectTo,
     copyArrayTo,
     appendThousandsSeparator,

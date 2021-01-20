@@ -26,7 +26,7 @@
 
         <f7-toolbar tabbar bottom>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateName('Date') | t }}</span>
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateRangeName(allDateRanges, 'Date') | t }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | t }}</span>
@@ -231,42 +231,13 @@
         <f7-popover class="date-popover-menu" :opened="showDatePopover"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
             <f7-list>
-                <f7-list-item :title="$t('All')" @click="changeDateFilter(0)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 0"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Today')" @click="changeDateFilter(1)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 1"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Yesterday')" @click="changeDateFilter(2)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 2"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Recent 7 days')" @click="changeDateFilter(3)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 3"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Recent 30 days')" @click="changeDateFilter(4)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 4"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('This week')" @click="changeDateFilter(5)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 5"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Last week')" @click="changeDateFilter(6)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 6"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('This month')" @click="changeDateFilter(7)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 7"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Last month')" @click="changeDateFilter(8)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 8"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('This year')" @click="changeDateFilter(9)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 9"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Last year')" @click="changeDateFilter(10)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 10"></f7-icon>
-                </f7-list-item>
-                <f7-list-item :title="$t('Custom')" @click="changeDateFilter(11)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === 11"></f7-icon>
-                    <div slot="footer" v-if="query.dateType === 11 && query.minTime && query.maxTime">
+                <f7-list-item v-for="dateRange in allDateRanges"
+                              :key="dateRange.type"
+                              :title="dateRange.name | t"
+                              @click="changeDateFilter(dateRange.type)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                    <div slot="footer"
+                         v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.minTime && query.maxTime">
                         <span>{{ query.minTime | moment($t('format.datetime.long-without-second')) }}</span>
                         <span>&nbsp;-&nbsp;</span>
                         <br/>
@@ -416,13 +387,16 @@ export default {
         },
         allCategories() {
             return this.$store.state.allTransactionCategoriesMap;
+        },
+        allDateRanges() {
+            return this.$constants.datetime.allDateRanges;
         }
     },
     created() {
         const self = this;
         const query = self.$f7route.query;
 
-        const dateParam = self.getDateParamByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+        const dateParam = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
 
         this.$store.dispatch('initTransactionListFilter', {
             dateType: dateParam ? dateParam.dateType : undefined,
@@ -514,7 +488,7 @@ export default {
             });
         },
         changeDateFilter(dateType) {
-            if (dateType === 11) { // Custom
+            if (dateType === this.$constants.datetime.allDateRanges.Custom.type) { // Custom
                 this.showCustomDateRangeSheet = true;
                 this.showDatePopover = false;
                 return;
@@ -522,7 +496,7 @@ export default {
                 return;
             }
 
-            const dateParam = this.getDateParamByDateType(dateType);
+            const dateParam = this.$utilities.getDateRangeByDateType(dateType);
 
             if (!dateParam) {
                 return;
@@ -543,7 +517,7 @@ export default {
             }
 
             this.$store.dispatch('updateTransactionListFilter', {
-                dateType: 11,
+                dateType: this.$constants.datetime.allDateRanges.Custom.type,
                 maxTime: maxTime,
                 minTime: minTime
             });
@@ -653,53 +627,6 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        },
-        getDateParamByDateType(dateType) {
-            let maxTime = 0;
-            let minTime = 0;
-
-            if (dateType === 0) { // All
-                maxTime = 0;
-                minTime = 0;
-            } else if (dateType === 1) { // Today
-                maxTime = this.$utilities.getTodayLastUnixTime();
-                minTime = this.$utilities.getTodayFirstUnixTime();
-            } else if (dateType === 2) { // Yesterday
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayLastUnixTime(), 1, 'days');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getTodayFirstUnixTime(), 1, 'days');
-            } else if (dateType === 3) { // Last 7 days
-                maxTime = this.$utilities.getUnixTime(new Date());
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 7, 'days');
-            } else if (dateType === 4) { // Last 30 days
-                maxTime = this.$utilities.getUnixTime(new Date());
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(maxTime, 30, 'days');
-            } else if (dateType === 5) { // This week
-                maxTime = this.$utilities.getThisWeekLastUnixTime();
-                minTime = this.$utilities.getThisWeekFirstUnixTime();
-            } else if (dateType === 6) { // Last week
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekLastUnixTime(), 7, 'days');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisWeekFirstUnixTime(), 7, 'days');
-            } else if (dateType === 7) { // This month
-                maxTime = this.$utilities.getThisMonthLastUnixTime();
-                minTime = this.$utilities.getThisMonthFirstUnixTime();
-            } else if (dateType === 8) { // Last month
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthLastUnixTime(), 1, 'months');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisMonthFirstUnixTime(), 1, 'months');
-            } else if (dateType === 9) { // This year
-                maxTime = this.$utilities.getThisYearLastUnixTime();
-                minTime = this.$utilities.getThisYearFirstUnixTime();
-            } else if (dateType === 10) { // Last year
-                maxTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearLastUnixTime(), 1, 'years');
-                minTime = this.$utilities.getUnixTimeBeforeUnixTime(this.$utilities.getThisYearFirstUnixTime(), 1, 'years');
-            } else {
-                return null;
-            }
-
-            return {
-                dateType: dateType,
-                maxTime: maxTime,
-                minTime: minTime
-            }
         }
     },
     filters: {
@@ -726,33 +653,24 @@ export default {
                 color: 'transparent'
             }
         },
-        dateName(dateType, defaultName) {
-            switch (dateType){
-                case 1:
-                    return 'Today';
-                case 2:
-                    return 'Yesterday';
-                case 3:
-                    return 'Recent 7 days';
-                case 4:
-                    return 'Recent 30 days';
-                case 5:
-                    return 'This week';
-                case 6:
-                    return 'Last week';
-                case 7:
-                    return 'This month';
-                case 8:
-                    return 'Last month';
-                case 9:
-                    return 'This year';
-                case 10:
-                    return 'Last year';
-                case 11:
-                    return 'Custom Date';
-                default:
-                    return defaultName;
+        dateRangeName(dateRangeType, allDateRanges, defaultName) {
+            if (dateRangeType === allDateRanges.All.type) {
+                return defaultName;
             }
+
+            for (let dateRangeField in allDateRanges) {
+                if (!Object.prototype.hasOwnProperty.call(allDateRanges, dateRangeField)) {
+                    continue;
+                }
+
+                const dateRange = allDateRanges[dateRangeField];
+
+                if (dateRange && dateRange.type === dateRangeType && dateRange.name) {
+                    return dateRange.name;
+                }
+            }
+
+            return defaultName;
         },
         typeName(type, defaultName) {
             switch (type){

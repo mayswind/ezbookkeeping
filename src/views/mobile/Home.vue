@@ -38,7 +38,7 @@
         <f7-card :class="{ 'skeleton-text': loading }">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item link="/transaction/list?dateType=1" chevron-center>
+                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.Today.type" chevron-center>
                         <div slot="media">
                             <f7-icon f7="calendar_today"></f7-icon>
                         </div>
@@ -62,7 +62,7 @@
                         </div>
                     </f7-list-item>
 
-                    <f7-list-item link="/transaction/list?dateType=5" chevron-center>
+                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisWeek.type" chevron-center>
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
@@ -89,7 +89,7 @@
                         </div>
                     </f7-list-item>
 
-                    <f7-list-item link="/transaction/list?dateType=7" chevron-center>
+                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisMonth.type" chevron-center>
                         <div slot="media">
                             <f7-icon f7="calendar"></f7-icon>
                         </div>
@@ -116,7 +116,7 @@
                         </div>
                     </f7-list-item>
 
-                    <f7-list-item link="/transaction/list?dateType=9" chevron-center>
+                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisYear.type" chevron-center>
                         <div slot="media">
                             <f7-icon f7="square_stack_3d_up"></f7-icon>
                         </div>

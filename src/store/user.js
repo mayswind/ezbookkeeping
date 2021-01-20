@@ -11,7 +11,9 @@ import {
     CLEAR_USER_INFO,
 
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
-    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE
+    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
+    UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE,
+    UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE
 } from './mutations.js';
 
 export function authorize(context, { loginName, password }) {
@@ -266,6 +268,49 @@ export function updateUserProfile(context, { profile, currentPassword }) {
                 reject({ message: 'Unable to update user profile' });
             } else {
                 reject(error);
+            }
+        });
+    });
+}
+
+export function clearUserData(context, { password }) {
+    return new Promise((resolve, reject) => {
+        services.clearData({
+            password: password
+        }).then(response => {
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                reject({ message: 'Unable to clear user data' });
+                return;
+            }
+
+            if (!context.state.accountListStateInvalid) {
+                context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionCategoryListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionTagListStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionOverviewStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            }
+
+            resolve(data.result);
+        }).catch(error => {
+            logger.error('failed to clear user data', error);
+
+            if (error && error.processed) {
+                reject(error);
+            } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                reject({ error: error.response.data });
+            } else {
+                reject({ message: 'Unable to clear user data' });
             }
         });
     });

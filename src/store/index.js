@@ -52,6 +52,7 @@ import {
     logout,
     getCurrentUserProfile,
     updateUserProfile,
+    clearUserData,
     clearUserInfoState,
     resetState,
     currentUserNickname,
@@ -735,6 +736,7 @@ const stores = {
         logout,
         getCurrentUserProfile,
         updateUserProfile,
+        clearUserData,
         clearUserInfoState,
         resetState,
 

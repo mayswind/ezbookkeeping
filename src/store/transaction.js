@@ -15,6 +15,7 @@ import {
     UPDATE_TRANSACTION_LIST_INVALID_STATE,
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
     UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
+    UPDATE_TRANSACTION_STATISTICS_INVALID_STATE,
 } from './mutations.js';
 
 const emptyTransactionResult = {
@@ -177,6 +178,10 @@ export function saveTransaction(context, { transaction, defaultCurrency }) {
                 context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
             }
 
+            if (!context.state.transactionStatisticsStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_STATISTICS_INVALID_STATE, true);
+            }
+
             resolve(data.result);
         }).catch(error => {
             logger.error('failed to save transaction', error);
@@ -228,6 +233,10 @@ export function deleteTransaction(context, { transaction, defaultCurrency, befor
 
             if (!context.state.transactionOverviewStateInvalid) {
                 context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionStatisticsStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_STATISTICS_INVALID_STATE, true);
             }
 
             resolve(data.result);

@@ -185,6 +185,19 @@ export default {
 
         return axios.get('v1/overviews/transaction.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));
     },
+    getTransactionStatistics: ({ startTime, endTime }) => {
+        const queryParams = [];
+
+        if (startTime) {
+            queryParams.push(`start_time=${startTime}`);
+        }
+
+        if (endTime) {
+            queryParams.push(`end_time=${endTime}`);
+        }
+
+        return axios.get('v1/statistics/transaction.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
+    },
     getAllAccounts: ({ visibleOnly }) => {
         return axios.get('v1/accounts/list.json?visible_only=' + !!visibleOnly);
     },

@@ -4,6 +4,7 @@ import VueI18n from 'vue-i18n';
 import VueI18nFilter from 'vue-i18n-filter';
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
+import ECharts from 'vue-echarts';
 import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
@@ -15,6 +16,13 @@ import 'framework7-icons';
 
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
+import 'echarts/lib/chart/line';
+import 'echarts/lib/chart/pie';
+import 'echarts/lib/chart/bar';
+import 'echarts/lib/component/legend';
+import 'echarts/lib/component/title';
+import 'echarts/lib/component/tooltip';
+
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
@@ -24,6 +32,7 @@ import icons from './consts/icon.js';
 import account from './consts/account.js';
 import transaction from './consts/transaction.js';
 import category from './consts/category.js';
+import statistics from './consts/statistics.js';
 import licenses from './lib/licenses.js';
 import version from './lib/version.js';
 import logger from './lib/logger.js';
@@ -62,6 +71,7 @@ Vue.use(VueI18n);
 Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
+Vue.component('v-chart', ECharts);
 Vue.component('PincodeInput', PincodeInput);
 Vue.component('PasswordInputSheet', PasswordInputSheet);
 Vue.component('PasscodeInputSheet', PasscodeInputSheet);
@@ -92,6 +102,7 @@ Vue.prototype.$constants = {
     account: account,
     transaction: transaction,
     category: category,
+    statistics: statistics,
 };
 
 Vue.prototype.$utilities = utils;

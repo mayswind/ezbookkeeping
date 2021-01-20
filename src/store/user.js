@@ -13,7 +13,8 @@ import {
     UPDATE_ACCOUNT_LIST_INVALID_STATE,
     UPDATE_TRANSACTION_CATEGORY_LIST_INVALID_STATE,
     UPDATE_TRANSACTION_TAG_LIST_INVALID_STATE,
-    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE
+    UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
+    UPDATE_TRANSACTION_STATISTICS_INVALID_STATE
 } from './mutations.js';
 
 export function authorize(context, { loginName, password }) {
@@ -258,6 +259,10 @@ export function updateUserProfile(context, { profile, currentPassword }) {
                 context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
             }
 
+            if (!context.state.transactionStatisticsStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_STATISTICS_INVALID_STATE, true);
+            }
+
             resolve(data.result);
         }).catch(error => {
             logger.error('failed to save user profile', error);
@@ -299,6 +304,10 @@ export function clearUserData(context, { password }) {
 
             if (!context.state.transactionOverviewStateInvalid) {
                 context.commit(UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE, true);
+            }
+
+            if (!context.state.transactionStatisticsStateInvalid) {
+                context.commit(UPDATE_TRANSACTION_STATISTICS_INVALID_STATE, true);
             }
 
             resolve(data.result);

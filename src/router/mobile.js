@@ -11,7 +11,7 @@ import TransactionEditPage from '../views/mobile/transactions/Edit.vue';
 import AccountListPage from '../views/mobile/accounts/List.vue';
 import AccountEditPage from '../views/mobile/accounts/Edit.vue';
 
-import StatisticsOverviewPage from '../views/mobile/statistics/Overview.vue';
+import StatisticsTransactionPage from '../views/mobile/statistics/Transaction.vue';
 
 import SettingsPage from '../views/mobile/Settings.vue';
 import ApplicationLockPage from '../views/mobile/ApplicationLock.vue';
@@ -171,8 +171,8 @@ const routes = [
         beforeEnter: checkLogin
     },
     {
-        path: '/statistic/overview',
-        component: StatisticsOverviewPage,
+        path: '/statistic/transaction',
+        component: StatisticsTransactionPage,
         beforeEnter: checkLogin
     },
     {

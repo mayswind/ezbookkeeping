@@ -155,7 +155,7 @@
             <f7-link href="/transaction/add">
                 <f7-icon f7="plus_square" class="lab-tarbar-big-icon"></f7-icon>
             </f7-link>
-            <f7-link href="/statistic/overview">
+            <f7-link href="/statistic/transaction">
                 <f7-icon f7="chart_pie"></f7-icon>
                 <span class="tabbar-label">{{ $t('Statistics') }}</span>
             </f7-link>

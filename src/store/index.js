@@ -1,4 +1,5 @@
 import datetimeConstants from "../consts/datetime.js";
+import statisticsConstants from "../consts/statistics.js";
 import userState from "../lib/userstate.js";
 import utils from "../lib/utils.js";
 
@@ -44,6 +45,11 @@ import {
 
     LOAD_TRANSACTION_OVERVIEW,
     UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE,
+
+    LOAD_TRANSACTION_STATISTICS,
+    INIT_TRANSACTION_STATISTICS_FILTER,
+    UPDATE_TRANSACTION_STATISTICS_FILTER,
+    UPDATE_TRANSACTION_STATISTICS_INVALID_STATE,
 } from './mutations.js';
 
 import {
@@ -87,6 +93,12 @@ import {
 import {
     loadTransactionOverview
 } from './overview.js';
+
+import {
+    loadTransactionStatistics,
+    initTransactionStatisticsFilter,
+    updateTransactionStatisticsFilter
+} from './statistics.js';
 
 import {
     loadAllAccounts,
@@ -165,6 +177,15 @@ const stores = {
         transactionTagListStateInvalid: true,
         transactionOverview: {},
         transactionOverviewStateInvalid: true,
+        transactionStatisticsFilter: {
+            dateType: datetimeConstants.allDateRanges.ThisMonth.type,
+            startTime: 0,
+            endTime: 0,
+            chartType: statisticsConstants.defaultChartType,
+            chartLegendType: statisticsConstants.defaultChartLegendType,
+        },
+        transactionStatistics: [],
+        transactionStatisticsStateInvalid: true,
     },
     getters: {
         // user
@@ -215,6 +236,14 @@ const stores = {
 
             state.transactionOverview = {};
             state.transactionOverviewStateInvalid = true;
+
+            state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+            state.transactionStatisticsFilter.startTime = 0;
+            state.transactionStatisticsFilter.endTime = 0;
+            state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
+            state.transactionStatisticsFilter.chartLegendType = statisticsConstants.defaultChartLegendType;
+            state.transactionStatistics = {};
+            state.transactionStatisticsStateInvalid = true;
 
             clearExchangeRatesFromLocalStorage();
         },
@@ -731,6 +760,86 @@ const stores = {
         [UPDATE_TRANSACTION_OVERVIEW_INVALID_STATE] (state, invalidState) {
             state.transactionOverviewStateInvalid = invalidState;
         },
+        [LOAD_TRANSACTION_STATISTICS] (state, { statistics, defaultCurrency }) {
+            if (statistics && statistics.items && statistics.items.length) {
+                for (let i = 0; i < statistics.items.length; i++) {
+                    const item = statistics.items[i];
+
+                    if (item.accountId) {
+                        item.account = state.allAccountsMap[item.accountId];
+                    }
+
+                    if (item.categoryId) {
+                        item.category = state.allTransactionCategoriesMap[item.categoryId];
+                    }
+
+                    if (item.account && item.account.currency !== defaultCurrency) {
+                        item.amountInDefaultCurrency = getExchangedAmount(state)(item.amount, item.account.currency, defaultCurrency);
+                    } else if (item.account && item.account.currency === defaultCurrency) {
+                        item.amountInDefaultCurrency = item.amount;
+                    } else {
+                        item.amountInDefaultCurrency = null;
+                    }
+                }
+            }
+
+            state.transactionStatistics = statistics;
+        },
+        [INIT_TRANSACTION_STATISTICS_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionStatisticsFilter.dateType = filter.dateType;
+            } else {
+                state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+            }
+
+            if (filter && utils.isNumber(filter.startTime)) {
+                state.transactionStatisticsFilter.startTime = filter.startTime;
+            } else {
+                state.transactionStatisticsFilter.startTime = 0;
+            }
+
+            if (filter && utils.isNumber(filter.endTime)) {
+                state.transactionStatisticsFilter.endTime = filter.endTime;
+            } else {
+                state.transactionStatisticsFilter.endTime = 0;
+            }
+
+            if (filter && utils.isNumber(filter.chartType)) {
+                state.transactionStatisticsFilter.chartType = filter.chartType;
+            } else {
+                state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
+            }
+
+            if (filter && utils.isNumber(filter.chartLegendType)) {
+                state.transactionStatisticsFilter.chartLegendType = filter.chartLegendType;
+            } else {
+                state.transactionStatisticsFilter.chartLegendType = statisticsConstants.defaultChartLegendType;
+            }
+        },
+        [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionStatisticsFilter.dateType = filter.dateType;
+            }
+
+            if (filter && utils.isNumber(filter.startTime)) {
+                state.transactionStatisticsFilter.startTime = filter.startTime;
+            }
+
+            if (filter && utils.isNumber(filter.endTime)) {
+                state.transactionStatisticsFilter.endTime = filter.endTime;
+            }
+
+            if (filter && utils.isNumber(filter.chartType)) {
+                state.transactionStatisticsFilter.chartType = filter.chartType;
+            }
+
+            if (filter && utils.isNumber(filter.chartLegendType)) {
+                state.transactionStatisticsFilter.chartLegendType = filter.chartLegendType;
+            }
+        },
+        [UPDATE_TRANSACTION_STATISTICS_INVALID_STATE] (state, invalidState) {
+            state.transactionStatisticsStateInvalid = invalidState;
+        },
     },
     actions: {
         // user
@@ -762,6 +871,11 @@ const stores = {
 
         // overview
         loadTransactionOverview,
+
+        // statistics
+        loadTransactionStatistics,
+        initTransactionStatisticsFilter,
+        updateTransactionStatisticsFilter,
 
         // account
         loadAllAccounts,

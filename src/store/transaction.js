@@ -30,7 +30,7 @@ export function updateTransactionListFilter(context, filter) {
     context.commit(UPDATE_TRANSACTION_LIST_FILTER, filter);
 }
 
-export function getTransactions(context, { reload, autoExpand, defaultCurrency }) {
+export function loadTransactions(context, { reload, autoExpand, defaultCurrency }) {
     let actualMaxTime = context.state.transactionsNextTimeId;
 
     if (reload && context.state.transactionsFilter.maxTime > 0) {

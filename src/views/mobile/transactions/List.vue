@@ -453,7 +453,7 @@ export default {
                 self.$store.dispatch('loadAllAccounts', { force: false }),
                 self.$store.dispatch('loadAllCategories', { force: false })
             ]).then(() => {
-                return self.$store.dispatch('getTransactions', {
+                return self.$store.dispatch('loadTransactions', {
                     reload: true,
                     autoExpand: true,
                     defaultCurrency: self.defaultCurrency
@@ -493,7 +493,7 @@ export default {
 
             self.loadingMore = true;
 
-            self.$store.dispatch('getTransactions', {
+            self.$store.dispatch('loadTransactions', {
                 reload: false,
                 autoExpand: autoExpand,
                 defaultCurrency: self.defaultCurrency

@@ -104,7 +104,7 @@ import {
 import {
     initTransactionListFilter,
     updateTransactionListFilter,
-    getTransactions,
+    loadTransactions,
     getTransaction,
     saveTransaction,
     deleteTransaction,
@@ -771,7 +771,7 @@ const stores = {
         // transaction
         initTransactionListFilter,
         updateTransactionListFilter,
-        getTransactions,
+        loadTransactions,
         getTransaction,
         saveTransaction,
         deleteTransaction,

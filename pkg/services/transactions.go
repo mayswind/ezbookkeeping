@@ -1032,11 +1032,25 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(uid i
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
-	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
+	conditionParams := make([]interface{}, 0, 8)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+
+	if startUnixTime > 0 {
+		condition = condition + " AND transaction_time>=?"
+		conditionParams = append(conditionParams, utils.GetMinTransactionTimeFromUnixTime(startUnixTime))
+	}
+
+	if endUnixTime > 0 {
+		condition = condition + " AND transaction_time<=?"
+		conditionParams = append(conditionParams, utils.GetMaxTransactionTimeFromUnixTime(endUnixTime))
+	}
 
 	var transactionTotalAmounts []*models.Transaction
-	err := s.UserDataDB(uid).Select("uid, category_id, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
+	err := s.UserDataDB(uid).Select("uid, category_id, account_id, SUM(amount) as amount").Where(condition, conditionParams...).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
 
 	if err != nil {
 		return nil, err

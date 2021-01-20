@@ -212,6 +212,9 @@ const stores = {
             state.allTransactionTagsMap = {};
             state.transactionTagListStateInvalid = true;
 
+            state.transactionOverview = {};
+            state.transactionOverviewStateInvalid = true;
+
             clearExchangeRatesFromLocalStorage();
         },
         [STORE_USER_INFO] (state, userInfo) {

@@ -164,7 +164,7 @@ export default {
             password
         });
     },
-    getTransactionOverview: ( { today, thisWeek, thisMonth, thisYear } ) => {
+    getTransactionOverview: ({ today, thisWeek, thisMonth, thisYear }) => {
         const queryParams = [];
 
         if (today) {

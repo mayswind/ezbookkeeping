@@ -1,4 +1,6 @@
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+
 const pkgFile = require('./package.json');
 const licenseFile = require('./third-patry-licenses.json');
 
@@ -19,6 +21,11 @@ module.exports = {
     },
     publicPath: '',
     productionSourceMap: false,
+    configureWebpack:{
+        plugins: [
+            new MomentLocalesPlugin()
+        ]
+    },
     chainWebpack: config => {
         config.optimization.splitChunks({
             cacheGroups: {

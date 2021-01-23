@@ -28,8 +28,8 @@
                                   v-for="token in tokens"
                                   :key="token.tokenId"
                                   :id="token | tokenDomId"
-                                  :title="token | tokenTitle | t"
-                                  :text="token | tokenDevice | t">
+                                  :title="token | tokenTitle | localized"
+                                  :text="token | tokenDevice | localized">
                         <f7-icon slot="media" :f7="token | tokenIcon"></f7-icon>
                         <small slot="after">{{ token.createdAt | moment($t('format.datetime.long')) }}</small>
                         <f7-swipeout-actions right v-if="!token.isCurrent">

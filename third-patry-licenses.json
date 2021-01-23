@@ -100,12 +100,6 @@
         "licenseUrl": "https://github.com/kazupon/vue-i18n/blob/v8.x/LICENSE"
     },
     {
-        "name": "vue-i18n-filter",
-        "copyright": "Copyright (c) 2018 +v",
-        "url": "https://github.com/chiaweilee/vue-i18n-filter",
-        "licenseUrl": "https://github.com/chiaweilee/vue-i18n-filter/blob/master/LICENSE"
-    },
-    {
         "name": "vue-moment",
         "copyright": "Copyright (c) 2017 Brock Petrie",
         "url": "https://github.com/brockpetrie/vue-moment",

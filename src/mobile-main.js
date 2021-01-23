@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import VueI18n from 'vue-i18n';
-import VueI18nFilter from 'vue-i18n-filter';
 import ECharts from 'vue-echarts';
 import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
@@ -72,6 +71,7 @@ import userstate from './lib/userstate.js';
 import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
 import stores from './store/index.js';
+import localizedFilter from './filters/localized.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
 import iconFilter from './filters/icon.js';
@@ -129,7 +129,6 @@ Framework7.use(Framework7Vue);
 
 Vue.use(Vuex);
 Vue.use(VueI18n);
-Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
 
@@ -287,6 +286,7 @@ Vue.prototype.$hideLoading = function () {
 
 Vue.prototype.$user = userstate;
 
+Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));

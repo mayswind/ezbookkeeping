@@ -26,10 +26,10 @@
 
         <f7-toolbar tabbar bottom>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateRangeName(allDateRanges, 'Date') | t }}</span>
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateRangeName(allDateRanges, 'Date') | localized }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | t }}</span>
+                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | localized }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
                 <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ query.categoryId | categoryName(allCategories, $t('Category')) }}</span>
@@ -165,7 +165,7 @@
                                             {{ transaction.day }}
                                         </span>
                                         <span class="transaction-day-of-week full-line flex-direction-column">
-                                            {{ `datetime.${transaction.dayOfWeek}.short` | t }}
+                                            {{ `datetime.${transaction.dayOfWeek}.short` | localized }}
                                         </span>
                                     </div>
                                     <div class="transaction-icon display-flex align-items-center">
@@ -186,7 +186,7 @@
                                         {{ transaction.category.name }}
                                     </span>
                                     <span v-else-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance && !transaction.category">
-                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) | t }}
+                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) | localized }}
                                     </span>
                                 </div>
                                 <div slot="text" class="transaction-comment" v-if="transaction.comment">
@@ -233,7 +233,7 @@
             <f7-list>
                 <f7-list-item v-for="dateRange in allDateRanges"
                               :key="dateRange.type"
-                              :title="dateRange.name | t"
+                              :title="dateRange.name | localized"
                               @click="changeDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"

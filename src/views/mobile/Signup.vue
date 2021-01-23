@@ -117,7 +117,7 @@
                 <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
                     <f7-card-header>
                         <small :style="{ opacity: 0.6 }">
-                            <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | t }}</span>
+                            <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
                         </small>
                     </f7-card-header>
                     <f7-card-content class="no-safe-areas" :padding="false">

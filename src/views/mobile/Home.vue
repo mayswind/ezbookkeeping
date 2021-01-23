@@ -13,7 +13,7 @@
                         <small>Expense</small>
                     </span>
                     <span :style="{ opacity: 0.6 }" v-else-if="!loading">
-                        <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | t }}</span>
+                        <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | localized }}</span>
                         <span>·</span>
                         <small>{{ $t('Expense') }}</small>
                     </span>

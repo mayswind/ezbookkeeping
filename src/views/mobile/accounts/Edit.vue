@@ -24,7 +24,7 @@
                     <f7-list-item
                         link="#"
                         :title="$t('Account Category')"
-                        :after="account.category | accountCategoryName(allAccountCategories) | t"
+                        :after="account.category | accountCategoryName(allAccountCategories) | localized"
                         @click="showAccountCategorySheet = true"
                     >
                         <list-item-selection-sheet value-type="item"
@@ -41,7 +41,7 @@
                         link="#"
                         :class="{ 'disabled': editAccountId }"
                         :title="$t('Account Type')"
-                        :after="account.type | accountTypeName | t"
+                        :after="account.type | accountTypeName | localized"
                         @click="showAccountTypeSheet = true"
                     >
                         <list-item-selection-sheet value-type="item"

@@ -331,6 +331,7 @@ export default {
 
 .overview-transaction-footer {
     padding-top: 6px;
+    font-size: 13px;
 }
 
 .overview-transaction-footer > span {

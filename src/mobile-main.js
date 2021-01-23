@@ -1,15 +1,45 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+
 import VueI18n from 'vue-i18n';
 import VueI18nFilter from 'vue-i18n-filter';
-import Framework7 from 'framework7/framework7.esm.bundle.js';
-import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 import ECharts from 'vue-echarts';
 import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
 
 import moment from 'moment';
+
+import Framework7 from 'framework7/framework7-lite.esm.js';
+import Framework7Dialog from 'framework7/components/dialog/dialog';
+import Framework7Popup from 'framework7/components/popup/popup';
+import Framework7LoginScreen from 'framework7/components/login-screen/login-screen';
+import Framework7Popover from 'framework7/components/popover/popover';
+import Framework7Actions from 'framework7/components/actions/actions';
+import Framework7Sheet from 'framework7/components/sheet/sheet';
+import Framework7Toast from 'framework7/components/toast/toast';
+import Framework7Preloader from 'framework7/components/preloader/preloader';
+import Framework7Sortable from 'framework7/components/sortable/sortable';
+import Framework7Swipeout from 'framework7/components/swipeout/swipeout';
+import Framework7Accordion from 'framework7/components/accordion/accordion';
+import Framework7Card from 'framework7/components/card/card';
+import Framework7Chip from 'framework7/components/chip/chip';
+import Framework7Form from 'framework7/components/form/form';
+import Framework7Input from 'framework7/components/input/input';
+import Framework7Checkbox from 'framework7/components/checkbox/checkbox';
+import Framework7Radio from 'framework7/components/radio/radio';
+import Framework7Toggle from 'framework7/components/toggle/toggle';
+import Framework7SmartSelect from 'framework7/components/smart-select/smart-select';
+import Framework7Grid from 'framework7/components/grid/grid';
+import Framework7InfiniteScroll from 'framework7/components/infinite-scroll/infinite-scroll';
+import Framework7PullToRefresh from 'framework7/components/pull-to-refresh/pull-to-refresh';
+import Framework7Searchbar from 'framework7/components/searchbar/searchbar';
+import Framework7Tooltip from 'framework7/components/tooltip/tooltip';
+import Framework7Skeleton from 'framework7/components/skeleton/skeleton';
+import Framework7Menu from 'framework7/components/menu/menu';
+import Framework7Treeview from 'framework7/components/treeview/treeview';
+import Framework7Typography from 'framework7/components/typography/typography';
+import Framework7Vue from 'framework7-vue/framework7-vue.esm.bundle.js';
 
 import 'framework7/css/framework7.bundle.css';
 import 'framework7-icons';
@@ -64,13 +94,45 @@ import IconSelectionSheet from "./components/mobile/IconSelectionSheet.vue";
 import ColorSelectionSheet from "./components/mobile/ColorSelectionSheet.vue";
 import InformationSheet from "./components/mobile/InformationSheet.vue";
 import NumberPadSheet from "./components/mobile/NumberPadSheet.vue";
+
 import App from './Mobile.vue';
+
+Framework7.use(Framework7Dialog);
+Framework7.use(Framework7Popup);
+Framework7.use(Framework7LoginScreen);
+Framework7.use(Framework7Popover);
+Framework7.use(Framework7Actions);
+Framework7.use(Framework7Sheet);
+Framework7.use(Framework7Toast);
+Framework7.use(Framework7Preloader);
+Framework7.use(Framework7Sortable);
+Framework7.use(Framework7Swipeout);
+Framework7.use(Framework7Accordion);
+Framework7.use(Framework7Card);
+Framework7.use(Framework7Chip);
+Framework7.use(Framework7Form);
+Framework7.use(Framework7Input);
+Framework7.use(Framework7Checkbox);
+Framework7.use(Framework7Radio);
+Framework7.use(Framework7Toggle);
+Framework7.use(Framework7SmartSelect);
+Framework7.use(Framework7Grid);
+Framework7.use(Framework7InfiniteScroll);
+Framework7.use(Framework7PullToRefresh);
+Framework7.use(Framework7Searchbar);
+Framework7.use(Framework7Tooltip);
+Framework7.use(Framework7Skeleton);
+Framework7.use(Framework7Menu);
+Framework7.use(Framework7Treeview);
+Framework7.use(Framework7Typography);
+Framework7.use(Framework7Vue);
 
 Vue.use(Vuex);
 Vue.use(VueI18n);
 Vue.use(VueI18nFilter);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
+
 Vue.component('v-chart', ECharts);
 Vue.component('PincodeInput', PincodeInput);
 Vue.component('PasswordInputSheet', PasswordInputSheet);
@@ -84,7 +146,6 @@ Vue.component('IconSelectionSheet', IconSelectionSheet);
 Vue.component('ColorSelectionSheet', ColorSelectionSheet);
 Vue.component('InformationSheet', InformationSheet);
 Vue.component('NumberPadSheet', NumberPadSheet);
-Framework7.use(Framework7Vue);
 
 const store = new Vuex.Store(stores);
 const i18n = new VueI18n(getI18nOptions());

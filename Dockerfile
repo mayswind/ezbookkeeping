@@ -1,8 +1,9 @@
 # Build backend binary file
 FROM golang:1.14.10-alpine3.12 AS be-builder
-RUN apk add git gcc g++ libc-dev
 WORKDIR /go/src/github.com/mayswind/lab
 COPY . .
+RUN docker/backend-build-pre-setup.sh
+RUN apk add git gcc g++ libc-dev
 RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d ' ' | tr -d ',' | tr -d '"'` \
   && COMMIT_HASH=$(git rev-parse --short HEAD) \
   && GOOS=linux \
@@ -13,9 +14,10 @@ RUN chmod +x lab
 
 # Build frontend files
 FROM node:12.19.0-alpine3.12 AS fe-builder
-RUN apk add git
 WORKDIR /go/src/github.com/mayswind/lab
 COPY . .
+RUN docker/frontend-build-pre-setup.sh
+RUN apk add git
 RUN npm install && npm run build
 
 # Package docker image

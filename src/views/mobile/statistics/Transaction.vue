@@ -7,6 +7,24 @@
                 <v-chart :options="chartData" v-if="chartData" />
             </f7-card-content>
         </f7-card>
+
+        <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
+            <f7-link>
+                <f7-icon f7="arrow_left_square"></f7-icon>
+            </f7-link>
+            <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query | dateRange }}</span>
+            </f7-link>
+            <f7-link>
+                <f7-icon f7="arrow_right_square"></f7-icon>
+            </f7-link>
+            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
+                <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Pie }">{{ $t('Pie Chart') }}</span>
+            </f7-link>
+            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Bar)">
+                <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
+            </f7-link>
+        </f7-toolbar>
     </f7-page>
 </template>
 
@@ -115,9 +133,9 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        const dateParam = self.$utilities.getDateRangeByDateType(self.query.dateType);
+        if (self.query.startTime < 0 || self.query.endTime < 0) {
+            const dateParam = self.$utilities.getDateRangeByDateType(self.$constants.datetime.allDateRanges.ThisMonth.type);
 
-        if (dateParam.minTime !== self.query.startTime || dateParam.maxTime !== self.query.endTime) {
             self.$store.dispatch('updateTransactionStatisticsFilter', {
                 startTime: dateParam.minTime,
                 endTime: dateParam.maxTime
@@ -161,6 +179,16 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        setChartType(chartType) {
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                chartType: chartType
+            });
+        }
+    },
+    filters: {
+        dateRange() {
+            return 'Date';
         }
     }
 };

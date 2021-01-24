@@ -163,6 +163,15 @@ i.icon.la, i.icon.las, i.icon.lab {
     height: 13px;
 }
 
+.toolbar-item-auto-size .toolbar-inner {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.toolbar-item-auto-size .toolbar-inner > .link {
+    width: auto;
+}
+
 .tabbar-text-with-ellipsis > span {
     display: block;
     width: 100%;

@@ -485,6 +485,8 @@ export default {
     'Begin Time': '开始时间',
     'End Time': '结束时间',
     'Custom': '自定义',
+    'Pie Chart': '饼图',
+    'Bar Chart': '条形图',
     'User': '用户',
     'Application': '应用',
     'Details': '详情',

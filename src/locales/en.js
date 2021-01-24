@@ -485,6 +485,8 @@ export default {
     'Begin Time': 'Begin Time',
     'End Time': 'End Time',
     'Custom': 'Custom',
+    'Pie Chart': 'Pie Chart',
+    'Bar Chart': 'Bar Chart',
     'User': 'User',
     'Application': 'Application',
     'Details': 'Details',

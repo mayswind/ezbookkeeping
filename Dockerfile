@@ -24,7 +24,6 @@ RUN npm install && npm run build
 FROM alpine:3.12.0
 LABEL maintainer="MaysWind <i@mayswind.net>"
 RUN addgroup -S -g 1000 labapp && adduser -S -G labapp -u 1000 labapp
-RUN apk --no-cache add tzdata
 COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 RUN mkdir -p /usr/local/bin/labapp && chown 1000:1000 /usr/local/bin/labapp \

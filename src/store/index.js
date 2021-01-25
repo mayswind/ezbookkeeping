@@ -181,7 +181,7 @@ const stores = {
             startTime: -1,
             endTime: -1,
             chartType: statisticsConstants.defaultChartType,
-            chartLegendType: statisticsConstants.defaultChartLegendType,
+            chartDataType: statisticsConstants.defaultChartDataType,
         },
         transactionStatistics: [],
         transactionStatisticsStateInvalid: true,
@@ -239,7 +239,7 @@ const stores = {
             state.transactionStatisticsFilter.startTime = -1;
             state.transactionStatisticsFilter.endTime = -1;
             state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
-            state.transactionStatisticsFilter.chartLegendType = statisticsConstants.defaultChartLegendType;
+            state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             state.transactionStatistics = {};
             state.transactionStatisticsStateInvalid = true;
 
@@ -802,10 +802,10 @@ const stores = {
                 state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
             }
 
-            if (filter && utils.isNumber(filter.chartLegendType)) {
-                state.transactionStatisticsFilter.chartLegendType = filter.chartLegendType;
+            if (filter && utils.isNumber(filter.chartDataType)) {
+                state.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             } else {
-                state.transactionStatisticsFilter.chartLegendType = statisticsConstants.defaultChartLegendType;
+                state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
@@ -821,8 +821,8 @@ const stores = {
                 state.transactionStatisticsFilter.chartType = filter.chartType;
             }
 
-            if (filter && utils.isNumber(filter.chartLegendType)) {
-                state.transactionStatisticsFilter.chartLegendType = filter.chartLegendType;
+            if (filter && utils.isNumber(filter.chartDataType)) {
+                state.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_INVALID_STATE] (state, invalidState) {

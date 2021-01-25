@@ -5,17 +5,20 @@ const allChartTypes = {
 
 const defaultChartType = allChartTypes.Pie;
 
-const allChartLegendTypes = {
-    Account: 0,
-    PrimaryCategory: 1,
-    SecondaryCategory: 1
+const allChartDataTypes = {
+    ExpenseByAccount: 0,
+    ExpenseByPrimaryCategory: 1,
+    ExpenseBySecondaryCategory: 2,
+    IncomeByAccount: 3,
+    IncomeByPrimaryCategory: 4,
+    IncomeBySecondaryCategory: 5
 };
 
-const defaultChartLegendType = allChartLegendTypes.SecondaryCategory;
+const defaultChartDataType = allChartDataTypes.ExpenseBySecondaryCategory;
 
 export default {
     allChartTypes: allChartTypes,
     defaultChartType: defaultChartType,
-    allChartLegendTypes: allChartLegendTypes,
-    defaultChartLegendType: defaultChartLegendType,
+    allChartDataTypes: allChartDataTypes,
+    defaultChartDataType: defaultChartDataType,
 };

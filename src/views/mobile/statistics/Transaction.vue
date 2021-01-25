@@ -1,6 +1,12 @@
 <template>
     <f7-page>
-        <f7-navbar :title="$t('Statistics')" :back-link="$t('Back')"></f7-navbar>
+        <f7-navbar>
+            <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
+            <f7-nav-title :title="$t('Statistics')"></f7-nav-title>
+            <f7-nav-right>
+                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
+            </f7-nav-right>
+        </f7-navbar>
 
         <f7-card>
             <f7-card-content class="no-safe-areas chart-container" :padding="false">
@@ -25,6 +31,22 @@
                 <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
             </f7-link>
         </f7-toolbar>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-label>{{ $t('Expense Chart') }}</f7-actions-label>
+                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.ExpenseByAccount)">{{ $t('Expense By Account') }}</f7-actions-button>
+                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory)">{{ $t('Expense By Secondary Category') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-label>{{ $t('Income Chart') }}</f7-actions-label>
+                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.IncomeByAccount)">{{ $t('Income By Account') }}</f7-actions-button>
+                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.IncomeBySecondaryCategory)">{{ $t('Income By Secondary Category') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
     </f7-page>
 </template>
 
@@ -32,7 +54,8 @@
 export default {
     data() {
         return {
-            loading: true
+            loading: true,
+            showMoreActionSheet: false
         };
     },
     computed: {
@@ -69,11 +92,24 @@ export default {
                     continue;
                 }
 
-                if (item.category.type !== self.$constants.category.allCategoryTypes.Expense) {
+                if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory) {
+                    if (item.category.type !== self.$constants.category.allCategoryTypes.Expense) {
+                        continue;
+                    }
+                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory) {
+                    if (item.category.type !== self.$constants.category.allCategoryTypes.Income) {
+                        continue;
+                    }
+                } else {
                     continue;
                 }
 
-                if (self.query.chartLegendType === self.$constants.statistics.allChartLegendTypes.Account) {
+                if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount) {
                     if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
                         let data = combinedData[item.account.name];
 
@@ -88,7 +124,8 @@ export default {
 
                         combinedData[item.account.name] = data;
                     }
-                } else if (self.query.chartLegendType === self.$constants.statistics.allChartLegendTypes.SecondaryCategory) {
+                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory) {
                     if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
                         let data = combinedData[item.category.name];
 
@@ -253,6 +290,11 @@ export default {
         setChartType(chartType) {
             this.$store.dispatch('updateTransactionStatisticsFilter', {
                 chartType: chartType
+            });
+        },
+        setChartDataType(chartDataType) {
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                chartDataType: chartDataType
             });
         },
         skeletonChart() {

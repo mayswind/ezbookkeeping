@@ -51,57 +51,59 @@ export default {
             return this.$store.state.transactionStatisticsFilter;
         },
         chartData() {
-            if (!this.$store.state.transactionStatistics ||
-                !this.$store.state.transactionStatistics.items ||
-                !this.$store.state.transactionStatistics.items.length) {
-                return null;
+            const self = this;
+
+            if (!self.$store.state.transactionStatistics ||
+                !self.$store.state.transactionStatistics.items ||
+                !self.$store.state.transactionStatistics.items.length) {
+                return self.skeletonChart();
             }
 
             const combinedData = {};
-            const data = [];
+            const allData = [];
 
-            for (let i = 0; i < this.$store.state.transactionStatistics.items.length; i++) {
-                const item = this.$store.state.transactionStatistics.items[i];
+            for (let i = 0; i < self.$store.state.transactionStatistics.items.length; i++) {
+                const item = self.$store.state.transactionStatistics.items[i];
 
                 if (!item.account || !item.category) {
                     continue;
                 }
 
-                if (item.category.type !== this.$constants.category.allCategoryTypes.Expense) {
+                if (item.category.type !== self.$constants.category.allCategoryTypes.Expense) {
                     continue;
                 }
 
-                if (this.query.chartLegendType === this.$constants.statistics.allChartLegendTypes.Account) {
-                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let totalAmount = combinedData[item.account.name];
+                if (self.query.chartLegendType === self.$constants.statistics.allChartLegendTypes.Account) {
+                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = combinedData[item.account.name];
 
-                        if (totalAmount) {
-                            totalAmount += totalAmount = item.amountInDefaultCurrency;
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
                         } else {
-                            totalAmount = item.amountInDefaultCurrency;
+                            data = {
+                                totalAmount: item.amountInDefaultCurrency,
+                                color: item.account.color || self.$constants.colors.defaultAccountColor
+                            }
                         }
 
-                        combinedData[item.account.name] = totalAmount;
+                        combinedData[item.account.name] = data;
                     }
-                } else if (this.query.chartLegendType === this.$constants.statistics.allChartLegendTypes.SecondaryCategory) {
-                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let totalAmount = combinedData[item.category.name];
+                } else if (self.query.chartLegendType === self.$constants.statistics.allChartLegendTypes.SecondaryCategory) {
+                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = combinedData[item.category.name];
 
-                        if (totalAmount) {
-                            totalAmount += totalAmount = item.amountInDefaultCurrency;
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
                         } else {
-                            totalAmount = item.amountInDefaultCurrency;
+                            data = {
+                                totalAmount: item.amountInDefaultCurrency,
+                                color: item.category.color || self.$constants.colors.defaultCategoryColor
+                            }
                         }
 
-                        combinedData[item.category.name] = totalAmount;
+                        combinedData[item.category.name] = data;
                     }
                 }
-            }
-
-            let chartType = 'pie';
-
-            if (this.query.chartType === this.$constants.statistics.allChartTypes.Bar) {
-                chartType = 'bar';
             }
 
             for (let legendName in combinedData) {
@@ -109,24 +111,92 @@ export default {
                     continue;
                 }
 
-                data.push({
+                const totalAmount = Math.floor(combinedData[legendName].totalAmount) / 100;
+
+                const data = {
                     name: legendName,
-                    value: combinedData[legendName] / 100
+                    value: totalAmount,
+                    itemStyle: {
+                        color: `#${combinedData[legendName].color}`
+                    }
+                };
+
+                allData.push(data);
+            }
+
+            if (self.query.chartType === self.$constants.statistics.allChartTypes.Bar) {
+                allData.sort(function (data1, data2) {
+                    return data1.value - data2.value;
                 });
             }
 
-            return {
+            const chartData =  {
+                label: {
+                    show: true,
+                    overflow: 'truncate',
+                    align: 'left',
+                    formatter: params => {
+                        return `${params.name} ${self.$options.filters.currency(params.value * 100, self.defaultCurrency)}`;
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
                 series: [
                     {
-                        type: chartType,
-                        data: data,
+                        data: allData,
+                    }
+                ],
+                animation: false
+            };
+
+            if (this.query.chartType === this.$constants.statistics.allChartTypes.Bar) {
+                return this.$utilities.copyObjectTo({
+                    grid: {
+                        left: 30,
+                        top: 30,
+                        right: 50,
+                        bottom: 50
+                    },
+                    xAxis: {
+                        type: 'value'
+                    },
+                    yAxis: {
+                        type: 'category'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    series: [{
+                        type: 'bar'
+                    }]
+                }, chartData);
+            } else {
+                return this.$utilities.copyObjectTo({
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    series: [{
+                        type: 'pie',
                         label: {
                             position: 'inside'
                         },
-                        animation: false,
-                    }
-                ]
-            };
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                }, chartData);
+            }
         }
     },
     created() {
@@ -184,6 +254,64 @@ export default {
             this.$store.dispatch('updateTransactionStatisticsFilter', {
                 chartType: chartType
             });
+        },
+        skeletonChart() {
+            const skeletonChartData = {
+                series: [{
+                    data: [{
+                        value: 20,
+                        itemStyle: {
+                            color: '#7c7c7f'
+                        }
+                    },{
+                        value: 20,
+                        itemStyle: {
+                            color: '#a5a5aa'
+                        }
+                    },{
+                        value: 60,
+                        itemStyle: {
+                            color: '#c5c5c9'
+                        }
+                    }]
+                }],
+                animation: false
+            };
+
+            if (this.query.chartType === this.$constants.statistics.allChartTypes.Bar) {
+                return this.$utilities.copyObjectTo({
+                    grid: {
+                        left: 30,
+                        top: 30,
+                        right: 50,
+                        bottom: 50
+                    },
+                    xAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            show: false
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    yAxis: {
+                        type: 'category'
+                    },
+                    series: [{
+                        type: 'bar'
+                    }]
+                }, skeletonChartData);
+            } else {
+                return this.$utilities.copyObjectTo({
+                    series: [{
+                        type: 'pie',
+                        label: {
+                            position: 'inside'
+                        }
+                    }]
+                }, skeletonChartData);
+            }
         }
     },
     filters: {

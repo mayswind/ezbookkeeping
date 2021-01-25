@@ -48,8 +48,9 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import 'echarts/lib/chart/line';
 import 'echarts/lib/chart/pie';
 import 'echarts/lib/chart/bar';
-import 'echarts/lib/component/legend';
 import 'echarts/lib/component/title';
+import 'echarts/lib/component/legend';
+import 'echarts/lib/component/grid';
 import 'echarts/lib/component/tooltip';
 
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';

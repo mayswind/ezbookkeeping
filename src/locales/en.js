@@ -10,9 +10,11 @@ export default {
     'format': {
         'date': {
             'long': 'MM/DD/YYYY',
+            'short': 'M/D/YYYY',
             'year': 'YYYY',
             'yearMonth': 'YYYY-M',
-            'monthDay': 'M/D'
+            'monthDay': 'M/D',
+            'shortMonthDay': 'M/D'
         },
         'datetime': {
             'long': 'MM/DD/YYYY HH:mm:ss',

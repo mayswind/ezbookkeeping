@@ -178,8 +178,9 @@ const stores = {
         transactionOverview: {},
         transactionOverviewStateInvalid: true,
         transactionStatisticsFilter: {
-            startTime: -1,
-            endTime: -1,
+            dateType: datetimeConstants.allDateRanges.ThisMonth.type,
+            startTime: 0,
+            endTime: 0,
             chartType: statisticsConstants.defaultChartType,
             chartDataType: statisticsConstants.defaultChartDataType,
         },
@@ -236,8 +237,9 @@ const stores = {
             state.transactionOverview = {};
             state.transactionOverviewStateInvalid = true;
 
-            state.transactionStatisticsFilter.startTime = -1;
-            state.transactionStatisticsFilter.endTime = -1;
+            state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+            state.transactionStatisticsFilter.startTime = 0;
+            state.transactionStatisticsFilter.endTime = 0;
             state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
             state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             state.transactionStatistics = {};
@@ -794,6 +796,12 @@ const stores = {
             state.transactionStatistics = statistics;
         },
         [INIT_TRANSACTION_STATISTICS_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionStatisticsFilter.dateType = filter.dateType;
+            } else {
+                state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+            }
+
             if (filter && utils.isNumber(filter.startTime)) {
                 state.transactionStatisticsFilter.startTime = filter.startTime;
             } else {
@@ -819,6 +827,10 @@ const stores = {
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
+            if (filter && utils.isNumber(filter.dateType)) {
+                state.transactionStatisticsFilter.dateType = filter.dateType;
+            }
+
             if (filter && utils.isNumber(filter.startTime)) {
                 state.transactionStatisticsFilter.startTime = filter.startTime;
             }

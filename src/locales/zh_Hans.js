@@ -10,9 +10,11 @@ export default {
     'format': {
         'date': {
             'long': 'YYYY年MM月DD日',
+            'short': 'YYYY-M-D',
             'year': 'YYYY年',
             'yearMonth': 'YYYY年M月',
-            'monthDay': 'M月D日'
+            'monthDay': 'M月D日',
+            'shortMonthDay': 'M-D'
         },
         'datetime': {
             'long': 'YYYY年MM月DD日 HH:mm:ss',

@@ -28,13 +28,13 @@
         </f7-card>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link>
+            <f7-link @click="backwardDateRange(query.startTime, query.endTime)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query | dateRange }}</span>
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link>
+            <f7-link @click="forwardDateRange(query.startTime, query.endTime)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
@@ -44,6 +44,32 @@
                 <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
             </f7-link>
         </f7-toolbar>
+
+        <f7-popover class="date-popover-menu" :opened="showDatePopover"
+                    @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
+            <f7-list>
+                <f7-list-item v-for="dateRange in allDateRanges"
+                              :key="dateRange.type"
+                              :title="dateRange.name | localized"
+                              @click="setDateFilter(dateRange.type)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                    <div slot="footer"
+                         v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.startTime && query.endTime">
+                        <span>{{ query.startTime | moment($t('format.datetime.long-without-second')) }}</span>
+                        <span>&nbsp;-&nbsp;</span>
+                        <br/>
+                        <span>{{ query.endTime | moment($t('format.datetime.long-without-second')) }}</span>
+                    </div>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
+        <date-range-selection-sheet :title="$t('Custom Date Range')"
+                                    :show.sync="showCustomDateRangeSheet"
+                                    :min-time="query.startTime"
+                                    :max-time="query.endTime"
+                                    @dateRange:change="setCustomDateFilter">
+        </date-range-selection-sheet>
     </f7-page>
 </template>
 
@@ -52,7 +78,9 @@ export default {
     data() {
         return {
             loading: true,
-            showChartDataTypePopover: false
+            showChartDataTypePopover: false,
+            showDatePopover: false,
+            showCustomDateRangeSheet: false
         };
     },
     computed: {
@@ -97,6 +125,9 @@ export default {
                     name: 'Income By Secondary Category'
                 },
             ];
+        },
+        allDateRanges() {
+            return this.$constants.datetime.allDateRanges;
         },
         statisticsData() {
             const self = this;
@@ -302,14 +333,13 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        if (self.query.startTime < 0 || self.query.endTime < 0) {
-            const dateParam = self.$utilities.getDateRangeByDateType(self.$constants.datetime.allDateRanges.ThisMonth.type);
+        const dateParam = self.$utilities.getDateRangeByDateType(self.query.dateType);
 
-            self.$store.dispatch('updateTransactionStatisticsFilter', {
-                startTime: dateParam.minTime,
-                endTime: dateParam.maxTime
-            });
-        }
+        self.$store.dispatch('initTransactionStatisticsFilter', {
+            dateType: dateParam ? dateParam.dateType : undefined,
+            startTime: dateParam ? dateParam.minTime : undefined,
+            endTime: dateParam ? dateParam.maxTime : undefined,
+        });
 
         Promise.all([
             self.$store.dispatch('loadAllAccounts', { force: false }),
@@ -359,6 +389,88 @@ export default {
                 chartDataType: chartDataType
             });
             this.showChartDataTypePopover = false;
+        },
+        setDateFilter(dateType) {
+            if (dateType === this.$constants.datetime.allDateRanges.Custom.type) { // Custom
+                this.showCustomDateRangeSheet = true;
+                this.showDatePopover = false;
+                return;
+            } else if (this.query.dateType === dateType) {
+                return;
+            }
+
+            const dateParam = this.$utilities.getDateRangeByDateType(dateType);
+
+            if (!dateParam) {
+                return;
+            }
+
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                dateType: dateParam.dateType,
+                startTime: dateParam.minTime,
+                endTime: dateParam.maxTime
+            });
+
+            this.showDatePopover = false;
+            this.reload(null);
+        },
+        setCustomDateFilter(startTime, endTime) {
+            if (!startTime || !endTime) {
+                return;
+            }
+
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                dateType: this.$constants.datetime.allDateRanges.Custom.type,
+                startTime: startTime,
+                endTime: endTime
+            });
+
+            this.showCustomDateRangeSheet = false;
+
+            this.reload(null);
+        },
+        backwardDateRange(startTime, endTime) {
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                dateType: this.$constants.datetime.allDateRanges.Custom.type,
+                startTime: startTime - (endTime - startTime),
+                endTime: startTime - 1
+            });
+
+            this.reload(null);
+        },
+        forwardDateRange(startTime, endTime) {
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                dateType: this.$constants.datetime.allDateRanges.Custom.type,
+                startTime: endTime + 1,
+                endTime: endTime + (endTime - startTime)
+            });
+
+            this.reload(null);
+        },
+        dateRangeName(query) {
+            if (query.dateType === this.allDateRanges.All.type) {
+                return this.$t(this.allDateRanges.All.name);
+            }
+
+            for (let dateRangeField in this.allDateRanges) {
+                if (!Object.prototype.hasOwnProperty.call(this.allDateRanges, dateRangeField)) {
+                    continue;
+                }
+
+                const dateRange = this.allDateRanges[dateRangeField];
+
+                if (dateRange && dateRange.type !== this.allDateRanges.Custom.type && dateRange.type === query.dateType && dateRange.name) {
+                    return this.$t(dateRange.name);
+                }
+            }
+
+            const startTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.startTime));
+            const endTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.endTime));
+
+            const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$t('format.date.short'));
+            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t(startTimeYear !== endTimeYear ? 'format.date.short' : 'format.date.shortMonthDay'));
+
+            return `${displayStartTime} ~ ${displayEndTime}`;
         },
         skeletonChart() {
             const skeletonChartData = {
@@ -428,9 +540,6 @@ export default {
             }
 
             return 'Statistics';
-        },
-        dateRange() {
-            return 'Date';
         }
     }
 };

@@ -2,11 +2,24 @@
     <f7-page>
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Statistics')"></f7-nav-title>
-            <f7-nav-right>
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-            </f7-nav-right>
+            <f7-nav-title>
+                <f7-link popover-open=".chart-data-type-popover-menu">
+                    <span>{{ query.chartDataType | chartDataTypeName(allChartDataTypes) | localized }}</span>
+                    <f7-icon size="14px" :f7="showChartDataTypePopover ? 'arrowtriangle_up_fill' : 'arrowtriangle_down_fill'"></f7-icon>
+                </f7-link>
+            </f7-nav-title>
         </f7-navbar>
+
+        <f7-popover class="chart-data-type-popover-menu" :opened="showChartDataTypePopover"
+                    @popover:open="showChartDataTypePopover = true" @popover:close="showChartDataTypePopover = false">
+            <f7-list>
+                <f7-list-item
+                    v-for="dataType in allChartDataTypes" :key="dataType.type"
+                    :title="$t(dataType.name)" @click="setChartDataType(dataType.type)">
+                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
 
         <f7-card>
             <f7-card-content class="no-safe-areas chart-container" :padding="false">
@@ -31,22 +44,6 @@
                 <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
             </f7-link>
         </f7-toolbar>
-
-        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
-            <f7-actions-group>
-                <f7-actions-label>{{ $t('Expense Chart') }}</f7-actions-label>
-                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.ExpenseByAccount)">{{ $t('Expense By Account') }}</f7-actions-button>
-                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory)">{{ $t('Expense By Secondary Category') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group>
-                <f7-actions-label>{{ $t('Income Chart') }}</f7-actions-label>
-                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.IncomeByAccount)">{{ $t('Income By Account') }}</f7-actions-button>
-                <f7-actions-button @click="setChartDataType($constants.statistics.allChartDataTypes.IncomeBySecondaryCategory)">{{ $t('Income By Secondary Category') }}</f7-actions-button>
-            </f7-actions-group>
-            <f7-actions-group>
-                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
-            </f7-actions-group>
-        </f7-actions>
     </f7-page>
 </template>
 
@@ -55,7 +52,7 @@ export default {
     data() {
         return {
             loading: true,
-            showMoreActionSheet: false
+            showChartDataTypePopover: false
         };
     },
     computed: {
@@ -73,22 +70,44 @@ export default {
         query() {
             return this.$store.state.transactionStatisticsFilter;
         },
-        chartData() {
+        allChartDataTypes() {
+            return [
+                {
+                    type: this.$constants.statistics.allChartDataTypes.ExpenseByAccount,
+                    name: 'Expense By Account'
+                },
+                {
+                    type: this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory,
+                    name: 'Expense By Primary Category'
+                },
+                {
+                    type: this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory,
+                    name: 'Expense By Secondary Category'
+                },
+                {
+                    type: this.$constants.statistics.allChartDataTypes.IncomeByAccount,
+                    name: 'Income By Account'
+                },
+                {
+                    type: this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory,
+                    name: 'Income By Primary Category'
+                },
+                {
+                    type: this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory,
+                    name: 'Income By Secondary Category'
+                },
+            ];
+        },
+        statisticsData() {
             const self = this;
-
-            if (!self.$store.state.transactionStatistics ||
-                !self.$store.state.transactionStatistics.items ||
-                !self.$store.state.transactionStatistics.items.length) {
-                return self.skeletonChart();
-            }
-
             const combinedData = {};
-            const allData = [];
+
+            let allAmount = 0;
 
             for (let i = 0; i < self.$store.state.transactionStatistics.items.length; i++) {
                 const item = self.$store.state.transactionStatistics.items[i];
 
-                if (!item.account || !item.category) {
+                if (!item.account || !item.primaryCategory || !item.category) {
                     continue;
                 }
 
@@ -111,59 +130,102 @@ export default {
                 if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount ||
                     self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount) {
                     if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = combinedData[item.account.name];
+                        let data = combinedData[item.account.id];
 
                         if (data) {
                             data.totalAmount += item.amountInDefaultCurrency;
                         } else {
                             data = {
-                                totalAmount: item.amountInDefaultCurrency,
-                                color: item.account.color || self.$constants.colors.defaultAccountColor
+                                name: item.account.name,
+                                icon: item.account.icon || self.$constants.icons.defaultAccountIcon.icon,
+                                color: item.account.color || self.$constants.colors.defaultAccountColor,
+                                totalAmount: item.amountInDefaultCurrency
                             }
                         }
 
-                        combinedData[item.account.name] = data;
+                        allAmount += item.amountInDefaultCurrency;
+                        combinedData[item.account.id] = data;
+                    }
+                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory ||
+                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory) {
+                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = combinedData[item.primaryCategory.id];
+
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
+                        } else {
+                            data = {
+                                name: item.primaryCategory.name,
+                                icon: item.account.icon || self.$constants.icons.defaultCategoryIcon.icon,
+                                color: item.primaryCategory.color || self.$constants.colors.defaultCategoryColor,
+                                totalAmount: item.amountInDefaultCurrency
+                            }
+                        }
+
+                        allAmount += item.amountInDefaultCurrency;
+                        combinedData[item.primaryCategory.id] = data;
                     }
                 } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory ||
                     self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory) {
                     if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = combinedData[item.category.name];
+                        let data = combinedData[item.category.id];
 
                         if (data) {
                             data.totalAmount += item.amountInDefaultCurrency;
                         } else {
                             data = {
-                                totalAmount: item.amountInDefaultCurrency,
-                                color: item.category.color || self.$constants.colors.defaultCategoryColor
+                                name: item.category.name,
+                                icon: item.account.icon || self.$constants.icons.defaultCategoryIcon.icon,
+                                color: item.category.color || self.$constants.colors.defaultCategoryColor,
+                                totalAmount: item.amountInDefaultCurrency
                             }
                         }
 
-                        combinedData[item.category.name] = data;
+                        allAmount += item.amountInDefaultCurrency;
+                        combinedData[item.category.id] = data;
                     }
                 }
             }
 
-            for (let legendName in combinedData) {
-                if (!Object.prototype.hasOwnProperty.call(combinedData, legendName)) {
+            const allStatisticsData = [];
+
+            for (let id in combinedData) {
+                if (!Object.prototype.hasOwnProperty.call(combinedData, id)) {
                     continue;
                 }
 
-                const totalAmount = Math.floor(combinedData[legendName].totalAmount) / 100;
+                const data = combinedData[id];
+                data.percent = data.totalAmount * 100 / allAmount;
 
-                const data = {
-                    name: legendName,
-                    value: totalAmount,
-                    itemStyle: {
-                        color: `#${combinedData[legendName].color}`
-                    }
-                };
-
-                allData.push(data);
+                allStatisticsData.push(data);
             }
 
-            if (self.query.chartType === self.$constants.statistics.allChartTypes.Bar) {
-                allData.sort(function (data1, data2) {
-                    return data1.value - data2.value;
+            allStatisticsData.sort(function (data1, data2) {
+                return data1.totalAmount - data2.totalAmount;
+            });
+
+            return allStatisticsData;
+        },
+        chartData() {
+            const self = this;
+
+            if (!self.$store.state.transactionStatistics ||
+                !self.$store.state.transactionStatistics.items ||
+                !self.$store.state.transactionStatistics.items.length) {
+                return self.skeletonChart();
+            }
+
+            const allData = [];
+
+            for (let i = 0; i < this.statisticsData.length; i++) {
+                const data = this.statisticsData[i];
+
+                allData.push({
+                    name: data.name,
+                    value: data.totalAmount / 100,
+                    itemStyle: {
+                        color: `#${data.color}`
+                    }
                 });
             }
 
@@ -296,6 +358,7 @@ export default {
             this.$store.dispatch('updateTransactionStatisticsFilter', {
                 chartDataType: chartDataType
             });
+            this.showChartDataTypePopover = false;
         },
         skeletonChart() {
             const skeletonChartData = {
@@ -357,6 +420,15 @@ export default {
         }
     },
     filters: {
+        chartDataTypeName(dataType, allChartDataTypes) {
+            for (let i = 0; i < allChartDataTypes.length; i++) {
+                if (allChartDataTypes[i].type === dataType) {
+                    return allChartDataTypes[i].name;
+                }
+            }
+
+            return 'Statistics';
+        },
         dateRange() {
             return 'Date';
         }

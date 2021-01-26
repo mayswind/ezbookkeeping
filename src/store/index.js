@@ -771,8 +771,18 @@ const stores = {
                         item.category = state.allTransactionCategoriesMap[item.categoryId];
                     }
 
+                    if (item.category && item.category.parentId !== '0') {
+                        item.primaryCategory = state.allTransactionCategoriesMap[item.category.parentId];
+                    } else {
+                        item.primaryCategory = item.category;
+                    }
+
                     if (item.account && item.account.currency !== defaultCurrency) {
-                        item.amountInDefaultCurrency = getExchangedAmount(state)(item.amount, item.account.currency, defaultCurrency);
+                        const amount = getExchangedAmount(state)(item.amount, item.account.currency, defaultCurrency);
+
+                        if (utils.isNumber(amount)) {
+                            item.amountInDefaultCurrency = Math.floor(amount);
+                        }
                     } else if (item.account && item.account.currency === defaultCurrency) {
                         item.amountInDefaultCurrency = item.amount;
                     } else {

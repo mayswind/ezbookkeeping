@@ -14,7 +14,7 @@ const allChartDataTypes = {
     IncomeBySecondaryCategory: 5
 };
 
-const defaultChartDataType = allChartDataTypes.ExpenseBySecondaryCategory;
+const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory;
 
 export default {
     allChartTypes: allChartTypes,

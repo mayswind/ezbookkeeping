@@ -21,9 +21,114 @@
             </f7-list>
         </f7-popover>
 
-        <f7-card>
+        <f7-card v-if="query.chartType === $constants.statistics.allChartTypes.Pie">
             <f7-card-content class="no-safe-areas chart-container" :padding="false">
                 <v-chart :options="chartData" v-if="chartData" />
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-else-if="query.chartType === $constants.statistics.allChartTypes.Bar">
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list class="statistics-list-item skeleton-text" v-if="loading">
+                    <f7-list-item link="#">
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex align-items-center statistics-icon">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+
+                        <div slot="title">
+                            <span>Category Name 1</span>
+                            <small class="statistics-percent">33.33</small>
+                        </div>
+
+                        <div slot="after">
+                            <span>0.00 USD</span>
+                        </div>
+
+                        <div slot="inner-end" class="statistics-item-end">
+                            <div class="statistics-percent-line">
+                                <f7-progressbar></f7-progressbar>
+                            </div>
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item link="#">
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex align-items-center statistics-icon">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+
+                        <div slot="title">
+                            <span>Category Name 2</span>
+                            <small class="statistics-percent">33.33</small>
+                        </div>
+
+                        <div slot="after">
+                            <span>0.00 USD</span>
+                        </div>
+
+                        <div slot="inner-end" class="statistics-item-end">
+                            <div class="statistics-percent-line">
+                                <f7-progressbar></f7-progressbar>
+                            </div>
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item link="#">
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex align-items-center statistics-icon">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+
+                        <div slot="title">
+                            <span>Category Name 3</span>
+                            <small class="statistics-percent">33.33</small>
+                        </div>
+
+                        <div slot="after">
+                            <span>0.00 USD</span>
+                        </div>
+
+                        <div slot="inner-end" class="statistics-item-end">
+                            <div class="statistics-percent-line">
+                                <f7-progressbar></f7-progressbar>
+                            </div>
+                        </div>
+                    </f7-list-item>
+                </f7-list>
+                <f7-list v-else-if="!loading">
+                    <f7-list-item v-for="(data, idx) in statisticsData" :key="idx"
+                                  class="statistics-list-item"
+                                  :link="`/transaction/list?${data.type}Id=${data.id}`">
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex align-items-center statistics-icon">
+                                <f7-icon v-if="data.icon"
+                                         :icon="data.icon | icon(data.type)"
+                                         :style="data.color | iconStyle(data.type, 'var(--category-icon-color)')">
+                                </f7-icon>
+                                <f7-icon v-else-if="!data.icon"
+                                         f7="pencil_ellipsis_rectangle">
+                                </f7-icon>
+                            </div>
+                        </div>
+
+                        <div slot="title">
+                            <span>{{ data.name }}</span>
+                            <small class="statistics-percent">{{ data.percent | percent(2, '&lt;0.01') }}</small>
+                        </div>
+
+                        <div slot="after">
+                            <span>{{ data.totalAmount | currency(defaultCurrency) }}</span>
+                        </div>
+
+                        <div slot="inner-end" class="statistics-item-end">
+                            <div class="statistics-percent-line">
+                                <f7-progressbar :progress="data.percent"></f7-progressbar>
+                            </div>
+                        </div>
+                    </f7-list-item>
+                </f7-list>
             </f7-card-content>
         </f7-card>
 
@@ -168,6 +273,8 @@ export default {
                         } else {
                             data = {
                                 name: item.account.name,
+                                type: 'account',
+                                id: item.account.id,
                                 icon: item.account.icon || self.$constants.icons.defaultAccountIcon.icon,
                                 color: item.account.color || self.$constants.colors.defaultAccountColor,
                                 totalAmount: item.amountInDefaultCurrency
@@ -187,7 +294,9 @@ export default {
                         } else {
                             data = {
                                 name: item.primaryCategory.name,
-                                icon: item.account.icon || self.$constants.icons.defaultCategoryIcon.icon,
+                                type: 'category',
+                                id: item.primaryCategory.id,
+                                icon: item.primaryCategory.icon || self.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.primaryCategory.color || self.$constants.colors.defaultCategoryColor,
                                 totalAmount: item.amountInDefaultCurrency
                             }
@@ -206,7 +315,9 @@ export default {
                         } else {
                             data = {
                                 name: item.category.name,
-                                icon: item.account.icon || self.$constants.icons.defaultCategoryIcon.icon,
+                                type: 'category',
+                                id: item.category.id,
+                                icon: item.category.icon || self.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.category.color || self.$constants.colors.defaultCategoryColor,
                                 totalAmount: item.amountInDefaultCurrency
                             }
@@ -232,7 +343,7 @@ export default {
             }
 
             allStatisticsData.sort(function (data1, data2) {
-                return data1.totalAmount - data2.totalAmount;
+                return data2.totalAmount - data1.totalAmount;
             });
 
             return allStatisticsData;
@@ -546,6 +657,39 @@ export default {
 </script>
 
 <style>
+.statistics-list-item .item-content {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+.statistics-list-item .item-inner:after {
+    background-color: transparent;
+}
+
+.statistics-icon {
+    margin-bottom: -2px;
+}
+
+.statistics-percent {
+    font-size: 0.7em;
+    opacity: 0.6;
+    margin-left: 6px;
+}
+
+.statistics-item-end {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.statistics-percent-line {
+    margin-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
+}
+
+.statistics-percent-line .progressbar {
+    height: 4px;
+    background: #f8f8f8;
+}
+
 .chart-container {
     height: 400px;
 }

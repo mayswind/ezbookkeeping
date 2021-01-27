@@ -626,6 +626,8 @@ export default {
     'No transaction data': '没有交易数据',
     'Are you sure you want to delete this transaction?': '您确定要删除该交易？',
     'Unable to delete this transaction': '无法删除该交易',
+    'Total Expense': '总支出',
+    'Total Income': '总收入',
     'Expense Chart': '支出图表',
     'Expense By Account': '账号支出',
     'Expense By Primary Category': '一级分类支出',

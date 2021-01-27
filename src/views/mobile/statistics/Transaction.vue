@@ -97,8 +97,19 @@
                         </div>
                     </f7-list-item>
                 </f7-list>
-                <f7-list v-else-if="!loading">
-                    <f7-list-item v-for="(data, idx) in statisticsData" :key="idx"
+                <f7-list v-else-if="!loading && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
+                    <f7-list-item :title="$t('No transaction data')"></f7-list-item>
+                </f7-list>
+                <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
+                    <f7-list-item class="statistics-list-item-overview">
+                        <div slot="header" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory">{{ $t('Total Expense') }}</div>
+                        <div slot="header" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory">{{ $t('Total Income') }}</div>
+                        <div slot="title"
+                             :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory, 'text-color-red': query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory }">
+                            {{ statisticsData.totalAmount | currency(defaultCurrency) }}
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item v-for="(data, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"
                                   :link="`/transaction/list?${data.type}Id=${data.id}`">
                         <div slot="media" class="display-flex no-padding-horizontal">
@@ -329,7 +340,7 @@ export default {
                 }
             }
 
-            const allStatisticsData = [];
+            const allStatisticsItems = [];
 
             for (let id in combinedData) {
                 if (!Object.prototype.hasOwnProperty.call(combinedData, id)) {
@@ -339,14 +350,17 @@ export default {
                 const data = combinedData[id];
                 data.percent = data.totalAmount * 100 / allAmount;
 
-                allStatisticsData.push(data);
+                allStatisticsItems.push(data);
             }
 
-            allStatisticsData.sort(function (data1, data2) {
+            allStatisticsItems.sort(function (data1, data2) {
                 return data2.totalAmount - data1.totalAmount;
             });
 
-            return allStatisticsData;
+            return {
+                totalAmount: allAmount,
+                items: allStatisticsItems
+            };
         },
         chartData() {
             const self = this;
@@ -359,8 +373,8 @@ export default {
 
             const allData = [];
 
-            for (let i = 0; i < this.statisticsData.length; i++) {
-                const data = this.statisticsData[i];
+            for (let i = 0; i < this.statisticsData.items.length; i++) {
+                const data = this.statisticsData.items[i];
 
                 allData.push({
                     name: data.name,
@@ -657,11 +671,22 @@ export default {
 </script>
 
 <style>
+.statistics-list-item-overview {
+    padding-top: 12px;
+    margin-bottom: 6px;
+}
+
+.statistics-list-item-overview-amount {
+    margin-top: 2px;
+    font-size: 1.5em;
+}
+
 .statistics-list-item .item-content {
     margin-top: 8px;
     margin-bottom: 12px;
 }
-.statistics-list-item .item-inner:after {
+
+.statistics-list-item-overview .item-inner:after, .statistics-list-item .item-inner:after {
     background-color: transparent;
 }
 

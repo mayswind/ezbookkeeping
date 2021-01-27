@@ -626,6 +626,8 @@ export default {
     'No transaction data': 'No transaction data',
     'Are you sure you want to delete this transaction?': 'Are you sure you want to delete this transaction?',
     'Unable to delete this transaction': 'Unable to delete this transaction',
+    'Total Expense': 'Total Expense',
+    'Total Income': 'Total Income',
     'Expense Chart': 'Expense Chart',
     'Expense By Account': 'Expense By Account',
     'Expense By Primary Category': 'Expense By Primary Category',

@@ -458,12 +458,12 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        const dateParam = self.$utilities.getDateRangeByDateType(self.query.dateType);
+        const dateRange = self.$utilities.getDateRangeByDateType(self.query.dateType);
 
         self.$store.dispatch('initTransactionStatisticsFilter', {
-            dateType: dateParam ? dateParam.dateType : undefined,
-            startTime: dateParam ? dateParam.minTime : undefined,
-            endTime: dateParam ? dateParam.maxTime : undefined,
+            dateType: dateRange ? dateRange.dateType : undefined,
+            startTime: dateRange ? dateRange.minTime : undefined,
+            endTime: dateRange ? dateRange.maxTime : undefined,
         });
 
         Promise.all([
@@ -524,16 +524,16 @@ export default {
                 return;
             }
 
-            const dateParam = this.$utilities.getDateRangeByDateType(dateType);
+            const dateRange = this.$utilities.getDateRangeByDateType(dateType);
 
-            if (!dateParam) {
+            if (!dateRange) {
                 return;
             }
 
             this.$store.dispatch('updateTransactionStatisticsFilter', {
-                dateType: dateParam.dateType,
-                startTime: dateParam.minTime,
-                endTime: dateParam.maxTime
+                dateType: dateRange.dateType,
+                startTime: dateRange.minTime,
+                endTime: dateRange.maxTime
             });
 
             this.showDatePopover = false;
@@ -559,7 +559,7 @@ export default {
                 return;
             }
 
-            const newDateRange = this.$utilities.getShiftedtDateRange(startTime, endTime, scale);
+            const newDateRange = this.$utilities.getShiftedDateRange(startTime, endTime, scale);
             let newDateType = this.$constants.datetime.allDateRanges.Custom.type;
 
             for (let dateRangeField in this.$constants.datetime.allDateRanges) {

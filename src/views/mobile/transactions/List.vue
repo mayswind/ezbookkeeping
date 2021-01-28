@@ -396,12 +396,12 @@ export default {
         const self = this;
         const query = self.$f7route.query;
 
-        let dateParam = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+        let dateRange = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
 
-        if (!dateParam &&
+        if (!dateRange &&
             query.dateType === self.$constants.datetime.allDateRanges.Custom.type.toString() &&
             parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
-            dateParam = {
+            dateRange = {
                 dateType: parseInt(query.dateType),
                 maxTime: parseInt(query.maxTime),
                 minTime: parseInt(query.minTime)
@@ -409,9 +409,9 @@ export default {
         }
 
         this.$store.dispatch('initTransactionListFilter', {
-            dateType: dateParam ? dateParam.dateType : undefined,
-            maxTime: dateParam ? dateParam.maxTime : undefined,
-            minTime: dateParam ? dateParam.minTime : undefined,
+            dateType: dateRange ? dateRange.dateType : undefined,
+            maxTime: dateRange ? dateRange.maxTime : undefined,
+            minTime: dateRange ? dateRange.minTime : undefined,
             type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
             categoryId: query.categoryId,
             accountId: query.accountId
@@ -506,16 +506,16 @@ export default {
                 return;
             }
 
-            const dateParam = this.$utilities.getDateRangeByDateType(dateType);
+            const dateRange = this.$utilities.getDateRangeByDateType(dateType);
 
-            if (!dateParam) {
+            if (!dateRange) {
                 return;
             }
 
             this.$store.dispatch('updateTransactionListFilter', {
-                dateType: dateParam.dateType,
-                maxTime: dateParam.maxTime,
-                minTime: dateParam.minTime
+                dateType: dateRange.dateType,
+                maxTime: dateRange.maxTime,
+                minTime: dateRange.minTime
             });
 
             this.showDatePopover = false;

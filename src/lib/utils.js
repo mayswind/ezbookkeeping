@@ -137,7 +137,7 @@ function getThisYearLastUnixTime() {
     return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
 }
 
-function getShiftedtDateRange(minTime, maxTime, scale) {
+function getShiftedDateRange(minTime, maxTime, scale) {
     const minDateTime = parseDateFromUnixTime(minTime);
     const maxDateTime = parseDateFromUnixTime(maxTime);
 
@@ -548,7 +548,7 @@ export default {
     getThisMonthLastUnixTime,
     getThisYearFirstUnixTime,
     getThisYearLastUnixTime,
-    getShiftedtDateRange,
+    getShiftedDateRange,
     getDateRangeByDateType,
     copyObjectTo,
     copyArrayTo,

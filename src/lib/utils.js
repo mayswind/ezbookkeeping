@@ -138,18 +138,20 @@ function getThisYearLastUnixTime() {
 }
 
 function getShiftedDateRange(minTime, maxTime, scale) {
-    const minDateTime = parseDateFromUnixTime(minTime);
-    const maxDateTime = parseDateFromUnixTime(maxTime);
+    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
 
-    const isFirstTimeOfDay = getHour(minDateTime) === 0 && getMinute(minDateTime) === 0;
-    const isLastTimeOfDay = getHour(maxDateTime) === 23 && getMinute(maxDateTime) === 59;
+    const firstDayOfMonth = minDateTime.clone().startOf('month');
+    const lastDayOfMonth = maxDateTime.clone().endOf('month');
 
-    if (!isFirstTimeOfDay || !isLastTimeOfDay) {
-        const range = (maxTime - minTime + 1) * scale;
+    if (firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix()) {
+        const months = getMonth(maxDateTime) - getMonth(minDateTime) + 1;
+        const newMinDateTime = minDateTime.add(months * scale, 'months');
+        const newMaxDateTime = newMinDateTime.clone().add(months, 'months').subtract(1, 'seconds');
 
         return {
-            minTime: minTime + range,
-            maxTime: maxTime + range
+            minTime: newMinDateTime.unix(),
+            maxTime: newMaxDateTime.unix()
         };
     }
 

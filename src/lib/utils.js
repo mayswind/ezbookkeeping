@@ -77,6 +77,18 @@ function getDayOfWeek(date) {
     return moment(date).format('dddd');
 }
 
+function getHour(date) {
+    return moment(date).hour();
+}
+
+function getMinute(date) {
+    return moment(date).minute();
+}
+
+function getSecond(date) {
+    return moment(date).second();
+}
+
 function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {
     return moment.unix(unixTime).subtract(amount, unit).unix();
 }
@@ -123,6 +135,30 @@ function getThisYearFirstUnixTime() {
 
 function getThisYearLastUnixTime() {
     return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
+}
+
+function getShiftedtDateRange(minTime, maxTime, scale) {
+    const minDateTime = parseDateFromUnixTime(minTime);
+    const maxDateTime = parseDateFromUnixTime(maxTime);
+
+    const isFirstTimeOfDay = getHour(minDateTime) === 0 && getMinute(minDateTime) === 0;
+    const isLastTimeOfDay = getHour(maxDateTime) === 23 && getMinute(maxDateTime) === 59;
+
+    if (!isFirstTimeOfDay || !isLastTimeOfDay) {
+        const range = (maxTime - minTime + 1) * scale;
+
+        return {
+            minTime: minTime + range,
+            maxTime: maxTime + range
+        };
+    }
+
+    const range = (maxTime - minTime + 1) * scale;
+
+    return {
+        minTime: minTime + range,
+        maxTime: maxTime + range
+    };
 }
 
 function getDateRangeByDateType(dateType) {
@@ -498,6 +534,9 @@ export default {
     getYearAndMonth,
     getDay,
     getDayOfWeek,
+    getHour,
+    getMinute,
+    getSecond,
     getUnixTimeBeforeUnixTime,
     getMinuteFirstUnixTime,
     getMinuteLastUnixTime,
@@ -509,6 +548,7 @@ export default {
     getThisMonthLastUnixTime,
     getThisYearFirstUnixTime,
     getThisYearLastUnixTime,
+    getShiftedtDateRange,
     getDateRangeByDateType,
     copyObjectTo,
     copyArrayTo,

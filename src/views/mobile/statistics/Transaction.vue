@@ -144,13 +144,13 @@
         </f7-card>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link @click="backwardDateRange(query.startTime, query.endTime)">
+            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link @click="forwardDateRange(query.startTime, query.endTime)">
+            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
@@ -554,20 +554,32 @@ export default {
 
             this.reload(null);
         },
-        backwardDateRange(startTime, endTime) {
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
-                dateType: this.$constants.datetime.allDateRanges.Custom.type,
-                startTime: startTime - (endTime - startTime),
-                endTime: startTime - 1
-            });
+        shiftDateRange(startTime, endTime, scale) {
+            if (this.query.dateType === this.$constants.datetime.allDateRanges.All.type) {
+                return;
+            }
 
-            this.reload(null);
-        },
-        forwardDateRange(startTime, endTime) {
+            const newDateRange = this.$utilities.getShiftedtDateRange(startTime, endTime, scale);
+            let newDateType = this.$constants.datetime.allDateRanges.Custom.type;
+
+            for (let dateRangeField in this.$constants.datetime.allDateRanges) {
+                if (!Object.prototype.hasOwnProperty.call(this.$constants.datetime.allDateRanges, dateRangeField)) {
+                    continue;
+                }
+
+                const dateRangeType = this.$constants.datetime.allDateRanges[dateRangeField];
+                const dateRange = this.$utilities.getDateRangeByDateType(dateRangeType.type);
+
+                if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
+                    newDateType = dateRangeType.type;
+                    break;
+                }
+            }
+
             this.$store.dispatch('updateTransactionStatisticsFilter', {
-                dateType: this.$constants.datetime.allDateRanges.Custom.type,
-                startTime: endTime + 1,
-                endTime: endTime + (endTime - startTime)
+                dateType: newDateType,
+                startTime: newDateRange.minTime,
+                endTime: newDateRange.maxTime
             });
 
             this.reload(null);

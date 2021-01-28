@@ -111,7 +111,7 @@
                     </f7-list-item>
                     <f7-list-item v-for="(data, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"
-                                  :link="`/transaction/list?${data.type}Id=${data.id}`">
+                                  :link="data | itemLinkUrl(query, $constants.statistics.allChartDataTypes)">
                         <div slot="media" class="display-flex no-padding-horizontal">
                             <div class="display-flex align-items-center statistics-icon">
                                 <f7-icon v-if="data.icon"
@@ -665,6 +665,27 @@ export default {
             }
 
             return 'Statistics';
+        },
+        itemLinkUrl(item, query, allChartDataTypes) {
+            const querys = [];
+
+            if (query.chartDataType === allChartDataTypes.IncomeByAccount || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory) {
+                querys.push('type=2');
+            } else if (query.chartDataType === allChartDataTypes.ExpenseByAccount || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory) {
+                querys.push('type=3');
+            }
+
+            if (query.chartDataType === allChartDataTypes.IncomeByAccount || query.chartDataType === allChartDataTypes.ExpenseByAccount) {
+                querys.push('accountId=' + item.id);
+            } else if (query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory) {
+                querys.push('categoryId=' + item.id);
+            }
+
+            querys.push('dateType=' + query.dateType);
+            querys.push('minTime=' + query.startTime);
+            querys.push('maxTime=' + query.endTime);
+
+            return '/transaction/list?' + querys.join('&');
         }
     }
 };

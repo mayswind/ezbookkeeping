@@ -396,13 +396,23 @@ export default {
         const self = this;
         const query = self.$f7route.query;
 
-        const dateParam = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+        let dateParam = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+
+        if (!dateParam &&
+            query.dateType === self.$constants.datetime.allDateRanges.Custom.type.toString() &&
+            parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
+            dateParam = {
+                dateType: parseInt(query.dateType),
+                maxTime: parseInt(query.maxTime),
+                minTime: parseInt(query.minTime)
+            };
+        }
 
         this.$store.dispatch('initTransactionListFilter', {
             dateType: dateParam ? dateParam.dateType : undefined,
             maxTime: dateParam ? dateParam.maxTime : undefined,
             minTime: dateParam ? dateParam.minTime : undefined,
-            type: query.type,
+            type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
             categoryId: query.categoryId,
             accountId: query.accountId
         });

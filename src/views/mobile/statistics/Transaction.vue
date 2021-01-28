@@ -135,7 +135,7 @@
 
                         <div slot="inner-end" class="statistics-item-end">
                             <div class="statistics-percent-line">
-                                <f7-progressbar :progress="data.percent"></f7-progressbar>
+                                <f7-progressbar :progress="data.percent" :style="{ '--f7-progressbar-progress-color': (data.color ? '#' + data.color : '') } "></f7-progressbar>
                             </div>
                         </div>
                     </f7-list-item>
@@ -712,7 +712,11 @@ export default {
 
 .statistics-percent-line .progressbar {
     height: 4px;
-    background: #f8f8f8;
+    --f7-progressbar-bg-color: #f8f8f8;
+}
+
+.theme-dark .statistics-percent-line .progressbar {
+    --f7-progressbar-bg-color: #161616;
 }
 
 .chart-container {

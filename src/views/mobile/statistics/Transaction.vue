@@ -126,7 +126,7 @@
 
                         <div slot="title">
                             <span>{{ data.name }}</span>
-                            <small class="statistics-percent">{{ data.percent | percent(2, '&lt;0.01') }}</small>
+                            <small class="statistics-percent" v-if="data.percent >= 0">{{ data.percent | percent(2, '&lt;0.01') }}</small>
                         </div>
 
                         <div slot="after">
@@ -135,7 +135,7 @@
 
                         <div slot="inner-end" class="statistics-item-end">
                             <div class="statistics-percent-line">
-                                <f7-progressbar :progress="data.percent" :style="{ '--f7-progressbar-progress-color': (data.color ? '#' + data.color : '') } "></f7-progressbar>
+                                <f7-progressbar :progress="data.percent >= 0 ? data.percent : 0" :style="{ '--f7-progressbar-progress-color': (data.color ? '#' + data.color : '') } "></f7-progressbar>
                             </div>
                         </div>
                     </f7-list-item>

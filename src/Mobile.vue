@@ -238,6 +238,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     color: rgba(255, 255, 255, 0.2);
 }
 
+.accordion-item.list-item-checked > .item-link > .item-content .item-title {
+    font-weight: bold;
+}
+
 .list .item-content .list-item-checked-icon {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));

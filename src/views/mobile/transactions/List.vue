@@ -282,10 +282,18 @@
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
                 </f7-list-item>
+            </f7-list>
+            <f7-list accordion-list
+                     class="no-margin-vertical"
+                     v-for="(categories, categoryType) in allPrimaryCategories"
+                     v-show="!query.type || parseInt(categoryType) === query.type - 1"
+                     :key="categoryType"
+            >
+                <f7-list-item divider :title="(parseInt(categoryType) + 1) | typeName('Type') | localized"></f7-list-item>
                 <f7-list-item accordion-item
-                              v-for="category in allPrimaryCategories"
-                              v-show="!query.type || category.type === query.type - 1"
+                              v-for="category in categories"
                               :key="category.id"
+                              :class="category | categoryListItemCheckedClass(query.categoryId)"
                               :title="category.name"
                 >
                     <f7-icon slot="media"
@@ -407,23 +415,7 @@ export default {
             return this.$store.state.allTransactionCategoriesMap;
         },
         allPrimaryCategories() {
-            const primaryCategories = [];
-
-            for (let categoryId in this.$store.state.allTransactionCategoriesMap) {
-                if (!Object.prototype.hasOwnProperty.call(this.$store.state.allTransactionCategoriesMap, categoryId)) {
-                    continue;
-                }
-
-                const category = this.$store.state.allTransactionCategoriesMap[categoryId];
-
-                if (category.parentId !== '0') {
-                    continue;
-                }
-
-                primaryCategories.push(category);
-            }
-
-            return primaryCategories;
+            return this.$store.state.allTransactionCategories;
         },
         allDateRanges() {
             return this.$constants.datetime.allDateRanges;
@@ -746,6 +738,23 @@ export default {
             }
 
             return defaultName;
+        },
+        categoryListItemCheckedClass(category, queryCategoryId) {
+            if (category.id === queryCategoryId) {
+                return {
+                    'list-item-checked': true
+                };
+            }
+
+            for (let i = 0; i < category.subCategories.length; i++) {
+                if (category.subCategories[i].id === queryCategoryId) {
+                    return {
+                        'list-item-checked': true
+                    };
+                }
+            }
+
+            return [];
         },
         income(value, incomplete) {
             return '+' + value + (incomplete ? '+' : '');

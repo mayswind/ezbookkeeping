@@ -277,26 +277,44 @@
 
         <f7-popover class="category-popover-menu" :opened="showCategoryPopover"
                     @popover:opened="showCategoryPopover = true" @popover:closed="showCategoryPopover = false">
-            <f7-list>
+            <f7-list accordion-list>
                 <f7-list-item :title="$t('All')" @click="changeCategoryFilter('0')">
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
                 </f7-list-item>
-                <f7-list-item v-for="category in allCategories"
-                              v-show="category.parentId > 0 && (!query.type || category.type === query.type - 1)"
+                <f7-list-item accordion-item
+                              v-for="category in allPrimaryCategories"
+                              v-show="!query.type || category.type === query.type - 1"
                               :key="category.id"
                               :title="category.name"
-                              @click="changeCategoryFilter(category.id)"
                 >
                     <f7-icon slot="media"
                              :icon="category.icon | categoryIcon"
                              :style="category.color | categoryIconStyle('var(--default-icon-color)')">
                     </f7-icon>
-                    <f7-icon slot="after"
-                             class="list-item-checked"
-                             f7="checkmark_alt"
-                             v-if="query.categoryId === category.id">
-                    </f7-icon>
+                    <f7-accordion-content>
+                        <f7-list class="padding-left">
+                            <f7-list-item :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                                <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
+                                <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
+                            </f7-list-item>
+                            <f7-list-item v-for="subCategory in category.subCategories"
+                                          :key="subCategory.id"
+                                          :title="subCategory.name"
+                                          @click="changeCategoryFilter(subCategory.id)"
+                            >
+                                <f7-icon slot="media"
+                                         :icon="subCategory.icon | categoryIcon"
+                                         :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
+                                </f7-icon>
+                                <f7-icon slot="after"
+                                         class="list-item-checked"
+                                         f7="checkmark_alt"
+                                         v-if="query.categoryId === subCategory.id">
+                                </f7-icon>
+                            </f7-list-item>
+                        </f7-list>
+                    </f7-accordion-content>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -387,6 +405,25 @@ export default {
         },
         allCategories() {
             return this.$store.state.allTransactionCategoriesMap;
+        },
+        allPrimaryCategories() {
+            const primaryCategories = [];
+
+            for (let categoryId in this.$store.state.allTransactionCategoriesMap) {
+                if (!Object.prototype.hasOwnProperty.call(this.$store.state.allTransactionCategoriesMap, categoryId)) {
+                    continue;
+                }
+
+                const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+
+                if (category.parentId !== '0') {
+                    continue;
+                }
+
+                primaryCategories.push(category);
+            }
+
+            return primaryCategories;
         },
         allDateRanges() {
             return this.$constants.datetime.allDateRanges;

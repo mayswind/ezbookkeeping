@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"xorm.io/xorm"
@@ -33,11 +34,11 @@ var (
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, 0, 0, "", count, noDuplicated)
+	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, nil, 0, "", count, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -76,9 +77,19 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 		}
 	}
 
-	if categoryId > 0 {
-		condition = condition + " AND category_id=?"
-		conditionParams = append(conditionParams, categoryId)
+	if len(categoryIds) > 0 {
+		var conditions strings.Builder
+
+		for i := 0; i < len(categoryIds); i++ {
+			if i > 0 {
+				conditions.WriteString(",")
+			}
+
+			conditions.WriteString("?")
+			conditionParams = append(conditionParams, categoryIds[i])
+		}
+
+		condition = condition + " AND category_id IN (" + conditions.String() + ")"
 	}
 
 	if accountId > 0 {
@@ -107,7 +118,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryId int64, accountId int64, keyword string, page int, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, page int, count int) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -162,9 +173,19 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 		}
 	}
 
-	if categoryId > 0 {
-		condition = condition + " AND category_id=?"
-		conditionParams = append(conditionParams, categoryId)
+	if len(categoryIds) > 0 {
+		var conditions strings.Builder
+
+		for i := 0; i < len(categoryIds); i++ {
+			if i > 0 {
+				conditions.WriteString(",")
+			}
+
+			conditions.WriteString("?")
+			conditionParams = append(conditionParams, categoryIds[i])
+		}
+
+		condition = condition + " AND category_id IN (" + conditions.String() + ")"
 	}
 
 	if accountId > 0 {

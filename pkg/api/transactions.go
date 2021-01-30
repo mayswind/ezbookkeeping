@@ -13,15 +13,17 @@ import (
 
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
-	transactions    *services.TransactionService
-	transactionTags *services.TransactionTagService
+	transactions          *services.TransactionService
+	transactionCategories *services.TransactionCategoryService
+	transactionTags       *services.TransactionTagService
 }
 
 // Initialize a transaction api singleton instance
 var (
 	Transactions = &TransactionsApi{
-		transactions:    services.Transactions,
-		transactionTags: services.TransactionTags,
+		transactions:          services.Transactions,
+		transactionCategories: services.TransactionCategories,
+		transactionTags:       services.TransactionTags,
 	}
 )
 
@@ -36,7 +38,26 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, transactionListReq.CategoryId, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Count+1, true)
+	var allCategoryIds []int64
+
+	if transactionListReq.CategoryId > 0 {
+		allSubCategories, err := a.transactionCategories.GetAllCategoriesByUid(uid, 0, transactionListReq.CategoryId)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get transaction category error, because %s", err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+
+		if len(allSubCategories) > 0 {
+			for i := 0; i < len(allSubCategories); i++ {
+				allCategoryIds = append(allCategoryIds, allSubCategories[i].CategoryId)
+			}
+		} else {
+			allCategoryIds = append(allCategoryIds, transactionListReq.CategoryId)
+		}
+	}
+
+	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Count+1, true)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
@@ -108,7 +129,26 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	}
 
 	uid := c.GetCurrentUid()
-	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, transactionListReq.CategoryId, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Page, transactionListReq.Count)
+	var allCategoryIds []int64
+
+	if transactionListReq.CategoryId > 0 {
+		allSubCategories, err := a.transactionCategories.GetAllCategoriesByUid(uid, 0, transactionListReq.CategoryId)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get transaction category error, because %s", err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+
+		if len(allSubCategories) > 0 {
+			for i := 0; i < len(allSubCategories); i++ {
+				allCategoryIds = append(allCategoryIds, allSubCategories[i].CategoryId)
+			}
+		} else {
+			allCategoryIds = append(allCategoryIds, transactionListReq.CategoryId)
+		}
+	}
+
+	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, transactionListReq.AccountId, transactionListReq.Keyword, transactionListReq.Page, transactionListReq.Count)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())

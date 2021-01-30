@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import VueI18n from 'vue-i18n';
-import ECharts from 'vue-echarts';
 import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
@@ -46,14 +45,6 @@ import 'framework7-icons';
 
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/grid';
-import 'echarts/lib/component/tooltip';
-
 import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
@@ -79,6 +70,7 @@ import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
 import iconFilter from './filters/icon.js';
 import iconStyleFilter from './filters/iconStyle.js';
+import defaultIconColorFilter from './filters/defaultIconColor.js';
 import accountIconFilter from './filters/accountIcon.js';
 import accountIconStyleFilter from './filters/accountIconStyle.js';
 import categoryIconFilter from './filters/categoryIcon.js';
@@ -86,6 +78,7 @@ import categoryIconStyleFilter from './filters/categoryIconStyle.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
 
+import PieChart from "./components/mobile/PieChart.vue";
 import PasswordInputSheet from "./components/mobile/PasswordInputSheet.vue";
 import PasscodeInputSheet from "./components/mobile/PasscodeInputSheet.vue";
 import PinCodeInputSheet from "./components/mobile/PinCodeInputSheet.vue";
@@ -136,8 +129,8 @@ Vue.use(VueI18n);
 Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
 
-Vue.component('v-chart', ECharts);
 Vue.component('PincodeInput', PincodeInput);
+Vue.component('PieChart', PieChart);
 Vue.component('PasswordInputSheet', PasswordInputSheet);
 Vue.component('PasscodeInputSheet', PasscodeInputSheet);
 Vue.component('PinCodeInputSheet', PinCodeInputSheet);
@@ -296,6 +289,7 @@ Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => it
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
 Vue.filter('iconStyle', (value, iconType, defaultColor) => iconStyleFilter(value, iconType, defaultColor));
+Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
 Vue.filter('accountIconStyle', (value, defaultColor) => accountIconStyleFilter(value, defaultColor));
 Vue.filter('categoryIcon', (value) => categoryIconFilter(value));

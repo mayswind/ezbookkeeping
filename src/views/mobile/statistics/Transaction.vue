@@ -22,8 +22,30 @@
         </f7-popover>
 
         <f7-card v-if="query.chartType === $constants.statistics.allChartTypes.Pie">
-            <f7-card-content class="no-safe-areas chart-container" :padding="false">
-                <v-chart :options="chartData" v-if="chartData" />
+            <f7-card-content class="pie-chart-container" :padding="false">
+                <pie-chart
+                    :items="[{value: 60, color: '7c7c7f'}, {value: 20, color: 'a5a5aa'}, {value: 20, color: 'c5c5c9'}]"
+                    :show-center-text="true"
+                    value-field="value"
+                    color-field="color"
+                    center-text-background="#cccccc"
+                    v-if="loading"
+                ></pie-chart>
+                <pie-chart
+                    :items="statisticsData.items"
+                    :min-valid-percent="0.0001"
+                    :show-center-text="true"
+                    name-field="name"
+                    value-field="totalAmount"
+                    color-field="color"
+                    v-else-if="!loading"
+                >
+                    <text class="statistics-pie-chart-total-amount-title" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory">{{ $t('Total Expense') }}</text>
+                    <text class="statistics-pie-chart-total-amount-title" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory">{{ $t('Total Income') }}</text>
+                    <text class="statistics-pie-chart-total-amount-value">
+                        {{ statisticsData.totalAmount | currency(defaultCurrency) }}
+                    </text>
+                </pie-chart>
             </f7-card-content>
         </f7-card>
 
@@ -361,97 +383,6 @@ export default {
                 totalAmount: allAmount,
                 items: allStatisticsItems
             };
-        },
-        chartData() {
-            const self = this;
-
-            if (!self.$store.state.transactionStatistics ||
-                !self.$store.state.transactionStatistics.items ||
-                !self.$store.state.transactionStatistics.items.length) {
-                return self.skeletonChart();
-            }
-
-            const allData = [];
-
-            for (let i = 0; i < this.statisticsData.items.length; i++) {
-                const data = this.statisticsData.items[i];
-
-                allData.push({
-                    name: data.name,
-                    value: data.totalAmount / 100,
-                    itemStyle: {
-                        color: `#${data.color}`
-                    }
-                });
-            }
-
-            const chartData =  {
-                label: {
-                    show: true,
-                    overflow: 'truncate',
-                    align: 'left',
-                    formatter: params => {
-                        return `${params.name} ${self.$options.filters.currency(params.value * 100, self.defaultCurrency)}`;
-                    }
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                },
-                series: [
-                    {
-                        data: allData,
-                    }
-                ],
-                animation: false
-            };
-
-            if (this.query.chartType === this.$constants.statistics.allChartTypes.Bar) {
-                return this.$utilities.copyObjectTo({
-                    grid: {
-                        left: 30,
-                        top: 30,
-                        right: 50,
-                        bottom: 50
-                    },
-                    xAxis: {
-                        type: 'value'
-                    },
-                    yAxis: {
-                        type: 'category'
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
-                    },
-                    series: [{
-                        type: 'bar'
-                    }]
-                }, chartData);
-            } else {
-                return this.$utilities.copyObjectTo({
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    series: [{
-                        type: 'pie',
-                        label: {
-                            position: 'inside'
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }]
-                }, chartData);
-            }
         }
     },
     created() {
@@ -608,64 +539,6 @@ export default {
             const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t(startTimeYear !== endTimeYear ? 'format.date.short' : 'format.date.shortMonthDay'));
 
             return `${displayStartTime} ~ ${displayEndTime}`;
-        },
-        skeletonChart() {
-            const skeletonChartData = {
-                series: [{
-                    data: [{
-                        value: 20,
-                        itemStyle: {
-                            color: '#7c7c7f'
-                        }
-                    },{
-                        value: 20,
-                        itemStyle: {
-                            color: '#a5a5aa'
-                        }
-                    },{
-                        value: 60,
-                        itemStyle: {
-                            color: '#c5c5c9'
-                        }
-                    }]
-                }],
-                animation: false
-            };
-
-            if (this.query.chartType === this.$constants.statistics.allChartTypes.Bar) {
-                return this.$utilities.copyObjectTo({
-                    grid: {
-                        left: 30,
-                        top: 30,
-                        right: 50,
-                        bottom: 50
-                    },
-                    xAxis: {
-                        type: 'value',
-                        axisLabel: {
-                            show: false
-                        },
-                        splitLine: {
-                            show: false
-                        }
-                    },
-                    yAxis: {
-                        type: 'category'
-                    },
-                    series: [{
-                        type: 'bar'
-                    }]
-                }, skeletonChartData);
-            } else {
-                return this.$utilities.copyObjectTo({
-                    series: [{
-                        type: 'pie',
-                        label: {
-                            position: 'inside'
-                        }
-                    }]
-                }, skeletonChartData);
-            }
         }
     },
     filters: {
@@ -704,6 +577,24 @@ export default {
 </script>
 
 <style>
+.statistics-pie-chart-total-amount-title {
+    fill: #f8f8f8;
+    text-anchor: middle;
+    -moz-transform: translateY(0.35em);
+    -ms-transform: translateY(0.35em);
+    -webkit-transform: translateY(0.35em);
+    transform: translateY(0.35em);
+}
+
+.statistics-pie-chart-total-amount-value {
+    fill: #fff;
+    text-anchor: middle;
+    -moz-transform: translateY(2em);
+    -ms-transform: translateY(2em);
+    -webkit-transform: translateY(2em);
+    transform: translateY(2em);
+}
+
 .statistics-list-item-overview {
     padding-top: 12px;
     margin-bottom: 6px;
@@ -750,14 +641,5 @@ export default {
 
 .theme-dark .statistics-percent-line .progressbar {
     --f7-progressbar-bg-color: #161616;
-}
-
-.chart-container {
-    height: 400px;
-}
-
-.chart-container .echarts {
-    width: 100%;
-    height: 100%;
 }
 </style>

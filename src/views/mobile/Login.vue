@@ -56,7 +56,7 @@
                     :title="lang.displayName"
                     @click="changeLanguage(locale)"
                 >
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
                 </f7-list-item>
             </f7-list>
         </f7-popover>

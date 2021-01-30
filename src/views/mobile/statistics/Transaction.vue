@@ -16,7 +16,7 @@
                 <f7-list-item
                     v-for="dataType in allChartDataTypes" :key="dataType.type"
                     :title="$t(dataType.name)" @click="setChartDataType(dataType.type)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -190,7 +190,7 @@
                               :key="dateRange.type"
                               :title="dateRange.name | localized"
                               @click="setDateFilter(dateRange.type)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"
                          v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.startTime && query.endTime">
                         <span>{{ query.startTime | moment($t('format.datetime.long-without-second')) }}</span>

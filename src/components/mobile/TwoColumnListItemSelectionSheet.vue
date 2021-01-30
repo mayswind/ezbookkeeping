@@ -43,7 +43,7 @@
                                          :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
                                          :style="subItem[secondaryColorField] | iconStyle(secondaryIconType, 'var(--default-icon-color)')"
                                          v-if="secondaryIconField"></f7-icon>
-                                <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
+                                <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
                             </f7-list-item>
                         </f7-list>
                     </div>

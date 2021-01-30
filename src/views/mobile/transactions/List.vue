@@ -235,7 +235,7 @@
                               :key="dateRange.type"
                               :title="dateRange.name | localized"
                               @click="changeDateFilter(dateRange.type)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"
                          v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.minTime && query.maxTime">
                         <span>{{ query.minTime | moment($t('format.datetime.long-without-second')) }}</span>
@@ -258,19 +258,19 @@
                     @popover:opened="showTypePopover = true" @popover:closed="showTypePopover = false">
             <f7-list>
                 <f7-list-item :title="$t('All')" @click="changeTypeFilter(0)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
                 </f7-list-item>
                 <f7-list-item :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
                 </f7-list-item>
                 <f7-list-item :title="$t('Income')" @click="changeTypeFilter(2)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
                 </f7-list-item>
                 <f7-list-item :title="$t('Expense')" @click="changeTypeFilter(3)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
                 </f7-list-item>
                 <f7-list-item :title="$t('Transfer')" @click="changeTypeFilter(4)">
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -280,7 +280,7 @@
             <f7-list accordion-list>
                 <f7-list-item :title="$t('All')" @click="changeCategoryFilter('0')">
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
                 </f7-list-item>
                 <f7-list-item accordion-item
                               v-for="category in allPrimaryCategories"
@@ -296,7 +296,7 @@
                         <f7-list class="padding-left">
                             <f7-list-item :title="$t('All')" @click="changeCategoryFilter(category.id)">
                                 <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
-                                <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
+                                <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
                             </f7-list-item>
                             <f7-list-item v-for="subCategory in category.subCategories"
                                           :key="subCategory.id"
@@ -308,7 +308,7 @@
                                          :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
                                 </f7-icon>
                                 <f7-icon slot="after"
-                                         class="list-item-checked"
+                                         class="list-item-checked-icon"
                                          f7="checkmark_alt"
                                          v-if="query.categoryId === subCategory.id">
                                 </f7-icon>
@@ -324,7 +324,7 @@
             <f7-list>
                 <f7-list-item :title="$t('All')" @click="changeAccountFilter('0')">
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
                 </f7-list-item>
                 <f7-list-item v-for="account in allAccounts"
                               v-show="!account.hidden"
@@ -337,7 +337,7 @@
                              :style="account.color | accountIconStyle('var(--default-icon-color)')">
                     </f7-icon>
                     <f7-icon slot="after"
-                             class="list-item-checked"
+                             class="list-item-checked-icon"
                              f7="checkmark_alt"
                              v-if="query.accountId === account.id">
                     </f7-icon>

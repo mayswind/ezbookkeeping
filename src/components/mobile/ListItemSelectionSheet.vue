@@ -18,7 +18,7 @@
                              :icon="item[iconField] | icon(iconType)"
                              :style="item[colorField] | iconStyle(iconType, 'var(--default-icon-color)')"
                              v-if="iconField"></f7-icon>
-                    <f7-icon slot="after" class="list-item-checked" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
                 </f7-list-item>
             </f7-list>
         </f7-page-content>

@@ -238,7 +238,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     color: rgba(255, 255, 255, 0.2);
 }
 
-.list .item-content .list-item-checked {
+.list .item-content .list-item-checked-icon {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));
 }

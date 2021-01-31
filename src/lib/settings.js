@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie';
 
+import statisticsConstants from '../consts/statistics.js';
+
 const settingsLocalStorageKey = 'lab_app_settings';
 const serverSettingsCookieKey = 'lab_server_settings';
 
@@ -13,6 +15,11 @@ const defaultSettings = {
     currencyDisplayMode: 'symbol', // or 'none' or 'code' or 'name'
     showAmountInHomePage: true,
     showAccountBalance: true,
+    statistics: {
+        defaultChartType: statisticsConstants.defaultChartType,
+        defaultChartDataType: statisticsConstants.defaultChartDataType,
+        defaultDataRangeType: statisticsConstants.defaultDataRangeType
+    },
     animate: true,
     autoDarkMode: true
 };
@@ -44,6 +51,11 @@ function getOption(key) {
     return getFinalSettings()[key];
 }
 
+function getSubOption(key, subKey) {
+    const options = getFinalSettings()[key] || {};
+    return options[subKey];
+}
+
 function setOption(key, value) {
     if (!Object.prototype.hasOwnProperty.call(defaultSettings, key)) {
         return;
@@ -51,6 +63,28 @@ function setOption(key, value) {
 
     const settings = getFinalSettings();
     settings[key] = value;
+
+    return setSettings(settings);
+}
+
+function setSubOption(key, subKey, value) {
+    if (!Object.prototype.hasOwnProperty.call(defaultSettings, key)) {
+        return;
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(defaultSettings[key], subKey)) {
+        return;
+    }
+
+    const settings = getFinalSettings();
+    let options = settings[key];
+
+    if (!options) {
+        options = {};
+    }
+
+    options[subKey] = value;
+    settings[key] = options;
 
     return setSettings(settings);
 }
@@ -93,6 +127,12 @@ export default {
     setShowAmountInHomePage: value => setOption('showAmountInHomePage', value),
     isShowAccountBalance: () => getOption('showAccountBalance'),
     setShowAccountBalance: value => setOption('showAccountBalance', value),
+    getStatisticsDefaultChartType: () => getSubOption('statistics', 'defaultChartType'),
+    setStatisticsDefaultChartType: value => setSubOption('statistics', 'defaultChartType', value),
+    getStatisticsDefaultChartDataType: () => getSubOption('statistics', 'defaultChartDataType'),
+    setStatisticsDefaultChartDataType: value => setSubOption('statistics', 'defaultChartDataType', value),
+    getStatisticsDefaultDateRange: () => getSubOption('statistics', 'defaultDataRangeType'),
+    setStatisticsDefaultDateRange: value => setSubOption('statistics', 'defaultDataRangeType', value),
     isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),

@@ -1,3 +1,5 @@
+import datetime from './datetime.js';
+
 const allChartTypes = {
     Pie: 0,
     Bar: 1
@@ -21,4 +23,5 @@ export default {
     defaultChartType: defaultChartType,
     allChartDataTypes: allChartDataTypes,
     defaultChartDataType: defaultChartDataType,
+    defaultDataRangeType: datetime.allDateRanges.ThisMonth.type,
 };

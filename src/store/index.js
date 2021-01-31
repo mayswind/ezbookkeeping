@@ -179,7 +179,7 @@ const stores = {
         transactionOverview: {},
         transactionOverviewStateInvalid: true,
         transactionStatisticsFilter: {
-            dateType: datetimeConstants.allDateRanges.ThisMonth.type,
+            dateType: statisticsConstants.defaultDataRangeType,
             startTime: 0,
             endTime: 0,
             chartType: statisticsConstants.defaultChartType,
@@ -239,7 +239,7 @@ const stores = {
             state.transactionOverview = {};
             state.transactionOverviewStateInvalid = true;
 
-            state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+            state.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
             state.transactionStatisticsFilter.startTime = 0;
             state.transactionStatisticsFilter.endTime = 0;
             state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
@@ -801,7 +801,7 @@ const stores = {
             if (filter && utils.isNumber(filter.dateType)) {
                 state.transactionStatisticsFilter.dateType = filter.dateType;
             } else {
-                state.transactionStatisticsFilter.dateType = datetimeConstants.allDateRanges.ThisMonth.type;
+                state.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
             }
 
             if (filter && utils.isNumber(filter.startTime)) {

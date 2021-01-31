@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr @ptr:refresh="reload">
+    <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title>
@@ -8,6 +8,9 @@
                     <f7-icon size="14px" :f7="showChartDataTypePopover ? 'arrowtriangle_up_fill' : 'arrowtriangle_down_fill'"></f7-icon>
                 </f7-link>
             </f7-nav-title>
+            <f7-nav-right>
+                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
+            </f7-nav-right>
         </f7-navbar>
 
         <f7-popover class="chart-data-type-popover-menu" :opened="showChartDataTypePopover"
@@ -213,6 +216,15 @@
                                     :max-time="query.endTime"
                                     @dateRange:change="setCustomDateFilter">
         </date-range-selection-sheet>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button @click="settings">{{ $t('Settings') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
     </f7-page>
 </template>
 
@@ -223,7 +235,8 @@ export default {
             loading: true,
             showChartDataTypePopover: false,
             showDatePopover: false,
-            showCustomDateRangeSheet: false
+            showCustomDateRangeSheet: false,
+            showMoreActionSheet: false
         };
     },
     computed: {
@@ -405,12 +418,32 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        const dateRange = self.$utilities.getDateRangeByDateType(self.query.dateType, self.firstDayOfWeek);
+        let defaultChartType = self.$settings.getStatisticsDefaultChartType();
+
+        if (defaultChartType !== self.$constants.statistics.allChartTypes.Pie && defaultChartType !== self.$constants.statistics.allChartTypes.Bar) {
+            defaultChartType = self.$constants.statistics.defaultChartType;
+        }
+
+        let defaultChartDataType = self.$settings.getStatisticsDefaultChartDataType();
+
+        if (defaultChartDataType < self.$constants.statistics.allChartDataTypes.ExpenseByAccount || defaultChartDataType > self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory) {
+            defaultChartDataType = self.$constants.statistics.defaultChartDataType;
+        }
+
+        let defaultDateRange = self.$settings.getStatisticsDefaultDateRange();
+
+        if (defaultDateRange < self.$constants.datetime.allDateRanges.All.type || defaultDateRange >= self.$constants.datetime.allDateRanges.Custom.type) {
+            defaultDateRange = self.$constants.statistics.defaultDataRangeType;
+        }
+
+        const dateRange = self.$utilities.getDateRangeByDateType(defaultDateRange, self.firstDayOfWeek);
 
         self.$store.dispatch('initTransactionStatisticsFilter', {
             dateType: dateRange ? dateRange.dateType : undefined,
             startTime: dateRange ? dateRange.minTime : undefined,
             endTime: dateRange ? dateRange.maxTime : undefined,
+            chartType: defaultChartType,
+            chartDataType: defaultChartDataType,
         });
 
         Promise.all([
@@ -432,6 +465,11 @@ export default {
         });
     },
     methods: {
+        onPageAfterIn() {
+            if (this.$store.state.transactionStatisticsStateInvalid && !this.loading) {
+                this.reload(null);
+            }
+        },
         reload(done) {
             const self = this;
 
@@ -576,6 +614,9 @@ export default {
             }
 
             return `${displayStartTime} ~ ${displayEndTime}`;
+        },
+        settings() {
+            this.$f7router.navigate('/statistic/settings');
         }
     },
     filters: {

@@ -68,6 +68,8 @@
                         <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
                     </f7-list-item>
 
+                    <f7-list-item :title="$t('Statistics Settings')" link="/statistic/settings"></f7-list-item>
+
                     <f7-list-item>
                         <span>{{ $t('Enable Animate') }}</span>
                         <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>

@@ -9,19 +9,25 @@ export default {
     },
     'format': {
         'date': {
-            'long': 'YYYY年MM月DD日',
-            'short': 'YYYY-M-D',
-            'year': 'YYYY年',
-            'yearMonth': 'YYYY年M月',
-            'monthDay': 'M月D日',
-            'shortMonthDay': 'M-D'
+            'long': 'YYYY年M月D日',
+            'short': 'YYYY-M-D'
         },
         'datetime': {
-            'long': 'YYYY年MM月DD日 HH:mm:ss',
-            'long-without-second': 'YYYY年MM月DD日 HH:mm',
+            'long': 'YYYY年M月D日 HH:mm:ss',
+            'long-without-second': 'YYYY年M月D日 HH:mm',
         },
-        'time': {
-            'hourMinute': 'HH:mm'
+        'year': {
+            'long': 'YYYY年'
+        },
+        'yearMonth': {
+            'long': 'YYYY年M月'
+        },
+        'monthDay': {
+            'long': 'M月D日',
+            'short': 'M-D'
+        },
+        'hourMinute': {
+            'long': 'HH:mm'
         },
         'currency': {
             'symbol': '{symbol} {amount}'

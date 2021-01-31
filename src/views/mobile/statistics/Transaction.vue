@@ -536,7 +536,7 @@ export default {
             const endTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.endTime));
 
             const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$t('format.date.short'));
-            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t(startTimeYear !== endTimeYear ? 'format.date.short' : 'format.date.shortMonthDay'));
+            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t(startTimeYear !== endTimeYear ? 'format.date.short' : 'format.monthDay.short'));
 
             return `${displayStartTime} ~ ${displayEndTime}`;
         }

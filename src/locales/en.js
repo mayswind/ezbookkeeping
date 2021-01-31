@@ -9,19 +9,25 @@ export default {
     },
     'format': {
         'date': {
-            'long': 'MM/DD/YYYY',
-            'short': 'M/D/YYYY',
-            'year': 'YYYY',
-            'yearMonth': 'YYYY-M',
-            'monthDay': 'M/D',
-            'shortMonthDay': 'M/D'
+            'long': 'M/D/YYYY',
+            'short': 'M/D/YYYY'
         },
         'datetime': {
-            'long': 'MM/DD/YYYY HH:mm:ss',
-            'long-without-second': 'MM/DD/YYYY HH:mm',
+            'long': 'M/D/YYYY HH:mm:ss',
+            'long-without-second': 'M/D/YYYY HH:mm',
         },
-        'time': {
-            'hourMinute': 'HH:mm'
+        'year': {
+            'long': 'YYYY'
+        },
+        'yearMonth': {
+            'long': 'YYYY-M'
+        },
+        'monthDay': {
+            'long': 'M/D',
+            'short': 'M/D'
+        },
+        'hourMinute': {
+            'long': 'HH:mm'
         },
         'currency': {
             'symbol': '{symbol} {amount}'

@@ -137,7 +137,7 @@
                 <f7-card-header>
                     <f7-accordion-toggle class="full-line">
                         <small :style="{ opacity: 0.6 }">
-                            <span>{{ transactionMonthList.yearMonth | moment($t('format.date.yearMonth')) }}</span>
+                            <span>{{ transactionMonthList.yearMonth | moment($t('format.yearMonth.long')) }}</span>
                         </small>
                         <small class="transaction-amount-statistics" v-if="transactionMonthList.totalAmount">
                             <span class="text-color-red">
@@ -193,7 +193,7 @@
                                     <span>{{ transaction.comment }}</span>
                                 </div>
                                 <div slot="footer" class="transaction-footer">
-                                    <span>{{ transaction.time | moment($t('format.time.hourMinute')) }}</span>
+                                    <span>{{ transaction.time | moment($t('format.hourMinute.long')) }}</span>
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                     <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>

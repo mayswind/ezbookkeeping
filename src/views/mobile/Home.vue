@@ -72,10 +72,10 @@
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">MM/DD</span>
-                            <span v-else-if="!loading">{{ dateRange.thisWeek.startTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-else-if="!loading">{{ dateRange.thisWeek.startTime | moment($t('format.monthDay.long')) }}</span>
                             <span>-</span>
                             <span v-if="loading">MM/DD</span>
-                            <span v-else-if="!loading">{{ dateRange.thisWeek.endTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-else-if="!loading">{{ dateRange.thisWeek.endTime | moment($t('format.monthDay.long')) }}</span>
                         </div>
                          <div slot="after">
                              <div class="text-color-red">
@@ -99,10 +99,10 @@
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">MM/DD</span>
-                            <span v-else-if="!loading">{{ dateRange.thisMonth.startTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-else-if="!loading">{{ dateRange.thisMonth.startTime | moment($t('format.monthDay.long')) }}</span>
                             <span>-</span>
                             <span v-if="loading">MM/DD</span>
-                            <span v-else-if="!loading">{{ dateRange.thisMonth.endTime | moment($t('format.date.monthDay')) }}</span>
+                            <span v-else-if="!loading">{{ dateRange.thisMonth.endTime | moment($t('format.monthDay.long')) }}</span>
                         </div>
                          <div slot="after">
                              <div class="text-color-red">
@@ -126,7 +126,7 @@
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">YYYY</span>
-                            <span v-else-if="!loading">{{ dateRange.thisYear.startTime | moment($t('format.date.year')) }}</span>
+                            <span v-else-if="!loading">{{ dateRange.thisYear.startTime | moment($t('format.year.long')) }}</span>
                         </div>
                          <div slot="after">
                             <div class="text-color-red">

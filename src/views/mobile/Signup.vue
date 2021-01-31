@@ -108,10 +108,15 @@
 
         <f7-popup :opened="showPresetCategories" @popup:closed="showPresetCategories = false">
             <f7-page>
-                <f7-navbar :title="$t('Preset Categories')">
+                <f7-navbar>
+                    <f7-nav-left>
+                        <f7-link popup-close :text="$t('Close')"></f7-link>
+                    </f7-nav-left>
+                    <f7-nav-title :title="$t('Preset Categories')"></f7-nav-title>
                     <f7-nav-right>
                         <f7-link icon-f7="ellipsis" @click="showPresetCategoriesMoreActionSheet = true"></f7-link>
-                        <f7-link popup-close :text="$t('Close')"></f7-link>
+                        <f7-link close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ $t('Enable') }}</f7-link>
+                        <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-link>
                     </f7-nav-right>
                 </f7-navbar>
                 <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
@@ -151,8 +156,6 @@
 
             <f7-actions close-by-outside-click close-on-escape :opened="showPresetCategoriesMoreActionSheet" @actions:closed="showPresetCategoriesMoreActionSheet = false">
                 <f7-actions-group>
-                    <f7-actions-button close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ $t('Enable') }}</f7-actions-button>
-                    <f7-actions-button close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-actions-button>
                     <f7-actions-button @click="showPresetCategoriesChangeLocaleSheet = true">{{ $t('Change Language') }}</f7-actions-button>
                 </f7-actions-group>
                 <f7-actions-group>

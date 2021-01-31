@@ -133,7 +133,8 @@ export function register(context, { user }) {
             password: user.password,
             email: user.email,
             nickname: user.nickname,
-            defaultCurrency: user.defaultCurrency
+            defaultCurrency: user.defaultCurrency,
+            firstDayOfWeek: user.firstDayOfWeek
         }).then(response => {
             const data = response.data;
 
@@ -234,7 +235,8 @@ export function updateUserProfile(context, { profile, currentPassword }) {
             oldPassword: currentPassword,
             email: profile.email,
             nickname: profile.nickname,
-            defaultCurrency: profile.defaultCurrency
+            defaultCurrency: profile.defaultCurrency,
+            firstDayOfWeek: profile.firstDayOfWeek
         }).then(response => {
             const data = response.data;
 
@@ -341,4 +343,9 @@ export function currentUserNickname(state) {
 export function currentUserDefaultCurrency(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.defaultCurrency || null;
+}
+
+export function currentUserFirstDayOfWeek(state) {
+    const userInfo = state.currentUserInfo || {};
+    return utils.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : null;
 }

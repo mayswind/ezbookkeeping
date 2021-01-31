@@ -16,6 +16,7 @@
                     <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
                     <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
                     <f7-list-item title="Default Currency" after="Currency"></f7-list-item>
+                    <f7-list-item title="First Day of Week" after="Week Day"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -74,6 +75,17 @@
                         </select>
                     </f7-list-item>
 
+                    <f7-list-item
+                        :title="$t('First Day of Week')"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                    >
+                        <select autocomplete="transaction-currency" v-model="newProfile.firstDayOfWeek">
+                            <option v-for="weekDay in allWeekDays"
+                                    :key="weekDay.type"
+                                    :value="weekDay.type">{{ `datetime.${weekDay.name}.long` | localized }}</option>
+                        </select>
+                    </f7-list-item>
+
                     <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -99,12 +111,14 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                defaultCurrency: ''
+                defaultCurrency: '',
+                firstDayOfWeek: 0
             },
             oldProfile: {
                 email: '',
                 nickname: '',
-                defaultCurrency: ''
+                defaultCurrency: '',
+                firstDayOfWeek: 0
             },
             currentPassword: '',
             loading: true,
@@ -115,6 +129,9 @@ export default {
     computed: {
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allWeekDays() {
+            return this.$constants.datetime.allWeekDays;
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
@@ -128,7 +145,8 @@ export default {
             } else if (!this.newProfile.password && !this.newProfile.confirmPassword &&
                 this.newProfile.email === this.oldProfile.email &&
                 this.newProfile.nickname === this.oldProfile.nickname &&
-                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency) {
+                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
+                this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be empty';
@@ -162,10 +180,12 @@ export default {
             self.oldProfile.email = profile.email;
             self.oldProfile.nickname = profile.nickname;
             self.oldProfile.defaultCurrency = profile.defaultCurrency;
+            self.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
 
             self.newProfile.email = self.oldProfile.email
             self.newProfile.nickname = self.oldProfile.nickname;
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
+            self.newProfile.firstDayOfWeek = self.oldProfile.firstDayOfWeek;
 
             self.loading = false;
         }).catch(error => {

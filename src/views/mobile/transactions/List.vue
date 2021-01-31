@@ -392,6 +392,17 @@ export default {
 
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
+        firstDayOfWeek() {
+            if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {
+                return this.$store.getters.currentUserFirstDayOfWeek;
+            }
+
+            if (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')]) {
+                return this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type;
+            }
+
+            return 0;
+        },
         query() {
             return this.$store.state.transactionsFilter;
         },
@@ -425,7 +436,7 @@ export default {
         const self = this;
         const query = self.$f7route.query;
 
-        let dateRange = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined);
+        let dateRange = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
 
         if (!dateRange &&
             query.dateType === self.$constants.datetime.allDateRanges.Custom.type.toString() &&
@@ -535,7 +546,7 @@ export default {
                 return;
             }
 
-            const dateRange = this.$utilities.getDateRangeByDateType(dateType);
+            const dateRange = this.$utilities.getDateRangeByDateType(dateType, this.firstDayOfWeek);
 
             if (!dateRange) {
                 return;

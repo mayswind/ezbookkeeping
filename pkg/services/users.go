@@ -194,6 +194,10 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		updateCols = append(updateCols, "default_currency")
 	}
 
+	if models.WEEKDAY_SUNDAY <= user.FirstDayOfWeek && user.FirstDayOfWeek <= models.WEEKDAY_SATURDAY {
+		updateCols = append(updateCols, "first_day_of_week")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

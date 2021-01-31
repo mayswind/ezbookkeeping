@@ -92,6 +92,18 @@
                                     :value="currency.code">{{ currency.displayName }}</option>
                         </select>
                     </f7-list-item>
+
+                    <f7-list-item
+                        :key="currentLocale + '_firstDayOfWeek'"
+                        :title="$t('First Day of Week')"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                    >
+                        <select v-model="user.firstDayOfWeek">
+                            <option v-for="weekDay in allWeekDays"
+                                    :key="weekDay.type"
+                                    :value="weekDay.type">{{ `datetime.${weekDay.name}.long` | localized }}</option>
+                        </select>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -185,7 +197,8 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                defaultCurrency: self.$t('default.currency')
+                defaultCurrency: self.$t('default.currency'),
+                firstDayOfWeek: self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')] ? self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
             },
             submitting: false,
             presetCategories: {
@@ -205,6 +218,9 @@ export default {
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allWeekDays() {
+            return this.$constants.datetime.allWeekDays;
         },
         currentLocale: {
             get: function () {

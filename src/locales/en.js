@@ -6,6 +6,7 @@ export default {
     },
     'default': {
         'currency': 'USD',
+        'firstDayOfWeek': 'Sunday'
     },
     'format': {
         'date': {
@@ -35,25 +36,32 @@ export default {
     },
     'datetime': {
         'Monday': {
-            'short': 'Mon'
+            'short': 'Mon',
+            'long': 'Monday'
         },
         'Tuesday': {
-            'short': 'Tue'
+            'short': 'Tue',
+            'long': 'Tuesday'
         },
         'Wednesday': {
-            'short': 'Wed'
+            'short': 'Wed',
+            'long': 'Wednesday'
         },
         'Thursday': {
-            'short': 'Thu'
+            'short': 'Thu',
+            'long': 'Thursday'
         },
         'Friday': {
-            'short': 'Fri'
+            'short': 'Fri',
+            'long': 'Friday'
         },
         'Saturday': {
-            'short': 'Sat'
+            'short': 'Sat',
+            'long': 'Saturday'
         },
         'Sunday': {
-            'short': 'Sun'
+            'short': 'Sun',
+            'long': 'Sunday'
         },
         'January': {
             'long': 'January'
@@ -420,6 +428,7 @@ export default {
         'nickname': 'Nickname',
         'oldPassword': 'Current Password',
         'defaultCurrency': 'Default Currency',
+        'firstDayOfWeek': 'First Day of Week',
         'name': 'Name',
         'category': 'Category',
         'type': 'Type',
@@ -520,6 +529,7 @@ export default {
     'Nickname': 'Nickname',
     'Your nickname': 'Your nickname',
     'Default Currency': 'Default Currency',
+    'First Day of Week': 'First Day of Week',
     'Log In': 'Log In',
     'Don\'t have an account?': 'Don\'t have an account?',
     'Create an account': 'Create an account',

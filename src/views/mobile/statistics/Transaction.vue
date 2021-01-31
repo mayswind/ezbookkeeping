@@ -233,6 +233,17 @@ export default {
 
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
+        firstDayOfWeek() {
+            if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {
+                return this.$store.getters.currentUserFirstDayOfWeek;
+            }
+
+            if (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')]) {
+                return this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type;
+            }
+
+            return 0;
+        },
         query() {
             return this.$store.state.transactionStatisticsFilter;
         },
@@ -389,7 +400,7 @@ export default {
         const self = this;
         const router = self.$f7router;
 
-        const dateRange = self.$utilities.getDateRangeByDateType(self.query.dateType);
+        const dateRange = self.$utilities.getDateRangeByDateType(self.query.dateType, self.firstDayOfWeek);
 
         self.$store.dispatch('initTransactionStatisticsFilter', {
             dateType: dateRange ? dateRange.dateType : undefined,
@@ -455,7 +466,7 @@ export default {
                 return;
             }
 
-            const dateRange = this.$utilities.getDateRangeByDateType(dateType);
+            const dateRange = this.$utilities.getDateRangeByDateType(dateType, this.firstDayOfWeek);
 
             if (!dateRange) {
                 return;
@@ -499,7 +510,7 @@ export default {
                 }
 
                 const dateRangeType = this.$constants.datetime.allDateRanges[dateRangeField];
-                const dateRange = this.$utilities.getDateRangeByDateType(dateRangeType.type);
+                const dateRange = this.$utilities.getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
 
                 if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
                     newDateType = dateRangeType.type;

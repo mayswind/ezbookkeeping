@@ -6,6 +6,7 @@ export default {
     },
     'default': {
         'currency': 'CNY',
+        'firstDayOfWeek': 'Monday'
     },
     'format': {
         'date': {
@@ -35,25 +36,32 @@ export default {
     },
     'datetime': {
         'Monday': {
-            'short': '周一'
+            'short': '周一',
+            'long':  '星期一'
         },
         'Tuesday': {
-            'short': '周二'
+            'short': '周二',
+            'long': '星期二'
         },
         'Wednesday': {
-            'short': '周三'
+            'short': '周三',
+            'long': '星期三'
         },
         'Thursday': {
-            'short': '周四'
+            'short': '周四',
+            'long': '星期四'
         },
         'Friday': {
-            'short': '周五'
+            'short': '周五',
+            'long': '星期五'
         },
         'Saturday': {
-            'short': '周六'
+            'short': '周六',
+            'long': '星期六'
         },
         'Sunday': {
-            'short': '周日'
+            'short': '周日',
+            'long': '星期日'
         },
         'January': {
             'long': '1月'
@@ -420,6 +428,7 @@ export default {
         'nickname': '昵称',
         'oldPassword': '当前密码',
         'defaultCurrency': '默认货币',
+        'firstDayOfWeek': '每周第一天',
         'name': '名称',
         'category': '分类',
         'type': '类型',
@@ -520,6 +529,7 @@ export default {
     'Nickname': '昵称',
     'Your nickname': '你的昵称',
     'Default Currency': '默认货币',
+    'First Day of Week': '每周第一天',
     'Log In': '登录',
     'Don\'t have an account?': '还没有账号？',
     'Create an account': '创建新账号',

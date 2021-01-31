@@ -50,6 +50,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		Nickname:        userRegisterReq.Nickname,
 		Password:        userRegisterReq.Password,
 		DefaultCurrency: userRegisterReq.DefaultCurrency,
+		FirstDayOfWeek:  userRegisterReq.FirstDayOfWeek,
 	}
 
 	err = a.users.CreateUser(user)
@@ -156,6 +157,14 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		user.DefaultCurrency = userUpdateReq.DefaultCurrency
 		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
 		anythingUpdate = true
+	}
+
+	if userUpdateReq.FirstDayOfWeek != nil && *userUpdateReq.FirstDayOfWeek != user.FirstDayOfWeek {
+		user.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
+		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
+		anythingUpdate = true
+	} else  {
+		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID;
 	}
 
 	if !anythingUpdate {

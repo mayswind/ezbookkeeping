@@ -1,3 +1,34 @@
+const allWeekDays = {
+    Sunday: {
+        type: 0,
+        name: 'Sunday'
+    },
+    Monday: {
+        type: 1,
+        name: 'Monday'
+    },
+    Tuesday: {
+        type: 2,
+        name: 'Tuesday'
+    },
+    Wednesday: {
+        type: 3,
+        name: 'Wednesday'
+    },
+    Thursday: {
+        type: 4,
+        name: 'Thursday'
+    },
+    Friday: {
+        type: 5,
+        name: 'Friday'
+    },
+    Saturday: {
+        type: 6,
+        name: 'Saturday'
+    }
+};
+
 const allDateRanges = {
     All: {
         type: 0,
@@ -50,5 +81,6 @@ const allDateRanges = {
 };
 
 export default {
+    allWeekDays: allWeekDays,
     allDateRanges: allDateRanges,
 };

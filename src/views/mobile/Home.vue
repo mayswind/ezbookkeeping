@@ -173,9 +173,10 @@ export default {
         const self = this;
 
         return {
-            dateRange: self.getCurrentDateRange(),
             loading: true,
-            showAmountInHomePage: this.$settings.isShowAmountInHomePage()
+            todayFirstUnixTime: self.$utilities.getTodayFirstUnixTime(),
+            todayLastUnixTime: self.$utilities.getTodayLastUnixTime(),
+            showAmountInHomePage: self.$settings.isShowAmountInHomePage()
         };
     },
     computed: {
@@ -184,6 +185,39 @@ export default {
         },
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
+        firstDayOfWeek() {
+            if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {
+                return this.$store.getters.currentUserFirstDayOfWeek;
+            }
+
+            if (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')]) {
+                return this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type;
+            }
+
+            return 0;
+        },
+        dateRange() {
+            const self = this;
+
+            return {
+                today: {
+                    startTime: self.todayFirstUnixTime,
+                    endTime: self.todayLastUnixTime
+                },
+                thisWeek: {
+                    startTime: self.$utilities.getThisWeekFirstUnixTime(self.firstDayOfWeek),
+                    endTime: self.$utilities.getThisWeekLastUnixTime(self.firstDayOfWeek)
+                },
+                thisMonth: {
+                    startTime: self.$utilities.getThisMonthFirstUnixTime(),
+                    endTime: self.$utilities.getThisMonthLastUnixTime()
+                },
+                thisYear: {
+                    startTime: self.$utilities.getThisYearFirstUnixTime(),
+                    endTime: self.$utilities.getThisYearLastUnixTime()
+                }
+            };
         },
         thisMonthAmount() {
             if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
@@ -221,14 +255,16 @@ export default {
         onPageAfterIn() {
             this.showAmountInHomePage = this.$settings.isShowAmountInHomePage();
 
-            const newDateRange = this.getCurrentDateRange();
+            let dateChanged = false;
 
-            if (newDateRange.today.startTime !== this.dateRange.today.startTime ||
-                newDateRange.today.endTime !== this.dateRange.today.endTime) {
-                this.dateRange = newDateRange;
+            if (this.todayFirstUnixTime !== this.$utilities.getTodayFirstUnixTime()) {
+                dateChanged = true;
+
+                this.todayFirstUnixTime = this.$utilities.getTodayFirstUnixTime();
+                this.todayLastUnixTime = this.$utilities.getTodayLastUnixTime();
             }
 
-            if (this.$store.state.transactionOverviewStateInvalid && !this.loading) {
+            if ((dateChanged || this.$store.state.transactionOverviewStateInvalid) && !this.loading) {
                 this.reload(null);
             }
         },
@@ -256,28 +292,6 @@ export default {
         toggleShowAmountInHomePage() {
             this.showAmountInHomePage = !this.showAmountInHomePage;
             this.$settings.setShowAmountInHomePage(this.showAmountInHomePage);
-        },
-        getCurrentDateRange() {
-            const self = this;
-
-            return {
-                today: {
-                    startTime: self.$utilities.getTodayFirstUnixTime(),
-                    endTime: self.$utilities.getTodayLastUnixTime()
-                },
-                thisWeek: {
-                    startTime: self.$utilities.getThisWeekFirstUnixTime(),
-                    endTime: self.$utilities.getThisWeekLastUnixTime()
-                },
-                thisMonth: {
-                    startTime: self.$utilities.getThisMonthFirstUnixTime(),
-                    endTime: self.$utilities.getThisMonthLastUnixTime()
-                },
-                thisYear: {
-                    startTime: self.$utilities.getThisYearFirstUnixTime(),
-                    endTime: self.$utilities.getThisYearLastUnixTime()
-                }
-            };
         }
     },
     filters: {

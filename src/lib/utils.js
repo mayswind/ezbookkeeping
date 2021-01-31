@@ -110,13 +110,24 @@ function getTodayLastUnixTime() {
     return moment.unix(getTodayFirstUnixTime()).add(1, 'days').subtract(1, 'seconds').unix();
 }
 
-function getThisWeekFirstUnixTime() {
+function getThisWeekFirstUnixTime(firstDayOfWeek) {
     const today = moment.unix(getTodayFirstUnixTime());
-    return today.subtract(today.day(), 'days').unix();
+
+    if (!isNumber(firstDayOfWeek)) {
+        firstDayOfWeek = 0;
+    }
+
+    let dayOfWeek = today.day() - firstDayOfWeek;
+
+    if (dayOfWeek < 0) {
+        dayOfWeek += 7;
+    }
+
+    return today.subtract(dayOfWeek, 'days').unix();
 }
 
-function getThisWeekLastUnixTime() {
-    return moment.unix(getThisWeekFirstUnixTime()).add(7, 'days').subtract(1, 'seconds').unix();
+function getThisWeekLastUnixTime(firstDayOfWeek) {
+    return moment.unix(getThisWeekFirstUnixTime(firstDayOfWeek)).add(7, 'days').subtract(1, 'seconds').unix();
 }
 
 function getThisMonthFirstUnixTime() {
@@ -163,7 +174,7 @@ function getShiftedDateRange(minTime, maxTime, scale) {
     };
 }
 
-function getDateRangeByDateType(dateType) {
+function getDateRangeByDateType(dateType, firstDayOfWeek) {
     let maxTime = 0;
     let minTime = 0;
 
@@ -183,11 +194,11 @@ function getDateRangeByDateType(dateType) {
         maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 29, 'days');
     } else if (dateType === dateTimeConstants.allDateRanges.ThisWeek.type) { // This week
-        maxTime = getThisWeekLastUnixTime();
-        minTime = getThisWeekFirstUnixTime();
+        maxTime = getThisWeekLastUnixTime(firstDayOfWeek);
+        minTime = getThisWeekFirstUnixTime(firstDayOfWeek);
     } else if (dateType === dateTimeConstants.allDateRanges.LastWeek.type) { // Last week
-        maxTime = getUnixTimeBeforeUnixTime(getThisWeekLastUnixTime(), 7, 'days');
-        minTime = getUnixTimeBeforeUnixTime(getThisWeekFirstUnixTime(), 7, 'days');
+        maxTime = getUnixTimeBeforeUnixTime(getThisWeekLastUnixTime(firstDayOfWeek), 7, 'days');
+        minTime = getUnixTimeBeforeUnixTime(getThisWeekFirstUnixTime(firstDayOfWeek), 7, 'days');
     } else if (dateType === dateTimeConstants.allDateRanges.ThisMonth.type) { // This month
         maxTime = getThisMonthLastUnixTime();
         minTime = getThisMonthFirstUnixTime();

@@ -176,7 +176,9 @@ export default {
             loading: true,
             todayFirstUnixTime: self.$utilities.getTodayFirstUnixTime(),
             todayLastUnixTime: self.$utilities.getTodayLastUnixTime(),
-            showAmountInHomePage: self.$settings.isShowAmountInHomePage()
+            showAmountInHomePage: self.$settings.isShowAmountInHomePage(),
+            isEnableThousandsSeparator: self.$settings.isEnableThousandsSeparator(),
+            currencyDisplayMode: self.$settings.getCurrencyDisplayMode()
         };
     },
     computed: {
@@ -254,6 +256,12 @@ export default {
     methods: {
         onPageAfterIn() {
             this.showAmountInHomePage = this.$settings.isShowAmountInHomePage();
+
+            if (this.isEnableThousandsSeparator !== this.$settings.isEnableThousandsSeparator() || this.currencyDisplayMode !== this.$settings.getCurrencyDisplayMode()) {
+                this.isEnableThousandsSeparator = this.$settings.isEnableThousandsSeparator();
+                this.currencyDisplayMode = this.$settings.getCurrencyDisplayMode();
+                this.$forceUpdate();
+            }
 
             let dateChanged = false;
 

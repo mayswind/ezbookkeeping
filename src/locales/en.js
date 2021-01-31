@@ -439,6 +439,8 @@ export default {
         'parentId': 'Parent Node ID',
         'categoryId': 'Category ID',
         'time': 'Time',
+        'startTime': 'Start Time',
+        'endTime': 'End Time',
         'sourceAccountId': 'Source Account ID',
         'destinationAccountId': 'Destination Account ID',
         'sourceAmount': 'Source Amount',

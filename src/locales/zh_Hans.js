@@ -439,6 +439,8 @@ export default {
         'parentId': '父节点ID',
         'categoryId': '分类ID',
         'time': '时间',
+        'startTime': '开始时间',
+        'endTime': '结束时间',
         'sourceAccountId': '来源账户ID',
         'destinationAccountId': '目标账户ID',
         'sourceAmount': '源金额',

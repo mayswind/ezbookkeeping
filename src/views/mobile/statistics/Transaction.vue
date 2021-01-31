@@ -661,10 +661,10 @@ export default {
 }
 
 .statistics-pie-chart-total-amount-title {
-    -moz-transform: translateY(0.35em);
-    -ms-transform: translateY(0.35em);
-    -webkit-transform: translateY(0.35em);
-    transform: translateY(0.35em);
+    -moz-transform: translateY(0.5em);
+    -ms-transform: translateY(0.5em);
+    -webkit-transform: translateY(0.5em);
+    transform: translateY(0.5em);
 }
 
 .statistics-pie-chart-total-amount-value {
@@ -675,10 +675,10 @@ export default {
 }
 
 .statistics-pie-chart-total-no-data {
-    -moz-transform: translateY(1em);
-    -ms-transform: translateY(1em);
-    -webkit-transform: translateY(1em);
-    transform: translateY(1em);
+    -moz-transform: translateY(1.5em);
+    -ms-transform: translateY(1.5em);
+    -webkit-transform: translateY(1.5em);
+    transform: translateY(1.5em);
 }
 
 .statistics-list-item-overview {

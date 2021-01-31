@@ -18,10 +18,12 @@ export default {
             'long-without-second': 'YYYY年M月D日 HH:mm',
         },
         'year': {
-            'long': 'YYYY年'
+            'long': 'YYYY年',
+            'short': 'YYYY'
         },
         'yearMonth': {
-            'long': 'YYYY年M月'
+            'long': 'YYYY年M月',
+            'short': 'YYYY-M'
         },
         'monthDay': {
             'long': 'M月D日',

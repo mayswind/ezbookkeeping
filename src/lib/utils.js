@@ -222,6 +222,26 @@ function getDateRangeByDateType(dateType, firstDayOfWeek) {
     };
 }
 
+function isDateRangeMatchFullYears(minTime, maxTime) {
+    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
+
+    const firstDayOfYear = minDateTime.clone().startOf('year');
+    const lastDayOfYear = maxDateTime.clone().endOf('year');
+
+    return firstDayOfYear.unix() === minDateTime.unix() && lastDayOfYear.unix() === maxDateTime.unix();
+}
+
+function isDateRangeMatchFullMonths(minTime, maxTime) {
+    const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
+    const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });
+
+    const firstDayOfMonth = minDateTime.clone().startOf('month');
+    const lastDayOfMonth = maxDateTime.clone().endOf('month');
+
+    return firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix();
+}
+
 function copyObjectTo(fromObject, toObject) {
     if (!isObject(fromObject)) {
         return toObject;
@@ -563,6 +583,8 @@ export default {
     getThisYearLastUnixTime,
     getShiftedDateRange,
     getDateRangeByDateType,
+    isDateRangeMatchFullYears,
+    isDateRangeMatchFullMonths,
     copyObjectTo,
     copyArrayTo,
     appendThousandsSeparator,

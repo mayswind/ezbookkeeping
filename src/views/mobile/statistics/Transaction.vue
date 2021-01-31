@@ -26,6 +26,7 @@
                 <pie-chart
                     :items="[{value: 60, color: '7c7c7f'}, {value: 20, color: 'a5a5aa'}, {value: 20, color: 'c5c5c9'}]"
                     :show-center-text="true"
+                    class="statistics-pie-chart"
                     value-field="value"
                     color-field="color"
                     center-text-background="#cccccc"
@@ -35,15 +36,19 @@
                     :items="statisticsData.items"
                     :min-valid-percent="0.0001"
                     :show-center-text="true"
+                    class="statistics-pie-chart"
                     name-field="name"
                     value-field="totalAmount"
                     color-field="color"
                     v-else-if="!loading"
                 >
-                    <text class="statistics-pie-chart-total-amount-title" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory">{{ $t('Total Expense') }}</text>
-                    <text class="statistics-pie-chart-total-amount-title" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory">{{ $t('Total Income') }}</text>
-                    <text class="statistics-pie-chart-total-amount-value">
+                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory)">{{ $t('Total Expense') }}</text>
+                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory)">{{ $t('Total Income') }}</text>
+                    <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
                         {{ statisticsData.totalAmount | currency(defaultCurrency) }}
+                    </text>
+                    <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!statisticsData.items || !statisticsData.items.length">
+                        {{ $t('No data') }}
                     </text>
                 </pie-chart>
             </f7-card-content>
@@ -609,9 +614,12 @@ export default {
 </script>
 
 <style>
-.statistics-pie-chart-total-amount-title {
-    fill: #f8f8f8;
+.statistics-pie-chart .pie-chart-text-group {
+    fill: #fff;
     text-anchor: middle;
+}
+
+.statistics-pie-chart-total-amount-title {
     -moz-transform: translateY(0.35em);
     -ms-transform: translateY(0.35em);
     -webkit-transform: translateY(0.35em);
@@ -619,12 +627,17 @@ export default {
 }
 
 .statistics-pie-chart-total-amount-value {
-    fill: #fff;
-    text-anchor: middle;
     -moz-transform: translateY(2em);
     -ms-transform: translateY(2em);
     -webkit-transform: translateY(2em);
     transform: translateY(2em);
+}
+
+.statistics-pie-chart-total-no-data {
+    -moz-transform: translateY(1em);
+    -ms-transform: translateY(1em);
+    -webkit-transform: translateY(1em);
+    transform: translateY(1em);
 }
 
 .statistics-list-item-overview {

@@ -514,6 +514,7 @@ export default {
     'Settings': '设置',
     'Back': '返回',
     'Load More': '加载更多',
+    'No data': '没有数据',
     'Change Language': '修改语言',
     'Date is too early': '日期过早',
     'Unlock': '解锁',

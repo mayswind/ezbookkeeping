@@ -514,6 +514,7 @@ export default {
     'Settings': 'Settings',
     'Back': 'Back',
     'Load More': 'Load More',
+    'No data': 'No data',
     'Change Language': 'Change Language',
     'Date is too early': 'Date is too early',
     'Unlock': 'Unlock',

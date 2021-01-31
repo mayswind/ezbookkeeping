@@ -28,7 +28,9 @@
             <f7-card-content class="pie-chart-container" :padding="false">
                 <pie-chart
                     :items="[{value: 60, color: '7c7c7f'}, {value: 20, color: 'a5a5aa'}, {value: 20, color: 'c5c5c9'}]"
+                    :skeleton="true"
                     :show-center-text="true"
+                    :show-selected-item-info="true"
                     class="statistics-pie-chart"
                     value-field="value"
                     color-field="color"
@@ -39,6 +41,8 @@
                     :items="statisticsData.items"
                     :min-valid-percent="0.0001"
                     :show-center-text="true"
+                    :show-selected-item-info="true"
+                    :default-currency="defaultCurrency"
                     class="statistics-pie-chart"
                     name-field="name"
                     value-field="totalAmount"

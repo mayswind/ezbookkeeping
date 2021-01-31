@@ -288,12 +288,12 @@ Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(val
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
-Vue.filter('iconStyle', (value, iconType, defaultColor) => iconStyleFilter(value, iconType, defaultColor));
+Vue.filter('iconStyle', (value, iconType, defaultColor, additionalFieldName) => iconStyleFilter(value, iconType, defaultColor, additionalFieldName));
 Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));
 Vue.filter('accountIcon', (value) => accountIconFilter(value));
-Vue.filter('accountIconStyle', (value, defaultColor) => accountIconStyleFilter(value, defaultColor));
+Vue.filter('accountIconStyle', (value, defaultColor, additionalFieldName) => accountIconStyleFilter(value, defaultColor, additionalFieldName));
 Vue.filter('categoryIcon', (value) => categoryIconFilter(value));
-Vue.filter('categoryIconStyle', (value, defaultColor) => categoryIconStyleFilter(value, defaultColor));
+Vue.filter('categoryIconStyle', (value, defaultColor, additionalFieldName) => categoryIconStyleFilter(value, defaultColor, additionalFieldName));
 Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
 Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 

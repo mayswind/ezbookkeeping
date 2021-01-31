@@ -124,6 +124,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-size: 28px;
 }
 
+.chip.chip-placeholder {
+    border: 0;
+}
+
 .navbar .navbar-compact-icons.right a + a {
     margin-left: 0;
 }

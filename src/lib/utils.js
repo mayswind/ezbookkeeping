@@ -156,7 +156,7 @@ function getShiftedDateRange(minTime, maxTime, scale) {
     const lastDayOfMonth = maxDateTime.clone().endOf('month');
 
     if (firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix()) {
-        const months = getMonth(maxDateTime) - getMonth(minDateTime) + 1;
+        const months = getYear(maxDateTime) * 12 + getMonth(maxDateTime) - getYear(minDateTime) * 12 - getMonth(minDateTime) + 1;
         const newMinDateTime = minDateTime.add(months * scale, 'months');
         const newMaxDateTime = newMinDateTime.clone().add(months, 'months').subtract(1, 'seconds');
 

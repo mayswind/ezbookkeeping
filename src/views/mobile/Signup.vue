@@ -228,11 +228,16 @@ export default {
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.$t('default.currency');
+                const isFirstWeekDayDefault = this.user.firstDayOfWeek === (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
 
                 this.$locale.setLanguage(value);
 
                 if (isCurrencyDefault) {
                     this.user.defaultCurrency = this.$t('default.currency');
+                }
+
+                if (isFirstWeekDayDefault) {
+                    this.user.firstDayOfWeek = this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0;
                 }
             }
         },

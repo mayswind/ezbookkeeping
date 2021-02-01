@@ -42,12 +42,14 @@
                     :min-valid-percent="0.0001"
                     :show-center-text="true"
                     :show-selected-item-info="true"
+                    :enable-click-item="true"
                     :default-currency="defaultCurrency"
                     class="statistics-pie-chart"
                     name-field="name"
                     value-field="totalAmount"
                     color-field="color"
                     v-else-if="!loading"
+                    @click="clickPieChartItem"
                 >
                     <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory)">{{ $t('Total Expense') }}</text>
                     <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory)">{{ $t('Total Income') }}</text>
@@ -618,6 +620,9 @@ export default {
             }
 
             return `${displayStartTime} ~ ${displayEndTime}`;
+        },
+        clickPieChartItem(item) {
+            this.$f7router.navigate(this.$options.filters.itemLinkUrl(item, this.query, this.$constants.statistics.allChartDataTypes));
         },
         settings() {
             this.$f7router.navigate('/statistic/settings');

@@ -40,15 +40,16 @@
                     <p v-else-if="!validItems || !validItems.length">
                         <f7-chip outline text="0%"></f7-chip>
                     </p>
-                    <p v-if="selectedItem">
+                    <f7-link :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
                         <span v-else-if="!skeleton" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(defaultCurrency) }}</span>
-                    </p>
-                    <p v-else-if="!validItems || !validItems.length">
+                        <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
+                    </f7-link>
+                    <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
                         {{ $t('No transaction data') }}
-                    </p>
+                    </f7-link>
                 </div>
 
                 <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || validItems.length <= 1 }" @click="switchSelectedItem(-1)">
@@ -71,6 +72,7 @@ export default {
         'defaultCurrency',
         'showCenterText',
         'showSelectedItemInfo',
+        'enableClickItem',
         'centerTextBackground',
     ],
     data: function () {
@@ -105,7 +107,8 @@ export default {
                         name: item[this.nameField],
                         value: item[this.valueField],
                         percent: item[this.valueField] / totalValidValue,
-                        color: item[this.colorField] ? item[this.colorField] : 'c8c8c8'
+                        color: item[this.colorField] ? item[this.colorField] : 'c8c8c8',
+                        sourceItem: item
                     });
                 }
             }
@@ -170,6 +173,11 @@ export default {
             }
 
             this.selectedIndex = newSelectedIndex % this.validItems.length;
+        },
+        clickItem: function (item) {
+            if (this.enableClickItem) {
+                this.$emit('click', item.sourceItem);
+            }
         }
     },
     filters: {
@@ -240,12 +248,20 @@ export default {
     margin: 0 0 4px 0;
 }
 
-.pie-chart-toolbox-info p > span {
-    padding-right: 8px;
+.pie-chart-toolbox-info a {
+    color: var(--f7-text-color);
 }
 
-.pie-chart-toolbox-info p > span:last-child {
-    padding-right: 0;
+.pie-chart-toolbox-info a > span + span {
+    padding-left: 8px;
+}
+
+.pie-chart-toolbox-info .item-navigate-icon {
+    color: rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 4px;
+    margin-bottom: 2px;
 }
 
 .pie-chart-toolbox-button {

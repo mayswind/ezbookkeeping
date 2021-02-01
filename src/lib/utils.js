@@ -93,6 +93,10 @@ function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {
     return moment.unix(unixTime).subtract(amount, unit).unix();
 }
 
+function getUnixTimeAfterUnixTime(unixTime, amount, unit) {
+    return moment.unix(unixTime).add(amount, unit).unix();
+}
+
 function getMinuteFirstUnixTime(date) {
     const datetime = moment(date);
     return datetime.set({ second: 0, millisecond: 0 }).unix();
@@ -571,6 +575,7 @@ export default {
     getMinute,
     getSecond,
     getUnixTimeBeforeUnixTime,
+    getUnixTimeAfterUnixTime,
     getMinuteFirstUnixTime,
     getMinuteLastUnixTime,
     getTodayFirstUnixTime,

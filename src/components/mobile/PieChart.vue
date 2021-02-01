@@ -23,7 +23,7 @@
         </svg>
         <div class="pie-chart-toolbox-container padding-horizontal" v-if="showSelectedItemInfo">
             <div class="pie-chart-toolbox">
-                <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || !validItems.length }" @click="switchSelectedItem(1)">
+                <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || validItems.length <= 1 }" @click="switchSelectedItem(1)">
                     <f7-icon f7="arrow_left"></f7-icon>
                 </f7-link>
 
@@ -51,7 +51,7 @@
                     </p>
                 </div>
 
-                <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || !validItems.length }" @click="switchSelectedItem(-1)">
+                <f7-link class="pie-chart-toolbox-button" :class="{ 'disabled': !!skeleton || !validItems || validItems.length <= 1 }" @click="switchSelectedItem(-1)">
                     <f7-icon f7="arrow_right"></f7-icon>
                 </f7-link>
             </div>

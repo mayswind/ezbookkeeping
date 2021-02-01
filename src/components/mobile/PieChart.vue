@@ -38,7 +38,7 @@
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
                     <p v-else-if="!validItems || !validItems.length">
-                        <f7-chip outline text="0%"></f7-chip>
+                        <f7-chip outline text="---"></f7-chip>
                     </p>
                     <f7-link :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
                         <span class="skeleton-text" v-if="skeleton">Name</span>

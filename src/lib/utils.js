@@ -207,7 +207,7 @@ function getDateRangeByDateType(dateType, firstDayOfWeek) {
         maxTime = getThisMonthLastUnixTime();
         minTime = getThisMonthFirstUnixTime();
     } else if (dateType === dateTimeConstants.allDateRanges.LastMonth.type) { // Last month
-        maxTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 1, 'months');
+        maxTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'seconds');
         minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 1, 'months');
     } else if (dateType === dateTimeConstants.allDateRanges.ThisYear.type) { // This year
         maxTime = getThisYearLastUnixTime();

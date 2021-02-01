@@ -47,7 +47,9 @@
                     class="statistics-pie-chart"
                     name-field="name"
                     value-field="totalAmount"
+                    percent-field="percent"
                     color-field="color"
+                    hidden-field="hidden"
                     v-else-if="!loading"
                     @click="clickPieChartItem"
                 >
@@ -145,33 +147,35 @@
                             {{ statisticsData.totalAmount | currency(defaultCurrency) }}
                         </div>
                     </f7-list-item>
-                    <f7-list-item v-for="(data, idx) in statisticsData.items" :key="idx"
+                    <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"
-                                  :link="data | itemLinkUrl(query, $constants.statistics.allChartDataTypes)">
+                                  :link="item | itemLinkUrl(query, $constants.statistics.allChartDataTypes)"
+                                  v-show="!item.hidden"
+                    >
                         <div slot="media" class="display-flex no-padding-horizontal">
                             <div class="display-flex align-items-center statistics-icon">
-                                <f7-icon v-if="data.icon"
-                                         :icon="data.icon | icon(data.type)"
-                                         :style="data.color | iconStyle(data.type, 'var(--category-icon-color)')">
+                                <f7-icon v-if="item.icon"
+                                         :icon="item.icon | icon(item.type)"
+                                         :style="item.color | iconStyle(item.type, 'var(--category-icon-color)')">
                                 </f7-icon>
-                                <f7-icon v-else-if="!data.icon"
+                                <f7-icon v-else-if="!item.icon"
                                          f7="pencil_ellipsis_rectangle">
                                 </f7-icon>
                             </div>
                         </div>
 
                         <div slot="title">
-                            <span>{{ data.name }}</span>
-                            <small class="statistics-percent" v-if="data.percent >= 0">{{ data.percent | percent(2, '&lt;0.01') }}</small>
+                            <span>{{ item.name }}</span>
+                            <small class="statistics-percent" v-if="item.percent >= 0">{{ item.percent | percent(2, '&lt;0.01') }}</small>
                         </div>
 
                         <div slot="after">
-                            <span>{{ data.totalAmount | currency(defaultCurrency) }}</span>
+                            <span>{{ item.totalAmount | currency(defaultCurrency) }}</span>
                         </div>
 
                         <div slot="inner-end" class="statistics-item-end">
                             <div class="statistics-percent-line">
-                                <f7-progressbar :progress="data.percent >= 0 ? data.percent : 0" :style="{ '--f7-progressbar-progress-color': (data.color ? '#' + data.color : '') } "></f7-progressbar>
+                                <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
                             </div>
                         </div>
                     </f7-list-item>
@@ -311,7 +315,7 @@ export default {
             for (let i = 0; i < self.$store.state.transactionStatistics.items.length; i++) {
                 const item = self.$store.state.transactionStatistics.items[i];
 
-                if (!item.account || !item.primaryCategory || !item.category) {
+                if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
                     continue;
                 }
 
@@ -345,6 +349,7 @@ export default {
                                 id: item.account.id,
                                 icon: item.account.icon || self.$constants.icons.defaultAccountIcon.icon,
                                 color: item.account.color || self.$constants.colors.defaultAccountColor,
+                                hidden: item.primaryAccount.hidden || item.account.hidden,
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }
@@ -366,6 +371,7 @@ export default {
                                 id: item.primaryCategory.id,
                                 icon: item.primaryCategory.icon || self.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.primaryCategory.color || self.$constants.colors.defaultCategoryColor,
+                                hidden: item.primaryCategory.hidden,
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }
@@ -387,6 +393,7 @@ export default {
                                 id: item.category.id,
                                 icon: item.category.icon || self.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.category.color || self.$constants.colors.defaultCategoryColor,
+                                hidden: item.primaryCategory.hidden || item.category.hidden,
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }

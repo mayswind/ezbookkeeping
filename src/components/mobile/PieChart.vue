@@ -33,7 +33,7 @@
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
                         <f7-chip outline
-                                 :text="(selectedItem.percent * 100) | percent(2, '&lt;0.01')"
+                                 :text="(selectedItem.percent) | percent(2, '&lt;0.01')"
                                  :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)', '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
@@ -67,7 +67,9 @@ export default {
         'items',
         'nameField',
         'valueField',
+        'percentField',
         'colorField',
+        'hiddenField',
         'minValidPercent',
         'defaultCurrency',
         'showCenterText',
@@ -91,7 +93,7 @@ export default {
             for (let i = 0; i < this.items.length; i++) {
                 const item = this.items[i];
 
-                if (item[this.valueField] && item[this.valueField] > 0) {
+                if (item[this.valueField] && item[this.valueField] > 0 && (!this.hiddenField || !item[this.hiddenField])) {
                     totalValidValue += item[this.valueField];
                 }
             }
@@ -102,11 +104,13 @@ export default {
                 const item = this.items[i];
 
                 if (item[this.valueField] && item[this.valueField] > 0 &&
+                    (!this.hiddenField || !item[this.hiddenField]) &&
                     (!this.minValidPercent || item[this.valueField] / totalValidValue > this.minValidPercent)) {
                     validItems.push({
                         name: item[this.nameField],
                         value: item[this.valueField],
-                        percent: item[this.valueField] / totalValidValue,
+                        percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
+                        actualPercent: item[this.valueField] / totalValidValue,
                         color: item[this.colorField] ? item[this.colorField] : 'c8c8c8',
                         sourceItem: item
                     });
@@ -134,11 +138,11 @@ export default {
             for (let i = 0; i < Math.min(this.selectedIndex + 1, this.validItems.length); i++) {
                 const item = this.validItems[i];
 
-                if (item.percent > 0) {
+                if (item.actualPercent > 0) {
                     if (i === this.selectedIndex) {
-                        offset += -this.circumference * (1 - item.percent) / 2;
+                        offset += -this.circumference * (1 - item.actualPercent) / 2;
                     } else {
-                        offset += -this.circumference * (1 - item.percent);
+                        offset += -this.circumference * (1 - item.actualPercent);
                     }
                 }
             }
@@ -182,7 +186,7 @@ export default {
     },
     filters: {
         itemStrokeDash(item, circumference) {
-            const length = item.percent * circumference;
+            const length = item.actualPercent * circumference;
             return `${length} ${circumference - length}`;
         },
         itemDashOffset(item, items, circumference, offset) {
@@ -195,7 +199,7 @@ export default {
                     break;
                 }
 
-                allPreviousPercent += curItem.percent;
+                allPreviousPercent += curItem.actualPercent;
             }
 
             if (offset) {

@@ -771,6 +771,12 @@ const stores = {
                         item.account = state.allAccountsMap[item.accountId];
                     }
 
+                    if (item.account && item.account.parentId !== '0') {
+                        item.primaryAccount = state.allAccountsMap[item.account.parentId];
+                    } else {
+                        item.primaryAccount = item.account;
+                    }
+
                     if (item.categoryId) {
                         item.category = state.allTransactionCategoriesMap[item.categoryId];
                     }

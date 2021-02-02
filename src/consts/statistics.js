@@ -8,12 +8,30 @@ const allChartTypes = {
 const defaultChartType = allChartTypes.Pie;
 
 const allChartDataTypes = {
-    ExpenseByAccount: 0,
-    ExpenseByPrimaryCategory: 1,
-    ExpenseBySecondaryCategory: 2,
-    IncomeByAccount: 3,
-    IncomeByPrimaryCategory: 4,
-    IncomeBySecondaryCategory: 5
+    ExpenseByAccount: {
+        type: 0,
+        name: 'Expense By Account'
+    },
+    ExpenseByPrimaryCategory: {
+        type: 1,
+        name: 'Expense By Primary Category'
+    },
+    ExpenseBySecondaryCategory: {
+        type: 2,
+        name: 'Expense By Secondary Category'
+    },
+    IncomeByAccount: {
+        type: 3,
+        name: 'Income By Account'
+    },
+    IncomeByPrimaryCategory: {
+        type: 4,
+        name: 'Income By Primary Category'
+    },
+    IncomeBySecondaryCategory: {
+        type: 5,
+        name: 'Income By Secondary Category'
+    }
 };
 
 const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory;

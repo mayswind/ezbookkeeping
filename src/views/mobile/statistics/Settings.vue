@@ -43,32 +43,7 @@
 export default {
     computed: {
         allChartDataTypes() {
-            return [
-                {
-                    type: this.$constants.statistics.allChartDataTypes.ExpenseByAccount,
-                    name: 'Expense By Account'
-                },
-                {
-                    type: this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory,
-                    name: 'Expense By Primary Category'
-                },
-                {
-                    type: this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory,
-                    name: 'Expense By Secondary Category'
-                },
-                {
-                    type: this.$constants.statistics.allChartDataTypes.IncomeByAccount,
-                    name: 'Income By Account'
-                },
-                {
-                    type: this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory,
-                    name: 'Income By Primary Category'
-                },
-                {
-                    type: this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory,
-                    name: 'Income By Secondary Category'
-                },
-            ];
+            return this.$constants.statistics.allChartDataTypes;
         },
         allDateRanges() {
             const allDateRanges = [];

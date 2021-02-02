@@ -31,6 +31,14 @@ const allChartDataTypes = {
     IncomeBySecondaryCategory: {
         type: 5,
         name: 'Income By Secondary Category'
+    },
+    AccountTotalAssets: {
+        type: 6,
+        name: 'Account Total Assets'
+    },
+    AccountTotalLiabilities: {
+        type: 7,
+        name: 'Account Total Liabilities'
     }
 };
 

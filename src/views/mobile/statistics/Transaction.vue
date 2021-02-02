@@ -48,13 +48,15 @@
                     name-field="name"
                     value-field="totalAmount"
                     percent-field="percent"
+                    currency-field="currency"
                     color-field="color"
                     hidden-field="hidden"
                     v-else-if="!loading"
                     @click="clickPieChartItem"
                 >
-                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type)">{{ $t('Total Expense') }}</text>
-                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length && (query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type)">{{ $t('Total Income') }}</text>
+                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length">
+                        {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
+                    </text>
                     <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
                         {{ statisticsData.totalAmount | currency(defaultCurrency) }}
                     </text>
@@ -140,8 +142,9 @@
                 </f7-list>
                 <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
                     <f7-list-item class="statistics-list-item-overview">
-                        <div slot="header" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type">{{ $t('Total Expense') }}</div>
-                        <div slot="header" v-if="query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type">{{ $t('Total Income') }}</div>
+                        <div slot="header">
+                            {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
+                        </div>
                         <div slot="title"
                              :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type }">
                             {{ statisticsData.totalAmount | currency(defaultCurrency) }}
@@ -170,7 +173,7 @@
                         </div>
 
                         <div slot="after">
-                            <span>{{ item.totalAmount | currency(defaultCurrency) }}</span>
+                            <span>{{ item.totalAmount | currency(item.currency || defaultCurrency) }}</span>
                         </div>
 
                         <div slot="inner-end" class="statistics-item-end">
@@ -184,13 +187,13 @@
         </f7-card>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
+            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
+            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
+            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
@@ -283,111 +286,32 @@ export default {
         },
         statisticsData() {
             const self = this;
-            const combinedData = {};
+            let combinedData = {
+                items: [],
+                totalAmount: 0
+            };
 
-            let allAmount = 0;
-
-            for (let i = 0; i < self.$store.state.transactionStatistics.items.length; i++) {
-                const item = self.$store.state.transactionStatistics.items[i];
-
-                if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
-                    continue;
-                }
-
-                if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                    if (item.category.type !== self.$constants.category.allCategoryTypes.Expense) {
-                        continue;
-                    }
-                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (item.category.type !== self.$constants.category.allCategoryTypes.Income) {
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
-
-                if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount.type) {
-                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = combinedData[item.account.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.account.name,
-                                type: 'account',
-                                id: item.account.id,
-                                icon: item.account.icon || self.$constants.icons.defaultAccountIcon.icon,
-                                color: item.account.color || self.$constants.colors.defaultAccountColor,
-                                hidden: item.primaryAccount.hidden || item.account.hidden,
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        allAmount += item.amountInDefaultCurrency;
-                        combinedData[item.account.id] = data;
-                    }
-                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type) {
-                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = combinedData[item.primaryCategory.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.primaryCategory.name,
-                                type: 'category',
-                                id: item.primaryCategory.id,
-                                icon: item.primaryCategory.icon || self.$constants.icons.defaultCategoryIcon.icon,
-                                color: item.primaryCategory.color || self.$constants.colors.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden,
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        allAmount += item.amountInDefaultCurrency;
-                        combinedData[item.primaryCategory.id] = data;
-                    }
-                } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
-                    self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (self.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = combinedData[item.category.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.category.name,
-                                type: 'category',
-                                id: item.category.id,
-                                icon: item.category.icon || self.$constants.icons.defaultCategoryIcon.icon,
-                                color: item.category.color || self.$constants.colors.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden || item.category.hidden,
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        allAmount += item.amountInDefaultCurrency;
-                        combinedData[item.category.id] = data;
-                    }
-                }
+            if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                combinedData = this.getDataItemsByTransactions(self.$store.state.transactionStatistics);
+            } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
+                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+                combinedData = this.getDataItemsByAccounts(self.$store.getters.allPlainAccounts);
             }
 
             const allStatisticsItems = [];
 
-            for (let id in combinedData) {
-                if (!Object.prototype.hasOwnProperty.call(combinedData, id)) {
+            for (let id in combinedData.items) {
+                if (!Object.prototype.hasOwnProperty.call(combinedData.items, id)) {
                     continue;
                 }
 
-                const data = combinedData[id];
-                data.percent = data.totalAmount * 100 / allAmount;
+                const data = combinedData.items[id];
+                data.percent = data.totalAmount * 100 / combinedData.totalAmount;
 
                 allStatisticsItems.push(data);
             }
@@ -397,7 +321,7 @@ export default {
             });
 
             return {
-                totalAmount: allAmount,
+                totalAmount: combinedData.totalAmount,
                 items: allStatisticsItems
             };
         }
@@ -414,7 +338,7 @@ export default {
 
         let defaultChartDataType = self.$settings.getStatisticsDefaultChartDataType();
 
-        if (defaultChartDataType < self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
+        if (defaultChartDataType < self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
             defaultChartDataType = self.$constants.statistics.defaultChartDataType;
         }
 
@@ -558,6 +482,11 @@ export default {
             this.reload(null);
         },
         dateRangeName(query) {
+            if (query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
+                query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+                return this.$t(this.allDateRanges.All.name);
+            }
+
             if (query.dateType === this.allDateRanges.All.type) {
                 return this.$t(this.allDateRanges.All.name);
             }
@@ -608,6 +537,163 @@ export default {
         },
         settings() {
             this.$f7router.navigate('/statistic/settings');
+        },
+        getDataItemsByTransactions(transactionStatistics) {
+            const allDataItems = {};
+            let allAmount = 0;
+
+            for (let i = 0; i < transactionStatistics.items.length; i++) {
+                const item = transactionStatistics.items[i];
+
+                if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
+                    continue;
+                }
+
+                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                    if (item.category.type !== this.$constants.category.allCategoryTypes.Expense) {
+                        continue;
+                    }
+                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                    if (item.category.type !== this.$constants.category.allCategoryTypes.Income) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+
+                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByAccount.type) {
+                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = allDataItems[item.account.id];
+
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
+                        } else {
+                            data = {
+                                name: item.account.name,
+                                type: 'account',
+                                id: item.account.id,
+                                icon: item.account.icon || this.$constants.icons.defaultAccountIcon.icon,
+                                color: item.account.color || this.$constants.colors.defaultAccountColor,
+                                hidden: item.primaryAccount.hidden || item.account.hidden,
+                                totalAmount: item.amountInDefaultCurrency
+                            }
+                        }
+
+                        allAmount += item.amountInDefaultCurrency;
+                        allDataItems[item.account.id] = data;
+                    }
+                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type) {
+                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = allDataItems[item.primaryCategory.id];
+
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
+                        } else {
+                            data = {
+                                name: item.primaryCategory.name,
+                                type: 'category',
+                                id: item.primaryCategory.id,
+                                icon: item.primaryCategory.icon || this.$constants.icons.defaultCategoryIcon.icon,
+                                color: item.primaryCategory.color || this.$constants.colors.defaultCategoryColor,
+                                hidden: item.primaryCategory.hidden,
+                                totalAmount: item.amountInDefaultCurrency
+                            }
+                        }
+
+                        allAmount += item.amountInDefaultCurrency;
+                        allDataItems[item.primaryCategory.id] = data;
+                    }
+                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
+                        let data = allDataItems[item.category.id];
+
+                        if (data) {
+                            data.totalAmount += item.amountInDefaultCurrency;
+                        } else {
+                            data = {
+                                name: item.category.name,
+                                type: 'category',
+                                id: item.category.id,
+                                icon: item.category.icon || this.$constants.icons.defaultCategoryIcon.icon,
+                                color: item.category.color || this.$constants.colors.defaultCategoryColor,
+                                hidden: item.primaryCategory.hidden || item.category.hidden,
+                                totalAmount: item.amountInDefaultCurrency
+                            }
+                        }
+
+                        allAmount += item.amountInDefaultCurrency;
+                        allDataItems[item.category.id] = data;
+                    }
+                }
+            }
+
+            return {
+                totalAmount: allAmount,
+                items: allDataItems
+            }
+        },
+        getDataItemsByAccounts(accounts) {
+            const allDataItems = {};
+            let allAmount = 0;
+
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+
+                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalAssets.type) {
+                    if (!account.isAsset) {
+                        continue;
+                    }
+                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+                    if (!account.isLiability) {
+                        continue;
+                    }
+                }
+
+                let primaryAccount = this.$store.state.allAccountsMap[account.parentId];
+
+                if (!primaryAccount) {
+                    primaryAccount = account;
+                }
+
+                let amount = account.balance;
+
+                if (account.currency !== this.defaultCurrency) {
+                    amount = Math.floor(this.$store.getters.getExchangedAmount(amount, account.currency, this.defaultCurrency));
+
+                    if (!this.$utilities.isNumber(amount)) {
+                        continue;
+                    }
+                }
+
+                if (account.isLiability) {
+                    amount = -amount;
+                }
+
+                const data = {
+                    name: account.name,
+                    type: 'account',
+                    id: account.id,
+                    icon: account.icon || self.$constants.icons.defaultAccountIcon.icon,
+                    color: account.color || self.$constants.colors.defaultAccountColor,
+                    hidden: primaryAccount.hidden || account.hidden,
+                    totalAmount: amount
+                };
+
+                allAmount += amount;
+                allDataItems[account.id] = data;
+            }
+
+            return {
+                totalAmount: allAmount,
+                items: allDataItems
+            }
         }
     },
     filters: {
@@ -621,8 +707,21 @@ export default {
                     return allChartDataTypes[chartDataTypeField].name;
                 }
             }
-            
+
             return 'Statistics';
+        },
+        totalAmountName(dataType, allChartDataTypes) {
+            if (dataType === allChartDataTypes.IncomeByAccount.type || dataType === allChartDataTypes.IncomeByPrimaryCategory.type || dataType === allChartDataTypes.IncomeBySecondaryCategory.type) {
+                return 'Total Income';
+            } else if (dataType === allChartDataTypes.ExpenseByAccount.type || dataType === allChartDataTypes.ExpenseByPrimaryCategory.type || dataType === allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                return 'Total Expense';
+            } else if (dataType === allChartDataTypes.AccountTotalAssets.type) {
+                return 'Total Assets';
+            } else if (dataType === allChartDataTypes.AccountTotalLiabilities.type) {
+                return 'Total Liabilities';
+            }
+
+            return 'Total Amount';
         },
         itemLinkUrl(item, query, allChartDataTypes) {
             const querys = [];
@@ -633,15 +732,17 @@ export default {
                 querys.push('type=3');
             }
 
-            if (query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByAccount.type) {
+            if (query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('accountId=' + item.id);
             } else if (query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type) {
                 querys.push('categoryId=' + item.id);
             }
 
-            querys.push('dateType=' + query.dateType);
-            querys.push('minTime=' + query.startTime);
-            querys.push('maxTime=' + query.endTime);
+            if (query.chartDataType !== allChartDataTypes.AccountTotalAssets.type && query.chartDataType !== allChartDataTypes.AccountTotalLiabilities.type) {
+                querys.push('dateType=' + query.dateType);
+                querys.push('minTime=' + query.startTime);
+                querys.push('maxTime=' + query.endTime);
+            }
 
             return '/transaction/list?' + querys.join('&');
         }

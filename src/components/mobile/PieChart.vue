@@ -44,7 +44,7 @@
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
-                        <span v-else-if="!skeleton" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(defaultCurrency) }}</span>
+                        <span v-else-if="!skeleton" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(selectedItem.currency || defaultCurrency) }}</span>
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
@@ -68,6 +68,7 @@ export default {
         'nameField',
         'valueField',
         'percentField',
+        'currencyField',
         'colorField',
         'hiddenField',
         'minValidPercent',
@@ -111,6 +112,7 @@ export default {
                         value: item[this.valueField],
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
+                        currency: item[this.currencyField],
                         color: item[this.colorField] ? item[this.colorField] : 'c8c8c8',
                         sourceItem: item
                     });

@@ -9,7 +9,7 @@ RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d '
   && GOOS=linux \
   && GOARCH=amd64 \
   && CGO_ENABLED=1 \
-  && go build -a -v -i -trimpath -ldflags "-X main.version=${VERSION} -X main.commitHash=${COMMIT_HASH}" -o lab lab.go
+  && go build -a -v -i -trimpath -ldflags "-w -linkmode external -extldflags '-static' -X main.version=${VERSION} -X main.commitHash=${COMMIT_HASH}" -o lab lab.go
 RUN chmod +x lab
 
 # Build frontend files

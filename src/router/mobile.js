@@ -13,6 +13,8 @@ import AccountEditPage from '../views/mobile/accounts/Edit.vue';
 
 import StatisticsTransactionPage from '../views/mobile/statistics/Transaction.vue';
 import StatisticsSettingsPage from '../views/mobile/statistics/Settings.vue';
+import StatisticsAccountFilterSettingsPage from '../views/mobile/statistics/AccountFilterSettings.vue';
+import StatisticsCategoryFilterSettingsPage from '../views/mobile/statistics/CategoryFilterSettings.vue';
 
 import SettingsPage from '../views/mobile/Settings.vue';
 import ApplicationLockPage from '../views/mobile/ApplicationLock.vue';
@@ -179,6 +181,16 @@ const routes = [
     {
         path: '/statistic/settings',
         component: StatisticsSettingsPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/statistic/filter/account',
+        component: StatisticsAccountFilterSettingsPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/statistic/filter/category',
+        component: StatisticsCategoryFilterSettingsPage,
         beforeEnter: checkLogin
     },
     {

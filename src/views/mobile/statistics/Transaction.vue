@@ -232,6 +232,10 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
+                <f7-actions-button @click="filterAccounts">{{ $t('Filter Accounts') }}</f7-actions-button>
+                <f7-actions-button @click="filterCategories">{{ $t('Filter Transaction Categories') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
                 <f7-actions-button @click="settings">{{ $t('Settings') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -535,6 +539,12 @@ export default {
         clickPieChartItem(item) {
             this.$f7router.navigate(this.$options.filters.itemLinkUrl(item, this.query, this.$constants.statistics.allChartDataTypes));
         },
+        filterAccounts() {
+            this.$f7router.navigate('/statistic/filter/account');
+        },
+        filterCategories() {
+            this.$f7router.navigate('/statistic/filter/category');
+        },
         settings() {
             this.$f7router.navigate('/statistic/settings');
         },
@@ -562,6 +572,14 @@ export default {
                         continue;
                     }
                 } else {
+                    continue;
+                }
+
+                if (this.query.filterAccountIds && this.query.filterAccountIds[item.account.id]) {
+                    continue;
+                }
+
+                if (this.query.filterCategoryIds && this.query.filterCategoryIds[item.category.id]) {
                     continue;
                 }
 
@@ -654,6 +672,10 @@ export default {
                     if (!account.isLiability) {
                         continue;
                     }
+                }
+
+                if (this.query.filterAccountIds && this.query.filterAccountIds[account.id]) {
+                    continue;
                 }
 
                 let primaryAccount = this.$store.state.allAccountsMap[account.parentId];

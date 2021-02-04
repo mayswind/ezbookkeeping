@@ -184,6 +184,8 @@ const stores = {
             endTime: 0,
             chartType: statisticsConstants.defaultChartType,
             chartDataType: statisticsConstants.defaultChartDataType,
+            filterAccountIds: {},
+            filterCategoryIds: {}
         },
         transactionStatistics: [],
         transactionStatisticsStateInvalid: true,
@@ -244,6 +246,8 @@ const stores = {
             state.transactionStatisticsFilter.endTime = 0;
             state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
             state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
+            state.transactionStatisticsFilter.filterAccountIds = {};
+            state.transactionStatisticsFilter.filterCategoryIds = {};
             state.transactionStatistics = {};
             state.transactionStatisticsStateInvalid = true;
 
@@ -833,6 +837,18 @@ const stores = {
             } else {
                 state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             }
+
+            if (filter && utils.isObject(filter.filterAccountIds)) {
+                state.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
+            } else {
+                state.transactionStatisticsFilter.filterAccountIds = {};
+            }
+
+            if (filter && utils.isObject(filter.filterCategoryIds)) {
+                state.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
+            } else {
+                state.transactionStatisticsFilter.filterCategoryIds = {};
+            }
         },
         [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
             if (filter && utils.isNumber(filter.dateType)) {
@@ -853,6 +869,14 @@ const stores = {
 
             if (filter && utils.isNumber(filter.chartDataType)) {
                 state.transactionStatisticsFilter.chartDataType = filter.chartDataType;
+            }
+
+            if (filter && utils.isObject(filter.filterAccountIds)) {
+                state.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
+            }
+
+            if (filter && utils.isObject(filter.filterCategoryIds)) {
+                state.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_INVALID_STATE] (state, invalidState) {

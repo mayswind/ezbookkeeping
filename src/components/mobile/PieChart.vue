@@ -267,7 +267,6 @@ export default {
     font-size: 18px;
     font-weight: bold;
     padding-left: 4px;
-    margin-bottom: 2px;
 }
 
 .pie-chart-toolbox-button {

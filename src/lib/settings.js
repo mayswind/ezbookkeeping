@@ -18,7 +18,8 @@ const defaultSettings = {
     statistics: {
         defaultChartType: statisticsConstants.defaultChartType,
         defaultChartDataType: statisticsConstants.defaultChartDataType,
-        defaultDataRangeType: statisticsConstants.defaultDataRangeType
+        defaultDataRangeType: statisticsConstants.defaultDataRangeType,
+        sortingType: statisticsConstants.defaultSortingType
     },
     animate: true,
     autoDarkMode: true
@@ -133,6 +134,8 @@ export default {
     setStatisticsDefaultChartDataType: value => setSubOption('statistics', 'defaultChartDataType', value),
     getStatisticsDefaultDateRange: () => getSubOption('statistics', 'defaultDataRangeType'),
     setStatisticsDefaultDateRange: value => setSubOption('statistics', 'defaultDataRangeType', value),
+    getStatisticsSortingType: () => getSubOption('statistics', 'sortingType'),
+    setStatisticsSortingType: value => setSubOption('statistics', 'sortingType', value),
     isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),

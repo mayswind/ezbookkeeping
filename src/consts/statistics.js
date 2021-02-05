@@ -44,10 +44,20 @@ const allChartDataTypes = {
 
 const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory;
 
+const allSortingTypes = {
+    ByAmount: 0,
+    ByDisplayOrder: 1,
+    ByName: 2
+};
+
+const defaultSortingType = allSortingTypes.ByAmount;
+
 export default {
     allChartTypes: allChartTypes,
     defaultChartType: defaultChartType,
     allChartDataTypes: allChartDataTypes,
     defaultChartDataType: defaultChartDataType,
     defaultDataRangeType: datetime.allDateRanges.ThisMonth.type,
+    allSortingTypes: allSortingTypes,
+    defaultSortingType: defaultSortingType,
 };

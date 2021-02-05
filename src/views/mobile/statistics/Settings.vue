@@ -33,6 +33,16 @@
                                     :value="dateRange.type">{{ dateRange.name | localized }}</option>
                         </select>
                     </f7-list-item>
+
+                    <f7-list-item
+                        :title="$t('Sort By')"
+                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        <select v-model="sortBy">
+                            <option :value="$constants.statistics.allSortingTypes.ByAmount">{{ $t('By Amount') }}</option>
+                            <option :value="$constants.statistics.allSortingTypes.ByDisplayOrder">{{ $t('By Display Order') }}</option>
+                            <option :value="$constants.statistics.allSortingTypes.ByName">{{ $t('By Name') }}</option>
+                        </select>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -84,6 +94,14 @@ export default {
             },
             set: function (value) {
                 this.$settings.setStatisticsDefaultDateRange(value);
+            }
+        },
+        sortBy: {
+            get: function () {
+                return this.$settings.getStatisticsSortingType();
+            },
+            set: function (value) {
+                this.$settings.setStatisticsSortingType(value);
             }
         }
     }

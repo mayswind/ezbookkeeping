@@ -248,8 +248,11 @@
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
             loading: true,
+            sortBy: self.$settings.getStatisticsSortingType(),
             showChartDataTypePopover: false,
             showDatePopover: false,
             showCustomDateRangeSheet: false,
@@ -329,9 +332,38 @@ export default {
                 allStatisticsItems.push(data);
             }
 
-            allStatisticsItems.sort(function (data1, data2) {
-                return data2.totalAmount - data1.totalAmount;
-            });
+            if (this.sortBy === this.$constants.statistics.allSortingTypes.ByDisplayOrder) {
+                allStatisticsItems.sort(function (data1, data2) {
+                    for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
+                        if (data1.displayOrders[i] !== data2.displayOrders[i]) {
+                            return data1.displayOrders[i] - data2.displayOrders[i]; // asc
+                        }
+                    }
+
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            } else if (this.sortBy === this.$constants.statistics.allSortingTypes.ByName) {
+                allStatisticsItems.sort(function (data1, data2) {
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            } else {
+                allStatisticsItems.sort(function (data1, data2) {
+                    if (data1.totalAmount !== data2.totalAmount) {
+                        return data2.totalAmount - data1.totalAmount; // desc
+                    }
+
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            }
 
             return {
                 totalAmount: combinedData.totalAmount,
@@ -391,6 +423,10 @@ export default {
     },
     methods: {
         onPageAfterIn() {
+            if (this.sortBy !== this.$settings.getStatisticsSortingType()) {
+                this.sortBy = this.$settings.getStatisticsSortingType();
+            }
+
             if (this.$store.state.transactionStatisticsStateInvalid && !this.loading) {
                 this.reload(null);
             }
@@ -608,6 +644,7 @@ export default {
                                 icon: item.account.icon || this.$constants.icons.defaultAccountIcon.icon,
                                 color: item.account.color || this.$constants.colors.defaultAccountColor,
                                 hidden: item.primaryAccount.hidden || item.account.hidden,
+                                displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }
@@ -635,6 +672,7 @@ export default {
                                 icon: item.primaryCategory.icon || this.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.primaryCategory.color || this.$constants.colors.defaultCategoryColor,
                                 hidden: item.primaryCategory.hidden,
+                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }
@@ -662,6 +700,7 @@ export default {
                                 icon: item.category.icon || this.$constants.icons.defaultCategoryIcon.icon,
                                 color: item.category.color || this.$constants.colors.defaultCategoryColor,
                                 hidden: item.primaryCategory.hidden || item.category.hidden,
+                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
                                 totalAmount: item.amountInDefaultCurrency
                             }
                         }
@@ -732,6 +771,7 @@ export default {
                     icon: account.icon || self.$constants.icons.defaultAccountIcon.icon,
                     color: account.color || self.$constants.colors.defaultAccountColor,
                     hidden: primaryAccount.hidden || account.hidden,
+                    displayOrders: [primaryAccount.category, primaryAccount.displayOrder, account.displayOrder],
                     totalAmount: amount
                 };
 

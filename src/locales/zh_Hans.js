@@ -669,6 +669,8 @@ export default {
     'Default Chart Type': '默认图表类型',
     'Default Chart Data Type': '默认图表数据类型',
     'Default Date Range': '默认时间范围',
+    'Default Account Filter': '默认账号过滤',
+    'Default Transaction Category Filter': '默认交易分类过滤',
     'Sort By': '排序方式',
     'By Amount': '金额',
     'By Display Order': '显示顺序',

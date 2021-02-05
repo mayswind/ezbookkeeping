@@ -669,6 +669,8 @@ export default {
     'Default Chart Type': 'Default Chart Type',
     'Default Chart Data Type': 'Default Chart Data Type',
     'Default Date Range': 'Default Date Range',
+    'Default Account Filter': 'Default Account Filter',
+    'Default Transaction Category Filter': 'Default Transaction Category Filter',
     'Sort By': 'Sort By',
     'By Amount': 'By Amount',
     'By Display Order': 'By Display Order',

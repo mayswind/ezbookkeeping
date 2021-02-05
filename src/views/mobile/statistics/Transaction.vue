@@ -401,6 +401,8 @@ export default {
             endTime: dateRange ? dateRange.maxTime : undefined,
             chartType: defaultChartType,
             chartDataType: defaultChartDataType,
+            filterAccountIds: self.$settings.getStatisticsDefaultAccountFilter() || {},
+            filterCategoryIds: self.$settings.getStatisticsDefaultTransactionCategoryFilter() || {},
         });
 
         Promise.all([

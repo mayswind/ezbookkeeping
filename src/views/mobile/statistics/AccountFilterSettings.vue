@@ -2,7 +2,7 @@
     <f7-page>
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Filter Accounts')"></f7-nav-title>
+            <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :text="$t('Save')" @click="save"></f7-link>
@@ -104,11 +104,19 @@ export default {
     data: function () {
         return {
             loading: true,
+            modifyDefault: false,
             filterAccountIds: {},
             showMoreActionSheet: false
         }
     },
     computed: {
+        title() {
+            if (this.modifyDefault) {
+                return 'Default Account Filter';
+            } else {
+                return 'Filter Accounts';
+            }
+        },
         allAccountCategories() {
             return this.$constants.account.allCategories;
         },
@@ -118,7 +126,10 @@ export default {
     },
     created() {
         const self = this;
+        const query = self.$f7route.query;
         const router = self.$f7router;
+
+        self.modifyDefault = !!query.modifyDefault;
 
         self.$store.dispatch('loadAllAccounts', {
             force: false
@@ -136,7 +147,11 @@ export default {
                 allAccountIds[account.id] = false;
             }
 
-            self.filterAccountIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterAccountIds, allAccountIds)
+            if (self.modifyDefault) {
+                self.filterAccountIds = self.$utilities.copyObjectTo(self.$settings.getStatisticsDefaultAccountFilter(), allAccountIds);
+            } else {
+                self.filterAccountIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterAccountIds, allAccountIds);
+            }
         }).catch(error => {
             self.logining = false;
 
@@ -163,9 +178,13 @@ export default {
                 }
             }
 
-            self.$store.dispatch('updateTransactionStatisticsFilter', {
-                filterAccountIds: filteredAccountIds
-            });
+            if (self.modifyDefault) {
+                self.$settings.setStatisticsDefaultAccountFilter(filteredAccountIds);
+            } else {
+                self.$store.dispatch('updateTransactionStatisticsFilter', {
+                    filterAccountIds: filteredAccountIds
+                });
+            }
 
             router.back();
         },

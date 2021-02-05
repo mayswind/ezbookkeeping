@@ -2,7 +2,7 @@
     <f7-page>
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Filter Transaction Categories')"></f7-nav-title>
+            <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :text="$t('Save')" @click="save"></f7-link>
@@ -109,18 +109,29 @@ export default {
     data: function () {
         return {
             loading: true,
+            modifyDefault: false,
             filterCategoryIds: {},
             showMoreActionSheet: false
         }
     },
     computed: {
+        title() {
+            if (this.modifyDefault) {
+                return 'Default Transaction Category Filter';
+            } else {
+                return 'Filter Transaction Categories';
+            }
+        },
         allTransactionCategories: function () {
             return this.$store.state.allTransactionCategories;
         }
     },
     created() {
         const self = this;
+        const query = self.$f7route.query;
         const router = self.$f7router;
+
+        self.modifyDefault = !!query.modifyDefault;
 
         self.$store.dispatch('loadAllCategories', {
             force: false
@@ -138,7 +149,11 @@ export default {
                 allCategoryIds[category.id] = false;
             }
 
-            self.filterCategoryIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterCategoryIds, allCategoryIds)
+            if (self.modifyDefault) {
+                self.filterCategoryIds = self.$utilities.copyObjectTo(self.$settings.getStatisticsDefaultTransactionCategoryFilter(), allCategoryIds);
+            } else {
+                self.filterCategoryIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
+            }
         }).catch(error => {
             self.logining = false;
 
@@ -165,9 +180,13 @@ export default {
                 }
             }
 
-            self.$store.dispatch('updateTransactionStatisticsFilter', {
-                filterCategoryIds: filteredCategoryIds
-            });
+            if (self.modifyDefault) {
+                self.$settings.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
+            } else {
+                self.$store.dispatch('updateTransactionStatisticsFilter', {
+                    filterCategoryIds: filteredCategoryIds
+                });
+            }
 
             router.back();
         },

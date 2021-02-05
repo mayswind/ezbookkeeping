@@ -42,7 +42,7 @@ const allChartDataTypes = {
     }
 };
 
-const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory;
+const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory.type;
 
 const allSortingTypes = {
     ByAmount: 0,

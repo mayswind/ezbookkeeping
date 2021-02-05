@@ -315,7 +315,16 @@ export default {
                 }
 
                 const data = combinedData.items[id];
-                data.percent = data.totalAmount * 100 / combinedData.totalAmount;
+
+                if (data.totalAmount > 0) {
+                    data.percent = data.totalAmount * 100 / combinedData.totalNonNegativeAmount;
+                } else {
+                    data.percent = 0;
+                }
+
+                if (data.percent < 0) {
+                    data.percent = 0;
+                }
 
                 allStatisticsItems.push(data);
             }
@@ -550,7 +559,8 @@ export default {
         },
         getDataItemsByTransactions(transactionStatistics) {
             const allDataItems = {};
-            let allAmount = 0;
+            let totalAmount = 0;
+            let totalNonNegativeAmount = 0;
 
             for (let i = 0; i < transactionStatistics.items.length; i++) {
                 const item = transactionStatistics.items[i];
@@ -602,7 +612,12 @@ export default {
                             }
                         }
 
-                        allAmount += item.amountInDefaultCurrency;
+                        totalAmount += item.amountInDefaultCurrency;
+
+                        if (item.amountInDefaultCurrency > 0) {
+                            totalNonNegativeAmount += item.amountInDefaultCurrency;
+                        }
+
                         allDataItems[item.account.id] = data;
                     }
                 } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
@@ -624,7 +639,12 @@ export default {
                             }
                         }
 
-                        allAmount += item.amountInDefaultCurrency;
+                        totalAmount += item.amountInDefaultCurrency;
+
+                        if (item.amountInDefaultCurrency > 0) {
+                            totalNonNegativeAmount += item.amountInDefaultCurrency;
+                        }
+
                         allDataItems[item.primaryCategory.id] = data;
                     }
                 } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
@@ -646,20 +666,27 @@ export default {
                             }
                         }
 
-                        allAmount += item.amountInDefaultCurrency;
+                        totalAmount += item.amountInDefaultCurrency;
+
+                        if (item.amountInDefaultCurrency > 0) {
+                            totalNonNegativeAmount += item.amountInDefaultCurrency;
+                        }
+
                         allDataItems[item.category.id] = data;
                     }
                 }
             }
 
             return {
-                totalAmount: allAmount,
+                totalAmount: totalAmount,
+                totalNonNegativeAmount: totalNonNegativeAmount,
                 items: allDataItems
             }
         },
         getDataItemsByAccounts(accounts) {
             const allDataItems = {};
-            let allAmount = 0;
+            let totalAmount = 0;
+            let totalNonNegativeAmount = 0;
 
             for (let i = 0; i < accounts.length; i++) {
                 const account = accounts[i];
@@ -708,12 +735,18 @@ export default {
                     totalAmount: amount
                 };
 
-                allAmount += amount;
+                totalAmount += amount;
+
+                if (amount > 0) {
+                    totalNonNegativeAmount += amount;
+                }
+
                 allDataItems[account.id] = data;
             }
 
             return {
-                totalAmount: allAmount,
+                totalAmount: totalAmount,
+                totalNonNegativeAmount: totalNonNegativeAmount,
                 items: allDataItems
             }
         }

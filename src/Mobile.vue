@@ -202,10 +202,6 @@ i.icon.la, i.icon.las, i.icon.lab {
     padding-right: 0;
 }
 
-.nested-list-item.has-child-list-item .item-inner {
-    padding-bottom: 0;
-}
-
 .nested-list-item.has-child-list-item .nested-list-item-child .item-inner {
     padding-bottom: var(--f7-list-item-padding-vertical);
 }
@@ -213,6 +209,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 .nested-list-item .nested-list-item-title {
     align-self: center;
     margin-left: var(--f7-list-item-media-margin);
+    margin-right: var(--f7-list-item-media-margin);
 }
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {

@@ -35,11 +35,12 @@
                         :href="'/category/preset?type=' + categoryType"></f7-list-button>
                 </f7-list>
 
-                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
+                <f7-list class="category-list" sortable :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="category in categories"
                                   :key="category.id"
                                   :id="category | categoryDomId"
                                   :title="category.name"
+                                  :footer="category.comment"
                                   :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
                                   v-show="showHidden || !category.hidden"
                                   swipeout @taphold.native="setSortable()">
@@ -356,3 +357,13 @@ export default {
     }
 };
 </script>
+
+<style>
+.category-list {
+    --f7-list-item-footer-font-size: 13px;
+}
+
+.category-list .item-footer {
+    padding-top: 4px;
+}
+</style>

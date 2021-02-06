@@ -124,7 +124,7 @@
                 </small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort" v-if="categorizedAccounts[accountCategory.id]">
+                <f7-list class="account-list" sortable :sortable-enabled="sortable" @sortable:sort="onSort" v-if="categorizedAccounts[accountCategory.id]">
                     <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
                                   :key="account.id" :id="account | accountDomId"
                                   :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
@@ -134,19 +134,22 @@
                     >
                         <f7-block slot="title" class="no-padding">
                             <div class="display-flex padding-top-half padding-bottom-half">
-                                <f7-icon slot="media" :icon="account.icon | accountIcon"
+                                <f7-icon class="align-self-center" slot="media" :icon="account.icon | accountIcon"
                                          :style="account.color | accountIconStyle('var(--default-icon-color)')">
                                     <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                         <f7-icon f7="eye_slash_fill"></f7-icon>
                                     </f7-badge>
                                 </f7-icon>
-                                <div class="nested-list-item-title">{{ account.name }}</div>
+                                <div class="nested-list-item-title">
+                                    <span>{{ account.name }}</span>
+                                    <div class="item-footer" slot="footer" v-if="account.comment">{{ account.comment }}</div>
+                                </div>
                             </div>
                             <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
                                 <ul class="no-padding">
                                     <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
                                                   :key="subAccount.id" :id="subAccount | accountDomId"
-                                                  :title="subAccount.name" :after="accountBalance(subAccount) | currency(subAccount.currency)"
+                                                  :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(subAccount) | currency(subAccount.currency)"
                                                   :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
                                     >
                                         <f7-icon slot="media" :icon="subAccount.icon | accountIcon"
@@ -608,5 +611,13 @@ export default {
 
 .account-overview-info > span:last-child {
     margin-right: 0;
+}
+
+.account-list {
+    --f7-list-item-footer-font-size: 13px;
+}
+
+.account-list .item-footer {
+    padding-top: 4px;
 }
 </style>

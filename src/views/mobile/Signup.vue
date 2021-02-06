@@ -133,7 +133,7 @@
                 </f7-navbar>
                 <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
                     <f7-card-header>
-                        <small :style="{ opacity: 0.6 }">
+                        <small class="card-header-content">
                             <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
                         </small>
                     </f7-card-header>

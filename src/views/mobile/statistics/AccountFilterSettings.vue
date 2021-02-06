@@ -11,7 +11,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small :style="{ opacity: 0.6 }">
+                <small class="card-header-content">
                     <span>Account Category</span>
                 </small>
             </f7-card-header>
@@ -27,7 +27,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small :style="{ opacity: 0.6 }">
+                <small class="card-header-content">
                     <span>Account Category 2</span>
                 </small>
             </f7-card-header>
@@ -47,7 +47,7 @@
         <f7-block class="no-padding no-margin" v-if="!loading">
             <f7-card v-for="accountCategory in allAccountCategories" :key="accountCategory.id" v-show="hasShownAccount(accountCategory)">
                 <f7-card-header>
-                    <small :style="{ opacity: 0.6 }">
+                    <small class="card-header-content">
                         <span>{{ $t(accountCategory.name) }}</span>
                     </small>
                 </f7-card-header>

@@ -42,7 +42,7 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
                 <div class="full-line">
-                    <small :style="{ opacity: 0.6 }">YYYY-MM</small>
+                    <small class="card-header-content">YYYY-MM</small>
                     <small class="transaction-amount-statistics">
                         <span>0.00 USD</span>
                         <span>0.00 USD</span>
@@ -136,7 +136,7 @@
                                @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
                 <f7-card-header>
                     <f7-accordion-toggle class="full-line">
-                        <small :style="{ opacity: 0.6 }">
+                        <small class="card-header-content">
                             <span>{{ transactionMonthList.yearMonth | moment($t('format.yearMonth.long')) }}</span>
                         </small>
                         <small class="transaction-amount-statistics" v-if="transactionMonthList.totalAmount">

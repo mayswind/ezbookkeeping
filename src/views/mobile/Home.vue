@@ -7,12 +7,12 @@
         <f7-card class="home-summary-card" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
-                    <span :style="{ opacity: 0.6 }" v-if="loading">
+                    <span class="card-header-content" v-if="loading">
                         <span class="home-summary-month">MM</span>
                         <span>·</span>
                         <small>Expense</small>
                     </span>
-                    <span :style="{ opacity: 0.6 }" v-else-if="!loading">
+                    <span class="card-header-content" v-else-if="!loading">
                         <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | localized }}</span>
                         <span>·</span>
                         <small>{{ $t('Expense') }}</small>

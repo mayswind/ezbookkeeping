@@ -13,8 +13,8 @@
         <f7-card class="account-overview-card" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
-                    <small :style="{ opacity: 0.6 }" v-if="loading">Net assets</small>
-                    <small :style="{ opacity: 0.6 }" v-else-if="!loading">{{ $t('Net assets') }}</small>
+                    <small class="card-header-content" v-if="loading">Net assets</small>
+                    <small class="card-header-content" v-else-if="!loading">{{ $t('Net assets') }}</small>
                 </p>
                 <p class="no-margin">
                     <span class="net-assets" v-if="loading">0.00 USD</span>
@@ -40,7 +40,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small style="opacity: 0.6;">Account Category</small>
+                <small class="card-header-content">Account Category</small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
@@ -58,7 +58,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small style="opacity: 0.6;">Account Category 2</small>
+                <small class="card-header-content">Account Category 2</small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
@@ -84,7 +84,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small style="opacity: 0.6;">Account Category 3</small>
+                <small class="card-header-content">Account Category 3</small>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
@@ -118,7 +118,7 @@
 
         <f7-card v-for="accountCategory in allAccountCategories" :key="accountCategory.id" v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
             <f7-card-header>
-                <small :style="{ opacity: 0.6 }">
+                <small class="card-header-content">
                     <span>{{ $t(accountCategory.name) }}</span>
                     <span style="margin-left: 10px">{{ accountCategoryTotalBalance(accountCategory) | currency(defaultCurrency) }}</span>
                 </small>

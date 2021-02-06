@@ -190,6 +190,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     color: var(--f7-theme-color);
 }
 
+.card-header-content {
+    opacity: 0.6;
+}
+
 .nested-list-item .item-title {
     width: 100%;
 }

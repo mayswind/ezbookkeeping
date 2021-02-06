@@ -11,7 +11,7 @@
 
         <f7-card v-for="categoryInfo in allCategories" :key="categoryInfo.type">
             <f7-card-header>
-                <small :style="{ opacity: 0.6 }">
+                <small class="card-header-content">
                     <span>{{ categoryInfo.type | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
                 </small>
             </f7-card-header>

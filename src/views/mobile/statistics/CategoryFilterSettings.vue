@@ -11,7 +11,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small :style="{ opacity: 0.6 }">
+                <small class="card-header-content">
                     <span>Transaction Category</span>
                 </small>
             </f7-card-header>
@@ -52,7 +52,7 @@
         <f7-block class="no-padding no-margin" v-if="!loading">
             <f7-card v-for="(categories, categoryType) in allTransactionCategories" :key="categoryType">
                 <f7-card-header>
-                    <small :style="{ opacity: 0.6 }">
+                    <small class="card-header-content">
                         <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
                     </small>
                 </f7-card-header>

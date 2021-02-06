@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+import currencyConstants from '../consts/currency.js';
 import statisticsConstants from '../consts/statistics.js';
 
 const settingsLocalStorageKey = 'lab_app_settings';
@@ -12,7 +13,7 @@ const defaultSettings = {
     applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
     thousandsSeparator: true,
-    currencyDisplayMode: 'symbol', // or 'none' or 'code' or 'name'
+    currencyDisplayMode: currencyConstants.defaultCurrencyDisplayMode,
     showAmountInHomePage: true,
     showAccountBalance: true,
     statistics: {

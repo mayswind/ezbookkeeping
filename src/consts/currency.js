@@ -629,8 +629,20 @@ const allCurrencies = {
     }
 };
 
+
+const allCurrencyDisplayModes = {
+    None: 0,
+    Symbol: 1,
+    Code: 2,
+    Name: 3
+};
+
+const defaultCurrencyDisplayMode = allCurrencyDisplayModes.Symbol;
+
 export default {
     parentAccountCurrencyPlaceholder: parentAccountCurrencyPlaceholder,
     defaultCurrencySymbol: defaultCurrencySymbol,
-    all: allCurrencies
+    all: allCurrencies,
+    allCurrencyDisplayModes: allCurrencyDisplayModes,
+    defaultCurrencyDisplayMode: defaultCurrencyDisplayMode
 };

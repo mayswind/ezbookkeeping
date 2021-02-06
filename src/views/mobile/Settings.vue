@@ -51,10 +51,10 @@
                         :title="$t('Currency Display Mode')"
                         smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
                         <select v-model="currencyDisplayMode">
-                            <option value="none">{{ $t('None') }}</option>
-                            <option value="symbol">{{ $t('Currency Symbol') }}</option>
-                            <option value="code">{{ $t('Currency Code') }}</option>
-                            <option value="name">{{ $t('Currency Name') }}</option>
+                            <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
+                            <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
+                            <option :value="$constants.currency.allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
+                            <option :value="$constants.currency.allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
                         </select>
                     </f7-list-item>
 

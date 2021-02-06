@@ -163,8 +163,8 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		user.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
 		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
 		anythingUpdate = true
-	} else  {
-		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID;
+	} else {
+		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID
 	}
 
 	if !anythingUpdate {

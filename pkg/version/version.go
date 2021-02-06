@@ -18,6 +18,7 @@ var (
 	BuildUnixTime string
 )
 
+// GetFullVersion returns the full version
 func GetFullVersion() string {
 	fullVersion := "Local Build"
 
@@ -28,14 +29,14 @@ func GetFullVersion() string {
 	additionalInfos := make([]string, 0, 2)
 
 	if CommitHash != "" {
-		additionalInfos = append(additionalInfos, "commit " + CommitHash)
+		additionalInfos = append(additionalInfos, "commit "+CommitHash)
 	}
 
 	if BuildUnixTime != "" {
 		unixTime, err := utils.StringToInt64(BuildUnixTime)
 
 		if unixTime > 0 && err == nil {
-			additionalInfos = append(additionalInfos, "build time " + utils.FormatToLongDateTime(utils.ParseFromUnixTime(unixTime)))
+			additionalInfos = append(additionalInfos, "build time "+utils.FormatToLongDateTime(utils.ParseFromUnixTime(unixTime)))
 		}
 	}
 

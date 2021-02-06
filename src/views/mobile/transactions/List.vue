@@ -10,18 +10,18 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="search" class="searchbar-enable" data-searchbar=".searchbar-keyword"></f7-link>
                 <f7-link icon-f7="plus" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryId}&accountId=${query.accountId}`"></f7-link>
             </f7-nav-right>
 
-            <f7-searchbar
-                expandable custom-search
-                class="searchbar-keyword"
-                :value="query.keyword"
-                :placeholder="$t('Search')"
-                :disable-button-text="$t('Cancel')"
-                @change="changeKeywordFilter($event.target.value)"
-            ></f7-searchbar>
+            <f7-subnavbar :inner="false">
+                <f7-searchbar
+                    custom-searchs
+                    :value="query.keyword"
+                    :placeholder="$t('Search')"
+                    :disable-button-text="$t('Cancel')"
+                    @change="changeKeywordFilter($event.target.value)"
+                ></f7-searchbar>
+            </f7-subnavbar>
         </f7-navbar>
 
         <f7-toolbar tabbar bottom>

@@ -93,6 +93,7 @@ import IconSelectionSheet from "./components/mobile/IconSelectionSheet.vue";
 import ColorSelectionSheet from "./components/mobile/ColorSelectionSheet.vue";
 import InformationSheet from "./components/mobile/InformationSheet.vue";
 import NumberPadSheet from "./components/mobile/NumberPadSheet.vue";
+import TransactionTagSelectionSheet from "./components/mobile/TransactionTagSelectionSheet.vue";
 
 import App from './Mobile.vue';
 
@@ -145,6 +146,7 @@ Vue.component('IconSelectionSheet', IconSelectionSheet);
 Vue.component('ColorSelectionSheet', ColorSelectionSheet);
 Vue.component('InformationSheet', InformationSheet);
 Vue.component('NumberPadSheet', NumberPadSheet);
+Vue.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 
 Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
 Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));

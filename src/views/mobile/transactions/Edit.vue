@@ -201,13 +201,16 @@
                     >
                     </f7-list-input>
 
-                    <f7-list-item :header="$t('Tags')" link="#"
-                                  smart-select :smart-select-params="{ openIn: 'sheet', setValueText: false, closeOnSelect: true, sheetCloseLinkText: $t('Close') }">
-                        <select multiple v-model="transaction.tagIds">
-                            <option v-for="tag in allTags"
-                                    :key="tag.id"
-                                    :value="tag.id">{{ tag.name }}</option>
-                        </select>
+                    <f7-list-item
+                        link="#"
+                        :header="$t('Tags')"
+                        @click="showTransactionTagSheet = true"
+                    >
+                        <transaction-tag-selection-sheet :items="allTags"
+                                                         :show.sync="showTransactionTagSheet"
+                                                         v-model="transaction.tagIds">
+                        </transaction-tag-selection-sheet>
+
                         <f7-block class="margin-top-half no-padding" slot="footer" v-if="transaction.tagIds && transaction.tagIds.length">
                             <f7-chip class="transaction-edit-tag" media-bg-color="black"
                                      v-for="tagId in transaction.tagIds"
@@ -276,7 +279,8 @@ export default {
             showDestinationAmountSheet: false,
             showCategorySheet: false,
             showSourceAccountSheet: false,
-            showDestinationAccountSheet: false
+            showDestinationAccountSheet: false,
+            showTransactionTagSheet: false
         };
     },
     computed: {

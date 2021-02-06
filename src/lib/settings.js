@@ -38,7 +38,19 @@ function getOriginalSettings() {
 }
 
 function getFinalSettings() {
-    return Object.assign({}, defaultSettings, getOriginalSettings());
+    const originalSettings = getOriginalSettings();
+
+    for (let key in originalSettings) {
+        if (!Object.prototype.hasOwnProperty.call(originalSettings, key)) {
+            continue;
+        }
+
+        if (typeof(defaultSettings[key]) === 'object') {
+            originalSettings[key] = Object.assign({}, defaultSettings[key], originalSettings[key]);
+        }
+    }
+
+    return Object.assign({}, defaultSettings, originalSettings);
 }
 
 function setSettings(settings) {

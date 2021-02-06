@@ -47,7 +47,7 @@
                         <span>0.00 USD</span>
                         <span>0.00 USD</span>
                     </small>
-                    <f7-icon class="transaction-month-card-chevron-icon float-right" f7="chevron_up"></f7-icon>
+                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
                 </div>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
@@ -147,7 +147,7 @@
                                 {{ transactionMonthList.totalAmount.expense | currency(defaultCurrency) | expense(transactionMonthList.totalAmount.incompleteExpense) }}
                             </span>
                         </small>
-                        <f7-icon class="transaction-month-card-chevron-icon float-right" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                        <f7-icon class="card-chevron-icon float-right" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                     </f7-accordion-toggle>
                 </f7-card-header>
                 <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
@@ -778,12 +778,6 @@ export default {
 </script>
 
 <style>
-.transaction-month-card-chevron-icon {
-    color: var(--f7-list-chevron-icon-color);
-    font-size: var(--f7-list-chevron-icon-font-size);
-    font-weight: bolder;
-}
-
 .transaction-amount-statistics > span {
     margin-left: 4px;
 }

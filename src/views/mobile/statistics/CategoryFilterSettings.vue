@@ -11,9 +11,12 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small class="card-header-content">
-                    <span>Transaction Category</span>
-                </small>
+                <f7-accordion-toggle class="full-line">
+                    <small class="card-header-content">
+                        <span>Transaction Category</span>
+                    </small>
+                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
+                </f7-accordion-toggle>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
@@ -51,43 +54,52 @@
 
         <f7-block class="no-padding no-margin" v-if="!loading">
             <f7-card v-for="(categories, categoryType) in allTransactionCategories" :key="categoryType">
-                <f7-card-header>
-                    <small class="card-header-content">
-                        <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
-                    </small>
-                </f7-card-header>
-                <f7-card-content class="no-safe-areas" :padding="false">
-                    <f7-list>
-                        <f7-list-item checkbox v-for="category in categories"
-                                      v-show="!category.hidden"
-                                      :key="category.id"
-                                      :title="category.name"
-                                      :value="category.id"
-                                      :checked="category | subCategoriesAllChecked(filterCategoryIds)"
-                                      :indeterminate="category | subCategoriesHasButNotAllChecked(filterCategoryIds)"
-                                      @change="selectSubCategories">
-                            <f7-icon slot="media"
-                                     :icon="category.icon | categoryIcon"
-                                     :style="category.color | categoryIconStyle('var(--default-icon-color)')">
-                            </f7-icon>
-
-                            <ul slot="root" v-if="category.subCategories.length" class="padding-left">
-                                <f7-list-item checkbox v-for="subCategory in category.subCategories"
-                                              v-show="!subCategory.hidden"
-                                              :key="subCategory.id"
-                                              :title="subCategory.name"
-                                              :value="subCategory.id"
-                                              :checked="subCategory | categoryChecked(filterCategoryIds) "
-                                              @change="selectCategory">
+                <f7-accordion-item :opened="collapseStates[categoryType].opened"
+                                   @accordion:open="collapseStates[categoryType].opened = true"
+                                   @accordion:close="collapseStates[categoryType].opened = false">
+                    <f7-card-header>
+                        <f7-accordion-toggle class="full-line">
+                            <small class="card-header-content">
+                                <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
+                            </small>
+                            <f7-icon class="card-chevron-icon float-right" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                        </f7-accordion-toggle>
+                    </f7-card-header>
+                    <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
+                        <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
+                            <f7-list>
+                                <f7-list-item checkbox v-for="category in categories"
+                                              v-show="!category.hidden"
+                                              :key="category.id"
+                                              :title="category.name"
+                                              :value="category.id"
+                                              :checked="category | subCategoriesAllChecked(filterCategoryIds)"
+                                              :indeterminate="category | subCategoriesHasButNotAllChecked(filterCategoryIds)"
+                                              @change="selectSubCategories">
                                     <f7-icon slot="media"
-                                             :icon="subCategory.icon | categoryIcon"
-                                             :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
+                                             :icon="category.icon | categoryIcon"
+                                             :style="category.color | categoryIconStyle('var(--default-icon-color)')">
                                     </f7-icon>
+
+                                    <ul slot="root" v-if="category.subCategories.length" class="padding-left">
+                                        <f7-list-item checkbox v-for="subCategory in category.subCategories"
+                                                      v-show="!subCategory.hidden"
+                                                      :key="subCategory.id"
+                                                      :title="subCategory.name"
+                                                      :value="subCategory.id"
+                                                      :checked="subCategory | categoryChecked(filterCategoryIds) "
+                                                      @change="selectCategory">
+                                            <f7-icon slot="media"
+                                                     :icon="subCategory.icon | categoryIcon"
+                                                     :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
+                                            </f7-icon>
+                                        </f7-list-item>
+                                    </ul>
                                 </f7-list-item>
-                            </ul>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-card-content>
+                            </f7-list>
+                        </f7-accordion-content>
+                    </f7-card-content>
+                </f7-accordion-item>
             </f7-card>
         </f7-block>
 
@@ -107,10 +119,13 @@
 <script>
 export default {
     data: function () {
+        const self = this;
+
         return {
             loading: true,
             modifyDefault: false,
             filterCategoryIds: {},
+            collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
         }
     },
@@ -251,6 +266,23 @@ export default {
                     this.filterCategoryIds[category.id] = !this.filterCategoryIds[category.id];
                 }
             }
+        },
+        getCollapseStates() {
+            const collapseStates = {};
+
+            for (let categoryTypeField in this.$constants.category.allCategoryTypes) {
+                if (!Object.prototype.hasOwnProperty.call(this.$constants.category.allCategoryTypes, categoryTypeField)) {
+                    continue;
+                }
+
+                const categoryType = this.$constants.category.allCategoryTypes[categoryTypeField];
+
+                collapseStates[categoryType] = {
+                    opened: true
+                };
+            }
+
+            return collapseStates;
         }
     },
     filters: {

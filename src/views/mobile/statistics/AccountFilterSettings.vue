@@ -11,9 +11,12 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small class="card-header-content">
-                    <span>Account Category</span>
-                </small>
+                <f7-accordion-toggle class="full-line">
+                    <small class="card-header-content">
+                        <span>Account Category</span>
+                    </small>
+                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
+                </f7-accordion-toggle>
             </f7-card-header>
 
             <f7-card-content class="no-safe-areas" :padding="false">
@@ -27,9 +30,12 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-header>
-                <small class="card-header-content">
-                    <span>Account Category 2</span>
-                </small>
+                <f7-accordion-toggle class="full-line">
+                    <small class="card-header-content">
+                        <span>Account Category 2</span>
+                    </small>
+                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
+                </f7-accordion-toggle>
             </f7-card-header>
 
             <f7-card-content class="no-safe-areas" :padding="false">
@@ -46,43 +52,52 @@
 
         <f7-block class="no-padding no-margin" v-if="!loading">
             <f7-card v-for="accountCategory in allAccountCategories" :key="accountCategory.id" v-show="hasShownAccount(accountCategory)">
-                <f7-card-header>
-                    <small class="card-header-content">
-                        <span>{{ $t(accountCategory.name) }}</span>
-                    </small>
-                </f7-card-header>
-                <f7-card-content class="no-safe-areas" :padding="false">
-                    <f7-list v-if="categorizedAccounts[accountCategory.id]">
-                        <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
-                                      v-show="!account.hidden"
-                                      :key="account.id"
-                                      :title="account.name"
-                                      :value="account.id"
-                                      :checked="account | accountOrSubAccountsAllChecked(filterAccountIds)"
-                                      :indeterminate="account | accountOrSubAccountsHasButNotAllChecked(filterAccountIds)"
-                                      @change="selectAccountOrSubAccounts">
-                            <f7-icon slot="media"
-                                     :icon="account.icon | accountIcon"
-                                     :style="account.color | accountIconStyle('var(--default-icon-color)')">
-                            </f7-icon>
-
-                            <ul slot="root" v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
-                                <f7-list-item checkbox v-for="subAccount in account.subAccounts"
-                                              v-show="!subAccount.hidden"
-                                              :key="subAccount.id"
-                                              :title="subAccount.name"
-                                              :value="subAccount.id"
-                                              :checked="subAccount | accountChecked(filterAccountIds) "
-                                              @change="selectAccount">
+                <f7-accordion-item :opened="collapseStates[accountCategory.id].opened"
+                                   @accordion:open="collapseStates[accountCategory.id].opened = true"
+                                   @accordion:close="collapseStates[accountCategory.id].opened = false">
+                    <f7-card-header>
+                        <f7-accordion-toggle class="full-line">
+                            <small class="card-header-content">
+                                <span>{{ $t(accountCategory.name) }}</span>
+                            </small>
+                            <f7-icon class="card-chevron-icon float-right" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                        </f7-accordion-toggle>
+                    </f7-card-header>
+                    <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
+                        <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
+                            <f7-list v-if="categorizedAccounts[accountCategory.id]">
+                                <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
+                                              v-show="!account.hidden"
+                                              :key="account.id"
+                                              :title="account.name"
+                                              :value="account.id"
+                                              :checked="account | accountOrSubAccountsAllChecked(filterAccountIds)"
+                                              :indeterminate="account | accountOrSubAccountsHasButNotAllChecked(filterAccountIds)"
+                                              @change="selectAccountOrSubAccounts">
                                     <f7-icon slot="media"
-                                             :icon="subAccount.icon | accountIcon"
-                                             :style="subAccount.color | accountIconStyle('var(--default-icon-color)')">
+                                             :icon="account.icon | accountIcon"
+                                             :style="account.color | accountIconStyle('var(--default-icon-color)')">
                                     </f7-icon>
+
+                                    <ul slot="root" v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
+                                        <f7-list-item checkbox v-for="subAccount in account.subAccounts"
+                                                      v-show="!subAccount.hidden"
+                                                      :key="subAccount.id"
+                                                      :title="subAccount.name"
+                                                      :value="subAccount.id"
+                                                      :checked="subAccount | accountChecked(filterAccountIds) "
+                                                      @change="selectAccount">
+                                            <f7-icon slot="media"
+                                                     :icon="subAccount.icon | accountIcon"
+                                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')">
+                                            </f7-icon>
+                                        </f7-list-item>
+                                    </ul>
                                 </f7-list-item>
-                            </ul>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-card-content>
+                            </f7-list>
+                        </f7-accordion-content>
+                    </f7-card-content>
+                </f7-accordion-item>
             </f7-card>
         </f7-block>
 
@@ -102,10 +117,13 @@
 <script>
 export default {
     data: function () {
+        const self = this;
+
         return {
             loading: true,
             modifyDefault: false,
             filterAccountIds: {},
+            collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
         }
     },
@@ -274,6 +292,23 @@ export default {
             }
 
             return false;
+        },
+        getCollapseStates() {
+            const collapseStates = {};
+
+            for (let categoryType in this.$constants.account.allCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.$constants.account.allCategories, categoryType)) {
+                    continue;
+                }
+
+                const accountCategory = this.$constants.account.allCategories[categoryType];
+
+                collapseStates[accountCategory.id] = {
+                    opened: true
+                };
+            }
+
+            return collapseStates;
         }
     },
     filters: {

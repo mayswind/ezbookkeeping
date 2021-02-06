@@ -194,6 +194,12 @@ i.icon.la, i.icon.las, i.icon.lab {
     opacity: 0.6;
 }
 
+.card-chevron-icon {
+    color: var(--f7-list-chevron-icon-color);
+    font-size: var(--f7-list-chevron-icon-font-size);
+    font-weight: bolder;
+}
+
 .nested-list-item .item-title {
     width: 100%;
 }

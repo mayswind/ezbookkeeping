@@ -66,6 +66,8 @@
 
                     <f7-list-input
                         type="textarea"
+                        class="textarea-auto-size"
+                        style="height: auto"
                         :placeholder="$t('Your category description (optional)')"
                         :value="category.comment"
                         @input="category.comment = $event.target.value"
@@ -185,6 +187,9 @@ export default {
             self.loading = false;
         }
     },
+    updated: function () {
+        this.autoChangeCommentTextareaSize();
+    },
     methods: {
         save() {
             const self = this;
@@ -234,6 +239,16 @@ export default {
                 if (!error.processed) {
                     self.$toast(error.message || error);
                 }
+            });
+        },
+        autoChangeCommentTextareaSize() {
+            const app = this.$f7;
+            const $$ = app.$;
+
+            $$('.textarea-auto-size textarea').each((idx, el) => {
+                el.scrollTop = 0;
+                el.style.height = '';
+                el.style.height = el.scrollHeight + 'px';
             });
         }
     }

@@ -142,6 +142,8 @@
 
                     <f7-list-input
                         type="textarea"
+                        class="textarea-auto-size"
+                        style="height: auto"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
@@ -192,6 +194,8 @@
 
                     <f7-list-input
                         type="textarea"
+                        class="textarea-auto-size"
+                        style="height: auto"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
@@ -276,6 +280,8 @@
 
                         <f7-list-input
                             type="textarea"
+                            class="textarea-auto-size"
+                            style="height: auto"
                             :placeholder="$t('Your sub account description (optional)')"
                             :value="subAccount.comment"
                             @input="subAccount.comment = $event.target.value"
@@ -435,6 +441,9 @@ export default {
             self.loading = false;
         }
     },
+    updated: function () {
+        this.autoChangeCommentTextareaSize();
+    },
     methods: {
         addSubAccount() {
             const self = this;
@@ -565,6 +574,16 @@ export default {
                 if (!error.processed) {
                     self.$toast(error.message || error);
                 }
+            });
+        },
+        autoChangeCommentTextareaSize() {
+            const app = this.$f7;
+            const $$ = app.$;
+
+            $$('.textarea-auto-size textarea').each((idx, el) => {
+                el.scrollTop = 0;
+                el.style.height = '';
+                el.style.height = el.scrollHeight + 'px';
             });
         },
         chooseSuitableIcon(oldCategory, newCategory) {

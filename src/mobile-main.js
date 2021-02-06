@@ -45,7 +45,6 @@ import 'framework7-icons';
 
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
-import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
 import currency from './consts/currency.js';
@@ -55,6 +54,7 @@ import account from './consts/account.js';
 import transaction from './consts/transaction.js';
 import category from './consts/category.js';
 import statistics from './consts/statistics.js';
+
 import licenses from './lib/licenses.js';
 import version from './lib/version.js';
 import logger from './lib/logger.js';
@@ -63,7 +63,10 @@ import services from './lib/services.js';
 import userstate from './lib/userstate.js';
 import webauthn from './lib/webauthn.js';
 import utils from './lib/utils.js';
+import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLocalizedError, getLocalizedErrorParameters } from './lib/i18n.js';
+
 import stores from './store/index.js';
+
 import localizedFilter from './filters/localized.js';
 import percentFilter from './filters/percent.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
@@ -143,13 +146,27 @@ Vue.component('ColorSelectionSheet', ColorSelectionSheet);
 Vue.component('InformationSheet', InformationSheet);
 Vue.component('NumberPadSheet', NumberPadSheet);
 
+Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
+Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));
+Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
+Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
+Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
+Vue.filter('iconStyle', (value, iconType, defaultColor, additionalFieldName) => iconStyleFilter(value, iconType, defaultColor, additionalFieldName));
+Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));
+Vue.filter('accountIcon', (value) => accountIconFilter(value));
+Vue.filter('accountIconStyle', (value, defaultColor, additionalFieldName) => accountIconStyleFilter(value, defaultColor, additionalFieldName));
+Vue.filter('categoryIcon', (value) => categoryIconFilter(value));
+Vue.filter('categoryIconStyle', (value, defaultColor, additionalFieldName) => categoryIconStyleFilter(value, defaultColor, additionalFieldName));
+Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
+Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
+
 const store = new Vuex.Store(stores);
 const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion();
 Vue.prototype.$buildTime = version.getBuildTime();
-
 Vue.prototype.$licenses = licenses.getLicenses();
+
 Vue.prototype.$constants = {
     api: api,
     datetime: datetime,
@@ -205,11 +222,11 @@ Vue.prototype.$locale = {
     init: function () {
         if (settings.getLanguage()) {
             logger.info(`Current language is ${settings.getLanguage()}`);
+            this.setLanguage(settings.getLanguage());
         } else {
             logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
+            this.setLanguage(getDefaultLanguage());
         }
-
-        this.setLanguage(settings.getLanguage() || getDefaultLanguage());
     }
 };
 
@@ -282,20 +299,6 @@ Vue.prototype.$hideLoading = function () {
 };
 
 Vue.prototype.$user = userstate;
-
-Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
-Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));
-Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
-Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
-Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
-Vue.filter('iconStyle', (value, iconType, defaultColor, additionalFieldName) => iconStyleFilter(value, iconType, defaultColor, additionalFieldName));
-Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));
-Vue.filter('accountIcon', (value) => accountIconFilter(value));
-Vue.filter('accountIconStyle', (value, defaultColor, additionalFieldName) => accountIconStyleFilter(value, defaultColor, additionalFieldName));
-Vue.filter('categoryIcon', (value) => categoryIconFilter(value));
-Vue.filter('categoryIconStyle', (value, defaultColor, additionalFieldName) => categoryIconStyleFilter(value, defaultColor, additionalFieldName));
-Vue.filter('tokenDevice', (value) => tokenDeviceFilter(value));
-Vue.filter('tokenIcon', (value) => tokenIconFilter(value));
 
 Vue.prototype.$locale.init();
 

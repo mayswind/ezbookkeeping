@@ -320,8 +320,6 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	}
 
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-	addTransactionTagIds := utils.Int64SliceMinus(tagIds, transactionTagIds)
-	removeTransactionTagIds := utils.Int64SliceMinus(transactionTagIds, tagIds)
 
 	newTransaction := &models.Transaction{
 		TransactionId:   transaction.TransactionId,
@@ -345,9 +343,16 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
 		newTransaction.Comment == transaction.Comment &&
-		len(addTransactionTagIds) < 1 &&
-		len(removeTransactionTagIds) < 1 {
+		utils.Int64SliceEquals(tagIds, transactionTagIds) {
 		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	var addTransactionTagIds []int64
+	var removeTransactionTagIds []int64
+
+	if !utils.Int64SliceEquals(tagIds, transactionTagIds) {
+		removeTransactionTagIds = transactionTagIds
+		addTransactionTagIds = tagIds
 	}
 
 	err = a.transactions.ModifyTransaction(newTransaction, addTransactionTagIds, removeTransactionTagIds)

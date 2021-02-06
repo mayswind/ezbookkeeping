@@ -1,5 +1,24 @@
 package utils
 
+// Int64SliceEquals returns whether specific two int64 arrays equal
+func Int64SliceEquals(s1, s2 []int64) bool {
+	if (s1 == nil) != (s2 == nil) {
+		return false
+	}
+
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i := 0; i < len(s1); i++ {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Int64SliceMinus returns a int64 array which contains items in s1 but not in s2
 func Int64SliceMinus(s1, s2 []int64) []int64 {
 	if s1 == nil {

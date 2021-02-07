@@ -11,7 +11,8 @@
                     :stroke="item.color | defaultIconColor('var(--default-icon-color)')"
                     :stroke-width="diameter"
                     :stroke-dasharray="item | itemStrokeDash(circumference)"
-                    :stroke-dashoffset="item | itemDashOffset(validItems, circumference, itemCommonDashOffset)">
+                    :stroke-dashoffset="item | itemDashOffset(validItems, circumference, itemCommonDashOffset)"
+                    @click="switchSelectedIndex(idx)">
             </circle>
 
             <circle class="pie-chart-text-background"
@@ -194,6 +195,9 @@ export default {
         }
     },
     methods: {
+        switchSelectedIndex: function (index) {
+            this.selectedIndex = index;
+        },
         switchSelectedItem: function (offset) {
             let newSelectedIndex = this.selectedIndex + offset;
 

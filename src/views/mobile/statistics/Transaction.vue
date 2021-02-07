@@ -49,7 +49,6 @@
                     value-field="totalAmount"
                     percent-field="percent"
                     currency-field="currency"
-                    color-field="color"
                     hidden-field="hidden"
                     v-else-if="!loading"
                     @click="clickPieChartItem"

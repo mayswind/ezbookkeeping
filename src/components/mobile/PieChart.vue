@@ -2,6 +2,7 @@
     <div class="pie-chart-container">
         <svg class="pie-chart" :viewBox="`${-diameter} ${-diameter} ${diameter * 2} ${diameter * 2}`">
             <circle class="pie-chart-background" cx="0" cy="0" :r="diameter"></circle>
+
             <circle class="pie-chart-item"
                     v-for="(item, idx) in validItems" :key="idx"
                     fill="transparent"
@@ -12,11 +13,20 @@
                     :stroke-dasharray="item | itemStrokeDash(circumference)"
                     :stroke-dashoffset="item | itemDashOffset(validItems, circumference, itemCommonDashOffset)">
             </circle>
+
             <circle class="pie-chart-text-background"
                     cx="0" cy="0"
-                    :style="{ '--pie-chart-text-background': centerTextBackground ? centerTextBackground : 'var(--f7-theme-color)' }"
+                    stroke="#ddd"
+                    :style="{ '--pie-chart-text-background': centerTextBackground ? centerTextBackground : '#7f2020' }"
                     :r="diameter / 2.5"
                     v-if="showCenterText"/>
+
+            <circle cx="0" cy="0"
+                    stroke="#ddd"
+                    fill="transparent"
+                    :r="diameter / 2.5"
+                    v-if="showCenterText"/>
+
             <g class="pie-chart-text-group" v-if="showCenterText">
                 <slot></slot>
             </g>
@@ -61,6 +71,19 @@
 </template>
 
 <script>
+const defaultColors = [
+    'cc4a66',
+    'e3564a',
+    'fc892c',
+    'ffc349',
+    '4dd291',
+    '24ceb3',
+    '2ab4d0',
+    '065786',
+    '713670',
+    '8e1d51'
+];
+
 export default {
     props: [
         'skeleton',
@@ -113,7 +136,7 @@ export default {
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
                         currency: item[this.currencyField],
-                        color: item[this.colorField] ? item[this.colorField] : 'c8c8c8',
+                        color: item[this.colorField] ? item[this.colorField] : defaultColors[validItems.length % defaultColors.length],
                         sourceItem: item
                     });
                 }
@@ -282,7 +305,7 @@ export default {
 }
 
 .pie-chart-text-background {
-    --pie-chart-text-background: var(--f7-theme-color);
+    --pie-chart-text-background: #7f2020;
     fill: var(--pie-chart-text-background);
 }
 

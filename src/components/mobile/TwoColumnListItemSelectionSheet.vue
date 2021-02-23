@@ -14,6 +14,7 @@
                             <f7-list-item link="#" no-chevron
                                           v-for="item in items"
                                           :key="item | itemFieldContent(primaryKeyField, item, false)"
+                                          :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
                                           :value="item | itemFieldContent(primaryValueField, item, false)"
                                           :title="item | itemFieldContent(primaryTitleField, null, primaryTitleI18n)"
                                           :header="item | itemFieldContent(primaryHeaderField, null, primaryHeaderI18n)"
@@ -34,6 +35,7 @@
                             <f7-list-item link="#" no-chevron
                                           v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
                                           :key="subItem | itemFieldContent(secondaryKeyField, subItem, false)"
+                                          :class="{ 'secondary-list-item-selected': isSecondarySelected(subItem) }"
                                           :value="subItem | itemFieldContent(secondaryValueField, subItem, false)"
                                           :title="subItem | itemFieldContent(secondaryTitleField, null, secondaryTitleI18n)"
                                           :header="subItem | itemFieldContent(secondaryHeaderField, null, secondaryHeaderI18n)"
@@ -123,9 +125,11 @@ export default {
         }
     },
     methods: {
-        onSheetOpen() {
+        onSheetOpen(event) {
             this.currentPrimaryValue = this.getPrimaryValueBySecondaryValue(this.value);
             this.currentSecondaryValue = this.value;
+            this.scrollToSelectedItem(event.$el, '.primary-list-container', 'li.primary-list-item-selected');
+            this.scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -201,6 +205,27 @@ export default {
             }
 
             return null;
+        },
+        scrollToSelectedItem(parent, containerSelector, selectedItemSelector) {
+            if (!parent || !parent.length) {
+                return;
+            }
+
+            const container = parent.find(containerSelector);
+            const selectedItem = parent.find(selectedItemSelector);
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     }
 }

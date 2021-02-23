@@ -204,10 +204,12 @@
         </f7-toolbar>
 
         <f7-popover class="date-popover-menu" :opened="showDatePopover"
+                    @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
             <f7-list>
                 <f7-list-item v-for="dateRange in allDateRanges"
                               :key="dateRange.type"
+                              :class="{ 'list-item-selected': query.dateType === dateRange.type }"
                               :title="dateRange.name | localized"
                               @click="setDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
@@ -790,6 +792,27 @@ export default {
                 totalNonNegativeAmount: totalNonNegativeAmount,
                 items: allDataItems
             }
+        },
+        scrollPopoverToSelectedItem(event) {
+            if (!event || !event.$el || !event.$el.length) {
+                return;
+            }
+
+            const container = event.$el.find('.popover-inner');
+            const selectedItem = event.$el.find('li.list-item-selected');
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     },
     filters: {

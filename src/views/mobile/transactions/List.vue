@@ -229,10 +229,12 @@
         </f7-block>
 
         <f7-popover class="date-popover-menu" :opened="showDatePopover"
+                    @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
             <f7-list>
                 <f7-list-item v-for="dateRange in allDateRanges"
                               :key="dateRange.type"
+                              :class="{ 'list-item-selected': query.dateType === dateRange.type }"
                               :title="dateRange.name | localized"
                               @click="changeDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
@@ -255,30 +257,32 @@
         </date-range-selection-sheet>
 
         <f7-popover class="type-popover-menu" :opened="showTypePopover"
+                    @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showTypePopover = true" @popover:closed="showTypePopover = false">
             <f7-list>
-                <f7-list-item :title="$t('All')" @click="changeTypeFilter(0)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="$t('All')" @click="changeTypeFilter(0)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
                 </f7-list-item>
-                <f7-list-item :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 1 }" :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
                 </f7-list-item>
-                <f7-list-item :title="$t('Income')" @click="changeTypeFilter(2)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 2 }" :title="$t('Income')" @click="changeTypeFilter(2)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
                 </f7-list-item>
-                <f7-list-item :title="$t('Expense')" @click="changeTypeFilter(3)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 3 }" :title="$t('Expense')" @click="changeTypeFilter(3)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
                 </f7-list-item>
-                <f7-list-item :title="$t('Transfer')" @click="changeTypeFilter(4)">
+                <f7-list-item :class="{ 'list-item-selected': query.type === 4 }" :title="$t('Transfer')" @click="changeTypeFilter(4)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
 
         <f7-popover class="category-popover-menu" :opened="showCategoryPopover"
+                    @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showCategoryPopover = true" @popover:closed="showCategoryPopover = false">
             <f7-list accordion-list>
-                <f7-list-item :title="$t('All')" @click="changeCategoryFilter('0')">
+                <f7-list-item :class="{ 'list-item-selected': query.categoryId === '0' }" :title="$t('All')" @click="changeCategoryFilter('0')">
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
                 </f7-list-item>
@@ -302,12 +306,13 @@
                     </f7-icon>
                     <f7-accordion-content>
                         <f7-list class="padding-left">
-                            <f7-list-item :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                            <f7-list-item :class="{ 'list-item-selected': query.categoryId === category.id }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
                                 <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
                                 <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
                             </f7-list-item>
                             <f7-list-item v-for="subCategory in category.subCategories"
                                           :key="subCategory.id"
+                                          :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
                                           :title="subCategory.name"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
@@ -328,15 +333,17 @@
         </f7-popover>
 
         <f7-popover class="account-popover-menu" :opened="showAccountPopover"
+                    @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showAccountPopover = true" @popover:closed="showAccountPopover = false">
             <f7-list>
-                <f7-list-item :title="$t('All')" @click="changeAccountFilter('0')">
+                <f7-list-item :class="{ 'list-item-selected': query.accountId === '0' }" :title="$t('All')" @click="changeAccountFilter('0')">
                     <f7-icon slot="media" f7="rectangle_badge_checkmark"></f7-icon>
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
                 </f7-list-item>
                 <f7-list-item v-for="account in allAccounts"
                               v-show="!account.hidden"
                               :key="account.id"
+                              :class="{ 'list-item-selected': query.accountId === account.id }"
                               :title="account.name"
                               @click="changeAccountFilter(account.id)"
                 >
@@ -677,6 +684,27 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        scrollPopoverToSelectedItem(event) {
+            if (!event || !event.$el || !event.$el.length) {
+                return;
+            }
+
+            const container = event.$el.find('.popover-inner');
+            const selectedItem = event.$el.find('li.list-item-selected');
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     },
     filters: {

@@ -8,7 +8,9 @@
         </f7-toolbar>
         <f7-page-content>
             <f7-block class="margin-vertical">
-                <f7-row class="padding-vertical padding-horizontal-half" v-for="(row, idx) in allColorRows" :key="idx">
+                <f7-row class="padding-vertical padding-horizontal-half"
+                        :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
+                        v-for="(row, idx) in allColorRows" :key="idx">
                     <f7-col class="text-align-center" v-for="colorInfo in row" :key="colorInfo.color">
                         <f7-icon f7="app_fill"
                                  :style="colorInfo.color | iconStyle('default', 'var(--default-icon-color)')"
@@ -65,11 +67,46 @@ export default {
             this.$emit('input', this.currentValue);
             this.$emit('update:show', false);
         },
-        onSheetOpen() {
+        onSheetOpen(event) {
             this.currentValue = this.value;
+            this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
             this.$emit('update:show', false);
+        },
+        hasSelectedIcon(row) {
+            if (!this.currentValue || !row || !row.length) {
+                return false;
+            }
+
+            for (let i = 0; i < row.length; i++) {
+                if (row[i].id === this.currentValue) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+        scrollToSelectedItem(parent) {
+            if (!parent || !parent.length) {
+                return;
+            }
+
+            const container = parent.find('.page-content');
+            const selectedItem = parent.find('.row.row-has-selected-item');
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     }
 }

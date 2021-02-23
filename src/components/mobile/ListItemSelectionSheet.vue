@@ -11,6 +11,7 @@
                 <f7-list-item link="#" no-chevron
                               v-for="(item, index) in items"
                               :key="item | itemKeyValue(index, keyField, valueType)"
+                              :class="{ 'list-item-selected': isSelected(item, index) }"
                               :value="item | itemKeyValue(index, valueField, valueType)"
                               :title="item | itemFieldContent(titleField, item, titleI18n)"
                               @click="onItemClicked(item, index)">
@@ -67,8 +68,9 @@ export default {
             this.$emit('input', this.currentValue);
             this.$emit('update:show', false);
         },
-        onSheetOpen() {
+        onSheetOpen(event) {
             this.currentValue = this.value;
+            this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -83,6 +85,27 @@ export default {
                     return this.currentValue === item;
                 }
             }
+        },
+        scrollToSelectedItem(parent) {
+            if (!parent || !parent.length) {
+                return;
+            }
+
+            const container = parent.find('.page-content');
+            const selectedItem = parent.find('li.list-item-selected');
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     },
     filters: {

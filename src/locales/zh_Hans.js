@@ -650,6 +650,7 @@ export default {
     'No transaction data': '没有交易数据',
     'Are you sure you want to delete this transaction?': '您确定要删除该交易？',
     'Unable to delete this transaction': '无法删除该交易',
+    'Unable to get transaction statistics': '无法获取交易统计数据',
     'Total Amount': '总金额',
     'Total Assets': '总资产',
     'Total Liabilities': '总负债',

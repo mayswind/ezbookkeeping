@@ -650,6 +650,7 @@ export default {
     'No transaction data': 'No transaction data',
     'Are you sure you want to delete this transaction?': 'Are you sure you want to delete this transaction?',
     'Unable to delete this transaction': 'Unable to delete this transaction',
+    'Unable to get transaction statistics': 'Unable to get transaction statistics',
     'Total Amount': 'Total Amount',
     'Total Assets': 'Total Assets',
     'Total Liabilities': 'Total Liabilities',

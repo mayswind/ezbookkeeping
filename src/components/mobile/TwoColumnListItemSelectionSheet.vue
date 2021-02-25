@@ -89,7 +89,7 @@ export default {
         const self = this;
 
         return {
-            currentPrimaryValue: null,
+            currentPrimaryValue: self.getPrimaryValueBySecondaryValue(self.value),
             currentSecondaryValue: self.value
         }
     },

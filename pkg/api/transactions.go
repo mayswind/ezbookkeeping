@@ -16,6 +16,7 @@ type TransactionsApi struct {
 	transactions          *services.TransactionService
 	transactionCategories *services.TransactionCategoryService
 	transactionTags       *services.TransactionTagService
+	accounts              *services.AccountService
 }
 
 // Initialize a transaction api singleton instance
@@ -24,6 +25,7 @@ var (
 		transactions:          services.Transactions,
 		transactionCategories: services.TransactionCategories,
 		transactionTags:       services.TransactionTags,
+		accounts:              services.Accounts,
 	}
 )
 
@@ -64,21 +66,19 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		return nil, errs.ErrOperationFailed
 	}
 
-	finalCount := transactionListReq.Count
-
-	if len(transactions) < finalCount {
-		finalCount = len(transactions)
-	}
-
 	hasMore := false
+	var nextTimeSequenceId *int64
 
-	if finalCount < len(transactions) {
+	if len(transactions) > transactionListReq.Count {
 		hasMore = true
+		nextTimeSequenceId = &transactions[transactionListReq.Count].TransactionTime
+		transactions = transactions[:transactionListReq.Count]
 	}
 
-	transactionIds := make([]int64, finalCount)
+	transactionIds := make([]int64, len(transactions))
+	accountIds := make([]int64, 0, len(transactions)*2)
 
-	for i := 0; i < finalCount; i++ {
+	for i := 0; i < len(transactions); i++ {
 		transactionId := transactions[i].TransactionId
 
 		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
@@ -86,7 +86,21 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		}
 
 		transactionIds[i] = transactionId
+		accountIds = append(accountIds, transactions[i].AccountId)
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			accountIds = append(accountIds, transactions[i].RelatedAccountId)
+		}
 	}
+
+	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
 
@@ -96,23 +110,34 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	transactionResps := &models.TransactionInfoPageWrapperResponse{}
-	transactionResps.Items = make(models.TransactionInfoResponseSlice, finalCount)
+	transactionResps.Items = make(models.TransactionInfoResponseSlice, len(transactions))
 
-	for i := 0; i < finalCount; i++ {
+	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
+		transactionEditable := true
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
+		if allAccounts[transaction.AccountId].Hidden {
+			transactionEditable = false
+		}
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			if allAccounts[transaction.RelatedAccountId].Hidden {
+				transactionEditable = false
+			}
+		}
+
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds)
+		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
 
 	sort.Sort(transactionResps.Items)
 
 	if hasMore {
-		transactionResps.NextTimeSequenceId = &transactions[finalCount].TransactionTime
+		transactionResps.NextTimeSequenceId = nextTimeSequenceId
 	}
 
 	return transactionResps, nil
@@ -156,6 +181,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	}
 
 	transactionIds := make([]int64, len(transactions))
+	accountIds := make([]int64, 0, len(transactions)*2)
 
 	for i := 0; i < len(transactions); i++ {
 		transactionId := transactions[i].TransactionId
@@ -165,7 +191,21 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		}
 
 		transactionIds[i] = transactionId
+		accountIds = append(accountIds, transactions[i].AccountId)
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			accountIds = append(accountIds, transactions[i].RelatedAccountId)
+		}
 	}
+
+	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
 
@@ -178,13 +218,24 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
+		transactionEditable := true
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
+		if allAccounts[transaction.AccountId].Hidden {
+			transactionEditable = false
+		}
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			if allAccounts[transaction.RelatedAccountId].Hidden {
+				transactionEditable = false
+			}
+		}
+
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds)
+		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
 
 	return transactionResps, nil
@@ -202,6 +253,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 
 	uid := c.GetCurrentUid()
 	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionGetReq.Id)
+	transactionEditable := true
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionGetReq.Id, uid, err.Error())
@@ -212,6 +264,32 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 	}
 
+	accountIds := make([]int64, 0, 2)
+	accountIds = append(accountIds, transaction.AccountId)
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		accountIds = append(accountIds, transaction.RelatedAccountId)
+		accountIds = utils.ToUniqueInt64Slice(accountIds)
+	}
+
+	accountMap, err := a.accounts.GetAccountsByAccountIds(uid, accountIds)
+
+	if _, exists := accountMap[transaction.AccountId]; !exists {
+		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+		return nil, errs.ErrTransactionNotFound
+	} else if accountMap[transaction.AccountId].Hidden {
+		transactionEditable = false
+	}
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		if _, exists := accountMap[transaction.RelatedAccountId]; !exists {
+			log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrTransactionNotFound
+		} else if accountMap[transaction.RelatedAccountId].Hidden {
+			transactionEditable = false
+		}
+	}
+
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, []int64{transaction.TransactionId})
 
 	if err != nil {
@@ -220,7 +298,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	}
 
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds)
+	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 
 	return transactionResp, nil
 }
@@ -277,7 +355,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 
 	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
-	transactionResp := transaction.ToTransactionInfoResponse(nil)
+	transactionResp := transaction.ToTransactionInfoResponse(nil, true)
 
 	return transactionResp, nil
 }
@@ -365,7 +443,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	log.InfofWithRequestId(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
 	newTransaction.Type = transaction.Type
-	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds)
+	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, true)
 
 	return newTransactionResp, nil
 }
@@ -390,6 +468,30 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}
 
 	log.InfofWithRequestId(c, "[transactions.TransactionDeleteHandler] user \"uid:%d\" has deleted transaction \"id:%d\"", uid, transactionDeleteReq.Id)
 	return true, nil
+}
+
+func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account) []*models.Transaction {
+	finalTransactions := make([]*models.Transaction, 0, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if _, exists := accountMap[transaction.AccountId]; !exists {
+			log.WarnfWithRequestId(c, "[transactions.filterTransactions] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+			continue
+		}
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			if _, exists := accountMap[transaction.RelatedAccountId]; !exists {
+				log.WarnfWithRequestId(c, "[transactions.filterTransactions] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+				continue
+			}
+		}
+
+		finalTransactions = append(finalTransactions, transaction)
+	}
+
+	return finalTransactions
 }
 
 func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest) *models.Transaction {

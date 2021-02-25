@@ -123,6 +123,7 @@ type TransactionInfoResponse struct {
 	DestinationAmount    int64           `json:"destinationAmount,omitempty"`
 	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment"`
+	Editable             bool            `json:"editable"`
 }
 
 // TransactionInfoPageWrapperResponse represents a response of transaction which contains items and next id
@@ -132,7 +133,7 @@ type TransactionInfoPageWrapperResponse struct {
 }
 
 // ToTransactionInfoResponse returns a view-object according to database model
-func (c *Transaction) ToTransactionInfoResponse(tagIds []int64) *TransactionInfoResponse {
+func (c *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
 	var transactionType TransactionType
 
 	if c.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
@@ -178,6 +179,7 @@ func (c *Transaction) ToTransactionInfoResponse(tagIds []int64) *TransactionInfo
 		DestinationAmount:    destinationAmount,
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              c.Comment,
+		Editable:             editable,
 	}
 }
 

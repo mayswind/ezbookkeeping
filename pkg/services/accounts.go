@@ -58,6 +58,27 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountI
 	return accounts, err
 }
 
+// GetAccountsByAccountIds returns account models according to account ids
+func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) (map[int64]*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if accountIds == nil {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	var accounts []*models.Account
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("account_id", accountIds).Find(&accounts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	accountMap := s.GetAccountMapByList(accounts)
+	return accountMap, err
+}
+
 // GetMaxDisplayOrder returns the max display order according to account category
 func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int, error) {
 	if uid <= 0 {

@@ -211,9 +211,11 @@
                                                         @click="duplicate(transaction)"></f7-swipeout-button>
                                     <f7-swipeout-button color="orange" close
                                                         :text="$t('Edit')"
-                                                        v-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
+                                                        v-if="transaction.editable && transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
                                                         @click="edit(transaction)"></f7-swipeout-button>
-                                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(transaction, false)">
+                                    <f7-swipeout-button color="red" class="padding-left padding-right"
+                                                        v-if="transaction.editable"
+                                                        @click="remove(transaction, false)">
                                         <f7-icon f7="trash"></f7-icon>
                                     </f7-swipeout-button>
                                 </f7-swipeout-actions>

@@ -16,6 +16,7 @@
                 <f7-list-item checkbox v-for="item in items"
                               v-show="!item.hidden"
                               :key="item.id"
+                              :class="item.id | tagItemClass(selectedItemIds)"
                               :value="item.id"
                               :checked="item.id | isChecked(selectedItemIds)"
                               @change="changeItemSelection">
@@ -66,8 +67,9 @@ export default {
             this.$emit('input', this.selectedItemIds);
             this.$emit('update:show', false);
         },
-        onSheetOpen() {
+        onSheetOpen(event) {
             this.selectedItemIds = this.$utilities.copyArrayTo(this.value, []);
+            this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -91,6 +93,46 @@ export default {
                     }
                 }
             }
+        },
+        scrollToSelectedItem(parent) {
+            const app = this.$f7;
+            const $$ = app.$;
+
+            if (!parent || !parent.length) {
+                return;
+            }
+
+            const container = parent.find('.page-content');
+            const selectedItem = parent.find('li.list-item-selected');
+
+            if (!container.length || !selectedItem.length) {
+                return;
+            }
+
+            let firstSelectedItem = selectedItem;
+            let lastSelectedItem = selectedItem;
+
+            if (selectedItem.length > 0) {
+                firstSelectedItem = $$(selectedItem[0]);
+                lastSelectedItem = $$(selectedItem[selectedItem.length - 1]);
+            }
+
+            let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
+            let lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
+            let lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+                - (container.outerHeight() - firstSelectedItem.outerHeight());
+
+            let targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
+
+            if (lastSelectedItemInTop - firstSelectedItemInTop > container.outerHeight()) {
+                targetPos = firstSelectedItemInTop;
+            }
+
+            if (targetPos <= 0) {
+                return;
+            }
+
+            container.scrollTop(targetPos);
         }
     },
     filters: {
@@ -102,6 +144,15 @@ export default {
             }
 
             return false;
+        },
+        tagItemClass(itemId, selectedItemIds) {
+            for (let i = 0; i < selectedItemIds.length; i++) {
+                if (selectedItemIds[i] === itemId) {
+                    return 'list-item-selected';
+                }
+            }
+
+            return '';
         }
     }
 }

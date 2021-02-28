@@ -59,7 +59,7 @@ export default {
                 },
                 serviceWorker: {
                     path: self.$settings.isProduction() ? './sw.js' : undefined,
-                    scope: '/',
+                    scope: './',
                 }
             }
         }

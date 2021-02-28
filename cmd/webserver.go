@@ -114,10 +114,12 @@ func startWebServer(c *cli.Context) error {
 	router.Static("/mobile/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/mobile/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/mobile/fonts", filepath.Join(config.StaticRootPath, "fonts"))
+	router.Static("/mobile/sw", filepath.Join(config.StaticRootPath, "sw"))
 	router.StaticFile("/mobile/favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))
 	router.StaticFile("/mobile/favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
 	router.StaticFile("/mobile/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("/mobile/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
+	router.StaticFile("/mobile/sw.js", filepath.Join(config.StaticRootPath, "sw.js"))
 
 	desktopEntryRoute := router.Group("/desktop")
 	desktopEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))

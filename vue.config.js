@@ -86,8 +86,8 @@ module.exports = {
                     type: "image/png"
                 }
             ],
-            start_url: '/',
-            scope: "/",
+            start_url: './',
+            scope: "./",
             display: 'standalone',
             background_color: "#F6F7F8",
             related_applications: [],
@@ -100,6 +100,22 @@ module.exports = {
         },
         workboxOptions: {
             importWorkboxFrom: 'local',
+            importsDirectory: 'sw',
+            precacheManifestFilename: 'precache-manifest.[manifestHash].js',
+            directoryIndex: '/',
+            globDirectory: '.',
+            templatedURLs: {
+                '/': [
+                    'src/public/mobile.html'
+                ]
+            },
+            exclude: [
+                /^mobile\.html$/,
+                /^desktop\.html$/,
+                /^robots\.txt$/,
+                /^(css|js)\/desktop\.[a-z0-9]+\.js$/,
+                /^(css|js)\/vendors-desktop-bundle\.[a-z0-9]+\.js$/,
+            ],
             skipWaiting: true,
             clientsClaim: true,
             swDest: 'sw.js'

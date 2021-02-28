@@ -1,6 +1,7 @@
 import datetimeConstants from "../consts/datetime.js";
 import statisticsConstants from "../consts/statistics.js";
 import userState from "../lib/userstate.js";
+import settings from "../lib/settings.js";
 import utils from "../lib/utils.js";
 
 import {
@@ -150,7 +151,7 @@ import {
 } from './transactionTag.js';
 
 const stores = {
-    strict: process.env.NODE_ENV !== 'production',
+    strict: !settings.isProduction(),
     state: {
         currentUserInfo: userState.getUserInfo(),
         latestExchangeRates: getExchangeRatesFromLocalStorage(),

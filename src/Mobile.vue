@@ -56,6 +56,10 @@ export default {
                     pushStateAnimate: false,
                     iosSwipeBackAnimateShadow: false,
                     mdSwipeBackAnimateShadow: false
+                },
+                serviceWorker: {
+                    path: self.$settings.isProduction() ? './sw.js' : undefined,
+                    scope: '/',
                 }
             }
         }

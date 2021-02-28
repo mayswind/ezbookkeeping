@@ -125,6 +125,7 @@ function clearSettings() {
 }
 
 export default {
+    isProduction: () => process.env.NODE_ENV === 'production',
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
     isEnableDebug: () => getOption('debug'),

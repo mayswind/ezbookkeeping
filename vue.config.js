@@ -65,6 +65,46 @@ module.exports = {
             return definitions;
         });
     },
+    pwa: {
+        name: 'lab account book',
+        themeColor: '#C67E48',
+        appleMobileWebAppCapable: 'yes',
+        appleMobileWebAppStatusBarStyle: 'default',
+        workboxPluginMode: 'GenerateSW',
+        manifestPath: 'manifest.json',
+        manifestOptions: {
+            short_name: 'lab',
+            icons: [
+                {
+                    src: "img/lab-192.png",
+                    sizes: "192x192",
+                    type: "image/png"
+                },
+                {
+                    src: "img/lab-512.png",
+                    sizes: "512x512",
+                    type: "image/png"
+                }
+            ],
+            start_url: '/',
+            scope: "/",
+            display: 'standalone',
+            background_color: "#F6F7F8",
+            related_applications: [],
+            prefer_related_applications: false
+        },
+        iconPaths: {
+            favicon32: 'favicon.png',
+            favicon16: 'favicon.ico',
+            appleTouchIcon: 'touchicon.png',
+        },
+        workboxOptions: {
+            importWorkboxFrom: 'local',
+            skipWaiting: true,
+            clientsClaim: true,
+            swDest: 'sw.js'
+        }
+    },
     devServer: {
         host: '0.0.0.0',
         port: 8081,

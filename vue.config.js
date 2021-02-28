@@ -21,7 +21,7 @@ module.exports = {
     },
     publicPath: '',
     productionSourceMap: false,
-    configureWebpack:{
+    configureWebpack: {
         plugins: [
             new MomentLocalesPlugin()
         ]
@@ -37,7 +37,7 @@ module.exports = {
                     minChunks: 2
                 },
                 'vendors-bundle': {
-                    name: (module, chunks, cacheGroupKey) => {
+                    name: (module, chunks) => {
                         const allChunksNames = chunks.map((item) => item.name).join('-');
                         return `vendors-${allChunksNames}-bundle`;
                     },

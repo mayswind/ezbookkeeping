@@ -253,6 +253,7 @@ export default {
 
         return {
             loading: true,
+            loadingError: null,
             sortBy: self.$settings.getStatisticsSortingType(),
             showChartDataTypePopover: false,
             showDatePopover: false,
@@ -374,7 +375,6 @@ export default {
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         let defaultChartType = self.$settings.getStatisticsDefaultChartType();
 
@@ -416,11 +416,11 @@ export default {
         }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
@@ -433,6 +433,8 @@ export default {
             if (this.$store.state.transactionStatisticsStateInvalid && !this.loading) {
                 this.reload(null);
             }
+
+            this.$routeBackOnError('loadingError');
         },
         reload(done) {
             const self = this;

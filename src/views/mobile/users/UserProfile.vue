@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('User Profile')"></f7-nav-title>
@@ -122,6 +122,7 @@ export default {
             },
             currentPassword: '',
             loading: true,
+            loadingError: null,
             saving: false,
             showInputPasswordSheet: false
         };
@@ -172,7 +173,6 @@ export default {
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -189,15 +189,18 @@ export default {
 
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         save() {
             const self = this;
             const router = self.$f7router;

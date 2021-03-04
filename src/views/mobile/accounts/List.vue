@@ -207,6 +207,7 @@ export default {
     data() {
         return {
             loading: true,
+            loadingError: null,
             showHidden: false,
             sortable: false,
             accountToDelete: null,
@@ -330,7 +331,6 @@ export default {
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -339,11 +339,11 @@ export default {
         }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
@@ -352,6 +352,8 @@ export default {
             if (this.$store.state.accountListStateInvalid && !this.loading) {
                 this.reload(null);
             }
+
+            this.$routeBackOnError('loadingError');
         },
         reload(done) {
             if (this.sortable) {

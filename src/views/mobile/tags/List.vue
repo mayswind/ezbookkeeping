@@ -1,5 +1,5 @@
 <template>
-    <f7-page :ptr="!sortable && !hasEditingTag" @ptr:refresh="reload">
+    <f7-page :ptr="!sortable && !hasEditingTag" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction Tags')"></f7-nav-title>
@@ -168,6 +168,7 @@ export default {
                 name: ''
             },
             loading: true,
+            loadingError: null,
             showHidden: false,
             sortable: false,
             tagToDelete: null,
@@ -197,7 +198,6 @@ export default {
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -206,15 +206,18 @@ export default {
         }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         reload(done) {
             if (this.sortable || this.hasEditingTag) {
                 done();

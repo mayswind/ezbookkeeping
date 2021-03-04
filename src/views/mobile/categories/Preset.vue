@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Default Categories')"></f7-nav-title>
@@ -67,6 +67,7 @@ export default {
         const self = this;
 
         return {
+            loadingError: null,
             currentLocale: self.$i18n.locale,
             categoryType: 0,
             allCategories: [],
@@ -83,7 +84,6 @@ export default {
     created() {
         const self = this;
         const query = self.$f7route.query;
-        const router = self.$f7router;
 
         self.categoryType = parseInt(query.type);
 
@@ -92,7 +92,7 @@ export default {
             self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
             self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
-            router.back();
+            self.loadingError = 'Parameter Invalid';
             return;
         }
 
@@ -111,6 +111,9 @@ export default {
         }
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         getDefaultCategories(categoryType) {
             switch (categoryType) {
                 case this.$constants.category.allCategoryTypes.Income:

@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
@@ -273,6 +273,7 @@ export default {
                 comment: ''
             },
             loading: true,
+            loadingError: null,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
             showSourceAmountSheet: false,
@@ -494,7 +495,6 @@ export default {
     created() {
         const self = this;
         const query = self.$f7route.query;
-        const router = self.$f7router;
 
         if (self.$f7route.path === '/transaction/edit') {
             self.mode = 'edit';
@@ -527,7 +527,7 @@ export default {
         Promise.all(promises).then(function (responses) {
             if (query.id && !responses[3]) {
                 self.$toast('Unable to get transaction');
-                router.back();
+                self.loadingError = 'Unable to get transaction';
                 return;
             }
 
@@ -626,9 +626,11 @@ export default {
         }).catch(error => {
             self.$logger.error('failed to load essential data for editing transaction', error);
 
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
@@ -636,6 +638,9 @@ export default {
         this.autoChangeCommentTextareaSize();
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         save() {
             const self = this;
             const router = self.$f7router;

@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
@@ -121,6 +121,7 @@ export default {
 
         return {
             loading: true,
+            loadingError: null,
             modifyDefault: false,
             filterAccountIds: {},
             collapseStates: self.getCollapseStates(),
@@ -145,7 +146,6 @@ export default {
     created() {
         const self = this;
         const query = self.$f7route.query;
-        const router = self.$f7router;
 
         self.modifyDefault = !!query.modifyDefault;
 
@@ -171,15 +171,18 @@ export default {
                 self.filterAccountIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterAccountIds, allAccountIds);
             }
         }).catch(error => {
-            self.logining = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         save() {
             const self = this;
             const router = self.$f7router;

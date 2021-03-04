@@ -97,6 +97,7 @@ export default {
             categoryType: 0,
             categoryId: '',
             loading: true,
+            loadingError: null,
             showHidden: false,
             sortable: false,
             categoryToDelete: null,
@@ -166,7 +167,6 @@ export default {
     created() {
         const self = this;
         const query = self.$f7route.query;
-        const router = self.$f7router;
 
         self.categoryType = parseInt(query.type);
 
@@ -174,7 +174,7 @@ export default {
             self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
             self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
-            router.back();
+            self.loadingError = 'Parameter Invalid';
             return;
         }
 
@@ -193,11 +193,11 @@ export default {
         }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.logining = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
@@ -206,6 +206,8 @@ export default {
             if (this.$store.state.transactionCategoryListStateInvalid && !this.loading) {
                 this.reload(null);
             }
+
+            this.$routeBackOnError('loadingError');
         },
         reload(done) {
             if (this.sortable) {

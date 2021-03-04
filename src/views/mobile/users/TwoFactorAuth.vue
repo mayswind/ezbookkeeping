@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
@@ -80,6 +80,7 @@ export default {
         return {
             status: null,
             loading: true,
+            loadingError: null,
             new2FASecret: '',
             new2FAQRCode: '',
             currentPasscodeForEnable: '',
@@ -98,7 +99,6 @@ export default {
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -106,15 +106,18 @@ export default {
             self.status = response.enable;
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         enable() {
             const self = this;
 

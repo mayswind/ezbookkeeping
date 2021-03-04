@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr @ptr:refresh="reload">
+    <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Transaction Categories')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
@@ -29,12 +29,12 @@
 export default {
     data() {
         return {
-            loading: true
+            loading: true,
+            loadingError: null
         };
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -43,15 +43,18 @@ export default {
         }).then(() => {
             self.loading = false;
         }).catch(error => {
-            self.logining = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         reload(done) {
             const self = this;
 

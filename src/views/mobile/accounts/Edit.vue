@@ -1,5 +1,5 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
@@ -320,6 +320,7 @@ export default {
         return {
             editAccountId: null,
             loading: false,
+            loadingError: null,
             account: {
                 category: 1,
                 type: self.$constants.account.allAccountTypes.SingleAccount,
@@ -384,7 +385,6 @@ export default {
     created() {
         const self = this;
         const query = self.$f7route.query;
-        const router = self.$f7router;
 
         if (query.id) {
             self.loading = true;
@@ -430,11 +430,11 @@ export default {
 
                 self.loading = false;
             }).catch(error => {
-                self.loading = false;
-
-                if (!error.processed) {
+                if (error.processed) {
+                    self.loading = false;
+                } else {
+                    self.loadingError = error;
                     self.$toast(error.message || error);
-                    router.back();
                 }
             });
         } else {
@@ -445,6 +445,9 @@ export default {
         this.autoChangeCommentTextareaSize();
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         addSubAccount() {
             const self = this;
 

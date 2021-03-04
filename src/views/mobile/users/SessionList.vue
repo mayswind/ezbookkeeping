@@ -1,5 +1,5 @@
 <template>
-    <f7-page ptr @ptr:refresh="reload">
+    <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Device & Sessions')"></f7-nav-title>
@@ -47,12 +47,12 @@ export default {
     data() {
         return {
             tokens: [],
-            loading: true
+            loading: true,
+            loadingError: null
         };
     },
     created() {
         const self = this;
-        const router = self.$f7router;
 
         self.loading = true;
 
@@ -60,15 +60,18 @@ export default {
             self.tokens = tokens;
             self.loading = false;
         }).catch(error => {
-            self.loading = false;
-
-            if (!error.processed) {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
                 self.$toast(error.message || error);
-                router.back();
             }
         });
     },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         reload(done) {
             const self = this;
 

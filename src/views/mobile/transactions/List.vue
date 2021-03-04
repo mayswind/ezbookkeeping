@@ -379,6 +379,7 @@ export default {
     data() {
         return {
             loading: true,
+            loadingError: null,
             loadingMore: false,
             transactionToDelete: null,
             showDatePopover: false,
@@ -473,10 +474,11 @@ export default {
             if (this.$store.state.transactionListStateInvalid && !this.loading) {
                 this.reload(null);
             }
+
+            this.$routeBackOnError('loadingError');
         },
         reload(done) {
             const self = this;
-            const router = self.$f7router;
 
             if (!done) {
                 self.loading = true;
@@ -498,18 +500,20 @@ export default {
 
                 self.loading = false;
             }).catch(error => {
-                self.loading = false;
+                if (error.processed || done) {
+                    self.loading = false;
+                }
 
                 if (done) {
                     done();
                 }
 
                 if (!error.processed) {
-                    self.$toast(error.message || error);
-
                     if (!done) {
-                        router.back();
+                        self.loadingError = error;
                     }
+
+                    self.$toast(error.message || error);
                 }
             });
         },

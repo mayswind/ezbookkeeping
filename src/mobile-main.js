@@ -299,6 +299,24 @@ Vue.prototype.$showLoading = function (delayConditionFunc, delayMills) {
 Vue.prototype.$hideLoading = function () {
     return this.$f7.preloader.hide();
 };
+Vue.prototype.$routeBackOnError = function (errorPropertyName) {
+    const self = this;
+    const router = self.$f7router;
+
+    const unwatch = self.$watch(errorPropertyName, () => {
+        if (self[errorPropertyName]) {
+            setTimeout(() => {
+                if (unwatch) {
+                    unwatch();
+                }
+
+                router.back();
+            }, 200);
+        }
+    }, {
+        immediate: true
+    });
+};
 
 Vue.prototype.$user = userstate;
 

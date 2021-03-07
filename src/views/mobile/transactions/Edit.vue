@@ -606,7 +606,7 @@ export default {
                     self.transaction.transferCategory = transaction.categoryId;
                 }
 
-                if (self.mode === 'edit') {
+                if (self.mode === 'edit' || self.mode === 'view') {
                     self.transaction.unixTime = transaction.time;
                     self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
                 }

@@ -118,6 +118,133 @@
                             <span>0.00 USD</span>
                         </div>
                     </f7-list-item>
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex flex-direction-column transaction-date">
+                                <span class="transaction-day full-line flex-direction-column">DD</span>
+                                <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                            </div>
+                            <div class="transaction-icon display-flex align-items-center">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+                        <div slot="title" class="no-padding">
+                            <span>Category 4</span>
+                        </div>
+                        <div slot="footer" class="no-padding-horizontal transaction-footer">
+                            <span>HH:mm</span>
+                            <span>·</span>
+                            <span>Source Account</span>
+                        </div>
+                        <div slot="after" class="no-padding transaction-amount">
+                            <span>0.00 USD</span>
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex flex-direction-column transaction-date">
+                                <span class="transaction-day full-line flex-direction-column">DD</span>
+                                <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                            </div>
+                            <div class="transaction-icon display-flex align-items-center">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+                        <div slot="title" class="no-padding">
+                            <span>Category 5</span>
+                        </div>
+                        <div slot="footer" class="no-padding-horizontal transaction-footer">
+                            <span>HH:mm</span>
+                            <span>·</span>
+                            <span>Source Account</span>
+                        </div>
+                        <div slot="after" class="no-padding transaction-amount">
+                            <span>0.00 USD</span>
+                        </div>
+                    </f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-header>
+                <div class="full-line">
+                    <small class="card-header-content">YYYY-MM</small>
+                    <small class="transaction-amount-statistics">
+                        <span>0.00 USD</span>
+                        <span>0.00 USD</span>
+                    </small>
+                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
+                </div>
+            </f7-card-header>
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list media-list>
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex flex-direction-column transaction-date">
+                                <span class="transaction-day full-line flex-direction-column">DD</span>
+                                <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                            </div>
+                            <div class="transaction-icon display-flex align-items-center">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+                        <div slot="title" class="no-padding">
+                            <span>Category</span>
+                        </div>
+                        <div slot="footer" class="no-padding-horizontal transaction-footer">
+                            <span>HH:mm</span>
+                            <span>·</span>
+                            <span>Source Account</span>
+                        </div>
+                        <div slot="after" class="no-padding transaction-amount">
+                            <span>0.00 USD</span>
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex flex-direction-column transaction-date">
+                                <span class="transaction-day full-line flex-direction-column">DD</span>
+                                <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                            </div>
+                            <div class="transaction-icon display-flex align-items-center">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+                        <div slot="title" class="no-padding">
+                            <span>Category 2</span>
+                        </div>
+                        <div slot="footer" class="no-padding-horizontal transaction-footer">
+                            <span>HH:mm</span>
+                            <span>·</span>
+                            <span>Source Account</span>
+                        </div>
+                        <div slot="after" class="no-padding transaction-amount">
+                            <span>0.00 USD</span>
+                        </div>
+                    </f7-list-item>
+                    <f7-list-item class="transaction-info" link="#" chevron-center>
+                        <div slot="media" class="display-flex no-padding-horizontal">
+                            <div class="display-flex flex-direction-column transaction-date">
+                                <span class="transaction-day full-line flex-direction-column">DD</span>
+                                <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                            </div>
+                            <div class="transaction-icon display-flex align-items-center">
+                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                            </div>
+                        </div>
+                        <div slot="title" class="no-padding">
+                            <span>Category 3</span>
+                        </div>
+                        <div slot="footer" class="no-padding-horizontal transaction-footer">
+                            <span>HH:mm</span>
+                            <span>·</span>
+                            <span>Source Account</span>
+                        </div>
+                        <div slot="after" class="no-padding transaction-amount">
+                            <span>0.00 USD</span>
+                        </div>
+                    </f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

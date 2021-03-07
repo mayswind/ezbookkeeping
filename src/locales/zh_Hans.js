@@ -680,6 +680,8 @@ export default {
     'Filter Transaction Categories': '过滤交易类型',
     'User Profile': '用户信息',
     'Language': '语言',
+    'Timezone': '时区',
+    'System Default': '系统默认',
     'Auto Update Exchange Rates Data': '自动更新汇率数据',
     'Enable Thousands Separator': '启用千位分隔符',
     'Currency Display Mode': '货币显示模式',

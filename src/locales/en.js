@@ -680,6 +680,8 @@ export default {
     'Filter Transaction Categories': 'Filter Transaction Categories',
     'User Profile': 'User Profile',
     'Language': 'Language',
+    'Timezone': 'Timezone',
+    'System Default': 'System Default',
     'Auto Update Exchange Rates Data': 'Auto Update Exchange Rates Data',
     'Enable Thousands Separator': 'Enable Thousands Separator',
     'Currency Display Mode': 'Currency Display Mode',

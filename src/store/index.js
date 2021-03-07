@@ -85,7 +85,7 @@ import {
 
 import {
     getLatestExchangeRates,
-    exchangeRatesLastUpdateDate,
+    exchangeRatesLastUpdateTime,
     getExchangedAmount,
     getExchangeRatesFromLocalStorage,
     setExchangeRatesToLocalStorage,
@@ -198,7 +198,7 @@ const stores = {
         currentUserFirstDayOfWeek,
 
         // exchange rates
-        exchangeRatesLastUpdateDate,
+        exchangeRatesLastUpdateTime,
         getExchangedAmount,
 
         // account

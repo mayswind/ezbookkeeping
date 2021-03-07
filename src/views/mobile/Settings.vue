@@ -24,11 +24,22 @@
                     <f7-list-item
                         :key="currentLocale + '_lang'"
                         :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
+                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
                                     :key="locale"
                                     :value="locale">{{ lang.displayName }}</option>
+                        </select>
+                    </f7-list-item>
+
+                    <f7-list-item
+                        :title="$t('Timezone')"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        <select v-model="currentTimezone">
+                            <option value="">{{ `(UTC${defaultTimezoneOffset}) ${$t('System Default')}` }}</option>
+                            <option v-for="timezone in allTimezones"
+                                    :key="timezone.name"
+                                    :value="timezone.name">{{ timezone.displayName }}</option>
                         </select>
                     </f7-list-item>
 
@@ -104,12 +115,26 @@ export default {
         allLanguages() {
             return this.$locale.getAllLanguages();
         },
+        allTimezones() {
+            return this.$locale.getAllTimezones();
+        },
+        defaultTimezoneOffset() {
+            return this.$locale.defaultTimezoneOffset;
+        },
         currentLocale: {
             get: function () {
                 return this.$i18n.locale;
             },
             set: function (value) {
                 this.$locale.setLanguage(value);
+            }
+        },
+        currentTimezone: {
+            get: function () {
+                return this.$locale.getTimezone();
+            },
+            set: function (value) {
+                this.$locale.setTimezone(value);
             }
         },
         currentNickName() {
@@ -119,8 +144,8 @@ export default {
             return this.$settings.isDataExportingEnabled();
         },
         exchangeRatesLastUpdateDate() {
-            const exchangeRatesLastUpdateDate = this.$store.getters.exchangeRatesLastUpdateDate;
-            return exchangeRatesLastUpdateDate ? this.$utilities.formatDate(exchangeRatesLastUpdateDate, this.$t('format.date.long')) : '';
+            const exchangeRatesLastUpdateTime = this.$store.getters.exchangeRatesLastUpdateTime;
+            return exchangeRatesLastUpdateTime ? this.$utilities.formatUnixTime(exchangeRatesLastUpdateTime, this.$t('format.date.long')) : '';
         },
         isAutoUpdateExchangeRatesData: {
             get: function () {

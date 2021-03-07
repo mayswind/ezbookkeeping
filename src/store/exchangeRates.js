@@ -10,16 +10,16 @@ const exchangeRatesLocalStorageKey = 'lab_app_exchange_rates';
 
 export function getLatestExchangeRates(context, { silent, force }) {
     const currentExchangeRateData = context.state.latestExchangeRates;
-    const now = new Date();
+    const now = utils.getCurrentUnixTime();
 
     if (!force) {
         if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-            currentExchangeRateData.data.date === utils.formatDate(now, 'YYYY-MM-DD')) {
+            utils.formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === utils.formatUnixTime(now, 'YYYY-MM-DD')) {
             return currentExchangeRateData.data;
         }
 
         if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-            utils.formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === utils.formatDate(now, 'YYYY-MM-DD HH')) {
+            utils.formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === utils.formatUnixTime(now, 'YYYY-MM-DD HH')) {
             return currentExchangeRateData.data;
         }
     }
@@ -36,7 +36,7 @@ export function getLatestExchangeRates(context, { silent, force }) {
             }
 
             context.commit(STORE_LATEST_EXCHANGE_RATES, {
-                time: utils.getUnixTime(now),
+                time: now,
                 data: data.result
             });
 
@@ -55,9 +55,9 @@ export function getLatestExchangeRates(context, { silent, force }) {
     });
 }
 
-export function exchangeRatesLastUpdateDate(state) {
+export function exchangeRatesLastUpdateTime(state) {
     const exchangeRates = state.latestExchangeRates || {};
-    return exchangeRates && exchangeRates.data ? exchangeRates.data.date : null;
+    return exchangeRates && exchangeRates.data ? exchangeRates.data.updateTime : null;
 }
 
 export function getExchangedAmount(state) {

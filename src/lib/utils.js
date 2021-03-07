@@ -34,12 +34,20 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
-function parseDateFromUnixTime(unixTime) {
-    return moment.unix(unixTime);
+function getTimezoneOffset(timezone) {
+    if (timezone) {
+        return moment().tz(timezone).format('Z');
+    } else {
+        return moment().format('Z');
+    }
 }
 
-function formatDate(date, format) {
-    return moment(date).format(format);
+function getCurrentUnixTime() {
+    return moment().unix();
+}
+
+function parseDateFromUnixTime(unixTime) {
+    return moment.unix(unixTime);
 }
 
 function formatUnixTime(unixTime, format) {
@@ -107,7 +115,7 @@ function getMinuteLastUnixTime(date) {
 }
 
 function getTodayFirstUnixTime() {
-    return moment({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+    return moment().set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
 
 function getTodayLastUnixTime() {
@@ -562,8 +570,9 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    getTimezoneOffset,
+    getCurrentUnixTime,
     parseDateFromUnixTime,
-    formatDate,
     formatUnixTime,
     getUnixTime,
     getYear,

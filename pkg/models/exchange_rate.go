@@ -4,7 +4,7 @@ package models
 type LatestExchangeRateResponse struct {
 	DataSource    string                `json:"dataSource"`
 	ReferenceUrl  string                `json:"referenceUrl"`
-	Date          string                `json:"date"`
+	UpdateTime    int64                 `json:"updateTime"`
 	BaseCurrency  string                `json:"baseCurrency"`
 	ExchangeRates []*LatestExchangeRate `json:"exchangeRates"`
 }

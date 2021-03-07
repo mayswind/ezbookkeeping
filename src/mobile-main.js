@@ -6,7 +6,7 @@ import PincodeInput from 'vue-pincode-input';
 import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
 
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import Framework7 from 'framework7/framework7-lite.esm.js';
 import Framework7Dialog from 'framework7/components/dialog/dialog';
@@ -186,6 +186,7 @@ Vue.prototype.$logger = logger;
 Vue.prototype.$webauthn = webauthn;
 Vue.prototype.$settings = settings;
 Vue.prototype.$locale = {
+    defaultTimezoneOffset: utils.getTimezoneOffset(),
     getDefaultLanguage: getDefaultLanguage,
     getAllLanguages: getAllLanguages,
     getLanguage: getLanguage,
@@ -199,6 +200,31 @@ Vue.prototype.$locale = {
         services.setLocale(locale);
         document.querySelector('html').setAttribute('lang', locale);
         return locale;
+    },
+    getTimezone: function () {
+        return settings.getTimezone();
+    },
+    setTimezone: function (timezone) {
+        if (timezone) {
+            settings.setTimezone(timezone);
+            moment.tz.setDefault(timezone);
+        } else {
+            settings.setTimezone('');
+            moment.tz.setDefault();
+        }
+    },
+    getAllTimezones: function () {
+        const allTimezoneNames = moment.tz.names();
+        const allTimezoneInfos = [];
+
+        for (let i = 0; i < allTimezoneNames.length; i++) {
+            allTimezoneInfos.push({
+                name: allTimezoneNames[i],
+                displayName: `(UTC${utils.getTimezoneOffset(allTimezoneNames[i])}) ${allTimezoneNames[i]}`
+            });
+        }
+
+        return allTimezoneInfos;
     },
     getAllCurrencies: function () {
         const allCurrencyCodes = currency.all;
@@ -228,6 +254,13 @@ Vue.prototype.$locale = {
         } else {
             logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
             this.setLanguage(getDefaultLanguage());
+        }
+
+        if (settings.getTimezone()) {
+            logger.info(`Current timezone is ${settings.getTimezone()}`);
+            this.setTimezone(settings.getTimezone());
+        } else {
+            logger.info(`No timezone is set, use browser default ${utils.getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
         }
     }
 };

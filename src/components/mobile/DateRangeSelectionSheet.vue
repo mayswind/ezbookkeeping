@@ -52,7 +52,7 @@ export default {
     data() {
         const self = this;
         let minDate = self.$utilities.getTodayFirstUnixTime();
-        let maxDate = self.$utilities.getUnixTime(new Date());
+        let maxDate = self.$utilities.getCurrentUnixTime();
 
         if (self.minTime) {
             minDate = self.minTime;
@@ -70,12 +70,12 @@ export default {
     watch: {
         'currentMinDate': function (newValue) {
             if (!newValue) {
-                this.currentMinDate = this.$utilities.formatDate(new Date(), 'YYYY-MM-DDTHH:mm');
+                this.currentMinDate = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
             }
         },
         'currentMaxDate': function (newValue) {
             if (!newValue) {
-                this.currentMaxDate = this.$utilities.formatDate(new Date(), 'YYYY-MM-DDTHH:mm');
+                this.currentMaxDate = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
             }
         }
     },

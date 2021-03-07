@@ -250,7 +250,7 @@ export default {
     data() {
         const self = this;
         const query = self.$f7route.query;
-        const now = new Date();
+        const now = self.$utilities.getCurrentUnixTime();
 
         let defaultType = self.$constants.transaction.allTransactionTypes.Expense;
 
@@ -265,8 +265,8 @@ export default {
             editTransactionId: null,
             transaction: {
                 type: defaultType,
-                unixTime: self.$utilities.getUnixTime(now),
-                time: self.$utilities.formatDate(now, 'YYYY-MM-DDTHH:mm'),
+                unixTime: now,
+                time: self.$utilities.formatUnixTime(now, 'YYYY-MM-DDTHH:mm'),
                 expenseCategory: '',
                 incomeCategory: '',
                 transferCategory: '',
@@ -488,7 +488,7 @@ export default {
         },
         'transaction.time': function (newValue) {
             if (!newValue) {
-                newValue = this.$utilities.formatDate(new Date(), 'YYYY-MM-DDTHH:mm');
+                newValue = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
                 this.transaction.time = newValue;
             }
 

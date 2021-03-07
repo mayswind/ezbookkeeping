@@ -8,6 +8,7 @@ const serverSettingsCookieKey = 'lab_server_settings';
 
 const defaultSettings = {
     lang: 'en',
+    timeZone: '',
     debug: false,
     applicationLock: false,
     applicationLockWebAuthn: false,
@@ -128,6 +129,8 @@ export default {
     isProduction: () => process.env.NODE_ENV === 'production',
     getLanguage: () => getOriginalOption('lang'),
     setLanguage: value => setOption('lang', value),
+    getTimezone: () => getOption('timeZone'),
+    setTimezone: value => setOption('timeZone', value),
     isEnableDebug: () => getOption('debug'),
     setEnableDebug: value => setOption('debug', value),
     isEnableApplicationLock: () => getOption('applicationLock'),

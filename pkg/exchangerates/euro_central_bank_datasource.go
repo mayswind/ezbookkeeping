@@ -2,6 +2,7 @@ package exchangerates
 
 import (
 	"encoding/xml"
+	"time"
 
 	"github.com/mayswind/lab/pkg/core"
 	"github.com/mayswind/lab/pkg/errs"
@@ -13,6 +14,9 @@ const euroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxre
 const euroCentralBankExchangeRateReferenceUrl = "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
 const euroCentralBankDataSource = "European Central Bank"
 const euroCentralBankBaseCurrency = "EUR"
+
+const euroCentralBankDataUpdateDateFormat = "2006-01-02 15"
+const euroCentralBankDataUpdateDateTimezone = "Etc/GMT-1" // UTC+01:00
 
 // EuroCentralBankDataSource defines the structure of exchange rates data source of euro central bank
 type EuroCentralBankDataSource struct {
@@ -55,10 +59,23 @@ func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *models
 		exchangeRates[i] = latestEuroCentralBankExchangeRate.ExchangeRates[i].ToLatestExchangeRate()
 	}
 
+	timezone, err := time.LoadLocation(euroCentralBankDataUpdateDateTimezone)
+
+	if err != nil {
+		return nil
+	}
+
+	updateDateTime := latestEuroCentralBankExchangeRate.Date + " 16" // The reference rates are usually updated around 16:00 CET on every working day
+	updateTime, err := time.ParseInLocation(euroCentralBankDataUpdateDateFormat, updateDateTime, timezone)
+
+	if err != nil {
+		return nil
+	}
+
 	latestExchangeRateResp := &models.LatestExchangeRateResponse{
 		DataSource:    euroCentralBankDataSource,
 		ReferenceUrl:  euroCentralBankExchangeRateReferenceUrl,
-		Date:          latestEuroCentralBankExchangeRate.Date,
+		UpdateTime:    updateTime.Unix(),
 		BaseCurrency:  euroCentralBankBaseCurrency,
 		ExchangeRates: exchangeRates,
 	}

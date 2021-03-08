@@ -42,26 +42,30 @@ type EuroCentralBankExchangeRate struct {
 }
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from euro central bank
-func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *models.LatestExchangeRateResponse {
+func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse(c *core.Context) *models.LatestExchangeRateResponse {
 	if len(e.AllExchangeRates) < 1 {
+		log.ErrorfWithRequestId(c, "[euro_central_bank_datasource.ToLatestExchangeRateResponse] all exchange rates is empty")
 		return nil
 	}
 
 	latestEuroCentralBankExchangeRate := e.AllExchangeRates[0]
 
 	if len(latestEuroCentralBankExchangeRate.ExchangeRates) < 1 {
+		log.ErrorfWithRequestId(c, "[euro_central_bank_datasource.ToLatestExchangeRateResponse] exchange rates is empty")
 		return nil
 	}
 
-	exchangeRates := make([]*models.LatestExchangeRate, len(latestEuroCentralBankExchangeRate.ExchangeRates))
+	exchangeRates := make(models.LatestExchangeRateSlice, 0, len(latestEuroCentralBankExchangeRate.ExchangeRates))
 
 	for i := 0; i < len(latestEuroCentralBankExchangeRate.ExchangeRates); i++ {
-		exchangeRates[i] = latestEuroCentralBankExchangeRate.ExchangeRates[i].ToLatestExchangeRate()
+		exchangeRate := latestEuroCentralBankExchangeRate.ExchangeRates[i]
+		exchangeRates = append(exchangeRates, exchangeRate.ToLatestExchangeRate())
 	}
 
 	timezone, err := time.LoadLocation(euroCentralBankDataUpdateDateTimezone)
 
 	if err != nil {
+		log.ErrorfWithRequestId(c, "[euro_central_bank_datasource.ToLatestExchangeRateResponse] failed to get timezone, timezone name is %s", euroCentralBankDataUpdateDateTimezone)
 		return nil
 	}
 
@@ -69,6 +73,7 @@ func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse() *models
 	updateTime, err := time.ParseInLocation(euroCentralBankDataUpdateDateFormat, updateDateTime, timezone)
 
 	if err != nil {
+		log.ErrorfWithRequestId(c, "[euro_central_bank_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
 		return nil
 	}
 
@@ -91,9 +96,9 @@ func (e *EuroCentralBankExchangeRate) ToLatestExchangeRate() *models.LatestExcha
 	}
 }
 
-// GetRequestUrl returns the euro central bank data source url
-func (e *EuroCentralBankDataSource) GetRequestUrl() string {
-	return euroCentralBankExchangeRateUrl
+// GetRequestUrls returns the euro central bank data source urls
+func (e *EuroCentralBankDataSource) GetRequestUrls() []string {
+	return []string{euroCentralBankExchangeRateUrl}
 }
 
 // Parse returns the common response entity according to the euro central bank data source raw response
@@ -106,17 +111,12 @@ func (e *EuroCentralBankDataSource) Parse(c *core.Context, content []byte) (*mod
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	latestExchangeRateResponse := euroCentralBankData.ToLatestExchangeRateResponse()
+	latestExchangeRateResponse := euroCentralBankData.ToLatestExchangeRateResponse(c)
 
 	if latestExchangeRateResponse == nil {
 		log.ErrorfWithRequestId(c, "[euro_central_bank_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
-
-	latestExchangeRateResponse.ExchangeRates = append(latestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
-		Currency: euroCentralBankBaseCurrency,
-		Rate:     "1",
-	})
 
 	return latestExchangeRateResponse, nil
 }

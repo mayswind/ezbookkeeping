@@ -3,12 +3,14 @@ package api
 import (
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/mayswind/lab/pkg/core"
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/exchangerates"
 	"github.com/mayswind/lab/pkg/log"
+	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/settings"
 )
 
@@ -34,26 +36,65 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 		Timeout: time.Duration(settings.Container.Current.ExchangeRatesRequestTimeout) * time.Millisecond,
 	}
 
-	resp, err := client.Get(dataSource.GetRequestUrl())
+	urls := dataSource.GetRequestUrls()
+	exchangeRateResps := make([]*models.LatestExchangeRateResponse, 0, len(urls))
 
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrFailedToRequestRemoteApi
+	for i := 0; i < len(urls); i++ {
+		resp, err := client.Get(urls[i])
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrFailedToRequestRemoteApi
+		}
+
+		if resp.StatusCode != 200 {
+			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not 200", uid)
+			return nil, errs.ErrFailedToRequestRemoteApi
+		}
+
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		exchangeRateResp, err := dataSource.Parse(c, body)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrFailedToRequestRemoteApi)
+		}
+
+		exchangeRateResps = append(exchangeRateResps, exchangeRateResp)
 	}
 
-	if resp.StatusCode != 200 {
-		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not 200", uid)
-		return nil, errs.ErrFailedToRequestRemoteApi
+	lastExchangeRateResponse := exchangeRateResps[len(exchangeRateResps)-1]
+	allExchangeRatesMap := make(map[string]string)
+
+	for i := 0; i < len(exchangeRateResps); i++ {
+		exchangeRateResp := exchangeRateResps[i]
+
+		for j := 0; j < len(exchangeRateResp.ExchangeRates); j++ {
+			exchangeRate := exchangeRateResp.ExchangeRates[j]
+			allExchangeRatesMap[exchangeRate.Currency] = exchangeRate.Rate
+		}
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	latestExchangeRateResponse, err := dataSource.Parse(c, body)
+	allExchangeRatesMap[lastExchangeRateResponse.BaseCurrency] = "1"
+	allExchangeRates := make(models.LatestExchangeRateSlice, 0, len(allExchangeRatesMap))
 
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.Or(err, errs.ErrFailedToRequestRemoteApi)
+	for currency, rate := range allExchangeRatesMap {
+		allExchangeRates = append(allExchangeRates, &models.LatestExchangeRate{
+			Currency: currency,
+			Rate:     rate,
+		})
 	}
 
-	return latestExchangeRateResponse, nil
+	sort.Sort(allExchangeRates)
+
+	finalExchangeRateResponse := &models.LatestExchangeRateResponse{
+		DataSource:    lastExchangeRateResponse.DataSource,
+		ReferenceUrl:  lastExchangeRateResponse.ReferenceUrl,
+		UpdateTime:    lastExchangeRateResponse.UpdateTime,
+		BaseCurrency:  lastExchangeRateResponse.BaseCurrency,
+		ExchangeRates: allExchangeRates,
+	}
+
+	return finalExchangeRateResponse, nil
 }

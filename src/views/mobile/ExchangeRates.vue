@@ -39,7 +39,7 @@
             </f7-card-content>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <span>{{ $t('Last Updated') }}</span>
-                <span>{{ exchangeRatesData.date | moment($t('format.date.long')) }}</span>
+                <span>{{ exchangeRatesData.updateTime | moment($t('format.date.long')) }}</span>
             </f7-card-footer>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <span>{{ $t('Data source') }}</span>

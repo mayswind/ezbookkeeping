@@ -8,7 +8,7 @@ import (
 const ParentAccountCurrencyPlaceholder = "---"
 
 // ISO 4217
-var allCurrencyNames = map[string]bool{
+var AllCurrencyNames = map[string]bool{
 	"AED": true, //UAE Dirham
 	"AFN": true, //Afghani
 	"ALL": true, //Lek
@@ -175,7 +175,7 @@ func ValidCurrency(fl validator.FieldLevel) bool {
 			return true
 		}
 
-		_, ok := allCurrencyNames[value]
+		_, ok := AllCurrencyNames[value]
 		return ok
 	}
 

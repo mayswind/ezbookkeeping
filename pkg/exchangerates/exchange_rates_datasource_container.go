@@ -23,6 +23,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.CzechNationalBankDataSource {
 		Container.Current = &CzechNationalBankDataSource{}
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.NationalBankOfPolandDataSource {
+		Container.Current = &NationalBankOfPolandDataSource{}
+		return nil
 	}
 
 	return errs.ErrInvalidExchangeRatesDataSource

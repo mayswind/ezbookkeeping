@@ -73,3 +73,13 @@ func StringTryToInt64(str string, defaultValue int64) int64 {
 
 	return num
 }
+
+// Float64ToString returns the textual representation of this number
+func Float64ToString(num float64) string {
+	return strconv.FormatFloat(num, 'f', -1, 64)
+}
+
+// StringToFloat64 parses a textual representation of the number to float64
+func StringToFloat64(str string) (float64, error) {
+	return strconv.ParseFloat(str, 64)
+}

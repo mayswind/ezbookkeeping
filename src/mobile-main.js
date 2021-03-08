@@ -47,6 +47,7 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
+import timezone from './consts/timezone.js';
 import currency from './consts/currency.js';
 import colors from './consts/color.js';
 import icons from './consts/icon.js';
@@ -214,15 +215,27 @@ Vue.prototype.$locale = {
         }
     },
     getAllTimezones: function () {
-        const allTimezoneNames = moment.tz.names();
+        const allTimezoneNames = timezone.all;
         const allTimezoneInfos = [];
 
         for (let i = 0; i < allTimezoneNames.length; i++) {
             allTimezoneInfos.push({
                 name: allTimezoneNames[i],
-                displayName: `(UTC${utils.getTimezoneOffset(allTimezoneNames[i])}) ${allTimezoneNames[i]}`
+                utcOffset: (allTimezoneNames[i] !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezoneNames[i]) : ''),
+                displayName: i18n.t(`timezone.${allTimezoneNames[i]}`)
             });
         }
+
+        allTimezoneInfos.sort(function(c1, c2){
+            const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
+            const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
+
+            if (utcOffset1 !== utcOffset2) {
+                return utcOffset1 - utcOffset2;
+            }
+
+            return c1.displayName.localeCompare(c2.displayName);
+        })
 
         return allTimezoneInfos;
     },

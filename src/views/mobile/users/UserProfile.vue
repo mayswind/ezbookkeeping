@@ -79,7 +79,7 @@
                         :title="$t('First Day of Week')"
                         smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
                     >
-                        <select autocomplete="transaction-currency" v-model="newProfile.firstDayOfWeek">
+                        <select v-model="newProfile.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
                                     :key="weekDay.type"
                                     :value="weekDay.type">{{ `datetime.${weekDay.name}.long` | localized }}</option>

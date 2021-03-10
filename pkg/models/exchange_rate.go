@@ -21,16 +21,16 @@ type LatestExchangeRate struct {
 type LatestExchangeRateSlice []*LatestExchangeRate
 
 // Len returns the count of items
-func (c LatestExchangeRateSlice) Len() int {
-	return len(c)
+func (s LatestExchangeRateSlice) Len() int {
+	return len(s)
 }
 
 // Swap swaps two items
-func (c LatestExchangeRateSlice) Swap(i, j int) {
-	c[i], c[j] = c[j], c[i]
+func (s LatestExchangeRateSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
 
 // Less reports whether the first item is less than the second one
-func (c LatestExchangeRateSlice) Less(i, j int) bool {
-	return strings.Compare(c[i].Currency, c[j].Currency) < 0
+func (s LatestExchangeRateSlice) Less(i, j int) bool {
+	return strings.Compare(s[i].Currency, s[j].Currency) < 0
 }

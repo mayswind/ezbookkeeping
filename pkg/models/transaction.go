@@ -133,12 +133,12 @@ type TransactionInfoPageWrapperResponse struct {
 }
 
 // IsEditable returns whether this transaction can be edited
-func (c *Transaction) IsEditable(account *Account, relatedAccount *Account) bool {
+func (t *Transaction) IsEditable(account *Account, relatedAccount *Account) bool {
 	if account == nil || account.Hidden {
 		return false
 	}
 
-	if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+	if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		if relatedAccount == nil || relatedAccount.Hidden {
 			return false
 		}
@@ -148,52 +148,52 @@ func (c *Transaction) IsEditable(account *Account, relatedAccount *Account) bool
 }
 
 // ToTransactionInfoResponse returns a view-object according to database model
-func (c *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
+func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
 	var transactionType TransactionType
 
-	if c.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		transactionType = TRANSACTION_TYPE_MODIFY_BALANCE
-	} else if c.Type == TRANSACTION_DB_TYPE_EXPENSE {
+	} else if t.Type == TRANSACTION_DB_TYPE_EXPENSE {
 		transactionType = TRANSACTION_TYPE_EXPENSE
-	} else if c.Type == TRANSACTION_DB_TYPE_INCOME {
+	} else if t.Type == TRANSACTION_DB_TYPE_INCOME {
 		transactionType = TRANSACTION_TYPE_INCOME
-	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		transactionType = TRANSACTION_TYPE_TRANSFER
-	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
+	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
 		transactionType = TRANSACTION_TYPE_TRANSFER
 	} else {
 		return nil
 	}
 
-	sourceAccountId := c.AccountId
-	sourceAmount := c.Amount
+	sourceAccountId := t.AccountId
+	sourceAmount := t.Amount
 
 	destinationAccountId := int64(0)
 	destinationAmount := int64(0)
 
-	if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
-		destinationAccountId = c.RelatedAccountId
-		destinationAmount = c.RelatedAccountAmount
-	} else if c.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
-		sourceAccountId = c.RelatedAccountId
-		sourceAmount = c.RelatedAccountAmount
+	if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		destinationAccountId = t.RelatedAccountId
+		destinationAmount = t.RelatedAccountAmount
+	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		sourceAccountId = t.RelatedAccountId
+		sourceAmount = t.RelatedAccountAmount
 
-		destinationAccountId = c.AccountId
-		destinationAmount = c.Amount
+		destinationAccountId = t.AccountId
+		destinationAmount = t.Amount
 	}
 
 	return &TransactionInfoResponse{
-		Id:                   c.TransactionId,
-		TimeSequenceId:       c.TransactionTime,
+		Id:                   t.TransactionId,
+		TimeSequenceId:       t.TransactionTime,
 		Type:                 transactionType,
-		CategoryId:           c.CategoryId,
-		Time:                 utils.GetUnixTimeFromTransactionTime(c.TransactionTime),
+		CategoryId:           t.CategoryId,
+		Time:                 utils.GetUnixTimeFromTransactionTime(t.TransactionTime),
 		SourceAccountId:      sourceAccountId,
 		DestinationAccountId: destinationAccountId,
 		SourceAmount:         sourceAmount,
 		DestinationAmount:    destinationAmount,
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
-		Comment:              c.Comment,
+		Comment:              t.Comment,
 		Editable:             editable,
 	}
 }
@@ -202,20 +202,20 @@ func (c *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 type TransactionInfoResponseSlice []*TransactionInfoResponse
 
 // Len returns the count of items
-func (c TransactionInfoResponseSlice) Len() int {
-	return len(c)
+func (s TransactionInfoResponseSlice) Len() int {
+	return len(s)
 }
 
 // Swap swaps two items
-func (c TransactionInfoResponseSlice) Swap(i, j int) {
-	c[i], c[j] = c[j], c[i]
+func (s TransactionInfoResponseSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
 
 // Less reports whether the first item is less than the second one
-func (c TransactionInfoResponseSlice) Less(i, j int) bool {
-	if c[i].Time != c[j].Time {
-		return c[i].Time > c[j].Time
+func (s TransactionInfoResponseSlice) Less(i, j int) bool {
+	if s[i].Time != s[j].Time {
+		return s[i].Time > s[j].Time
 	}
 
-	return c[i].Id > c[j].Id
+	return s[i].Id > s[j].Id
 }

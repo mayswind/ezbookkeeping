@@ -60,12 +60,12 @@ type TransactionTagInfoResponse struct {
 }
 
 // ToTransactionTagInfoResponse returns a view-object according to database model
-func (c *TransactionTag) ToTransactionTagInfoResponse() *TransactionTagInfoResponse {
+func (t *TransactionTag) ToTransactionTagInfoResponse() *TransactionTagInfoResponse {
 	return &TransactionTagInfoResponse{
-		Id:           c.TagId,
-		Name:         c.Name,
-		DisplayOrder: c.DisplayOrder,
-		Hidden:       c.Hidden,
+		Id:           t.TagId,
+		Name:         t.Name,
+		DisplayOrder: t.DisplayOrder,
+		Hidden:       t.Hidden,
 	}
 }
 
@@ -73,16 +73,16 @@ func (c *TransactionTag) ToTransactionTagInfoResponse() *TransactionTagInfoRespo
 type TransactionTagInfoResponseSlice []*TransactionTagInfoResponse
 
 // Len returns the count of items
-func (c TransactionTagInfoResponseSlice) Len() int {
-	return len(c)
+func (s TransactionTagInfoResponseSlice) Len() int {
+	return len(s)
 }
 
 // Swap swaps two items
-func (c TransactionTagInfoResponseSlice) Swap(i, j int) {
-	c[i], c[j] = c[j], c[i]
+func (s TransactionTagInfoResponseSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
 
 // Less reports whether the first item is less than the second one
-func (c TransactionTagInfoResponseSlice) Less(i, j int) bool {
-	return c[i].DisplayOrder < c[j].DisplayOrder
+func (s TransactionTagInfoResponseSlice) Less(i, j int) bool {
+	return s[i].DisplayOrder < s[j].DisplayOrder
 }

@@ -99,7 +99,7 @@ type UserProfileResponse struct {
 }
 
 // ToUserBasicInfo returns a user basic view-object according to database model
-func (u User) ToUserBasicInfo() *UserBasicInfo {
+func (u *User) ToUserBasicInfo() *UserBasicInfo {
 	return &UserBasicInfo{
 		Username:        u.Username,
 		Email:           u.Email,
@@ -110,7 +110,7 @@ func (u User) ToUserBasicInfo() *UserBasicInfo {
 }
 
 // ToUserProfileResponse returns a user profile view-object according to database model
-func (u User) ToUserProfileResponse() *UserProfileResponse {
+func (u *User) ToUserProfileResponse() *UserProfileResponse {
 	return &UserProfileResponse{
 		Username:        u.Username,
 		Email:           u.Email,

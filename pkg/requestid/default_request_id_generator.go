@@ -171,7 +171,7 @@ func (r *DefaultRequestIdGenerator) getRequestId(serverUniqId uint16, instanceUn
 
 func (r *DefaultRequestIdGenerator) getSecondsElapsedToday() int {
 	now := time.Now()
-	seconds := now.Hour()*24*60 + now.Minute()*60 + now.Second()
+	seconds := now.Hour()*60*60 + now.Minute()*60 + now.Second()
 
 	return seconds
 }

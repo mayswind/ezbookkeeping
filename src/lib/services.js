@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import api from "../consts/api.js";
 import userState from "./userstate.js";
+import utils from "./utils.js";
 
 let needBlockRequest = false;
 let blockedRequests = [];
@@ -130,14 +131,15 @@ export default {
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },
-    updateProfile: ({ email, nickname, password, oldPassword, defaultCurrency, firstDayOfWeek }) => {
+    updateProfile: ({ email, nickname, password, oldPassword, defaultCurrency, firstDayOfWeek, transactionEditScope }) => {
         return axios.post('v1/users/profile/update.json', {
             email,
             nickname,
             password,
             oldPassword,
             defaultCurrency,
-            firstDayOfWeek
+            firstDayOfWeek,
+            transactionEditScope
         });
     },
     get2FAStatus: () => {
@@ -249,12 +251,14 @@ export default {
         });
     },
     getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50`);
+        const utcOffset = utils.getTimezoneOffsetMinutes();
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50&utc_offset=${utcOffset}`);
     },
     getTransaction: ({ id }) => {
-        return axios.get('v1/transactions/get.json?id=' + id);
+        const utcOffset = utils.getTimezoneOffsetMinutes();
+        return axios.get(`v1/transactions/get.json?id=${id}&utc_offset=${utcOffset}`);
     },
-    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment, utcOffset }) => {
         return axios.post('v1/transactions/add.json', {
             type,
             categoryId,
@@ -264,10 +268,11 @@ export default {
             sourceAmount,
             destinationAmount,
             tagIds,
-            comment
+            comment,
+            utcOffset
         });
     },
-    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment, utcOffset }) => {
         return axios.post('v1/transactions/modify.json', {
             id,
             type,
@@ -278,7 +283,8 @@ export default {
             sourceAmount,
             destinationAmount,
             tagIds,
-            comment
+            comment,
+            utcOffset
         });
     },
     deleteTransaction: ({ id }) => {

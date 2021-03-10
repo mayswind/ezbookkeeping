@@ -45,12 +45,13 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	userRegisterReq.Nickname = strings.TrimSpace(userRegisterReq.Nickname)
 
 	user := &models.User{
-		Username:        userRegisterReq.Username,
-		Email:           userRegisterReq.Email,
-		Nickname:        userRegisterReq.Nickname,
-		Password:        userRegisterReq.Password,
-		DefaultCurrency: userRegisterReq.DefaultCurrency,
-		FirstDayOfWeek:  userRegisterReq.FirstDayOfWeek,
+		Username:             userRegisterReq.Username,
+		Email:                userRegisterReq.Email,
+		Nickname:             userRegisterReq.Nickname,
+		Password:             userRegisterReq.Password,
+		DefaultCurrency:      userRegisterReq.DefaultCurrency,
+		FirstDayOfWeek:       userRegisterReq.FirstDayOfWeek,
+		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 	}
 
 	err = a.users.CreateUser(user)
@@ -165,6 +166,14 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		anythingUpdate = true
 	} else {
 		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID
+	}
+
+	if userUpdateReq.TransactionEditScope != nil && *userUpdateReq.TransactionEditScope != user.TransactionEditScope {
+		user.TransactionEditScope = *userUpdateReq.TransactionEditScope
+		userNew.TransactionEditScope = *userUpdateReq.TransactionEditScope
+		anythingUpdate = true
+	} else {
+		userNew.TransactionEditScope = models.TRANSACTION_EDIT_SCOPE_INVALID
 	}
 
 	if !anythingUpdate {

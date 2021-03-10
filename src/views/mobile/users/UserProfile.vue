@@ -86,6 +86,21 @@
                         </select>
                     </f7-list-item>
 
+                    <f7-list-item
+                        :title="$t('Transaction Edit Scope')"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                    >
+                        <select v-model="newProfile.transactionEditScope">
+                            <option :value="0">{{ $t('None') }}</option>
+                            <option :value="1">{{ $t('All') }}</option>
+                            <option :value="2">{{ $t('Today or later') }}</option>
+                            <option :value="3">{{ $t('Recent 24 hours or later') }}</option>
+                            <option :value="4">{{ $t('This week or later') }}</option>
+                            <option :value="5">{{ $t('This month or later') }}</option>
+                            <option :value="6">{{ $t('This year or later') }}</option>
+                        </select>
+                    </f7-list-item>
+
                     <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -112,13 +127,15 @@ export default {
                 email: '',
                 nickname: '',
                 defaultCurrency: '',
-                firstDayOfWeek: 0
+                firstDayOfWeek: 0,
+                transactionEditScope: 1
             },
             oldProfile: {
                 email: '',
                 nickname: '',
                 defaultCurrency: '',
-                firstDayOfWeek: 0
+                firstDayOfWeek: 0,
+                transactionEditScope: 1
             },
             currentPassword: '',
             loading: true,
@@ -147,7 +164,8 @@ export default {
                 this.newProfile.email === this.oldProfile.email &&
                 this.newProfile.nickname === this.oldProfile.nickname &&
                 this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
-                this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek) {
+                this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek &&
+                this.newProfile.transactionEditScope === this.oldProfile.transactionEditScope) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be empty';
@@ -181,11 +199,13 @@ export default {
             self.oldProfile.nickname = profile.nickname;
             self.oldProfile.defaultCurrency = profile.defaultCurrency;
             self.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
+            self.oldProfile.transactionEditScope = profile.transactionEditScope;
 
             self.newProfile.email = self.oldProfile.email
             self.newProfile.nickname = self.oldProfile.nickname;
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
             self.newProfile.firstDayOfWeek = self.oldProfile.firstDayOfWeek;
+            self.newProfile.transactionEditScope = self.oldProfile.transactionEditScope;
 
             self.loading = false;
         }).catch(error => {

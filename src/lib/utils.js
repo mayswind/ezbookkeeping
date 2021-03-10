@@ -42,6 +42,22 @@ function getTimezoneOffset(timezone) {
     }
 }
 
+function getTimezoneOffsetMinutes(timezone) {
+    const offset = getTimezoneOffset(timezone);
+
+    if (!offset) {
+        return 0;
+    }
+
+    const parts = offset.split(':');
+
+    if (parts.length !== 2) {
+        return 0;
+    }
+
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+}
+
 function getCurrentUnixTime() {
     return moment().unix();
 }
@@ -571,6 +587,7 @@ export default {
     isNumber,
     isBoolean,
     getTimezoneOffset,
+    getTimezoneOffsetMinutes,
     getCurrentUnixTime,
     parseDateFromUnixTime,
     formatUnixTime,

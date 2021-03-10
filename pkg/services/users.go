@@ -198,6 +198,10 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		updateCols = append(updateCols, "first_day_of_week")
 	}
 
+	if models.TRANSACTION_EDIT_SCOPE_NONE <= user.TransactionEditScope && user.TransactionEditScope <= models.TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER {
+		updateCols = append(updateCols, "transaction_edit_scope")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

@@ -662,7 +662,8 @@ export default {
                 destinationAccountId: '0',
                 destinationAmount: 0,
                 tagIds: self.transaction.tagIds,
-                comment: self.transaction.comment
+                comment: self.transaction.comment,
+                utcOffset: self.$utilities.getTimezoneOffsetMinutes()
             };
 
             if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {

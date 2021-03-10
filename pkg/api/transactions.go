@@ -17,6 +17,7 @@ type TransactionsApi struct {
 	transactionCategories *services.TransactionCategoryService
 	transactionTags       *services.TransactionTagService
 	accounts              *services.AccountService
+	users                 *services.UserService
 }
 
 // Initialize a transaction api singleton instance
@@ -26,6 +27,7 @@ var (
 		transactionCategories: services.TransactionCategories,
 		transactionTags:       services.TransactionTags,
 		accounts:              services.Accounts,
+		users:                 services.Users,
 	}
 )
 
@@ -40,6 +42,16 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	var allCategoryIds []int64
 
 	if transactionListReq.CategoryId > 0 {
@@ -119,7 +131,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		transactionEditable := transaction.IsEditable(allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
+		transactionEditable := transaction.IsEditable(user, transactionListReq.UtcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -144,6 +156,16 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	var allCategoryIds []int64
 
 	if transactionListReq.CategoryId > 0 {
@@ -213,7 +235,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		transactionEditable := transaction.IsEditable(allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
+		transactionEditable := transaction.IsEditable(user, transactionListReq.UtcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -232,6 +254,16 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionGetReq.Id)
 
 	if err != nil {
@@ -272,7 +304,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
-	transactionEditable := transaction.IsEditable(accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
+	transactionEditable := transaction.IsEditable(user, transactionGetReq.UtcOffset, accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 
@@ -320,7 +352,22 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	transaction := a.createNewTransactionModel(uid, &transactionCreateReq)
+	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transactionCreateReq.UtcOffset)
+
+	if !transactionEditable {
+		return nil, errs.ErrCannotCreateTransactionWithThisTransactionTime
+	}
 
 	err = a.transactions.CreateTransaction(transaction, tagIds)
 
@@ -331,7 +378,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 
 	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
-	transactionResp := transaction.ToTransactionInfoResponse(nil, true)
+	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return transactionResp, nil
 }
@@ -354,6 +401,16 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionModifyReq.Id)
 
 	if err != nil {
@@ -409,6 +466,12 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		addTransactionTagIds = tagIds
 	}
 
+	transactionEditable := user.CanEditTransactionByTransactionTime(newTransaction.TransactionTime, transactionModifyReq.UtcOffset)
+
+	if !transactionEditable {
+		return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
+	}
+
 	err = a.transactions.ModifyTransaction(newTransaction, addTransactionTagIds, removeTransactionTagIds)
 
 	if err != nil {
@@ -419,7 +482,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	log.InfofWithRequestId(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
 	newTransaction.Type = transaction.Type
-	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, true)
+	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return newTransactionResp, nil
 }

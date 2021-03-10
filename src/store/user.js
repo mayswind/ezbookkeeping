@@ -236,7 +236,8 @@ export function updateUserProfile(context, { profile, currentPassword }) {
             email: profile.email,
             nickname: profile.nickname,
             defaultCurrency: profile.defaultCurrency,
-            firstDayOfWeek: profile.firstDayOfWeek
+            firstDayOfWeek: profile.firstDayOfWeek,
+            transactionEditScope: profile.transactionEditScope
         }).then(response => {
             const data = response.data;
 

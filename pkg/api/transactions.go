@@ -114,22 +114,12 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
-		transactionEditable := true
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		if allAccounts[transaction.AccountId].Hidden {
-			transactionEditable = false
-		}
-
-		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			if allAccounts[transaction.RelatedAccountId].Hidden {
-				transactionEditable = false
-			}
-		}
-
+		transactionEditable := transaction.IsEditable(allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -218,22 +208,12 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
-		transactionEditable := true
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		if allAccounts[transaction.AccountId].Hidden {
-			transactionEditable = false
-		}
-
-		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			if allAccounts[transaction.RelatedAccountId].Hidden {
-				transactionEditable = false
-			}
-		}
-
+		transactionEditable := transaction.IsEditable(allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -253,7 +233,6 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 
 	uid := c.GetCurrentUid()
 	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionGetReq.Id)
-	transactionEditable := true
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionGetReq.Id, uid, err.Error())
@@ -277,16 +256,12 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	if _, exists := accountMap[transaction.AccountId]; !exists {
 		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 		return nil, errs.ErrTransactionNotFound
-	} else if accountMap[transaction.AccountId].Hidden {
-		transactionEditable = false
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		if _, exists := accountMap[transaction.RelatedAccountId]; !exists {
 			log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 			return nil, errs.ErrTransactionNotFound
-		} else if accountMap[transaction.RelatedAccountId].Hidden {
-			transactionEditable = false
 		}
 	}
 
@@ -297,6 +272,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
+	transactionEditable := transaction.IsEditable(accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 

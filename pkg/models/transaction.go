@@ -132,6 +132,21 @@ type TransactionInfoPageWrapperResponse struct {
 	NextTimeSequenceId *int64                       `json:"nextTimeSequenceId,string"`
 }
 
+// IsEditable returns whether this transaction can be edited
+func (c *Transaction) IsEditable(account *Account, relatedAccount *Account) bool {
+	if account == nil || account.Hidden {
+		return false
+	}
+
+	if c.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		if relatedAccount == nil || relatedAccount.Hidden {
+			return false
+		}
+	}
+
+	return true
+}
+
 // ToTransactionInfoResponse returns a view-object according to database model
 func (c *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
 	var transactionType TransactionType

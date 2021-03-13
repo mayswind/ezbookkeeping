@@ -239,8 +239,9 @@
         </f7-card>
 
         <f7-toolbar tabbar bottom v-if="mode !== 'view'">
-            <f7-button fill :class="{ 'disabled': inputIsEmpty || submitting }"
-                       :text="$t(saveButtonTitle)" @click="save"></f7-button>
+            <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="save">
+                {{ $t(saveButtonTitle) }}
+            </f7-link>
         </f7-toolbar>
     </f7-page>
 </template>

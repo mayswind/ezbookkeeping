@@ -72,6 +72,7 @@ import momentFilter from './filters/moment.js';
 import percentFilter from './filters/percent.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
+import utcOffsetFilter from './filters/utcOffset.js';
 import iconFilter from './filters/icon.js';
 import iconStyleFilter from './filters/iconStyle.js';
 import defaultIconColorFilter from './filters/defaultIconColor.js';
@@ -153,6 +154,7 @@ Vue.filter('moment', (value, format) => momentFilter(value, format));
 Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
+Vue.filter('utcOffset', (value) => utcOffsetFilter(value));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
 Vue.filter('iconStyle', (value, iconType, defaultColor, additionalFieldName) => iconStyleFilter(value, iconType, defaultColor, additionalFieldName));
 Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));
@@ -188,6 +190,7 @@ Vue.prototype.$webauthn = webauthn;
 Vue.prototype.$settings = settings;
 Vue.prototype.$locale = {
     defaultTimezoneOffset: utils.getTimezoneOffset(),
+    defaultTimezoneOffsetMinutes: utils.getTimezoneOffsetMinutes(),
     getDefaultLanguage: getDefaultLanguage,
     getAllLanguages: getAllLanguages,
     getLanguage: getLanguage,
@@ -222,6 +225,7 @@ Vue.prototype.$locale = {
             allTimezoneInfos.push({
                 name: allTimezones[i].timezoneName,
                 utcOffset: (allTimezones[i].timezoneName !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+                utcOffsetMinutes: utils.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
                 displayName: i18n.t(`timezone.${allTimezones[i].displayName}`)
             });
         }
@@ -230,6 +234,7 @@ Vue.prototype.$locale = {
             allTimezoneInfos.push({
                 name: '',
                 utcOffset: this.defaultTimezoneOffset,
+                utcOffsetMinutes: this.defaultTimezoneOffsetMinutes,
                 displayName: i18n.t('System Default')
             });
         }

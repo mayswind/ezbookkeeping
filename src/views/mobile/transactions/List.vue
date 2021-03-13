@@ -871,28 +871,6 @@ export default {
         applyTimezoneOffset(unixTime, utcOffsetMinutes, currentTimezoneOffsetMinutes) {
             return unixTime + (utcOffsetMinutes - currentTimezoneOffsetMinutes) * 60;
         },
-        utcOffset(utcOffsetMinutes) {
-            let offsetHours = parseInt(Math.abs(utcOffsetMinutes) / 60);
-            let offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
-
-            if (offsetHours < 10) {
-                offsetHours = '0' + offsetHours;
-            }
-
-            if (offsetMinutes < 10) {
-                offsetMinutes = '0' + offsetMinutes;
-            }
-
-            let utcOffset = '';
-
-            if (utcOffsetMinutes > 0) {
-                utcOffset = `+${offsetHours}:${offsetMinutes}`;
-            } else if (utcOffsetMinutes < 0) {
-                utcOffset = `-${offsetHours}:${offsetMinutes}`;
-            }
-
-            return `(UTC${utcOffset})`;
-        },
         dateRangeName(dateRangeType, allDateRanges, defaultName) {
             if (dateRangeType === allDateRanges.All.type) {
                 return defaultName;

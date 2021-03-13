@@ -34,6 +34,39 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+function getUtcOffsetMinutesByUtcOffset(utcOffset) {
+    if (!utcOffset) {
+        return 0;
+    }
+
+    const parts = utcOffset.split(':');
+
+    if (parts.length !== 2) {
+        return 0;
+    }
+
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+}
+
+function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes) {
+    let offsetHours = parseInt(Math.abs(utcOffsetMinutes) / 60);
+    let offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
+
+    if (offsetHours < 10) {
+        offsetHours = '0' + offsetHours;
+    }
+
+    if (offsetMinutes < 10) {
+        offsetMinutes = '0' + offsetMinutes;
+    }
+
+    if (utcOffsetMinutes >= 0) {
+        return `+${offsetHours}:${offsetMinutes}`;
+    } else if (utcOffsetMinutes < 0) {
+        return `-${offsetHours}:${offsetMinutes}`;
+    }
+}
+
 function getTimezoneOffset(timezone) {
     if (timezone) {
         return moment().tz(timezone).format('Z');
@@ -43,19 +76,8 @@ function getTimezoneOffset(timezone) {
 }
 
 function getTimezoneOffsetMinutes(timezone) {
-    const offset = getTimezoneOffset(timezone);
-
-    if (!offset) {
-        return 0;
-    }
-
-    const parts = offset.split(':');
-
-    if (parts.length !== 2) {
-        return 0;
-    }
-
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    const utcOffset = getTimezoneOffset(timezone);
+    return getUtcOffsetMinutesByUtcOffset(utcOffset);
 }
 
 function getCurrentUnixTime() {
@@ -590,6 +612,8 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    getUtcOffsetMinutesByUtcOffset,
+    getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getCurrentUnixTime,

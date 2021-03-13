@@ -70,6 +70,10 @@ function formatUnixTime(unixTime, format) {
     return moment.unix(unixTime).format(format);
 }
 
+function formatTime(dateTime, format) {
+    return moment(dateTime).format(format);
+}
+
 function getUnixTime(date) {
     return moment(date).unix();
 }
@@ -591,6 +595,7 @@ export default {
     getCurrentUnixTime,
     parseDateFromUnixTime,
     formatUnixTime,
+    formatTime,
     getUnixTime,
     getYear,
     getMonth,

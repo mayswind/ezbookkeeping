@@ -3,7 +3,6 @@ import Vuex from 'vuex';
 
 import VueI18n from 'vue-i18n';
 import PincodeInput from 'vue-pincode-input';
-import VueMoment from 'vue-moment';
 import VueClipboard from 'vue-clipboard2';
 
 import moment from 'moment-timezone';
@@ -69,6 +68,7 @@ import { getAllLanguages, getLanguage, getDefaultLanguage, getI18nOptions, getLo
 import stores from './store/index.js';
 
 import localizedFilter from './filters/localized.js';
+import momentFilter from './filters/moment.js';
 import percentFilter from './filters/percent.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
@@ -131,7 +131,6 @@ Framework7.use(Framework7Vue);
 
 Vue.use(Vuex);
 Vue.use(VueI18n);
-Vue.use(VueMoment, { moment });
 Vue.use(VueClipboard);
 
 Vue.component('PincodeInput', PincodeInput);
@@ -150,6 +149,7 @@ Vue.component('NumberPadSheet', NumberPadSheet);
 Vue.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 
 Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
+Vue.filter('moment', (value, format) => momentFilter(value, format));
 Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));

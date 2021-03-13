@@ -100,12 +100,6 @@
         "licenseUrl": "https://github.com/kazupon/vue-i18n/blob/v8.x/LICENSE"
     },
     {
-        "name": "vue-moment",
-        "copyright": "Copyright (c) 2017 Brock Petrie",
-        "url": "https://github.com/brockpetrie/vue-moment",
-        "licenseUrl": "https://github.com/brockpetrie/vue-moment/blob/master/LICENSE"
-    },
-    {
         "name": "vue-clipboard2",
         "copyright": "Copyright (c) 2017 Inndy <inndy \\dot tw \\at gmail \\dot com>",
         "url": "https://github.com/Inndy/vue-clipboard2",

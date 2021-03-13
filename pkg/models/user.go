@@ -124,7 +124,7 @@ type UserProfileResponse struct {
 }
 
 // CanEditTransactionByTransactionTime returns whether this user can edit transaction with specified transaction time
-func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOffset int) bool {
+func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOffset int16) bool {
 	if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_NONE {
 		return false
 	} else if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_ALL {
@@ -141,7 +141,7 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOff
 
 	_, serverUtcOffset := now.Zone()
 	serverTodayFirstUnixTime := now.Unix() - int64(now.Hour()*60*60+now.Minute()*60+now.Second())
-	clientTodayFirstUnixTime := serverTodayFirstUnixTime + int64(utcOffset*60-serverUtcOffset)
+	clientTodayFirstUnixTime := serverTodayFirstUnixTime + int64(utcOffset)*60 - int64(serverUtcOffset)
 
 	if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_TODAY_OR_LATER {
 		return transactionUnixTime >= clientTodayFirstUnixTime

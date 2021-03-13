@@ -15,6 +15,7 @@ var (
 	ErrFailedToRequestRemoteApi        = NewNormalError(NormalSubcategoryGlobal, 5, http.StatusBadRequest, "failed to request third party api")
 	ErrPageIndexInvalid                = NewNormalError(NormalSubcategoryGlobal, 6, http.StatusBadRequest, "page index is invalid")
 	ErrPageCountInvalid                = NewNormalError(NormalSubcategoryGlobal, 7, http.StatusBadRequest, "page count is invalid")
+	ErrClientTimezoneOffsetInvalid     = NewNormalError(NormalSubcategoryGlobal, 8, http.StatusBadRequest, "client timezone offset is invalid")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

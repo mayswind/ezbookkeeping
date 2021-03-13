@@ -16,6 +16,8 @@ axios.interceptors.request.use(config => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
+    config.headers['X-Timezone-Offset'] = utils.getTimezoneOffsetMinutes();
+
     if (needBlockRequest && !config.ignoreBlocked) {
         return new Promise(resolve => {
             blockedRequests.push(newToken => {
@@ -251,12 +253,10 @@ export default {
         });
     },
     getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
-        const utcOffset = utils.getTimezoneOffsetMinutes();
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50&utc_offset=${utcOffset}`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50`);
     },
     getTransaction: ({ id }) => {
-        const utcOffset = utils.getTimezoneOffsetMinutes();
-        return axios.get(`v1/transactions/get.json?id=${id}&utc_offset=${utcOffset}`);
+        return axios.get(`v1/transactions/get.json?id=${id}`);
     },
     addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment, utcOffset }) => {
         return axios.post('v1/transactions/add.json', {
@@ -288,10 +288,8 @@ export default {
         });
     },
     deleteTransaction: ({ id }) => {
-        const utcOffset = utils.getTimezoneOffsetMinutes();
         return axios.post('v1/transactions/delete.json', {
-            id,
-            utcOffset
+            id
         });
     },
     getAllTransactionCategories: () => {

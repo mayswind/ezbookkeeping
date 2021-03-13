@@ -41,6 +41,13 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(uid)
 
@@ -131,7 +138,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		transactionEditable := transaction.IsEditable(user, transactionListReq.UtcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
+		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -153,6 +160,13 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
 	uid := c.GetCurrentUid()
@@ -235,7 +249,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
 		}
 
-		transactionEditable := transaction.IsEditable(user, transactionListReq.UtcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
+		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 	}
@@ -251,6 +265,13 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
 	uid := c.GetCurrentUid()
@@ -304,7 +325,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
-	transactionEditable := transaction.IsEditable(user, transactionGetReq.UtcOffset, accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
+	transactionEditable := transaction.IsEditable(user, utcOffset, accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 
@@ -497,6 +518,13 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionDeleteHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(uid)
 
@@ -520,7 +548,7 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
-	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transactionDeleteReq.UtcOffset)
+	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, utcOffset)
 
 	if !transactionEditable {
 		return nil, errs.ErrCannotDeleteTransactionWithThisTransactionTime

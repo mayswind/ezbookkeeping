@@ -491,6 +491,7 @@ export default {
         'operation failed': 'Operation failed',
         'nothing will be updated': 'Nothing will be updated',
         'failed to request third party api': 'Failed to request third party api',
+        'client timezone offset is invalid': 'Client timezone offset is invalid',
         'user id is invalid': 'User ID is invalid',
         'username is empty': 'Username is empty',
         'email is empty': 'Email is empty',

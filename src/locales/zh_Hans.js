@@ -491,6 +491,7 @@ export default {
         'operation failed': '操作失败',
         'nothing will be updated': '没有内容更新',
         'failed to request third party api': '请求第三方接口失败',
+        'client timezone offset is invalid': '客户端时区时间差异无效',
         'user id is invalid': '用户ID无效',
         'username is empty': '用户名为空',
         'email is empty': '电子邮箱为空',

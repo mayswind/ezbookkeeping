@@ -56,13 +56,13 @@ type TransactionCreateRequest struct {
 	Type                 TransactionType `json:"type" binding:"required"`
 	CategoryId           int64           `json:"categoryId,string"`
 	Time                 int64           `json:"time" binding:"required,min=1"`
+	UtcOffset            int16           `json:"utcOffset" binding:"min=-720,max=840"`
 	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment" binding:"max=255"`
-	UtcOffset            int             `json:"utcOffset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionModifyRequest represents all parameters of transaction modification request
@@ -70,13 +70,13 @@ type TransactionModifyRequest struct {
 	Id                   int64    `json:"id,string" binding:"required,min=1"`
 	CategoryId           int64    `json:"categoryId,string"`
 	Time                 int64    `json:"time" binding:"required,min=1"`
+	UtcOffset            int16    `json:"utcOffset" binding:"min=-720,max=840"`
 	SourceAccountId      int64    `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64    `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64    `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	TagIds               []string `json:"tagIds"`
 	Comment              string   `json:"comment" binding:"max=255"`
-	UtcOffset            int      `json:"utcOffset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
@@ -88,7 +88,6 @@ type TransactionListByMaxTimeRequest struct {
 	MaxTime    int64             `form:"max_time" binding:"min=0"`
 	MinTime    int64             `form:"min_time" binding:"min=0"`
 	Count      int               `form:"count" binding:"required,min=1,max=50"`
-	UtcOffset  int               `form:"utc_offset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionListInMonthByPageRequest represents all parameters of transaction listing by month request
@@ -101,19 +100,16 @@ type TransactionListInMonthByPageRequest struct {
 	Keyword    string            `form:"keyword"`
 	Page       int               `form:"page" binding:"required,min=1"`
 	Count      int               `form:"count" binding:"required,min=1,max=50"`
-	UtcOffset  int               `form:"utc_offset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
 	Id        int64 `form:"id,string" binding:"required,min=1"`
-	UtcOffset int   `form:"utc_offset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
 	Id        int64 `json:"id,string" binding:"required,min=1"`
-	UtcOffset int   `form:"utc_offset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionInfoResponse represents a view-object of transaction
@@ -139,7 +135,7 @@ type TransactionInfoPageWrapperResponse struct {
 }
 
 // IsEditable returns whether this transaction can be edited
-func (t *Transaction) IsEditable(currentUser *User, utcOffset int, account *Account, relatedAccount *Account) bool {
+func (t *Transaction) IsEditable(currentUser *User, utcOffset int16, account *Account, relatedAccount *Account) bool {
 	if currentUser == nil || !currentUser.CanEditTransactionByTransactionTime(t.TransactionTime, utcOffset) {
 		return false
 	}

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import api from "../consts/api.js";
-import userState from "./userstate.js";
-import utils from "./utils.js";
+import api from '../consts/api.js';
+import userState from './userstate.js';
+import utils from './utils.js';
 
 let needBlockRequest = false;
 let blockedRequests = [];

@@ -1,6 +1,6 @@
-import defaultIconStyle from "./defaultIconStyle.js";
-import accountIconStyle from "./accountIconStyle.js";
-import categoryIconStyle from "./categoryIconStyle.js";
+import defaultIconStyle from './defaultIconStyle.js';
+import accountIconStyle from './accountIconStyle.js';
+import categoryIconStyle from './categoryIconStyle.js';
 
 export default function (color, iconType, defaultColor, additionalFieldName) {
     if (iconType === 'account') {

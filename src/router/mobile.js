@@ -1,4 +1,4 @@
-import userState from "../lib/userstate.js";
+import userState from '../lib/userstate.js';
 
 import HomePage from '../views/mobile/Home.vue';
 import LoginPage from '../views/mobile/Login.vue';
@@ -18,20 +18,20 @@ import StatisticsCategoryFilterSettingsPage from '../views/mobile/statistics/Cat
 
 import SettingsPage from '../views/mobile/Settings.vue';
 import ApplicationLockPage from '../views/mobile/ApplicationLock.vue';
-import ExchangeRatesPage from "../views/mobile/ExchangeRates.vue";
-import AboutPage from "../views/mobile/About.vue";
+import ExchangeRatesPage from '../views/mobile/ExchangeRates.vue';
+import AboutPage from '../views/mobile/About.vue';
 
-import UserProfilePage from "../views/mobile/users/UserProfile.vue";
-import DataManagementPage from "../views/mobile/users/DataManagement.vue";
-import TwoFactorAuthPage from "../views/mobile/users/TwoFactorAuth.vue";
-import SessionListPage from "../views/mobile/users/SessionList.vue";
+import UserProfilePage from '../views/mobile/users/UserProfile.vue';
+import DataManagementPage from '../views/mobile/users/DataManagement.vue';
+import TwoFactorAuthPage from '../views/mobile/users/TwoFactorAuth.vue';
+import SessionListPage from '../views/mobile/users/SessionList.vue';
 
-import CategoryAllPage from "../views/mobile/categories/All.vue";
-import CategoryListPage from "../views/mobile/categories/List.vue";
-import CategoryEditPage from "../views/mobile/categories/Edit.vue";
-import CategoryPresetPage from "../views/mobile/categories/Preset.vue";
+import CategoryAllPage from '../views/mobile/categories/All.vue';
+import CategoryListPage from '../views/mobile/categories/List.vue';
+import CategoryEditPage from '../views/mobile/categories/Edit.vue';
+import CategoryPresetPage from '../views/mobile/categories/Preset.vue';
 
-import TagListPage from "../views/mobile/tags/List.vue";
+import TagListPage from '../views/mobile/tags/List.vue';
 
 function checkLogin(to, from, resolve, reject) {
     const router = this;

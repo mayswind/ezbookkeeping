@@ -83,19 +83,19 @@ import categoryIconStyleFilter from './filters/categoryIconStyle.js';
 import tokenDeviceFilter from './filters/tokenDevice.js';
 import tokenIconFilter from './filters/tokenIcon.js';
 
-import PieChart from "./components/mobile/PieChart.vue";
-import PasswordInputSheet from "./components/mobile/PasswordInputSheet.vue";
-import PasscodeInputSheet from "./components/mobile/PasscodeInputSheet.vue";
-import PinCodeInputSheet from "./components/mobile/PinCodeInputSheet.vue";
-import DateRangeSelectionSheet from "./components/mobile/DateRangeSelectionSheet.vue";
-import ListItemSelectionSheet from "./components/mobile/ListItemSelectionSheet.vue";
-import TwoColumnListItemSelectionSheet from "./components/mobile/TwoColumnListItemSelectionSheet.vue";
-import TreeViewSelectionSheet from "./components/mobile/TreeViewSelectionSheet.vue";
-import IconSelectionSheet from "./components/mobile/IconSelectionSheet.vue";
-import ColorSelectionSheet from "./components/mobile/ColorSelectionSheet.vue";
-import InformationSheet from "./components/mobile/InformationSheet.vue";
-import NumberPadSheet from "./components/mobile/NumberPadSheet.vue";
-import TransactionTagSelectionSheet from "./components/mobile/TransactionTagSelectionSheet.vue";
+import PieChart from './components/mobile/PieChart.vue';
+import PasswordInputSheet from './components/mobile/PasswordInputSheet.vue';
+import PasscodeInputSheet from './components/mobile/PasscodeInputSheet.vue';
+import PinCodeInputSheet from './components/mobile/PinCodeInputSheet.vue';
+import DateRangeSelectionSheet from './components/mobile/DateRangeSelectionSheet.vue';
+import ListItemSelectionSheet from './components/mobile/ListItemSelectionSheet.vue';
+import TwoColumnListItemSelectionSheet from './components/mobile/TwoColumnListItemSelectionSheet.vue';
+import TreeViewSelectionSheet from './components/mobile/TreeViewSelectionSheet.vue';
+import IconSelectionSheet from './components/mobile/IconSelectionSheet.vue';
+import ColorSelectionSheet from './components/mobile/ColorSelectionSheet.vue';
+import InformationSheet from './components/mobile/InformationSheet.vue';
+import NumberPadSheet from './components/mobile/NumberPadSheet.vue';
+import TransactionTagSelectionSheet from './components/mobile/TransactionTagSelectionSheet.vue';
 
 import App from './Mobile.vue';
 

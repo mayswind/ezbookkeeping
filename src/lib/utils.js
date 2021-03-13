@@ -1,10 +1,10 @@
-import CryptoJS from "crypto-js";
+import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import uaParser from 'ua-parser-js';
 
 import dateTimeConstants from '../consts/datetime.js';
 import accountConstants from '../consts/account.js';
-import settings from "./settings.js";
+import settings from './settings.js';
 
 function isFunction(val) {
     return typeof(val) === 'function';

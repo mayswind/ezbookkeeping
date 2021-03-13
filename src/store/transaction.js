@@ -3,7 +3,7 @@ import services from '../lib/services.js';
 import logger from '../lib/logger.js';
 import utils from '../lib/utils.js';
 
-import { getExchangedAmount } from "./exchangeRates.js";
+import { getExchangedAmount } from './exchangeRates.js';
 
 import {
     LOAD_TRANSACTION_LIST,

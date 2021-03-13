@@ -6,7 +6,7 @@ import {
     INIT_TRANSACTION_STATISTICS_FILTER,
     UPDATE_TRANSACTION_STATISTICS_FILTER,
     UPDATE_TRANSACTION_STATISTICS_INVALID_STATE
-} from "./mutations.js";
+} from './mutations.js';
 
 export function loadTransactionStatistics(context, { defaultCurrency }) {
     return new Promise((resolve, reject) => {

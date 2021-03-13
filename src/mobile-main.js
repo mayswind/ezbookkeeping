@@ -214,7 +214,7 @@ Vue.prototype.$locale = {
             moment.tz.setDefault();
         }
     },
-    getAllTimezones: function () {
+    getAllTimezones: function (includeSystemDefault) {
         const allTimezones = timezone.all;
         const allTimezoneInfos = [];
 
@@ -223,6 +223,14 @@ Vue.prototype.$locale = {
                 name: allTimezones[i].timezoneName,
                 utcOffset: (allTimezones[i].timezoneName !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
                 displayName: i18n.t(`timezone.${allTimezones[i].displayName}`)
+            });
+        }
+
+        if (includeSystemDefault) {
+            allTimezoneInfos.push({
+                name: '',
+                utcOffset: this.defaultTimezoneOffset,
+                displayName: i18n.t('System Default')
             });
         }
 

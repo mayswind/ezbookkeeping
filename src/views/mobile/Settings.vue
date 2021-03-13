@@ -37,7 +37,6 @@
                         :title="$t('Timezone')"
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currentTimezone">
-                            <option value="">{{ `(UTC${defaultTimezoneOffset}) ${$t('System Default')}` }}</option>
                             <option v-for="timezone in allTimezones"
                                     :key="timezone.name"
                                     :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
@@ -117,10 +116,7 @@ export default {
             return this.$locale.getAllLanguages();
         },
         allTimezones() {
-            return this.$locale.getAllTimezones();
-        },
-        defaultTimezoneOffset() {
-            return this.$locale.defaultTimezoneOffset;
+            return this.$locale.getAllTimezones(true);
         },
         currentLocale: {
             get: function () {

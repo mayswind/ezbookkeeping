@@ -1,220 +1,597 @@
 // https://github.com/nodatime/nodatime/blob/master/data/cldr/windowsZones-38-1.xml
-const allTimezoneNames = [
+const allAvailableTimezones = [
     // UTC-12:00
-    'Etc/GMT+12', // International Date Line West
-
+    {
+        displayName: 'International Date Line West',
+        timezoneName: 'Etc/GMT+12'
+    },
     // UTC-11:00
-    'Etc/GMT+11', // Coordinated Universal Time-11
-
+    {
+        displayName: 'Coordinated Universal Time-11',
+        timezoneName: 'Etc/GMT+11'
+    },
     // UTC-10:00
-    'America/Adak', // Aleutian Islands
-    'Pacific/Honolulu', // Hawaii
-
+    {
+        displayName: 'Aleutian Islands',
+        timezoneName: 'America/Adak'
+    },
+    {
+        displayName: 'Hawaii',
+        timezoneName: 'Pacific/Honolulu'
+    },
     // UTC-09:30
-    'Pacific/Marquesas', // Marquesas Islands=
-
+    {
+        displayName: 'Marquesas Islands',
+        timezoneName: 'Pacific/Marquesas'
+    },
     // UTC-09:00
-    'America/Anchorage', // Alaska
-    'Etc/GMT+9', // Coordinated Universal Time-09
-
+    {
+        displayName: 'Alaska',
+        timezoneName: 'America/Anchorage'
+    },
+    {
+        displayName: 'Coordinated Universal Time-09',
+        timezoneName: 'Etc/GMT+9'
+    },
     // UTC-08:00
-    'America/Tijuana', // Baja California
-    'Etc/GMT+8', // Coordinated Universal Time-08
-    'America/Los_Angeles', // Pacific Time (US & Canada)
-
+    {
+        displayName: 'Baja California',
+        timezoneName: 'America/Tijuana'
+    },
+    {
+        displayName: 'Coordinated Universal Time-08',
+        timezoneName: 'Etc/GMT+8'
+    },
+    {
+        displayName: 'Pacific Time (US & Canada)',
+        timezoneName: 'America/Los_Angeles'
+    },
     // UTC-07:00
-    'America/Phoenix', // Arizona
-    'America/Chihuahua', // Chihuahua, La Paz, Mazatlan
-    'America/Denver', // Mountain Time (US & Canada)
-    'America/Whitehorse', // Yukon
-
+    {
+        displayName: 'Arizona',
+        timezoneName: 'America/Phoenix'
+    },
+    {
+        displayName: 'Chihuahua, La Paz, Mazatlan',
+        timezoneName: 'America/Chihuahua'
+    },
+    {
+        displayName: 'Mountain Time (US & Canada)',
+        timezoneName: 'America/Denver'
+    },
+    {
+        displayName: 'Yukon',
+        timezoneName: 'America/Whitehorse'
+    },
     // UTC-06:00
-    'America/Guatemala', // Central America
-    'America/Chicago', // Central Time (US & Canada)
-    'Pacific/Easter', // Easter Island
-    'America/Mexico_City', // Guadalajara, Mexico City, Monterrey
-    'America/Regina', // Saskatchewan
-
+    {
+        displayName: 'Central America',
+        timezoneName: 'America/Guatemala'
+    },
+    {
+        displayName: 'Central Time (US & Canada)',
+        timezoneName: 'America/Chicago'
+    },
+    {
+        displayName: 'Easter Island',
+        timezoneName: 'Pacific/Easter'
+    },
+    {
+        displayName: 'Guadalajara, Mexico City, Monterrey',
+        timezoneName: 'America/Mexico_City'
+    },
+    {
+        displayName: 'Saskatchewan',
+        timezoneName: 'America/Regina'
+    },
     // UTC-05:00
-    'America/Bogota', // Bogota, Lima, Quito, Rio Branco
-    'America/Cancun', // Chetumal
-    'America/New_York', // Eastern Time (US & Canada)
-    'America/Port-au-Prince', // Haiti
-    'America/Havana', // Havana
-    'America/Indianapolis', // Indiana (East)
-    'America/Grand_Turk', // Turks and Caicos
-
+    {
+        displayName: 'Bogota, Lima, Quito, Rio Branco',
+        timezoneName: 'America/Bogota'
+    },
+    {
+        displayName: 'Chetumal',
+        timezoneName: 'America/Cancun'
+    },
+    {
+        displayName: 'Eastern Time (US & Canada)',
+        timezoneName: 'America/New_York'
+    },
+    {
+        displayName: 'Haiti',
+        timezoneName: 'America/Port-au-Prince'
+    },
+    {
+        displayName: 'Havana',
+        timezoneName: 'America/Havana'
+    },
+    {
+        displayName: 'Indiana (East)',
+        timezoneName: 'America/Indianapolis'
+    },
+    {
+        displayName: 'Turks and Caicos',
+        timezoneName: 'America/Grand_Turk'
+    },
     // UTC-04:00
-    'America/Asuncion', // Asuncion
-    'America/Halifax', // Atlantic Time (Canada)
-    'America/Caracas', // Caracas
-    'America/Cuiaba', // Cuiaba
-    'America/La_Paz', // Georgetown, La Paz, Manaus, San Juan
-    'America/Santiago', // Santiago
-
+    {
+        displayName: 'Asuncion',
+        timezoneName: 'America/Asuncion'
+    },
+    {
+        displayName: 'Atlantic Time (Canada)',
+        timezoneName: 'America/Halifax'
+    },
+    {
+        displayName: 'Caracas',
+        timezoneName: 'America/Caracas'
+    },
+    {
+        displayName: 'Cuiaba',
+        timezoneName: 'America/Cuiaba'
+    },
+    {
+        displayName: 'Georgetown, La Paz, Manaus, San Juan',
+        timezoneName: 'America/La_Paz'
+    },
+    {
+        displayName: 'Santiago',
+        timezoneName: 'America/Santiago'
+    },
     // UTC-03:30
-    'America/St_Johns', // Newfoundland
-
+    {
+        displayName: 'Newfoundland',
+        timezoneName: 'America/St_Johns'
+    },
     // UTC-03:00
-    'America/Araguaina', // Araguaina
-    'America/Sao_Paulo', // Brasilia
-    'America/Cayenne', // Cayenne, Fortaleza
-    'America/Buenos_Aires', // City of Buenos Aires
-    'America/Godthab', // Greenland
-    'America/Montevideo', // Montevideo
-    'America/Punta_Arenas', // Punta Arenas
-    'America/Miquelon', // Saint Pierre and Miquelon
-    'America/Bahia', // Salvador
-
+    {
+        displayName: 'Araguaina',
+        timezoneName: 'America/Araguaina'
+    },
+    {
+        displayName: 'Brasilia',
+        timezoneName: 'America/Sao_Paulo'
+    },
+    {
+        displayName: 'Cayenne, Fortaleza',
+        timezoneName: 'America/Cayenne'
+    },
+    {
+        displayName: 'City of Buenos Aires',
+        timezoneName: 'America/Buenos_Aires'
+    },
+    {
+        displayName: 'Greenland',
+        timezoneName: 'America/Godthab'
+    },
+    {
+        displayName: 'Montevideo',
+        timezoneName: 'America/Montevideo'
+    },
+    {
+        displayName: 'Punta Arenas',
+        timezoneName: 'America/Punta_Arenas'
+    },
+    {
+        displayName: 'Saint Pierre and Miquelon',
+        timezoneName: 'America/Miquelon'
+    },
+    {
+        displayName: 'Salvador',
+        timezoneName: 'America/Bahia'
+    },
     // UTC-02:00
-    'Etc/GMT+2', // Coordinated Universal Time-02
-
+    {
+        displayName: 'Coordinated Universal Time-02',
+        timezoneName: 'Etc/GMT+2'
+    },
     // UTC-01:00
-    'Atlantic/Azores', // Azores
-    'Atlantic/Cape_Verde', // Cabo Verde Is.
-
+    {
+        displayName: 'Azores',
+        timezoneName: 'Atlantic/Azores'
+    },
+    {
+        displayName: 'Cabo Verde Is',
+        timezoneName: 'Atlantic/Cape_Verde'
+    },
     // UTC
-    'Etc/GMT', // Coordinated Universal Time
-
+    {
+        displayName: 'Coordinated Universal Time',
+        timezoneName: 'Etc/GMT'
+    },
     // UTC+00:00
-    'Europe/London', // Dublin, Edinburgh, Lisbon, London
-    'Atlantic/Reykjavik', // Monrovia, Reykjavik
-    'Africa/Sao_Tome', // Sao Tome
-
+    {
+        displayName: 'Dublin, Edinburgh, Lisbon, London',
+        timezoneName: 'Europe/London'
+    },
+    {
+        displayName: 'Monrovia, Reykjavik',
+        timezoneName: 'Atlantic/Reykjavik'
+    },
+    {
+        displayName: 'Sao Tome',
+        timezoneName: 'Africa/Sao_Tome'
+    },
     // UTC+01:00
-    'Africa/Casablanca', // Casablanca
-    'Europe/Berlin', // Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna
-    'Europe/Budapest', // Belgrade, Bratislava, Budapest, Ljubljana, Prague
-    'Europe/Paris', // Brussels, Copenhagen, Madrid, Paris
-    'Europe/Warsaw', // Sarajevo, Skopje, Warsaw, Zagreb
-    'Africa/Lagos', // West Central Africa
-
+    {
+        displayName: 'Casablanca',
+        timezoneName: 'Africa/Casablanca'
+    },
+    {
+        displayName: 'Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+        timezoneName: 'Europe/Berlin'
+    },
+    {
+        displayName: 'Belgrade, Bratislava, Budapest, Ljubljana, Prague',
+        timezoneName: 'Europe/Budapest'
+    },
+    {
+        displayName: 'Brussels, Copenhagen, Madrid, Paris',
+        timezoneName: 'Europe/Paris'
+    },
+    {
+        displayName: 'Sarajevo, Skopje, Warsaw, Zagreb',
+        timezoneName: 'Europe/Warsaw'
+    },
+    {
+        displayName: 'West Central Africa',
+        timezoneName: 'Africa/Lagos'
+    },
     // UTC+02:00
-    'Asia/Amman', // Amman
-    'Europe/Bucharest', // Athens, Bucharest
-    'Asia/Beirut', // Beirut
-    'Africa/Cairo', // Cairo
-    'Europe/Chisinau', // Chisinau
-    'Asia/Damascus', // Damascus
-    'Asia/Gaza', // Gaza, Hebron
-    'Africa/Johannesburg', // Harare, Pretoria
-    'Europe/Kiev', // Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius
-    'Asia/Jerusalem', // Jerusalem
-    'Europe/Kaliningrad', // Kaliningrad
-    'Africa/Khartoum', // Khartoum
-    'Africa/Tripoli', // Tripoli
-    'Africa/Windhoek', // Windhoek
-
+    {
+        displayName: 'Amman',
+        timezoneName: 'Asia/Amman'
+    },
+    {
+        displayName: 'Athens, Bucharest',
+        timezoneName: 'Europe/Bucharest'
+    },
+    {
+        displayName: 'Beirut',
+        timezoneName: 'Asia/Beirut'
+    },
+    {
+        displayName: 'Cairo',
+        timezoneName: 'Africa/Cairo'
+    },
+    {
+        displayName: 'Chisinau',
+        timezoneName: 'Europe/Chisinau'
+    },
+    {
+        displayName: 'Damascus',
+        timezoneName: 'Asia/Damascus'
+    },
+    {
+        displayName: 'Gaza, Hebron',
+        timezoneName: 'Asia/Gaza'
+    },
+    {
+        displayName: 'Harare, Pretoria',
+        timezoneName: 'Africa/Johannesburg'
+    },
+    {
+        displayName: 'Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius',
+        timezoneName: 'Europe/Kiev'
+    },
+    {
+        displayName: 'Jerusalem',
+        timezoneName: 'Asia/Jerusalem'
+    },
+    {
+        displayName: 'Kaliningrad',
+        timezoneName: 'Europe/Kaliningrad'
+    },
+    {
+        displayName: 'Khartoum',
+        timezoneName: 'Africa/Khartoum'
+    },
+    {
+        displayName: 'Tripoli',
+        timezoneName: 'Africa/Tripoli'
+    },
+    {
+        displayName: 'Windhoek',
+        timezoneName: 'Africa/Windhoek'
+    },
     // UTC+03:00
-    'Asia/Baghdad', // Baghdad
-    'Europe/Istanbul', // Istanbul
-    'Asia/Riyadh', // Kuwait, Riyadh
-    'Europe/Minsk', // Minsk
-    'Europe/Moscow', // Moscow, St. Petersburg, Volgograd
-    'Africa/Nairobi', // Nairobi
-    'Asia/Tehran', // Tehran
-
+    {
+        displayName: 'Baghdad',
+        timezoneName: 'Asia/Baghdad'
+    },
+    {
+        displayName: 'Istanbul',
+        timezoneName: 'Europe/Istanbul'
+    },
+    {
+        displayName: 'Kuwait, Riyadh',
+        timezoneName: 'Asia/Riyadh'
+    },
+    {
+        displayName: 'Minsk',
+        timezoneName: 'Europe/Minsk'
+    },
+    {
+        displayName: 'Moscow, St Petersburg, Volgograd',
+        timezoneName: 'Europe/Moscow'
+    },
+    {
+        displayName: 'Nairobi',
+        timezoneName: 'Africa/Nairobi'
+    },
+    {
+        displayName: 'Tehran',
+        timezoneName: 'Asia/Tehran'
+    },
     // UTC+04:00
-    'Asia/Dubai', // Abu Dhabi, Muscat
-    'Europe/Astrakhan', // Astrakhan, Ulyanovsk
-    'Asia/Baku', // Baku
-    'Europe/Samara', // Izhevsk, Samara
-    'Indian/Mauritius', // Port Louis
-    'Europe/Saratov', // Saratov
-    'Asia/Tbilisi', // Tbilisi
-    'Europe/Volgograd', // Volgograd
-    'Asia/Yerevan', // Yerevan
-
+    {
+        displayName: 'Abu Dhabi, Muscat',
+        timezoneName: 'Asia/Dubai'
+    },
+    {
+        displayName: 'Astrakhan, Ulyanovsk',
+        timezoneName: 'Europe/Astrakhan'
+    },
+    {
+        displayName: 'Baku',
+        timezoneName: 'Asia/Baku'
+    },
+    {
+        displayName: 'Izhevsk, Samara',
+        timezoneName: 'Europe/Samara'
+    },
+    {
+        displayName: 'Port Louis',
+        timezoneName: 'Indian/Mauritius'
+    },
+    {
+        displayName: 'Saratov',
+        timezoneName: 'Europe/Saratov'
+    },
+    {
+        displayName: 'Tbilisi',
+        timezoneName: 'Asia/Tbilisi'
+    },
+    {
+        displayName: 'Volgograd',
+        timezoneName: 'Europe/Volgograd'
+    },
+    {
+        displayName: 'Yerevan',
+        timezoneName: 'Asia/Yerevan'
+    },
     // UTC+04:30
-    'Asia/Kabul', // Kabul
-
+    {
+        displayName: 'Kabul',
+        timezoneName: 'Asia/Kabul'
+    },
     // UTC+05:00
-    'Asia/Tashkent', // Ashgabat, Tashkent
-    'Asia/Yekaterinburg', // Ekaterinburg
-    'Asia/Karachi', // Islamabad, Karachi
-    'Asia/Qyzylorda', // Qyzylorda
-
+    {
+        displayName: 'Ashgabat, Tashkent',
+        timezoneName: 'Asia/Tashkent'
+    },
+    {
+        displayName: 'Ekaterinburg',
+        timezoneName: 'Asia/Yekaterinburg'
+    },
+    {
+        displayName: 'Islamabad, Karachi',
+        timezoneName: 'Asia/Karachi'
+    },
+    {
+        displayName: 'Qyzylorda',
+        timezoneName: 'Asia/Qyzylorda'
+    },
     // UTC+05:30
-    'Asia/Calcutta', // Chennai, Kolkata, Mumbai, New Delhi
-    'Asia/Colombo', // Sri Jayawardenepura
-
+    {
+        displayName: 'Chennai, Kolkata, Mumbai, New Delhi',
+        timezoneName: 'Asia/Calcutta'
+    },
+    {
+        displayName: 'Sri Jayawardenepura',
+        timezoneName: 'Asia/Colombo'
+    },
     // UTC+05:45
-    'Asia/Kathmandu', // Kathmandu
-
+    {
+        displayName: 'Kathmandu',
+        timezoneName: 'Asia/Kathmandu'
+    },
     // UTC+06:00
-    'Asia/Almaty', // Astana
-    'Asia/Dhaka', // Dhaka
-    'Asia/Omsk', // Omsk
-
+    {
+        displayName: 'Astana',
+        timezoneName: 'Asia/Almaty'
+    },
+    {
+        displayName: 'Dhaka',
+        timezoneName: 'Asia/Dhaka'
+    },
+    {
+        displayName: 'Omsk',
+        timezoneName: 'Asia/Omsk'
+    },
     // UTC+06:30
-    'Asia/Rangoon', // Yangon (Rangoon)
-
+    {
+        displayName: 'Yangon (Rangoon)',
+        timezoneName: 'Asia/Rangoon'
+    },
     // UTC+07:00
-    'Asia/Bangkok', // Bangkok, Hanoi, Jakarta
-    'Asia/Barnaul', // Barnaul, Gorno-Altaysk
-    'Asia/Hovd', // Hovd
-    'Asia/Krasnoyarsk', // Krasnoyarsk
-    'Asia/Novosibirsk', // Novosibirsk
-    'Asia/Tomsk', // Tomsk
-
+    {
+        displayName: 'Bangkok, Hanoi, Jakarta',
+        timezoneName: 'Asia/Bangkok'
+    },
+    {
+        displayName: 'Barnaul, Gorno-Altaysk',
+        timezoneName: 'Asia/Barnaul'
+    },
+    {
+        displayName: 'Hovd',
+        timezoneName: 'Asia/Hovd'
+    },
+    {
+        displayName: 'Krasnoyarsk',
+        timezoneName: 'Asia/Krasnoyarsk'
+    },
+    {
+        displayName: 'Novosibirsk',
+        timezoneName: 'Asia/Novosibirsk'
+    },
+    {
+        displayName: 'Tomsk',
+        timezoneName: 'Asia/Tomsk'
+    },
     // UTC+08:00
-    'Asia/Shanghai', // Beijing, Chongqing, Hong Kong SAR, Urumqi
-    'Asia/Irkutsk', // Irkutsk
-    'Asia/Singapore', // Kuala Lumpur, Singapore
-    'Australia/Perth', // Perth
-    'Asia/Taipei', // Taipei
-    'Asia/Ulaanbaatar', // Ulaanbaatar
-
+    {
+        displayName: 'Beijing, Chongqing, Hong Kong SAR, Urumqi',
+        timezoneName: 'Asia/Shanghai'
+    },
+    {
+        displayName: 'Irkutsk',
+        timezoneName: 'Asia/Irkutsk'
+    },
+    {
+        displayName: 'Kuala Lumpur, Singapore',
+        timezoneName: 'Asia/Singapore'
+    },
+    {
+        displayName: 'Perth',
+        timezoneName: 'Australia/Perth'
+    },
+    {
+        displayName: 'Taipei',
+        timezoneName: 'Asia/Taipei'
+    },
+    {
+        displayName: 'Ulaanbaatar',
+        timezoneName: 'Asia/Ulaanbaatar'
+    },
     // UTC+08:45
-    'Australia/Eucla', // Eucla
-
+    {
+        displayName: 'Eucla',
+        timezoneName: 'Australia/Eucla'
+    },
     // UTC+09:00
-    'Asia/Chita', // Chita
-    'Asia/Tokyo', // Osaka, Sapporo, Tokyo
-    'Asia/Pyongyang', // Pyongyang
-    'Asia/Seoul', // Seoul
-    'Asia/Yakutsk', // Yakutsk
-
+    {
+        displayName: 'Chita',
+        timezoneName: 'Asia/Chita'
+    },
+    {
+        displayName: 'Osaka, Sapporo, Tokyo',
+        timezoneName: 'Asia/Tokyo'
+    },
+    {
+        displayName: 'Pyongyang',
+        timezoneName: 'Asia/Pyongyang'
+    },
+    {
+        displayName: 'Seoul',
+        timezoneName: 'Asia/Seoul'
+    },
+    {
+        displayName: 'Yakutsk',
+        timezoneName: 'Asia/Yakutsk'
+    },
     // UTC+09:30
-    'Australia/Adelaide', // Adelaide
-    'Australia/Darwin', // Darwin
-
+    {
+        displayName: 'Adelaide',
+        timezoneName: 'Australia/Adelaide'
+    },
+    {
+        displayName: 'Darwin',
+        timezoneName: 'Australia/Darwin'
+    },
     // UTC+10:00
-    'Australia/Brisbane', // Brisbane
-    'Australia/Sydney', // Canberra, Melbourne, Sydney
-    'Pacific/Port_Moresby', // Guam, Port Moresby
-    'Australia/Hobart', // Hobart
-    'Asia/Vladivostok', // Vladivostok
-
+    {
+        displayName: 'Brisbane',
+        timezoneName: 'Australia/Brisbane'
+    },
+    {
+        displayName: 'Canberra, Melbourne, Sydney',
+        timezoneName: 'Australia/Sydney'
+    },
+    {
+        displayName: 'Guam, Port Moresby',
+        timezoneName: 'Pacific/Port_Moresby'
+    },
+    {
+        displayName: 'Hobart',
+        timezoneName: 'Australia/Hobart'
+    },
+    {
+        displayName: 'Vladivostok',
+        timezoneName: 'Asia/Vladivostok'
+    },
     // UTC+10:30
-    'Australia/Lord_Howe', // Lord Howe Island
-
+    {
+        displayName: 'Lord Howe Island',
+        timezoneName: 'Australia/Lord_Howe'
+    },
     // UTC+11:00
-    'Pacific/Bougainville', // Bougainville Island
-    'Asia/Srednekolymsk', // Chokurdakh
-    'Asia/Magadan', // Magadan
-    'Pacific/Norfolk', // Norfolk Island
-    'Asia/Sakhalin', // Sakhalin
-    'Pacific/Guadalcanal', // Solomon Is., New Caledonia
-
+    {
+        displayName: 'Bougainville Island',
+        timezoneName: 'Pacific/Bougainville'
+    },
+    {
+        displayName: 'Chokurdakh',
+        timezoneName: 'Asia/Srednekolymsk'
+    },
+    {
+        displayName: 'Magadan',
+        timezoneName: 'Asia/Magadan'
+    },
+    {
+        displayName: 'Norfolk Island',
+        timezoneName: 'Pacific/Norfolk'
+    },
+    {
+        displayName: 'Sakhalin',
+        timezoneName: 'Asia/Sakhalin'
+    },
+    {
+        displayName: 'Solomon Is, New Caledonia',
+        timezoneName: 'Pacific/Guadalcanal'
+    },
     // UTC+12:00
-    'Asia/Kamchatka', // Anadyr, Petropavlovsk-Kamchatsky
-    'Pacific/Auckland', // Auckland, Wellington
-    'Etc/GMT-12', // Coordinated Universal Time+12
-    'Pacific/Fiji', // Fiji
-
+    {
+        displayName: 'Anadyr, Petropavlovsk-Kamchatsky',
+        timezoneName: 'Asia/Kamchatka'
+    },
+    {
+        displayName: 'Auckland, Wellington',
+        timezoneName: 'Pacific/Auckland'
+    },
+    {
+        displayName: 'Coordinated Universal Time+12',
+        timezoneName: 'Etc/GMT-12'
+    },
+    {
+        displayName: 'Fiji',
+        timezoneName: 'Pacific/Fiji'
+    },
     // UTC+12:45
-    'Pacific/Chatham', // Chatham Islands
-
+    {
+        displayName: 'Chatham Islands',
+        timezoneName: 'Pacific/Chatham'
+    },
     // UTC+13:00
-    'Etc/GMT-13', // Coordinated Universal Time+13
-    'Pacific/Tongatapu', // Nuku'alofa
-    'Pacific/Apia', // Samoa
-
+    {
+        displayName: 'Coordinated Universal Time+13',
+        timezoneName: 'Etc/GMT-13'
+    },
+    {
+        displayName: 'Nukualofa',
+        timezoneName: 'Pacific/Tongatapu'
+    },
+    {
+        displayName: 'Samoa',
+        timezoneName: 'Pacific/Apia'
+    },
     // UTC+14:00
-    'Pacific/Kiritimati', // Kiritimati Island
+    {
+        displayName: 'Kiritimati Island',
+        timezoneName: 'Pacific/Kiritimati'
+    }
 ];
 
 export default {
-    all: allTimezoneNames
+    all: allAvailableTimezones
 };

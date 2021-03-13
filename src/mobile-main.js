@@ -215,14 +215,14 @@ Vue.prototype.$locale = {
         }
     },
     getAllTimezones: function () {
-        const allTimezoneNames = timezone.all;
+        const allTimezones = timezone.all;
         const allTimezoneInfos = [];
 
-        for (let i = 0; i < allTimezoneNames.length; i++) {
+        for (let i = 0; i < allTimezones.length; i++) {
             allTimezoneInfos.push({
-                name: allTimezoneNames[i],
-                utcOffset: (allTimezoneNames[i] !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezoneNames[i]) : ''),
-                displayName: i18n.t(`timezone.${allTimezoneNames[i]}`)
+                name: allTimezones[i].timezoneName,
+                utcOffset: (allTimezones[i].timezoneName !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+                displayName: i18n.t(`timezone.${allTimezones[i].displayName}`)
             });
         }
 

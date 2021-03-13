@@ -453,6 +453,10 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 
+	if transactionTagIds == nil {
+		transactionTagIds = make([]int64, 0, 0)
+	}
+
 	newTransaction := &models.Transaction{
 		TransactionId:     transaction.TransactionId,
 		Uid:               uid,

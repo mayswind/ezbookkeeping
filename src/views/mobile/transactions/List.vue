@@ -320,7 +320,7 @@
                                     <span>{{ transaction.comment }}</span>
                                 </div>
                                 <div slot="footer" class="transaction-footer">
-                                    <span>{{ transaction.time | applyTimezoneOffset(transaction.utcOffset, currentTimezoneOffsetMinutes) | moment($t('format.hourMinute.long')) }}</span>
+                                    <span>{{ transaction.time | moment($t('format.hourMinute.long'), { utcOffset: transaction.utcOffset, currentUtcOffset: currentTimezoneOffsetMinutes }) }}</span>
                                     <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ transaction.utcOffset | utcOffset }}</span>
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
@@ -867,9 +867,6 @@ export default {
             return {
                 color: 'transparent'
             }
-        },
-        applyTimezoneOffset(unixTime, utcOffsetMinutes, currentTimezoneOffsetMinutes) {
-            return unixTime + (utcOffsetMinutes - currentTimezoneOffsetMinutes) * 60;
         },
         dateRangeName(dateRangeType, allDateRanges, defaultName) {
             if (dateRangeType === allDateRanges.All.type) {

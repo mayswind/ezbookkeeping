@@ -786,6 +786,7 @@ export default {
     'Source Account': '来源账户',
     'Destination Account': '目标账户',
     'Transaction Time': '交易时间',
+    'Transaction Time Zone': '交易时区',
     'Tags': '标签',
     'Your transaction description (optional)': '你的交易描述 (可选)',
     'Are you sure you want to save this transaction whose amount is 0?': '您确定要保存这个金额为0的交易？',

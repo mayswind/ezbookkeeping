@@ -150,7 +150,7 @@ Vue.component('NumberPadSheet', NumberPadSheet);
 Vue.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 
 Vue.filter('localized', (value, options) => localizedFilter({ i18n }, value, options));
-Vue.filter('moment', (value, format) => momentFilter(value, format));
+Vue.filter('moment', (value, format, options) => momentFilter(value, format, options));
 Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(value, precision, lowPrecisionValue));
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));

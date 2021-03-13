@@ -234,6 +234,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     align-self: normal !important;
 }
 
+.list-item-no-item-after .item-after {
+    display: none;
+}
+
 .list .item-content .input.list-title-input {
     margin-top: calc(-1 * var(--f7-list-item-padding-vertical));
     margin-bottom: calc(-1 * var(--f7-list-item-padding-vertical));

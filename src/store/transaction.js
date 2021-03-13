@@ -279,12 +279,13 @@ export function hasMoreTransaction(state) {
     return state.transactionsNextTimeId > 0;
 }
 
-export function fillTransactionObject(state, transaction) {
+export function fillTransactionObject(state, transaction, currentUtcOffset) {
     if (!transaction) {
         return;
     }
 
-    const transactionTime = utils.parseDateFromUnixTime(transaction.time);
+    const transactionUnixTimeForLocalUsage = utils.getDummyUnixTimeForLocalDisplay(transaction.time, transaction.utcOffset, currentUtcOffset);
+    const transactionTime = utils.parseDateFromUnixTime(transactionUnixTimeForLocalUsage);
 
     transaction.day = utils.getDay(transactionTime);
     transaction.dayOfWeek = utils.getDayOfWeek(transactionTime);

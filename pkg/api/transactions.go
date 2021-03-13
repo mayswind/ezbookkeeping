@@ -454,13 +454,14 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 
 	newTransaction := &models.Transaction{
-		TransactionId:   transaction.TransactionId,
-		Uid:             uid,
-		CategoryId:      transactionModifyReq.CategoryId,
-		TransactionTime: utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
-		AccountId:       transactionModifyReq.SourceAccountId,
-		Amount:          transactionModifyReq.SourceAmount,
-		Comment:         transactionModifyReq.Comment,
+		TransactionId:     transaction.TransactionId,
+		Uid:               uid,
+		CategoryId:        transactionModifyReq.CategoryId,
+		TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
+		TimezoneUtcOffset: transactionModifyReq.UtcOffset,
+		AccountId:         transactionModifyReq.SourceAccountId,
+		Amount:            transactionModifyReq.SourceAmount,
+		Comment:           transactionModifyReq.Comment,
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
@@ -470,6 +471,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 
 	if newTransaction.CategoryId == transaction.CategoryId &&
 		utils.GetUnixTimeFromTransactionTime(newTransaction.TransactionTime) == utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) &&
+		newTransaction.TimezoneUtcOffset == transaction.TimezoneUtcOffset &&
 		newTransaction.AccountId == transaction.AccountId &&
 		newTransaction.Amount == transaction.Amount &&
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
@@ -487,9 +489,10 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		addTransactionTagIds = tagIds
 	}
 
-	transactionEditable := user.CanEditTransactionByTransactionTime(newTransaction.TransactionTime, transactionModifyReq.UtcOffset)
+	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transaction.TimezoneUtcOffset)
+	newTransactionEditable := user.CanEditTransactionByTransactionTime(newTransaction.TransactionTime, transactionModifyReq.UtcOffset)
 
-	if !transactionEditable {
+	if !transactionEditable || !newTransactionEditable {
 		return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
 	}
 

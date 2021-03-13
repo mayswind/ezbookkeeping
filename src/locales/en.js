@@ -786,6 +786,7 @@ export default {
     'Source Account': 'Source Account',
     'Destination Account': 'Destination Account',
     'Transaction Time': 'Transaction Time',
+    'Transaction Time Zone': 'Transaction Time Zone',
     'Tags': 'Tags',
     'Your transaction description (optional)': 'Your transaction description (optional)',
     'Are you sure you want to save this transaction whose amount is 0?': 'Are you sure you want to save this transaction whose amount is 0?',

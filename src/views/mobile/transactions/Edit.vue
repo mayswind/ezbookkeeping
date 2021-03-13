@@ -27,6 +27,7 @@
                     <f7-list-item class="transaction-edit-category" header="Category" title="Category Names" link="#"></f7-list-item>
                     <f7-list-item class="transaction-edit-account" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
+                    <f7-list-item class="transaction-edit-timezone" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
                     <f7-list-item header="Tags" link="#">
                         <f7-block class="margin-top-half no-padding" slot="footer">
                             <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
@@ -202,6 +203,21 @@
                     </f7-list-input>
 
                     <f7-list-item
+                        class="transaction-edit-timezone list-item-no-item-after"
+                        :header="$t('Transaction Time Zone')"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Transaction Time Zone'), searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        <select v-model="transaction.timeZone">
+                            <option v-for="timezone in allTimezones"
+                                    :key="timezone.name"
+                                    :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                        </select>
+                        <f7-block slot="title" class="transaction-edit-timezone-title no-padding">
+                            <span>{{ transaction.utcOffset | utcOffset }}</span>
+                            <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transaction.timeZone | timeZoneName(allTimezones) }}</span>
+                        </f7-block>
+                    </f7-list-item>
+
+                    <f7-list-item
                         link="#"
                         :header="$t('Tags')"
                         @click="showTransactionTagSheet = true"
@@ -252,6 +268,7 @@ export default {
         const self = this;
         const query = self.$f7route.query;
         const now = self.$utilities.getCurrentUnixTime();
+        const currentTimezone = self.$locale.getTimezone();
 
         let defaultType = self.$constants.transaction.allTransactionTypes.Expense;
 
@@ -268,6 +285,8 @@ export default {
                 type: defaultType,
                 unixTime: now,
                 time: self.$utilities.formatUnixTime(now, 'YYYY-MM-DDTHH:mm'),
+                timeZone: currentTimezone,
+                utcOffset: self.$utilities.getTimezoneOffsetMinutes(currentTimezone),
                 expenseCategory: '',
                 incomeCategory: '',
                 transferCategory: '',
@@ -329,6 +348,12 @@ export default {
         },
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
+        defaultTimezoneOffset() {
+            return this.$locale.defaultTimezoneOffset;
+        },
+        allTimezones() {
+            return this.$locale.getAllTimezones(true);
         },
         allAccounts() {
             return this.$store.getters.allPlainAccounts;
@@ -496,6 +521,14 @@ export default {
             if (this.$utilities.formatUnixTime(this.transaction.unixTime, 'YYYY-MM-DDTHH:mm') !== newValue) {
                 this.transaction.unixTime = this.$utilities.getUnixTime(newValue);
             }
+        },
+        'transaction.timeZone': function (newValue) {
+            for (let i = 0; i < this.allTimezones.length; i++) {
+                if (this.allTimezones[i].name === newValue) {
+                    this.transaction.utcOffset = this.allTimezones[i].utcOffsetMinutes;
+                    break;
+                }
+            }
         }
     },
     created() {
@@ -608,8 +641,10 @@ export default {
                 }
 
                 if (self.mode === 'edit' || self.mode === 'view') {
-                    self.transaction.unixTime = transaction.time;
-                    self.transaction.time = self.$utilities.formatUnixTime(transaction.time, 'YYYY-MM-DDTHH:mm');
+                    self.transaction.utcOffset = transaction.utcOffset;
+                    self.transaction.timeZone = null;
+                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalDisplay(transaction.time, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes());
+                    self.transaction.time = self.$utilities.formatUnixTime(self.transaction.unixTime, 'YYYY-MM-DDTHH:mm');
                 }
 
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
@@ -657,14 +692,14 @@ export default {
 
             const submitTransaction = {
                 type: self.transaction.type,
-                time: self.transaction.unixTime,
+                time: self.$utilities.getActualUnixTimeForStore(self.transaction.unixTime, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes()),
                 sourceAccountId: self.transaction.sourceAccountId,
                 sourceAmount: self.transaction.sourceAmount,
                 destinationAccountId: '0',
                 destinationAmount: 0,
                 tagIds: self.transaction.tagIds,
                 comment: self.transaction.comment,
-                utcOffset: self.$utilities.getTimezoneOffsetMinutes()
+                utcOffset: self.transaction.utcOffset
             };
 
             if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
@@ -800,6 +835,15 @@ export default {
 
             return '';
         },
+        timeZoneName(timeZoneName, allTimezones) {
+            for (let i = 0; i < allTimezones.length; i++) {
+                if (allTimezones[i].name === timeZoneName) {
+                    return allTimezones[i].displayName;
+                }
+            }
+
+            return '';
+        },
         tagName(tagId, allTags) {
             for (let i = 0; i < allTags.length; i++) {
                 if (allTags[i].id === tagId) {
@@ -835,12 +879,23 @@ export default {
     padding-top: calc(var(--f7-typography-padding) / 2);
 }
 
-.transaction-edit-category .item-header, .transaction-edit-account .item-header {
+.transaction-edit-category .item-header,
+.transaction-edit-account .item-header,
+.transaction-edit-timezone .item-header{
     margin-bottom: 11px;
 }
 
 .transaction-edit-time input[type="datetime-local"] {
     max-width: inherit;
+}
+
+.transaction-edit-timezone-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transaction-edit-timezone-name {
+    padding-left: 4px;
 }
 
 .transaction-edit-tag {

@@ -567,6 +567,10 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			updateCols = append(updateCols, "transaction_time")
 		}
 
+		if transaction.TimezoneUtcOffset != oldTransaction.TimezoneUtcOffset {
+			updateCols = append(updateCols, "timezone_utc_offset")
+		}
+
 		if transaction.AccountId != oldTransaction.AccountId {
 			updateCols = append(updateCols, "account_id")
 		}

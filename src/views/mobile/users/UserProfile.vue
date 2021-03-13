@@ -66,7 +66,7 @@
 
                     <f7-list-item
                         :title="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
                             <option v-for="currency in allCurrencies"
@@ -77,7 +77,7 @@
 
                     <f7-list-item
                         :title="$t('First Day of Week')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="newProfile.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
@@ -88,7 +88,7 @@
 
                     <f7-list-item
                         :title="$t('Transaction Edit Scope')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="newProfile.transactionEditScope">
                             <option :value="0">{{ $t('None') }}</option>

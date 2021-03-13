@@ -16,10 +16,11 @@
 
         <f7-popup class="license-popup">
             <f7-page>
-                <f7-navbar :title="$t('License')">
-                    <f7-nav-right>
-                        <f7-link popup-close :text="$t('Close')"></f7-link>
-                    </f7-nav-right>
+                <f7-navbar>
+                    <f7-nav-left>
+                        <f7-link popup-close :text="$t('Cancel')"></f7-link>
+                    </f7-nav-left>
+                    <f7-nav-title :title="$t('License')"></f7-nav-title>
                 </f7-navbar>
                 <f7-block>
                     <p><p>MIT License</p>

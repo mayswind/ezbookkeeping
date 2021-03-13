@@ -72,7 +72,7 @@
                     <f7-list-item
                         :key="currentLocale + '_lang'"
                         :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
@@ -84,7 +84,7 @@
                     <f7-list-item
                         :key="currentLocale + '_currency'"
                         :title="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
                             <option v-for="currency in allCurrencies"
@@ -96,7 +96,7 @@
                     <f7-list-item
                         :key="currentLocale + '_firstDayOfWeek'"
                         :title="$t('First Day of Week')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Close'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="user.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
@@ -122,7 +122,7 @@
             <f7-page>
                 <f7-navbar>
                     <f7-nav-left>
-                        <f7-link popup-close :text="$t('Close')"></f7-link>
+                        <f7-link popup-close :text="$t('Cancel')"></f7-link>
                     </f7-nav-left>
                     <f7-nav-title :title="$t('Preset Categories')"></f7-nav-title>
                     <f7-nav-right>

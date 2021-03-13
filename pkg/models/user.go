@@ -139,9 +139,9 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOff
 		return transactionUnixTime >= now.Unix()-24*60*60
 	}
 
-	_, serverUtcOffset := now.Zone()
-	serverTodayFirstUnixTime := now.Unix() - int64(now.Hour()*60*60+now.Minute()*60+now.Second())
-	clientTodayFirstUnixTime := serverTodayFirstUnixTime + int64(utcOffset)*60 - int64(serverUtcOffset)
+	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
+	clientNow := now.In(clientLocation)
+	clientTodayFirstUnixTime := clientNow.Unix() - int64(clientNow.Hour()*60*60+clientNow.Minute()*60+clientNow.Second())
 
 	if u.TransactionEditScope == TRANSACTION_EDIT_SCOPE_TODAY_OR_LATER {
 		return transactionUnixTime >= clientTodayFirstUnixTime

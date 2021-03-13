@@ -1001,6 +1001,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 		Type:                 relatedType,
 		CategoryId:           originalTransaction.CategoryId,
 		TransactionTime:      relatedTransactionTime,
+		TimezoneUtcOffset:    originalTransaction.TimezoneUtcOffset,
 		AccountId:            originalTransaction.RelatedAccountId,
 		Amount:               originalTransaction.RelatedAccountAmount,
 		RelatedId:            originalTransaction.TransactionId,

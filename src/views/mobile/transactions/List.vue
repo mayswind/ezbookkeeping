@@ -320,7 +320,8 @@
                                     <span>{{ transaction.comment }}</span>
                                 </div>
                                 <div slot="footer" class="transaction-footer">
-                                    <span>{{ transaction.time | moment($t('format.hourMinute.long')) }}</span>
+                                    <span>{{ transaction.time | applyTimezoneOffset(transaction.utcOffset, currentTimezoneOffsetMinutes) | moment($t('format.hourMinute.long')) }}</span>
+                                    <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ transaction.utcOffset | utcOffset }}</span>
                                     <span v-if="transaction.sourceAccount">·</span>
                                     <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
                                     <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>
@@ -528,6 +529,9 @@ export default {
             }
 
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+        },
+        currentTimezoneOffsetMinutes() {
+            return this.$utilities.getTimezoneOffsetMinutes();
         },
         firstDayOfWeek() {
             if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {
@@ -863,6 +867,31 @@ export default {
             return {
                 color: 'transparent'
             }
+        },
+        applyTimezoneOffset(unixTime, utcOffsetMinutes, currentTimezoneOffsetMinutes) {
+            return unixTime + (utcOffsetMinutes - currentTimezoneOffsetMinutes) * 60;
+        },
+        utcOffset(utcOffsetMinutes) {
+            let offsetHours = parseInt(Math.abs(utcOffsetMinutes) / 60);
+            let offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
+
+            if (offsetHours < 10) {
+                offsetHours = '0' + offsetHours;
+            }
+
+            if (offsetMinutes < 10) {
+                offsetMinutes = '0' + offsetMinutes;
+            }
+
+            let utcOffset = '';
+
+            if (utcOffsetMinutes > 0) {
+                utcOffset = `+${offsetHours}:${offsetMinutes}`;
+            } else if (utcOffsetMinutes < 0) {
+                utcOffset = `-${offsetHours}:${offsetMinutes}`;
+            }
+
+            return `(UTC${utcOffset})`;
         },
         dateRangeName(dateRangeType, allDateRanges, defaultName) {
             if (dateRangeType === allDateRanges.All.type) {

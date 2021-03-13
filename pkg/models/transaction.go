@@ -34,6 +34,7 @@ type Transaction struct {
 	CategoryId           int64             `xorm:"INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
 	AccountId            int64             `xorm:"INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
 	TransactionTime      int64             `xorm:"UNIQUE(UQE_transaction_uid_time) INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	TimezoneUtcOffset    int16             `xorm:"NOT NULL"`
 	Amount               int64             `xorm:"NOT NULL"`
 	RelatedId            int64             `xorm:"NOT NULL"`
 	RelatedAccountId     int64             `xorm:"NOT NULL"`
@@ -119,6 +120,7 @@ type TransactionInfoResponse struct {
 	Type                 TransactionType `json:"type"`
 	CategoryId           int64           `json:"categoryId,string"`
 	Time                 int64           `json:"time"`
+	UtcOffset            int16           `json:"utcOffset"`
 	SourceAccountId      int64           `json:"sourceAccountId,string"`
 	DestinationAccountId int64           `json:"destinationAccountId,string,omitempty"`
 	SourceAmount         int64           `json:"sourceAmount"`
@@ -194,6 +196,7 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		Type:                 transactionType,
 		CategoryId:           t.CategoryId,
 		Time:                 utils.GetUnixTimeFromTransactionTime(t.TransactionTime),
+		UtcOffset:            t.TimezoneUtcOffset,
 		SourceAccountId:      sourceAccountId,
 		DestinationAccountId: destinationAccountId,
 		SourceAmount:         sourceAmount,

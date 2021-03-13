@@ -603,13 +603,14 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 	}
 
 	transaction := &models.Transaction{
-		Uid:             uid,
-		Type:            transactionDbType,
-		CategoryId:      transactionCreateReq.CategoryId,
-		TransactionTime: utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
-		AccountId:       transactionCreateReq.SourceAccountId,
-		Amount:          transactionCreateReq.SourceAmount,
-		Comment:         transactionCreateReq.Comment,
+		Uid:               uid,
+		Type:              transactionDbType,
+		CategoryId:        transactionCreateReq.CategoryId,
+		TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
+		TimezoneUtcOffset: transactionCreateReq.UtcOffset,
+		AccountId:         transactionCreateReq.SourceAccountId,
+		Amount:            transactionCreateReq.SourceAmount,
+		Comment:           transactionCreateReq.Comment,
 	}
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {

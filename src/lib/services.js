@@ -288,8 +288,10 @@ export default {
         });
     },
     deleteTransaction: ({ id }) => {
+        const utcOffset = utils.getTimezoneOffsetMinutes();
         return axios.post('v1/transactions/delete.json', {
-            id
+            id,
+            utcOffset
         });
     },
     getAllTransactionCategories: () => {

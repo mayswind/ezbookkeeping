@@ -498,6 +498,34 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionDeleteHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	transaction, err := a.transactions.GetTransactionByTransactionId(uid, transactionDeleteReq.Id)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionDeleteHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionDeleteReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		log.WarnfWithRequestId(c, "[transactions.TransactionDeleteHandler] cannot delete transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionDeleteReq.Id, uid)
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transactionDeleteReq.UtcOffset)
+
+	if !transactionEditable {
+		return nil, errs.ErrCannotDeleteTransactionWithThisTransactionTime
+	}
+
 	err = a.transactions.DeleteTransaction(uid, transactionDeleteReq.Id)
 
 	if err != nil {

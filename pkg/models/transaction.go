@@ -112,7 +112,8 @@ type TransactionGetRequest struct {
 
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
-	Id int64 `json:"id,string" binding:"required,min=1"`
+	Id        int64 `json:"id,string" binding:"required,min=1"`
+	UtcOffset int   `form:"utc_offset" binding:"required,min=-720,max=840"`
 }
 
 // TransactionInfoResponse represents a view-object of transaction

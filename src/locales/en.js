@@ -548,6 +548,7 @@ export default {
         'cannot delete transaction in hidden account': 'You cannot delete transaction in an hidden account',
         'cannot add transaction with this transaction time': 'You cannot add transaction with this transaction time',
         'cannot modify transaction with this transaction time': 'You cannot modify this transaction with this transaction time',
+        'cannot delete transaction with this transaction time': 'You cannot delete this transaction with this transaction time',
         'transaction category id is invalid': 'Transaction category ID is invalid',
         'transaction category not found': 'Transaction category is not found',
         'transaction category type is invalid': 'Transaction category type is invalid',

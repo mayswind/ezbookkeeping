@@ -548,6 +548,7 @@ export default {
         'cannot delete transaction in hidden account': '您不能删除隐藏账户中的交易',
         'cannot add transaction with this transaction time': '您不能添加该交易时间的交易',
         'cannot modify transaction with this transaction time': '您不能修改该交易时间的交易',
+        'cannot delete transaction with this transaction time': '您不能删除该交易时间的交易',
         'transaction category id is invalid': '交易分类ID无效',
         'transaction category not found': '交易分类不存在',
         'transaction category type is invalid': '交易分类类型无效',

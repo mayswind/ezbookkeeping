@@ -643,7 +643,7 @@ export default {
                 if (self.mode === 'edit' || self.mode === 'view') {
                     self.transaction.utcOffset = transaction.utcOffset;
                     self.transaction.timeZone = null;
-                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalDisplay(transaction.time, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes());
+                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes());
                     self.transaction.time = self.$utilities.formatUnixTime(self.transaction.unixTime, 'YYYY-MM-DDTHH:mm');
                 }
 

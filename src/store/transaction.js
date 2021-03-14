@@ -284,8 +284,7 @@ export function fillTransactionObject(state, transaction, currentUtcOffset) {
         return;
     }
 
-    const transactionUnixTimeForLocalUsage = utils.getDummyUnixTimeForLocalDisplay(transaction.time, transaction.utcOffset, currentUtcOffset);
-    const transactionTime = utils.parseDateFromUnixTime(transactionUnixTimeForLocalUsage);
+    const transactionTime = utils.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
 
     transaction.day = utils.getDay(transactionTime);
     transaction.dayOfWeek = utils.getDayOfWeek(transactionTime);

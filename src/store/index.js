@@ -425,8 +425,7 @@ const stores = {
                     const item = transactions.items[i];
                     fillTransactionObject(state, item, currentUtcOffset);
 
-                    const transactionUnixTimeForLocalUsage = utils.getDummyUnixTimeForLocalDisplay(item.time, item.utcOffset, currentUtcOffset);
-                    const transactionTime = utils.parseDateFromUnixTime(transactionUnixTimeForLocalUsage);
+                    const transactionTime = utils.parseDateFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
                     const transactionYear = utils.getYear(transactionTime);
                     const transactionMonth = utils.getMonth(transactionTime);
                     const transactionYearMonth = utils.getYearAndMonth(transactionTime);

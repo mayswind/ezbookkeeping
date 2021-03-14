@@ -5,13 +5,16 @@ export default function (value, format, options) {
         value = utils.getUnixTime(value);
     }
 
-    if (utils.isObject(options) && utils.isNumber(options.utcOffset)) {
-        if (!utils.isNumber(options.currentUtcOffset)) {
-            options.currentUtcOffset = utils.getTimezoneOffsetMinutes();
-        }
+    let utcOffset = null;
+    let currentUtcOffset = null;
 
-        value = utils.getDummyUnixTimeForLocalDisplay(value, options.utcOffset, options.currentUtcOffset);
+    if (utils.isObject(options) && utils.isNumber(options.utcOffset)) {
+        utcOffset = options.utcOffset;
     }
 
-    return utils.formatUnixTime(value, format);
+    if (utils.isObject(options) && utils.isNumber(options.currentUtcOffset)) {
+        currentUtcOffset = options.currentUtcOffset;
+    }
+
+    return utils.formatUnixTime(value, format, utcOffset, currentUtcOffset);
 }

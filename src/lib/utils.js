@@ -84,7 +84,7 @@ function getActualUnixTimeForStore(unixTime, utcOffset, currentUtcOffset) {
     return unixTime - (utcOffset - currentUtcOffset) * 60;
 }
 
-function getDummyUnixTimeForLocalDisplay(unixTime, utcOffset, currentUtcOffset) {
+function getDummyUnixTimeForLocalUsage(unixTime, utcOffset, currentUtcOffset) {
     return unixTime + (utcOffset - currentUtcOffset) * 60;
 }
 
@@ -92,12 +92,20 @@ function getCurrentUnixTime() {
     return moment().unix();
 }
 
-function parseDateFromUnixTime(unixTime) {
+function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
+    if (isNumber(utcOffset)) {
+        if (!isNumber(currentUtcOffset)) {
+            currentUtcOffset = getTimezoneOffsetMinutes();
+        }
+
+        unixTime = getDummyUnixTimeForLocalUsage(unixTime, utcOffset, currentUtcOffset);
+    }
+
     return moment.unix(unixTime);
 }
 
-function formatUnixTime(unixTime, format) {
-    return moment.unix(unixTime).format(format);
+function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
+    return parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format);
 }
 
 function formatTime(dateTime, format) {
@@ -625,7 +633,7 @@ export default {
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
-    getDummyUnixTimeForLocalDisplay,
+    getDummyUnixTimeForLocalUsage,
     getCurrentUnixTime,
     parseDateFromUnixTime,
     formatUnixTime,

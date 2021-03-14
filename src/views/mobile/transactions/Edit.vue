@@ -82,7 +82,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
                     >
-                        <div slot="title">
+                        <div slot="title" class="transaction-edit-category-title">
                             <span>{{ transaction.expenseCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.expenseCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
@@ -107,7 +107,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
                     >
-                        <div slot="title">
+                        <div slot="title" class="transaction-edit-category-title">
                             <span>{{ transaction.incomeCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.incomeCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
@@ -132,7 +132,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
-                        <div slot="title">
+                        <div slot="title" class="transaction-edit-category-title">
                             <span>{{ transaction.transferCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.transferCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
@@ -885,13 +885,14 @@ export default {
     margin-bottom: 11px;
 }
 
-.transaction-edit-time input[type="datetime-local"] {
-    max-width: inherit;
-}
-
+.transaction-edit-category-title,
 .transaction-edit-timezone-title {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.transaction-edit-time input[type="datetime-local"] {
+    max-width: inherit;
 }
 
 .transaction-edit-timezone-name {
@@ -900,5 +901,8 @@ export default {
 
 .transaction-edit-tag {
     margin-right: 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

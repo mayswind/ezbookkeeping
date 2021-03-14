@@ -73,6 +73,7 @@ import percentFilter from './filters/percent.js';
 import itemFieldContentFilter from './filters/itemFieldContent.js';
 import currencyFilter from './filters/currency.js';
 import utcOffsetFilter from './filters/utcOffset.js';
+import textLimitFilter from './filters/textLimit.js';
 import iconFilter from './filters/icon.js';
 import iconStyleFilter from './filters/iconStyle.js';
 import defaultIconColorFilter from './filters/defaultIconColor.js';
@@ -155,6 +156,7 @@ Vue.filter('percent', (value, precision, lowPrecisionValue) => percentFilter(val
 Vue.filter('itemFieldContent', (value, fieldName, defaultValue, translate) => itemFieldContentFilter({ i18n }, value, fieldName, defaultValue, translate));
 Vue.filter('currency', (value, currencyCode) => currencyFilter({ i18n }, value, currencyCode));
 Vue.filter('utcOffset', (value) => utcOffsetFilter(value));
+Vue.filter('textLimit', (value, maxLength) => textLimitFilter(value, maxLength));
 Vue.filter('icon', (value, iconType) => iconFilter(value, iconType));
 Vue.filter('iconStyle', (value, iconType, defaultColor, additionalFieldName) => iconStyleFilter(value, iconType, defaultColor, additionalFieldName));
 Vue.filter('defaultIconColor', (value, defaultColor) => defaultIconColorFilter(value, defaultColor));

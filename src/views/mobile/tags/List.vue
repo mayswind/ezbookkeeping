@@ -17,7 +17,7 @@
                         <f7-block slot="title" class="no-padding">
                             <div class="display-flex">
                                 <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="list-item-valign-middle padding-left-half">Tag Name</div>
+                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
                             </div>
                         </f7-block>
                     </f7-list-item>
@@ -25,7 +25,7 @@
                         <f7-block slot="title" class="no-padding">
                             <div class="display-flex">
                                 <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="list-item-valign-middle padding-left-half">Tag Name 2</div>
+                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
                             </div>
                         </f7-block>
                     </f7-list-item>
@@ -33,7 +33,7 @@
                         <f7-block slot="title" class="no-padding">
                             <div class="display-flex">
                                 <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="list-item-valign-middle padding-left-half">Tag Name 3</div>
+                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
                             </div>
                         </f7-block>
                     </f7-list-item>
@@ -61,7 +61,7 @@
                                     </f7-badge>
                                 </f7-icon>
 
-                                <div class="list-item-valign-middle padding-left-half"
+                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
                                      v-if="editingTag.id !== tag.id">
                                     {{ tag.name }}
                                 </div>
@@ -410,3 +410,10 @@ export default {
     }
 }
 </script>
+
+<style>
+.transaction-tag-list-item-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

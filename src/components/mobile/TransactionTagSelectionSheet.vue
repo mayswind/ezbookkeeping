@@ -23,7 +23,7 @@
                     <f7-block slot="title" class="no-padding no-margin">
                         <div class="display-flex">
                             <f7-icon slot="media" f7="number"></f7-icon>
-                            <div class="list-item-valign-middle padding-left-half">
+                            <div class="tag-selection-list-item list-item-valign-middle padding-left-half">
                                 {{ item.name }}
                             </div>
                         </div>
@@ -163,6 +163,11 @@ export default {
     .tag-selection-huge-sheet {
         height: 400px;
     }
+}
+
+.tag-selection-list-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
 self

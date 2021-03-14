@@ -28,7 +28,11 @@
                     :r="diameter / 2.5"
                     v-if="showCenterText"/>
 
-            <g class="pie-chart-text-group" v-if="showCenterText">
+            <clipPath id="pie-chart-text-clip">
+                <rect :x="-diameter / 2.5 + 2" :y="-diameter / 2.5 + 2" :width="diameter / 1.25 - 4" :height="diameter / 1.25 -4 "/>
+            </clipPath>
+
+            <g class="pie-chart-text-group" clip-path="url(#pie-chart-text-clip)" v-if="showCenterText">
                 <slot></slot>
             </g>
         </svg>
@@ -51,7 +55,7 @@
                     <p v-else-if="!validItems || !validItems.length">
                         <f7-chip outline text="---"></f7-chip>
                     </p>
-                    <f7-link :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
+                    <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
@@ -298,6 +302,11 @@ export default {
 
 .pie-chart-toolbox-button {
     color: var(--f7-text-color);
+}
+
+.pie-chart-selected-item-info {
+    display: inline-block;
+    text-align: center;
 }
 
 .pie-chart-background {

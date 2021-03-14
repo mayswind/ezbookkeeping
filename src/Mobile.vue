@@ -220,6 +220,8 @@ i.icon.la, i.icon.las, i.icon.lab {
     align-self: center;
     margin-left: var(--f7-list-item-media-margin);
     margin-right: var(--f7-list-item-media-margin);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {

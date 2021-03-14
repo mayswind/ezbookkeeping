@@ -57,7 +57,7 @@
                         {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
                     </text>
                     <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
-                        {{ statisticsData.totalAmount | currency(defaultCurrency) }}
+                        {{ statisticsData.totalAmount | currency(defaultCurrency) | textLimit(16) }}
                     </text>
                     <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!statisticsData.items || !statisticsData.items.length">
                         {{ $t('No data') }}
@@ -76,7 +76,7 @@
                             </div>
                         </div>
 
-                        <div slot="title">
+                        <div slot="title" class="statistics-list-item-text">
                             <span>Category Name 1</span>
                             <small class="statistics-percent">33.33</small>
                         </div>
@@ -98,7 +98,7 @@
                             </div>
                         </div>
 
-                        <div slot="title">
+                        <div slot="title" class="statistics-list-item-text">
                             <span>Category Name 2</span>
                             <small class="statistics-percent">33.33</small>
                         </div>
@@ -120,7 +120,7 @@
                             </div>
                         </div>
 
-                        <div slot="title">
+                        <div slot="title" class="statistics-list-item-text">
                             <span>Category Name 3</span>
                             <small class="statistics-percent">33.33</small>
                         </div>
@@ -166,7 +166,7 @@
                             </div>
                         </div>
 
-                        <div slot="title">
+                        <div slot="title" class="statistics-list-item-text">
                             <span>{{ item.name }}</span>
                             <small class="statistics-percent" v-if="item.percent >= 0">{{ item.percent | percent(2, '&lt;0.01') }}</small>
                         </div>
@@ -906,6 +906,13 @@ export default {
 .statistics-list-item-overview-amount {
     margin-top: 2px;
     font-size: 1.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statistics-list-item-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .statistics-list-item .item-content {

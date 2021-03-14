@@ -62,7 +62,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -84,7 +84,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 2</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -106,7 +106,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 3</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -128,7 +128,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 4</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -150,7 +150,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 5</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -189,7 +189,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -211,7 +211,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 2</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -233,7 +233,7 @@
                                 <f7-icon slot="media" f7="app_fill"></f7-icon>
                             </div>
                         </div>
-                        <div slot="title" class="no-padding">
+                        <div slot="title" class="transaction-category-name no-padding">
                             <span>Category 3</span>
                         </div>
                         <div slot="footer" class="no-padding-horizontal transaction-footer">
@@ -305,7 +305,7 @@
                                         </f7-icon>
                                     </div>
                                 </div>
-                                <div slot="title" class="no-padding">
+                                <div slot="title" class="transaction-category-name no-padding">
                                     <span v-if="transaction.type === $constants.transaction.allTransactionTypes.ModifyBalance">
                                         {{ $t('Modify Balance') }}
                                     </span>
@@ -989,10 +989,16 @@ export default {
 
 .transaction-amount {
     color: var(--f7-list-item-after-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .transaction-info .item-inner:after {
     background-color: transparent;
+}
+
+.transaction-info .item-after {
+    max-width: 70%;
 }
 
 .transaction-info .transaction-icon:after {
@@ -1008,6 +1014,11 @@ export default {
     width: 100%;
     transform-origin: 50% 100%;
     transform: scaleY(calc(1 / var(--f7-device-pixel-ratio)));
+}
+
+.transaction-category-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .date-popover-menu .popover-inner, .category-popover-menu .popover-inner, .account-popover-menu .popover-inner {

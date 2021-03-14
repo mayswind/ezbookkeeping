@@ -13,7 +13,7 @@
                 <f7-list>
                     <f7-list-item
                         :title="$t('Base Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="baseCurrency">
                             <option v-for="exchangeRate in availableExchangeRates"
                                     :key="exchangeRate.currencyCode"

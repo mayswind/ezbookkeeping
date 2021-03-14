@@ -549,19 +549,27 @@ const stores = {
         },
         [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency }) {
             const currentUtcOffset = utils.getTimezoneOffsetMinutes();
+            const transactionTime = utils.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+            const transactionYear = utils.getYear(transactionTime);
+            const transactionMonth = utils.getMonth(transactionTime);
 
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
 
-                if (!transactionMonthList.items ||
-                    transactionMonthList.items[0].time < transaction.time ||
-                    transactionMonthList.items[transactionMonthList.items.length - 1].time > transaction.time) {
+                if (!transactionMonthList.items) {
                     continue;
                 }
 
                 for (let j = 0; j < transactionMonthList.items.length; j++) {
                     if (transactionMonthList.items[j].id === transaction.id) {
                         fillTransactionObject(state, transaction, currentUtcOffset);
+
+                        if (transactionYear !== transactionMonthList.year ||
+                            transactionMonth !== transactionMonthList.month ||
+                            transaction.day !== transactionMonthList.items[j].day) {
+                            state.transactionListStateInvalid = true;
+                            return;
+                        }
 
                         if ((state.transactionsFilter.categoryId && state.transactionsFilter.categoryId !== '0' && state.transactionsFilter.categoryId !== transaction.categoryId) ||
                             (state.transactionsFilter.accountId && state.transactionsFilter.accountId !== '0' && state.transactionsFilter.accountId !== transaction.sourceAccountId && state.transactionsFilter.accountId !== transaction.destinationAccountId)) {

@@ -65,6 +65,7 @@ const (
 // Exchange rates data source types
 const (
 	EuroCentralBankDataSource      string = "euro_central_bank"
+	BankOfCanadaDataSource         string = "bank_of_canada"
 	CzechNationalBankDataSource    string = "czech_national_bank"
 	NationalBankOfPolandDataSource string = "national_bank_of_poland"
 )
@@ -414,6 +415,8 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	if getConfigItemStringValue(configFile, sectionName, "data_source") == EuroCentralBankDataSource {
 		config.ExchangeRatesDataSource = EuroCentralBankDataSource
+	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == BankOfCanadaDataSource {
+		config.ExchangeRatesDataSource = BankOfCanadaDataSource
 	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == CzechNationalBankDataSource {
 		config.ExchangeRatesDataSource = CzechNationalBankDataSource
 	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == NationalBankOfPolandDataSource {

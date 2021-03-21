@@ -16,6 +16,18 @@ var UserData = &cli.Command{
 	Usage: "lab user data maintenance",
 	Subcommands: []*cli.Command{
 		{
+			Name:   "user-get",
+			Usage:  "Get specified user info",
+			Action: getUserInfo,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "username",
+					Aliases: []string{"n"},
+					Usage:   "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "transaction-check",
 			Usage:  "Check whether user all transactions and accounts are correct",
 			Action: checkUserTransactionAndAccount,
@@ -45,6 +57,26 @@ var UserData = &cli.Command{
 			},
 		},
 	},
+}
+
+func getUserInfo(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	userName := c.String("username")
+	user, err := clis.UserData.GetUserByUsername(c, userName)
+
+	if err != nil {
+		log.BootErrorf("[user_data.getUserInfo] error occurs when getting user data")
+		return err
+	}
+
+	utils.PrintObjectFields(user)
+
+	return nil
 }
 
 func checkUserTransactionAndAccount(c *cli.Context) error {

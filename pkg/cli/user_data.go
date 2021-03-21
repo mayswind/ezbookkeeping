@@ -35,6 +35,23 @@ var (
 	}
 )
 
+// GetUserByUsername returns user by user name
+func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*models.User, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.GetUserByUsername] user name is empty")
+		return nil, errs.ErrUsernameIsEmpty
+	}
+
+	user, err := a.users.GetUserByUsername(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.GetUserByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // CheckTransactionAndAccount checks whether all user transactions and all user accounts are correct
 func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (bool, error) {
 	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)
@@ -171,12 +188,7 @@ func (a *UserDataCli) ExportTransaction(c *cli.Context, uid int64) ([]byte, erro
 
 // GetUserIdByUsername returns user id by user name
 func (a *UserDataCli) GetUserIdByUsername(c *cli.Context, username string) (int64, error) {
-	if username == "" {
-		log.BootErrorf("[user_data.GetUserIdByUsername] user name is empty")
-		return 0, errs.ErrUsernameIsEmpty
-	}
-
-	user, err := a.users.GetUserByUsername(username)
+	user, err := a.GetUserByUsername(c, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.GetUserIdByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())

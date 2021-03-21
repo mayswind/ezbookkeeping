@@ -16,7 +16,7 @@ var UserData = &cli.Command{
 	Usage: "lab user data maintenance",
 	Subcommands: []*cli.Command{
 		{
-			Name:   "check",
+			Name:   "transaction-check",
 			Usage:  "Check whether user all transactions and accounts are correct",
 			Action: checkUserTransactionAndAccount,
 			Flags: []cli.Flag{
@@ -28,7 +28,7 @@ var UserData = &cli.Command{
 			},
 		},
 		{
-			Name:   "export",
+			Name:   "transaction-export",
 			Usage:  "Export user all transactions to csv file",
 			Action: exportUserTransaction,
 			Flags: []cli.Flag{

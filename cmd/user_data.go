@@ -14,7 +14,7 @@ var UserData = &cli.Command{
 	Subcommands: []*cli.Command{
 		{
 			Name:   "check",
-			Usage:  "Check whether all user transactions and all user accounts are correct",
+			Usage:  "Check whether user all transactions and accounts are correct",
 			Action: checkUserTransactionAndAccount,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
@@ -38,20 +38,20 @@ func checkUserTransactionAndAccount(c *cli.Context) error {
 	uid, err := clis.UserData.GetUserIdByUsername(c, userName)
 
 	if err != nil {
-		log.BootErrorf("[data.checkAccountBalance] error occurs when getting user id by user name")
+		log.BootErrorf("[user_data.checkUserTransactionAndAccount] error occurs when getting user id by user name")
 		return err
 	}
 
-	log.BootInfof("[data.checkAccountBalance] starting checking user \"%s\" data", userName)
+	log.BootInfof("[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", userName)
 
 	_, err = clis.UserData.CheckTransactionAndAccount(c, uid)
 
 	if err != nil {
-		log.BootErrorf("[data.checkAccountBalance] error occurs when checking user data")
+		log.BootErrorf("[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
 		return err
 	}
 
-	log.BootInfof("[data.checkAccountBalance] user transactions and accounts data has been checked successfully, there is no problem with user data")
+	log.BootInfof("[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
 
 	return nil
 }

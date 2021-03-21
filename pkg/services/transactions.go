@@ -32,6 +32,31 @@ var (
 	}
 )
 
+// GetAllTransactions returns all transactions
+func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDuplicated bool) ([]*models.Transaction, error) {
+	maxTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	var allTransactions []*models.Transaction
+
+	for maxTime > 0 {
+		transactions, err := s.GetAllTransactionsByMaxTime(uid, maxTime, pageCount, noDuplicated)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactions = append(allTransactions, transactions...)
+
+		if len(transactions) < pageCount {
+			maxTime = 0
+			break
+		}
+
+		maxTime = transactions[len(transactions)-1].TransactionTime - 1
+	}
+
+	return allTransactions, nil
+}
+
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
 	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, nil, 0, "", count, noDuplicated)

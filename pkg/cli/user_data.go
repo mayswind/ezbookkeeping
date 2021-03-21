@@ -1,18 +1,15 @@
 package cli
 
 import (
-	"time"
-
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
-	"github.com/mayswind/lab/pkg/utils"
 )
 
-const pageCountForAccountCheck = 1000
+const pageCountForGettingTransactions = 1000
 
 // UserDataCli represents user data cli
 type UserDataCli struct {
@@ -36,72 +33,26 @@ var (
 
 // CheckTransactionAndAccount checks whether all user transactions and all user accounts are correct
 func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (bool, error) {
-	if uid <= 0 {
-		log.BootErrorf("[user_data.CheckAccountBalance] user uid \"%d\" is invalid", uid)
-		return false, errs.ErrUserIdInvalid
-	}
-
-	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.CheckAccountBalance] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
 		return false, err
 	}
-
-	categories, err := a.categories.GetAllCategoriesByUid(uid, 0, -1)
-
-	if err != nil {
-		log.BootErrorf("[user_data.CheckAccountBalance] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
-		return false, err
-	}
-
-	tags, err := a.tags.GetAllTagsByUid(uid)
-
-	if err != nil {
-		log.BootErrorf("[user_data.CheckAccountBalance] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
-		return false, err
-	}
-
-	tagIndexs, err := a.tags.GetAllTagIdsOfAllTransactions(uid)
-
-	if err != nil {
-		log.BootErrorf("[user_data.CheckAccountBalance] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
-		return false, err
-	}
-
-	accountMap := a.accounts.GetAccountMapByList(accounts)
-	categoryMap := a.categories.GetCategoryMapByList(categories)
-	tagMap := a.tags.GetTagMapByList(tags)
 
 	accountHasChild := make(map[int64]bool)
 
-	for i := 0; i < len(accounts); i++ {
-		account := accounts[i]
-
+	for _, account := range accountMap {
 		if account.ParentAccountId > models.LevelOneAccountParentId {
 			accountHasChild[account.ParentAccountId] = true
 		}
 	}
 
-	maxTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
-	var allTransactions []*models.Transaction
+	allTransactions, err := a.transactions.GetAllTransactions(uid, pageCountForGettingTransactions, false)
 
-	for maxTime > 0 {
-		transactions, err := a.transactions.GetAllTransactionsByMaxTime(uid, maxTime, pageCountForAccountCheck, false)
-
-		if err != nil {
-			log.BootErrorf("[user_data.CheckAccountBalance] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", maxTime, uid, err.Error())
-			return false, err
-		}
-
-		allTransactions = append(allTransactions, transactions...)
-
-		if len(transactions) < pageCountForAccountCheck {
-			maxTime = 0
-			break
-		}
-
-		maxTime = transactions[len(transactions)-1].TransactionTime - 1
+	if err != nil {
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return false, err
 	}
 
 	transactionMap := a.transactions.GetTransactionMapByList(allTransactions)
@@ -158,8 +109,7 @@ func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (boo
 		accountBalance[transaction.AccountId] = balance
 	}
 
-	for i := 0; i < len(accounts); i++ {
-		account := accounts[i]
+	for _, account := range accountMap {
 		actualBalance, exists := accountBalance[account.AccountId]
 
 		if !exists && account.Balance == 0 {
@@ -204,6 +154,49 @@ func (a *UserDataCli) GetUserIdByUsername(c *cli.Context, username string) (int6
 	}
 
 	return user.Uid, nil
+}
+
+func (a *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
+	if uid <= 0 {
+		log.BootErrorf("[user_data.getUserEssentialData] user uid \"%d\" is invalid", uid)
+		return nil, nil, nil, nil, errs.ErrUserIdInvalid
+	}
+
+	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, err
+	}
+
+	accountMap = a.accounts.GetAccountMapByList(accounts)
+
+	categories, err := a.categories.GetAllCategoriesByUid(uid, 0, -1)
+
+	if err != nil {
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, err
+	}
+
+	categoryMap = a.categories.GetCategoryMapByList(categories)
+
+	tags, err := a.tags.GetAllTagsByUid(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, err
+	}
+
+	tagMap = a.tags.GetTagMapByList(tags)
+
+	tagIndexs, err = a.tags.GetAllTagIdsOfAllTransactions(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, err
+	}
+
+	return accountMap, categoryMap, tagMap, tagIndexs, nil
 }
 
 func (a *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {

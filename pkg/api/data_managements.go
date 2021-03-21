@@ -81,25 +81,11 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 	categoryMap := a.categories.GetCategoryMapByList(categories)
 	tagMap := a.tags.GetTagMapByList(tags)
 
-	maxTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
-	var allTransactions []*models.Transaction
+	allTransactions, err := a.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
 
-	for maxTime > 0 {
-		transactions, err := a.transactions.GetAllTransactionsByMaxTime(uid, maxTime, pageCountForDataExport, true)
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", maxTime, uid, err.Error())
-			return nil, "", errs.ErrOperationFailed
-		}
-
-		allTransactions = append(allTransactions, transactions...)
-
-		if len(transactions) < pageCountForDataExport {
-			maxTime = 0
-			break
-		}
-
-		maxTime = transactions[len(transactions)-1].TransactionTime - 1
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
 	}
 
 	result, err := a.exporter.GetOutputContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)

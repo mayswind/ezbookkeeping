@@ -4,15 +4,18 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/errs"
+	"github.com/mayswind/lab/pkg/exporters"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
 )
 
 const pageCountForGettingTransactions = 1000
+const pageCountForDataExport = 1000
 
 // UserDataCli represents user data cli
 type UserDataCli struct {
+	csvExporter  *exporters.CSVFileExporter
 	accounts     *services.AccountService
 	transactions *services.TransactionService
 	categories   *services.TransactionCategoryService
@@ -23,6 +26,7 @@ type UserDataCli struct {
 // Initialize an user data cli singleton instance
 var (
 	UserData = &UserDataCli{
+		csvExporter:  &exporters.CSVFileExporter{},
 		accounts:     services.Accounts,
 		transactions: services.Transactions,
 		users:        services.Users,
@@ -137,6 +141,32 @@ func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (boo
 	}
 
 	return true, nil
+}
+
+// ExportTransaction returns csv file content according user all transactions
+func (a *UserDataCli) ExportTransaction(c *cli.Context, uid int64) ([]byte, error) {
+	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ExportTransaction] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, err
+	}
+
+	allTransactions, err := a.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ExportTransaction] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, err
+	}
+
+	result, err := a.csvExporter.GetOutputContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // GetUserIdByUsername returns user id by user name

@@ -96,6 +96,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 
 	transactionIds := make([]int64, len(transactions))
 	accountIds := make([]int64, 0, len(transactions)*2)
+	categoryIds := make([]int64, 0, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
 		transactionId := transactions[i].TransactionId
@@ -110,6 +111,8 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			accountIds = append(accountIds, transactions[i].RelatedAccountId)
 		}
+
+		categoryIds = append(categoryIds, transactions[i].CategoryId)
 	}
 
 	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
@@ -128,6 +131,27 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		return nil, errs.ErrOperationFailed
 	}
 
+	var categoryMap map[int64]*models.TransactionCategory
+	var tagMap map[int64]*models.TransactionTag
+
+	if !transactionListReq.TrimCategory {
+		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(uid, utils.ToUniqueInt64Slice(categoryIds))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
+	if !transactionListReq.TrimTag {
+		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
 	transactionResps := &models.TransactionInfoPageWrapperResponse{}
 	transactionResps.Items = make(models.TransactionInfoResponseSlice, len(transactions))
 
@@ -141,6 +165,26 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
+
+		if !transactionListReq.TrimAccount {
+			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
+				transactionResps.Items[i].SourceAccount = sourceAccount.ToAccountInfoResponse()
+			}
+
+			if destinationAccount := allAccounts[transaction.RelatedAccountId]; destinationAccount != nil {
+				transactionResps.Items[i].DestinationAccount = destinationAccount.ToAccountInfoResponse()
+			}
+		}
+
+		if !transactionListReq.TrimCategory {
+			if category := categoryMap[transaction.CategoryId]; category != nil {
+				transactionResps.Items[i].Category = category.ToTransactionCategoryInfoResponse()
+			}
+		}
+
+		if !transactionListReq.TrimTag {
+			transactionResps.Items[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
+		}
 	}
 
 	sort.Sort(transactionResps.Items)
@@ -208,6 +252,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 
 	transactionIds := make([]int64, len(transactions))
 	accountIds := make([]int64, 0, len(transactions)*2)
+	categoryIds := make([]int64, 0, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
 		transactionId := transactions[i].TransactionId
@@ -222,6 +267,8 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			accountIds = append(accountIds, transactions[i].RelatedAccountId)
 		}
+
+		categoryIds = append(categoryIds, transactions[i].CategoryId)
 	}
 
 	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
@@ -240,6 +287,27 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		return nil, errs.ErrOperationFailed
 	}
 
+	var categoryMap map[int64]*models.TransactionCategory
+	var tagMap map[int64]*models.TransactionTag
+
+	if !transactionListReq.TrimCategory {
+		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(uid, utils.ToUniqueInt64Slice(categoryIds))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
+	if !transactionListReq.TrimTag {
+		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
 	transactionResps := make([]*models.TransactionInfoResponse, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
@@ -252,6 +320,26 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
+
+		if !transactionListReq.TrimAccount {
+			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
+				transactionResps[i].SourceAccount = sourceAccount.ToAccountInfoResponse()
+			}
+
+			if destinationAccount := allAccounts[transaction.RelatedAccountId]; destinationAccount != nil {
+				transactionResps[i].DestinationAccount = destinationAccount.ToAccountInfoResponse()
+			}
+		}
+
+		if !transactionListReq.TrimCategory {
+			if category := categoryMap[transaction.CategoryId]; category != nil {
+				transactionResps[i].Category = category.ToTransactionCategoryInfoResponse()
+			}
+		}
+
+		if !transactionListReq.TrimTag {
+			transactionResps[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
+		}
 	}
 
 	return transactionResps, nil
@@ -325,9 +413,50 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 		return nil, errs.ErrOperationFailed
 	}
 
+	var category *models.TransactionCategory
+	var tagMap map[int64]*models.TransactionTag
+
+	if !transactionGetReq.TrimCategory {
+		category, err = a.transactionCategories.GetCategoryByCategoryId(uid, transaction.CategoryId)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions category for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
+	if !transactionGetReq.TrimTag {
+		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
 	transactionEditable := transaction.IsEditable(user, utcOffset, accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
 	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
+
+	if !transactionGetReq.TrimAccount {
+		if sourceAccount := accountMap[transaction.AccountId]; sourceAccount != nil {
+			transactionResp.SourceAccount = sourceAccount.ToAccountInfoResponse()
+		}
+
+		if destinationAccount := accountMap[transaction.RelatedAccountId]; destinationAccount != nil {
+			transactionResp.DestinationAccount = destinationAccount.ToAccountInfoResponse()
+		}
+	}
+
+	if !transactionGetReq.TrimCategory {
+		if category != nil {
+			transactionResp.Category = category.ToTransactionCategoryInfoResponse()
+		}
+	}
+
+	if !transactionGetReq.TrimTag {
+		transactionResp.Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
+	}
 
 	return transactionResp, nil
 }
@@ -594,6 +723,32 @@ func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transac
 	}
 
 	return finalTransactions
+}
+
+func (a *TransactionsApi) getTransactionTagIds(allTransactionTagIds map[int64][]int64) []int64 {
+	allTagIds := make([]int64, 0, len(allTransactionTagIds))
+
+	for _, tagIds := range allTransactionTagIds {
+		allTagIds = append(allTagIds, tagIds...)
+	}
+
+	return allTagIds
+}
+
+func (a *TransactionsApi) getTransactionTagInfoResponses(tagIds []int64, allTransactionTags map[int64]*models.TransactionTag) []*models.TransactionTagInfoResponse {
+	allTags := make([]*models.TransactionTagInfoResponse, 0, len(tagIds))
+
+	for i := 0; i < len(tagIds); i++ {
+		tag := allTransactionTags[tagIds[i]]
+
+		if tag == nil {
+			continue
+		}
+
+		allTags = append(allTags, tag.ToTransactionTagInfoResponse())
+	}
+
+	return allTags
 }
 
 func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest) *models.Transaction {

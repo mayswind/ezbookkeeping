@@ -63,6 +63,27 @@ func (s *TransactionTagService) GetTagByTagId(uid int64, tagId int64) (*models.T
 	return tag, nil
 }
 
+// GetTagsByTagIds returns transaction tag models according to transaction tag ids
+func (s *TransactionTagService) GetTagsByTagIds(uid int64, tagIds []int64) (map[int64]*models.TransactionTag, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if tagIds == nil {
+		return nil, errs.ErrTransactionTagIdInvalid
+	}
+
+	var tags []*models.TransactionTag
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("tag_id", tagIds).Find(&tags)
+
+	if err != nil {
+		return nil, err
+	}
+
+	tagMap := s.GetTagMapByList(tags)
+	return tagMap, err
+}
+
 // GetMaxDisplayOrder returns the max display order
 func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int, error) {
 	if uid <= 0 {

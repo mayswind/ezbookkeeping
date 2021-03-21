@@ -82,52 +82,65 @@ type TransactionModifyRequest struct {
 
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
-	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryId int64             `form:"category_id" binding:"min=0"`
-	AccountId  int64             `form:"account_id" binding:"min=0"`
-	Keyword    string            `form:"keyword"`
-	MaxTime    int64             `form:"max_time" binding:"min=0"`
-	MinTime    int64             `form:"min_time" binding:"min=0"`
-	Count      int               `form:"count" binding:"required,min=1,max=50"`
+	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
+	CategoryId   int64             `form:"category_id" binding:"min=0"`
+	AccountId    int64             `form:"account_id" binding:"min=0"`
+	Keyword      string            `form:"keyword"`
+	MaxTime      int64             `form:"max_time" binding:"min=0"`
+	MinTime      int64             `form:"min_time" binding:"min=0"`
+	Count        int               `form:"count" binding:"required,min=1,max=50"`
+	TrimAccount  bool              `form:"trim_account"`
+	TrimCategory bool              `form:"trim_category"`
+	TrimTag      bool              `form:"trim_tag"`
 }
 
 // TransactionListInMonthByPageRequest represents all parameters of transaction listing by month request
 type TransactionListInMonthByPageRequest struct {
-	Year       int               `form:"year" binding:"required,min=1"`
-	Month      int               `form:"month" binding:"required,min=1"`
-	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryId int64             `form:"category_id" binding:"min=0"`
-	AccountId  int64             `form:"account_id" binding:"min=0"`
-	Keyword    string            `form:"keyword"`
-	Page       int               `form:"page" binding:"required,min=1"`
-	Count      int               `form:"count" binding:"required,min=1,max=50"`
+	Year         int               `form:"year" binding:"required,min=1"`
+	Month        int               `form:"month" binding:"required,min=1"`
+	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
+	CategoryId   int64             `form:"category_id" binding:"min=0"`
+	AccountId    int64             `form:"account_id" binding:"min=0"`
+	Keyword      string            `form:"keyword"`
+	Page         int               `form:"page" binding:"required,min=1"`
+	Count        int               `form:"count" binding:"required,min=1,max=50"`
+	TrimAccount  bool              `form:"trim_account"`
+	TrimCategory bool              `form:"trim_category"`
+	TrimTag      bool              `form:"trim_tag"`
 }
 
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
-	Id        int64 `form:"id,string" binding:"required,min=1"`
+	Id           int64 `form:"id,string" binding:"required,min=1"`
+	TrimAccount  bool  `form:"trim_account"`
+	TrimCategory bool  `form:"trim_category"`
+	TrimTag      bool  `form:"trim_tag"`
 }
 
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
-	Id        int64 `json:"id,string" binding:"required,min=1"`
+	Id int64 `json:"id,string" binding:"required,min=1"`
 }
 
 // TransactionInfoResponse represents a view-object of transaction
 type TransactionInfoResponse struct {
-	Id                   int64           `json:"id,string"`
-	TimeSequenceId       int64           `json:"timeSequenceId,string"`
-	Type                 TransactionType `json:"type"`
-	CategoryId           int64           `json:"categoryId,string"`
-	Time                 int64           `json:"time"`
-	UtcOffset            int16           `json:"utcOffset"`
-	SourceAccountId      int64           `json:"sourceAccountId,string"`
-	DestinationAccountId int64           `json:"destinationAccountId,string,omitempty"`
-	SourceAmount         int64           `json:"sourceAmount"`
-	DestinationAmount    int64           `json:"destinationAmount,omitempty"`
-	TagIds               []string        `json:"tagIds"`
-	Comment              string          `json:"comment"`
-	Editable             bool            `json:"editable"`
+	Id                   int64                            `json:"id,string"`
+	TimeSequenceId       int64                            `json:"timeSequenceId,string"`
+	Type                 TransactionType                  `json:"type"`
+	CategoryId           int64                            `json:"categoryId,string"`
+	Category             *TransactionCategoryInfoResponse `json:"category,omitempty"`
+	Time                 int64                            `json:"time"`
+	UtcOffset            int16                            `json:"utcOffset"`
+	SourceAccountId      int64                            `json:"sourceAccountId,string"`
+	SourceAccount        *AccountInfoResponse             `json:"sourceAccount,omitempty"`
+	DestinationAccountId int64                            `json:"destinationAccountId,string,omitempty"`
+	DestinationAccount   *AccountInfoResponse             `json:"destinationAccount,omitempty"`
+	SourceAmount         int64                            `json:"sourceAmount"`
+	DestinationAmount    int64                            `json:"destinationAmount,omitempty"`
+	TagIds               []string                         `json:"tagIds"`
+	Tags                 []*TransactionTagInfoResponse    `json:"tags,omitempty"`
+	Comment              string                           `json:"comment"`
+	Editable             bool                             `json:"editable"`
 }
 
 // TransactionInfoPageWrapperResponse represents a response of transaction which contains items and next id

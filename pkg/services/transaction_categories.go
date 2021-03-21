@@ -78,6 +78,27 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 	return category, nil
 }
 
+// GetCategoriesByCategoryIds returns transaction category models according to transaction category ids
+func (s *TransactionCategoryService) GetCategoriesByCategoryIds(uid int64, categoryIds []int64) (map[int64]*models.TransactionCategory, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if categoryIds == nil {
+		return nil, errs.ErrTransactionCategoryIdInvalid
+	}
+
+	var categories []*models.TransactionCategory
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("category_id", categoryIds).Find(&categories)
+
+	if err != nil {
+		return nil, err
+	}
+
+	categoryMap := s.GetCategoryMapByList(categories)
+	return categoryMap, err
+}
+
 // GetMaxDisplayOrder returns the max display order according to transaction category type
 func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int, error) {
 	if uid <= 0 {

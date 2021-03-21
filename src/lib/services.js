@@ -253,10 +253,10 @@ export default {
         });
     },
     getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50&trim_account=true&trim_category=true&trim_tag=true`);
     },
     getTransaction: ({ id }) => {
-        return axios.get(`v1/transactions/get.json?id=${id}`);
+        return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment, utcOffset }) => {
         return axios.post('v1/transactions/add.json', {

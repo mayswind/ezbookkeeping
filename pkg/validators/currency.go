@@ -7,7 +7,7 @@ import (
 // ParentAccountCurrencyPlaceholder represents the currency field of parent account stored in database
 const ParentAccountCurrencyPlaceholder = "---"
 
-// ISO 4217
+// AllCurrencyNames represents all currency name in ISO 4217
 var AllCurrencyNames = map[string]bool{
 	"AED": true, //UAE Dirham
 	"AFN": true, //Afghani

@@ -30,8 +30,8 @@ type NationalBankOfPolandDataSource struct {
 
 // NationalBankOfPolandExchangeRateData represents the whole data from National Bank of Poland
 type NationalBankOfPolandExchangeRateData struct {
-	XMLName          xml.Name                          `xml:"exchange_rates"`
-	Date             string                            `xml:"date,attr"`
+	XMLName          xml.Name                            `xml:"exchange_rates"`
+	Date             string                              `xml:"date,attr"`
 	AllExchangeRates []*NationalBankOfPolandExchangeRate `xml:"mid-rate"`
 }
 

@@ -16,6 +16,7 @@ type CSVFileExporter struct {
 const csvHeaderLine = "Time,Type,Category,Sub Category,Account,Amount,Account2,Account2 Amount,Tags,Comment\n"
 const csvDataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
+// GetOutputContent returns the exported csv data
 func (e *CSVFileExporter) GetOutputContent(uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
 	var ret strings.Builder
 
@@ -52,7 +53,7 @@ func (e *CSVFileExporter) GetOutputContent(uid int64, transactions []*models.Tra
 	return []byte(ret.String()), nil
 }
 
-func (e *CSVFileExporter) getTransactionTypeName( transactionDbType models.TransactionDbType) string {
+func (e *CSVFileExporter) getTransactionTypeName(transactionDbType models.TransactionDbType) string {
 	if transactionDbType == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		return "Balance Modification"
 	} else if transactionDbType == models.TRANSACTION_DB_TYPE_INCOME {
@@ -66,7 +67,7 @@ func (e *CSVFileExporter) getTransactionTypeName( transactionDbType models.Trans
 	}
 }
 
-func (e *CSVFileExporter) getTransactionCategoryName( categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
+func (e *CSVFileExporter) getTransactionCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
 	category, exists := categoryMap[categoryId]
 
 	if !exists {
@@ -86,7 +87,7 @@ func (e *CSVFileExporter) getTransactionCategoryName( categoryId int64, category
 	return parentCategory.Name
 }
 
-func (e *CSVFileExporter) getTransactionSubCategoryName( categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
+func (e *CSVFileExporter) getTransactionSubCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
 	category, exists := categoryMap[categoryId]
 
 	if exists {
@@ -96,7 +97,7 @@ func (e *CSVFileExporter) getTransactionSubCategoryName( categoryId int64, categ
 	}
 }
 
-func (e *CSVFileExporter) getAccountName( accountId int64, accountMap map[int64]*models.Account) string {
+func (e *CSVFileExporter) getAccountName(accountId int64, accountMap map[int64]*models.Account) string {
 	account, exists := accountMap[accountId]
 
 	if exists {
@@ -106,7 +107,7 @@ func (e *CSVFileExporter) getAccountName( accountId int64, accountMap map[int64]
 	}
 }
 
-func (e *CSVFileExporter) getDisplayAmount( amount int64) string {
+func (e *CSVFileExporter) getDisplayAmount(amount int64) string {
 	displayAmount := utils.Int64ToString(amount)
 	integer := utils.SubString(displayAmount, 0, len(displayAmount)-2)
 	decimals := utils.SubString(displayAmount, -2, 2)
@@ -126,7 +127,7 @@ func (e *CSVFileExporter) getDisplayAmount( amount int64) string {
 	return integer + "." + decimals
 }
 
-func (e *CSVFileExporter) getTags( transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
+func (e *CSVFileExporter) getTags(transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
 	tagIndexs, exists := allTagIndexs[transactionId]
 
 	if !exists {
@@ -153,7 +154,7 @@ func (e *CSVFileExporter) getTags( transactionId int64, allTagIndexs map[int64][
 	return ret.String()
 }
 
-func (e *CSVFileExporter) getComment( comment string) string {
+func (e *CSVFileExporter) getComment(comment string) string {
 	comment = strings.Replace(comment, ",", " ", -1)
 	comment = strings.Replace(comment, "\r\n", " ", -1)
 	comment = strings.Replace(comment, "\n", " ", -1)

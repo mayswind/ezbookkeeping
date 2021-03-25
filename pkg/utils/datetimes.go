@@ -23,8 +23,9 @@ func ParseFromUnixTime(unixTime int64) time.Time {
 }
 
 // ParseFromLongDateTime parses a formatted string in long date time format
-func ParseFromLongDateTime(t string) (time.Time, error) {
-	return time.Parse(longDateTimeFormat, t)
+func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
+	return time.ParseInLocation(longDateTimeFormat, t, timezone)
 }
 
 // GetMinTransactionTimeFromUnixTime returns the minimum transaction time from unix time

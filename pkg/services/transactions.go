@@ -143,7 +143,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, page int, count int) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, page int, count int, utcOffset int16) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -156,7 +156,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 		return nil, errs.ErrPageCountInvalid
 	}
 
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month))
+	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month), utcOffset)
 
 	if err != nil {
 		return nil, errs.ErrSystemError
@@ -260,12 +260,12 @@ func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, month int64) (int64, error) {
+func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, month int64, utcOffset int16) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month))
+	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month), utcOffset)
 
 	if err != nil {
 		return 0, errs.ErrSystemError

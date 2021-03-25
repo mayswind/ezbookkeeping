@@ -36,7 +36,7 @@ func GetFullVersion() string {
 		unixTime, err := utils.StringToInt64(BuildUnixTime)
 
 		if unixTime > 0 && err == nil {
-			additionalInfos = append(additionalInfos, "build time "+utils.FormatToLongDateTime(utils.ParseFromUnixTime(unixTime)))
+			additionalInfos = append(additionalInfos, "build time "+utils.FormatUnixTimeToLongDateTimeInServerTimezone(unixTime))
 		}
 	}
 

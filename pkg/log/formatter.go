@@ -27,7 +27,7 @@ func (f *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		b = &bytes.Buffer{}
 	}
 
-	b.WriteString(utils.FormatToLongDateTime(time.Now()))
+	b.WriteString(utils.FormatUnixTimeToLongDateTimeInServerTimezone(time.Now().Unix()))
 	b.WriteString(" ")
 
 	if f.Prefix != "" {

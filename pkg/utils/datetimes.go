@@ -7,9 +7,9 @@ const (
 	longDateTimeWithoutSecondFormat = "2006-01-02 15:04"
 )
 
-// FormatToLongDateTime returns a textual representation of the time value formatted by long date time format
-func FormatToLongDateTime(t time.Time) string {
-	return t.Format(longDateTimeFormat)
+// FormatUnixTimeToLongDateTimeInServerTimezone returns a textual representation of the unix time formatted by long date time format
+func FormatUnixTimeToLongDateTimeInServerTimezone(unixTime int64) string {
+	return ParseFromUnixTime(unixTime).Format(longDateTimeFormat)
 }
 
 // FormatToLongDateTimeWithoutSecond returns a textual representation of the time value formatted by long date time format (no second)

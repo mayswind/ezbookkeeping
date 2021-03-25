@@ -5,7 +5,7 @@
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-button external no-chevron target="_blank" :link="`${$constants.api.baseUrlPath}/data/export.csv?token=${$user.getToken()}&utc_offset=${currentTimezoneOffsetMinutes}`">{{ $t('Export Data') }}</f7-list-button>
+                    <f7-list-button external no-chevron target="_blank" :link="`${$constants.api.baseUrlPath}/data/export.csv?token=${$user.getToken()}&utc_offset=${currentTimezoneOffsetMinutes}`" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
                     <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
                 </f7-list>
             </f7-card-content>
@@ -34,6 +34,9 @@ export default {
     computed: {
         currentTimezoneOffsetMinutes() {
             return this.$utilities.getTimezoneOffsetMinutes();
+        },
+        isDataExportingEnabled() {
+            return this.$settings.isDataExportingEnabled();
         }
     },
     methods: {

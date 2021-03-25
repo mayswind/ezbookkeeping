@@ -12,8 +12,14 @@ func FormatUnixTimeToLongDateTimeInServerTimezone(unixTime int64) string {
 	return ParseFromUnixTime(unixTime).Format(longDateTimeFormat)
 }
 
-// FormatToLongDateTimeWithoutSecond returns a textual representation of the time value formatted by long date time format (no second)
-func FormatToLongDateTimeWithoutSecond(t time.Time) string {
+// FormatUnixTimeToLongDateTimeWithoutSecond returns a textual representation of the unix time formatted by long date time format (no second)
+func FormatUnixTimeToLongDateTimeWithoutSecond(unixTime int64, timezone *time.Location) string {
+	t := ParseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
 	return t.Format(longDateTimeWithoutSecondFormat)
 }
 

@@ -3,6 +3,7 @@ package exporters
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/utils"
@@ -17,7 +18,7 @@ const csvHeaderLine = "Time,Type,Category,Sub Category,Account,Amount,Account2,A
 const csvDataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
 // GetOutputContent returns the exported csv data
-func (e *CSVFileExporter) GetOutputContent(uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
+func (e *CSVFileExporter) GetOutputContent(uid int64, timezone *time.Location, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
 	var ret strings.Builder
 
 	ret.Grow(len(transactions) * 100)
@@ -30,7 +31,8 @@ func (e *CSVFileExporter) GetOutputContent(uid int64, transactions []*models.Tra
 			continue
 		}
 
-		transactionTime := utils.FormatToLongDateTimeWithoutSecond(utils.ParseFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)))
+		transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
+		transactionTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
 		transactionType := e.getTransactionTypeName(transaction.Type)
 		category := e.getTransactionCategoryName(transaction.CategoryId, categoryMap)
 		subCategory := e.getTransactionSubCategoryName(transaction.CategoryId, categoryMap)

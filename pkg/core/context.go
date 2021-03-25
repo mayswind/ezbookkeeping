@@ -12,7 +12,7 @@ const requestIdFieldKey = "REQUEST_ID"
 const tokenClaimsFieldKey = "TOKEN_CLAIMS"
 const responseErrorFieldKey = "RESPONSE_ERROR"
 
-const clientTimezoneOffsetHeaderName = "X-Timezone-Offset"
+const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
 
 // Context represents the request and response context
 type Context struct {
@@ -71,7 +71,7 @@ func (c *Context) GetCurrentUid() int64 {
 
 // GetClientTimezoneOffset returns the client timezone offset
 func (c *Context) GetClientTimezoneOffset() (int16, error) {
-	value := c.GetHeader(clientTimezoneOffsetHeaderName)
+	value := c.GetHeader(ClientTimezoneOffsetHeaderName)
 	offset, err := strconv.Atoi(value)
 
 	if err != nil {

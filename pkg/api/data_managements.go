@@ -47,6 +47,15 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 		return nil, "", errs.ErrDataExportNotAllowed
 	}
 
+	timezone := time.Local
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
+	} else {
+		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
+	}
+
 	uid := c.GetCurrentUid()
 
 	accounts, err := a.accounts.GetAllAccountsByUid(uid)
@@ -88,14 +97,14 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	result, err := a.exporter.GetOutputContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := a.exporter.GetOutputContent(uid, timezone, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	fileName := a.getFileName()
+	fileName := a.getFileName(timezone)
 
 	return result, fileName, nil
 }
@@ -150,8 +159,8 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *er
 	return true, nil
 }
 
-func (a *DataManagementsApi) getFileName() string {
-	currentTime := utils.FormatToLongDateTimeWithoutSecond(time.Now())
+func (a *DataManagementsApi) getFileName(timezone *time.Location) string {
+	currentTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(time.Now().Unix(), timezone)
 	currentTime = strings.Replace(currentTime, "-", "_", -1)
 	currentTime = strings.Replace(currentTime, " ", "_", -1)
 	currentTime = strings.Replace(currentTime, ":", "_", -1)

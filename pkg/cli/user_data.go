@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"time"
+
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/lab/pkg/errs"
@@ -176,7 +178,7 @@ func (a *UserDataCli) ExportTransaction(c *cli.Context, uid int64) ([]byte, erro
 		return nil, err
 	}
 
-	result, err := a.csvExporter.GetOutputContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := a.csvExporter.GetOutputContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())

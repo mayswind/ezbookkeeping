@@ -157,6 +157,7 @@ func startWebServer(c *cli.Context) error {
 
 		if config.EnableDataExport {
 			dataRoute := apiRoute.Group("/data")
+			dataRoute.Use(bindMiddleware(middlewares.HeaderInQueryString))
 			dataRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
 			{
 				dataRoute.GET("/export.csv", bindCsv(api.DataManagements.ExportDataHandler))

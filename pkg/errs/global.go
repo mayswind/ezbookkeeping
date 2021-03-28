@@ -19,6 +19,7 @@ var (
 	ErrQueryItemsEmpty                 = NewNormalError(NormalSubcategoryGlobal, 9, http.StatusBadRequest, "query items cannot be empty")
 	ErrQueryItemsTooMuch               = NewNormalError(NormalSubcategoryGlobal, 10, http.StatusBadRequest, "query items too much")
 	ErrQueryItemsInvalid               = NewNormalError(NormalSubcategoryGlobal, 11, http.StatusBadRequest, "query items have invalid item")
+	ErrParameterInvalid                = NewNormalError(NormalSubcategoryGlobal, 12, http.StatusBadRequest, "parameter invalid")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

@@ -564,6 +564,8 @@ export default {
         'transaction tag is in use and cannot be deleted': 'Transaction tag is in use and it cannot be deleted',
         'query items cannot be empty': 'There are no query items',
         'query items too much': 'There are too many query items',
+        'query items have invalid item': 'There is invalid item in query items',
+        'parameter invalid': 'Parameter is invalid',
     },
     'parameter': {
         'id': 'ID',

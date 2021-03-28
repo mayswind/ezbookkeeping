@@ -1,7 +1,9 @@
 package models
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/utils"
@@ -135,6 +137,12 @@ type TransactionAmountsRequestItem struct {
 	EndTime   int64
 }
 
+// TransactionMonthAmountsRequest represents all parameters of transaction month amounts request
+type TransactionMonthAmountsRequest struct {
+	StartYearMonth string `form:"start_year_month"`
+	EndYearMonth   string `form:"end_year_month"`
+}
+
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
 	Id           int64 `form:"id,string" binding:"required,min=1"`
@@ -146,6 +154,16 @@ type TransactionGetRequest struct {
 // TransactionDeleteRequest represents all parameters of transaction deleting request
 type TransactionDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
+}
+
+// TransactionAccountsAmount represents transaction accounts amount map
+type TransactionAccountsAmount map[int64]*TransactionAccountAmount
+
+// TransactionAccountAmount represents transaction account amount
+type TransactionAccountAmount struct {
+	AccountId          int64
+	TotalIncomeAmount  int64
+	TotalExpenseAmount int64
 }
 
 // TransactionInfoResponse represents a view-object of transaction
@@ -205,6 +223,13 @@ type TransactionAmountsResponseItem struct {
 	StartTime int64                                       `json:"startTime"`
 	EndTime   int64                                       `json:"endTime"`
 	Amounts   []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
+}
+
+// TransactionMonthAmountsResponseItem represents an item of transaction month amounts
+type TransactionMonthAmountsResponseItem struct {
+	Year    int                                         `json:"year"`
+	Month   int                                         `json:"month"`
+	Amounts []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
 }
 
 // TransactionAmountsResponseItemAmountInfo represents amount info for an response item
@@ -321,6 +346,35 @@ func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*Tran
 	return requestItems, nil
 }
 
+// GetStartTimeAndEndTime returns start unix time and end unix time by request parameter
+func (t *TransactionMonthAmountsRequest) GetStartTimeAndEndTime(utcOffset int16) (int64, int64, error) {
+	startUnixTime := int64(0)
+	endUnixTime := time.Now().Unix()
+
+	if t.StartYearMonth != "" {
+		startTime, err := utils.ParseFromShortDateTime(fmt.Sprintf("%s-1 0:0:0", t.StartYearMonth), utcOffset)
+
+		if err != nil {
+			return 0, 0, err
+		}
+
+		startUnixTime = startTime.Unix()
+	}
+
+	if t.EndYearMonth != "" {
+		endTime, err := utils.ParseFromShortDateTime(fmt.Sprintf("%s-1 0:0:0", t.EndYearMonth), utcOffset)
+
+		if err != nil {
+			return 0, 0, err
+		}
+
+		endTime = endTime.AddDate(0, 1, 0)
+		endUnixTime = endTime.Unix() - 1
+	}
+
+	return startUnixTime, endUnixTime, nil
+}
+
 // TransactionInfoResponseSlice represents the slice data structure of TransactionInfoResponse
 type TransactionInfoResponseSlice []*TransactionInfoResponse
 
@@ -341,4 +395,26 @@ func (s TransactionInfoResponseSlice) Less(i, j int) bool {
 	}
 
 	return s[i].Id > s[j].Id
+}
+
+// TransactionMonthAmountsResponseItemSlice represents the slice data structure of TransactionMonthAmountsResponseItem
+type TransactionMonthAmountsResponseItemSlice []*TransactionMonthAmountsResponseItem
+
+// Len returns the count of items
+func (s TransactionMonthAmountsResponseItemSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionMonthAmountsResponseItemSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s TransactionMonthAmountsResponseItemSlice) Less(i, j int) bool {
+	if s[i].Year != s[j].Year {
+		return s[i].Year > s[j].Year
+	}
+
+	return s[i].Month > s[j].Month
 }

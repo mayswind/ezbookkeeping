@@ -564,6 +564,8 @@ export default {
         'transaction tag is in use and cannot be deleted': '交易标签正在被使用，无法删除',
         'query items cannot be empty': '请求项目不能为空',
         'query items too much': '请求项目过多',
+        'query items have invalid item': '请求项目中有非法项目',
+        'parameter invalid': '参数错误',
     },
     'parameter': {
         'id': 'ID',

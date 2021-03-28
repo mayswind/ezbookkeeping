@@ -292,6 +292,7 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 	}
 }
 
+// GetTransactionAmountsRequestItems returns request items by query parameters
 func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*TransactionAmountsRequestItem, error) {
 	items := strings.Split(t.Query, "|")
 	requestItems := make([]*TransactionAmountsRequestItem, 0, len(items))

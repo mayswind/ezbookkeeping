@@ -198,7 +198,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interfa
 	err := c.ShouldBindQuery(&statisticReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionOverviewHandler] parse request failed, because %s", err.Error())
+		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 

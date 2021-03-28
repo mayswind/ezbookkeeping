@@ -224,6 +224,117 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interfa
 	return statisticResp, nil
 }
 
+// TransactionAmountsHandler returns transaction amounts of current user
+func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{}, *errs.Error) {
+	var transactionAmountsReq models.TransactionAmountsRequest
+	err := c.ShouldBindQuery(&transactionAmountsReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	requestItems, err := transactionAmountsReq.GetTransactionAmountsRequestItems()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] get request item failed, because %s", err.Error())
+		return nil, errs.ErrQueryItemsInvalid
+	}
+
+	if len(requestItems) < 1 {
+		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are no valid items")
+		return nil, errs.ErrQueryItemsEmpty
+	}
+
+	if len(requestItems) > 5 {
+		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are too many items")
+		return nil, errs.ErrQueryItemsTooMuch
+	}
+
+	uid := c.GetCurrentUid()
+
+	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+	accountMap := a.accounts.GetAccountMapByList(accounts)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionAmountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	amountsResp := make(map[string]*models.TransactionAmountsResponseItem)
+
+	for i := 0; i < len(requestItems); i++ {
+		requestItem := requestItems[i]
+
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(uid, requestItem.StartTime, requestItem.EndTime)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+
+		amountsMap := make(map[string]*models.TransactionAmountsResponseItemAmountInfo)
+
+		for accountId, incomeAmount := range incomeAmounts {
+			account, exists := accountMap[accountId]
+
+			if !exists {
+				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				continue
+			}
+
+			totalAmounts, exists := amountsMap[account.Currency]
+
+			if !exists {
+				totalAmounts = &models.TransactionAmountsResponseItemAmountInfo{
+					Currency:      account.Currency,
+					IncomeAmount:  0,
+					ExpenseAmount: 0,
+				}
+			}
+
+			totalAmounts.IncomeAmount += incomeAmount
+			amountsMap[account.Currency] = totalAmounts
+		}
+
+		for accountId, expenseAmount := range expenseAmounts {
+			account, exists := accountMap[accountId]
+
+			if !exists {
+				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				continue
+			}
+
+			totalAmounts, exists := amountsMap[account.Currency]
+
+			if !exists {
+				totalAmounts = &models.TransactionAmountsResponseItemAmountInfo{
+					Currency:      account.Currency,
+					IncomeAmount:  0,
+					ExpenseAmount: 0,
+				}
+			}
+
+			totalAmounts.ExpenseAmount += expenseAmount
+			amountsMap[account.Currency] = totalAmounts
+		}
+
+		allTotalAmounts := make([]*models.TransactionAmountsResponseItemAmountInfo, 0)
+
+		for _, totalAmounts := range amountsMap {
+			allTotalAmounts = append(allTotalAmounts, totalAmounts)
+		}
+
+		amountsResp[requestItem.Name] = &models.TransactionAmountsResponseItem{
+			StartTime: requestItem.StartTime,
+			EndTime:   requestItem.EndTime,
+			Amounts:   allTotalAmounts,
+		}
+	}
+
+	return amountsResp, nil
+}
+
 // TransactionGetHandler returns one specific transaction of current user
 func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionGetReq models.TransactionGetRequest

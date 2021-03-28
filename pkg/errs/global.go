@@ -16,6 +16,9 @@ var (
 	ErrPageIndexInvalid                = NewNormalError(NormalSubcategoryGlobal, 6, http.StatusBadRequest, "page index is invalid")
 	ErrPageCountInvalid                = NewNormalError(NormalSubcategoryGlobal, 7, http.StatusBadRequest, "page count is invalid")
 	ErrClientTimezoneOffsetInvalid     = NewNormalError(NormalSubcategoryGlobal, 8, http.StatusBadRequest, "client timezone offset is invalid")
+	ErrQueryItemsEmpty                 = NewNormalError(NormalSubcategoryGlobal, 9, http.StatusBadRequest, "query items cannot be empty")
+	ErrQueryItemsTooMuch               = NewNormalError(NormalSubcategoryGlobal, 10, http.StatusBadRequest, "query items too much")
+	ErrQueryItemsInvalid               = NewNormalError(NormalSubcategoryGlobal, 11, http.StatusBadRequest, "query items have invalid item")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

@@ -1,6 +1,11 @@
 package models
 
-import "github.com/mayswind/lab/pkg/utils"
+import (
+	"strings"
+
+	"github.com/mayswind/lab/pkg/errs"
+	"github.com/mayswind/lab/pkg/utils"
+)
 
 // TransactionType represents transaction type
 type TransactionType byte
@@ -125,6 +130,18 @@ type TransactionStatisticRequest struct {
 	EndTime   int64 `form:"end_time" binding:"min=0"`
 }
 
+// TransactionAmountsRequest represents all parameters of transaction amounts request
+type TransactionAmountsRequest struct {
+	Query string `form:"query"`
+}
+
+// TransactionAmountsRequestItem represents an item of transaction amounts request
+type TransactionAmountsRequestItem struct {
+	Name      string
+	StartTime int64
+	EndTime   int64
+}
+
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
 	Id           int64 `form:"id,string" binding:"required,min=1"`
@@ -176,7 +193,7 @@ type TransactionInfoPageWrapperResponse2 struct {
 	TotalCount int64                        `json:"total_count"`
 }
 
-// TransactionStatisticResponse represents an item of transaction overview
+// TransactionStatisticResponse represents an item of transaction amounts
 type TransactionStatisticResponse struct {
 	StartTime int64                               `json:"startTime"`
 	EndTime   int64                               `json:"endTime"`
@@ -188,6 +205,20 @@ type TransactionStatisticResponseItem struct {
 	CategoryId  int64 `json:"categoryId,string"`
 	AccountId   int64 `json:"accountId,string"`
 	TotalAmount int64 `json:"amount"`
+}
+
+// TransactionAmountsResponseItem represents an item of transaction amounts
+type TransactionAmountsResponseItem struct {
+	StartTime int64                                       `json:"startTime"`
+	EndTime   int64                                       `json:"endTime"`
+	Amounts   []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
+}
+
+// TransactionAmountsResponseItemAmountInfo represents amount info for an response item
+type TransactionAmountsResponseItemAmountInfo struct {
+	Currency      string `json:"currency"`
+	IncomeAmount  int64  `json:"incomeAmount"`
+	ExpenseAmount int64  `json:"expenseAmount"`
 }
 
 // IsEditable returns whether this transaction can be edited
@@ -259,6 +290,41 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		Comment:              t.Comment,
 		Editable:             editable,
 	}
+}
+
+func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*TransactionAmountsRequestItem, error) {
+	items := strings.Split(t.Query, "|")
+	requestItems := make([]*TransactionAmountsRequestItem, 0, len(items))
+
+	for i := 0; i < len(items); i++ {
+		itemValues := strings.Split(items[i], "_")
+
+		if len(itemValues) != 3 {
+			return nil, errs.ErrQueryItemsInvalid
+		}
+
+		startTime, err := utils.StringToInt64(itemValues[1])
+
+		if err != nil {
+			return nil, err
+		}
+
+		endTime, err := utils.StringToInt64(itemValues[2])
+
+		if err != nil {
+			return nil, err
+		}
+
+		requestItem := &TransactionAmountsRequestItem{
+			Name:      itemValues[0],
+			StartTime: startTime,
+			EndTime:   endTime,
+		}
+
+		requestItems = append(requestItems, requestItem)
+	}
+
+	return requestItems, nil
 }
 
 // TransactionInfoResponseSlice represents the slice data structure of TransactionInfoResponse

@@ -191,9 +191,6 @@ func startWebServer(c *cli.Context) error {
 			// Data
 			apiV1Route.POST("/data/clear.json", bindApi(api.DataManagements.ClearDataHandler))
 
-			// Overview
-			apiV1Route.GET("/overviews/transaction.json", bindApi(api.Overviews.TransactionOverviewHandler))
-
 			// Accounts
 			apiV1Route.GET("/accounts/list.json", bindApi(api.Accounts.AccountListHandler))
 			apiV1Route.GET("/accounts/get.json", bindApi(api.Accounts.AccountGetHandler))
@@ -208,6 +205,7 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.GET("/transactions/list.json", bindApi(api.Transactions.TransactionListHandler))
 			apiV1Route.GET("/transactions/list/by_month.json", bindApi(api.Transactions.TransactionMonthListHandler))
 			apiV1Route.GET("/transactions/statistics.json", bindApi(api.Transactions.TransactionStatisticsHandler))
+			apiV1Route.GET("/transactions/amounts.json", bindApi(api.Transactions.TransactionAmountsHandler))
 			apiV1Route.GET("/transactions/get.json", bindApi(api.Transactions.TransactionGetHandler))
 			apiV1Route.POST("/transactions/add.json", bindApi(api.Transactions.TransactionCreateHandler))
 			apiV1Route.POST("/transactions/modify.json", bindApi(api.Transactions.TransactionModifyHandler))

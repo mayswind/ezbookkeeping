@@ -17,7 +17,7 @@ export function loadTransactionOverview(context, { defaultCurrency, dateRange, f
     }
 
     return new Promise((resolve, reject) => {
-        services.getTransactionOverview({
+        services.getTransactionAmounts({
             today: dateRange.today,
             thisWeek: dateRange.thisWeek,
             thisMonth: dateRange.thisMonth,

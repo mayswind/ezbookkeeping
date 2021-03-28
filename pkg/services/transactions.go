@@ -34,11 +34,11 @@ var (
 
 // GetAllTransactions returns all transactions
 func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDuplicated bool) ([]*models.Transaction, error) {
-	maxTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
+	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	var allTransactions []*models.Transaction
 
-	for maxTime > 0 {
-		transactions, err := s.GetAllTransactionsByMaxTime(uid, maxTime, pageCount, noDuplicated)
+	for maxTransactionTime > 0 {
+		transactions, err := s.GetAllTransactionsByMaxTime(uid, maxTransactionTime, pageCount, noDuplicated)
 
 		if err != nil {
 			return nil, err
@@ -47,23 +47,23 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDupl
 		allTransactions = append(allTransactions, transactions...)
 
 		if len(transactions) < pageCount {
-			maxTime = 0
+			maxTransactionTime = 0
 			break
 		}
 
-		maxTime = transactions[len(transactions)-1].TransactionTime - 1
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
 	}
 
 	return allTransactions, nil
 }
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTime, 0, 0, nil, 0, "", count, noDuplicated)
+func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
+	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, 0, "", count, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, minTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -127,14 +127,14 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTime int64, 
 		conditionParams = append(conditionParams, "%%"+keyword+"%%")
 	}
 
-	if maxTime > 0 {
+	if maxTransactionTime > 0 {
 		condition = condition + " AND transaction_time<=?"
-		conditionParams = append(conditionParams, maxTime)
+		conditionParams = append(conditionParams, maxTransactionTime)
 	}
 
-	if minTime > 0 {
+	if minTransactionTime > 0 {
 		condition = condition + " AND transaction_time>=?"
-		conditionParams = append(conditionParams, minTime)
+		conditionParams = append(conditionParams, minTransactionTime)
 	}
 
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)

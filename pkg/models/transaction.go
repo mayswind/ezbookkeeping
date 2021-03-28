@@ -80,6 +80,16 @@ type TransactionModifyRequest struct {
 	Comment              string   `json:"comment" binding:"max=255"`
 }
 
+// TransactionCountRequest represents transaction count request
+type TransactionCountRequest struct {
+	Type       TransactionDbType `form:"type" binding:"min=0,max=4"`
+	CategoryId int64             `form:"category_id" binding:"min=0"`
+	AccountId  int64             `form:"account_id" binding:"min=0"`
+	Keyword    string            `form:"keyword"`
+	MaxTime    int64             `form:"max_time" binding:"min=0"`
+	MinTime    int64             `form:"min_time" binding:"min=0"`
+}
+
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
@@ -141,6 +151,11 @@ type TransactionInfoResponse struct {
 	Tags                 []*TransactionTagInfoResponse    `json:"tags,omitempty"`
 	Comment              string                           `json:"comment"`
 	Editable             bool                             `json:"editable"`
+}
+
+// TransactionCountResponse represents transaction count response
+type TransactionCountResponse struct {
+	Count      int64           `json:"count"`
 }
 
 // TransactionInfoPageWrapperResponse represents a response of transaction which contains items and next id

@@ -31,6 +31,46 @@ var (
 	}
 )
 
+// TransactionCountHandler returns transaction total count of current user
+func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{}, *errs.Error) {
+	var transactionCountReq models.TransactionCountRequest
+	err := c.ShouldBindQuery(&transactionCountReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	var allCategoryIds []int64
+
+	if transactionCountReq.CategoryId > 0 {
+		allSubCategories, err := a.transactionCategories.GetAllCategoriesByUid(uid, 0, transactionCountReq.CategoryId)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get transaction category error, because %s", err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+
+		if len(allSubCategories) > 0 {
+			for i := 0; i < len(allSubCategories); i++ {
+				allCategoryIds = append(allCategoryIds, allSubCategories[i].CategoryId)
+			}
+		} else {
+			allCategoryIds = append(allCategoryIds, transactionCountReq.CategoryId)
+		}
+	}
+
+	totalCount, err := a.transactions.GetTransactionCount(uid, transactionCountReq.MaxTime, transactionCountReq.MinTime, transactionCountReq.Type, allCategoryIds, transactionCountReq.AccountId, transactionCountReq.Keyword)
+
+	countResp := &models.TransactionCountResponse{
+		Count: totalCount,
+	}
+
+	return countResp, nil
+}
+
 // TransactionListHandler returns transaction list of current user
 func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionListReq models.TransactionListByMaxTimeRequest

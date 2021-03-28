@@ -75,68 +75,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionT
 	var transactions []*models.Transaction
 	var err error
 
-	condition := "uid=? AND deleted=?"
-	conditionParams := make([]interface{}, 0, 16)
-	conditionParams = append(conditionParams, uid)
-	conditionParams = append(conditionParams, false)
-
-	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
-		condition = condition + " AND type=?"
-		conditionParams = append(conditionParams, transactionType)
-	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		if accountId == 0 {
-			condition = condition + " AND type=?"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-		} else {
-			condition = condition + " AND (type=? OR type=?)"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
-		}
-	} else {
-		if noDuplicated && accountId == 0 {
-			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-		}
-	}
-
-	if len(categoryIds) > 0 {
-		var conditions strings.Builder
-
-		for i := 0; i < len(categoryIds); i++ {
-			if i > 0 {
-				conditions.WriteString(",")
-			}
-
-			conditions.WriteString("?")
-			conditionParams = append(conditionParams, categoryIds[i])
-		}
-
-		condition = condition + " AND category_id IN (" + conditions.String() + ")"
-	}
-
-	if accountId > 0 {
-		condition = condition + " AND account_id=?"
-		conditionParams = append(conditionParams, accountId)
-	}
-
-	if keyword != "" {
-		condition = condition + " AND comment LIKE ?"
-		conditionParams = append(conditionParams, "%%"+keyword+"%%")
-	}
-
-	if maxTransactionTime > 0 {
-		condition = condition + " AND transaction_time<=?"
-		conditionParams = append(conditionParams, maxTransactionTime)
-	}
-
-	if minTransactionTime > 0 {
-		condition = condition + " AND transaction_time>=?"
-		conditionParams = append(conditionParams, minTransactionTime)
-	}
-
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, noDuplicated)
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
@@ -164,65 +103,12 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 
 	endTime := startTime.AddDate(0, 1, 0)
 
-	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
-	endTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix())
+	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
+	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
 
 	var transactions []*models.Transaction
 
-	condition := "uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?"
-	conditionParams := make([]interface{}, 0, 16)
-	conditionParams = append(conditionParams, uid)
-	conditionParams = append(conditionParams, false)
-	conditionParams = append(conditionParams, startTransactionTime)
-	conditionParams = append(conditionParams, endTransactionTime)
-
-	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
-		condition = condition + " AND type=?"
-		conditionParams = append(conditionParams, transactionType)
-	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		if accountId == 0 {
-			condition = condition + " AND type=?"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-		} else {
-			condition = condition + " AND (type=? OR type=?)"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
-		}
-	} else {
-		if accountId == 0 {
-			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-		}
-	}
-
-	if len(categoryIds) > 0 {
-		var conditions strings.Builder
-
-		for i := 0; i < len(categoryIds); i++ {
-			if i > 0 {
-				conditions.WriteString(",")
-			}
-
-			conditions.WriteString("?")
-			conditionParams = append(conditionParams, categoryIds[i])
-		}
-
-		condition = condition + " AND category_id IN (" + conditions.String() + ")"
-	}
-
-	if accountId > 0 {
-		condition = condition + " AND account_id=?"
-		conditionParams = append(conditionParams, accountId)
-	}
-
-	if keyword != "" {
-		condition = condition + " AND comment LIKE ?"
-		conditionParams = append(conditionParams, "%%"+keyword+"%%")
-	}
-
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, true)
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
@@ -252,11 +138,17 @@ func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactio
 
 // GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
+	return s.GetTransactionCount(uid, 0, 0, 0, nil, 0, "")
+}
+
+// GetTransactionCount returns count of transactions
+func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	return s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Transaction{})
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, true)
+	return s.UserDataDB(uid).Where(condition, conditionParams...).Count(&models.Transaction{})
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
@@ -1120,6 +1012,72 @@ func (s *TransactionService) GetTransactionMapByList(transactions []*models.Tran
 	}
 
 	return transactionMap
+}
+
+func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, noDuplicated bool) (string, []interface{}) {
+	condition := "uid=? AND deleted=?"
+	conditionParams := make([]interface{}, 0, 16)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+
+	if maxTransactionTime > 0 {
+		condition = condition + " AND transaction_time<=?"
+		conditionParams = append(conditionParams, maxTransactionTime)
+	}
+
+	if minTransactionTime > 0 {
+		condition = condition + " AND transaction_time>=?"
+		conditionParams = append(conditionParams, minTransactionTime)
+	}
+
+	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
+		condition = condition + " AND type=?"
+		conditionParams = append(conditionParams, transactionType)
+	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		if accountId == 0 {
+			condition = condition + " AND type=?"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		} else {
+			condition = condition + " AND (type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+		}
+	} else {
+		if noDuplicated && accountId == 0 {
+			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		}
+	}
+
+	if len(categoryIds) > 0 {
+		var conditions strings.Builder
+
+		for i := 0; i < len(categoryIds); i++ {
+			if i > 0 {
+				conditions.WriteString(",")
+			}
+
+			conditions.WriteString("?")
+			conditionParams = append(conditionParams, categoryIds[i])
+		}
+
+		condition = condition + " AND category_id IN (" + conditions.String() + ")"
+	}
+
+	if accountId > 0 {
+		condition = condition + " AND account_id=?"
+		conditionParams = append(conditionParams, accountId)
+	}
+
+	if keyword != "" {
+		condition = condition + " AND comment LIKE ?"
+		conditionParams = append(conditionParams, "%%"+keyword+"%%")
+	}
+
+	return condition, conditionParams
 }
 
 func (s *TransactionService) isAccountIdValid(transaction *models.Transaction) error {

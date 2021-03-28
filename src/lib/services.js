@@ -192,19 +192,6 @@ export default {
 
         return axios.get('v1/overviews/transaction.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));
     },
-    getTransactionStatistics: ({ startTime, endTime }) => {
-        const queryParams = [];
-
-        if (startTime) {
-            queryParams.push(`start_time=${startTime}`);
-        }
-
-        if (endTime) {
-            queryParams.push(`end_time=${endTime}`);
-        }
-
-        return axios.get('v1/statistics/transaction.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
-    },
     getAllAccounts: ({ visibleOnly }) => {
         return axios.get('v1/accounts/list.json?visible_only=' + !!visibleOnly);
     },
@@ -254,6 +241,19 @@ export default {
     },
     getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
         return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50&trim_account=true&trim_category=true&trim_tag=true`);
+    },
+    getTransactionStatistics: ({ startTime, endTime }) => {
+        const queryParams = [];
+
+        if (startTime) {
+            queryParams.push(`start_time=${startTime}`);
+        }
+
+        if (endTime) {
+            queryParams.push(`end_time=${endTime}`);
+        }
+
+        return axios.get('v1/transactions/statistics.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
     },
     getTransaction: ({ id }) => {
         return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);

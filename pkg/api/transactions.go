@@ -192,6 +192,38 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 	return transactionResps, nil
 }
 
+// TransactionStatisticsHandler returns transaction statistics of current user
+func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interface{}, *errs.Error) {
+	var statisticReq models.TransactionStatisticRequest
+	err := c.ShouldBindQuery(&statisticReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionOverviewHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalIncomeAndExpense(uid, statisticReq.StartTime, statisticReq.EndTime)
+
+	statisticResp := &models.TransactionStatisticResponse{
+		StartTime: statisticReq.StartTime,
+		EndTime:   statisticReq.EndTime,
+	}
+
+	statisticResp.Items = make([]*models.TransactionStatisticResponseItem, len(totalAmounts))
+
+	for i := 0; i < len(totalAmounts); i++ {
+		totalAmountItem := totalAmounts[i]
+		statisticResp.Items[i] = &models.TransactionStatisticResponseItem{
+			CategoryId:  totalAmountItem.CategoryId,
+			AccountId:   totalAmountItem.AccountId,
+			TotalAmount: totalAmountItem.Amount,
+		}
+	}
+
+	return statisticResp, nil
+}
+
 // TransactionGetHandler returns one specific transaction of current user
 func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionGetReq models.TransactionGetRequest

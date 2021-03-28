@@ -95,7 +95,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 		return nil, errs.ErrPageCountInvalid
 	}
 
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month), utcOffset)
+	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month), utcOffset)
 
 	if err != nil {
 		return nil, errs.ErrSystemError

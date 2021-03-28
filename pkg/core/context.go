@@ -12,6 +12,7 @@ const requestIdFieldKey = "REQUEST_ID"
 const tokenClaimsFieldKey = "TOKEN_CLAIMS"
 const responseErrorFieldKey = "RESPONSE_ERROR"
 
+// ClientTimezoneOffsetHeaderName represents the header name of client timezone offset
 const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
 
 // Context represents the request and response context

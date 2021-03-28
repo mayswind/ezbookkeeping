@@ -178,7 +178,7 @@ type TransactionInfoResponse struct {
 
 // TransactionCountResponse represents transaction count response
 type TransactionCountResponse struct {
-	TotalCount int64 `json:"total_count"`
+	TotalCount int64 `json:"totalCount"`
 }
 
 // TransactionInfoPageWrapperResponse represents a response of transaction which contains items and next id
@@ -190,7 +190,7 @@ type TransactionInfoPageWrapperResponse struct {
 // TransactionInfoPageWrapperResponse2 represents a response of transaction which contains items and count
 type TransactionInfoPageWrapperResponse2 struct {
 	Items      TransactionInfoResponseSlice `json:"items"`
-	TotalCount int64                        `json:"total_count"`
+	TotalCount int64                        `json:"totalCount"`
 }
 
 // TransactionStatisticResponse represents an item of transaction amounts

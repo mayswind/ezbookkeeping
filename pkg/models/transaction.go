@@ -50,13 +50,6 @@ type Transaction struct {
 	DeletedUnixTime      int64
 }
 
-// TransactionTotalAmount represents total amount for specific transaction type
-type TransactionTotalAmount struct {
-	Uid         int64
-	Type        TransactionDbType
-	TotalAmount int64 `xorm:"NOT NULL"`
-}
-
 // TransactionCreateRequest represents all parameters of transaction creation request
 type TransactionCreateRequest struct {
 	Type                 TransactionType `json:"type" binding:"required"`

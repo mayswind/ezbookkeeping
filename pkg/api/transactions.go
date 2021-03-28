@@ -53,7 +53,7 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{},
 	totalCount, err := a.transactions.GetTransactionCount(uid, transactionCountReq.MaxTime, transactionCountReq.MinTime, transactionCountReq.Type, allCategoryIds, transactionCountReq.AccountId, transactionCountReq.Keyword)
 
 	countResp := &models.TransactionCountResponse{
-		Count: totalCount,
+		TotalCount: totalCount,
 	}
 
 	return countResp, nil

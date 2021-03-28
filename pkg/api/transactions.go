@@ -110,100 +110,16 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		transactions = transactions[:transactionListReq.Count]
 	}
 
-	transactionIds := make([]int64, len(transactions))
-	accountIds := make([]int64, 0, len(transactions)*2)
-	categoryIds := make([]int64, 0, len(transactions))
-
-	for i := 0; i < len(transactions); i++ {
-		transactionId := transactions[i].TransactionId
-
-		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transactionId = transactions[i].RelatedId
-		}
-
-		transactionIds[i] = transactionId
-		accountIds = append(accountIds, transactions[i].AccountId)
-
-		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			accountIds = append(accountIds, transactions[i].RelatedAccountId)
-		}
-
-		categoryIds = append(categoryIds, transactions[i].CategoryId)
-	}
-
-	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
+	transactionResult, err := a.getTransactionListResult(c, user, transactions, utcOffset, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
-
-	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+	transactionResps := &models.TransactionInfoPageWrapperResponse{
+		Items: transactionResult,
 	}
-
-	var categoryMap map[int64]*models.TransactionCategory
-	var tagMap map[int64]*models.TransactionTag
-
-	if !transactionListReq.TrimCategory {
-		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(uid, utils.ToUniqueInt64Slice(categoryIds))
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, errs.ErrOperationFailed
-		}
-	}
-
-	if !transactionListReq.TrimTag {
-		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, errs.ErrOperationFailed
-		}
-	}
-
-	transactionResps := &models.TransactionInfoPageWrapperResponse{}
-	transactionResps.Items = make(models.TransactionInfoResponseSlice, len(transactions))
-
-	for i := 0; i < len(transactions); i++ {
-		transaction := transactions[i]
-
-		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
-		}
-
-		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
-		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-		transactionResps.Items[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
-
-		if !transactionListReq.TrimAccount {
-			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
-				transactionResps.Items[i].SourceAccount = sourceAccount.ToAccountInfoResponse()
-			}
-
-			if destinationAccount := allAccounts[transaction.RelatedAccountId]; destinationAccount != nil {
-				transactionResps.Items[i].DestinationAccount = destinationAccount.ToAccountInfoResponse()
-			}
-		}
-
-		if !transactionListReq.TrimCategory {
-			if category := categoryMap[transaction.CategoryId]; category != nil {
-				transactionResps.Items[i].Category = category.ToTransactionCategoryInfoResponse()
-			}
-		}
-
-		if !transactionListReq.TrimTag {
-			transactionResps.Items[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
-		}
-	}
-
-	sort.Sort(transactionResps.Items)
 
 	if hasMore {
 		transactionResps.NextTimeSequenceId = nextTimeSequenceId
@@ -254,96 +170,23 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		return nil, errs.ErrOperationFailed
 	}
 
-	transactionIds := make([]int64, len(transactions))
-	accountIds := make([]int64, 0, len(transactions)*2)
-	categoryIds := make([]int64, 0, len(transactions))
-
-	for i := 0; i < len(transactions); i++ {
-		transactionId := transactions[i].TransactionId
-
-		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transactionId = transactions[i].RelatedId
-		}
-
-		transactionIds[i] = transactionId
-		accountIds = append(accountIds, transactions[i].AccountId)
-
-		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			accountIds = append(accountIds, transactions[i].RelatedAccountId)
-		}
-
-		categoryIds = append(categoryIds, transactions[i].CategoryId)
-	}
-
-	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
+	totalCount, err := a.transactions.GetMonthTransactionCount(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, transactionListReq.AccountId, transactionListReq.Keyword, utcOffset)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transaction count in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
-	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
-
-	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
+	transactionResult, err := a.getTransactionListResult(c, user, transactions, utcOffset, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	var categoryMap map[int64]*models.TransactionCategory
-	var tagMap map[int64]*models.TransactionTag
-
-	if !transactionListReq.TrimCategory {
-		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(uid, utils.ToUniqueInt64Slice(categoryIds))
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, errs.ErrOperationFailed
-		}
-	}
-
-	if !transactionListReq.TrimTag {
-		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, errs.ErrOperationFailed
-		}
-	}
-
-	transactionResps := make([]*models.TransactionInfoResponse, len(transactions))
-
-	for i := 0; i < len(transactions); i++ {
-		transaction := transactions[i]
-
-		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
-		}
-
-		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
-		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-		transactionResps[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
-
-		if !transactionListReq.TrimAccount {
-			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
-				transactionResps[i].SourceAccount = sourceAccount.ToAccountInfoResponse()
-			}
-
-			if destinationAccount := allAccounts[transaction.RelatedAccountId]; destinationAccount != nil {
-				transactionResps[i].DestinationAccount = destinationAccount.ToAccountInfoResponse()
-			}
-		}
-
-		if !transactionListReq.TrimCategory {
-			if category := categoryMap[transaction.CategoryId]; category != nil {
-				transactionResps[i].Category = category.ToTransactionCategoryInfoResponse()
-			}
-		}
-
-		if !transactionListReq.TrimTag {
-			transactionResps[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
-		}
+	transactionResps := &models.TransactionInfoPageWrapperResponse2{
+		Items:      transactionResult,
+		TotalCount: totalCount,
 	}
 
 	return transactionResps, nil
@@ -775,6 +618,105 @@ func (a *TransactionsApi) getTransactionTagInfoResponses(tagIds []int64, allTran
 	}
 
 	return allTags
+}
+
+func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models.User, transactions []*models.Transaction, utcOffset int16, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
+	uid := user.Uid
+	transactionIds := make([]int64, len(transactions))
+	accountIds := make([]int64, 0, len(transactions)*2)
+	categoryIds := make([]int64, 0, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transactionId := transactions[i].TransactionId
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transactionId = transactions[i].RelatedId
+		}
+
+		transactionIds[i] = transactionId
+		accountIds = append(accountIds, transactions[i].AccountId)
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			accountIds = append(accountIds, transactions[i].RelatedAccountId)
+		}
+
+		categoryIds = append(categoryIds, transactions[i].CategoryId)
+	}
+
+	allAccounts, err := a.accounts.GetAccountsByAccountIds(uid, utils.ToUniqueInt64Slice(accountIds))
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, err
+	}
+
+	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
+
+	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(uid, transactionIds)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, err
+	}
+
+	var categoryMap map[int64]*models.TransactionCategory
+	var tagMap map[int64]*models.TransactionTag
+
+	if !trimCategory {
+		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(uid, utils.ToUniqueInt64Slice(categoryIds))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, err
+		}
+	}
+
+	if !trimTag {
+		tagMap, err = a.transactionTags.GetTagsByTagIds(uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, err
+		}
+	}
+
+	result := make(models.TransactionInfoResponseSlice, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+		}
+
+		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
+		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+		result[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
+
+		if !trimAccount {
+			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
+				result[i].SourceAccount = sourceAccount.ToAccountInfoResponse()
+			}
+
+			if destinationAccount := allAccounts[transaction.RelatedAccountId]; destinationAccount != nil {
+				result[i].DestinationAccount = destinationAccount.ToAccountInfoResponse()
+			}
+		}
+
+		if !trimCategory {
+			if category := categoryMap[transaction.CategoryId]; category != nil {
+				result[i].Category = category.ToTransactionCategoryInfoResponse()
+			}
+		}
+
+		if !trimTag {
+			result[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
+		}
+	}
+
+	sort.Sort(result)
+
+	return result, nil
 }
 
 func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest) *models.Transaction {

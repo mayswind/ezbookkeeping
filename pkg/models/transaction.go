@@ -155,13 +155,19 @@ type TransactionInfoResponse struct {
 
 // TransactionCountResponse represents transaction count response
 type TransactionCountResponse struct {
-	Count      int64           `json:"count"`
+	Count int64 `json:"count"`
 }
 
 // TransactionInfoPageWrapperResponse represents a response of transaction which contains items and next id
 type TransactionInfoPageWrapperResponse struct {
 	Items              TransactionInfoResponseSlice `json:"items"`
 	NextTimeSequenceId *int64                       `json:"nextTimeSequenceId,string"`
+}
+
+// TransactionInfoPageWrapperResponse2 represents a response of transaction which contains items and count
+type TransactionInfoPageWrapperResponse2 struct {
+	Items      TransactionInfoResponseSlice `json:"items"`
+	TotalCount int64                        `json:"total_count"`
 }
 
 // IsEditable returns whether this transaction can be edited

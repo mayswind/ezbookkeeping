@@ -141,6 +141,26 @@ func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
 	return s.GetTransactionCount(uid, 0, 0, 0, nil, 0, "")
 }
 
+// GetMonthTransactionCount returns total count of transactions in given year and month
+func (s *TransactionService) GetMonthTransactionCount(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, utcOffset int16) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month), utcOffset)
+
+	if err != nil {
+		return 0, errs.ErrSystemError
+	}
+
+	endTime := startTime.AddDate(0, 1, 0)
+
+	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
+	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
+
+	return s.GetTransactionCount(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword)
+}
+
 // GetTransactionCount returns count of transactions
 func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string) (int64, error) {
 	if uid <= 0 {
@@ -149,26 +169,6 @@ func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime i
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, true)
 	return s.UserDataDB(uid).Where(condition, conditionParams...).Count(&models.Transaction{})
-}
-
-// GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(uid int64, year int64, month int64, utcOffset int16) (int64, error) {
-	if uid <= 0 {
-		return 0, errs.ErrUserIdInvalid
-	}
-
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%d-01 00:00:00", year, month), utcOffset)
-
-	if err != nil {
-		return 0, errs.ErrSystemError
-	}
-
-	endTime := startTime.AddDate(0, 1, 0)
-
-	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
-	endTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix())
-
-	return s.UserDataDB(uid).Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<?", uid, false, startTransactionTime, endTransactionTime).Count(&models.Transaction{})
 }
 
 // CreateTransaction saves a new transaction to database

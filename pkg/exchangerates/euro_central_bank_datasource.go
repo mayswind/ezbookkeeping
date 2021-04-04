@@ -8,8 +8,8 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/validators"
 	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/lab/pkg/validators"
 )
 
 const euroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"

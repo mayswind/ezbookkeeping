@@ -1019,8 +1019,8 @@ func (s *TransactionService) GetAccountsMonthTotalIncomeAndExpense(uid int64, st
 
 		if !exists {
 			monthAccountAmount = &models.TransactionAccountAmount{
-				AccountId: transaction.AccountId,
-				TotalIncomeAmount: 0,
+				AccountId:          transaction.AccountId,
+				TotalIncomeAmount:  0,
 				TotalExpenseAmount: 0,
 			}
 			monthAccountsAmounts[transaction.AccountId] = monthAccountAmount

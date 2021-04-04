@@ -41,11 +41,11 @@ func TestEuroCentralBankDataSource_StandardDataExtractExchangeRates(t *testing.T
 	assert.Equal(t, nil, err)
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "USD",
-		Rate: "1.1746",
+		Rate:     "1.1746",
 	})
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "CNY",
-		Rate: "7.7195",
+		Rate:     "7.7195",
 	})
 }
 
@@ -75,8 +75,8 @@ func TestEuroCentralBankDataSource_EmptyEnvelopeContent(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">" +
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
 		"</gesmes:Envelope>"))
 	assert.NotEqual(t, nil, err)
 }
@@ -87,10 +87,10 @@ func TestEuroCentralBankDataSource_EmptyCubeContent(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">" +
-		"<Cube>" +
-		"</Cube>" +
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
+		"<Cube>"+
+		"</Cube>"+
 		"</gesmes:Envelope>"))
 	assert.NotEqual(t, nil, err)
 }
@@ -101,13 +101,13 @@ func TestEuroCentralBankDataSource_InvalidCurrency(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">" +
-		"<Cube>" +
-		"<Cube time=\"2021-04-01\">" +
-		"<Cube currency=\"XXX\" rate=\"1\" />" +
-		"</Cube>" +
-		"</Cube>" +
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
+		"<Cube>"+
+		"<Cube time=\"2021-04-01\">"+
+		"<Cube currency=\"XXX\" rate=\"1\" />"+
+		"</Cube>"+
+		"</Cube>"+
 		"</gesmes:Envelope>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
@@ -119,13 +119,13 @@ func TestEuroCentralBankDataSource_EmptyRate(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">" +
-		"<Cube>" +
-		"<Cube time=\"2021-04-01\">" +
-		"<Cube currency=\"USD\" rate=\"\" />" +
-		"</Cube>" +
-		"</Cube>" +
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
+		"<Cube>"+
+		"<Cube time=\"2021-04-01\">"+
+		"<Cube currency=\"USD\" rate=\"\" />"+
+		"</Cube>"+
+		"</Cube>"+
 		"</gesmes:Envelope>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
@@ -137,13 +137,13 @@ func TestEuroCentralBankDataSource_InvalidRate(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">" +
-		"<Cube>" +
-		"<Cube time=\"2021-04-01\">" +
-		"<Cube currency=\"USD\" rate=\"null\" />" +
-		"</Cube>" +
-		"</Cube>" +
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
+		"<Cube>"+
+		"<Cube time=\"2021-04-01\">"+
+		"<Cube currency=\"USD\" rate=\"null\" />"+
+		"</Cube>"+
+		"</Cube>"+
 		"</gesmes:Envelope>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)

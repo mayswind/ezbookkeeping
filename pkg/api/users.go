@@ -132,8 +132,8 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 	anythingUpdate := false
 	userNew := &models.User{
-		Uid:   user.Uid,
-		Salt:  user.Salt,
+		Uid:  user.Uid,
+		Salt: user.Salt,
 	}
 
 	if userUpdateReq.Email != "" && userUpdateReq.Email != user.Email {

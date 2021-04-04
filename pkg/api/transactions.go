@@ -395,8 +395,8 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 
 			if !exists {
 				monthTotalAmount = &models.TransactionAmountsResponseItemAmountInfo{
-					Currency: account.Currency,
-					IncomeAmount: 0,
+					Currency:      account.Currency,
+					IncomeAmount:  0,
 					ExpenseAmount: 0,
 				}
 			}
@@ -433,8 +433,8 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 		}
 
 		amountsResp = append(amountsResp, &models.TransactionMonthAmountsResponseItem{
-			Year: year,
-			Month: month,
+			Year:    year,
+			Month:   month,
 			Amounts: amounts,
 		})
 	}

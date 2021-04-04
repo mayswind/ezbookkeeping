@@ -6,16 +6,6 @@ import (
 	"github.com/mayswind/lab/pkg/utils"
 )
 
-// UserType represents user type
-type UserType byte
-
-// User types
-const (
-	USER_TYPE_NORMAL      UserType = 0
-	USER_TYPE_ADMIN       UserType = 63
-	USER_TYPE_SUPER_ADMIN UserType = 127
-)
-
 // WeekDay represents week day
 type WeekDay byte
 
@@ -54,12 +44,9 @@ type User struct {
 	Nickname             string               `xorm:"VARCHAR(64) NOT NULL"`
 	Password             string               `xorm:"VARCHAR(64) NOT NULL"`
 	Salt                 string               `xorm:"VARCHAR(10) NOT NULL"`
-	Rands                string               `xorm:"VARCHAR(10) NOT NULL"`
-	Type                 UserType             `xorm:"TINYINT NOT NULL"`
 	DefaultCurrency      string               `xorm:"VARCHAR(3) NOT NULL"`
 	FirstDayOfWeek       WeekDay              `xorm:"TINYINT NOT NULL"`
 	TransactionEditScope TransactionEditScope `xorm:"TINYINT NOT NULL"`
-	IsAdmin              bool                 `xorm:"NOT NULL"`
 	Deleted              bool                 `xorm:"NOT NULL"`
 	EmailVerified        bool                 `xorm:"NOT NULL"`
 	CreatedUnixTime      int64
@@ -116,7 +103,6 @@ type UserProfileResponse struct {
 	Username             string               `json:"username"`
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
-	Type                 UserType             `json:"type"`
 	DefaultCurrency      string               `json:"defaultCurrency"`
 	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
@@ -183,7 +169,6 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
-		Type:                 u.Type,
 		DefaultCurrency:      u.DefaultCurrency,
 		FirstDayOfWeek:       u.FirstDayOfWeek,
 		TransactionEditScope: u.TransactionEditScope,

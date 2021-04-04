@@ -134,10 +134,6 @@ func (s *UserService) CreateUser(user *models.User) error {
 		return err
 	}
 
-	if user.Rands, err = utils.GetRandomString(10); err != nil {
-		return err
-	}
-
 	user.Uid = s.GenerateUuid(uuid.UUID_TYPE_USER)
 	user.Password = utils.EncodePassword(user.Password, user.Salt)
 

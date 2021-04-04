@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
+	"github.com/mayswind/lab/pkg/validators"
 )
 
 const pageCountForGettingTransactions = 1000
@@ -38,6 +39,60 @@ var (
 		tokens:       services.Tokens,
 	}
 )
+
+// AddNewUser adds a new user according to specified info
+func (a *UserDataCli) AddNewUser(c *cli.Context, username string, email string, nickname string, password string, defaultCurrency string) (*models.User, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.AddNewUser] user name is empty")
+		return nil, errs.ErrUsernameIsEmpty
+	}
+
+	if email == "" {
+		log.BootErrorf("[user_data.AddNewUser] user email is empty")
+		return nil, errs.ErrEmailIsEmpty
+	}
+
+	if nickname == "" {
+		log.BootErrorf("[user_data.AddNewUser] user nickname is empty")
+		return nil, errs.ErrNicknameIsEmpty
+	}
+
+	if password == "" {
+		log.BootErrorf("[user_data.AddNewUser] user password is empty")
+		return nil, errs.ErrPasswordIsEmpty
+	}
+
+	if defaultCurrency == "" {
+		log.BootErrorf("[user_data.AddNewUser] user default currency is empty")
+		return nil, errs.ErrUserDefaultCurrencyIsEmpty
+	}
+
+	if _, ok := validators.AllCurrencyNames[defaultCurrency]; !ok {
+		log.BootErrorf("[user_data.AddNewUser] user default currency is invalid")
+		return nil, errs.ErrUserDefaultCurrencyIsInvalid
+	}
+
+	user := &models.User{
+		Username:             username,
+		Email:                email,
+		Nickname:             nickname,
+		Password:             password,
+		DefaultCurrency:      defaultCurrency,
+		FirstDayOfWeek:       models.WEEKDAY_SUNDAY,
+		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
+	}
+
+	err := a.users.CreateUser(user)
+
+	if err != nil {
+		log.BootErrorf("[user_data.AddNewUser] failed to create user \"%s\", because %s", user.Username, err.Error())
+		return nil, err
+	}
+
+	log.BootInfof( "[user_data.AddNewUser] user \"%s\" has add successfully, uid is %d", user.Username, user.Uid)
+
+	return user, nil
+}
 
 // GetUserByUsername returns user by user name
 func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*models.User, error) {

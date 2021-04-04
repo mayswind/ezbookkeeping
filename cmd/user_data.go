@@ -16,6 +16,38 @@ var UserData = &cli.Command{
 	Usage: "lab user data maintenance",
 	Subcommands: []*cli.Command{
 		{
+			Name:   "user-add",
+			Usage:  "Add new user",
+			Action: addNewUser,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "username",
+					Aliases: []string{"n"},
+					Usage:   "New user name",
+				},
+				&cli.StringFlag{
+					Name:    "email",
+					Aliases: []string{"m"},
+					Usage:   "New user email",
+				},
+				&cli.StringFlag{
+					Name:    "nickname",
+					Aliases: []string{"i"},
+					Usage:   "New user nickname",
+				},
+				&cli.StringFlag{
+					Name:    "password",
+					Aliases: []string{"p"},
+					Usage:   "New user password",
+				},
+				&cli.StringFlag{
+					Name:    "default-currency",
+					Aliases: []string{"c"},
+					Usage:   "New user default currency",
+				},
+			},
+		},
+		{
 			Name:   "user-get",
 			Usage:  "Get specified user info",
 			Action: getUserInfo,
@@ -86,6 +118,31 @@ var UserData = &cli.Command{
 			},
 		},
 	},
+}
+
+func addNewUser(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	userName := c.String("username")
+	email := c.String("email")
+	nickname := c.String("nickname")
+	password := c.String("password")
+	defaultCurrency := c.String("default-currency")
+
+	user, err := clis.UserData.AddNewUser(c, userName, email, nickname, password, defaultCurrency)
+
+	if err != nil {
+		log.BootErrorf("[user_data.addNewUser] error occurs when adding new user")
+		return err
+	}
+
+	utils.PrintObjectFields(user)
+
+	return nil
 }
 
 func getUserInfo(c *cli.Context) error {

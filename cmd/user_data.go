@@ -28,6 +28,18 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-delete",
+			Usage:  "Delete specified user",
+			Action: deleteUser,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "username",
+					Aliases: []string{"n"},
+					Usage:   "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "transaction-check",
 			Usage:  "Check whether user all transactions and accounts are correct",
 			Action: checkUserTransactionAndAccount,
@@ -75,6 +87,26 @@ func getUserInfo(c *cli.Context) error {
 	}
 
 	utils.PrintObjectFields(user)
+
+	return nil
+}
+
+func deleteUser(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	userName := c.String("username")
+	err = clis.UserData.DeleteUser(c, userName)
+
+	if err != nil {
+		log.BootErrorf("[user_data.deleteUser] error occurs when deleting user")
+		return err
+	}
+
+	log.BootInfof("[user_data.deleteUser] user \"%s\" has been deleted", userName)
 
 	return nil
 }

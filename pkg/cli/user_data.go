@@ -54,6 +54,23 @@ func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*model
 	return user, nil
 }
 
+// DeleteUser deletes user according to the specified user name
+func (a *UserDataCli) DeleteUser(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.DeleteUser] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := a.users.DeleteUser(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DeleteUser] failed to delete user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // CheckTransactionAndAccount checks whether all user transactions and all user accounts are correct
 func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (bool, error) {
 	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)

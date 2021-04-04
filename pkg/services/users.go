@@ -232,6 +232,29 @@ func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
 	})
 }
 
+// DeleteUser deletes an existed user from database
+func (s *UserService) DeleteUser(username string) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	deletedRows, err := s.UserDB().Cols("deleted", "deleted_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if deletedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
 // ExistsUsername returns whether the given user name exists
 func (s *UserService) ExistsUsername(username string) (bool, error) {
 	if username == "" {

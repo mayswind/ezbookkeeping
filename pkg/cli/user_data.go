@@ -176,6 +176,31 @@ func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 	return nil
 }
 
+// ClearUserTokens clears all tokens of the specified user
+func (l *UserDataCli) ClearUserTokens(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.ClearUserTokens] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ClearUserTokens] error occurs when getting user id by user name")
+		return  err
+	}
+
+	now := time.Now().Unix()
+	err = l.tokens.DeleteTokensBeforeTime(uid, now)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ClearUserTokens] failed to delete tokens of user \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // CheckTransactionAndAccount checks whether all user transactions and all user accounts are correct
 func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string) (bool, error) {
 	if username == "" {

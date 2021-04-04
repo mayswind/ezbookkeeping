@@ -89,6 +89,18 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-token-clear",
+			Usage:  "Clear user all tokens",
+			Action: clearUserTokens,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "username",
+					Aliases: []string{"n"},
+					Usage:   "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "transaction-check",
 			Usage:  "Check whether user all transactions and accounts are correct",
 			Action: checkUserTransactionAndAccount,
@@ -202,6 +214,26 @@ func deleteUser(c *cli.Context) error {
 	}
 
 	log.BootInfof("[user_data.deleteUser] user \"%s\" has been deleted", username)
+
+	return nil
+}
+
+func clearUserTokens(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	err = clis.UserData.ClearUserTokens(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.clearUserTokens] error occurs when clearing user tokens")
+		return err
+	}
+
+	log.BootInfof("[user_data.clearUserTokens] all tokens of user \"%s\" has been cleared", username)
 
 	return nil
 }

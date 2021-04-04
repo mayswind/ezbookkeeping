@@ -282,7 +282,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 			account, exists := accountMap[accountId]
 
 			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
 				continue
 			}
 
@@ -304,7 +304,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 			account, exists := accountMap[accountId]
 
 			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
 				continue
 			}
 
@@ -380,7 +380,7 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 			account, exists := accountMap[accountId]
 
 			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\", because %s", accountId, uid)
+				log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
 				continue
 			}
 
@@ -415,14 +415,14 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 		year, err := utils.StringToInt32(yearMonthItems[0])
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get year from year-month item \"%s\" for user \"uid:%d\", because %s", yearMonth, uid)
+			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get year from year-month item \"%s\" for user \"uid:%d\"", yearMonth, uid)
 			continue
 		}
 
 		month, err := utils.StringToInt32(yearMonthItems[1])
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get month from year-month item \"%s\" for user \"uid:%d\", because %s", yearMonth, uid)
+			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get month from year-month item \"%s\" for user \"uid:%d\"", yearMonth, uid)
 			continue
 		}
 

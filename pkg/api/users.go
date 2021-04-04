@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/services"
 	"github.com/mayswind/lab/pkg/settings"
+	"github.com/mayswind/lab/pkg/validators"
 )
 
 // UsersApi represents user api
@@ -38,6 +39,11 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	if err != nil {
 		log.WarnfWithRequestId(c, "[users.UserRegisterHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	if userRegisterReq.DefaultCurrency == validators.ParentAccountCurrencyPlaceholder {
+		log.WarnfWithRequestId(c, "[users.UserRegisterHandler] user default currency is invalid")
+		return nil, errs.ErrUserDefaultCurrencyIsInvalid
 	}
 
 	userRegisterReq.Username = strings.TrimSpace(userRegisterReq.Username)

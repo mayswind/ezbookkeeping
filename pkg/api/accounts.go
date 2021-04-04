@@ -141,6 +141,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub accounts")
 			return nil, errs.ErrAccountCannotHaveSubAccounts
 		}
+
+		if accountCreateReq.Currency == validators.ParentAccountCurrencyPlaceholder {
+			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot set currency placeholder")
+			return nil, errs.ErrAccountCurrencyInvalid
+		}
 	} else if accountCreateReq.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		if len(accountCreateReq.SubAccounts) < 1 {
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account does not have any sub accounts")
@@ -168,6 +173,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 			if subAccount.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub account type invalid")
 				return nil, errs.ErrSubAccountTypeInvalid
+			}
+
+			if subAccount.Currency == validators.ParentAccountCurrencyPlaceholder {
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub account cannot set currency placeholder")
+				return nil, errs.ErrAccountCurrencyInvalid
 			}
 		}
 	} else {

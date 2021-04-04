@@ -127,13 +127,13 @@ func addNewUser(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
+	username := c.String("username")
 	email := c.String("email")
 	nickname := c.String("nickname")
 	password := c.String("password")
 	defaultCurrency := c.String("default-currency")
 
-	user, err := clis.UserData.AddNewUser(c, userName, email, nickname, password, defaultCurrency)
+	user, err := clis.UserData.AddNewUser(c, username, email, nickname, password, defaultCurrency)
 
 	if err != nil {
 		log.BootErrorf("[user_data.addNewUser] error occurs when adding new user")
@@ -152,8 +152,8 @@ func getUserInfo(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
-	user, err := clis.UserData.GetUserByUsername(c, userName)
+	username := c.String("username")
+	user, err := clis.UserData.GetUserByUsername(c, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserInfo] error occurs when getting user data")
@@ -172,16 +172,16 @@ func modifyUserPassword(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
+	username := c.String("username")
 	password := c.String("password")
-	err = clis.UserData.ModifyUserPassword(c, userName, password)
+	err = clis.UserData.ModifyUserPassword(c, username, password)
 
 	if err != nil {
 		log.BootErrorf("[user_data.modifyUserPassword] error occurs when modifying user password")
 		return err
 	}
 
-	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", userName)
+	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
 
 	return nil
 }
@@ -193,15 +193,15 @@ func deleteUser(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
-	err = clis.UserData.DeleteUser(c, userName)
+	username := c.String("username")
+	err = clis.UserData.DeleteUser(c, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.deleteUser] error occurs when deleting user")
 		return err
 	}
 
-	log.BootInfof("[user_data.deleteUser] user \"%s\" has been deleted", userName)
+	log.BootInfof("[user_data.deleteUser] user \"%s\" has been deleted", username)
 
 	return nil
 }
@@ -213,17 +213,11 @@ func checkUserTransactionAndAccount(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
-	uid, err := clis.UserData.GetUserIdByUsername(c, userName)
+	username := c.String("username")
 
-	if err != nil {
-		log.BootErrorf("[user_data.checkUserTransactionAndAccount] error occurs when getting user id by user name")
-		return err
-	}
+	log.BootInfof("[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", username)
 
-	log.BootInfof("[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", userName)
-
-	_, err = clis.UserData.CheckTransactionAndAccount(c, uid)
+	_, err = clis.UserData.CheckTransactionAndAccount(c, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
@@ -242,14 +236,7 @@ func exportUserTransaction(c *cli.Context) error {
 		return err
 	}
 
-	userName := c.String("username")
-	uid, err := clis.UserData.GetUserIdByUsername(c, userName)
-
-	if err != nil {
-		log.BootErrorf("[user_data.exportUserTransaction] error occurs when getting user id by user name")
-		return err
-	}
-
+	username := c.String("username")
 	filePath := c.String("file")
 
 	if filePath == "" {
@@ -264,9 +251,9 @@ func exportUserTransaction(c *cli.Context) error {
 		return os.ErrExist
 	}
 
-	log.BootInfof("[user_data.exportUserTransaction] starting exporting user \"%s\" data", userName)
+	log.BootInfof("[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
 
-	content, err := clis.UserData.ExportTransaction(c, uid)
+	content, err := clis.UserData.ExportTransaction(c, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.exportUserTransaction] error occurs when exporting user data")

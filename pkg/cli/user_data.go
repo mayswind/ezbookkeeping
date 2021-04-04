@@ -41,7 +41,7 @@ var (
 )
 
 // AddNewUser adds a new user according to specified info
-func (a *UserDataCli) AddNewUser(c *cli.Context, username string, email string, nickname string, password string, defaultCurrency string) (*models.User, error) {
+func (l *UserDataCli) AddNewUser(c *cli.Context, username string, email string, nickname string, password string, defaultCurrency string) (*models.User, error) {
 	if username == "" {
 		log.BootErrorf("[user_data.AddNewUser] user name is empty")
 		return nil, errs.ErrUsernameIsEmpty
@@ -82,7 +82,7 @@ func (a *UserDataCli) AddNewUser(c *cli.Context, username string, email string, 
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 	}
 
-	err := a.users.CreateUser(user)
+	err := l.users.CreateUser(user)
 
 	if err != nil {
 		log.BootErrorf("[user_data.AddNewUser] failed to create user \"%s\", because %s", user.Username, err.Error())
@@ -95,13 +95,13 @@ func (a *UserDataCli) AddNewUser(c *cli.Context, username string, email string, 
 }
 
 // GetUserByUsername returns user by user name
-func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*models.User, error) {
+func (l *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*models.User, error) {
 	if username == "" {
 		log.BootErrorf("[user_data.GetUserByUsername] user name is empty")
 		return nil, errs.ErrUsernameIsEmpty
 	}
 
-	user, err := a.users.GetUserByUsername(username)
+	user, err := l.users.GetUserByUsername(username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.GetUserByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())
@@ -112,7 +112,7 @@ func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*model
 }
 
 // ModifyUserPassword modifies user password
-func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, password string) error {
+func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, password string) error {
 	if username == "" {
 		log.BootErrorf("[user_data.ModifyUserPassword] user name is empty")
 		return errs.ErrUsernameIsEmpty
@@ -123,14 +123,14 @@ func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 		return errs.ErrPasswordIsEmpty
 	}
 
-	user, err := a.users.GetUserByUsername(username)
+	user, err := l.users.GetUserByUsername(username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ModifyUserPassword] failed to get user by user name \"%s\", because %s", username, err.Error())
 		return err
 	}
 
-	if a.users.IsPasswordEqualsUserPassword(password, user) {
+	if l.users.IsPasswordEqualsUserPassword(password, user) {
 		return errs.ErrNothingWillBeUpdated
 	}
 
@@ -140,7 +140,7 @@ func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 		Password: password,
 	}
 
-	_, err = a.users.UpdateUser(userNew)
+	_, err = l.users.UpdateUser(userNew)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ModifyUserPassword] failed to update user \"%s\" password, because %s", user.Username, err.Error())
@@ -148,7 +148,7 @@ func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 	}
 
 	now := time.Now().Unix()
-	err = a.tokens.DeleteTokensBeforeTime(user.Uid, now)
+	err = l.tokens.DeleteTokensBeforeTime(user.Uid, now)
 
 	if err == nil {
 		log.BootInfof("[user_data.ModifyUserPassword] revoke old tokens before unix time \"%d\" for user \"%s\"", now, user.Username)
@@ -160,13 +160,13 @@ func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 }
 
 // DeleteUser deletes user according to the specified user name
-func (a *UserDataCli) DeleteUser(c *cli.Context, username string) error {
+func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 	if username == "" {
 		log.BootErrorf("[user_data.DeleteUser] user name is empty")
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := a.users.DeleteUser(username)
+	err := l.users.DeleteUser(username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DeleteUser] failed to delete user by user name \"%s\", because %s", username, err.Error())
@@ -177,8 +177,20 @@ func (a *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 }
 
 // CheckTransactionAndAccount checks whether all user transactions and all user accounts are correct
-func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (bool, error) {
-	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)
+func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string) (bool, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] user name is empty")
+		return false, errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] error occurs when getting user id by user name")
+		return false, err
+	}
+
+	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
@@ -193,38 +205,38 @@ func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (boo
 		}
 	}
 
-	allTransactions, err := a.transactions.GetAllTransactions(uid, pageCountForGettingTransactions, false)
+	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForGettingTransactions, false)
 
 	if err != nil {
 		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
 		return false, err
 	}
 
-	transactionMap := a.transactions.GetTransactionMapByList(allTransactions)
+	transactionMap := l.transactions.GetTransactionMapByList(allTransactions)
 	accountBalance := make(map[int64]int64)
 
 	for i := len(allTransactions) - 1; i >= 0; i-- {
 		transaction := allTransactions[i]
 
-		err := a.checkTransactionAccount(c, transaction, accountMap, accountHasChild)
+		err := l.checkTransactionAccount(c, transaction, accountMap, accountHasChild)
 
 		if err != nil {
 			return false, err
 		}
 
-		err = a.checkTransactionCategory(c, transaction, categoryMap)
+		err = l.checkTransactionCategory(c, transaction, categoryMap)
 
 		if err != nil {
 			return false, err
 		}
 
-		err = a.checkTransactionTag(c, transaction.TransactionId, tagIndexs, tagMap)
+		err = l.checkTransactionTag(c, transaction.TransactionId, tagIndexs, tagMap)
 
 		if err != nil {
 			return false, err
 		}
 
-		err = a.checkTransactionRelatedTransaction(c, transaction, transactionMap, accountMap)
+		err = l.checkTransactionRelatedTransaction(c, transaction, transactionMap, accountMap)
 
 		if err != nil {
 			return false, err
@@ -285,22 +297,34 @@ func (a *UserDataCli) CheckTransactionAndAccount(c *cli.Context, uid int64) (boo
 }
 
 // ExportTransaction returns csv file content according user all transactions
-func (a *UserDataCli) ExportTransaction(c *cli.Context, uid int64) ([]byte, error) {
-	accountMap, categoryMap, tagMap, tagIndexs, err := a.getUserEssentialData(uid)
+func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.ExportTransaction] user name is empty")
+		return nil, errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ExportTransaction] error occurs when getting user id by user name")
+		return nil, err
+	}
+
+	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, err
 	}
 
-	allTransactions, err := a.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
+	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, err
 	}
 
-	result, err := a.csvExporter.GetOutputContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := l.csvExporter.GetOutputContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
@@ -310,52 +334,51 @@ func (a *UserDataCli) ExportTransaction(c *cli.Context, uid int64) ([]byte, erro
 	return result, nil
 }
 
-// GetUserIdByUsername returns user id by user name
-func (a *UserDataCli) GetUserIdByUsername(c *cli.Context, username string) (int64, error) {
-	user, err := a.GetUserByUsername(c, username)
+func (l *UserDataCli) getUserIdByUsername(c *cli.Context, username string) (int64, error) {
+	user, err := l.GetUserByUsername(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.GetUserIdByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())
+		log.BootErrorf("[user_data.getUserIdByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())
 		return 0, err
 	}
 
 	return user.Uid, nil
 }
 
-func (a *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
+func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
 	if uid <= 0 {
 		log.BootErrorf("[user_data.getUserEssentialData] user uid \"%d\" is invalid", uid)
 		return nil, nil, nil, nil, errs.ErrUserIdInvalid
 	}
 
-	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+	accounts, err := l.accounts.GetAllAccountsByUid(uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
-	accountMap = a.accounts.GetAccountMapByList(accounts)
+	accountMap = l.accounts.GetAccountMapByList(accounts)
 
-	categories, err := a.categories.GetAllCategoriesByUid(uid, 0, -1)
+	categories, err := l.categories.GetAllCategoriesByUid(uid, 0, -1)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
-	categoryMap = a.categories.GetCategoryMapByList(categories)
+	categoryMap = l.categories.GetCategoryMapByList(categories)
 
-	tags, err := a.tags.GetAllTagsByUid(uid)
+	tags, err := l.tags.GetAllTagsByUid(uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
-	tagMap = a.tags.GetTagMapByList(tags)
+	tagMap = l.tags.GetTagMapByList(tags)
 
-	tagIndexs, err = a.tags.GetAllTagIdsOfAllTransactions(uid)
+	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
@@ -365,7 +388,7 @@ func (a *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*mod
 	return accountMap, categoryMap, tagMap, tagIndexs, nil
 }
 
-func (a *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {
+func (l *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {
 	account, exists := accountMap[transaction.AccountId]
 
 	if !exists {
@@ -395,7 +418,7 @@ func (a *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *model
 	return nil
 }
 
-func (a *UserDataCli) checkTransactionCategory(c *cli.Context, transaction *models.Transaction, categoryMap map[int64]*models.TransactionCategory) error {
+func (l *UserDataCli) checkTransactionCategory(c *cli.Context, transaction *models.Transaction, categoryMap map[int64]*models.TransactionCategory) error {
 	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		if transaction.CategoryId > 0 {
 			log.BootErrorf("[user_data.checkTransactionCategory] transaction \"id:%d\" is balance modification transaction, but has category \"id:%d\"", transaction.TransactionId, transaction.CategoryId)
@@ -420,7 +443,7 @@ func (a *UserDataCli) checkTransactionCategory(c *cli.Context, transaction *mode
 	return nil
 }
 
-func (a *UserDataCli) checkTransactionTag(c *cli.Context, transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) error {
+func (l *UserDataCli) checkTransactionTag(c *cli.Context, transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) error {
 	tagIndexs, exists := allTagIndexs[transactionId]
 
 	if !exists {
@@ -440,7 +463,7 @@ func (a *UserDataCli) checkTransactionTag(c *cli.Context, transactionId int64, a
 	return nil
 }
 
-func (a *UserDataCli) checkTransactionRelatedTransaction(c *cli.Context, transaction *models.Transaction, transactionMap map[int64]*models.Transaction, accountMap map[int64]*models.Account) error {
+func (l *UserDataCli) checkTransactionRelatedTransaction(c *cli.Context, transaction *models.Transaction, transactionMap map[int64]*models.Transaction, accountMap map[int64]*models.Account) error {
 	if transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT && transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 		return nil
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/lab/pkg/errs"
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
+	"github.com/mayswind/lab/pkg/utils"
 	"github.com/mayswind/lab/pkg/validators"
 )
 
@@ -84,6 +85,10 @@ func (e *ReserveBankOfAustraliaData) ToLatestExchangeRateResponse(c *core.Contex
 		}
 
 		if _, exists := validators.AllCurrencyNames[item.Statistics.ExchangeRate.TargetCurrency]; !exists {
+			continue
+		}
+
+		if _, err := utils.StringToFloat64(item.Statistics.ExchangeRate.Observation.Value); err != nil {
 			continue
 		}
 

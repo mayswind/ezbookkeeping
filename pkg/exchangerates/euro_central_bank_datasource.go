@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/lab/pkg/log"
 	"github.com/mayswind/lab/pkg/models"
 	"github.com/mayswind/lab/pkg/validators"
+	"github.com/mayswind/lab/pkg/utils"
 )
 
 const euroCentralBankExchangeRateUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
@@ -62,6 +63,10 @@ func (e *EuroCentralBankExchangeRateData) ToLatestExchangeRateResponse(c *core.C
 		exchangeRate := latestEuroCentralBankExchangeRate.ExchangeRates[i]
 
 		if _, exists := validators.AllCurrencyNames[exchangeRate.Currency]; !exists {
+			continue
+		}
+
+		if _, err := utils.StringToFloat64(exchangeRate.Rate); err != nil {
 			continue
 		}
 

@@ -28,6 +28,23 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-modify-password",
+			Usage:  "Modify user password",
+			Action: modifyUserPassword,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "username",
+					Aliases: []string{"n"},
+					Usage:   "Specific user name",
+				},
+				&cli.StringFlag{
+					Name:    "password",
+					Aliases: []string{"p"},
+					Usage:   "User new password",
+				},
+			},
+		},
+		{
 			Name:   "user-delete",
 			Usage:  "Delete specified user",
 			Action: deleteUser,
@@ -87,6 +104,27 @@ func getUserInfo(c *cli.Context) error {
 	}
 
 	utils.PrintObjectFields(user)
+
+	return nil
+}
+
+func modifyUserPassword(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	userName := c.String("username")
+	password := c.String("password")
+	err = clis.UserData.ModifyUserPassword(c, userName, password)
+
+	if err != nil {
+		log.BootErrorf("[user_data.modifyUserPassword] error occurs when modifying user password")
+		return err
+	}
+
+	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", userName)
 
 	return nil
 }

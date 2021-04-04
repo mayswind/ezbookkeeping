@@ -23,6 +23,7 @@ type UserDataCli struct {
 	categories   *services.TransactionCategoryService
 	tags         *services.TransactionTagService
 	users        *services.UserService
+	tokens       *services.TokenService
 }
 
 // Initialize an user data cli singleton instance
@@ -34,6 +35,7 @@ var (
 		users:        services.Users,
 		categories:   services.TransactionCategories,
 		tags:         services.TransactionTags,
+		tokens:       services.Tokens,
 	}
 )
 
@@ -52,6 +54,54 @@ func (a *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*model
 	}
 
 	return user, nil
+}
+
+// ModifyUserPassword modifies user password
+func (a *UserDataCli) ModifyUserPassword(c *cli.Context, username string, password string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.ModifyUserPassword] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	if password == "" {
+		log.BootErrorf("[user_data.ModifyUserPassword] user password is empty")
+		return errs.ErrPasswordIsEmpty
+	}
+
+	user, err := a.users.GetUserByUsername(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ModifyUserPassword] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if a.users.IsPasswordEqualsUserPassword(password, user) {
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	userNew := &models.User{
+		Uid:      user.Uid,
+		Salt:     user.Salt,
+		Password: password,
+	}
+
+	_, err = a.users.UpdateUser(userNew)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ModifyUserPassword] failed to update user \"%s\" password, because %s", user.Username, err.Error())
+		return err
+	}
+
+	now := time.Now().Unix()
+	err = a.tokens.DeleteTokensBeforeTime(user.Uid, now)
+
+	if err == nil {
+		log.BootInfof("[user_data.ModifyUserPassword] revoke old tokens before unix time \"%d\" for user \"%s\"", now, user.Username)
+	} else {
+		log.BootWarnf("[user_data.ModifyUserPassword] failed to revoke old tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
+	}
+
+	return nil
 }
 
 // DeleteUser deletes user according to the specified user name

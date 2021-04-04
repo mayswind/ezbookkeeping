@@ -18,25 +18,27 @@ const pageCountForDataExport = 1000
 
 // UserDataCli represents user data cli
 type UserDataCli struct {
-	csvExporter  *exporters.CSVFileExporter
-	accounts     *services.AccountService
-	transactions *services.TransactionService
-	categories   *services.TransactionCategoryService
-	tags         *services.TransactionTagService
-	users        *services.UserService
-	tokens       *services.TokenService
+	csvExporter             *exporters.CSVFileExporter
+	accounts                *services.AccountService
+	transactions            *services.TransactionService
+	categories              *services.TransactionCategoryService
+	tags                    *services.TransactionTagService
+	users                   *services.UserService
+	twoFactorAuthorizations *services.TwoFactorAuthorizationService
+	tokens                  *services.TokenService
 }
 
 // Initialize an user data cli singleton instance
 var (
 	UserData = &UserDataCli{
-		csvExporter:  &exporters.CSVFileExporter{},
-		accounts:     services.Accounts,
-		transactions: services.Transactions,
-		users:        services.Users,
-		categories:   services.TransactionCategories,
-		tags:         services.TransactionTags,
-		tokens:       services.Tokens,
+		csvExporter:             &exporters.CSVFileExporter{},
+		accounts:                services.Accounts,
+		transactions:            services.Transactions,
+		categories:              services.TransactionCategories,
+		tags:                    services.TransactionTags,
+		users:                   services.Users,
+		twoFactorAuthorizations: services.TwoFactorAuthorizations,
+		tokens:                  services.Tokens,
 	}
 )
 
@@ -89,7 +91,7 @@ func (l *UserDataCli) AddNewUser(c *cli.Context, username string, email string, 
 		return nil, err
 	}
 
-	log.BootInfof( "[user_data.AddNewUser] user \"%s\" has add successfully, uid is %d", user.Username, user.Uid)
+	log.BootInfof("[user_data.AddNewUser] user \"%s\" has add successfully, uid is %d", user.Username, user.Uid)
 
 	return user, nil
 }
@@ -187,7 +189,7 @@ func (l *UserDataCli) ClearUserTokens(c *cli.Context, username string) error {
 
 	if err != nil {
 		log.BootErrorf("[user_data.ClearUserTokens] error occurs when getting user id by user name")
-		return  err
+		return err
 	}
 
 	now := time.Now().Unix()
@@ -195,6 +197,48 @@ func (l *UserDataCli) ClearUserTokens(c *cli.Context, username string) error {
 
 	if err != nil {
 		log.BootErrorf("[user_data.ClearUserTokens] failed to delete tokens of user \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// DisableUserTwoFactorAuthorization disables 2fa for the specified user
+func (l *UserDataCli) DisableUserTwoFactorAuthorization(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] error occurs when getting user id by user name")
+		return err
+	}
+
+	enableTwoFactor, err := l.twoFactorAuthorizations.ExistsTwoFactorSetting(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to check two factor setting, because %s", err.Error())
+		return err
+	}
+
+	if !enableTwoFactor {
+		return errs.ErrTwoFactorIsNotEnabled
+	}
+
+	err = l.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor recovery codes for user \"%s\"", username)
+		return err
+	}
+
+	err = l.twoFactorAuthorizations.DeleteTwoFactorSetting(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor setting for user \"%s\"", username)
 		return err
 	}
 

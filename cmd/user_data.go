@@ -23,26 +23,31 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "New user name",
 				},
 				&cli.StringFlag{
 					Name:    "email",
 					Aliases: []string{"m"},
+					Required: true,
 					Usage:   "New user email",
 				},
 				&cli.StringFlag{
 					Name:    "nickname",
 					Aliases: []string{"i"},
+					Required: true,
 					Usage:   "New user nickname",
 				},
 				&cli.StringFlag{
 					Name:    "password",
 					Aliases: []string{"p"},
+					Required: true,
 					Usage:   "New user password",
 				},
 				&cli.StringFlag{
 					Name:    "default-currency",
 					Aliases: []string{"c"},
+					Required: true,
 					Usage:   "New user default currency",
 				},
 			},
@@ -55,6 +60,7 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 			},
@@ -67,11 +73,13 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 				&cli.StringFlag{
 					Name:    "password",
 					Aliases: []string{"p"},
+					Required: true,
 					Usage:   "User new password",
 				},
 			},
@@ -84,6 +92,7 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 			},
@@ -96,6 +105,7 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 			},
@@ -108,6 +118,7 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 			},
@@ -120,11 +131,13 @@ var UserData = &cli.Command{
 				&cli.StringFlag{
 					Name:    "username",
 					Aliases: []string{"n"},
+					Required: true,
 					Usage:   "Specific user name",
 				},
 				&cli.StringFlag{
 					Name:    "file",
 					Aliases: []string{"f"},
+					Required: true,
 					Usage:   "Specific exported file path (e.g. transaction.csv)",
 				},
 			},

@@ -153,7 +153,7 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 	if err == nil {
 		log.BootInfof("[user_data.ModifyUserPassword] revoke old tokens before unix time \"%d\" for user \"%s\"", now, user.Username)
 	} else {
-		log.BootWarnf("[user_data.ModifyUserPassword] failed to revoke old tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.BootWarnf("[user_data.ModifyUserPassword] failed to revoke old tokens for user \"%s\", because %s", user.Username, err.Error())
 	}
 
 	return nil
@@ -215,10 +215,10 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		return false, err
 	}
 
-	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid)
+	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to get essential data for user \"%s\", because %s", username, err.Error())
 		return false, err
 	}
 
@@ -233,7 +233,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForGettingTransactions, false)
 
 	if err != nil {
-		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to all transactions for user \"%s\", because %s", username, err.Error())
 		return false, err
 	}
 
@@ -335,24 +335,24 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte
 		return nil, err
 	}
 
-	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid)
+	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.ExportTransaction] failed to get essential data for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.ExportTransaction] failed to get essential data for user \"%s\", because %s", username, err.Error())
 		return nil, err
 	}
 
 	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
 
 	if err != nil {
-		log.BootErrorf("[user_data.ExportTransaction] failed to all transactions for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.ExportTransaction] failed to all transactions for user \"%s\", because %s", username, err.Error())
 		return nil, err
 	}
 
 	result, err := l.csvExporter.GetOutputContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
-		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())
 		return nil, err
 	}
 
@@ -370,7 +370,7 @@ func (l *UserDataCli) getUserIdByUsername(c *cli.Context, username string) (int6
 	return user.Uid, nil
 }
 
-func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
+func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
 	if uid <= 0 {
 		log.BootErrorf("[user_data.getUserEssentialData] user uid \"%d\" is invalid", uid)
 		return nil, nil, nil, nil, errs.ErrUserIdInvalid
@@ -379,7 +379,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*mod
 	accounts, err := l.accounts.GetAllAccountsByUid(uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"%s\", because %s", username, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
@@ -388,7 +388,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*mod
 	categories, err := l.categories.GetAllCategoriesByUid(uid, 0, -1)
 
 	if err != nil {
-		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"%s\", because %s", username, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
@@ -397,7 +397,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*mod
 	tags, err := l.tags.GetAllTagsByUid(uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"%s\", because %s", username, err.Error())
 		return nil, nil, nil, nil, err
 	}
 
@@ -406,7 +406,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64) (accountMap map[int64]*mod
 	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
+		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"%s\", because %s", username, err.Error())
 		return nil, nil, nil, nil, err
 	}
 

@@ -43,7 +43,7 @@
             <f7-card-header>
                 <div class="full-line">
                     <small class="card-header-content">YYYY-MM</small>
-                    <small class="transaction-amount-statistics">
+                    <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage">
                         <span>0.00 USD</span>
                         <span>0.00 USD</span>
                     </small>
@@ -170,7 +170,7 @@
             <f7-card-header>
                 <div class="full-line">
                     <small class="card-header-content">YYYY-MM</small>
-                    <small class="transaction-amount-statistics">
+                    <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage">
                         <span>0.00 USD</span>
                         <span>0.00 USD</span>
                     </small>
@@ -266,7 +266,7 @@
                         <small class="card-header-content">
                             <span>{{ transactionMonthList.yearMonth | moment($t('format.yearMonth.long')) }}</span>
                         </small>
-                        <small class="transaction-amount-statistics" v-if="transactionMonthList.totalAmount">
+                        <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
                             <span class="text-color-red">
                                 {{ transactionMonthList.totalAmount.income | currency(defaultCurrency) | income(transactionMonthList.totalAmount.incompleteIncome) }}
                             </span>
@@ -505,11 +505,14 @@
 <script>
 export default {
     data() {
+        const self = this;
+
         return {
             loading: true,
             loadingError: null,
             loadingMore: false,
             transactionToDelete: null,
+            showTotalAmountInTransactionListPage: self.$settings.isShowTotalAmountInTransactionListPage(),
             showDatePopover: false,
             showTypePopover: false,
             showCategoryPopover: false,

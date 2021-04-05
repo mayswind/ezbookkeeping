@@ -848,6 +848,7 @@ export default {
     'Currency Symbol': 'Currency Symbol',
     'Show Amount In Home Page': 'Show Amount In Home Page',
     'Show Account Balance': 'Show Account Balance',
+    'Show Total Amount In Transaction List Page': 'Show Total Amount In Transaction List Page',
     'Enable Animate': 'Enable Animate',
     'Enable Auto Dark Mode': 'Enable Auto Dark Mode',
     'Use preset transaction categories': 'Use preset transaction categories',

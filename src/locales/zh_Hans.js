@@ -848,6 +848,7 @@ export default {
     'Currency Symbol': '货币符号',
     'Show Amount In Home Page': '首页显示金额',
     'Show Account Balance': '显示账户余额',
+    'Show Total Amount In Transaction List Page': '交易列表页显示总金额',
     'Enable Animate': '启用动画',
     'Enable Auto Dark Mode': '启用自动深色模式',
     'Use preset transaction categories': '使用预设交易分类',

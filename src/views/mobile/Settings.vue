@@ -79,6 +79,11 @@
                         <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
                     </f7-list-item>
 
+                    <f7-list-item>
+                        <span>{{ $t('Show Total Amount In Transaction List Page') }}</span>
+                        <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
+                    </f7-list-item>
+
                     <f7-list-item :title="$t('Statistics Settings')" link="/statistic/settings"></f7-list-item>
 
                     <f7-list-item>
@@ -179,6 +184,14 @@ export default {
             },
             set: function (value) {
                 this.$settings.setShowAccountBalance(value);
+            }
+        },
+        showTotalAmountInTransactionListPage: {
+            get: function () {
+                return this.$settings.isShowTotalAmountInTransactionListPage();
+            },
+            set: function (value) {
+                this.$settings.setShowTotalAmountInTransactionListPage(value);
             }
         },
         isEnableAnimate: {

@@ -16,6 +16,7 @@ const defaultSettings = {
     thousandsSeparator: true,
     currencyDisplayMode: currencyConstants.defaultCurrencyDisplayMode,
     showAmountInHomePage: true,
+    showTotalAmountInTransactionListPage: true,
     showAccountBalance: true,
     statistics: {
         defaultChartType: statisticsConstants.defaultChartType,
@@ -145,6 +146,8 @@ export default {
     setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
     isShowAmountInHomePage: () => getOption('showAmountInHomePage'),
     setShowAmountInHomePage: value => setOption('showAmountInHomePage', value),
+    isShowTotalAmountInTransactionListPage: () => getOption('showTotalAmountInTransactionListPage'),
+    setShowTotalAmountInTransactionListPage: value => setOption('showTotalAmountInTransactionListPage', value),
     isShowAccountBalance: () => getOption('showAccountBalance'),
     setShowAccountBalance: value => setOption('showAccountBalance', value),
     getStatisticsDefaultChartType: () => getSubOption('statistics', 'defaultChartType'),

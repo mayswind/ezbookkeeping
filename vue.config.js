@@ -1,8 +1,12 @@
+const fs = require('fs');
+
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 const pkgFile = require('./package.json');
-const licenseFile = require('./third-patry-licenses.json');
+const thirdPartyLicenseFile = require('./third-patry-licenses.json');
+
+const licenseFile = fs.readFileSync('./LICENSE', 'UTF-8');
 
 module.exports = {
     pages: {
@@ -60,7 +64,8 @@ module.exports = {
             definitions[0]['process.env']['VERSION'] = JSON.stringify(pkgFile.version);
             definitions[0]['process.env']['COMMIT_HASH'] = JSON.stringify(gitRevisionPlugin.commithash());
             definitions[0]['process.env']['BUILD_UNIXTIME'] = JSON.stringify(parseInt((new Date().getTime() / 1000).toString()));
-            definitions[0]['process.env']['LICENSES'] = JSON.stringify(licenseFile);
+            definitions[0]['process.env']['LICENSE'] = JSON.stringify(licenseFile.trim());
+            definitions[0]['process.env']['THIRD_PARTY_LICENSES'] = JSON.stringify(thirdPartyLicenseFile);
 
             return definitions;
         });

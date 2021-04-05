@@ -1,5 +1,8 @@
 export default {
-    getLicenses: () => {
-        return process.env.LICENSES || [];
+    getLicense: () => {
+        return process.env.LICENSE;
+    },
+    getThirdPartyLicenses: () => {
+        return process.env.THIRD_PARTY_LICENSES || [];
     }
 };

@@ -172,7 +172,11 @@ const i18n = new VueI18n(getI18nOptions());
 
 Vue.prototype.$version = version.getVersion();
 Vue.prototype.$buildTime = version.getBuildTime();
-Vue.prototype.$licenses = licenses.getLicenses();
+
+Vue.prototype.$licenses = {
+    license: licenses.getLicense(),
+    thirdPartyLicenses: licenses.getThirdPartyLicenses()
+};
 
 Vue.prototype.$constants = {
     api: api,

@@ -189,15 +189,7 @@ export default {
             return this.$store.getters.currentUserDefaultCurrency;
         },
         firstDayOfWeek() {
-            if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {
-                return this.$store.getters.currentUserFirstDayOfWeek;
-            }
-
-            if (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')]) {
-                return this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type;
-            }
-
-            return 0;
+            return this.$store.getters.currentUserFirstDayOfWeek;
         },
         dateRange() {
             const self = this;

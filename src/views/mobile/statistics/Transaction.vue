@@ -145,13 +145,13 @@
                             {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
                         </div>
                         <div slot="title"
-                             :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByAccount.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === $constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type }">
+                             :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
                             {{ statisticsData.totalAmount | currency(defaultCurrency) }}
                         </div>
                     </f7-list-item>
                     <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"
-                                  :link="item | itemLinkUrl(query, $constants.statistics.allChartDataTypes)"
+                                  :link="item | itemLinkUrl(query, allChartDataTypes)"
                                   v-show="!item.hidden"
                     >
                         <div slot="media" class="display-flex no-padding-horizontal">
@@ -186,13 +186,13 @@
         </f7-card>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
+            <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
-            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
+            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': query.dateType === $constants.datetime.allDateRanges.All.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalAssets.type || query.chartDataType === $constants.statistics.allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
+            <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
@@ -214,7 +214,7 @@
                               @click="setDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"
-                         v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.startTime && query.endTime">
+                         v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
                         <span>{{ query.startTime | moment($t('format.datetime.long-without-second')) }}</span>
                         <span>&nbsp;-&nbsp;</span>
                         <br/>
@@ -284,15 +284,15 @@ export default {
                 totalAmount: 0
             };
 
-            if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
+            if (self.query.chartDataType === self.allChartDataTypes.ExpenseByAccount.type ||
+                self.query.chartDataType === self.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
                 combinedData = this.$store.getters.statisticsItemsByTransactionStatisticsData;
-            } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
-                self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+            } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
+                self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
                 combinedData = this.$store.getters.statisticsItemsByAccountsData;
             }
 
@@ -368,13 +368,13 @@ export default {
 
         let defaultChartDataType = self.$settings.getStatisticsDefaultChartDataType();
 
-        if (defaultChartDataType < self.$constants.statistics.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+        if (defaultChartDataType < self.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.allChartDataTypes.AccountTotalLiabilities.type) {
             defaultChartDataType = self.$constants.statistics.defaultChartDataType;
         }
 
         let defaultDateRange = self.$settings.getStatisticsDefaultDateRange();
 
-        if (defaultDateRange < self.$constants.datetime.allDateRanges.All.type || defaultDateRange >= self.$constants.datetime.allDateRanges.Custom.type) {
+        if (defaultDateRange < self.allDateRanges.All.type || defaultDateRange >= self.allDateRanges.Custom.type) {
             defaultDateRange = self.$constants.statistics.defaultDataRangeType;
         }
 
@@ -451,7 +451,7 @@ export default {
             this.showChartDataTypePopover = false;
         },
         setDateFilter(dateType) {
-            if (dateType === this.$constants.datetime.allDateRanges.Custom.type) { // Custom
+            if (dateType === this.allDateRanges.Custom.type) { // Custom
                 this.showCustomDateRangeSheet = true;
                 this.showDatePopover = false;
                 return;
@@ -480,7 +480,7 @@ export default {
             }
 
             this.$store.dispatch('updateTransactionStatisticsFilter', {
-                dateType: this.$constants.datetime.allDateRanges.Custom.type,
+                dateType: this.allDateRanges.Custom.type,
                 startTime: startTime,
                 endTime: endTime
             });
@@ -490,19 +490,19 @@ export default {
             this.reload(null);
         },
         shiftDateRange(startTime, endTime, scale) {
-            if (this.query.dateType === this.$constants.datetime.allDateRanges.All.type) {
+            if (this.query.dateType === this.allDateRanges.All.type) {
                 return;
             }
 
             const newDateRange = this.$utilities.getShiftedDateRange(startTime, endTime, scale);
-            let newDateType = this.$constants.datetime.allDateRanges.Custom.type;
+            let newDateType = this.allDateRanges.Custom.type;
 
-            for (let dateRangeField in this.$constants.datetime.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(this.$constants.datetime.allDateRanges, dateRangeField)) {
+            for (let dateRangeField in this.allDateRanges) {
+                if (!Object.prototype.hasOwnProperty.call(this.allDateRanges, dateRangeField)) {
                     continue;
                 }
 
-                const dateRangeType = this.$constants.datetime.allDateRanges[dateRangeField];
+                const dateRangeType = this.allDateRanges[dateRangeField];
                 const dateRange = this.$utilities.getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
 
                 if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
@@ -520,8 +520,8 @@ export default {
             this.reload(null);
         },
         dateRangeName(query) {
-            if (query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
-                query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
+            if (query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type ||
+                query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
                 return this.$t(this.allDateRanges.All.name);
             }
 
@@ -571,7 +571,7 @@ export default {
             return `${displayStartTime} ~ ${displayEndTime}`;
         },
         clickPieChartItem(item) {
-            this.$f7router.navigate(this.$options.filters.itemLinkUrl(item, this.query, this.$constants.statistics.allChartDataTypes));
+            this.$f7router.navigate(this.$options.filters.itemLinkUrl(item, this.query, this.allChartDataTypes));
         },
         filterAccounts() {
             this.$f7router.navigate('/statistic/filter/account');

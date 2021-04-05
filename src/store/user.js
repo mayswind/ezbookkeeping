@@ -343,10 +343,10 @@ export function currentUserNickname(state) {
 
 export function currentUserDefaultCurrency(state) {
     const userInfo = state.currentUserInfo || {};
-    return userInfo.defaultCurrency || null;
+    return userInfo.defaultCurrency || state.defaultSetting.currency;
 }
 
 export function currentUserFirstDayOfWeek(state) {
     const userInfo = state.currentUserInfo || {};
-    return utils.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : null;
+    return utils.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : state.defaultSetting.firstDayOfWeek;
 }

@@ -1,4 +1,5 @@
 import datetimeConstants from '../consts/datetime.js';
+import currencyConstants from '../consts/currency.js';
 import statisticsConstants from '../consts/statistics.js';
 import userState from '../lib/userstate.js';
 import settings from '../lib/settings.js';
@@ -6,6 +7,8 @@ import utils from '../lib/utils.js';
 
 import {
     RESET_STATE,
+
+    UPDATE_DEFAULT_SETTING,
 
     STORE_USER_INFO,
     CLEAR_USER_INFO,
@@ -54,6 +57,10 @@ import {
 } from './mutations.js';
 
 import {
+    updateLocalizedDefaultSettings
+} from './setting.js';
+
+import {
     authorize,
     authorize2FA,
     register,
@@ -100,7 +107,8 @@ import {
     loadTransactionStatistics,
     initTransactionStatisticsFilter,
     updateTransactionStatisticsFilter,
-    statisticsItemsByTransactionStatisticsData
+    statisticsItemsByTransactionStatisticsData,
+    statisticsItemsByAccountsData,
 } from './statistics.js';
 
 import {
@@ -154,6 +162,10 @@ import {
 const stores = {
     strict: !settings.isProduction(),
     state: {
+        defaultSetting: {
+            currency: currencyConstants.defaultCurrency,
+            firstDayOfWeek: datetimeConstants.defaultFirstDayOfWeek
+        },
         currentUserInfo: userState.getUserInfo(),
         latestExchangeRates: getExchangeRatesFromLocalStorage(),
         allAccounts: [],
@@ -204,6 +216,7 @@ const stores = {
 
         // statistics
         statisticsItemsByTransactionStatisticsData,
+        statisticsItemsByAccountsData,
 
         // account
         allPlainAccounts,
@@ -257,6 +270,10 @@ const stores = {
             state.transactionStatisticsStateInvalid = true;
 
             clearExchangeRatesFromLocalStorage();
+        },
+        [UPDATE_DEFAULT_SETTING] (state, { defaultCurrency, defaultFirstDayOfWeek }) {
+            state.defaultSetting.currency = defaultCurrency;
+            state.defaultSetting.firstDayOfWeek = defaultFirstDayOfWeek;
         },
         [STORE_USER_INFO] (state, userInfo) {
             state.currentUserInfo = userInfo;
@@ -900,6 +917,9 @@ const stores = {
         },
     },
     actions: {
+        // setting
+        updateLocalizedDefaultSettings,
+
         // user
         authorize,
         authorize2FA,

@@ -6,6 +6,8 @@ import services from '../lib/services.js';
 import logger from '../lib/logger.js';
 import utils from '../lib/utils.js';
 
+import { getExchangedAmount } from './exchangeRates.js';
+
 import {
     LOAD_TRANSACTION_STATISTICS,
     INIT_TRANSACTION_STATISTICS_FILTER,
@@ -183,6 +185,79 @@ export function statisticsItemsByTransactionStatisticsData(state) {
                 allDataItems[item.category.id] = data;
             }
         }
+    }
+
+    return {
+        totalAmount: totalAmount,
+        totalNonNegativeAmount: totalNonNegativeAmount,
+        items: allDataItems
+    }
+}
+
+export function statisticsItemsByAccountsData(state, getters) {
+    if (!getters.allPlainAccounts) {
+        return null;
+    }
+
+    const allDataItems = {};
+    let totalAmount = 0;
+    let totalNonNegativeAmount = 0;
+
+    for (let i = 0; i < getters.allPlainAccounts.length; i++) {
+        const account = getters.allPlainAccounts[i];
+
+        if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type) {
+            if (!account.isAsset) {
+                continue;
+            }
+        } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+            if (!account.isLiability) {
+                continue;
+            }
+        }
+
+        if (state.transactionStatisticsFilter.filterAccountIds && state.transactionStatisticsFilter.filterAccountIds[account.id]) {
+            continue;
+        }
+
+        let primaryAccount = state.allAccountsMap[account.parentId];
+
+        if (!primaryAccount) {
+            primaryAccount = account;
+        }
+
+        let amount = account.balance;
+
+        if (account.currency !== getters.currentUserDefaultCurrency) {
+            amount = Math.floor(getExchangedAmount(state)(amount, account.currency, getters.currentUserDefaultCurrency));
+
+            if (!utils.isNumber(amount)) {
+                continue;
+            }
+        }
+
+        if (account.isLiability) {
+            amount = -amount;
+        }
+
+        const data = {
+            name: account.name,
+            type: 'account',
+            id: account.id,
+            icon: account.icon || iconConstants.defaultAccountIcon.icon,
+            color: account.color || colorConstants.defaultAccountColor,
+            hidden: primaryAccount.hidden || account.hidden,
+            displayOrders: [primaryAccount.category, primaryAccount.displayOrder, account.displayOrder],
+            totalAmount: amount
+        };
+
+        totalAmount += amount;
+
+        if (amount > 0) {
+            totalNonNegativeAmount += amount;
+        }
+
+        allDataItems[account.id] = data;
     }
 
     return {

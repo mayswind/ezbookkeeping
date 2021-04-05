@@ -629,7 +629,6 @@ const allCurrencies = {
     }
 };
 
-
 const allCurrencyDisplayModes = {
     None: 0,
     Symbol: 1,
@@ -637,12 +636,14 @@ const allCurrencyDisplayModes = {
     Name: 3
 };
 
+const defaultCurrency = allCurrencies.USD.code;
 const defaultCurrencyDisplayMode = allCurrencyDisplayModes.Symbol;
 
 export default {
     parentAccountCurrencyPlaceholder: parentAccountCurrencyPlaceholder,
     defaultCurrencySymbol: defaultCurrencySymbol,
     all: allCurrencies,
+    defaultCurrency: defaultCurrency,
     allCurrencyDisplayModes: allCurrencyDisplayModes,
     defaultCurrencyDisplayMode: defaultCurrencyDisplayMode
 };

@@ -263,14 +263,6 @@ export default {
     },
     computed: {
         defaultCurrency() {
-            if (this.query.accountId && this.query.accountId !== '0') {
-                const account = this.allAccounts[this.query.accountId];
-
-                if (account && account.currency && account.currency !== this.$constants.currency.parentAccountCurrencyPlaceholder) {
-                    return account.currency;
-                }
-            }
-
             return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
         },
         firstDayOfWeek() {
@@ -309,7 +301,7 @@ export default {
                 combinedData = this.$store.getters.statisticsItemsByTransactionStatisticsData;
             } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
-                combinedData = this.getDataItemsByAccounts(self.$store.getters.allPlainAccounts);
+                combinedData = this.$store.getters.statisticsItemsByAccountsData;
             }
 
             const allStatisticsItems = [];
@@ -597,74 +589,6 @@ export default {
         },
         settings() {
             this.$f7router.navigate('/statistic/settings');
-        },
-        getDataItemsByAccounts(accounts) {
-            const allDataItems = {};
-            let totalAmount = 0;
-            let totalNonNegativeAmount = 0;
-
-            for (let i = 0; i < accounts.length; i++) {
-                const account = accounts[i];
-
-                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalAssets.type) {
-                    if (!account.isAsset) {
-                        continue;
-                    }
-                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
-                    if (!account.isLiability) {
-                        continue;
-                    }
-                }
-
-                if (this.query.filterAccountIds && this.query.filterAccountIds[account.id]) {
-                    continue;
-                }
-
-                let primaryAccount = this.$store.state.allAccountsMap[account.parentId];
-
-                if (!primaryAccount) {
-                    primaryAccount = account;
-                }
-
-                let amount = account.balance;
-
-                if (account.currency !== this.defaultCurrency) {
-                    amount = Math.floor(this.$store.getters.getExchangedAmount(amount, account.currency, this.defaultCurrency));
-
-                    if (!this.$utilities.isNumber(amount)) {
-                        continue;
-                    }
-                }
-
-                if (account.isLiability) {
-                    amount = -amount;
-                }
-
-                const data = {
-                    name: account.name,
-                    type: 'account',
-                    id: account.id,
-                    icon: account.icon || self.$constants.icons.defaultAccountIcon.icon,
-                    color: account.color || self.$constants.colors.defaultAccountColor,
-                    hidden: primaryAccount.hidden || account.hidden,
-                    displayOrders: [primaryAccount.category, primaryAccount.displayOrder, account.displayOrder],
-                    totalAmount: amount
-                };
-
-                totalAmount += amount;
-
-                if (amount > 0) {
-                    totalNonNegativeAmount += amount;
-                }
-
-                allDataItems[account.id] = data;
-            }
-
-            return {
-                totalAmount: totalAmount,
-                totalNonNegativeAmount: totalNonNegativeAmount,
-                items: allDataItems
-            }
         },
         scrollPopoverToSelectedItem(event) {
             if (!event || !event.$el || !event.$el.length) {

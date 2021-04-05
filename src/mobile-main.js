@@ -209,6 +209,17 @@ Vue.prototype.$locale = {
         moment.locale(locale);
         services.setLocale(locale);
         document.querySelector('html').setAttribute('lang', locale);
+
+        const defaultCurrency = i18n.t('default.currency');
+        const defaultFirstDayOfWeekName = i18n.t('default.firstDayOfWeek');
+        let defaultFirstDayOfWeek = datetime.defaultFirstDayOfWeek;
+
+        if (datetime.allWeekDays[defaultFirstDayOfWeekName]) {
+            defaultFirstDayOfWeek = datetime.allWeekDays[defaultFirstDayOfWeekName].type;
+        }
+
+        store.dispatch('updateLocalizedDefaultSettings', { defaultCurrency, defaultFirstDayOfWeek });
+
         return locale;
     },
     getTimezone: function () {

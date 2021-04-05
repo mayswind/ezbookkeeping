@@ -1,5 +1,7 @@
 export const RESET_STATE = 'RESET_STATE';
 
+export const UPDATE_DEFAULT_SETTING = 'UPDATE_DEFAULT_SETTING';
+
 export const STORE_USER_INFO = 'STORE_USER_INFO';
 export const CLEAR_USER_INFO = 'CLEAR_USER_INFO';
 

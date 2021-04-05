@@ -80,7 +80,10 @@ const allDateRanges = {
     }
 };
 
+const defaultFirstDayOfWeek = allWeekDays.Sunday.type;
+
 export default {
     allWeekDays: allWeekDays,
     allDateRanges: allDateRanges,
+    defaultFirstDayOfWeek: defaultFirstDayOfWeek
 };

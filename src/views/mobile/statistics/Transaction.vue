@@ -40,6 +40,7 @@
                 <pie-chart
                     :items="statisticsData.items"
                     :min-valid-percent="0.0001"
+                    :show-value="showAmountInChart"
                     :show-center-text="true"
                     :show-selected-item-info="true"
                     :enable-click-item="true"
@@ -57,7 +58,7 @@
                         {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
                     </text>
                     <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
-                        {{ statisticsData.totalAmount | currency(defaultCurrency) | textLimit(16) }}
+                        {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) | textLimit(16) }}
                     </text>
                     <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!statisticsData.items || !statisticsData.items.length">
                         {{ $t('No data') }}
@@ -146,7 +147,7 @@
                         </div>
                         <div slot="title"
                              :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
-                            {{ statisticsData.totalAmount | currency(defaultCurrency) }}
+                            {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}
                         </div>
                     </f7-list-item>
                     <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
@@ -172,7 +173,7 @@
                         </div>
 
                         <div slot="after">
-                            <span>{{ item.totalAmount | currency(item.currency || defaultCurrency) }}</span>
+                            <span>{{ item.totalAmount | currency(item.currency || defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}</span>
                         </div>
 
                         <div slot="inner-end" class="statistics-item-end">
@@ -255,6 +256,7 @@ export default {
             loading: true,
             loadingError: null,
             sortBy: self.$settings.getStatisticsSortingType(),
+            showAccountBalance: self.$settings.isShowAccountBalance(),
             showChartDataTypePopover: false,
             showDatePopover: false,
             showCustomDateRangeSheet: false,
@@ -355,6 +357,14 @@ export default {
                 totalAmount: combinedData.totalAmount,
                 items: allStatisticsItems
             };
+        },
+        showAmountInChart() {
+            if (!this.showAccountBalance
+                && (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type || this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type)) {
+                return false;
+            }
+
+            return true;
         }
     },
     created() {
@@ -605,6 +615,13 @@ export default {
         }
     },
     filters: {
+        finalAmount(amount, isShowAccountBalance, dataType, allChartDataTypes) {
+            if (!isShowAccountBalance && (dataType === allChartDataTypes.AccountTotalAssets.type || dataType === allChartDataTypes.AccountTotalLiabilities.type)) {
+                return '***';
+            }
+
+            return amount;
+        },
         chartDataTypeName(dataType, allChartDataTypes) {
             for (let chartDataTypeField in allChartDataTypes) {
                 if (!Object.prototype.hasOwnProperty.call(allChartDataTypes, chartDataTypeField)) {

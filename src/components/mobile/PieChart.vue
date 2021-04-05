@@ -59,7 +59,7 @@
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
-                        <span v-else-if="!skeleton" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(selectedItem.currency || defaultCurrency) }}</span>
+                        <span v-else-if="!skeleton && showValue" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(selectedItem.currency || defaultCurrency) }}</span>
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
@@ -101,6 +101,7 @@ export default {
         'hiddenField',
         'minValidPercent',
         'defaultCurrency',
+        'showValue',
         'showCenterText',
         'showSelectedItemInfo',
         'enableClickItem',

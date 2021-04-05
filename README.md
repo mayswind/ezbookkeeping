@@ -8,8 +8,6 @@
 ## Introduction
 The lab is a lightweight account book app hosted by yourself. It can be deployed on almost all platforms, including Windows, macOS and Linux on x86, amd64 and ARM architectures. You can even deploy it on an raspberry device. It also supports many different databases, including sqlite and mysql. With docker, you can just deploy it via one command without complicated configuration.
 
-This project is still **under construction**.
-
 ## Features
 1. Open source & Self-hosted
 2. Lightweight & Fast
@@ -18,7 +16,6 @@ This project is still **under construction**.
     * Multiple database support (sqlite, mysql, etc.)
     * Multiple os & architecture support (Windows, macOS, Linux & x86, amd64, ARM)
 4. User-friendly interface
-    * Desktop (planning) and mobile support
     * Almost native app experience (for mobile device)
     * Two-level account & two-level category support
     * Plentiful preset categories
@@ -26,10 +23,11 @@ This project is still **under construction**.
     * Data statistics
     * Dark theme
 5. Multiple currency support & automatically updating exchange rates
-6. Two-factor authentication
-7. Application lock (WebAuthn support)
-8. Data export
-9. Multi-language support
+6. Multiple timezone support
+7. Multi-language support
+8. Two-factor authentication
+9. Application lock (WebAuthn support)
+10. Data export
 
 ## Screenshots
 ### Mobile Device

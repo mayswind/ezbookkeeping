@@ -347,7 +347,7 @@ export default {
             }
         },
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+            return this.$store.getters.currentUserDefaultCurrency;
         },
         defaultTimezoneOffset() {
             return this.$locale.defaultTimezoneOffset;

@@ -220,7 +220,7 @@ export default {
     },
     computed: {
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+            return this.$store.getters.currentUserDefaultCurrency;
         },
         allAccountCategories() {
             return this.$constants.account.allCategories;

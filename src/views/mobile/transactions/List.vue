@@ -528,7 +528,7 @@ export default {
                 }
             }
 
-            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+            return this.$store.getters.currentUserDefaultCurrency;
         },
         currentTimezoneOffsetMinutes() {
             return this.$utilities.getTimezoneOffsetMinutes();

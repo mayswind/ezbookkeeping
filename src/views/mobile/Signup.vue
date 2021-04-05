@@ -197,7 +197,7 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                defaultCurrency: self.$t('default.currency'),
+                defaultCurrency: self.$store.state.defaultSetting.currency,
                 firstDayOfWeek: self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')] ? self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
             },
             submitting: false,
@@ -227,13 +227,13 @@ export default {
                 return this.$i18n.locale;
             },
             set: function (value) {
-                const isCurrencyDefault = this.user.defaultCurrency === this.$t('default.currency');
+                const isCurrencyDefault = this.user.defaultCurrency === this.$store.state.defaultSetting.currency;
                 const isFirstWeekDayDefault = this.user.firstDayOfWeek === (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
 
                 this.$locale.setLanguage(value);
 
                 if (isCurrencyDefault) {
-                    this.user.defaultCurrency = this.$t('default.currency');
+                    this.user.defaultCurrency = this.$store.state.defaultSetting.currency;
                 }
 
                 if (isFirstWeekDayDefault) {

@@ -186,7 +186,7 @@ export default {
             return this.$store.state.transactionOverview;
         },
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency || this.$t('default.currency');
+            return this.$store.getters.currentUserDefaultCurrency;
         },
         firstDayOfWeek() {
             if (this.$utilities.isNumber(this.$store.getters.currentUserFirstDayOfWeek)) {

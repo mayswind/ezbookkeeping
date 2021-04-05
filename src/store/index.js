@@ -99,7 +99,8 @@ import {
 import {
     loadTransactionStatistics,
     initTransactionStatisticsFilter,
-    updateTransactionStatisticsFilter
+    updateTransactionStatisticsFilter,
+    statisticsItemsByTransactionStatisticsData
 } from './statistics.js';
 
 import {
@@ -200,6 +201,9 @@ const stores = {
         // exchange rates
         exchangeRatesLastUpdateTime,
         getExchangedAmount,
+
+        // statistics
+        statisticsItemsByTransactionStatisticsData,
 
         // account
         allPlainAccounts,

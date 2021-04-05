@@ -306,7 +306,7 @@ export default {
                 self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                combinedData = this.getDataItemsByTransactions(self.$store.state.transactionStatistics);
+                combinedData = this.$store.getters.statisticsItemsByTransactionStatisticsData;
             } else if (self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.$constants.statistics.allChartDataTypes.AccountTotalLiabilities.type) {
                 combinedData = this.getDataItemsByAccounts(self.$store.getters.allPlainAccounts);
@@ -597,135 +597,6 @@ export default {
         },
         settings() {
             this.$f7router.navigate('/statistic/settings');
-        },
-        getDataItemsByTransactions(transactionStatistics) {
-            const allDataItems = {};
-            let totalAmount = 0;
-            let totalNonNegativeAmount = 0;
-
-            for (let i = 0; i < transactionStatistics.items.length; i++) {
-                const item = transactionStatistics.items[i];
-
-                if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
-                    continue;
-                }
-
-                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                    if (item.category.type !== this.$constants.category.allCategoryTypes.Expense) {
-                        continue;
-                    }
-                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByAccount.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (item.category.type !== this.$constants.category.allCategoryTypes.Income) {
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
-
-                if (this.query.filterAccountIds && this.query.filterAccountIds[item.account.id]) {
-                    continue;
-                }
-
-                if (this.query.filterCategoryIds && this.query.filterCategoryIds[item.category.id]) {
-                    continue;
-                }
-
-                if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByAccount.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByAccount.type) {
-                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.account.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.account.name,
-                                type: 'account',
-                                id: item.account.id,
-                                icon: item.account.icon || this.$constants.icons.defaultAccountIcon.icon,
-                                color: item.account.color || this.$constants.colors.defaultAccountColor,
-                                hidden: item.primaryAccount.hidden || item.account.hidden,
-                                displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.account.id] = data;
-                    }
-                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeByPrimaryCategory.type) {
-                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.primaryCategory.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.primaryCategory.name,
-                                type: 'category',
-                                id: item.primaryCategory.id,
-                                icon: item.primaryCategory.icon || this.$constants.icons.defaultCategoryIcon.icon,
-                                color: item.primaryCategory.color || this.$constants.colors.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden,
-                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.primaryCategory.id] = data;
-                    }
-                } else if (this.query.chartDataType === this.$constants.statistics.allChartDataTypes.ExpenseBySecondaryCategory.type ||
-                    this.query.chartDataType === this.$constants.statistics.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (this.$utilities.isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.category.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.category.name,
-                                type: 'category',
-                                id: item.category.id,
-                                icon: item.category.icon || this.$constants.icons.defaultCategoryIcon.icon,
-                                color: item.category.color || this.$constants.colors.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden || item.category.hidden,
-                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.category.id] = data;
-                    }
-                }
-            }
-
-            return {
-                totalAmount: totalAmount,
-                totalNonNegativeAmount: totalNonNegativeAmount,
-                items: allDataItems
-            }
         },
         getDataItemsByAccounts(accounts) {
             const allDataItems = {};

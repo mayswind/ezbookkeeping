@@ -71,22 +71,22 @@ module.exports = {
         });
     },
     pwa: {
-        name: 'lab account book',
+        name: 'ezBookkeeping',
         themeColor: '#C67E48',
         appleMobileWebAppCapable: 'yes',
         appleMobileWebAppStatusBarStyle: 'default',
         workboxPluginMode: 'GenerateSW',
         manifestPath: 'manifest.json',
         manifestOptions: {
-            short_name: 'lab',
+            short_name: 'ezBookkeeping',
             icons: [
                 {
-                    src: "img/lab-192.png",
+                    src: "img/ezbookkeeping-192.png",
                     sizes: "192x192",
                     type: "image/png"
                 },
                 {
-                    src: "img/lab-512.png",
+                    src: "img/ezbookkeeping-512.png",
                     sizes: "512x512",
                     type: "image/png"
                 }

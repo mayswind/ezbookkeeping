@@ -4,13 +4,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/services"
-	"github.com/mayswind/lab/pkg/settings"
-	"github.com/mayswind/lab/pkg/validators"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
 // UsersApi represents user api

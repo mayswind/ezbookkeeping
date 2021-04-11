@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"runtime"
 
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 var (

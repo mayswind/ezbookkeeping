@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
-const settingsCookieName = "lab_server_settings"
+const settingsCookieName = "ebk_server_settings"
 
 // ServerSettingsCookie adds server settings to cookies in response
 func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {

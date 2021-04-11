@@ -4,12 +4,12 @@ set -e;
 
 conf_path_param="";
 
-if [ "${LAB_CONF_PATH}" != "" ]; then
-  conf_path_param="--conf-path=${LAB_CONF_PATH}";
+if [ "${EBK_CONF_PATH}" != "" ]; then
+  conf_path_param="--conf-path=${EBK_CONF_PATH}";
 fi
 
 if [ $# -gt 0 ]; then
     exec "$@"
 else
-    exec /usr/local/bin/labapp/lab server run ${conf_path_param};
+    exec /usr/local/bin/ezbookkeeping/ezbookkeeping server run ${conf_path_param};
 fi

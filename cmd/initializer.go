@@ -6,12 +6,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mayswind/lab/pkg/datastore"
-	"github.com/mayswind/lab/pkg/exchangerates"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/settings"
-	"github.com/mayswind/lab/pkg/utils"
-	"github.com/mayswind/lab/pkg/uuid"
+	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
 func initializeSystem(c *cli.Context) (*settings.Config, error) {

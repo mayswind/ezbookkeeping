@@ -7,11 +7,11 @@ import (
 
 	"xorm.io/xorm"
 
-	"github.com/mayswind/lab/pkg/datastore"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/utils"
-	"github.com/mayswind/lab/pkg/uuid"
+	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
 // TransactionService represents transaction service

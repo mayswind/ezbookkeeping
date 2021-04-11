@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // WeekDay represents week day

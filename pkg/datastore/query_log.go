@@ -3,8 +3,8 @@ package datastore
 import (
 	xorm "xorm.io/xorm/log"
 
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // XOrmLoggerAdapter represents the logger adapter for xorm

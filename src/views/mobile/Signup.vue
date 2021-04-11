@@ -61,7 +61,7 @@
                         @input="user.nickname = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item class="lab-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                    <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

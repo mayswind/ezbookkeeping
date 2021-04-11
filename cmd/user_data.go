@@ -5,15 +5,15 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	clis "github.com/mayswind/lab/pkg/cli"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/utils"
+	clis "github.com/mayswind/ezbookkeeping/pkg/cli"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // UserData represents the data command
 var UserData = &cli.Command{
 	Name:  "userdata",
-	Usage: "lab user data maintenance",
+	Usage: "ezBookkeeping user data maintenance",
 	Subcommands: []*cli.Command{
 		{
 			Name:   "user-add",

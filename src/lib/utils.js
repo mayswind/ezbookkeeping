@@ -512,7 +512,7 @@ function stringToArrayBuffer(str){
 }
 
 function generateRandomString() {
-    const baseString = 'lab_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
+    const baseString = 'ebk_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
     return CryptoJS.SHA256(baseString).toString();
 }
 

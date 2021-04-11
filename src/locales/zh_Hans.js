@@ -1,7 +1,7 @@
 export default {
     'global': {
         'app': {
-            'title': 'lab 轻记账',
+            'title': 'ezBookkeeping',
         }
     },
     'default': {

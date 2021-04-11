@@ -1,6 +1,6 @@
 package models
 
-import "github.com/mayswind/lab/pkg/core"
+import "github.com/mayswind/ezbookkeeping/pkg/core"
 
 // TokenMaxUserAgentLength represents the maximum size of user agent stored in database
 const TokenMaxUserAgentLength = 255

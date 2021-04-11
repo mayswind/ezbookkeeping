@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/utils"
-	"github.com/mayswind/lab/pkg/validators"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
 const czechNationalBankDailyExchangeRateUrl = "https://www.cnb.cz/en/financial-markets/foreign-exchange-market/central-bank-exchange-rate-fixing/central-bank-exchange-rate-fixing/daily.txt"

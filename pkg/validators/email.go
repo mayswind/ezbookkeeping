@@ -3,7 +3,7 @@ package validators
 import (
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // ValidEmail returns whether the given email is valid

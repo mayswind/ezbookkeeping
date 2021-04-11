@@ -1,15 +1,16 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mayswind/lab/pkg/settings"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestClone(t *testing.T) {
 	expectedObject := &settings.Config{
-		AppName: "lab",
+		AppName: "ezbookkeeping",
 		Mode:    settings.MODE_PRODUCTION,
 		DatabaseConfig: &settings.DatabaseConfig{
 			DatabaseType:          settings.MySqlDbType,

@@ -1,7 +1,16 @@
 {
-  "name": "lab",
+  "name": "ezbookkeeping",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayswind/ezbookkeeping.git"
+  },
+  "author": "MaysWind <i@mayswind.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mayswind/ezbookkeeping/issues"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

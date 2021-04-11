@@ -8,4 +8,4 @@ if [ "$mode" == "--snapshot" ]; then
 fi
 
 echo "Building docker image...";
-docker build -t lab:${version} .
+docker build -t ezbookkeeping:${version} .

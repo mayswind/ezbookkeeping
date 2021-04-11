@@ -3,14 +3,14 @@ import CryptoJS from 'crypto-js';
 import settings from './settings.js';
 import utils from './utils.js';
 
-const appLockSecretBaseStringPrefix = 'LAB_LOCK_SECRET_';
+const appLockSecretBaseStringPrefix = 'EBK_LOCK_SECRET_';
 
-const tokenLocalStorageKey = 'lab_user_token';
-const webauthnConfigLocalStorageKey = 'lab_user_webauthn_config';
-const userInfoLocalStorageKey = 'lab_user_info';
+const tokenLocalStorageKey = 'ebk_user_token';
+const webauthnConfigLocalStorageKey = 'ebk_user_webauthn_config';
+const userInfoLocalStorageKey = 'ebk_user_info';
 
-const tokenSessionStorageKey = 'lab_user_session_token';
-const appLockStateSessionStorageKey = 'lab_user_app_lock_state'; // { 'username': '', secret: '' }
+const tokenSessionStorageKey = 'ebk_user_session_token';
+const appLockStateSessionStorageKey = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
 
 function getAppLockSecret(pinCode) {
     const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();

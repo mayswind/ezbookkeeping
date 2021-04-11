@@ -12,25 +12,25 @@ import (
 	"github.com/mssola/user_agent"
 	"github.com/urfave/cli/v2"
 
-	"github.com/mayswind/lab/pkg/api"
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/middlewares"
-	"github.com/mayswind/lab/pkg/requestid"
-	"github.com/mayswind/lab/pkg/settings"
-	"github.com/mayswind/lab/pkg/utils"
-	"github.com/mayswind/lab/pkg/validators"
+	"github.com/mayswind/ezbookkeeping/pkg/api"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/middlewares"
+	"github.com/mayswind/ezbookkeeping/pkg/requestid"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
 // WebServer represents the server command
 var WebServer = &cli.Command{
 	Name:  "server",
-	Usage: "lab web server operation",
+	Usage: "ezBookkeeping web server operation",
 	Subcommands: []*cli.Command{
 		{
 			Name:   "run",
-			Usage:  "Run lab web server",
+			Usage:  "Run ezBookkeeping web server",
 			Action: startWebServer,
 		},
 	},

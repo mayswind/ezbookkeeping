@@ -1,8 +1,8 @@
 package uuid
 
 import (
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // UuidContainer contains the current uuid generator

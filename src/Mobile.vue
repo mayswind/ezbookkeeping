@@ -13,8 +13,8 @@ export default {
 
         return {
             f7params: {
-                name: 'lab',
-                id: 'net.mayswind.lab',
+                name: 'ezBookkeeping',
+                id: 'net.mayswind.ezbookkeeping',
                 theme: 'ios',
                 autoDarkTheme: self.$settings.isEnableAutoDarkMode(),
                 routes: routes,
@@ -268,7 +268,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     color: var(--f7-radio-active-color, var(--f7-theme-color));
 }
 
-.lab-list-item-error-info div.item-footer {
+.ebk-list-item-error-info div.item-footer {
     color: var(--f7-input-error-text-color)
 }
 </style>

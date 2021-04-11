@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // CSVFileExporter defines the structure of csv file exporter

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 // DefaultApi represents default api

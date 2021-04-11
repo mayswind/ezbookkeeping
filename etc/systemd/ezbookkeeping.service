@@ -1,0 +1,16 @@
+[Unit]
+Description=ezBookkeeping, a lightweight personal bookkeeping app hosted by yourself.
+After=syslog.target
+After=network.target
+After=mariadb.service mysqld.service postgresql.service
+
+[Service]
+Type=simple
+User=ezbookkeeping
+Group=ezbookkeeping
+WorkingDirectory=/usr/local/bin/ezbookkeeping
+ExecStart=/usr/local/bin/ezbookkeeping/ezbookkeeping server run
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

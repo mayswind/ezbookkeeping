@@ -3,7 +3,7 @@ package exporters
 import (
 	"time"
 
-	"github.com/mayswind/lab/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // DataExporter defines the structure of data exporter

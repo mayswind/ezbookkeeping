@@ -1,7 +1,7 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
-            <img class="login-page-logo" src="img/lab-192.png" />
+            <img class="login-page-logo" src="img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
         <f7-list form>
@@ -40,7 +40,7 @@
         <f7-list>
             <f7-block-footer>
                 <span>Powered by </span>
-                <f7-link external href="https://github.com/mayswind/lab" target="_blank">lab</f7-link>&nbsp;
+                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>&nbsp;
                 <span>{{ version }}</span>
             </f7-block-footer>
             <f7-block-footer>

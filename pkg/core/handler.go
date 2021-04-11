@@ -1,6 +1,6 @@
 package core
 
-import "github.com/mayswind/lab/pkg/errs"
+import "github.com/mayswind/ezbookkeeping/pkg/errs"
 
 // MiddlewareHandlerFunc represents the middleware handler function
 type MiddlewareHandlerFunc func(*Context)

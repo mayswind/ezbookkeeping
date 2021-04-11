@@ -6,14 +6,14 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mayswind/lab/cmd"
-	"github.com/mayswind/lab/pkg/version"
+	"github.com/mayswind/ezbookkeeping/cmd"
+	"github.com/mayswind/ezbookkeeping/pkg/version"
 )
 
 func main() {
 	app := &cli.App{
-		Name:    "lab",
-		Usage:   "A lightweight account book app hosted by yourself.",
+		Name:    "ezBookkeeping",
+		Usage:   "A lightweight personal bookkeeping app hosted by yourself.",
 		Version: version.GetFullVersion(),
 		Commands: []*cli.Command{
 			cmd.WebServer,
@@ -31,6 +31,6 @@ func main() {
 	err := app.Run(os.Args)
 
 	if err != nil {
-		log.Fatalf("Failed to run lab app with %s: %v", os.Args, err)
+		log.Fatalf("Failed to run ezBookkeeping with %s: %v", os.Args, err)
 	}
 }

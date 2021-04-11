@@ -1,8 +1,8 @@
 package exchangerates
 
 import (
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // ExchangeRatesDataSource defines the structure of exchange rates data source

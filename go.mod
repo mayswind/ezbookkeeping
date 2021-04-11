@@ -1,4 +1,4 @@
-module github.com/mayswind/lab
+module github.com/mayswind/ezbookkeeping
 
 go 1.14
 

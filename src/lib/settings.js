@@ -3,8 +3,8 @@ import Cookies from 'js-cookie';
 import currencyConstants from '../consts/currency.js';
 import statisticsConstants from '../consts/statistics.js';
 
-const settingsLocalStorageKey = 'lab_app_settings';
-const serverSettingsCookieKey = 'lab_server_settings';
+const settingsLocalStorageKey = 'ebk_app_settings';
+const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
     lang: 'en',

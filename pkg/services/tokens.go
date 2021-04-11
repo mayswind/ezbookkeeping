@@ -10,13 +10,13 @@ import (
 	"github.com/dgrijalva/jwt-go/request"
 	"xorm.io/xorm"
 
-	"github.com/mayswind/lab/pkg/core"
-	"github.com/mayswind/lab/pkg/datastore"
-	"github.com/mayswind/lab/pkg/errs"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/models"
-	"github.com/mayswind/lab/pkg/settings"
-	"github.com/mayswind/lab/pkg/utils"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // TokenService represents user token service

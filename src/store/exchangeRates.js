@@ -6,7 +6,7 @@ import {
     STORE_LATEST_EXCHANGE_RATES
 } from './mutations.js';
 
-const exchangeRatesLocalStorageKey = 'lab_app_exchange_rates';
+const exchangeRatesLocalStorageKey = 'ebk_app_exchange_rates';
 
 export function getLatestExchangeRates(context, { silent, force }) {
     const currentExchangeRateData = context.state.latestExchangeRates;

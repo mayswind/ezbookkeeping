@@ -10,13 +10,13 @@ import (
 
 	"gopkg.in/ini.v1"
 
-	"github.com/mayswind/lab/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 const (
-	labWorkDirEnvName     = "LAB_WORK_DIR"
-	labEnvNamePrefix      = "LAB"
-	defaultConfigPath     = "/conf/lab.ini"
+	ebkWorkDirEnvName     = "EBK_WORK_DIR"
+	ebkEnvNamePrefix      = "EBK"
+	defaultConfigPath     = "/conf/ezbookkeeping.ini"
 	defaultStaticRootPath = "public"
 )
 
@@ -72,14 +72,14 @@ const (
 )
 
 const (
-	defaultAppName string = "lab"
+	defaultAppName string = "ezBookkeeping"
 
 	defaultHttpAddr string = "0.0.0.0"
 	defaultHttpPort int    = 8080
 	defaultDomain   string = "localhost"
 
 	defaultDatabaseHost            string = "127.0.0.1:3306"
-	defaultDatabaseName            string = "lab"
+	defaultDatabaseName            string = "ezbookkeeping"
 	defaultDatabaseMaxIdleConn     int    = 2
 	defaultDatabaseMaxOpenConn     int    = 0
 	defaultDatabaseConnMaxLifetime int    = 14400
@@ -87,7 +87,7 @@ const (
 	defaultLogMode  string = "console"
 	defaultLoglevel Level  = LOGLEVEL_INFO
 
-	defaultSecretKey                 string = "lab"
+	defaultSecretKey                 string = "ezbookkeeping"
 	defaultTokenExpiredTime          int    = 604800 // 7 days
 	defaultTemporaryTokenExpiredTime int    = 300    // 5 minutes
 
@@ -434,7 +434,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 }
 
 func getWorkingPath() (string, error) {
-	workingPath := os.Getenv(labWorkDirEnvName)
+	workingPath := os.Getenv(ebkWorkDirEnvName)
 
 	if workingPath != "" {
 		return workingPath, nil
@@ -513,7 +513,7 @@ func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName s
 }
 
 func getEnvironmentKey(sectionName string, itemName string) string {
-	return fmt.Sprintf("%s_%s_%s", labEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
+	return fmt.Sprintf("%s_%s_%s", ebkEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
 }
 
 func getLogLevel(logLevelStr string, defaultLogLevel Level) Level {

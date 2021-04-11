@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/mayswind/lab/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
 const utcOffsetQueryStringParam = "utc_offset"

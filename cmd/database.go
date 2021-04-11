@@ -3,15 +3,15 @@ package cmd
 import (
 	"github.com/urfave/cli/v2"
 
-	"github.com/mayswind/lab/pkg/datastore"
-	"github.com/mayswind/lab/pkg/log"
-	"github.com/mayswind/lab/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // Database represents the database command
 var Database = &cli.Command{
 	Name:  "database",
-	Usage: "lab database maintenance",
+	Usage: "ezBookkeeping database maintenance",
 	Subcommands: []*cli.Command{
 		{
 			Name:   "update",

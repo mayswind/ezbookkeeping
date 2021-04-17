@@ -24,7 +24,7 @@ const (
 // TransactionEditScope represents the scope which transaction can be edited
 type TransactionEditScope byte
 
-// Historical Transaction Edit Scopes
+// Editable Transaction Scopes
 const (
 	TRANSACTION_EDIT_SCOPE_NONE                TransactionEditScope = 0
 	TRANSACTION_EDIT_SCOPE_ALL                 TransactionEditScope = 1

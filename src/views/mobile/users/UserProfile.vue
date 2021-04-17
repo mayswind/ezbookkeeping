@@ -87,7 +87,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        :title="$t('Transaction Edit Scope')"
+                        :title="$t('Editable Transaction Scope')"
                         smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="newProfile.transactionEditScope">

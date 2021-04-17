@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -21,6 +22,30 @@ const (
 	WEEKDAY_INVALID   WeekDay = 255
 )
 
+// String returns a textual representation of the week day enum
+func (d WeekDay) String() string {
+	switch d {
+	case WEEKDAY_SUNDAY:
+		return "Sunday"
+	case WEEKDAY_MONDAY:
+		return "Monday"
+	case WEEKDAY_TUESDAY:
+		return "Tuesday"
+	case WEEKDAY_WEDNESDAY:
+		return "Wednesday"
+	case WEEKDAY_THURSDAY:
+		return "Thursday"
+	case WEEKDAY_FRIDAY:
+		return "Friday"
+	case WEEKDAY_SATURDAY:
+		return "Saturday"
+	case WEEKDAY_INVALID:
+		return "Invalid"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(d))
+	}
+}
+
 // TransactionEditScope represents the scope which transaction can be edited
 type TransactionEditScope byte
 
@@ -35,6 +60,30 @@ const (
 	TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER  TransactionEditScope = 6
 	TRANSACTION_EDIT_SCOPE_INVALID             TransactionEditScope = 255
 )
+
+// String returns a textual representation of the editable transaction scopes enum
+func (s TransactionEditScope) String() string {
+	switch s {
+	case TRANSACTION_EDIT_SCOPE_NONE:
+		return "None"
+	case TRANSACTION_EDIT_SCOPE_ALL:
+		return "All"
+	case TRANSACTION_EDIT_SCOPE_TODAY_OR_LATER:
+		return "TodayOrLater"
+	case TRANSACTION_EDIT_SCOPE_LAST_24H_OR_LATER:
+		return "Last24HourOrLater"
+	case TRANSACTION_EDIT_SCOPE_THIS_WEEK_OR_LATER:
+		return "ThisWeekOrLater"
+	case TRANSACTION_EDIT_SCOPE_THIS_MONTH_OR_LATER:
+		return "ThisMonthOrLater"
+	case TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER:
+		return "ThisYearOrLater"
+	case TRANSACTION_EDIT_SCOPE_INVALID:
+		return "Invalid"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(s))
+	}
+}
 
 // User represents user data stored in database
 type User struct {

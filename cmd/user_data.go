@@ -193,7 +193,7 @@ func addNewUser(c *cli.Context) error {
 		return err
 	}
 
-	utils.PrintObjectFields(user)
+	printUserInfo(user)
 
 	return nil
 }
@@ -213,7 +213,7 @@ func getUserInfo(c *cli.Context) error {
 		return err
 	}
 
-	utils.PrintObjectFields(user)
+	printUserInfo(user)
 
 	return nil
 }
@@ -389,6 +389,33 @@ func exportUserTransaction(c *cli.Context) error {
 	log.BootInfof("[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
 
 	return nil
+}
+
+func printUserInfo(user *models.User) {
+	fmt.Printf("[Uid] %d\n", user.Uid)
+	fmt.Printf("[Username] %s\n", user.Username)
+	fmt.Printf("[Email] %s\n", user.Email)
+	fmt.Printf("[Nickname] %s\n", user.Nickname)
+	fmt.Printf("[Password] %s\n", user.Password)
+	fmt.Printf("[Salt] %s\n", user.Salt)
+	fmt.Printf("[DefaultCurrency] %s\n", user.DefaultCurrency)
+	fmt.Printf("[FirstDayOfWeek] %s\n", user.FirstDayOfWeek)
+	fmt.Printf("[TransactionEditScope] %s\n", user.TransactionEditScope)
+	fmt.Printf("[Deleted] %t\n", user.Deleted)
+	fmt.Printf("[EmailVerified] %t\n", user.EmailVerified)
+	fmt.Printf("[CreatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.CreatedUnixTime), user.CreatedUnixTime)
+
+	if user.UpdatedUnixTime > 0 {
+		fmt.Printf("[UpdatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.UpdatedUnixTime), user.UpdatedUnixTime)
+	}
+
+	if user.DeletedUnixTime > 0 {
+		fmt.Printf("[DeletedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.DeletedUnixTime), user.DeletedUnixTime)
+	}
+
+	if user.LastLoginUnixTime > 0 {
+		fmt.Printf("[LastLoginAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.LastLoginUnixTime), user.LastLoginUnixTime)
+	}
 }
 
 func printTokenInfo(token *models.TokenRecord) {

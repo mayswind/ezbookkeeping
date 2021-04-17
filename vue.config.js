@@ -4,7 +4,7 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 const pkgFile = require('./package.json');
-const thirdPartyLicenseFile = require('./third-patry-licenses.json');
+const thirdPartyLicenseFile = require('./third-patry-dependencies.json');
 
 const licenseFile = fs.readFileSync('./LICENSE', 'UTF-8');
 

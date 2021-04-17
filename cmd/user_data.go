@@ -111,8 +111,8 @@ var UserData = &cli.Command{
 			},
 		},
 		{
-			Name:   "user-token-clear",
-			Usage:  "Clear user all tokens",
+			Name:   "user-session-clear",
+			Usage:  "Clear user all sessions",
 			Action: clearUserTokens,
 			Flags: []cli.Flag{
 				&cli.StringFlag{

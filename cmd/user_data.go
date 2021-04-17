@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -101,6 +103,19 @@ var UserData = &cli.Command{
 			Name:   "user-2fa-disable",
 			Usage:  "Disable user 2fa setting",
 			Action: disableUser2FA,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
+			Name:   "user-session-list",
+			Usage:  "List all user sessions",
+			Action: listUserTokens,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -264,6 +279,32 @@ func disableUser2FA(c *cli.Context) error {
 	return nil
 }
 
+func listUserTokens(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	tokens, err := clis.UserData.ListUserTokens(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.listUserTokens] error occurs when getting user tokens")
+		return err
+	}
+
+	for i := 0; i < len(tokens); i++ {
+		printTokenInfo(tokens[i])
+
+		if i < len(tokens) - 1 {
+			fmt.Printf("---\n")
+		}
+	}
+
+	return nil
+}
+
 func clearUserTokens(c *cli.Context) error {
 	_, err := initializeSystem(c)
 
@@ -348,4 +389,10 @@ func exportUserTransaction(c *cli.Context) error {
 	log.BootInfof("[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
 
 	return nil
+}
+
+func printTokenInfo(token *models.TokenRecord) {
+	fmt.Printf("[CreatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(token.CreatedUnixTime), token.CreatedUnixTime)
+	fmt.Printf("[ExpiredAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(token.ExpiredUnixTime), token.ExpiredUnixTime)
+	fmt.Printf("[UserAgent] %s\n", token.UserAgent)
 }

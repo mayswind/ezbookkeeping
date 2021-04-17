@@ -178,6 +178,30 @@ func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 	return nil
 }
 
+// ListUserTokens returns all tokens of the specified user
+func (l *UserDataCli) ListUserTokens(c *cli.Context, username string) ([]*models.TokenRecord, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.ListUserTokens] user name is empty")
+		return nil, errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ListUserTokens] error occurs when getting user id by user name")
+		return nil, err
+	}
+
+	tokens, err := l.tokens.GetAllUnexpiredNormalTokensByUid(uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ListUserTokens] failed to get tokens of user \"%s\", because %s", username, err.Error())
+		return nil, err
+	}
+
+	return tokens, nil
+}
+
 // ClearUserTokens clears all tokens of the specified user
 func (l *UserDataCli) ClearUserTokens(c *cli.Context, username string) error {
 	if username == "" {

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/exporters"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
@@ -19,7 +19,7 @@ const pageCountForDataExport = 1000
 
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
-	exporter     *exporters.CSVFileExporter
+	exporter     *converters.EzBookKeepingCSVFileExporter
 	tokens       *services.TokenService
 	users        *services.UserService
 	accounts     *services.AccountService
@@ -31,7 +31,7 @@ type DataManagementsApi struct {
 // Initialize a data management api singleton instance
 var (
 	DataManagements = &DataManagementsApi{
-		exporter:     &exporters.CSVFileExporter{},
+		exporter:     &converters.EzBookKeepingCSVFileExporter{},
 		tokens:       services.Tokens,
 		users:        services.Users,
 		accounts:     services.Accounts,
@@ -97,7 +97,7 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	result, err := a.exporter.GetOutputContent(uid, timezone, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := a.exporter.ToExportedContent(uid, timezone, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())

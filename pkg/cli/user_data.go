@@ -5,8 +5,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/exporters"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
@@ -18,27 +18,27 @@ const pageCountForDataExport = 1000
 
 // UserDataCli represents user data cli
 type UserDataCli struct {
-	csvExporter             *exporters.CSVFileExporter
-	accounts                *services.AccountService
-	transactions            *services.TransactionService
-	categories              *services.TransactionCategoryService
-	tags                    *services.TransactionTagService
-	users                   *services.UserService
-	twoFactorAuthorizations *services.TwoFactorAuthorizationService
-	tokens                  *services.TokenService
+	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
+	accounts                 *services.AccountService
+	transactions             *services.TransactionService
+	categories               *services.TransactionCategoryService
+	tags                     *services.TransactionTagService
+	users                    *services.UserService
+	twoFactorAuthorizations  *services.TwoFactorAuthorizationService
+	tokens                   *services.TokenService
 }
 
 // Initialize an user data cli singleton instance
 var (
 	UserData = &UserDataCli{
-		csvExporter:             &exporters.CSVFileExporter{},
-		accounts:                services.Accounts,
-		transactions:            services.Transactions,
-		categories:              services.TransactionCategories,
-		tags:                    services.TransactionTags,
-		users:                   services.Users,
-		twoFactorAuthorizations: services.TwoFactorAuthorizations,
-		tokens:                  services.Tokens,
+		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
+		accounts:                 services.Accounts,
+		transactions:             services.Transactions,
+		categories:               services.TransactionCategories,
+		tags:                     services.TransactionTags,
+		users:                    services.Users,
+		twoFactorAuthorizations:  services.TwoFactorAuthorizations,
+		tokens:                   services.Tokens,
 	}
 )
 
@@ -417,7 +417,7 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte
 		return nil, err
 	}
 
-	result, err := l.csvExporter.GetOutputContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := l.ezBookKeepingCsvExporter.ToExportedContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())

@@ -75,6 +75,37 @@ func TestFormatTimezoneOffset(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestParseFromTimezoneOffset(t *testing.T) {
+	expectedValue := time.FixedZone("Timezone", 120*60)
+	actualValue, err := ParseFromTimezoneOffset("+02:00")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = time.FixedZone("Timezone", 345*60)
+	actualValue, err = ParseFromTimezoneOffset("+05:45")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = time.FixedZone("Timezone", -720*60)
+	actualValue, err = ParseFromTimezoneOffset("-12:00")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = time.FixedZone("Timezone", 0)
+	actualValue, err = ParseFromTimezoneOffset("+00:00")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	actualValue, err = ParseFromTimezoneOffset("00:00")
+	assert.NotEqual(t, nil, err)
+
+	actualValue, err = ParseFromTimezoneOffset("0")
+	assert.NotEqual(t, nil, err)
+
+	actualValue, err = ParseFromTimezoneOffset("1000")
+	assert.NotEqual(t, nil, err)
+}
+
 func TestGetMinTransactionTimeFromUnixTime(t *testing.T) {
 	expectedValue := int64(1617228083000)
 	actualValue := GetMinTransactionTimeFromUnixTime(1617228083)

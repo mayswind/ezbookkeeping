@@ -2,7 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 const (
@@ -72,6 +75,46 @@ func FormatTimezoneOffset(timezone *time.Location) string {
 	}
 
 	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset)
+}
+
+// ParseFromTimezoneOffset parses a formatted string in timezone offset format
+func ParseFromTimezoneOffset(tzOffset string) (*time.Location, error) {
+	if len(tzOffset) != 6 { // +/-HH:MM
+		return nil, errs.ErrFormatInvalid
+	}
+
+	sign := tzOffset[0]
+
+	if sign != '-' && sign != '+' {
+		return nil, errs.ErrFormatInvalid
+	}
+
+	offsets := strings.Split(tzOffset[1:], ":")
+
+	if len(offsets) != 2 {
+		return nil, errs.ErrFormatInvalid
+	}
+
+	hourAbsOffset, err := StringToInt32(offsets[0])
+
+	if err != nil {
+		return nil, err
+	}
+
+	minuteAbsOffset, err := StringToInt32(offsets[1])
+
+	if err != nil {
+		return nil, err
+	}
+
+	totalMinuteOffset := hourAbsOffset*60 + minuteAbsOffset
+
+	if sign == '-' {
+		totalMinuteOffset = -totalMinuteOffset
+	}
+
+	totalOffset := totalMinuteOffset * 60
+	return time.FixedZone("Timezone", totalOffset), nil
 }
 
 // GetMinTransactionTimeFromUnixTime returns the minimum transaction time from unix time

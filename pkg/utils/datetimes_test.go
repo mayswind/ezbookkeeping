@@ -35,13 +35,6 @@ func TestFormatUnixTimeToYearMonth(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestParseFromUnixTime(t *testing.T) {
-	expectedValue := int64(1617228083)
-	actualTime := ParseFromUnixTime(expectedValue)
-	actualValue := actualTime.Unix()
-	assert.Equal(t, expectedValue, actualValue)
-}
-
 func TestParseFromLongDateTime(t *testing.T) {
 	expectedValue := int64(1617228083)
 	actualTime, err := ParseFromLongDateTime("2021-04-01 06:01:23", 480)
@@ -97,5 +90,12 @@ func TestGetMaxTransactionTimeFromUnixTime(t *testing.T) {
 func TestGetUnixTimeFromTransactionTime(t *testing.T) {
 	expectedValue := int64(1617228083)
 	actualValue := GetUnixTimeFromTransactionTime(1617228083999)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromUnixTime(t *testing.T) {
+	expectedValue := int64(1617228083)
+	actualTime := parseFromUnixTime(expectedValue)
+	actualValue := actualTime.Unix()
 	assert.Equal(t, expectedValue, actualValue)
 }

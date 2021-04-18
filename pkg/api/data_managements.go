@@ -57,6 +57,15 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, "", errs.ErrUserNotFound
+	}
 
 	accounts, err := a.accounts.GetAllAccountsByUid(uid)
 
@@ -104,7 +113,7 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	fileName := a.getFileName(timezone)
+	fileName := a.getFileName(user, timezone)
 
 	return result, fileName, nil
 }
@@ -159,11 +168,11 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *er
 	return true, nil
 }
 
-func (a *DataManagementsApi) getFileName(timezone *time.Location) string {
+func (a *DataManagementsApi) getFileName(user *models.User, timezone *time.Location) string {
 	currentTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(time.Now().Unix(), timezone)
 	currentTime = strings.Replace(currentTime, "-", "_", -1)
 	currentTime = strings.Replace(currentTime, " ", "_", -1)
 	currentTime = strings.Replace(currentTime, ":", "_", -1)
 
-	return fmt.Sprintf("%s.csv", currentTime)
+	return fmt.Sprintf("%s_%s.csv", user.Username, currentTime)
 }

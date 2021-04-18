@@ -14,8 +14,8 @@ type EzBookKeepingCSVFileExporter struct {
 	DataConverter
 }
 
-const csvHeaderLine = "Time,Type,Category,Sub Category,Account,Amount,Account2,Account2 Amount,Tags,Comment\n"
-const csvDataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+const csvHeaderLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Tags,Comment\n"
+const csvDataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
 // ToExportedContent returns the exported csv data
 func (e *EzBookKeepingCSVFileExporter) ToExportedContent(uid int64, timezone *time.Location, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
@@ -33,23 +33,27 @@ func (e *EzBookKeepingCSVFileExporter) ToExportedContent(uid int64, timezone *ti
 
 		transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
 		transactionTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
+		transactionTimezone := utils.FormatTimezoneOffset(transactionTimeZone)
 		transactionType := e.getTransactionTypeName(transaction.Type)
 		category := e.getTransactionCategoryName(transaction.CategoryId, categoryMap)
 		subCategory := e.getTransactionSubCategoryName(transaction.CategoryId, categoryMap)
 		account := e.getAccountName(transaction.AccountId, accountMap)
+		accountCurrency := e.getAccountCurrency(transaction.AccountId, accountMap)
 		amount := e.getDisplayAmount(transaction.Amount)
 		account2 := ""
+		account2Currency := ""
 		account2Amount := ""
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			account2 = e.getAccountName(transaction.RelatedAccountId, accountMap)
+			account2Currency = e.getAccountCurrency(transaction.RelatedAccountId, accountMap)
 			account2Amount = e.getDisplayAmount(transaction.RelatedAccountAmount)
 		}
 
 		tags := e.getTags(transaction.TransactionId, allTagIndexs, tagMap)
 		comment := e.getComment(transaction.Comment)
 
-		ret.WriteString(fmt.Sprintf(csvDataLineFormat, transactionTime, transactionType, category, subCategory, account, amount, account2, account2Amount, tags, comment))
+		ret.WriteString(fmt.Sprintf(csvDataLineFormat, transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, tags, comment))
 	}
 
 	return []byte(ret.String()), nil
@@ -104,6 +108,16 @@ func (e *EzBookKeepingCSVFileExporter) getAccountName(accountId int64, accountMa
 
 	if exists {
 		return account.Name
+	} else {
+		return ""
+	}
+}
+
+func (e *EzBookKeepingCSVFileExporter) getAccountCurrency(accountId int64, accountMap map[int64]*models.Account) string {
+	account, exists := accountMap[accountId]
+
+	if exists {
+		return account.Currency
 	} else {
 		return ""
 	}

@@ -60,6 +60,28 @@ func TestParseFromShortDateTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatTimezoneOffset(t *testing.T) {
+	timezone := time.FixedZone("Test Timezone", 120*60)
+	expectedValue := "+02:00"
+	actualValue := FormatTimezoneOffset(timezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	timezone = time.FixedZone("Test Timezone", 345*60)
+	expectedValue = "+05:45"
+	actualValue = FormatTimezoneOffset(timezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	timezone = time.FixedZone("Test Timezone", -720*60)
+	expectedValue = "-12:00"
+	actualValue = FormatTimezoneOffset(timezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	timezone = time.FixedZone("Test Timezone", 0)
+	expectedValue = "+00:00"
+	actualValue = FormatTimezoneOffset(timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestGetMinTransactionTimeFromUnixTime(t *testing.T) {
 	expectedValue := int64(1617228083000)
 	actualValue := GetMinTransactionTimeFromUnixTime(1617228083)

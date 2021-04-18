@@ -1,6 +1,9 @@
 package utils
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	longDateTimeFormat              = "2006-01-02 15:04:05"
@@ -51,6 +54,24 @@ func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
 func ParseFromShortDateTime(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
 	return time.ParseInLocation(shortDateTimeFormat, t, timezone)
+}
+
+// FormatTimezoneOffset returns "+/-HH:MM" format of timezone
+func FormatTimezoneOffset(timezone *time.Location) string {
+	_, tzOffset := time.Now().In(timezone).Zone()
+	tzMinutesOffset := tzOffset / 60
+
+	sign := "+"
+	hourAbsOffset := tzMinutesOffset / 60
+	minuteAbsOffset := tzMinutesOffset % 60
+
+	if hourAbsOffset < 0 {
+		sign = "-"
+		hourAbsOffset = -hourAbsOffset
+		minuteAbsOffset = -minuteAbsOffset
+	}
+
+	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset)
 }
 
 // GetMinTransactionTimeFromUnixTime returns the minimum transaction time from unix time

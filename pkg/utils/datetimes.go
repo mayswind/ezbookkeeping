@@ -59,10 +59,17 @@ func ParseFromShortDateTime(t string, utcOffset int16) (time.Time, error) {
 	return time.ParseInLocation(shortDateTimeFormat, t, timezone)
 }
 
+// GetTimezoneOffsetMinutes returns offset minutes according specified timezone
+func GetTimezoneOffsetMinutes(timezone *time.Location) int16 {
+	_, tzOffset := time.Now().In(timezone).Zone()
+	tzMinuteOffset := int16(tzOffset / 60)
+
+	return tzMinuteOffset
+}
+
 // FormatTimezoneOffset returns "+/-HH:MM" format of timezone
 func FormatTimezoneOffset(timezone *time.Location) string {
-	_, tzOffset := time.Now().In(timezone).Zone()
-	tzMinutesOffset := tzOffset / 60
+	tzMinutesOffset := GetTimezoneOffsetMinutes(timezone)
 
 	sign := "+"
 	hourAbsOffset := tzMinutesOffset / 60

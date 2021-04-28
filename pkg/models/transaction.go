@@ -46,6 +46,7 @@ type Transaction struct {
 	RelatedId            int64             `xorm:"NOT NULL"`
 	RelatedAccountId     int64             `xorm:"NOT NULL"`
 	RelatedAccountAmount int64             `xorm:"NOT NULL"`
+	HideAmount           bool              `xorm:"NOT NULL"`
 	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
@@ -62,6 +63,7 @@ type TransactionCreateRequest struct {
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool            `json:"hideAmount"`
 	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment" binding:"max=255"`
 }
@@ -76,6 +78,7 @@ type TransactionModifyRequest struct {
 	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64    `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64    `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool     `json:"hideAmount"`
 	TagIds               []string `json:"tagIds"`
 	Comment              string   `json:"comment" binding:"max=255"`
 }
@@ -181,6 +184,7 @@ type TransactionInfoResponse struct {
 	DestinationAccount   *AccountInfoResponse             `json:"destinationAccount,omitempty"`
 	SourceAmount         int64                            `json:"sourceAmount"`
 	DestinationAmount    int64                            `json:"destinationAmount,omitempty"`
+	HideAmount           bool                             `json:"hideAmount"`
 	TagIds               []string                         `json:"tagIds"`
 	Tags                 []*TransactionTagInfoResponse    `json:"tags,omitempty"`
 	Comment              string                           `json:"comment"`
@@ -304,6 +308,7 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		DestinationAccountId: destinationAccountId,
 		SourceAmount:         sourceAmount,
 		DestinationAmount:    destinationAmount,
+		HideAmount:           t.HideAmount,
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              t.Comment,
 		Editable:             editable,

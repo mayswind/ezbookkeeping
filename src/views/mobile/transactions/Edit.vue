@@ -4,6 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
+                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true" v-if="mode !== 'view'"></f7-link>
                 <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" :text="$t(saveButtonTitle)" @click="save" v-if="mode !== 'view'"></f7-link>
             </f7-nav-right>
 
@@ -47,7 +48,7 @@
                         :class="{ 'color-theme-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-theme-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
                         :style="{ fontSize: sourceAmountFontSize + 'px' }"
                         :header="$t(sourceAmountName)"
-                        :title="transaction.sourceAmount | currency"
+                        :title="transaction.sourceAmount | finalAmount(transaction.hideAmount) | currency"
                         @click="showSourceAmountSheet = true"
                     >
                         <number-pad-sheet :min-value="$constants.transaction.minAmount"
@@ -62,7 +63,7 @@
                         link="#" no-chevron
                         :style="{ fontSize: destinationAmountFontSize + 'px' }"
                         :header="$t('Transfer In Amount')"
-                        :title="transaction.destinationAmount | currency"
+                        :title="transaction.destinationAmount | finalAmount(transaction.hideAmount) | currency"
                         @click="showDestinationAmountSheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
@@ -254,6 +255,16 @@
             </f7-card-content>
         </f7-card>
 
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ $t('Show Amount') }}</f7-actions-button>
+                <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ $t('Hide Amount') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
         <f7-toolbar tabbar bottom v-if="mode !== 'view'">
             <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="save">
                 {{ $t(saveButtonTitle) }}
@@ -294,6 +305,7 @@ export default {
                 destinationAccountId: '',
                 sourceAmount: 0,
                 destinationAmount: 0,
+                hideAmount: false,
                 tagIds: [],
                 comment: ''
             },
@@ -301,6 +313,7 @@ export default {
             loadingError: null,
             submitting: false,
             showAccountBalance: self.$settings.isShowAccountBalance(),
+            showMoreActionSheet: false,
             showSourceAmountSheet: false,
             showDestinationAmountSheet: false,
             showCategorySheet: false,
@@ -659,6 +672,7 @@ export default {
                     self.transaction.destinationAmount = transaction.destinationAmount;
                 }
 
+                self.transaction.hideAmount = transaction.hideAmount;
                 self.transaction.tagIds = transaction.tagIds || [];
                 self.transaction.comment = transaction.comment;
             }
@@ -697,6 +711,7 @@ export default {
                 sourceAmount: self.transaction.sourceAmount,
                 destinationAccountId: '0',
                 destinationAmount: 0,
+                hideAmount: self.transaction.hideAmount,
                 tagIds: self.transaction.tagIds,
                 comment: self.transaction.comment,
                 utcOffset: self.transaction.utcOffset
@@ -802,6 +817,13 @@ export default {
         }
     },
     filters: {
+        finalAmount(amount, hideAmount) {
+            if (hideAmount) {
+                return '***';
+            }
+
+            return amount;
+        },
         primaryCategoryName(categoryId, allCategories) {
             for (let i = 0; i < allCategories.length; i++) {
                 for (let j = 0; j < allCategories[i].subCategories.length; j++) {

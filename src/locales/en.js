@@ -787,6 +787,8 @@ export default {
     'Income Amount': 'Income Amount',
     'Transfer Out Amount': 'Transfer Out Amount',
     'Transfer In Amount': 'Transfer In Amount',
+    'Show Amount': 'Show Amount',
+    'Hide Amount': 'Hide Amount',
     'Category': 'Category',
     'Account': 'Account',
     'Source Account': 'Source Account',

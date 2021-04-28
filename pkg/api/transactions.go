@@ -693,6 +693,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		TimezoneUtcOffset: transactionModifyReq.UtcOffset,
 		AccountId:         transactionModifyReq.SourceAccountId,
 		Amount:            transactionModifyReq.SourceAmount,
+		HideAmount:        transactionModifyReq.HideAmount,
 		Comment:           transactionModifyReq.Comment,
 	}
 
@@ -708,6 +709,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		newTransaction.Amount == transaction.Amount &&
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
+		newTransaction.HideAmount == transaction.HideAmount &&
 		newTransaction.Comment == transaction.Comment &&
 		utils.Int64SliceEquals(tagIds, transactionTagIds) {
 		return nil, errs.ErrNothingWillBeUpdated
@@ -992,6 +994,7 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		TimezoneUtcOffset: transactionCreateReq.UtcOffset,
 		AccountId:         transactionCreateReq.SourceAccountId,
 		Amount:            transactionCreateReq.SourceAmount,
+		HideAmount:        transactionCreateReq.HideAmount,
 		Comment:           transactionCreateReq.Comment,
 	}
 

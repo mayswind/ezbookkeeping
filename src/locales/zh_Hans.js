@@ -787,6 +787,8 @@ export default {
     'Income Amount': '收入金额',
     'Transfer Out Amount': '转出金额',
     'Transfer In Amount': '转入金额',
+    'Show Amount': '显示金额',
+    'Hide Amount': '隐藏金额',
     'Category': '分类',
     'Account': '账户',
     'Source Account': '来源账户',

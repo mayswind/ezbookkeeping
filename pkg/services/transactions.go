@@ -512,6 +512,10 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			}
 		}
 
+		if transaction.HideAmount != oldTransaction.HideAmount {
+			updateCols = append(updateCols, "hide_amount")
+		}
+
 		if transaction.Comment != oldTransaction.Comment {
 			updateCols = append(updateCols, "comment")
 		}

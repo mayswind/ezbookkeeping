@@ -329,8 +329,8 @@
                                 </div>
                                 <div slot="after" class="transaction-amount" v-if="transaction.sourceAccount"
                                      :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">
-                                    <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && transaction.sourceAccount.id === query.accountId)">{{ transaction.sourceAmount | currency(transaction.sourceAccount.currency) }}</span>
-                                    <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && transaction.destinationAccount.id === query.accountId">{{ transaction.destinationAmount | currency(transaction.destinationAccount.currency) }}</span>
+                                    <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && transaction.sourceAccount.id === query.accountId)">{{ transaction.sourceAmount | finalAmount(transaction.hideAmount) | currency(transaction.sourceAccount.currency) }}</span>
+                                    <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && transaction.destinationAccount.id === query.accountId">{{ transaction.destinationAmount | finalAmount(transaction.hideAmount) | currency(transaction.destinationAccount.currency) }}</span>
                                 </div>
                                 <f7-swipeout-actions right>
                                     <f7-swipeout-button color="primary" close
@@ -840,6 +840,13 @@ export default {
         }
     },
     filters: {
+        finalAmount(amount, hideAmount) {
+            if (hideAmount) {
+                return '***';
+            }
+
+            return amount;
+        },
         transactionTypeName(type, allTransactionTypes) {
             if (type === allTransactionTypes.Income) {
                 return 'Income';

@@ -14,8 +14,8 @@ export default {
             'short': 'M/D/YYYY'
         },
         'datetime': {
-            'long': 'M/D/YYYY HH:mm:ss',
-            'long-without-second': 'M/D/YYYY HH:mm',
+            'long': 'M/D/YYYY hh:mm:ss A',
+            'long-without-second': 'M/D/YYYY hh:mm A',
         },
         'year': {
             'long': 'YYYY',
@@ -30,7 +30,7 @@ export default {
             'short': 'M/D'
         },
         'hourMinute': {
-            'long': 'HH:mm'
+            'long': 'hh:mm A'
         },
         'currency': {
             'symbol': '{symbol} {amount}'

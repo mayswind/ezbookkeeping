@@ -36,6 +36,11 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
+    'input-format': {
+        'datetime': {
+            'long': 'm/d/yyyy hh::mm A',
+        },
+    },
     'datetime': {
         'Monday': {
             'short': 'Mon',
@@ -66,39 +71,51 @@ export default {
             'long': 'Sunday'
         },
         'January': {
+            'short': 'Jan',
             'long': 'January'
         },
         'February': {
+            'short': 'Feb',
             'long': 'February'
         },
         'March': {
+            'short': 'Mar',
             'long': 'March'
         },
         'April': {
+            'short': 'Apr',
             'long': 'April'
         },
         'May': {
+            'short': 'May',
             'long': 'May'
         },
         'June': {
+            'short': 'Jun',
             'long': 'June'
         },
         'July': {
+            'short': 'Jul',
             'long': 'July'
         },
         'August': {
+            'short': 'Aug',
             'long': 'August'
         },
         'September': {
+            'short': 'Sep',
             'long': 'September'
         },
         'October': {
+            'short': 'Oct',
             'long': 'October'
         },
         'November': {
+            'short': 'Nov',
             'long': 'November'
         },
         'December': {
+            'short': 'Dec',
             'long': 'December'
         }
     },
@@ -655,6 +672,8 @@ export default {
     'Custom Date': 'Custom Date',
     'Begin Time': 'Begin Time',
     'End Time': 'End Time',
+    'Select Date': 'Select Date',
+    'Select Time': 'Select Time',
     'Custom': 'Custom',
     'Pie Chart': 'Pie Chart',
     'Bar Chart': 'Bar Chart',

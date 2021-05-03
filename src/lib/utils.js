@@ -80,6 +80,18 @@ function getTimezoneOffsetMinutes(timezone) {
     return getUtcOffsetMinutesByUtcOffset(utcOffset);
 }
 
+function getBrowserTimezoneOffsetMinutes() {
+    return -new Date().getTimezoneOffset();
+}
+
+function getLocalDatetimeFromUnixTime(unixTime) {
+    return new Date(unixTime * 1000);
+}
+
+function getUnixTimeFromLocalDatetime(datetime) {
+    return datetime.getTime() / 1000;
+}
+
 function getActualUnixTimeForStore(unixTime, utcOffset, currentUtcOffset) {
     return unixTime - (utcOffset - currentUtcOffset) * 60;
 }
@@ -632,6 +644,9 @@ export default {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffsetMinutes,
+    getLocalDatetimeFromUnixTime,
+    getUnixTimeFromLocalDatetime,
     getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
     getCurrentUnixTime,

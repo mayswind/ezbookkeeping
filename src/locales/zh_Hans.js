@@ -36,6 +36,11 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
+    'input-format': {
+        'datetime': {
+            'long': 'yyyy年m月d日 HH::mm',
+        },
+    },
     'datetime': {
         'Monday': {
             'short': '周一',
@@ -66,39 +71,51 @@ export default {
             'long': '星期日'
         },
         'January': {
+            'short': '1月',
             'long': '1月'
         },
         'February': {
+            'short': '2月',
             'long': '2月'
         },
         'March': {
+            'short': '3月',
             'long': '3月'
         },
         'April': {
+            'short': '4月',
             'long': '4月'
         },
         'May': {
+            'short': '5月',
             'long': '5月'
         },
         'June': {
+            'short': '6月',
             'long': '6月'
         },
         'July': {
+            'short': '7月',
             'long': '7月'
         },
         'August': {
+            'short': '8月',
             'long': '8月'
         },
         'September': {
+            'short': '9月',
             'long': '9月'
         },
         'October': {
+            'short': '10月',
             'long': '10月'
         },
         'November': {
+            'short': '11月',
             'long': '11月'
         },
         'December': {
+            'short': '12月',
             'long': '12月'
         }
     },
@@ -655,6 +672,8 @@ export default {
     'Custom Date': '自定义日期',
     'Begin Time': '开始时间',
     'End Time': '结束时间',
+    'Select Date': '选择日期',
+    'Select Time': '选择时间',
     'Custom': '自定义',
     'Pie Chart': '饼图',
     'Bar Chart': '条形图',

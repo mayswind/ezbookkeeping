@@ -57,6 +57,11 @@ export default {
                     iosSwipeBackAnimateShadow: false,
                     mdSwipeBackAnimateShadow: false
                 },
+                calendar: {
+                    locale: 'en',
+                    openIn: 'customModal',
+                    backdrop: true
+                },
                 serviceWorker: {
                     path: self.$settings.isProduction() ? './sw.js' : undefined,
                     scope: './',

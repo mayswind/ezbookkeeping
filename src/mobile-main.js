@@ -29,6 +29,8 @@ import Framework7Radio from 'framework7/components/radio/radio';
 import Framework7Toggle from 'framework7/components/toggle/toggle';
 import Framework7SmartSelect from 'framework7/components/smart-select/smart-select';
 import Framework7Grid from 'framework7/components/grid/grid';
+import Framework7Calendar from 'framework7/components/calendar/calendar';
+import Framework7Picker from 'framework7/components/picker/picker';
 import Framework7InfiniteScroll from 'framework7/components/infinite-scroll/infinite-scroll';
 import Framework7PullToRefresh from 'framework7/components/pull-to-refresh/pull-to-refresh';
 import Framework7Searchbar from 'framework7/components/searchbar/searchbar';
@@ -121,6 +123,8 @@ Framework7.use(Framework7Radio);
 Framework7.use(Framework7Toggle);
 Framework7.use(Framework7SmartSelect);
 Framework7.use(Framework7Grid);
+Framework7.use(Framework7Calendar);
+Framework7.use(Framework7Picker);
 Framework7.use(Framework7InfiniteScroll);
 Framework7.use(Framework7PullToRefresh);
 Framework7.use(Framework7Searchbar);
@@ -199,6 +203,72 @@ Vue.prototype.$locale = {
     defaultTimezoneOffsetMinutes: utils.getTimezoneOffsetMinutes(),
     getDefaultLanguage: getDefaultLanguage,
     getAllLanguages: getAllLanguages,
+    getAllLongMonthNames: function () {
+        return [
+            i18n.t('datetime.January.long'),
+            i18n.t('datetime.February.long'),
+            i18n.t('datetime.March.long'),
+            i18n.t('datetime.April.long'),
+            i18n.t('datetime.May.long'),
+            i18n.t('datetime.June.long'),
+            i18n.t('datetime.July.long'),
+            i18n.t('datetime.August.long'),
+            i18n.t('datetime.September.long'),
+            i18n.t('datetime.October.long'),
+            i18n.t('datetime.November.long'),
+            i18n.t('datetime.December.long')
+        ];
+    },
+    getAllShortMonthNames: function () {
+        return [
+            i18n.t('datetime.January.short'),
+            i18n.t('datetime.February.short'),
+            i18n.t('datetime.March.short'),
+            i18n.t('datetime.April.short'),
+            i18n.t('datetime.May.short'),
+            i18n.t('datetime.June.short'),
+            i18n.t('datetime.July.short'),
+            i18n.t('datetime.August.short'),
+            i18n.t('datetime.September.short'),
+            i18n.t('datetime.October.short'),
+            i18n.t('datetime.November.short'),
+            i18n.t('datetime.December.short')
+        ];
+    },
+    getAllLongWeekdayNames: function () {
+        return [
+            i18n.t('datetime.Sunday.long'),
+            i18n.t('datetime.Monday.long'),
+            i18n.t('datetime.Tuesday.long'),
+            i18n.t('datetime.Wednesday.long'),
+            i18n.t('datetime.Thursday.long'),
+            i18n.t('datetime.Friday.long'),
+            i18n.t('datetime.Saturday.long')
+        ];
+    },
+    getAllShortWeekdayNames: function () {
+        return [
+            i18n.t('datetime.Sunday.short'),
+            i18n.t('datetime.Monday.short'),
+            i18n.t('datetime.Tuesday.short'),
+            i18n.t('datetime.Wednesday.short'),
+            i18n.t('datetime.Thursday.short'),
+            i18n.t('datetime.Friday.short'),
+            i18n.t('datetime.Saturday.short')
+        ];
+    },
+    getInputTimeIntlDateTimeFormatOptions: function () {
+        const hourMinuteFormat = i18n.t('input-format.datetime.long');
+        const is24HourFormat = hourMinuteFormat.indexOf('H') > 0;
+        const hour2Digits = (hourMinuteFormat.indexOf('HH') > 0) || (hourMinuteFormat.indexOf('hh') > 0);
+        const minute2Digits = hourMinuteFormat.indexOf(':mm') > 0;
+
+        return {
+            hour12: !is24HourFormat,
+            hour: hour2Digits ? '2-digit' : 'numeric',
+            minute: minute2Digits ? '2-digit' : 'numeric'
+        }
+    },
     getLanguage: getLanguage,
     setLanguage: function (locale) {
         if (settings.getLanguage() !== locale) {

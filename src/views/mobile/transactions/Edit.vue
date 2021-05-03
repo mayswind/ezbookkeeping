@@ -196,10 +196,21 @@
 
                     <f7-list-input
                         :label="$t('Transaction Time')"
-                        type="datetime-local"
+                        type="datepicker"
                         class="transaction-edit-time"
+                        :calendar-params="{
+                            timePicker: true,
+                            dateFormat: $t('input-format.datetime.long'),
+                            firstDay: defaultFirstDayOfWeek,
+                            toolbarCloseText: $t('Done'),
+                            timePickerPlaceholder: $t('Select Time'),
+                            timePickerFormat: $locale.getInputTimeIntlDateTimeFormatOptions(),
+                            monthNames: $locale.getAllLongMonthNames(),
+                            monthNamesShort: $locale.getAllShortMonthNames(),
+                            dayNames: $locale.getAllLongWeekdayNames(),
+                            dayNamesShort: $locale.getAllShortWeekdayNames()}"
                         :value="transaction.time"
-                        @input="transaction.time = $event.target.value"
+                        @calendar:change="transaction.time = $event"
                     >
                     </f7-list-input>
 
@@ -295,7 +306,7 @@ export default {
             transaction: {
                 type: defaultType,
                 unixTime: now,
-                time: self.$utilities.formatUnixTime(now, 'YYYY-MM-DDTHH:mm'),
+                time: self.$utilities.getLocalDatetimeFromUnixTime(now),
                 timeZone: currentTimezone,
                 utcOffset: self.$utilities.getTimezoneOffsetMinutes(currentTimezone),
                 expenseCategory: '',
@@ -362,8 +373,8 @@ export default {
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency;
         },
-        defaultTimezoneOffset() {
-            return this.$locale.defaultTimezoneOffset;
+        defaultFirstDayOfWeek() {
+            return this.$store.getters.currentUserFirstDayOfWeek;
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -526,13 +537,17 @@ export default {
             }
         },
         'transaction.time': function (newValue) {
-            if (!newValue) {
-                newValue = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
-                this.transaction.time = newValue;
+            if (this.$utilities.isArray(newValue)) {
+                newValue = newValue[0];
             }
 
-            if (this.$utilities.formatUnixTime(this.transaction.unixTime, 'YYYY-MM-DDTHH:mm') !== newValue) {
-                this.transaction.unixTime = this.$utilities.getUnixTime(newValue);
+            if (!newValue) {
+                newValue = this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime());
+                this.transaction.time = [newValue];
+            }
+
+            if (this.$utilities.getUnixTimeFromLocalDatetime(newValue) !== this.transaction.unixTime) {
+                this.transaction.unixTime = this.$utilities.getUnixTimeFromLocalDatetime(newValue);
             }
         },
         'transaction.timeZone': function (newValue) {
@@ -656,8 +671,8 @@ export default {
                 if (self.mode === 'edit' || self.mode === 'view') {
                     self.transaction.utcOffset = transaction.utcOffset;
                     self.transaction.timeZone = null;
-                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes());
-                    self.transaction.time = self.$utilities.formatUnixTime(self.transaction.unixTime, 'YYYY-MM-DDTHH:mm');
+                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes());
+                    self.transaction.time = [self.$utilities.getLocalDatetimeFromUnixTime(self.transaction.unixTime)];
                 }
 
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
@@ -706,7 +721,7 @@ export default {
 
             const submitTransaction = {
                 type: self.transaction.type,
-                time: self.$utilities.getActualUnixTimeForStore(self.transaction.unixTime, self.transaction.utcOffset, self.$utilities.getTimezoneOffsetMinutes()),
+                time: self.$utilities.getActualUnixTimeForStore(self.transaction.unixTime, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes()),
                 sourceAccountId: self.transaction.sourceAccountId,
                 sourceAmount: self.transaction.sourceAmount,
                 destinationAccountId: '0',
@@ -911,10 +926,6 @@ export default {
 .transaction-edit-timezone-title {
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.transaction-edit-time input[type="datetime-local"] {
-    max-width: inherit;
 }
 
 .transaction-edit-timezone-name {

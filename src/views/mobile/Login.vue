@@ -4,6 +4,7 @@
             <img class="login-page-logo" src="img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
+
         <f7-list form>
             <f7-list-input
                 type="text"
@@ -25,6 +26,7 @@
                 @keyup.enter.native="loginByPressEnter"
             ></f7-list-input>
         </f7-list>
+
         <f7-list>
             <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
@@ -34,7 +36,9 @@
             <f7-block-footer>
             </f7-block-footer>
         </f7-list>
+
         <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
+
         <f7-list>
             <f7-block-footer>
                 <span>Powered by </span>

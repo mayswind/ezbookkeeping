@@ -766,6 +766,7 @@ export default {
     'Account Type': 'Account Type',
     'Account Name': 'Account Name',
     'Your account name': 'Your account name',
+    'Sub Account': 'Sub Account',
     'Sub Account Name': 'Sub Account Name',
     'Your sub account name': 'Your sub account name',
     'Account Icon': 'Account Icon',

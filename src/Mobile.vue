@@ -225,6 +225,15 @@ i.icon.la, i.icon.las, i.icon.lab {
     color: var(--f7-input-error-text-color)
 }
 
+.skeleton-text .list-item-toggle .item-after {
+    height: var(--f7-toggle-height);
+}
+
+.skeleton-text .list-item-toggle .item-after > span {
+    line-height: var(--f7-toggle-height);
+    font-size: var(--f7-toggle-height);
+}
+
 .no-sortable > .sortable-handler {
     display: none;
 }

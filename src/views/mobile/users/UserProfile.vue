@@ -10,20 +10,28 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list inline-labels>
+                <f7-list>
                     <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
                     <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
                     <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
                     <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
-                    <f7-list-item title="Default Currency" after="Currency"></f7-list-item>
-                    <f7-list-item title="First Day of Week" after="Week Day"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="!loading">
+        <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form inline-labels>
+                <f7-list>
+                    <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Editable Transaction Scope" title="All"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-if="!loading">
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list form>
                     <f7-list-input
                         type="password"
                         autocomplete="new-password"
@@ -64,9 +72,19 @@
                         @input="newProfile.nickname = $event.target.value"
                     ></f7-list-input>
 
+                    <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-if="!loading">
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list form>
                     <f7-list-item
-                        :title="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        class="list-item-with-header-and-title list-item-no-item-after"
+                        :header="$t('Default Currency')"
+                        :title="`currency.${newProfile.defaultCurrency}` | localized"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
                             <option v-for="currency in allCurrencies"
@@ -76,8 +94,10 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        :title="$t('First Day of Week')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        class="list-item-with-header-and-title list-item-no-item-after"
+                        :header="$t('First Day of Week')"
+                        :title="newProfile.firstDayOfWeek | optionName(allWeekDays, 'type', 'name') | format('datetime.#{value}.long') | localized"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('First Day of Week'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="newProfile.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
@@ -87,21 +107,19 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        :title="$t('Editable Transaction Scope')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        class="list-item-with-header-and-title list-item-no-item-after"
+                        :header="$t('Editable Transaction Scope')"
+                        :title="newProfile.transactionEditScope | optionName(allTransactionEditScopeTypes, 'value', 'name') | localized"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Editable Transaction Scope'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="newProfile.transactionEditScope">
-                            <option :value="0">{{ $t('None') }}</option>
-                            <option :value="1">{{ $t('All') }}</option>
-                            <option :value="2">{{ $t('Today or later') }}</option>
-                            <option :value="3">{{ $t('Recent 24 hours or later') }}</option>
-                            <option :value="4">{{ $t('This week or later') }}</option>
-                            <option :value="5">{{ $t('This month or later') }}</option>
-                            <option :value="6">{{ $t('This year or later') }}</option>
+                            <option v-for="option in allTransactionEditScopeTypes"
+                                    :key="option.value"
+                                    :value="option.value">{{ option.name | localized }}</option>
                         </select>
                     </f7-list-item>
 
-                    <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+                    <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInvalidProblemMessage)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -151,11 +169,38 @@ export default {
         allWeekDays() {
             return this.$constants.datetime.allWeekDays;
         },
+        allTransactionEditScopeTypes() {
+            return [{
+                value: 0,
+                name: 'None'
+            },{
+                value: 1,
+                name: 'All'
+            },{
+                value: 2,
+                name: 'Today or later'
+            },{
+                value: 3,
+                name: 'Recent 24 hours or later'
+            },{
+                value: 4,
+                name: 'This week or later'
+            },{
+                value: 5,
+                name: 'This month or later'
+            },{
+                value: 6,
+                name: 'This year or later'
+            }];
+        },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
         },
         inputIsInvalid() {
             return !!this.inputInvalidProblemMessage;
+        },
+        extendInputIsInvalid() {
+            return !!this.extendInputInvalidProblemMessage;
         },
         inputIsNotChangedProblemMessage() {
             if (!this.newProfile.password && !this.newProfile.confirmPassword && !this.newProfile.email && !this.newProfile.nickname) {
@@ -183,6 +228,13 @@ export default {
             } else if (!this.newProfile.nickname) {
                 return 'Nickname cannot be empty';
             } else if (!this.newProfile.defaultCurrency) {
+                return 'Default currency cannot be empty';
+            } else {
+                return null;
+            }
+        },
+        extendInputInvalidProblemMessage() {
+            if (!this.newProfile.defaultCurrency) {
                 return 'Default currency cannot be empty';
             } else {
                 return null;
@@ -227,7 +279,7 @@ export default {
 
             self.showInputPasswordSheet = false;
 
-            let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage;
+            let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage;
 
             if (problemMessage) {
                 self.$alert(problemMessage);

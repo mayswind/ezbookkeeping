@@ -70,9 +70,11 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
                     <f7-list-item
+                        class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_lang'"
-                        :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        :header="$t('Language')"
+                        :title="currentLocale | languageName"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Language'), searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
@@ -82,9 +84,11 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_currency'"
-                        :title="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        :header="$t('Default Currency')"
+                        :title="`currency.${user.defaultCurrency}` | localized"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
                             <option v-for="currency in allCurrencies"
@@ -94,9 +98,11 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_firstDayOfWeek'"
-                        :title="$t('First Day of Week')"
-                        smart-select :smart-select-params="{ openIn: 'popup', closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        :header="$t('First Day of Week')"
+                        :title="user.firstDayOfWeek | optionName(allWeekDays, 'type', 'name') | format('datetime.#{value}.long') | localized"
+                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('First Day of Week'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="user.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"

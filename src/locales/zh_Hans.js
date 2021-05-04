@@ -766,6 +766,7 @@ export default {
     'Account Type': '账户类型',
     'Account Name': '账户名称',
     'Your account name': '你的账户名称',
+    'Sub Account': '子账户',
     'Sub Account Name': '子账户名称',
     'Your sub account name': '你的子账户名称',
     'Account Icon': '账户图标',

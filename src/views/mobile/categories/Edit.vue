@@ -11,15 +11,19 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-input inline-label label="Category Name" placeholder="Your category name"></f7-list-input>
-                    <f7-list-item title="Category Icon" link="#">
-                        <f7-icon f7="app_fill"></f7-icon>
+                    <f7-list-input label="Category Name" placeholder="Your category name"></f7-list-input>
+                    <f7-list-item class="list-item-with-header-and-title" header="Category Icon" link="#">
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </f7-block>
                     </f7-list-item>
-                    <f7-list-item title="Category Color" link="#">
-                        <f7-icon f7="app_fill"></f7-icon>
+                    <f7-list-item class="list-item-with-header-and-title" header="Category Color" link="#">
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </f7-block>
                     </f7-list-item>
-                    <f7-list-item title="Visible" after="Visible"></f7-list-item>
-                    <f7-list-input type="textarea" placeholder="Your category description (optional)"></f7-list-input>
+                    <f7-list-item class="list-item-toggle" header="Visible" after="True"></f7-list-item>
+                    <f7-list-input label="Description" type="textarea" placeholder="Your category description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -29,7 +33,6 @@
                 <f7-list form>
                     <f7-list-input
                         type="text"
-                        inline-label
                         clear-button
                         :label="$t('Category Name')"
                         :placeholder="$t('Your category name')"
@@ -37,11 +40,14 @@
                         @input="category.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :title="$t('Category Icon')" key="singleTypeCategoryIconSelection" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  key="singleTypeCategoryIconSelection" link="#"
+                                  :header="$t('Category Icon')"
                                   @click="category.showIconSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 :icon="category.icon | categoryIcon"
-                                 :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon :icon="category.icon | categoryIcon"
+                                     :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <icon-selection-sheet :all-icon-infos="allCategoryIcons"
                                               :show.sync="category.showIconSelectionSheet"
                                               :color="category.color"
@@ -49,18 +55,21 @@
                         ></icon-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Category Color')" key="singleTypeCategoryColorSelection" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  key="singleTypeCategoryColorSelection" link="#"
+                                  :header="$t('Category Color')"
                                   @click="category.showColorSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 f7="app_fill"
-                                 :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"
+                                     :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <color-selection-sheet :all-color-infos="allCategoryColors"
                                                :show.sync="category.showColorSelectionSheet"
                                                v-model="category.color"
                         ></color-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Visible')" v-if="editCategoryId">
+                    <f7-list-item :header="$t('Visible')" v-if="editCategoryId">
                         <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
                     </f7-list-item>
 
@@ -68,6 +77,7 @@
                         type="textarea"
                         class="textarea-auto-size"
                         style="height: auto"
+                        :label="$t('Description')"
                         :placeholder="$t('Your category description (optional)')"
                         :value="category.comment"
                         @input="category.comment = $event.target.value"

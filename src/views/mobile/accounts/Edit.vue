@@ -12,8 +12,8 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-item link="#" title="Account Category" after="Category"></f7-list-item>
-                    <f7-list-item link="#" title="Account Type" after="Account Type"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title" link="#" header="Account Category" title="Category"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title" link="#" header="Account Type" title="Account Type"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -22,9 +22,10 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list form>
                     <f7-list-item
+                        class="list-item-with-header-and-title"
                         link="#"
-                        :title="$t('Account Category')"
-                        :after="account.category | accountCategoryName(allAccountCategories) | localized"
+                        :header="$t('Account Category')"
+                        :title="account.category | accountCategoryName(allAccountCategories) | localized"
                         @click="showAccountCategorySheet = true"
                     >
                         <list-item-selection-sheet value-type="item"
@@ -38,10 +39,12 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="list-item-with-header-and-title"
                         link="#"
                         :class="{ 'disabled': editAccountId }"
-                        :title="$t('Account Type')"
-                        :after="account.type | accountTypeName | localized"
+                        :header="$t('Account Type')"
+                        :title="account.type | accountTypeName | localized"
+                        :no-chevron="!!editAccountId"
                         @click="showAccountTypeSheet = true"
                     >
                         <list-item-selection-sheet value-type="item"
@@ -59,17 +62,21 @@
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-input inline-label label="Account Name" placeholder="Your account name"></f7-list-input>
-                    <f7-list-item title="Account Icon" link="#">
-                        <f7-icon f7="app_fill"></f7-icon>
+                    <f7-list-input label="Account Name" placeholder="Your account name"></f7-list-input>
+                    <f7-list-item class="list-item-with-header-and-title" header="Account Icon" link="#">
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </f7-block>
                     </f7-list-item>
-                    <f7-list-item title="Account Color" link="#">
-                        <f7-icon f7="app_fill"></f7-icon>
+                    <f7-list-item class="list-item-with-header-and-title" header="Account Color" link="#">
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </f7-block>
                     </f7-list-item>
-                    <f7-list-item title="Currency" after="Currency" link="#"></f7-list-item>
-                    <f7-list-item title="Account Balance" after="Balance" link="#"></f7-list-item>
-                    <f7-list-item title="Visible" after="Visible"></f7-list-item>
-                    <f7-list-input type="textarea" placeholder="Your account description (optional)"></f7-list-input>
+                    <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Currency" title="Currency" link="#"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title" header="Account Balance" title="Balance" link="#"></f7-list-item>
+                    <f7-list-item class="list-item-toggle" header="Visible" after="True"></f7-list-item>
+                    <f7-list-input label="Description" type="textarea" placeholder="Your account description (optional)"></f7-list-input>
                 </f7-list>
             </f7-card-content>
         </f7-card>
@@ -79,7 +86,6 @@
                 <f7-list form>
                     <f7-list-input
                         type="text"
-                        inline-label
                         clear-button
                         :label="$t('Account Name')"
                         :placeholder="$t('Your account name')"
@@ -87,11 +93,13 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :title="$t('Account Icon')" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  :header="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 :icon="account.icon | accountIcon"
-                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon :icon="account.icon | accountIcon"
+                                     :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                               :show.sync="account.showIconSelectionSheet"
                                               :color="account.color"
@@ -99,11 +107,13 @@
                         ></icon-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Account Color')" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  :header="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 f7="app_fill"
-                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"
+                                     :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <color-selection-sheet :all-color-infos="allAccountColors"
                                                :show.sync="account.showColorSelectionSheet"
                                                v-model="account.color"
@@ -111,8 +121,11 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="list-item-with-header-and-title list-item-no-item-after"
                         :class="{ 'disabled': editAccountId }"
-                        :title="$t('Currency')"
+                        :header="$t('Currency')"
+                        :title="`currency.${account.currency}` | localized"
+                        :no-chevron="!!editAccountId"
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select autocomplete="transaction-currency" v-model="account.currency">
@@ -123,10 +136,11 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        link="#"
+                        class="list-item-with-header-and-title"
+                        :link="editAccountId ? null : '#'"
                         :class="{ 'disabled': editAccountId }"
-                        :title="$t('Account Balance')"
-                        :after="account.balance | currency(account.currency)"
+                        :header="$t('Account Balance')"
+                        :title="account.balance | currency(account.currency)"
                         @click="account.showBalanceSheet = true"
                     >
                         <number-pad-sheet :min-value="$constants.transaction.minAmount"
@@ -136,7 +150,7 @@
                         ></number-pad-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
                         <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
                     </f7-list-item>
 
@@ -144,6 +158,7 @@
                         type="textarea"
                         class="textarea-auto-size"
                         style="height: auto"
+                        :label="$t('Description')"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
@@ -157,7 +172,6 @@
                 <f7-list form>
                     <f7-list-input
                         type="text"
-                        inline-label
                         clear-button
                         :label="$t('Account Name')"
                         :placeholder="$t('Your account name')"
@@ -165,11 +179,13 @@
                         @input="account.name = $event.target.value"
                     ></f7-list-input>
 
-                    <f7-list-item :title="$t('Account Icon')" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  :header="$t('Account Icon')" link="#"
                                   @click="account.showIconSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 :icon="account.icon | accountIcon"
-                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon :icon="account.icon | accountIcon"
+                                     :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                               :show.sync="account.showIconSelectionSheet"
                                               :color="account.color"
@@ -177,18 +193,20 @@
                         ></icon-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Account Color')" link="#"
+                    <f7-list-item class="list-item-with-header-and-title"
+                                  :header="$t('Account Color')" link="#"
                                   @click="account.showColorSelectionSheet = true">
-                        <f7-icon slot="after"
-                                 f7="app_fill"
-                                 :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
+                            <f7-icon f7="app_fill"
+                                     :style="account.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                        </f7-block>
                         <color-selection-sheet :all-color-infos="allAccountColors"
                                                :show.sync="account.showColorSelectionSheet"
                                                v-model="account.color"
                         ></color-selection-sheet>
                     </f7-list-item>
 
-                    <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                    <f7-list-item :header="$t('Visible')" v-if="editAccountId">
                         <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
                     </f7-list-item>
 
@@ -196,6 +214,7 @@
                         type="textarea"
                         class="textarea-auto-size"
                         style="height: auto"
+                        :label="$t('Description')"
                         :placeholder="$t('Your account description (optional)')"
                         :value="account.comment"
                         @input="account.comment = $event.target.value"
@@ -206,10 +225,11 @@
 
         <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts">
             <f7-card v-for="(subAccount, idx) in subAccounts" :key="idx">
-                <f7-card-header v-if="!editAccountId">
-                    <f7-button rasied fill color="red"
-                               icon-f7="trash" icon-size="16px"
+                <f7-card-header>
+                    <small class="subaccount-header-content">{{ $t('Sub Account') + ' #' + (idx + 1) }}</small>
+                    <f7-button rasied fill color="red" icon-f7="trash" icon-size="16px"
                                :tooltip="$t('Remove Sub Account')"
+                               v-if="!editAccountId"
                                @click="removeSubAccount(subAccount, false)">
                     </f7-button>
                 </f7-card-header>
@@ -217,7 +237,6 @@
                     <f7-list>
                         <f7-list-input
                             type="text"
-                            inline-label
                             clear-button
                             :label="$t('Sub Account Name')"
                             :placeholder="$t('Your sub account name')"
@@ -225,11 +244,13 @@
                             @input="subAccount.name = $event.target.value"
                         ></f7-list-input>
 
-                        <f7-list-item :title="$t('Sub Account Icon')" link="#"
+                        <f7-list-item class="list-item-with-header-and-title"
+                                      :header="$t('Sub Account Icon')" link="#"
                                       @click="subAccount.showIconSelectionSheet = true">
-                            <f7-icon slot="after"
-                                     :icon="subAccount.icon | accountIcon"
-                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                            <f7-block slot="title" class="list-item-custom-title no-padding">
+                                <f7-icon :icon="subAccount.icon | accountIcon"
+                                         :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                            </f7-block>
                             <icon-selection-sheet :all-icon-infos="allAccountIcons"
                                                   :show.sync="subAccount.showIconSelectionSheet"
                                                   :color="subAccount.color"
@@ -237,11 +258,13 @@
                             ></icon-selection-sheet>
                         </f7-list-item>
 
-                        <f7-list-item :title="$t('Sub Account Color')" link="#"
+                        <f7-list-item class="list-item-with-header-and-title"
+                                      :header="$t('Sub Account Color')" link="#"
                                       @click="subAccount.showColorSelectionSheet = true">
-                            <f7-icon slot="after"
-                                     f7="app_fill"
-                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                            <f7-block slot="title" class="list-item-custom-title no-padding">
+                                <f7-icon f7="app_fill"
+                                         :style="subAccount.color | accountIconStyle('var(--default-icon-color)')"></f7-icon>
+                            </f7-block>
                             <color-selection-sheet :all-color-infos="allAccountColors"
                                                    :show.sync="subAccount.showColorSelectionSheet"
                                                    v-model="subAccount.color"
@@ -249,8 +272,11 @@
                         </f7-list-item>
 
                         <f7-list-item
+                            class="list-item-with-header-and-title list-item-no-item-after"
                             :class="{ 'disabled': editAccountId }"
-                            :title="$t('Currency')"
+                            :header="$t('Currency')"
+                            :title="`currency.${subAccount.currency}` | localized"
+                            :no-chevron="!!editAccountId"
                             smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                         >
                             <select autocomplete="transaction-currency" v-model="subAccount.currency">
@@ -261,10 +287,11 @@
                         </f7-list-item>
 
                         <f7-list-item
-                            link="#"
+                            class="list-item-with-header-and-title"
+                            :link="editAccountId ? null : '#'"
                             :class="{ 'disabled': editAccountId }"
-                            :title="$t('Sub Account Balance')"
-                            :after="subAccount.balance | currency(subAccount.currency)"
+                            :header="$t('Sub Account Balance')"
+                            :title="subAccount.balance | currency(subAccount.currency)"
                             @click="subAccount.showBalanceSheet = true"
                         >
                             <number-pad-sheet :min-value="$constants.transaction.minAmount"
@@ -274,7 +301,7 @@
                             ></number-pad-sheet>
                         </f7-list-item>
 
-                        <f7-list-item :title="$t('Visible')" v-if="editAccountId">
+                        <f7-list-item :header="$t('Visible')" v-if="editAccountId">
                             <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
                         </f7-list-item>
 
@@ -282,6 +309,7 @@
                             type="textarea"
                             class="textarea-auto-size"
                             style="height: auto"
+                            :label="$t('Description')"
                             :placeholder="$t('Your sub account description (optional)')"
                             :value="subAccount.comment"
                             @input="subAccount.comment = $event.target.value"
@@ -663,3 +691,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.subaccount-header-content {
+    opacity: 0.6;
+}
+</style>

@@ -11,19 +11,41 @@
                 <f7-list no-hairlines inline-labels class="no-margin-top margin-bottom">
                     <f7-list-input
                         :label="$t('Begin Time')"
-                        type="datetime-local"
+                        type="datepicker"
                         class="date-range-sheet-time-item"
+                        :calendar-params="{
+                            timePicker: true,
+                            dateFormat: $t('input-format.datetime.long'),
+                            firstDay: defaultFirstDayOfWeek,
+                            toolbarCloseText: $t('Done'),
+                            timePickerPlaceholder: $t('Select Time'),
+                            timePickerFormat: $locale.getInputTimeIntlDateTimeFormatOptions(),
+                            monthNames: $locale.getAllLongMonthNames(),
+                            monthNamesShort: $locale.getAllShortMonthNames(),
+                            dayNames: $locale.getAllLongWeekdayNames(),
+                            dayNamesShort: $locale.getAllShortWeekdayNames()}"
                         :value="currentMinDate"
-                        @input="currentMinDate = $event.target.value"
+                        @calendar:change="currentMinDate = $event"
                     >
                     </f7-list-input>
 
                     <f7-list-input
                         :label="$t('End Time')"
-                        type="datetime-local"
+                        type="datepicker"
                         class="date-range-sheet-time-item"
+                        :calendar-params="{
+                            timePicker: true,
+                            dateFormat: $t('input-format.datetime.long'),
+                            firstDay: defaultFirstDayOfWeek,
+                            toolbarCloseText: $t('Done'),
+                            timePickerPlaceholder: $t('Select Time'),
+                            timePickerFormat: $locale.getInputTimeIntlDateTimeFormatOptions(),
+                            monthNames: $locale.getAllLongMonthNames(),
+                            monthNamesShort: $locale.getAllShortMonthNames(),
+                            dayNames: $locale.getAllLongWeekdayNames(),
+                            dayNamesShort: $locale.getAllShortWeekdayNames()}"
                         :value="currentMaxDate"
-                        @input="currentMaxDate = $event.target.value"
+                        @calendar:change="currentMaxDate = $event"
                     >
                     </f7-list-input>
                 </f7-list>
@@ -33,7 +55,7 @@
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">
-                    <f7-link  @click="cancel" :text="$t('Cancel')"></f7-link>
+                    <f7-link @click="cancel" :text="$t('Cancel')"></f7-link>
                 </div>
             </div>
         </f7-page-content>
@@ -62,31 +84,41 @@ export default {
             maxDate = self.maxTime;
         }
 
+        minDate = self.$utilities.getDummyUnixTimeForLocalUsage(minDate, self.$utilities.getTimezoneOffsetMinutes(), self.$utilities.getBrowserTimezoneOffsetMinutes());
+        maxDate = self.$utilities.getDummyUnixTimeForLocalUsage(maxDate, self.$utilities.getTimezoneOffsetMinutes(), self.$utilities.getBrowserTimezoneOffsetMinutes());
+
         return {
-            currentMinDate: self.$utilities.formatUnixTime(minDate, 'YYYY-MM-DDTHH:mm'),
-            currentMaxDate: self.$utilities.formatUnixTime(maxDate, 'YYYY-MM-DDTHH:mm')
+            currentMinDate: [self.$utilities.getLocalDatetimeFromUnixTime(minDate)],
+            currentMaxDate: [self.$utilities.getLocalDatetimeFromUnixTime(maxDate)]
+        }
+    },
+    computed: {
+        defaultFirstDayOfWeek() {
+            return this.$store.getters.currentUserFirstDayOfWeek;
         }
     },
     watch: {
         'currentMinDate': function (newValue) {
             if (!newValue) {
-                this.currentMinDate = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
+                this.currentMinDate = [this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime())];
             }
         },
         'currentMaxDate': function (newValue) {
             if (!newValue) {
-                this.currentMaxDate = this.$utilities.formatUnixTime(this.$utilities.getCurrentUnixTime(), 'YYYY-MM-DDTHH:mm');
+                this.currentMaxDate = [this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime())];
             }
         }
     },
     methods: {
         onSheetOpen() {
             if (this.minTime) {
-                this.currentMinDate = this.$utilities.formatUnixTime(this.minTime, 'YYYY-MM-DDTHH:mm');
+                const minTime = this.$utilities.getDummyUnixTimeForLocalUsage(this.minTime, this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
+                this.currentMinDate = [this.$utilities.getLocalDatetimeFromUnixTime(minTime)];
             }
 
             if (this.maxTime) {
-                this.currentMaxDate = this.$utilities.formatUnixTime(this.maxTime, 'YYYY-MM-DDTHH:mm');
+                const maxTime = this.$utilities.getDummyUnixTimeForLocalUsage(this.maxTime, this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
+                this.currentMaxDate = [this.$utilities.getLocalDatetimeFromUnixTime(maxTime)];
             }
         },
         onSheetClosed() {
@@ -97,13 +129,28 @@ export default {
                 return;
             }
 
-            const minUnixTime = this.$utilities.getMinuteFirstUnixTime(this.currentMinDate);
-            const maxUnixTime = this.$utilities.getMinuteLastUnixTime(this.currentMaxDate);
+            let currentMinDate = this.currentMinDate;
+
+            if (this.$utilities.isArray(this.currentMinDate)) {
+                currentMinDate = this.currentMinDate[0];
+            }
+
+            let currentMaxDate = this.currentMaxDate;
+
+            if (this.$utilities.isArray(this.currentMaxDate)) {
+                currentMaxDate = this.currentMaxDate[0];
+            }
+
+            let minUnixTime = this.$utilities.getMinuteFirstUnixTime(currentMinDate);
+            let maxUnixTime = this.$utilities.getMinuteLastUnixTime(currentMaxDate);
 
             if (minUnixTime < 0 || maxUnixTime < 0) {
                 this.$toast('Date is too early');
                 return;
             }
+
+            minUnixTime = this.$utilities.getActualUnixTimeForStore(minUnixTime, this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
+            maxUnixTime = this.$utilities.getActualUnixTimeForStore(maxUnixTime, this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
 
             this.$emit('dateRange:change', minUnixTime, maxUnixTime);
         },
@@ -115,10 +162,6 @@ export default {
 </script>
 
 <style>
-.date-range-sheet-time-item input[type="datetime-local"] {
-    max-width: inherit;
-}
-
 .list .date-range-sheet-time-item > .item-content {
     padding-left: 0;
 }

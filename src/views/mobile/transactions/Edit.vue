@@ -25,10 +25,10 @@
                         style="font-size: 40px;"
                         header="Expense Amount" title="0.00">
                     </f7-list-item>
-                    <f7-list-item class="transaction-edit-category" header="Category" title="Category Names" link="#"></f7-list-item>
-                    <f7-list-item class="transaction-edit-account" header="Account" title="Account Name" link="#"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names" link="#"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
-                    <f7-list-item class="transaction-edit-timezone" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
+                    <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
                     <f7-list-item header="Tags" link="#">
                         <f7-block class="margin-top-half no-padding" slot="footer">
                             <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
@@ -75,7 +75,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-category"
+                        class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="expenseCategorySelection"
                         link="#"
                         :class="{ 'disabled': !hasAvailableExpenseCategories }"
@@ -83,7 +83,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
                     >
-                        <div slot="title" class="transaction-edit-category-title">
+                        <div slot="title" class="list-item-custom-title">
                             <span>{{ transaction.expenseCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.expenseCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
@@ -100,7 +100,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-category"
+                        class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="incomeCategorySelection"
                         link="#"
                         :class="{ 'disabled': !hasAvailableIncomeCategories }"
@@ -108,7 +108,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
                     >
-                        <div slot="title" class="transaction-edit-category-title">
+                        <div slot="title" class="list-item-custom-title">
                             <span>{{ transaction.incomeCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.incomeCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
@@ -125,7 +125,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-category"
+                        class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="transferCategorySelection"
                         link="#"
                         :class="{ 'disabled': !hasAvailableTransferCategories }"
@@ -133,7 +133,7 @@
                         @click="showCategorySheet = true"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                     >
-                        <div slot="title" class="transaction-edit-category-title">
+                        <div slot="title" class="list-item-custom-title">
                             <span>{{ transaction.transferCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
                             <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                             <span>{{ transaction.transferCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
@@ -150,7 +150,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-account"
+                        class="list-item-with-header-and-title"
                         link="#"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t(sourceAccountName)"
@@ -172,7 +172,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        class="transaction-edit-account"
+                        class="list-item-with-header-and-title"
                         link="#"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t('Destination Account')"
@@ -215,7 +215,7 @@
                     </f7-list-input>
 
                     <f7-list-item
-                        class="transaction-edit-timezone list-item-no-item-after"
+                        class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                         :header="$t('Transaction Time Zone')"
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Transaction Time Zone'), searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="transaction.timeZone">
@@ -223,7 +223,7 @@
                                     :key="timezone.name"
                                     :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
                         </select>
-                        <f7-block slot="title" class="transaction-edit-timezone-title no-padding">
+                        <f7-block slot="title" class="list-item-custom-title no-padding">
                             <span>{{ transaction.utcOffset | utcOffset }}</span>
                             <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transaction.timeZone | timeZoneName(allTimezones) }}</span>
                         </f7-block>
@@ -914,18 +914,6 @@ export default {
 
 .transaction-edit-amount .item-header {
     padding-top: calc(var(--f7-typography-padding) / 2);
-}
-
-.transaction-edit-category .item-header,
-.transaction-edit-account .item-header,
-.transaction-edit-timezone .item-header{
-    margin-bottom: 11px;
-}
-
-.transaction-edit-category-title,
-.transaction-edit-timezone-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .transaction-edit-timezone-name {

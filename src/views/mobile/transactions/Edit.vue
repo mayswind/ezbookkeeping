@@ -278,7 +278,7 @@
 
         <f7-toolbar tabbar bottom v-if="mode !== 'view'">
             <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="save">
-                {{ $t(saveButtonTitle) }}
+                <span class="tabbar-primary-link">{{ $t(saveButtonTitle) }}</span>
             </f7-link>
         </f7-toolbar>
     </f7-page>

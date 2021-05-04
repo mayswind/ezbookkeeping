@@ -162,6 +162,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     width: auto;
 }
 
+.tabbar-primary-link,
 .tabbar-item-changed {
     color: var(--f7-theme-color);
 }

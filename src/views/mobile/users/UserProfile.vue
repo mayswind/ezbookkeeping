@@ -173,22 +173,22 @@ export default {
             return [{
                 value: 0,
                 name: 'None'
-            },{
+            }, {
                 value: 1,
                 name: 'All'
-            },{
+            }, {
                 value: 2,
                 name: 'Today or later'
-            },{
+            }, {
                 value: 3,
                 name: 'Recent 24 hours or later'
-            },{
+            }, {
                 value: 4,
                 name: 'This week or later'
-            },{
+            }, {
                 value: 5,
                 name: 'This month or later'
-            },{
+            }, {
                 value: 6,
                 name: 'This year or later'
             }];

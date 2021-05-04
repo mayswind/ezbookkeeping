@@ -13,7 +13,7 @@
                         <small>Expense</small>
                     </span>
                     <span class="card-header-content" v-else-if="!loading">
-                        <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | monthNameLocalizedKey | localized }}</span>
+                        <span class="home-summary-month">{{ dateRange.thisMonth.startTime | moment('MMMM') | format('datetime.#{value}.long') | localized }}</span>
                         <span>·</span>
                         <small>{{ $t('Expense') }}</small>
                     </span>
@@ -301,9 +301,6 @@ export default {
             }
 
             return amount + (incomplete ? '+' : '');
-        },
-        monthNameLocalizedKey(monthName) {
-            return `datetime.${monthName}.long`;
         }
     }
 }

@@ -25,7 +25,7 @@
                         class="list-item-with-header-and-title"
                         link="#"
                         :header="$t('Account Category')"
-                        :title="account.category | accountCategoryName(allAccountCategories) | localized"
+                        :title="account.category | optionName(allAccountCategories, 'id', 'name') | localized"
                         @click="showAccountCategorySheet = true"
                     >
                         <list-item-selection-sheet value-type="item"
@@ -43,13 +43,13 @@
                         link="#"
                         :class="{ 'disabled': editAccountId }"
                         :header="$t('Account Type')"
-                        :title="account.type | accountTypeName | localized"
+                        :title="account.type | optionName(allAccountTypes, 'id', 'name') | localized"
                         :no-chevron="!!editAccountId"
                         @click="showAccountTypeSheet = true"
                     >
                         <list-item-selection-sheet value-type="item"
                                                    key-field="id" value-field="id" title-field="name"
-                                                   :items="[{ id: 1, name: 'Single Account' }, { id: 2, name: 'Multi Sub Accounts' }]"
+                                                   :items="allAccountTypes"
                                                    :title-i18n="true"
                                                    :show.sync="showAccountTypeSheet"
                                                    v-model="account.type">
@@ -390,6 +390,15 @@ export default {
         allAccountCategories() {
             return this.$constants.account.allCategories;
         },
+        allAccountTypes() {
+            return [{
+                id: 1,
+                name: 'Single Account'
+            }, {
+                id: 2,
+                name: 'Multi Sub Accounts'
+            }];
+        },
         allAccountIcons() {
             return this.$constants.icons.allAccountIcons;
         },
@@ -667,26 +676,6 @@ export default {
             } else {
                 return null;
             }
-        }
-    },
-    filters: {
-        accountCategoryName(categoryId, allCategories) {
-            for (let i = 0; i < allCategories.length; i++) {
-                if (allCategories[i].id === categoryId) {
-                    return allCategories[i].name;
-                }
-            }
-
-            return '';
-        },
-        accountTypeName(type) {
-            if (type === 1) {
-                return 'Single Account';
-            } else if (type === 2) {
-                return 'Multi Sub Accounts';
-            }
-
-            return '';
         }
     }
 }

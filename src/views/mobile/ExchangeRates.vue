@@ -34,7 +34,7 @@
                 <f7-list>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
                                   :title="exchangeRate.currencyDisplayName"
-                                  :after="exchangeRate.rate | exchangeRate(exchangeRatesData.exchangeRates, baseCurrency)"></f7-list-item>
+                                  :after="exchangeRate.rate | exchangeRate(baseCurrency, exchangeRatesData.exchangeRates)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
@@ -144,40 +144,6 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        }
-    },
-    filters: {
-        exchangeRate(oldRate, exchangeRates, currentCurrency) {
-            const exchangeRateMap = {};
-
-            for (let i = 0; i < exchangeRates.length; i++) {
-                const exchangeRate = exchangeRates[i];
-                exchangeRateMap[exchangeRate.currency] = exchangeRate;
-            }
-
-            const toCurrencyExchangeRate = exchangeRateMap[currentCurrency];
-
-            if (!toCurrencyExchangeRate) {
-                return '';
-            }
-
-            const newRate = parseFloat(oldRate) / parseFloat(toCurrencyExchangeRate.rate);
-            const newRateStr = newRate.toString();
-
-            if (newRateStr.indexOf('.') < 0) {
-                return newRateStr;
-            } else {
-                let firstNonZeroPos = 0;
-
-                for (let i = 0; i < newRateStr.length; i++) {
-                    if (newRateStr.charAt(i) !== '.' && newRateStr.charAt(i) !== '0') {
-                        firstNonZeroPos = Math.min(i + 4, newRateStr.length);
-                        break;
-                    }
-                }
-
-                return newRateStr.substr(0, Math.max(6, Math.max(firstNonZeroPos, newRateStr.indexOf('.') + 2)));
-            }
         }
     }
 }

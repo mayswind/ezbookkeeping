@@ -32,10 +32,10 @@
                 <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | localized }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
-                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ query.categoryId | categoryName(allCategories, $t('Category')) }}</span>
+                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ query.categoryId | optionName(allCategories, null, 'name', $t('Category')) }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".account-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ query.accountId | accountName(allAccounts, $t('Account')) }}</span>
+                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ query.accountId | optionName(allAccounts, null, 'name', $t('Account')) }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -902,20 +902,6 @@ export default {
                 default:
                     return defaultName;
             }
-        },
-        categoryName(categoryId, allCategories, defaultName) {
-            if (allCategories[categoryId]) {
-                return allCategories[categoryId].name;
-            }
-
-            return defaultName;
-        },
-        accountName(accountId, allAccounts, defaultName) {
-            if (allAccounts[accountId]) {
-                return allAccounts[accountId].name;
-            }
-
-            return defaultName;
         },
         categoryListItemCheckedClass(category, queryCategoryId) {
             if (category.id === queryCategoryId) {

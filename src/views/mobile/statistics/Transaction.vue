@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title>
                 <f7-link popover-open=".chart-data-type-popover-menu">
-                    <span>{{ query.chartDataType | chartDataTypeName(allChartDataTypes) | localized }}</span>
+                    <span>{{ query.chartDataType | optionName(allChartDataTypes, 'type', 'name', 'Statistics') | localized }}</span>
                     <f7-icon size="14px" :f7="showChartDataTypePopover ? 'arrowtriangle_up_fill' : 'arrowtriangle_down_fill'"></f7-icon>
                 </f7-link>
             </f7-nav-title>
@@ -621,19 +621,6 @@ export default {
             }
 
             return amount;
-        },
-        chartDataTypeName(dataType, allChartDataTypes) {
-            for (let chartDataTypeField in allChartDataTypes) {
-                if (!Object.prototype.hasOwnProperty.call(allChartDataTypes, chartDataTypeField)) {
-                    return;
-                }
-
-                if (allChartDataTypes[chartDataTypeField].type === dataType) {
-                    return allChartDataTypes[chartDataTypeField].name;
-                }
-            }
-
-            return 'Statistics';
         },
         totalAmountName(dataType, allChartDataTypes) {
             if (dataType === allChartDataTypes.IncomeByAccount.type || dataType === allChartDataTypes.IncomeByPrimaryCategory.type || dataType === allChartDataTypes.IncomeBySecondaryCategory.type) {

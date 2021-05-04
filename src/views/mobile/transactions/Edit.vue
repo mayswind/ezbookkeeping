@@ -154,7 +154,7 @@
                         link="#"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t(sourceAccountName)"
-                        :title="transaction.sourceAccountId | accountName(allAccounts)"
+                        :title="transaction.sourceAccountId | optionName(allAccounts, 'id', 'name')"
                         @click="showSourceAccountSheet = true"
                     >
                         <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -176,7 +176,7 @@
                         link="#"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t('Destination Account')"
-                        :title="transaction.destinationAccountId | accountName(allAccounts)"
+                        :title="transaction.destinationAccountId | optionName(allAccounts, 'id', 'name')"
                         v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                         @click="showDestinationAccountSheet = true"
                     >
@@ -225,7 +225,7 @@
                         </select>
                         <f7-block slot="title" class="list-item-custom-title no-padding">
                             <span>{{ transaction.utcOffset | utcOffset }}</span>
-                            <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transaction.timeZone | timeZoneName(allTimezones) }}</span>
+                            <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transaction.timeZone | optionName(allTimezones, 'name', 'displayName') }}</span>
                         </f7-block>
                     </f7-list-item>
 
@@ -243,7 +243,7 @@
                             <f7-chip class="transaction-edit-tag" media-bg-color="black"
                                      v-for="tagId in transaction.tagIds"
                                      :key="tagId"
-                                     :text="tagId | tagName(allTags)">
+                                     :text="tagId | optionName(allTags, 'id', 'name')">
                                 <f7-icon slot="media" f7="number"></f7-icon>
                             </f7-chip>
                         </f7-block>
@@ -858,33 +858,6 @@ export default {
                     if (subCategory.id === categoryId) {
                         return subCategory.name;
                     }
-                }
-            }
-
-            return '';
-        },
-        accountName(accountId, allAccounts) {
-            for (let i = 0; i < allAccounts.length; i++) {
-                if (allAccounts[i].id === accountId) {
-                    return allAccounts[i].name;
-                }
-            }
-
-            return '';
-        },
-        timeZoneName(timeZoneName, allTimezones) {
-            for (let i = 0; i < allTimezones.length; i++) {
-                if (allTimezones[i].name === timeZoneName) {
-                    return allTimezones[i].displayName;
-                }
-            }
-
-            return '';
-        },
-        tagName(tagId, allTags) {
-            for (let i = 0; i < allTags.length; i++) {
-                if (allTags[i].id === tagId) {
-                    return allTags[i].name;
                 }
             }
 

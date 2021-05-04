@@ -691,7 +691,7 @@ export default {
     'No data': 'No data',
     'Change Language': 'Change Language',
     'Date is too early': 'Date is too early',
-    'Unlock': 'Unlock',
+    'Unlock Application': 'Unlock Application',
     'Re-login': 'Re-login',
     'Username': 'Username',
     'Your username': 'Your username',

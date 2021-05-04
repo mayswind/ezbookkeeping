@@ -4,14 +4,16 @@
             <img class="login-page-logo" src="img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
+
         <f7-list form>
             <f7-list-item-row class="justify-content-center padding-vertical-half">
-                {{ $t('Unlock') }}
+                {{ $t('Unlock Application') }}
             </f7-list-item-row>
             <f7-list-item class="list-item-pincode-input">
                 <pincode-input secure :length="6" v-model="pinCode" @keyup.native="unlockByPin" />
             </f7-list-item>
         </f7-list>
+
         <f7-list>
             <f7-list-button :class="{ 'disabled': !pinCodeValid }" :text="$t('Unlock By PIN Code')" @click="unlockByPin"></f7-list-button>
             <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock By Face ID/Touch ID')" @click="unlockByWebAuthn"></f7-list-button>
@@ -19,6 +21,32 @@
                 <f7-link :text="$t('Re-login')" @click="relogin"></f7-link>
             </f7-block-footer>
         </f7-list>
+
+        <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
+
+        <f7-list>
+            <f7-block-footer>
+                <span>Powered by </span>
+                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>&nbsp;
+                <span>{{ version }}</span>
+            </f7-block-footer>
+            <f7-block-footer>
+            </f7-block-footer>
+        </f7-list>
+
+        <f7-popover class="lang-popover-menu">
+            <f7-list>
+                <f7-list-item
+                    link="#" no-chevron popover-close
+                    v-for="(lang, locale) in allLanguages"
+                    :key="locale"
+                    :title="lang.displayName"
+                    @click="changeLanguage(locale)"
+                >
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
     </f7-page>
 </template>
 
@@ -30,6 +58,12 @@ export default {
         }
     },
     computed: {
+        version() {
+            return 'v' + this.$version;
+        },
+        allLanguages() {
+            return this.$locale.getAllLanguages();
+        },
         isWebAuthnAvailable() {
             return this.$settings.isEnableApplicationLockWebAuthn()
                 && this.$user.getWebAuthnCredentialId()
@@ -37,6 +71,16 @@ export default {
         },
         pinCodeValid() {
             return this.pinCode && this.pinCode.length === 6;
+        },
+        currentLanguageName() {
+            const currentLocale = this.$i18n.locale;
+            let lang = this.$locale.getLanguage(currentLocale);
+
+            if (!lang) {
+                lang = this.$locale.getLanguage(this.$locale.getDefaultLanguage());
+            }
+
+            return lang.displayName;
         }
     },
     methods: {
@@ -135,6 +179,9 @@ export default {
                     clearPreviousHistory: true
                 });
             });
+        },
+        changeLanguage(locale) {
+            this.$locale.setLanguage(locale);
         }
     }
 }

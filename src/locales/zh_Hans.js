@@ -691,7 +691,7 @@ export default {
     'No data': '没有数据',
     'Change Language': '修改语言',
     'Date is too early': '日期过早',
-    'Unlock': '解锁',
+    'Unlock Application': '解锁应用',
     'Re-login': '重新登陆',
     'Username': '用户名',
     'Your username': '你的用户名',

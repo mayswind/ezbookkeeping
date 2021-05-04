@@ -26,9 +26,9 @@
                     </f7-link>
                 </p>
                 <p class="no-margin">
-                    <small class="home-summary-misc" v-if="loading">Income of this month 0.00 USD</small>
+                    <small class="home-summary-misc" v-if="loading">Monthly income 0.00 USD</small>
                     <small class="home-summary-misc" v-else-if="!loading">
-                        <span>{{ $t('Income of this month') }}</span>
+                        <span>{{ $t('Monthly income') }}</span>
                         <span>{{ thisMonthAmount.incomeAmount | amount(thisMonthAmount.incompleteIncomeAmount, showAmountInHomePage) | currency(defaultCurrency) }}</span>
                     </small>
                 </p>

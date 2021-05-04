@@ -741,7 +741,7 @@ export default {
     'This Week': '本周',
     'This Month': '本月',
     'This Year': '今年',
-    'Income of this month': '当月收入',
+    'Monthly income': '当月收入',
     'Unable to get transaction overview': '无法获取交易概要',
     'Net assets': '净资产',
     'Total assets': '总资产',

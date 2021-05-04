@@ -741,7 +741,7 @@ export default {
     'This Week': 'This Week',
     'This Month': 'This Month',
     'This Year': 'This Year',
-    'Income of this month': 'Income of this month',
+    'Monthly income': 'Monthly income',
     'Unable to get transaction overview': 'Unable to get transaction overview',
     'Net assets': 'Net assets',
     'Total assets': 'Total assets',

@@ -716,7 +716,6 @@ export default {
     'Log In': '登录',
     'Don\'t have an account?': '还没有账号？',
     'Create an account': '创建新账号',
-    'Forget Password?': '找回密码？',
     'Username cannot be empty': '用户名不能为空',
     'Password cannot be empty': '密码不能为空',
     'Confirmation password cannot be empty': '确认密码不能为空',

@@ -716,7 +716,6 @@ export default {
     'Log In': 'Log In',
     'Don\'t have an account?': 'Don\'t have an account?',
     'Create an account': 'Create an account',
-    'Forget Password?': 'Forget Password?',
     'Username cannot be empty': 'Username cannot be empty',
     'Password cannot be empty': 'Password cannot be empty',
     'Confirmation password cannot be empty': 'Confirmation password cannot be empty',

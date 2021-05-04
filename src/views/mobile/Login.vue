@@ -30,8 +30,6 @@
             <f7-block-footer>
                 <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
                 <f7-link :class="{'disabled': !isUserRegistrationEnabled}" href="/signup" :text="$t('Create an account')"></f7-link>
-                <br/>
-                <f7-link class="disabled" href="/forget-pwd" :text="$t('Forget Password?')"></f7-link>
             </f7-block-footer>
             <f7-block-footer>
             </f7-block-footer>

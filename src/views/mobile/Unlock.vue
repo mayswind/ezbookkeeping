@@ -20,6 +20,8 @@
             <f7-block-footer>
                 <f7-link :text="$t('Re-login')" @click="relogin"></f7-link>
             </f7-block-footer>
+            <f7-block-footer class="padding-bottom">
+            </f7-block-footer>
         </f7-list>
 
         <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>

@@ -265,6 +265,17 @@ Vue.prototype.$locale = {
             i18n.t('datetime.Saturday.short')
         ];
     },
+    getAllMinWeekdayNames: function () {
+        return [
+            i18n.t('datetime.Sunday.min'),
+            i18n.t('datetime.Monday.min'),
+            i18n.t('datetime.Tuesday.min'),
+            i18n.t('datetime.Wednesday.min'),
+            i18n.t('datetime.Thursday.min'),
+            i18n.t('datetime.Friday.min'),
+            i18n.t('datetime.Saturday.min')
+        ];
+    },
     getInputTimeIntlDateTimeFormatOptions: function () {
         const hourMinuteFormat = i18n.t('input-format.datetime.long');
         const is24HourFormat = hourMinuteFormat.indexOf('H') > 0;
@@ -284,7 +295,13 @@ Vue.prototype.$locale = {
         }
 
         i18n.locale = locale;
-        moment.locale(locale);
+        moment.locale(locale, {
+            months : this.getAllLongMonthNames(),
+            monthsShort : this.getAllShortMonthNames(),
+            weekdays : this.getAllLongWeekdayNames(),
+            weekdaysShort : this.getAllShortWeekdayNames(),
+            weekdaysMin : this.getAllMinWeekdayNames(),
+        });
         services.setLocale(locale);
         document.querySelector('html').setAttribute('lang', locale);
 

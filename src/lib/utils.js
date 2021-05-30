@@ -151,8 +151,9 @@ function getDay(date) {
     return moment(date).date();
 }
 
-function getDayOfWeek(date) {
-    return moment(date).format('dddd');
+function getDayOfWeekName(date) {
+    const dayOfWeek = moment(date).days();
+    return dateTimeConstants.allWeekDaysArray[dayOfWeek].name;
 }
 
 function getHour(date) {
@@ -658,7 +659,7 @@ export default {
     getMonth,
     getYearAndMonth,
     getDay,
-    getDayOfWeek,
+    getDayOfWeekName,
     getHour,
     getMinute,
     getSecond,

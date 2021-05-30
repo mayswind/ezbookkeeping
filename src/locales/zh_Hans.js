@@ -43,30 +43,37 @@ export default {
     },
     'datetime': {
         'Monday': {
+            'min': '一',
             'short': '周一',
             'long':  '星期一'
         },
         'Tuesday': {
+            'min': '二',
             'short': '周二',
             'long': '星期二'
         },
         'Wednesday': {
+            'min': '三',
             'short': '周三',
             'long': '星期三'
         },
         'Thursday': {
+            'min': '四',
             'short': '周四',
             'long': '星期四'
         },
         'Friday': {
+            'min': '五',
             'short': '周五',
             'long': '星期五'
         },
         'Saturday': {
+            'min': '六',
             'short': '周六',
             'long': '星期六'
         },
         'Sunday': {
+            'min': '日',
             'short': '周日',
             'long': '星期日'
         },

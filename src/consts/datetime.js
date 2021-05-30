@@ -29,6 +29,16 @@ const allWeekDays = {
     }
 };
 
+const allWeekDaysArray = [
+    allWeekDays.Sunday,
+    allWeekDays.Monday,
+    allWeekDays.Tuesday,
+    allWeekDays.Wednesday,
+    allWeekDays.Thursday,
+    allWeekDays.Friday,
+    allWeekDays.Saturday
+];
+
 const allDateRanges = {
     All: {
         type: 0,
@@ -84,6 +94,7 @@ const defaultFirstDayOfWeek = allWeekDays.Sunday.type;
 
 export default {
     allWeekDays: allWeekDays,
+    allWeekDaysArray: allWeekDaysArray,
     allDateRanges: allDateRanges,
     defaultFirstDayOfWeek: defaultFirstDayOfWeek
 };

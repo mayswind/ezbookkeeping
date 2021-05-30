@@ -8,7 +8,7 @@ export default {
         'currency': 'USD',
         'firstDayOfWeek': 'Sunday'
     },
-    'format': {
+    'format': { // The type of date or time format is moment format, ref: https://momentjs.com/docs/#/displaying/
         'date': {
             'long': 'M/D/YYYY',
             'short': 'M/D/YYYY'
@@ -36,37 +36,44 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
-    'input-format': {
+    'input-format': { // The type of date or time format is framework7 format, ref: https://v5.framework7.io/docs/calendar.html#calendar-parameters
         'datetime': {
             'long': 'm/d/yyyy hh::mm A',
         },
     },
     'datetime': {
         'Monday': {
+            'min': 'Mo',
             'short': 'Mon',
             'long': 'Monday'
         },
         'Tuesday': {
+            'min': 'Tu',
             'short': 'Tue',
             'long': 'Tuesday'
         },
         'Wednesday': {
+            'min': 'We',
             'short': 'Wed',
             'long': 'Wednesday'
         },
         'Thursday': {
+            'min': 'Th',
             'short': 'Thu',
             'long': 'Thursday'
         },
         'Friday': {
+            'min': 'Fr',
             'short': 'Fri',
             'long': 'Friday'
         },
         'Saturday': {
+            'min': 'Sa',
             'short': 'Sat',
             'long': 'Saturday'
         },
         'Sunday': {
+            'min': 'Su',
             'short': 'Sun',
             'long': 'Sunday'
         },

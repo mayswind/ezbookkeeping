@@ -287,7 +287,7 @@ export function fillTransactionObject(state, transaction, currentUtcOffset) {
     const transactionTime = utils.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
 
     transaction.day = utils.getDay(transactionTime);
-    transaction.dayOfWeek = utils.getDayOfWeek(transactionTime);
+    transaction.dayOfWeek = utils.getDayOfWeekName(transactionTime);
 
     if (transaction.sourceAccountId) {
         transaction.sourceAccount = state.allAccountsMap[transaction.sourceAccountId];

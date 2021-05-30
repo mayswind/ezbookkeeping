@@ -90,6 +90,10 @@ func startWebServer(c *cli.Context) error {
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
 	router.StaticFile("/", filepath.Join(config.StaticRootPath, "index.html"))
+	router.Static("/js", filepath.Join(config.StaticRootPath, "js"))
+	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
+	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
+	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
 	router.StaticFile("favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))

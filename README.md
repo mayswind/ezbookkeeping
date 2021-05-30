@@ -31,7 +31,7 @@ ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It c
 
 ## Screenshots
 ### Mobile Device
-(Coming soon...)
+![ezBookkeeping](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/en.png)
 
 ## Installation
 ### Ship with docker

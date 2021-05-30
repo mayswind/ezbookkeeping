@@ -70,12 +70,6 @@
         "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/master/LICENSE"
     },
     {
-        "name": "UserAgent",
-        "copyright": "Copyright (c) 2012-2020 Miquel Sabaté Solà",
-        "url": "https://github.com/mssola/user_agent",
-        "licenseUrl": "https://github.com/mssola/user_agent/blob/master/LICENSE"
-    },
-    {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",

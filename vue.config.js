@@ -10,6 +10,12 @@ const licenseFile = fs.readFileSync('./LICENSE', 'UTF-8');
 
 module.exports = {
     pages: {
+        index: {
+            entry: 'src/index-main.js',
+            template: 'src/public/index.html',
+            filename: 'index.html',
+            chunks: ['vendors-common-bundle', 'vendors-index-bundle', 'common-bundle', 'index']
+        },
         desktop: {
             entry: 'src/desktop-main.js',
             template: 'src/public/desktop.html',

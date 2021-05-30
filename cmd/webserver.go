@@ -2,14 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"net/http"
 	"path/filepath"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/mssola/user_agent"
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/api"
@@ -91,19 +89,13 @@ func startWebServer(c *cli.Context) error {
 	router.NoRoute(bindApi(api.Default.ApiNotFound))
 	router.NoMethod(bindApi(api.Default.MethodNotAllowed))
 
-	router.GET("/", func(c *gin.Context) {
-		ua := user_agent.New(c.GetHeader("User-Agent"))
-
-		if ua.Mobile() {
-			c.Redirect(http.StatusMovedPermanently, "/mobile/")
-		} else {
-			c.Redirect(http.StatusMovedPermanently, "/desktop/")
-		}
-	})
+	router.StaticFile("/", filepath.Join(config.StaticRootPath, "index.html"))
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
 	router.StaticFile("favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))
 	router.StaticFile("favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
+	router.StaticFile("touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
+	router.StaticFile("manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 
 	mobileEntryRoute := router.Group("/mobile")
 	mobileEntryRoute.Use(bindMiddleware(middlewares.ServerSettingsCookie(config)))

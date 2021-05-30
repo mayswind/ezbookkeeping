@@ -79,51 +79,51 @@ export default {
         },
         'January': {
             'short': '1月',
-            'long': '1月'
+            'long': '一月'
         },
         'February': {
             'short': '2月',
-            'long': '2月'
+            'long': '二月'
         },
         'March': {
             'short': '3月',
-            'long': '3月'
+            'long': '三月'
         },
         'April': {
             'short': '4月',
-            'long': '4月'
+            'long': '四月'
         },
         'May': {
             'short': '5月',
-            'long': '5月'
+            'long': '五月'
         },
         'June': {
             'short': '6月',
-            'long': '6月'
+            'long': '六月'
         },
         'July': {
             'short': '7月',
-            'long': '7月'
+            'long': '七月'
         },
         'August': {
             'short': '8月',
-            'long': '8月'
+            'long': '八月'
         },
         'September': {
             'short': '9月',
-            'long': '9月'
+            'long': '九月'
         },
         'October': {
             'short': '10月',
-            'long': '10月'
+            'long': '十月'
         },
         'November': {
             'short': '11月',
-            'long': '11月'
+            'long': '十一月'
         },
         'December': {
             'short': '12月',
-            'long': '12月'
+            'long': '十二月'
         }
     },
     'timezone': {

@@ -121,6 +121,7 @@ module.exports = {
                 ]
             },
             exclude: [
+                /^index\.html$/,
                 /^mobile\.html$/,
                 /^desktop\.html$/,
                 /^robots\.txt$/,

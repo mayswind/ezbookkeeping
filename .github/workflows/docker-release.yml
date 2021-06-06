@@ -15,7 +15,7 @@ jobs:
       -
         name: Set up docker tag
         id: vars
-        run: echo ::set-output name=RELEASE_TAG::${GTIHUB_REF/refs\/tags\/v/}
+        run: echo ::set-output name=RELEASE_TAG::${GITHUB_REF/refs\/tags\/v/}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1

@@ -9,7 +9,7 @@ RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d '
   && BUILD_UNIXTIME="$(date '+%s')" \
   && VERSION_FLAGS="-X github.com/mayswind/ezbookkeeping/pkg/version.Version=${VERSION} -X github.com/mayswind/ezbookkeeping/pkg/version.CommitHash=${COMMIT_HASH} -X github.com/mayswind/ezbookkeeping/pkg/version.BuildUnixTime=${BUILD_UNIXTIME}" \
   && CGO_ENABLED=1 \
-  && go build -a -v -trimpath -ldflags "-w -linkmode external -extldflags '-static' ${VERSION_FLAGS}" -o ezbookkeeping ezbookkeeping.go
+  && go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' ${VERSION_FLAGS}" -o ezbookkeeping ezbookkeeping.go
 RUN chmod +x ezbookkeeping
 
 # Build frontend files

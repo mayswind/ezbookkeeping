@@ -297,7 +297,7 @@ func listUserTokens(c *cli.Context) error {
 	for i := 0; i < len(tokens); i++ {
 		printTokenInfo(tokens[i])
 
-		if i < len(tokens) - 1 {
+		if i < len(tokens)-1 {
 			fmt.Printf("---\n")
 		}
 	}

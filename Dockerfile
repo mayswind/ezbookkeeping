@@ -8,8 +8,6 @@ RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d '
   && COMMIT_HASH=$(git rev-parse --short HEAD) \
   && BUILD_UNIXTIME="$(date '+%s')" \
   && VERSION_FLAGS="-X github.com/mayswind/ezbookkeeping/pkg/version.Version=${VERSION} -X github.com/mayswind/ezbookkeeping/pkg/version.CommitHash=${COMMIT_HASH} -X github.com/mayswind/ezbookkeeping/pkg/version.BuildUnixTime=${BUILD_UNIXTIME}" \
-  && GOOS=linux \
-  && GOARCH=amd64 \
   && CGO_ENABLED=1 \
   && go build -a -v -trimpath -ldflags "-w -linkmode external -extldflags '-static' ${VERSION_FLAGS}" -o ezbookkeeping ezbookkeeping.go
 RUN chmod +x ezbookkeeping

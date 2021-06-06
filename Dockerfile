@@ -1,18 +1,22 @@
 # Build backend binary file
 FROM golang:1.16.5-alpine3.13 AS be-builder
+ARG RELEASE_BUILD
+ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/backend-build-pre-setup.sh
 RUN apk add git gcc g++ libc-dev
-RUN build.sh backend
+RUN ./build.sh backend
 
 # Build frontend files
 FROM node:14.17.0-alpine3.13 AS fe-builder
+ARG RELEASE_BUILD
+ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/frontend-build-pre-setup.sh
 RUN apk add git
-RUN build.sh frontend
+RUN ./build.sh frontend
 
 # Package docker image
 FROM alpine:3.13.5

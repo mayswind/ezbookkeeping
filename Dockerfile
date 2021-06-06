@@ -4,13 +4,7 @@ WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/backend-build-pre-setup.sh
 RUN apk add git gcc g++ libc-dev
-RUN VERSION=`grep '"version": ' package.json | awk -F ':' '{print $2}' | tr -d ' ' | tr -d ',' | tr -d '"'` \
-  && COMMIT_HASH=$(git rev-parse --short HEAD) \
-  && BUILD_UNIXTIME="$(date '+%s')" \
-  && VERSION_FLAGS="-X github.com/mayswind/ezbookkeeping/pkg/version.Version=${VERSION} -X github.com/mayswind/ezbookkeeping/pkg/version.CommitHash=${COMMIT_HASH} -X github.com/mayswind/ezbookkeeping/pkg/version.BuildUnixTime=${BUILD_UNIXTIME}" \
-  && CGO_ENABLED=1 \
-  && go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' ${VERSION_FLAGS}" -o ezbookkeeping ezbookkeeping.go
-RUN chmod +x ezbookkeeping
+RUN build.sh backend
 
 # Build frontend files
 FROM node:14.17.0-alpine3.13 AS fe-builder
@@ -18,7 +12,7 @@ WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/frontend-build-pre-setup.sh
 RUN apk add git
-RUN npm install && npm run build
+RUN build.sh frontend
 
 # Package docker image
 FROM alpine:3.13.5

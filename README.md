@@ -55,14 +55,13 @@ ezBookkeeping will listen at port 8080 as default. Then you can visit http://<YO
 
 ### Build from source
 
-Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps.
+Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
 
     # Build backend binary file
-    $ GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -a -v -i -trimpath -o ezbookkeeping ezbookkeeping.go
+    $ ./build.sh backend
 
     # Build frontend static files
-    $ npm install
-    $ npm run build
+    $ ./build.sh frontend
 
     # Copy files to target path
     $ cp ezbookkeeping <target>/ezbookkeeping
@@ -70,6 +69,10 @@ Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [N
     $ cp -R conf <target>/conf
 
 All the files will be placed in `<target>` directory.
+
+You can also build docker image, make sure you have [docker](https://www.docker.com/) installed, then follow these steps:
+
+    $ ./build.sh docker
 
 For more information about how to install ezBookkeeping, please visit our documentation.
 

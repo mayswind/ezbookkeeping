@@ -66,10 +66,24 @@ module.exports = {
         });
 
         config.plugin('define').tap(definitions => {
+            let buildUnixTime = '';
+
+            for (let i = 0; i < process.argv.length; i++) {
+                if (process.argv[i].indexOf('--') !== 0) {
+                    continue;
+                }
+
+                const pairs = process.argv[i].split('=');
+
+                if (pairs[0] === '--buildUnixTime') {
+                    buildUnixTime = pairs[1];
+                }
+            }
+
             const gitRevisionPlugin = new GitRevisionPlugin();
             definitions[0]['process.env']['VERSION'] = JSON.stringify(pkgFile.version);
             definitions[0]['process.env']['COMMIT_HASH'] = JSON.stringify(gitRevisionPlugin.commithash());
-            definitions[0]['process.env']['BUILD_UNIXTIME'] = JSON.stringify(parseInt((new Date().getTime() / 1000).toString()));
+            definitions[0]['process.env']['BUILD_UNIXTIME'] = buildUnixTime;
             definitions[0]['process.env']['LICENSE'] = JSON.stringify(licenseFile.trim());
             definitions[0]['process.env']['THIRD_PARTY_LICENSES'] = JSON.stringify(thirdPartyLicenseFile);
 

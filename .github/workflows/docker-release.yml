@@ -36,6 +36,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6
           push: true
+          build-args: |
+            RELEASE_BUILD=1
           tags:  |
             ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:${{ steps.vars.outputs.RELEASE_TAG }}
             ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:latest

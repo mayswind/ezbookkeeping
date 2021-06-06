@@ -368,7 +368,9 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.LogLevel = getLogLevel(getConfigItemStringValue(configFile, sectionName, "level"), defaultLoglevel)
 
 	if config.EnableFileLog {
-		config.FileLogPath = getConfigItemStringValue(configFile, sectionName, "log_path")
+		fileLogPath := getConfigItemStringValue(configFile, sectionName, "log_path")
+		finalFileLogPath, _ := getFinalPath(config.WorkingPath, fileLogPath)
+		config.FileLogPath = finalFileLogPath
 	}
 
 	return nil

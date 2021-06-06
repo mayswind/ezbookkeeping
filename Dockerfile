@@ -27,13 +27,13 @@ RUN addgroup -S -g 1000 ezbookkeeping && adduser -S -G ezbookkeeping -u 1000 ezb
 RUN apk --no-cache add tzdata
 COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
-RUN mkdir -p /usr/local/bin/ezbookkeeping && chown 1000:1000 /usr/local/bin/ezbookkeeping \
-  && mkdir -p /usr/local/bin/ezbookkeeping/data && chown 1000:1000 /usr/local/bin/ezbookkeeping/data \
-  && mkdir -p /usr/local/bin/ezbookkeeping/log && chown 1000:1000 /usr/local/bin/ezbookkeeping/log
-WORKDIR /usr/local/bin/ezbookkeeping
-COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping /usr/local/bin/ezbookkeeping/ezbookkeeping
-COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/dist /usr/local/bin/ezbookkeeping/public
-COPY --chown=1000:1000 conf /usr/local/bin/ezbookkeeping/conf
+RUN mkdir -p /ezbookkeeping && chown 1000:1000 /ezbookkeeping \
+  && mkdir -p /ezbookkeeping/data && chown 1000:1000 /ezbookkeeping/data \
+  && mkdir -p /ezbookkeeping/log && chown 1000:1000 /ezbookkeeping/log
+WORKDIR /ezbookkeeping
+COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping /ezbookkeeping/ezbookkeeping
+COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/dist /ezbookkeeping/public
+COPY --chown=1000:1000 conf /ezbookkeeping/conf
 USER 1000:1000
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]

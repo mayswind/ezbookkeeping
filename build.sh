@@ -5,6 +5,7 @@ RELEASE=${RELEASE_BUILD:-"0"};
 VERSION=""
 COMMIT_HASH=""
 BUILD_UNIXTIME=""
+DOCKER_TAG=""
 
 echo_red() {
     printf '\033[31m%s\033[0m\n' "$1"
@@ -34,6 +35,7 @@ Types:
 
 Options:
     -r, --release       Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
+    -t, --tag           Docker tag (For "docker" type only)
     -h, --help          Show help
 EOF
 }
@@ -48,6 +50,10 @@ parse_args() {
         case "${1}" in
             --release | -r)
                 RELEASE="1"
+                ;;
+            --tag | -t)
+                DOCKER_TAG="$2"
+                shift
                 ;;
             --help | -h)
                 show_help
@@ -123,9 +129,15 @@ build_docker() {
         docker_tag="SNAPSHOT-$(date '+%Y%m%d')";
     fi
 
-    echo "Building docker image \"ezbookkeeping:$docker_tag\"..."
+    docker_tag="ezbookkeeping:$docker_tag"
 
-    docker build . -t "ezbookkeeping:$docker_tag" --build-arg RELEASE_BUILD=$RELEASE
+    if [ -n "$DOCKER_TAG" ]; then
+        docker_tag="$DOCKER_TAG"
+    fi
+
+    echo "Building docker image \"$docker_tag\"..."
+
+    docker build . -t "$docker_tag" --build-arg RELEASE_BUILD=$RELEASE
 }
 
 main() {

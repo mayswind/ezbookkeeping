@@ -125,7 +125,7 @@ build_docker() {
 
     echo "Building docker image \"ezbookkeeping:$docker_tag\"..."
 
-    docker build . -t "ezbookkeeping:$docker_tag"
+    docker build . -t "ezbookkeeping:$docker_tag" --build-arg RELEASE_BUILD=$RELEASE
 }
 
 main() {

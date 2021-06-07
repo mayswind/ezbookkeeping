@@ -111,9 +111,10 @@ build_frontend() {
         build_arguments="$build_arguments --buildUnixTime=$BUILD_UNIXTIME"
     fi
 
-    echo "Building frontend files..."
-
+    echo "Pulling frontend dependencies..."
     npm install
+
+    echo "Building frontend files..."
     npm run build $build_arguments
 }
 

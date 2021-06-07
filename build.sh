@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 
 TYPE=""
-RELEASE=${RELEASE_BUILD:-"0"};
+RELEASE=${RELEASE_BUILD:-"0"}
+RELEASE_TYPE="unknown"
 VERSION=""
 COMMIT_HASH=""
 BUILD_UNIXTIME=""
@@ -68,6 +69,12 @@ parse_args() {
 
         shift 1
     done
+
+    if [ "$RELEASE" = "0" ]; then
+        RELEASE_TYPE="snapshot"
+    else
+        RELEASE_TYPE="release"
+    fi
 }
 
 check_type_dependencies() {
@@ -102,7 +109,7 @@ build_backend() {
         backend_extra_arguments="$backend_extra_arguments -X github.com/mayswind/ezbookkeeping/pkg/version.BuildUnixTime=$BUILD_UNIXTIME"
     fi
 
-    echo "Building backend binary file..."
+    echo "Building backend binary file ($RELEASE_TYPE)..."
 
     CGO_ENABLED=1 go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' $backend_extra_arguments" -o ezbookkeeping ezbookkeeping.go
     chmod +x ezbookkeeping
@@ -118,7 +125,7 @@ build_frontend() {
     echo "Pulling frontend dependencies..."
     npm install
 
-    echo "Building frontend files..."
+    echo "Building frontend files ($RELEASE_TYPE)..."
     npm run build "$frontend_build_arguments"
 }
 
@@ -135,7 +142,7 @@ build_docker() {
         docker_tag="$DOCKER_TAG"
     fi
 
-    echo "Building docker image \"$docker_tag\"..."
+    echo "Building docker image \"$docker_tag\" ($RELEASE_TYPE)..."
 
     docker build . -t "$docker_tag" --build-arg RELEASE_BUILD=$RELEASE
 }

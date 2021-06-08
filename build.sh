@@ -116,7 +116,7 @@ build_backend() {
 }
 
 build_frontend() {
-    frontend_build_arguments="--";
+    frontend_build_arguments="";
 
     if [ "$RELEASE" = "0" ]; then
         frontend_build_arguments="$frontend_build_arguments --buildUnixTime=$BUILD_UNIXTIME"
@@ -126,7 +126,7 @@ build_frontend() {
     npm install
 
     echo "Building frontend files ($RELEASE_TYPE)..."
-    npm run build "$frontend_build_arguments"
+    npm run build -- "$frontend_build_arguments"
 }
 
 build_docker() {

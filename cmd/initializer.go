@@ -73,13 +73,13 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 		return nil, err
 	}
 
-	cfgJson, _ := json.Marshal(getConfigWithNoSensitiveData(config))
+	cfgJson, _ := json.Marshal(getConfigWithoutSensitiveData(config))
 	log.BootInfof("[initializer.initializeSystem] has loaded configuration %s", cfgJson)
 
 	return config, nil
 }
 
-func getConfigWithNoSensitiveData(config *settings.Config) *settings.Config {
+func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	clonedConfig := &settings.Config{}
 	err := utils.Clone(config, clonedConfig)
 

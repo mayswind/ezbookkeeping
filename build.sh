@@ -6,6 +6,7 @@ RELEASE_TYPE="unknown"
 VERSION=""
 COMMIT_HASH=""
 BUILD_UNIXTIME=""
+PACKAGE_FILENAME=""
 DOCKER_TAG=""
 
 echo_red() {
@@ -32,17 +33,19 @@ Usage:
 Types:
     backend             Build backend binary file
     frontend            Build frontend files
+    package             Build package archive
     docker              Build docker image
 
 Options:
     -r, --release       Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
+    -f, --file          Package file name (For "package" type only)
     -t, --tag           Docker tag (For "docker" type only)
     -h, --help          Show help
 EOF
 }
 
 parse_args() {
-    if [ "$1" = "backend" ] || [ "$1" = "frontend" ] || [ "$1" = "docker" ]; then
+    if [ "$1" = "backend" ] || [ "$1" = "frontend" ] || [ "$1" = "package" ] || [ "$1" = "docker" ]; then
         TYPE="$1"
         shift 1
     fi
@@ -51,6 +54,10 @@ parse_args() {
         case "${1}" in
             --release | -r)
                 RELEASE="1"
+                ;;
+            --file | -f)
+                PACKAGE_FILENAME="$2"
+                shift
                 ;;
             --tag | -t)
                 DOCKER_TAG="$2"
@@ -90,6 +97,8 @@ check_type_dependencies() {
         check_dependency "go gcc"
     elif [ "$TYPE" = "frontend" ]; then
         check_dependency "node npm"
+    elif [ "$TYPE" = "package" ]; then
+        check_dependency "go gcc node npm tar"
     elif [ "$TYPE" = "docker" ]; then
         check_dependency "docker"
     fi
@@ -129,6 +138,35 @@ build_frontend() {
     npm run build -- "$frontend_build_arguments"
 }
 
+build_package() {
+    package_file_name="$VERSION";
+
+    if [ "$RELEASE" = "0" ]; then
+        package_file_name="$package_file_name-$(date '+%Y%m%d')"
+    fi
+
+    package_file_name="ezbookkeeping-$package_file_name-$(arch).tar.gz"
+
+    if [ -n "$PACKAGE_FILENAME" ]; then
+        package_file_name="$PACKAGE_FILENAME"
+    fi
+
+    echo "Building package archive \"$package_file_name\" ($RELEASE_TYPE)..."
+
+    build_backend
+    build_frontend
+
+    rm -rf package
+    mkdir package
+    cp ezbookkeeping package/
+    cp -R dist package/public
+    cp -R conf package/conf
+
+    cd package || { echo_red "Error: Build Failed"; exit 1; }
+    tar cvzf "../$package_file_name" .
+    cd - || return
+}
+
 build_docker() {
     docker_tag="$VERSION"
 
@@ -161,6 +199,8 @@ main() {
         build_backend
     elif [ "$TYPE" = "frontend" ]; then
         build_frontend
+    elif [ "$TYPE" = "package" ]; then
+        build_package
     elif [ "$TYPE" = "docker" ]; then
         build_docker
     fi

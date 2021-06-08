@@ -87,7 +87,7 @@ check_type_dependencies() {
     check_dependency "git"
 
     if [ "$TYPE" = "backend" ]; then
-        check_dependency "go"
+        check_dependency "go gcc"
     elif [ "$TYPE" = "frontend" ]; then
         check_dependency "node npm"
     elif [ "$TYPE" = "docker" ]; then

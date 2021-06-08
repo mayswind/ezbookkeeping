@@ -161,6 +161,7 @@ build_package() {
     cp ezbookkeeping package/
     cp -R dist package/public
     cp -R conf package/conf
+    cp LICENSE package/
 
     cd package || { echo_red "Error: Build Failed"; exit 1; }
     tar cvzf "../$package_file_name" .

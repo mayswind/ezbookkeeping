@@ -102,16 +102,16 @@ set_build_parameters() {
 }
 
 build_backend() {
-    backend_extra_arguments="-X github.com/mayswind/ezbookkeeping/pkg/version.Version=$VERSION"
-    backend_extra_arguments="$backend_extra_arguments -X github.com/mayswind/ezbookkeeping/pkg/version.CommitHash=$COMMIT_HASH"
+    backend_build_extra_arguments="-X main.Version=$VERSION"
+    backend_build_extra_arguments="$backend_build_extra_arguments -X main.CommitHash=$COMMIT_HASH"
 
     if [ "$RELEASE" = "0" ]; then
-        backend_extra_arguments="$backend_extra_arguments -X github.com/mayswind/ezbookkeeping/pkg/version.BuildUnixTime=$BUILD_UNIXTIME"
+        backend_build_extra_arguments="$backend_build_extra_arguments -X main.BuildUnixTime=$BUILD_UNIXTIME"
     fi
 
     echo "Building backend binary file ($RELEASE_TYPE)..."
 
-    CGO_ENABLED=1 go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' $backend_extra_arguments" -o ezbookkeeping ezbookkeeping.go
+    CGO_ENABLED=1 go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' $backend_build_extra_arguments" -o ezbookkeeping ezbookkeeping.go
     chmod +x ezbookkeeping
 }
 

@@ -79,7 +79,7 @@ parse_args() {
 
 check_type_dependencies() {
     if [ "$TYPE" = "" ]; then
-        echo_red "No specified type"
+        echo_red "Error: No specified type"
         show_help
         exit 2
     fi

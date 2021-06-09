@@ -128,7 +128,7 @@ build_frontend() {
     frontend_build_arguments="";
 
     if [ "$RELEASE" = "0" ]; then
-        frontend_build_arguments="$frontend_build_arguments --buildUnixTime=$BUILD_UNIXTIME"
+        frontend_build_arguments="--buildUnixTime=$BUILD_UNIXTIME"
     fi
 
     echo "Pulling frontend dependencies..."

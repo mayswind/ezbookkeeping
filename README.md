@@ -16,7 +16,7 @@ ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It c
     * Multiple database support (sqlite, mysql, etc.)
     * Multiple os & architecture support (Windows, macOS, Linux & x86, amd64, ARM)
 4. User-friendly interface
-    * Almost native app experience (for mobile device)
+    * Close to native app experience (for mobile device)
     * Two-level account & two-level category support
     * Plentiful preset categories
     * Searching & filtering history records
@@ -31,7 +31,7 @@ ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It c
 
 ## Screenshots
 ### Mobile Device
-![ezBookkeeping](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/en.png)
+[![ezBookkeeping](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/en.png)](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/en.png)
 
 ## Installation
 ### Ship with docker
@@ -46,15 +46,13 @@ Latest Daily Build:
     $ docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
 
 ### Install from binary
-
 Latest release: [https://github.com/mayswind/ezbookkeeping/releases](https://github.com/mayswind/ezbookkeeping/releases)
 
     $ ./ezbookkeeping server run
 
-ezBookkeeping will listen at port 8080 as default. Then you can visit http://<YOUR_HOST_ADDRESS>:8080/ .
+ezBookkeeping will listen at port 8080 as default. Then you can visit http://{YOUR_HOST_ADDRESS}:8080/ .
 
 ### Build from source
-
 Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
 
     $ ./build.sh package -f ezbookkeeping.tar.gz
@@ -65,7 +63,9 @@ You can also build docker image, make sure you have [docker](https://www.docker.
 
     $ ./build.sh docker
 
-For more information about how to install ezBookkeeping, please visit our documentation.
+## Documents
+1. [English](http://ezbookkeeping.mayswind.net)
+1. [简体中文 (Simplified Chinese)](http://ezbookkeeping.mayswind.net/zh_Hans)
 
 ## License
 [MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)

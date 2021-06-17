@@ -55,7 +55,7 @@ ezBookkeeping will listen at port 8080 as default. Then you can visit http://{YO
 ### Build from source
 Make sure you have [Golang](https://golang.org/), [GCC](http://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
 
-    $ ./build.sh package -f ezbookkeeping.tar.gz
+    $ ./build.sh package -o ezbookkeeping.tar.gz
 
 All the files will be packaged in `ezbookkeeping.tar.gz`.
 

@@ -38,7 +38,7 @@ Types:
 
 Options:
     -r, --release       Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
-    -f, --file          Package file name (For "package" type only)
+    -o, --output        Package file name (For "package" type only)
     -t, --tag           Docker tag (For "docker" type only)
     -h, --help          Show help
 EOF
@@ -55,7 +55,7 @@ parse_args() {
             --release | -r)
                 RELEASE="1"
                 ;;
-            --file | -f)
+            --output | -o)
                 PACKAGE_FILENAME="$2"
                 shift
                 ;;

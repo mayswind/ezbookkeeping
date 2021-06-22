@@ -31,16 +31,16 @@ Usage:
     build.sh type [options]
 
 Types:
-    backend             Build backend binary file
-    frontend            Build frontend files
-    package             Build package archive
-    docker              Build docker image
+    backend                 Build backend binary file
+    frontend                Build frontend files
+    package                 Build package archive
+    docker                  Build docker image
 
 Options:
-    -r, --release       Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
-    -o, --output        Package file name (For "package" type only)
-    -t, --tag           Docker tag (For "docker" type only)
-    -h, --help          Show help
+    -r, --release           Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
+    -o, --output <filename> Package file name (For "package" type only)
+    -t, --tag               Docker tag (For "docker" type only)
+    -h, --help              Show help
 EOF
 }
 

@@ -78,6 +78,11 @@ func TestGetRandomString(t *testing.T) {
 	assert.Len(t, actualValue, 10)
 }
 
+func TestGetRandomNumberOrLetter(t *testing.T) {
+	actualValue, err := GetRandomNumberOrLetter(10)
+	assert.Equal(t, nil, err)
+	assert.Len(t, actualValue, 10)
+}
 func TestGetRandomNumberOrLowercaseLetter(t *testing.T) {
 	actualValue, err := GetRandomNumberOrLowercaseLetter(10)
 	assert.Equal(t, nil, err)

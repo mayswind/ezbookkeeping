@@ -17,8 +17,10 @@ import (
 
 const (
 	availableCharacters                      = "!#$&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
+	availableNumberAndLetters                = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	availableNumberAndLowercaseLetters       = "0123456789abcdefghijklmnopqrstuvwxyz"
 	availableCharactersLength                = len(availableCharacters)
+	availableNumberAndLettersLength          = len(availableNumberAndLetters)
 	availableNumberAndLowercaseLettersLength = len(availableNumberAndLowercaseLetters)
 )
 
@@ -85,6 +87,23 @@ func GetRandomString(n int) (string, error) {
 		}
 
 		result[i] = availableCharacters[index]
+	}
+
+	return string(result), nil
+}
+
+// GetRandomNumberOrLetter returns a random string which only contains number or letter characters
+func GetRandomNumberOrLetter(n int) (string, error) {
+	var result = make([]byte, n)
+
+	for i := 0; i < n; i++ {
+		index, err := GetRandomInteger(availableNumberAndLettersLength)
+
+		if err != nil {
+			return "", err
+		}
+
+		result[i] = availableNumberAndLetters[index]
 	}
 
 	return string(result), nil

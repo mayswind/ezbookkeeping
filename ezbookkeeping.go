@@ -32,6 +32,7 @@ func main() {
 			cmd.WebServer,
 			cmd.Database,
 			cmd.UserData,
+			cmd.SecurityUtils,
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

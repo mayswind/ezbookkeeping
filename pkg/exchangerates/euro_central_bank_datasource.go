@@ -18,7 +18,7 @@ const euroCentralBankDataSource = "European Central Bank"
 const euroCentralBankBaseCurrency = "EUR"
 
 const euroCentralBankDataUpdateDateFormat = "2006-01-02 15"
-const euroCentralBankDataUpdateDateTimezone = "Etc/GMT-1" // UTC+01:00
+const euroCentralBankDataUpdateDateTimezone = "Europe/Berlin"
 
 // EuroCentralBankDataSource defines the structure of exchange rates data source of euro central bank
 type EuroCentralBankDataSource struct {

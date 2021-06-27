@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	availableCharacters             = "!#$&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
-	availableNumberAndLetters       = "0123456789abcdefghijklmnopqrstuvwxyz"
-	availableCharactersLength       = len(availableCharacters)
-	availableNumberAndLettersLength = len(availableNumberAndLetters)
+	availableCharacters                      = "!#$&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{|}~"
+	availableNumberAndLowercaseLetters       = "0123456789abcdefghijklmnopqrstuvwxyz"
+	availableCharactersLength                = len(availableCharacters)
+	availableNumberAndLowercaseLettersLength = len(availableNumberAndLowercaseLetters)
 )
 
 // SubString returns part of the source string according to start index and length
@@ -90,18 +90,18 @@ func GetRandomString(n int) (string, error) {
 	return string(result), nil
 }
 
-// GetRandomNumberOrLetter returns a random string which only contains number or letter characters
-func GetRandomNumberOrLetter(n int) (string, error) {
+// GetRandomNumberOrLowercaseLetter returns a random string which only contains number or letter characters
+func GetRandomNumberOrLowercaseLetter(n int) (string, error) {
 	var result = make([]byte, n)
 
 	for i := 0; i < n; i++ {
-		index, err := GetRandomInteger(availableNumberAndLettersLength)
+		index, err := GetRandomInteger(availableNumberAndLowercaseLettersLength)
 
 		if err != nil {
 			return "", err
 		}
 
-		result[i] = availableNumberAndLetters[index]
+		result[i] = availableNumberAndLowercaseLetters[index]
 	}
 
 	return string(result), nil

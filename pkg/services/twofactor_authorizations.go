@@ -159,7 +159,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]stri
 	recoveryCodes := make([]string, twoFactorRecoveryCodeCount)
 
 	for i := 0; i < twoFactorRecoveryCodeCount; i++ {
-		recoveryCode, err := utils.GetRandomNumberOrLetter(twoFactorRecoveryCodeLength)
+		recoveryCode, err := utils.GetRandomNumberOrLowercaseLetter(twoFactorRecoveryCodeLength)
 
 		if err != nil {
 			return nil, err

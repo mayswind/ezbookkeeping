@@ -1,4 +1,4 @@
-// https://github.com/nodatime/nodatime/blob/master/data/cldr/windowsZones-38-1.xml
+// Reference: https://github.com/nodatime/nodatime/blob/master/data/cldr/windowsZones-38-1.xml
 const allAvailableTimezones = [
     // UTC-12:00
     {

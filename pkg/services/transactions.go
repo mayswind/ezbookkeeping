@@ -951,7 +951,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUn
 	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
 
 	var transactionTotalAmounts []*models.Transaction
-	err := s.UserDataDB(uid).Select("uid, type, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("type, account_id").Find(&transactionTotalAmounts)
+	err := s.UserDataDB(uid).Select("type, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("type, account_id").Find(&transactionTotalAmounts)
 
 	if err != nil {
 		return nil, nil, err

@@ -646,6 +646,7 @@ export default {
     'Close': 'Close',
     'Submit': 'Submit',
     'Add': 'Add',
+    'Apply': 'Apply',
     'Save': 'Save',
     'Update': 'Update',
     'None': 'None',

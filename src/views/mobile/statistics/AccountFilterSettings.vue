@@ -5,7 +5,7 @@
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t('Save')" @click="save"></f7-link>
+                <f7-link :text="$t(applyText)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -134,6 +134,13 @@ export default {
                 return 'Default Account Filter';
             } else {
                 return 'Filter Accounts';
+            }
+        },
+        applyText() {
+            if (this.modifyDefault) {
+                return 'Save';
+            } else {
+                return 'Apply';
             }
         },
         allAccountCategories() {

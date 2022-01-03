@@ -646,6 +646,7 @@ export default {
     'Close': '关闭',
     'Submit': '提交',
     'Add': '添加',
+    'Apply': '应用',
     'Save': '保存',
     'Update': '更新',
     'None': '无',

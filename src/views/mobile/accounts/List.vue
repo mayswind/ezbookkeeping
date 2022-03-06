@@ -129,7 +129,7 @@
                                   :key="account.id" :id="account | accountDomId"
                                   :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
                                   :after="accountBalance(account) | currency(account.currency)"
-                                  :link="!sortable && account.type === $constants.account.allAccountTypes.SingleAccount ? '/transaction/list?accountId=' + account.id : null"
+                                  :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
                                   swipeout @taphold.native="setSortable()"
                     >
                         <f7-block slot="title" class="no-padding">

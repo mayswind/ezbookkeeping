@@ -279,6 +279,30 @@ i.icon.la, i.icon.las, i.icon.lab {
     padding-bottom: var(--f7-list-item-padding-vertical);
 }
 
+.nested-list-item.has-child-list-item .item-link.active-state {
+    background-color: transparent;
+}
+
+.nested-list-item.has-child-list-item .item-link .item-inner {
+    padding-right: 0;
+}
+
+.nested-list-item.has-child-list-item .item-link .item-inner:before {
+    color: transparent;
+}
+
+.nested-list-item.has-child-list-item .item-link.active-state .item-inner .nested-list-item-child .item-link.active-state {
+    background-color: var(--f7-list-link-pressed-bg-color);
+}
+
+.nested-list-item.has-child-list-item .item-link .item-inner .nested-list-item-child .item-link .item-inner {
+    padding-right: calc(var(--f7-list-chevron-icon-area) + var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-right));
+}
+
+.nested-list-item.has-child-list-item .item-link .item-inner .nested-list-item-child .item-link .item-inner:before {
+    color: var(--f7-list-chevron-icon-color);
+}
+
 .nested-list-item .nested-list-item-title {
     align-self: center;
     margin-left: var(--f7-list-item-media-margin);

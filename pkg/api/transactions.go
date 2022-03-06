@@ -46,7 +46,7 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{},
 
 	uid := c.GetCurrentUid()
 
-	allCategoryIds, err := a.getCategoryAndSubCategoryIds(transactionCountReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(transactionCountReq.CategoryId, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get transaction category error, because %s", err.Error())
@@ -90,7 +90,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		return nil, errs.ErrUserNotFound
 	}
 
-	allCategoryIds, err := a.getCategoryAndSubCategoryIds(transactionListReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(transactionListReq.CategoryId, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get transaction category error, because %s", err.Error())
@@ -159,7 +159,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		return nil, errs.ErrUserNotFound
 	}
 
-	allCategoryIds, err := a.getCategoryAndSubCategoryIds(transactionListReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(transactionListReq.CategoryId, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get transaction category error, because %s", err.Error())
@@ -826,7 +826,7 @@ func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transac
 	return finalTransactions
 }
 
-func (a *TransactionsApi) getCategoryAndSubCategoryIds(categoryId int64, uid int64) ([]int64, error) {
+func (a *TransactionsApi) getCategoryOrSubCategoryIds(categoryId int64, uid int64) ([]int64, error) {
 	var allCategoryIds []int64
 
 	if categoryId > 0 {

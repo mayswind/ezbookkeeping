@@ -10,7 +10,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="plus" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryId}&accountId=${query.accountId}`"></f7-link>
+                <f7-link icon-f7="plus" v-if="canAddTransaction" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryId}&accountId=${query.accountId}`"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">
@@ -532,6 +532,17 @@ export default {
             }
 
             return this.$store.getters.currentUserDefaultCurrency;
+        },
+        canAddTransaction() {
+            if (this.query.accountId && this.query.accountId !== '0') {
+                const account = this.allAccounts[this.query.accountId];
+
+                if (account && account.type === this.$constants.account.allAccountTypes.MultiSubAccounts) {
+                    return false;
+                }
+            }
+
+            return true;
         },
         currentTimezoneOffsetMinutes() {
             return this.$utilities.getTimezoneOffsetMinutes();

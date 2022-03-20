@@ -59,11 +59,11 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDupl
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, 0, "", count, noDuplicated)
+	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, nil, "", count, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -75,14 +75,14 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionT
 	var transactions []*models.Transaction
 	var err error
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, noDuplicated)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, noDuplicated)
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, page int, count int, utcOffset int16) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int, count int, utcOffset int16) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -108,7 +108,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 
 	var transactions []*models.Transaction
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, true)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
 	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
@@ -138,11 +138,11 @@ func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactio
 
 // GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
-	return s.GetTransactionCount(uid, 0, 0, 0, nil, 0, "")
+	return s.GetTransactionCount(uid, 0, 0, 0, nil, nil, "")
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, utcOffset int16) (int64, error) {
+func (s *TransactionService) GetMonthTransactionCount(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -158,16 +158,16 @@ func (s *TransactionService) GetMonthTransactionCount(uid int64, year int, month
 	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
 	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
 
-	return s.GetTransactionCount(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword)
+	return s.GetTransactionCount(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword)
 }
 
 // GetTransactionCount returns count of transactions
-func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string) (int64, error) {
+func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountId, keyword, true)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
 	return s.UserDataDB(uid).Where(condition, conditionParams...).Count(&models.Transaction{})
 }
 
@@ -1085,7 +1085,7 @@ func (s *TransactionService) GetTransactionMapByList(transactions []*models.Tran
 	return transactionMap
 }
 
-func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountId int64, keyword string, noDuplicated bool) (string, []interface{}) {
+func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, noDuplicated bool) (string, []interface{}) {
 	condition := "uid=? AND deleted=?"
 	conditionParams := make([]interface{}, 0, 16)
 	conditionParams = append(conditionParams, uid)
@@ -1105,7 +1105,7 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 		condition = condition + " AND type=?"
 		conditionParams = append(conditionParams, transactionType)
 	} else if transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transactionType == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		if accountId == 0 {
+		if len(accountIds) == 0 {
 			condition = condition + " AND type=?"
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
 		} else {
@@ -1114,7 +1114,7 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
 		}
 	} else {
-		if noDuplicated && accountId == 0 {
+		if noDuplicated && len(accountIds) == 0 {
 			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
@@ -1138,9 +1138,19 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 		condition = condition + " AND category_id IN (" + conditions.String() + ")"
 	}
 
-	if accountId > 0 {
-		condition = condition + " AND account_id=?"
-		conditionParams = append(conditionParams, accountId)
+	if len(accountIds) > 0 {
+		var conditions strings.Builder
+
+		for i := 0; i < len(accountIds); i++ {
+			if i > 0 {
+				conditions.WriteString(",")
+			}
+
+			conditions.WriteString("?")
+			conditionParams = append(conditionParams, accountIds[i])
+		}
+
+		condition = condition + " AND account_id IN (" + conditions.String() + ")"
 	}
 
 	if keyword != "" {

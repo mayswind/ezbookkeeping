@@ -58,6 +58,22 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountI
 	return accounts, err
 }
 
+// GetSubAccountsByAccountId returns sub account models according to account id
+func (s *AccountService) GetSubAccountsByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if accountId <= 0 {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	var accounts []*models.Account
+	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, accountId).OrderBy("display_order asc").Find(&accounts)
+
+	return accounts, err
+}
+
 // GetAccountsByAccountIds returns account models according to account ids
 func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) (map[int64]*models.Account, error) {
 	if uid <= 0 {

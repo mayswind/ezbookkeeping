@@ -320,7 +320,7 @@ export function calculateMonthTotalAmount(state, transactionMonthList, defaultCu
         let amount = transaction.sourceAmount;
         let account = transaction.sourceAccount;
 
-        if (accountId && transaction.destinationAccount && transaction.destinationAccount.id === accountId) {
+        if (accountId && transaction.destinationAccount && (transaction.destinationAccount.id === accountId || transaction.destinationAccount.parentId === accountId)) {
             amount = transaction.destinationAmount;
             account = transaction.destinationAccount;
         }
@@ -353,6 +353,13 @@ export function calculateMonthTotalAmount(state, transactionMonthList, defaultCu
             if (accountId === transaction.sourceAccountId) {
                 totalExpense += amount;
             } else if (accountId === transaction.destinationAccountId) {
+                totalIncome += amount;
+            } else if (transaction.sourceAccount && accountId === transaction.sourceAccount.parentId &&
+                transaction.destinationAccount && accountId === transaction.destinationAccount.parentId) {
+                // Do Nothing
+            } else if (transaction.sourceAccount && accountId === transaction.sourceAccount.parentId) {
+                totalExpense += amount;
+            } else if (transaction.destinationAccount && accountId === transaction.destinationAccount.parentId) {
                 totalIncome += amount;
             }
         }

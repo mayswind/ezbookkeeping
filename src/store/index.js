@@ -593,7 +593,13 @@ const stores = {
                         }
 
                         if ((state.transactionsFilter.categoryId && state.transactionsFilter.categoryId !== '0' && state.transactionsFilter.categoryId !== transaction.categoryId) ||
-                            (state.transactionsFilter.accountId && state.transactionsFilter.accountId !== '0' && state.transactionsFilter.accountId !== transaction.sourceAccountId && state.transactionsFilter.accountId !== transaction.destinationAccountId)) {
+                            (state.transactionsFilter.accountId && state.transactionsFilter.accountId !== '0' &&
+                                state.transactionsFilter.accountId !== transaction.sourceAccountId &&
+                                state.transactionsFilter.accountId !== transaction.destinationAccountId &&
+                                (!transaction.sourceAccount || state.transactionsFilter.accountId !== transaction.sourceAccount.parentId) &&
+                                (!transaction.destinationAccount || state.transactionsFilter.accountId !== transaction.destinationAccount.parentId)
+                            )
+                        ) {
                             transactionMonthList.items.splice(j, 1);
                         } else {
                             transactionMonthList.items.splice(j, 1, transaction);

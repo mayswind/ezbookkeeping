@@ -43,9 +43,9 @@
     },
     {
         "name": "jwt-go",
-        "copyright": "Copyright (c) 2012 Dave Grijalva",
-        "url": "https://github.com/dgrijalva/jwt-go",
-        "licenseUrl": "https://github.com/dgrijalva/jwt-go/blob/master/LICENSE"
+        "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
+        "url": "https://github.com/golang-jwt/jwt",
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/master/LICENSE"
     },
     {
         "name": "otp",
@@ -107,7 +107,7 @@
     },
     {
         "name": "core-js",
-        "copyright": "Copyright (c) 2014-2020 Denis Pushkarev",
+        "copyright": "Copyright (c) 2014-2022 Denis Pushkarev",
         "url": "https://github.com/zloirock/core-js",
         "licenseUrl": "https://github.com/zloirock/core-js/blob/master/LICENSE"
     },
@@ -161,7 +161,7 @@
     },
     {
         "name": "UAParser.js",
-        "copyright": "Copyright (c) 2012-2019 Faisal Salman <f@faisalman.com>",
+        "copyright": "Copyright (c) 2012-2021 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
         "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/master/license.md"
     },

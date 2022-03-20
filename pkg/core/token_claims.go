@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // TokenType represents token type

@@ -236,6 +236,7 @@ export function updateUserProfile(context, { profile, currentPassword }) {
             email: profile.email,
             nickname: profile.nickname,
             defaultCurrency: profile.defaultCurrency,
+            defaultAccountId: profile.defaultAccountId,
             firstDayOfWeek: profile.firstDayOfWeek,
             transactionEditScope: profile.transactionEditScope
         }).then(response => {
@@ -344,6 +345,11 @@ export function currentUserNickname(state) {
 export function currentUserDefaultCurrency(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.defaultCurrency || state.defaultSetting.currency;
+}
+
+export function currentUserDefaultAccountId(state) {
+    const userInfo = state.currentUserInfo || {};
+    return userInfo.defaultAccountId || '';
 }
 
 export function currentUserFirstDayOfWeek(state) {

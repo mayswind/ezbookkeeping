@@ -87,13 +87,14 @@ func (s TransactionEditScope) String() string {
 
 // User represents user data stored in database
 type User struct {
-	Uid                  int64                `xorm:"PK"`
-	Username             string               `xorm:"VARCHAR(32) UNIQUE NOT NULL"`
-	Email                string               `xorm:"VARCHAR(100) UNIQUE NOT NULL"`
-	Nickname             string               `xorm:"VARCHAR(64) NOT NULL"`
-	Password             string               `xorm:"VARCHAR(64) NOT NULL"`
-	Salt                 string               `xorm:"VARCHAR(10) NOT NULL"`
-	DefaultCurrency      string               `xorm:"VARCHAR(3) NOT NULL"`
+	Uid                  int64  `xorm:"PK"`
+	Username             string `xorm:"VARCHAR(32) UNIQUE NOT NULL"`
+	Email                string `xorm:"VARCHAR(100) UNIQUE NOT NULL"`
+	Nickname             string `xorm:"VARCHAR(64) NOT NULL"`
+	Password             string `xorm:"VARCHAR(64) NOT NULL"`
+	Salt                 string `xorm:"VARCHAR(10) NOT NULL"`
+	DefaultCurrency      string `xorm:"VARCHAR(3) NOT NULL"`
+	DefaultAccountId     int64
 	FirstDayOfWeek       WeekDay              `xorm:"TINYINT NOT NULL"`
 	TransactionEditScope TransactionEditScope `xorm:"TINYINT NOT NULL"`
 	Deleted              bool                 `xorm:"NOT NULL"`
@@ -110,6 +111,7 @@ type UserBasicInfo struct {
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
 	DefaultCurrency      string               `json:"defaultCurrency"`
+	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 }
@@ -137,6 +139,7 @@ type UserProfileUpdateRequest struct {
 	Password             string                `json:"password" binding:"omitempty,min=6,max=128"`
 	OldPassword          string                `json:"oldPassword" binding:"omitempty,min=6,max=128"`
 	DefaultCurrency      string                `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
+	DefaultAccountId     int64                 `json:"defaultAccountId,string" binding:"omitempty,min=1"`
 	FirstDayOfWeek       *WeekDay              `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
 	TransactionEditScope *TransactionEditScope `json:"transactionEditScope" binding:"omitempty,min=0,max=7"`
 }
@@ -153,6 +156,7 @@ type UserProfileResponse struct {
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
 	DefaultCurrency      string               `json:"defaultCurrency"`
+	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 	LastLoginAt          int64                `json:"lastLoginAt"`
@@ -207,6 +211,7 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		Email:                u.Email,
 		Nickname:             u.Nickname,
 		DefaultCurrency:      u.DefaultCurrency,
+		DefaultAccountId:     u.DefaultAccountId,
 		FirstDayOfWeek:       u.FirstDayOfWeek,
 		TransactionEditScope: u.TransactionEditScope,
 	}
@@ -219,6 +224,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Email:                u.Email,
 		Nickname:             u.Nickname,
 		DefaultCurrency:      u.DefaultCurrency,
+		DefaultAccountId:     u.DefaultAccountId,
 		FirstDayOfWeek:       u.FirstDayOfWeek,
 		TransactionEditScope: u.TransactionEditScope,
 		LastLoginAt:          u.LastLoginUnixTime,

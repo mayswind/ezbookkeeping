@@ -15,15 +15,17 @@ import (
 
 // UsersApi represents user api
 type UsersApi struct {
-	users  *services.UserService
-	tokens *services.TokenService
+	users    *services.UserService
+	tokens   *services.TokenService
+	accounts *services.AccountService
 }
 
 // Initialize a user api singleton instance
 var (
 	Users = &UsersApi{
-		users:  services.Users,
-		tokens: services.Tokens,
+		users:    services.Users,
+		tokens:   services.Tokens,
+		accounts: services.Accounts,
 	}
 )
 
@@ -162,6 +164,18 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
 		user.DefaultCurrency = userUpdateReq.DefaultCurrency
 		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
+		anythingUpdate = true
+	}
+
+	if userUpdateReq.DefaultAccountId > 0 && userUpdateReq.DefaultAccountId != user.DefaultAccountId {
+		accounts, err := a.accounts.GetAccountsByAccountIds(uid, []int64{userUpdateReq.DefaultAccountId})
+
+		if err != nil || len(accounts) < 1 {
+			return nil, errs.Or(err, errs.ErrUserDefaultAccountIsInvalid)
+		}
+
+		user.DefaultAccountId = userUpdateReq.DefaultAccountId
+		userNew.DefaultAccountId = userUpdateReq.DefaultAccountId
 		anythingUpdate = true
 	}
 

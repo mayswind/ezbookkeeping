@@ -373,6 +373,9 @@ export default {
         defaultCurrency() {
             return this.$store.getters.currentUserDefaultCurrency;
         },
+        defaultAccountId() {
+            return this.$store.getters.currentUserDefaultAccountId;
+        },
         defaultFirstDayOfWeek() {
             return this.$store.getters.currentUserFirstDayOfWeek;
         },
@@ -643,11 +646,19 @@ export default {
                 }
 
                 if (!self.transaction.sourceAccountId) {
-                    self.transaction.sourceAccountId = self.allVisibleAccounts[0].id;
+                    if (self.defaultAccountId && self.allAccountsMap[self.defaultAccountId]) {
+                        self.transaction.sourceAccountId = self.defaultAccountId;
+                    } else {
+                        self.transaction.sourceAccountId = self.allVisibleAccounts[0].id;
+                    }
                 }
 
                 if (!self.transaction.destinationAccountId) {
-                    self.transaction.destinationAccountId = self.allVisibleAccounts[0].id;
+                    if (self.defaultAccountId && self.allAccountsMap[self.defaultAccountId]) {
+                        self.transaction.destinationAccountId = self.defaultAccountId;
+                    } else {
+                        self.transaction.destinationAccountId = self.allVisibleAccounts[0].id;
+                    }
                 }
             }
 

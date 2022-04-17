@@ -94,6 +94,28 @@
                     </f7-list-item>
 
                     <f7-list-item
+                        class="list-item-with-header-and-title"
+                        link="#"
+                        :class="{ 'disabled': !allVisibleAccounts.length }"
+                        :header="$t('Default Account')"
+                        :title="newProfile.defaultAccountId | optionName(allAccounts, 'id', 'name', $t('Not Specified'))"
+                        @click="showAccountSheet = true"
+                    >
+                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
+                                                              primary-title-field="name"
+                                                              primary-icon-field="icon" primary-icon-type="account"
+                                                              primary-sub-items-field="accounts"
+                                                              :primary-title-i18n="true"
+                                                              secondary-key-field="id" secondary-value-field="id"
+                                                              secondary-title-field="name"
+                                                              secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                              :items="allCategorizedAccounts"
+                                                              :show.sync="showAccountSheet"
+                                                              v-model="newProfile.defaultAccountId">
+                        </two-column-list-item-selection-sheet>
+                    </f7-list-item>
+
+                    <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :header="$t('First Day of Week')"
                         :title="newProfile.firstDayOfWeek | optionName(allWeekDays, 'type', 'name') | format('datetime.#{value}.long') | localized"
@@ -145,6 +167,7 @@ export default {
                 email: '',
                 nickname: '',
                 defaultCurrency: '',
+                defaultAccountId: '',
                 firstDayOfWeek: 0,
                 transactionEditScope: 1
             },
@@ -152,6 +175,7 @@ export default {
                 email: '',
                 nickname: '',
                 defaultCurrency: '',
+                defaultAccountId: '',
                 firstDayOfWeek: 0,
                 transactionEditScope: 1
             },
@@ -159,12 +183,22 @@ export default {
             loading: true,
             loadingError: null,
             saving: false,
-            showInputPasswordSheet: false
+            showInputPasswordSheet: false,
+            showAccountSheet: false
         };
     },
     computed: {
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allAccounts() {
+            return this.$store.getters.allPlainAccounts;
+        },
+        allVisibleAccounts() {
+            return this.$store.getters.allVisiblePlainAccounts;
+        },
+        allCategorizedAccounts() {
+            return this.$utilities.getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {
             return this.$constants.datetime.allWeekDays;
@@ -209,6 +243,7 @@ export default {
                 this.newProfile.email === this.oldProfile.email &&
                 this.newProfile.nickname === this.oldProfile.nickname &&
                 this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
+                this.newProfile.defaultAccountId === this.oldProfile.defaultAccountId &&
                 this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek &&
                 this.newProfile.transactionEditScope === this.oldProfile.transactionEditScope) {
                 return 'Nothing has been modified';
@@ -246,16 +281,25 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('getCurrentUserProfile').then(profile => {
+        const promises = [
+            self.$store.dispatch('loadAllAccounts', { force: false }),
+            self.$store.dispatch('getCurrentUserProfile')
+        ];
+
+        Promise.all(promises).then(responses => {
+            const profile = responses[1];
+
             self.oldProfile.email = profile.email;
             self.oldProfile.nickname = profile.nickname;
             self.oldProfile.defaultCurrency = profile.defaultCurrency;
+            self.oldProfile.defaultAccountId = profile.defaultAccountId;
             self.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
             self.oldProfile.transactionEditScope = profile.transactionEditScope;
 
             self.newProfile.email = self.oldProfile.email
             self.newProfile.nickname = self.oldProfile.nickname;
             self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
+            self.newProfile.defaultAccountId = self.oldProfile.defaultAccountId;
             self.newProfile.firstDayOfWeek = self.oldProfile.firstDayOfWeek;
             self.newProfile.transactionEditScope = self.oldProfile.transactionEditScope;
 

@@ -72,6 +72,7 @@ import {
     resetState,
     currentUserNickname,
     currentUserDefaultCurrency,
+    currentUserDefaultAccountId,
     currentUserFirstDayOfWeek,
 } from './user.js';
 
@@ -208,6 +209,7 @@ const stores = {
         // user
         currentUserNickname,
         currentUserDefaultCurrency,
+        currentUserDefaultAccountId,
         currentUserFirstDayOfWeek,
 
         // exchange rates

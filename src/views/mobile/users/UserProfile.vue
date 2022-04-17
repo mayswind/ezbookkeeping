@@ -119,7 +119,7 @@
                         </select>
                     </f7-list-item>
 
-                    <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInvalidProblemMessage)"></f7-list-item>
+                    <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInputInvalidProblemMessage)"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>

@@ -993,6 +993,8 @@ export default {
     'Are you sure you want to re-login?': 'Are you sure you want to re-login?',
     'Exchange Rates Data': 'Exchange Rates Data',
     'Base Currency': 'Base Currency',
+    'Base Amount': 'Base Amount',
+    'Set As Baseline': 'Set As Baseline',
     'Last Updated': 'Last Updated',
     'Data source': 'Data source',
     'No exchange rates data': 'No exchange rates data',

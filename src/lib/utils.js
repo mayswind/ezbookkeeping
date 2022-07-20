@@ -508,6 +508,16 @@ function stringCurrencyToNumeric(str) {
     }
 }
 
+function getExchangedAmount(amount, fromRate, toRate) {
+    const exchangeRate = parseFloat(toRate) / parseFloat(fromRate);
+
+    if (!isNumber(exchangeRate)) {
+        return null;
+    }
+
+    return amount * exchangeRate;
+}
+
 function base64encode(arrayBuffer) {
     if (!arrayBuffer || arrayBuffer.length === 0) {
         return null;
@@ -684,6 +694,7 @@ export default {
     appendThousandsSeparator,
     numericCurrencyToString,
     stringCurrencyToNumeric,
+    getExchangedAmount,
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,

@@ -81,13 +81,7 @@ export function getExchangedAmount(state) {
             return null;
         }
 
-        const exchangeRate = parseFloat(toCurrencyExchangeRate.rate) / parseFloat(fromCurrencyExchangeRate.rate);
-
-        if (!utils.isNumber(exchangeRate)) {
-            return null;
-        }
-
-        return amount * exchangeRate;
+        return utils.getExchangedAmount(amount, fromCurrencyExchangeRate.rate, toCurrencyExchangeRate.rate)
     };
 }
 

@@ -993,6 +993,8 @@ export default {
     'Are you sure you want to re-login?': '您确定要重新登录？',
     'Exchange Rates Data': '汇率数据',
     'Base Currency': '基准货币',
+    'Base Amount': '基准金额',
+    'Set As Baseline': '设置为基准',
     'Last Updated': '最后更新',
     'Data source': '数据来源',
     'No exchange rates data': '没有汇率数据',

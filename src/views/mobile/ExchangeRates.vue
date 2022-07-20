@@ -14,9 +14,12 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :header="$t('Base Currency')"
-                        :title="`currency.${baseCurrency}` | localized"
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Base Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
+                        <f7-block slot="title" class="no-padding no-margin">
+                            <span>{{ `currency.${baseCurrency}` | localized }}&nbsp;</span>
+                            <small class="smaller">{{ baseCurrency }}</small>
+                        </f7-block>
                         <select v-model="baseCurrency">
                             <option v-for="exchangeRate in availableExchangeRates"
                                     :key="exchangeRate.currencyCode"
@@ -50,9 +53,12 @@
             <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <f7-list>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
-                                  :title="exchangeRate.currencyDisplayName"
                                   :after="getConvertedAmount(exchangeRate) | exchangeRate"
                                   swipeout>
+                        <f7-block slot="title" class="no-padding no-margin">
+                            <span>{{ exchangeRate.currencyDisplayName }}&nbsp;</span>
+                            <small class="smaller">{{ exchangeRate.currencyCode }}</small>
+                        </f7-block>
                         <f7-swipeout-actions right>
                             <f7-swipeout-button color="primary" close :text="$t('Set As Baseline')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
                         </f7-swipeout-actions>

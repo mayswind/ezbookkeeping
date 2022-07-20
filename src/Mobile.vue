@@ -126,6 +126,10 @@ body {
     width: 100%;
 }
 
+.smaller {
+    font-size: 10px;
+}
+
 /** Replacing the default style of framework7 **/
 :root {
     --f7-theme-color: #c67e48;

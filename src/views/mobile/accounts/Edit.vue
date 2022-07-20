@@ -124,10 +124,13 @@
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :class="{ 'disabled': editAccountId }"
                         :header="$t('Currency')"
-                        :title="`currency.${account.currency}` | localized"
                         :no-chevron="!!editAccountId"
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
+                        <f7-block slot="title" class="no-padding no-margin">
+                            <span>{{ `currency.${account.currency}` | localized }}&nbsp;</span>
+                            <small class="smaller">{{ account.currency }}</small>
+                        </f7-block>
                         <select autocomplete="transaction-currency" v-model="account.currency">
                             <option v-for="currency in allCurrencies"
                                     :key="currency.code"
@@ -275,10 +278,13 @@
                             class="list-item-with-header-and-title list-item-no-item-after"
                             :class="{ 'disabled': editAccountId }"
                             :header="$t('Currency')"
-                            :title="`currency.${subAccount.currency}` | localized"
                             :no-chevron="!!editAccountId"
                             smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                         >
+                            <f7-block slot="title" class="no-padding no-margin">
+                                <span>{{ `currency.${subAccount.currency}` | localized }}&nbsp;</span>
+                                <small class="smaller">{{ subAccount.currency }}</small>
+                            </f7-block>
                             <select autocomplete="transaction-currency" v-model="subAccount.currency">
                                 <option v-for="currency in allCurrencies"
                                         :key="currency.code"

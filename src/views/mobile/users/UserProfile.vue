@@ -83,9 +83,12 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :header="$t('Default Currency')"
-                        :title="`currency.${newProfile.defaultCurrency}` | localized"
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
+                        <f7-block slot="title" class="no-padding no-margin">
+                            <span>{{ `currency.${newProfile.defaultCurrency}` | localized }}&nbsp;</span>
+                            <small class="smaller">{{ newProfile.defaultCurrency }}</small>
+                        </f7-block>
                         <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
                             <option v-for="currency in allCurrencies"
                                     :key="currency.code"

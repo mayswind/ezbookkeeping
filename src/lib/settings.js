@@ -24,7 +24,7 @@ const defaultSettings = {
         defaultDataRangeType: statisticsConstants.defaultDataRangeType,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
-        sortingType: statisticsConstants.defaultSortingType
+        defaultSortingType: statisticsConstants.defaultSortingType
     },
     animate: true,
     autoDarkMode: true
@@ -160,8 +160,8 @@ export default {
     setStatisticsDefaultAccountFilter: value => setSubOption('statistics', 'defaultAccountFilter', value),
     getStatisticsDefaultTransactionCategoryFilter: () => getSubOption('statistics', 'defaultTransactionCategoryFilter'),
     setStatisticsDefaultTransactionCategoryFilter: value => setSubOption('statistics', 'defaultTransactionCategoryFilter', value),
-    getStatisticsSortingType: () => getSubOption('statistics', 'sortingType'),
-    setStatisticsSortingType: value => setSubOption('statistics', 'sortingType', value),
+    getStatisticsSortingType: () => getSubOption('statistics', 'defaultSortingType'),
+    setStatisticsSortingType: value => setSubOption('statistics', 'defaultSortingType', value),
     isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
     isEnableAutoDarkMode: () => getOption('autoDarkMode'),

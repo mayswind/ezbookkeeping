@@ -25,7 +25,13 @@
         </f7-popover>
 
         <f7-card v-if="query.chartType === $constants.statistics.allChartTypes.Pie">
-            <f7-card-content class="pie-chart-container" :padding="false">
+            <f7-card-header class="no-border">
+                <small class="full-line text-align-right">
+                    <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
+                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
+                </small>
+            </f7-card-header>
+            <f7-card-content class="pie-chart-container" style="margin-top: -6px" :padding="false">
                 <pie-chart
                     :items="[{value: 60, color: '7c7c7f'}, {value: 20, color: 'a5a5aa'}, {value: 20, color: 'c5c5c9'}]"
                     :skeleton="true"
@@ -68,7 +74,13 @@
         </f7-card>
 
         <f7-card v-else-if="query.chartType === $constants.statistics.allChartTypes.Bar">
-            <f7-card-content class="no-safe-areas" :padding="false">
+            <f7-card-header class="no-border">
+                <small class="full-line text-align-right">
+                    <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
+                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
+                </small>
+            </f7-card-header>
+            <f7-card-content class="no-safe-areas" style="margin-top: -14px" :padding="false">
                 <f7-list class="statistics-list-item skeleton-text" v-if="loading">
                     <f7-list-item link="#">
                         <div slot="media" class="display-flex no-padding-horizontal">
@@ -186,6 +198,20 @@
             </f7-card-content>
         </f7-card>
 
+        <f7-popover class="sorting-type-popover-menu" :opened="showSortingTypePopover"
+                    @popover:open="scrollPopoverToSelectedItem"
+                    @popover:opened="showSortingTypePopover = true" @popover:closed="showSortingTypePopover = false">
+            <f7-list>
+                <f7-list-item v-for="sortingType in allSortingTypes"
+                              :key="sortingType.type"
+                              :class="{ 'list-item-selected': query.sortingType === sortingType.type }"
+                              :title="$t(sortingType.name)"
+                              @click="setSortingType(sortingType.type)">
+                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.sortingType === sortingType.type"></f7-icon>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
             <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
@@ -211,7 +237,7 @@
                 <f7-list-item v-for="dateRange in allDateRanges"
                               :key="dateRange.type"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                              :title="dateRange.name | localized"
+                              :title="$t(dateRange.name)"
                               @click="setDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"
@@ -255,9 +281,9 @@ export default {
         return {
             loading: true,
             loadingError: null,
-            sortBy: self.$settings.getStatisticsSortingType(),
             showAccountBalance: self.$settings.isShowAccountBalance(),
             showChartDataTypePopover: false,
+            showSortingTypePopover: false,
             showDatePopover: false,
             showCustomDateRangeSheet: false,
             showMoreActionSheet: false
@@ -275,6 +301,9 @@ export default {
         },
         allChartDataTypes() {
             return this.$constants.statistics.allChartDataTypes;
+        },
+        allSortingTypes() {
+            return this.$constants.statistics.allSortingTypes;
         },
         allDateRanges() {
             return this.$constants.datetime.allDateRanges;
@@ -320,7 +349,7 @@ export default {
                 allStatisticsItems.push(data);
             }
 
-            if (this.sortBy === this.$constants.statistics.allSortingTypes.ByDisplayOrder) {
+            if (self.query.sortingType === this.allSortingTypes.DisplayOrder.type) {
                 allStatisticsItems.sort(function (data1, data2) {
                     for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
                         if (data1.displayOrders[i] !== data2.displayOrders[i]) {
@@ -333,7 +362,7 @@ export default {
                         sensitivity: 'base'
                     });
                 });
-            } else if (this.sortBy === this.$constants.statistics.allSortingTypes.ByName) {
+            } else if (self.query.sortingType === this.allSortingTypes.Name.type) {
                 allStatisticsItems.sort(function (data1, data2) {
                     return data1.name.localeCompare(data2.name, undefined, { // asc
                         numeric: true,
@@ -388,6 +417,12 @@ export default {
             defaultDateRange = self.$constants.statistics.defaultDataRangeType;
         }
 
+        let defaultSortType = self.$settings.getStatisticsSortingType();
+
+        if (defaultSortType < self.allSortingTypes.Amount.type || defaultSortType > self.allSortingTypes.Name.type) {
+            defaultSortType = self.$constants.statistics.defaultSortingType;
+        }
+
         const dateRange = self.$utilities.getDateRangeByDateType(defaultDateRange, self.firstDayOfWeek);
 
         self.$store.dispatch('initTransactionStatisticsFilter', {
@@ -398,6 +433,7 @@ export default {
             chartDataType: defaultChartDataType,
             filterAccountIds: self.$settings.getStatisticsDefaultAccountFilter() || {},
             filterCategoryIds: self.$settings.getStatisticsDefaultTransactionCategoryFilter() || {},
+            sortingType: defaultSortType,
         });
 
         Promise.all([
@@ -420,10 +456,6 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            if (this.sortBy !== this.$settings.getStatisticsSortingType()) {
-                this.sortBy = this.$settings.getStatisticsSortingType();
-            }
-
             if (this.$store.state.transactionStatisticsStateInvalid && !this.loading) {
                 this.reload(null);
             }
@@ -432,22 +464,39 @@ export default {
         },
         reload(done) {
             const self = this;
+            let dispatchPromise = null;
 
-            self.$store.dispatch('loadTransactionStatistics', {
-                defaultCurrency: self.defaultCurrency
-            }).then(() => {
-                if (done) {
-                    done();
-                }
-            }).catch(error => {
-                if (done) {
-                    done();
-                }
+            if (self.query.chartDataType === self.allChartDataTypes.ExpenseByAccount.type ||
+                self.query.chartDataType === self.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                dispatchPromise = self.$store.dispatch('loadTransactionStatistics', {
+                    defaultCurrency: self.defaultCurrency
+                });
+            } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
+                self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
+                dispatchPromise = self.$store.dispatch('loadAllAccounts', {
+                    force: true
+                });
+            }
 
-                if (!error.processed) {
-                    self.$toast(error.message || error);
-                }
-            });
+            if (dispatchPromise) {
+                dispatchPromise.then(() => {
+                    if (done) {
+                        done();
+                    }
+                }).catch(error => {
+                    if (done) {
+                        done();
+                    }
+
+                    if (!error.processed) {
+                        self.$toast(error.message || error);
+                    }
+                });
+            }
         },
         setChartType(chartType) {
             this.$store.dispatch('updateTransactionStatisticsFilter', {
@@ -459,6 +508,19 @@ export default {
                 chartDataType: chartDataType
             });
             this.showChartDataTypePopover = false;
+        },
+        setSortingType(sortingType) {
+            if (sortingType < this.allSortingTypes.Amount.type || sortingType > this.allSortingTypes.Name.type) {
+                this.showSortingTypePopover = false;
+                return;
+            }
+
+            this.$store.dispatch('updateTransactionStatisticsFilter', {
+                sortingType: sortingType
+            });
+
+            this.showSortingTypePopover = false;
+            this.reload(null);
         },
         setDateFilter(dateType) {
             if (dateType === this.allDateRanges.Custom.type) { // Custom
@@ -663,6 +725,10 @@ export default {
 </script>
 
 <style>
+.card-header.no-border:after {
+    display: none;
+}
+
 .statistics-pie-chart .pie-chart-text-group {
     fill: #fff;
     text-anchor: middle;
@@ -690,7 +756,6 @@ export default {
 }
 
 .statistics-list-item-overview {
-    padding-top: 12px;
     margin-bottom: 6px;
 }
 

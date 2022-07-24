@@ -890,6 +890,12 @@ const stores = {
             } else {
                 state.transactionStatisticsFilter.filterCategoryIds = {};
             }
+
+            if (filter && utils.isNumber(filter.sortingType)) {
+                state.transactionStatisticsFilter.sortingType = filter.sortingType;
+            } else {
+                state.transactionStatisticsFilter.sortingType = statisticsConstants.defaultSortingType;
+            }
         },
         [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
             if (filter && utils.isNumber(filter.dateType)) {
@@ -918,6 +924,10 @@ const stores = {
 
             if (filter && utils.isObject(filter.filterCategoryIds)) {
                 state.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
+            }
+
+            if (filter && utils.isNumber(filter.sortingType)) {
+                state.transactionStatisticsFilter.sortingType = filter.sortingType;
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_INVALID_STATE] (state, invalidState) {

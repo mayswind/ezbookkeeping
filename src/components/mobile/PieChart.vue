@@ -260,7 +260,7 @@ export default {
 }
 
 .pie-chart {
-    margin: 24px 24px 0 24px;
+    margin: 0 24px 0 24px;
 }
 
 .pie-chart-toolbox-container {

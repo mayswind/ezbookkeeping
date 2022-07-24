@@ -20,7 +20,7 @@
                         <select v-model="defaultChartDataType">
                             <option v-for="chartDataType in allChartDataTypes"
                                     :key="chartDataType.type"
-                                    :value="chartDataType.type">{{ chartDataType.name | localized }}</option>
+                                    :value="chartDataType.type">{{ $t(chartDataType.name) }}</option>
                         </select>
                     </f7-list-item>
 
@@ -30,7 +30,7 @@
                         <select v-model="defaultDateRange">
                             <option v-for="dateRange in allDateRanges"
                                     :key="dateRange.type"
-                                    :value="dateRange.type">{{ dateRange.name | localized }}</option>
+                                    :value="dateRange.type">{{ $t(dateRange.name) }}</option>
                         </select>
                     </f7-list-item>
 
@@ -39,12 +39,12 @@
                     <f7-list-item :title="$t('Default Transaction Category Filter')" link="/statistic/filter/category?modifyDefault=1"></f7-list-item>
 
                     <f7-list-item
-                        :title="$t('Sort By')"
+                        :title="$t('Default Sort By')"
                         smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
-                        <select v-model="sortBy">
-                            <option :value="$constants.statistics.allSortingTypes.ByAmount">{{ $t('By Amount') }}</option>
-                            <option :value="$constants.statistics.allSortingTypes.ByDisplayOrder">{{ $t('By Display Order') }}</option>
-                            <option :value="$constants.statistics.allSortingTypes.ByName">{{ $t('By Name') }}</option>
+                        <select v-model="defaultSortingType">
+                            <option v-for="sortingType in allSortingTypes"
+                                    :key="sortingType.type"
+                                    :value="sortingType.type">{{ $t(sortingType.name) }}</option>
                         </select>
                     </f7-list-item>
                 </f7-list>
@@ -58,6 +58,9 @@ export default {
     computed: {
         allChartDataTypes() {
             return this.$constants.statistics.allChartDataTypes;
+        },
+        allSortingTypes() {
+            return this.$constants.statistics.allSortingTypes;
         },
         allDateRanges() {
             const allDateRanges = [];
@@ -100,7 +103,7 @@ export default {
                 this.$settings.setStatisticsDefaultDateRange(value);
             }
         },
-        sortBy: {
+        defaultSortingType: {
             get: function () {
                 return this.$settings.getStatisticsSortingType();
             },

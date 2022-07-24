@@ -45,12 +45,21 @@ const allChartDataTypes = {
 const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory.type;
 
 const allSortingTypes = {
-    ByAmount: 0,
-    ByDisplayOrder: 1,
-    ByName: 2
+    Amount: {
+        type: 0,
+        name: 'Amount'
+    },
+    DisplayOrder: {
+        type: 1,
+        name: 'Display Order'
+    },
+    Name: {
+        type: 2,
+        name: 'Name'
+    }
 };
 
-const defaultSortingType = allSortingTypes.ByAmount;
+const defaultSortingType = allSortingTypes.Amount.type;
 
 export default {
     allChartTypes: allChartTypes,

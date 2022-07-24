@@ -128,7 +128,7 @@
                         smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ `currency.${account.currency}` | localized }}&nbsp;</span>
+                            <span>{{ $t(`currency.${account.currency}`) }}&nbsp;</span>
                             <small class="smaller">{{ account.currency }}</small>
                         </f7-block>
                         <select autocomplete="transaction-currency" v-model="account.currency">
@@ -282,7 +282,7 @@
                             smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                         >
                             <f7-block slot="title" class="no-padding no-margin">
-                                <span>{{ `currency.${subAccount.currency}` | localized }}&nbsp;</span>
+                                <span>{{ $t(`currency.${subAccount.currency}`) }}&nbsp;</span>
                                 <small class="smaller">{{ subAccount.currency }}</small>
                             </f7-block>
                             <select autocomplete="transaction-currency" v-model="subAccount.currency">

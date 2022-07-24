@@ -292,7 +292,7 @@
                                             {{ transaction.day }}
                                         </span>
                                         <span class="transaction-day-of-week full-line flex-direction-column">
-                                            {{ `datetime.${transaction.dayOfWeek}.short` | localized }}
+                                            {{ $t(`datetime.${transaction.dayOfWeek}.short`) }}
                                         </span>
                                     </div>
                                     <div class="transaction-icon display-flex align-items-center">
@@ -366,7 +366,7 @@
                 <f7-list-item v-for="dateRange in allDateRanges"
                               :key="dateRange.type"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                              :title="dateRange.name | localized"
+                              :title="$t(dateRange.name)"
                               @click="changeDateFilter(dateRange.type)">
                     <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     <div slot="footer"

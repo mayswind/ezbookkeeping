@@ -86,7 +86,7 @@
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ `currency.${newProfile.defaultCurrency}` | localized }}&nbsp;</span>
+                            <span>{{ $t(`currency.${newProfile.defaultCurrency}`) }}&nbsp;</span>
                             <small class="smaller">{{ newProfile.defaultCurrency }}</small>
                         </f7-block>
                         <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
@@ -127,7 +127,7 @@
                         <select v-model="newProfile.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
                                     :key="weekDay.type"
-                                    :value="weekDay.type">{{ `datetime.${weekDay.name}.long` | localized }}</option>
+                                    :value="weekDay.type">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
                         </select>
                     </f7-list-item>
 
@@ -140,7 +140,7 @@
                         <select v-model="newProfile.transactionEditScope">
                             <option v-for="option in allTransactionEditScopeTypes"
                                     :key="option.value"
-                                    :value="option.value">{{ option.name | localized }}</option>
+                                    :value="option.value">{{ $t(option.name) }}</option>
                         </select>
                     </f7-list-item>
 

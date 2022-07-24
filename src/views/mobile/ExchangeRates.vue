@@ -17,7 +17,7 @@
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Base Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ `currency.${baseCurrency}` | localized }}&nbsp;</span>
+                            <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
                             <small class="smaller">{{ baseCurrency }}</small>
                         </f7-block>
                         <select v-model="baseCurrency">
@@ -56,7 +56,7 @@
                                   :after="getConvertedAmount(exchangeRate) | exchangeRate"
                                   swipeout>
                         <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ exchangeRate.currencyDisplayName }}&nbsp;</span>
+                            <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
                             <small class="smaller">{{ exchangeRate.currencyCode }}</small>
                         </f7-block>
                         <f7-swipeout-actions right>

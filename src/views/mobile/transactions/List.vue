@@ -29,7 +29,7 @@
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ query.dateType | dateRangeName(allDateRanges, 'Date') | localized }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | typeName('Type') | localized }}</span>
+                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ query.type | transactionTypeName($constants.transaction.allTransactionTypes, 'Type') | localized }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
                 <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ query.categoryId | optionName(allCategories, null, 'name', $t('Category')) }}</span>
@@ -313,7 +313,7 @@
                                         {{ transaction.category.name }}
                                     </span>
                                     <span v-else-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance && !transaction.category">
-                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes) | localized }}
+                                        {{ transaction.type | transactionTypeName($constants.transaction.allTransactionTypes, 'Transaction') | localized }}
                                     </span>
                                 </div>
                                 <div slot="text" class="transaction-comment" v-if="transaction.comment">
@@ -421,10 +421,10 @@
             <f7-list accordion-list
                      class="no-margin-vertical"
                      v-for="(categories, categoryType) in allPrimaryCategories"
-                     v-show="!query.type || parseInt(categoryType) === query.type - 1"
+                     v-show="!query.type || $utilities.categroyTypeToTransactionType(parseInt(categoryType)) === query.type"
                      :key="categoryType"
             >
-                <f7-list-item divider :title="(parseInt(categoryType) + 1) | typeName('Type') | localized"></f7-list-item>
+                <f7-list-item divider :title="$utilities.categroyTypeToTransactionType(parseInt(categoryType)) | transactionTypeName($constants.transaction.allTransactionTypes, 'Type') | localized"></f7-list-item>
                 <f7-list-item accordion-item
                               v-for="category in categories"
                               :key="category.id"
@@ -737,7 +737,7 @@ export default {
             if (type && this.query.categoryId) {
                 const category = this.allCategories[this.query.categoryId];
 
-                if (category && category.type !== type - 1) {
+                if (category && category.type !== this.$utilities.transactionTypeToCategroyType(type)) {
                     removeCategoryFilter = true;
                 }
             }
@@ -859,15 +859,18 @@ export default {
 
             return amount;
         },
-        transactionTypeName(type, allTransactionTypes) {
-            if (type === allTransactionTypes.Income) {
-                return 'Income';
-            } else if (type === allTransactionTypes.Expense) {
-                return 'Expense';
-            } else if (type === allTransactionTypes.Transfer) {
-                return 'Transfer';
-            } else {
-                return 'Transaction';
+        transactionTypeName(type, allTransactionTypes, defaultName) {
+            switch (type){
+                case allTransactionTypes.ModifyBalance:
+                    return 'Modify Balance';
+                case allTransactionTypes.Income:
+                    return 'Income';
+                case allTransactionTypes.Expense:
+                    return 'Expense';
+                case allTransactionTypes.Transfer:
+                    return 'Transfer';
+                default:
+                    return defaultName;
             }
         },
         transactionDomId(transaction) {
@@ -900,20 +903,6 @@ export default {
             }
 
             return defaultName;
-        },
-        typeName(type, defaultName) {
-            switch (type){
-                case 1:
-                    return 'Modify Balance';
-                case 2:
-                    return 'Income';
-                case 3:
-                    return 'Expense';
-                case 4:
-                    return 'Transfer';
-                default:
-                    return defaultName;
-            }
         },
         categoryListItemCheckedClass(category, queryCategoryId) {
             if (category.id === queryCategoryId) {

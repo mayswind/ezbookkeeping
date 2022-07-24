@@ -458,6 +458,9 @@ export default {
         allCategories() {
             return this.$store.state.allTransactionCategories;
         },
+        allCategoriesMap() {
+            return this.$store.state.allTransactionCategoriesMap;
+        },
         allTags() {
             return this.$store.state.allTransactionTags;
         },
@@ -599,6 +602,15 @@ export default {
                 self.$toast('Unable to get transaction');
                 self.loadingError = 'Unable to get transaction';
                 return;
+            }
+
+            if ((!query.type || query.type === '0') && query.categoryId && query.categoryId !== '0' && self.allCategoriesMap[query.categoryId]) {
+                const category = self.allCategoriesMap[query.categoryId];
+                const type = self.$utilities.categroyTypeToTransactionType(category.type);
+
+                if (self.$utilities.isNumber(type)) {
+                    self.transaction.type = type;
+                }
             }
 
             if (self.allCategories[self.$constants.category.allCategoryTypes.Expense] &&

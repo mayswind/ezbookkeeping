@@ -4,6 +4,8 @@ import uaParser from 'ua-parser-js';
 
 import dateTimeConstants from '../consts/datetime.js';
 import accountConstants from '../consts/account.js';
+import categoryConstants from '../consts/category.js';
+import transactionConstants from '../consts/transaction.js';
 import settings from './settings.js';
 
 function isFunction(val) {
@@ -559,6 +561,30 @@ function parseUserAgent(ua) {
     };
 }
 
+function transactionTypeToCategroyType(transactionType) {
+    if (transactionType === transactionConstants.allTransactionTypes.Income) {
+        return categoryConstants.allCategoryTypes.Income;
+    } else if (transactionType === transactionConstants.allTransactionTypes.Expense) {
+        return categoryConstants.allCategoryTypes.Expense;
+    } else if (transactionType === transactionConstants.allTransactionTypes.Transfer) {
+        return categoryConstants.allCategoryTypes.Transfer;
+    } else {
+        return null;
+    }
+}
+
+function categroyTypeToTransactionType(categoryType) {
+    if (categoryType === categoryConstants.allCategoryTypes.Income) {
+        return transactionConstants.allTransactionTypes.Income;
+    } else if (categoryType === categoryConstants.allCategoryTypes.Expense) {
+        return transactionConstants.allTransactionTypes.Expense;
+    } else if (categoryType === categoryConstants.allCategoryTypes.Transfer) {
+        return transactionConstants.allTransactionTypes.Transfer;
+    } else {
+        return null;
+    }
+}
+
 function getCategoryInfo(categoryId) {
     for (let i = 0; i < accountConstants.allCategories.length; i++) {
         if (accountConstants.allCategories[i].id === categoryId) {
@@ -700,6 +726,8 @@ export default {
     stringToArrayBuffer,
     generateRandomString,
     parseUserAgent,
+    transactionTypeToCategroyType,
+    categroyTypeToTransactionType,
     getCategoryInfo,
     getCategorizedAccounts,
     getAllFilteredAccountsBalance,

@@ -3,101 +3,107 @@
         "name": "Gin",
         "copyright": "Copyright (c) 2014 Manuel Martínez-Almeida",
         "url": "https://github.com/gin-gonic/gin",
-        "licenseUrl": "https://github.com/gin-gonic/gin/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.8.1/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v0.0.6/LICENSE"
     },
     {
         "name": "xorm",
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/branch/master/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.1/LICENSE"
     },
     {
         "name": "Logrus",
         "copyright": "Copyright (c) 2014 Simon Eskildsen",
         "url": "https://github.com/sirupsen/logrus",
-        "licenseUrl": "https://github.com/sirupsen/logrus/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.0/LICENSE"
     },
     {
         "name": "cli",
-        "copyright": "Copyright (c) 2016 Jeremy Saenz & Contributors",
+        "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.11.1/LICENSE"
     },
     {
         "name": "INI",
         "copyright": "Copyright 2014 Unknwon",
         "url": "https://gopkg.in/ini.v1",
-        "licenseUrl": "https://github.com/go-ini/ini/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/go-ini/ini/blob/v1.66.6/LICENSE"
     },
     {
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.11.0/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v4.4.2/LICENSE"
     },
     {
         "name": "otp",
         "url": "https://github.com/pquerna/otp",
-        "licenseUrl": "https://github.com/pquerna/otp/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/pquerna/otp/blob/v1.3.0/LICENSE"
     },
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.6.0/LICENSE"
     },
     {
         "name": "pq",
         "copyright": "Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany",
         "url": "https://github.com/lib/pq",
-        "licenseUrl": "https://github.com/lib/pq/blob/master/LICENSE.md"
+        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.6/LICENSE.md"
     },
     {
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.14/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://github.com/golang/crypto/blob/master/LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/630584e8d5aaa1472863b49679b2d5548d80dcba:LICENSE"
     },
     {
         "name": "Testify",
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",
-        "licenseUrl": "https://github.com/stretchr/testify/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.8.0/LICENSE"
     },
     {
         "name": "vue",
         "copyright": "Copyright (c) 2013-present, Yuxi (Evan) You",
         "url": "https://github.com/vuejs/vue",
-        "licenseUrl": "https://github.com/vuejs/vue/blob/dev/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/vue/blob/v2.6.14/LICENSE"
+    },
+    {
+        "name": "vuex",
+        "copyright": "Copyright (c) 2015-present Evan You",
+        "url": "https://github.com/vuejs/vuex",
+        "licenseUrl": "https://github.com/vuejs/vuex/blob/v3.6.2/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/kazupon/vue-i18n",
-        "licenseUrl": "https://github.com/kazupon/vue-i18n/blob/v8.x/LICENSE"
+        "licenseUrl": "https://github.com/kazupon/vue-i18n/blob/v8.27.2/LICENSE"
     },
     {
         "name": "vue-clipboard2",
         "copyright": "Copyright (c) 2017 Inndy <inndy \\dot tw \\at gmail \\dot com>",
         "url": "https://github.com/Inndy/vue-clipboard2",
-        "licenseUrl": "https://github.com/Inndy/vue-clipboard2/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/Inndy/vue-clipboard2/blob/v0.3.3/LICENSE"
     },
     {
         "name": "vue-pincode-input",
@@ -106,64 +112,76 @@
         "licenseUrl": "https://github.com/Seokky/vue-pincode-input/blob/master/LICENSE"
     },
     {
+        "name": "register-service-worker",
+        "copyright": "Copyright (c) 2013-present, Yuxi (Evan) You",
+        "url": "https://github.com/yyx990803/register-service-worker",
+        "licenseUrl": "https://github.com/yyx990803/register-service-worker/blob/v1.7.2/LICENSE"
+    },
+    {
         "name": "core-js",
         "copyright": "Copyright (c) 2014-2022 Denis Pushkarev",
         "url": "https://github.com/zloirock/core-js",
-        "licenseUrl": "https://github.com/zloirock/core-js/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/zloirock/core-js/blob/v3.23.5/LICENSE"
     },
     {
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v5.7.14/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v5.7.14/LICENSE"
     },
     {
         "name": "Framework7-icons",
         "copyright": "Copyright (c) 2016 Vladimir Kharlampidi",
         "url": "https://framework7.io/icons/",
-        "licenseUrl": "https://github.com/framework7io/framework7-icons/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7-icons/blob/v5.0.5/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie",
         "url": "https://github.com/axios/axios",
-        "licenseUrl": "https://github.com/axios/axios/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v0.27.2/LICENSE"
     },
     {
         "name": "Moment.js",
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
-        "licenseUrl": "https://github.com/moment/moment/blob/develop/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment/blob/2.29.4/LICENSE"
+    },
+    {
+        "name": "Moment Timezone",
+        "copyright": "Copyright (c) JS Foundation and other contributors",
+        "url": "https://momentjs.com",
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.34/LICENSE"
     },
     {
         "name": "crypto-js",
         "copyright": "Copyright (c) 2009-2013 Jeff Mott, Copyright (c) 2013-2016 Evan Vosberg",
         "url": "https://github.com/brix/crypto-js",
-        "licenseUrl": "https://github.com/brix/crypto-js/blob/develop/LICENSE"
+        "licenseUrl": "https://github.com/brix/crypto-js/blob/4.1.1/LICENSE"
     },
     {
         "name": "cbor-js",
         "copyright": "Copyright (c) 2014 Patrick Gansterer <paroga@paroga.com>",
         "url": "https://github.com/paroga/cbor-js",
-        "licenseUrl": "https://github.com/paroga/cbor-js/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/paroga/cbor-js/blob/v0.1.0/LICENSE"
     },
     {
         "name": "js-cookie",
         "copyright": "Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors",
         "url": "https://github.com/js-cookie/js-cookie",
-        "licenseUrl": "https://github.com/js-cookie/js-cookie/blob/master/LICENSE"
+        "licenseUrl": "https://github.com/js-cookie/js-cookie/blob/v3.0.1/LICENSE"
     },
     {
         "name": "UAParser.js",
         "copyright": "Copyright (c) 2012-2021 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
-        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/master/license.md"
+        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.2/license.md"
     },
     {
         "name": "Icons8 Line Awesome",

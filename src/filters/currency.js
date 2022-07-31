@@ -2,7 +2,7 @@ import currency from '../consts/currency.js';
 import settings from '../lib/settings.js';
 import utils from '../lib/utils.js';
 
-export default function ({i18n}, value, currencyCode) {
+export default function ({i18n}, value, currencyCode, notConvertValue) {
     if (!utils.isNumber(value) && !utils.isString(value)) {
         return value;
     }
@@ -11,16 +11,18 @@ export default function ({i18n}, value, currencyCode) {
         value = value.toString();
     }
 
-    const hasIncompleteFlag = utils.isString(value) && value.charAt(value.length - 1) === '+';
+    if (!notConvertValue) {
+        const hasIncompleteFlag = utils.isString(value) && value.charAt(value.length - 1) === '+';
 
-    if (hasIncompleteFlag) {
-        value = value.substr(0, value.length - 1);
-    }
+        if (hasIncompleteFlag) {
+            value = value.substr(0, value.length - 1);
+        }
 
-    value = utils.numericCurrencyToString(value);
+        value = utils.numericCurrencyToString(value);
 
-    if (hasIncompleteFlag) {
-        value = value + '+';
+        if (hasIncompleteFlag) {
+            value = value + '+';
+        }
     }
 
     const currencyDisplayMode = settings.getCurrencyDisplayMode();

@@ -25,11 +25,11 @@
         </f7-popover>
 
         <f7-card v-if="query.chartType === $constants.statistics.allChartTypes.Pie">
-            <f7-card-header class="no-border">
-                <small class="full-line text-align-right">
+            <f7-card-header class="no-border display-block">
+                <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
                     <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
-                </small>
+                </div>
             </f7-card-header>
             <f7-card-content class="pie-chart-container" style="margin-top: -6px" :padding="false">
                 <pie-chart
@@ -74,11 +74,26 @@
         </f7-card>
 
         <f7-card v-else-if="query.chartType === $constants.statistics.allChartTypes.Bar">
-            <f7-card-header class="no-border">
-                <small class="full-line text-align-right">
-                    <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
-                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
-                </small>
+            <f7-card-header class="no-border display-block">
+                <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                    <div>
+                        {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
+                    </div>
+                    <div class="align-self-flex-end">
+                        <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
+                        <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
+                    </div>
+                </div>
+                <div class="display-flex full-line">
+                    <div :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
+                        <span v-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
+                            {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}
+                        </span>
+                        <span v-else-if="loading || !statisticsData || !statisticsData.items || !statisticsData.items.length">
+                            {{ '---' | currency(defaultCurrency, true) }}
+                        </span>
+                    </div>
+                </div>
             </f7-card-header>
             <f7-card-content class="no-safe-areas" style="margin-top: -14px" :padding="false">
                 <f7-list class="statistics-list-item skeleton-text" v-if="loading">
@@ -153,15 +168,6 @@
                     <f7-list-item :title="$t('No transaction data')"></f7-list-item>
                 </f7-list>
                 <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
-                    <f7-list-item class="statistics-list-item-overview">
-                        <div slot="header">
-                            {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
-                        </div>
-                        <div slot="title"
-                             :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
-                            {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}
-                        </div>
-                    </f7-list-item>
                     <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"
                                   :link="item | itemLinkUrl(query, allChartDataTypes)"
@@ -729,6 +735,10 @@ export default {
     display: none;
 }
 
+.statistics-chart-header {
+    font-size: var(--f7-list-item-header-font-size);
+}
+
 .statistics-pie-chart .pie-chart-text-group {
     fill: #fff;
     text-anchor: middle;
@@ -755,15 +765,12 @@ export default {
     transform: translateY(1.5em);
 }
 
-.statistics-list-item-overview {
-    margin-bottom: 6px;
-}
-
 .statistics-list-item-overview-amount {
     margin-top: 2px;
     font-size: 1.5em;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 6px;
 }
 
 .statistics-list-item-text {
@@ -774,10 +781,6 @@ export default {
 .statistics-list-item .item-content {
     margin-top: 8px;
     margin-bottom: 12px;
-}
-
-.statistics-list-item-overview .item-inner:after, .statistics-list-item .item-inner:after {
-    background-color: transparent;
 }
 
 .statistics-icon {

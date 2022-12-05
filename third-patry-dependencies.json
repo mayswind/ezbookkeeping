@@ -15,7 +15,7 @@
         "name": "xorm",
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.1/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.2/LICENSE"
     },
     {
         "name": "Logrus",
@@ -27,25 +27,25 @@
         "name": "cli",
         "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.11.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.23.6/LICENSE"
     },
     {
         "name": "INI",
         "copyright": "Copyright 2014 Unknwon",
         "url": "https://gopkg.in/ini.v1",
-        "licenseUrl": "https://github.com/go-ini/ini/blob/v1.66.6/LICENSE"
+        "licenseUrl": "https://github.com/go-ini/ini/blob/v1.67.0/LICENSE"
     },
     {
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.11.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.11.1/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v4.4.2/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v4.4.3/LICENSE"
     },
     {
         "name": "otp",
@@ -55,19 +55,19 @@
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.6.0/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.7.0/LICENSE"
     },
     {
         "name": "pq",
         "copyright": "Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany",
         "url": "https://github.com/lib/pq",
-        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.6/LICENSE.md"
+        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.7/LICENSE.md"
     },
     {
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.14/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.16/LICENSE"
     },
     {
         "name": "Go Cryptography",

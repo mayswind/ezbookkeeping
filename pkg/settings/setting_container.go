@@ -7,7 +7,9 @@ type ConfigContainer struct {
 
 // Initialize a config container singleton instance
 var (
-	Container = &ConfigContainer{}
+	Version    string
+	CommitHash string
+	Container  = &ConfigContainer{}
 )
 
 // SetCurrentConfig sets the current config by a given config

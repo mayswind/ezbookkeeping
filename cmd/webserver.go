@@ -131,6 +131,8 @@ func startWebServer(c *cli.Context) error {
 	router.StaticFile("/desktop/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("/desktop/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 
+	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
+
 	apiRoute := router.Group("/api")
 
 	apiRoute.Use(bindMiddleware(middlewares.RequestId(config)))

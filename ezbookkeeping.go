@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/ezbookkeeping/cmd"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -24,6 +25,9 @@ var (
 )
 
 func main() {
+	settings.Version = Version
+	settings.CommitHash = CommitHash
+
 	app := &cli.App{
 		Name:    "ezBookkeeping",
 		Usage:   "A lightweight personal bookkeeping app hosted by yourself.",

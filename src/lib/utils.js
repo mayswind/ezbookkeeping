@@ -273,10 +273,10 @@ function getDateRangeByDateType(dateType, firstDayOfWeek) {
         maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 1, 'days');
     } else if (dateType === dateTimeConstants.allDateRanges.LastSevenDays.type) { // Last 7 days
-        maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
+        maxTime = getTodayLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 6, 'days');
     } else if (dateType === dateTimeConstants.allDateRanges.LastThirtyDays.type) { // Last 30 days
-        maxTime = getUnixTimeBeforeUnixTime(getTodayLastUnixTime(), 1, 'days');
+        maxTime = getTodayLastUnixTime();
         minTime = getUnixTimeBeforeUnixTime(getTodayFirstUnixTime(), 29, 'days');
     } else if (dateType === dateTimeConstants.allDateRanges.ThisWeek.type) { // This week
         maxTime = getThisWeekLastUnixTime(firstDayOfWeek);

@@ -135,6 +135,7 @@ build_frontend() {
     npm install
 
     echo "Building frontend files ($RELEASE_TYPE)..."
+    export NODE_OPTIONS=--openssl-legacy-provider
     npm run build -- "$frontend_build_arguments"
 }
 

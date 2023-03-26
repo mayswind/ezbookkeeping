@@ -501,7 +501,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+		transaction = a.transactions.GetRelatedTransferTransaction(transaction)
 	}
 
 	accountIds := make([]int64, 0, 2)
@@ -983,7 +983,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 		transaction := transactions[i]
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transaction = a.transactions.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+			transaction = a.transactions.GetRelatedTransferTransaction(transaction)
 		}
 
 		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])

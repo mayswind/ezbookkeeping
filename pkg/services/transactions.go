@@ -186,7 +186,19 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 
 	now := time.Now().Unix()
 
-	transaction.TransactionId = s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION)
+	needUuidCount := 1
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		needUuidCount = 2
+	}
+
+	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint8(needUuidCount))
+	transaction.TransactionId = uuids[0]
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		transaction.RelatedId = uuids[1]
+	}
+
 	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
 	transaction.CreatedUnixTime = now
@@ -256,8 +268,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 		var relatedTransaction *models.Transaction
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			relatedTransaction = s.GetRelatedTransferTransaction(transaction, s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION))
-			transaction.RelatedId = relatedTransaction.TransactionId
+			relatedTransaction = s.GetRelatedTransferTransaction(transaction)
 		}
 
 		createdRows, err := sess.Insert(transaction)
@@ -537,7 +548,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			relatedTransaction := s.GetRelatedTransferTransaction(transaction, transaction.RelatedId)
+			relatedTransaction := s.GetRelatedTransferTransaction(transaction)
 
 			if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(relatedTransaction.TransactionTime) {
 				return errs.ErrTooMuchTransactionInOneSecond
@@ -905,7 +916,7 @@ func (s *TransactionService) DeleteAllTransactions(uid int64) error {
 }
 
 // GetRelatedTransferTransaction returns the related transaction for transfer transaction
-func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *models.Transaction, relatedTransactionId int64) *models.Transaction {
+func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *models.Transaction) *models.Transaction {
 	var relatedType models.TransactionDbType
 	var relatedTransactionTime int64
 
@@ -920,7 +931,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 	}
 
 	relatedTransaction := &models.Transaction{
-		TransactionId:        relatedTransactionId,
+		TransactionId:        originalTransaction.RelatedId,
 		Uid:                  originalTransaction.Uid,
 		Deleted:              originalTransaction.Deleted,
 		Type:                 relatedType,

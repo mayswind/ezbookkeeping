@@ -37,7 +37,7 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (interfa
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryListHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	return a.getTransactionCategoryListByTypeResponse(categories, categoryListReq.ParentId)
@@ -58,7 +58,7 @@ func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (interfac
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryGetHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryGetReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	categoryResp := category.ToTransactionCategoryInfoResponse()
@@ -112,7 +112,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
@@ -157,7 +157,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 
 			if err != nil {
 				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
-				return nil, errs.ErrOperationFailed
+				return nil, errs.Or(err, errs.ErrOperationFailed)
 			}
 		}
 
@@ -208,7 +208,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (inter
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	newCategory := &models.TransactionCategory{

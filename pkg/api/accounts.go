@@ -38,7 +38,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountListHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	userAllAccountResps := make([]*models.AccountInfoResponse, len(accounts))
@@ -98,7 +98,7 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	accountRespMap := make(map[int64]*models.AccountInfoResponse)
@@ -190,7 +190,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
@@ -233,7 +233,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	accountMap := a.accounts.GetAccountMapByList(accountAndSubAccounts)

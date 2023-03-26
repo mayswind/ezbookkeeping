@@ -32,7 +32,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[tokens.TokenListHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	tokenResps := make(models.TokenInfoResponseSlice, len(tokens))
@@ -145,7 +145,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[tokens.TokenRevokeAllHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	claims := c.GetTokenClaims()

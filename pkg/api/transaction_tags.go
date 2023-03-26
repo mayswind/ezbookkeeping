@@ -29,7 +29,7 @@ func (a *TransactionTagsApi) TagListHandler(c *core.Context) (interface{}, *errs
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagListHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	tagResps := make(models.TransactionTagInfoResponseSlice, len(tags))
@@ -58,7 +58,7 @@ func (a *TransactionTagsApi) TagGetHandler(c *core.Context) (interface{}, *errs.
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagGetHandler] failed to get tag \"id:%d\" for user \"uid:%d\", because %s", tagGetReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	tagResp := tag.ToTransactionTagInfoResponse()
@@ -82,7 +82,7 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.Context) (interface{}, *er
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	tag := a.createNewTagModel(uid, &tagCreateReq, maxOrderId+1)
@@ -116,7 +116,7 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.Context) (interface{}, *er
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagModifyHandler] failed to get tag \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.Id, uid, err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	newTag := &models.TransactionTag{

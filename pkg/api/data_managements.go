@@ -147,21 +147,21 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *er
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transactions, because %s", err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.categories.DeleteAllCategories(uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction categories, because %s", err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.tags.DeleteAllTags(uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
-		return nil, errs.ErrOperationFailed
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	log.InfofWithRequestId(c, "[data_managements.ClearDataHandler] user \"uid:%d\" has cleared all data", uid)

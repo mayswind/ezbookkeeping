@@ -632,7 +632,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 		return nil, errs.ErrUserNotFound
 	}
 
-	transaction := a.createNewTransactionModel(uid, &transactionCreateReq)
+	transaction := a.createNewTransactionModel(uid, &transactionCreateReq, c.ClientIP())
 	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transactionCreateReq.UtcOffset)
 
 	if !transactionEditable {
@@ -1016,7 +1016,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 	return result, nil
 }
 
-func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest) *models.Transaction {
+func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreateReq *models.TransactionCreateRequest, clientIp string) *models.Transaction {
 	var transactionDbType models.TransactionDbType
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE {
@@ -1039,6 +1039,7 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		Amount:            transactionCreateReq.SourceAmount,
 		HideAmount:        transactionCreateReq.HideAmount,
 		Comment:           transactionCreateReq.Comment,
+		CreatedIp:         clientIp,
 	}
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {

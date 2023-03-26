@@ -48,6 +48,7 @@ type Transaction struct {
 	RelatedAccountAmount int64             `xorm:"NOT NULL"`
 	HideAmount           bool              `xorm:"NOT NULL"`
 	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
+	CreatedIp            string            `xorm:"VARCHAR(39)"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
 	DeletedUnixTime      int64

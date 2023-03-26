@@ -933,6 +933,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 		RelatedAccountId:     originalTransaction.AccountId,
 		RelatedAccountAmount: originalTransaction.Amount,
 		Comment:              originalTransaction.Comment,
+		CreatedIp:            originalTransaction.CreatedIp,
 		CreatedUnixTime:      originalTransaction.CreatedUnixTime,
 		UpdatedUnixTime:      originalTransaction.UpdatedUnixTime,
 		DeletedUnixTime:      originalTransaction.DeletedUnixTime,

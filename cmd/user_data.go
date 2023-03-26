@@ -399,7 +399,7 @@ func printUserInfo(user *models.User) {
 	fmt.Printf("[Password] %s\n", user.Password)
 	fmt.Printf("[Salt] %s\n", user.Salt)
 	fmt.Printf("[DefaultCurrency] %s\n", user.DefaultCurrency)
-	fmt.Printf("[DefaultAccountId] %s\n", user.DefaultAccountId)
+	fmt.Printf("[DefaultAccountId] %d\n", user.DefaultAccountId)
 	fmt.Printf("[FirstDayOfWeek] %s\n", user.FirstDayOfWeek)
 	fmt.Printf("[TransactionEditScope] %s\n", user.TransactionEditScope)
 	fmt.Printf("[Deleted] %t\n", user.Deleted)

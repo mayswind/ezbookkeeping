@@ -48,40 +48,51 @@ func NewInternalUuidGenerator(config *settings.Config) (*InternalUuidGenerator, 
 	return generator, nil
 }
 
-// GenerateUuid returns a new uuid
+// GenerateUuid generates a new uuid
 func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
+	uuids := u.GenerateUuids(idType, 1)
+	return uuids[0]
+}
+
+// GenerateUuids generates new uuids
+func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []int64 {
 	// 63bits = unixTime(32bits) + uuidType(4bits) + uuidServerId(8bits) + sequentialNumber(19bits)
 
+	uuids := make([]int64, count)
+
+	if count < 1 {
+		return uuids
+	}
+
 	var unixTime uint64
-	var newSeqId uint64
+	var newFirstSeqId uint64
+	var newLastSeqId uint64
 	uuidType := uint8(idType)
 
 	for {
 		unixTime = uint64(time.Now().Unix())
-		newSeqId = atomic.AddUint64(&u.uuidSeqNumbers[uuidType], 1)
+		newLastSeqId = atomic.AddUint64(&u.uuidSeqNumbers[uuidType], uint64(count))
 
-		if newSeqId>>seqNumberIdBits == unixTime {
+		if newLastSeqId>>seqNumberIdBits == unixTime {
+			newFirstSeqId = newLastSeqId - uint64(count-1)
 			break
 		}
 
-		currentSeqId := newSeqId
-		newSeqId = unixTime << seqNumberIdBits
+		currentSeqId := newLastSeqId
+		newFirstSeqId = unixTime << seqNumberIdBits
+		newLastSeqId = newFirstSeqId + uint64(count-1)
 
-		if atomic.CompareAndSwapUint64(&u.uuidSeqNumbers[uuidType], currentSeqId, newSeqId) {
+		if atomic.CompareAndSwapUint64(&u.uuidSeqNumbers[uuidType], currentSeqId, newLastSeqId) {
 			break
 		}
 	}
 
-	seqId := newSeqId & seqNumberIdMask
+	for i := 0; i < int(count); i++ {
+		seqId := (newFirstSeqId + uint64(i)) & seqNumberIdMask
+		uuids[i] = u.assembleUuid(unixTime, uuidType, seqId)
+	}
 
-	unixTimePart := (int64(unixTime) & internalUuidUnixTimeMask) << (internalUuidTypeBits + internalUuidServerIdBits + internalUuidSeqIdBits)
-	uuidTypePart := (int64(uuidType) & internalUuidTypeMask) << (internalUuidServerIdBits + internalUuidSeqIdBits)
-	uuidServerIdPart := (int64(u.uuidServerId) & internalUuidServerIdMask) << internalUuidSeqIdBits
-	seqIdPart := int64(seqId) & internalUuidSeqIdMask
-
-	uuid := unixTimePart | uuidTypePart | uuidServerIdPart | seqIdPart
-
-	return uuid
+	return uuids
 }
 
 // ParseUuidInfo returns a info struct which contains all information in uuid
@@ -103,4 +114,13 @@ func (u *InternalUuidGenerator) ParseUuidInfo(uuid int64) *InternalUuidInfo {
 		UuidServerId: uuidServerId,
 		SequentialId: seqId,
 	}
+}
+
+func (u *InternalUuidGenerator) assembleUuid(unixTime uint64, uuidType uint8, seqId uint64) int64 {
+	unixTimePart := (int64(unixTime) & internalUuidUnixTimeMask) << (internalUuidTypeBits + internalUuidServerIdBits + internalUuidSeqIdBits)
+	uuidTypePart := (int64(uuidType) & internalUuidTypeMask) << (internalUuidServerIdBits + internalUuidSeqIdBits)
+	uuidServerIdPart := (int64(u.uuidServerId) & internalUuidServerIdMask) << internalUuidSeqIdBits
+	seqIdPart := int64(seqId) & internalUuidSeqIdMask
+
+	return unixTimePart | uuidTypePart | uuidServerIdPart | seqIdPart
 }

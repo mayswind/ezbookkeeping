@@ -19,7 +19,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 		}
 
 		bundledSettings := strings.Join(settingsArr, "_")
-		c.SetCookie(settingsCookieName, bundledSettings, config.TokenExpiredTime, "", "", false, false)
+		c.SetCookie(settingsCookieName, bundledSettings, int(config.TokenExpiredTime), "", "", false, false)
 
 		c.Next()
 	}

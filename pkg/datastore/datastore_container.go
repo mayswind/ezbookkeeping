@@ -98,8 +98,8 @@ func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 		return nil, err
 	}
 
-	engineGroup.SetMaxIdleConns(dbConfig.MaxIdleConnection)
-	engineGroup.SetMaxOpenConns(dbConfig.MaxOpenConnection)
+	engineGroup.SetMaxIdleConns(int(dbConfig.MaxIdleConnection))
+	engineGroup.SetMaxOpenConns(int(dbConfig.MaxOpenConnection))
 	engineGroup.SetConnMaxLifetime(time.Duration(dbConfig.ConnectionMaxLifeTime) * time.Second)
 
 	return &Database{

@@ -75,23 +75,23 @@ const (
 	defaultAppName string = "ezBookkeeping"
 
 	defaultHttpAddr string = "0.0.0.0"
-	defaultHttpPort int    = 8080
+	defaultHttpPort uint16 = 8080
 	defaultDomain   string = "localhost"
 
 	defaultDatabaseHost            string = "127.0.0.1:3306"
 	defaultDatabaseName            string = "ezbookkeeping"
-	defaultDatabaseMaxIdleConn     int    = 2
-	defaultDatabaseMaxOpenConn     int    = 0
-	defaultDatabaseConnMaxLifetime int    = 14400
+	defaultDatabaseMaxIdleConn     uint16 = 2
+	defaultDatabaseMaxOpenConn     uint16 = 0
+	defaultDatabaseConnMaxLifetime uint32 = 14400
 
 	defaultLogMode  string = "console"
 	defaultLoglevel Level  = LOGLEVEL_INFO
 
 	defaultSecretKey                 string = "ezbookkeeping"
-	defaultTokenExpiredTime          int    = 604800 // 7 days
-	defaultTemporaryTokenExpiredTime int    = 300    // 5 minutes
+	defaultTokenExpiredTime          uint32 = 604800 // 7 days
+	defaultTemporaryTokenExpiredTime uint32 = 300    // 5 minutes
 
-	defaultExchangeRatesDataRequestTimeout int = 10000 // 10 seconds
+	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
 )
 
 // DatabaseConfig represents the database setting config
@@ -106,9 +106,9 @@ type DatabaseConfig struct {
 
 	DatabasePath string
 
-	MaxIdleConnection     int
-	MaxOpenConnection     int
-	ConnectionMaxLifeTime int
+	MaxIdleConnection     uint16
+	MaxOpenConnection     uint16
+	ConnectionMaxLifeTime uint32
 }
 
 // Config represents the global setting config
@@ -121,7 +121,7 @@ type Config struct {
 	// Server
 	Protocol Scheme
 	HttpAddr string
-	HttpPort int
+	HttpPort uint16
 
 	Domain  string
 	RootUrl string
@@ -156,9 +156,9 @@ type Config struct {
 	// Secret
 	SecretKey                         string
 	EnableTwoFactor                   bool
-	TokenExpiredTime                  int
+	TokenExpiredTime                  uint32
 	TokenExpiredTimeDuration          time.Duration
-	TemporaryTokenExpiredTime         int
+	TemporaryTokenExpiredTime         uint32
 	TemporaryTokenExpiredTimeDuration time.Duration
 	EnableRequestIdHeader             bool
 
@@ -170,7 +170,7 @@ type Config struct {
 
 	// Exchange Rates
 	ExchangeRatesDataSource     string
-	ExchangeRatesRequestTimeout int
+	ExchangeRatesRequestTimeout uint32
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -281,12 +281,12 @@ func loadServerConfiguration(config *Config, configFile *ini.File, sectionName s
 		config.Protocol = SCHEME_HTTP
 
 		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", defaultHttpAddr)
-		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", defaultHttpPort)
+		config.HttpPort = getConfigItemUint16Value(configFile, sectionName, "http_port", defaultHttpPort)
 	} else if getConfigItemStringValue(configFile, sectionName, "protocol") == "https" {
 		config.Protocol = SCHEME_HTTPS
 
 		config.HttpAddr = getConfigItemStringValue(configFile, sectionName, "http_addr", defaultHttpAddr)
-		config.HttpPort = getConfigItemIntValue(configFile, sectionName, "http_port", defaultHttpPort)
+		config.HttpPort = getConfigItemUint16Value(configFile, sectionName, "http_port", defaultHttpPort)
 
 		config.CertFile = getConfigItemStringValue(configFile, sectionName, "cert_file")
 		config.CertKeyFile = getConfigItemStringValue(configFile, sectionName, "cert_key_file")
@@ -339,9 +339,9 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 		dbConfig.DatabasePath = finalStaticDBPath
 	}
 
-	dbConfig.MaxIdleConnection = getConfigItemIntValue(configFile, sectionName, "max_idle_conn", defaultDatabaseMaxIdleConn)
-	dbConfig.MaxOpenConnection = getConfigItemIntValue(configFile, sectionName, "max_open_conn", defaultDatabaseMaxOpenConn)
-	dbConfig.ConnectionMaxLifeTime = getConfigItemIntValue(configFile, sectionName, "conn_max_lifetime", defaultDatabaseConnMaxLifetime)
+	dbConfig.MaxIdleConnection = getConfigItemUint16Value(configFile, sectionName, "max_idle_conn", defaultDatabaseMaxIdleConn)
+	dbConfig.MaxOpenConnection = getConfigItemUint16Value(configFile, sectionName, "max_open_conn", defaultDatabaseMaxOpenConn)
+	dbConfig.ConnectionMaxLifeTime = getConfigItemUint32Value(configFile, sectionName, "conn_max_lifetime", defaultDatabaseConnMaxLifetime)
 
 	config.DatabaseConfig = dbConfig
 	config.EnableQueryLog = getConfigItemBoolValue(configFile, sectionName, "log_query", false)
@@ -383,7 +383,7 @@ func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName str
 		return errs.ErrInvalidUuidMode
 	}
 
-	config.UuidServerId = uint8(getConfigItemIntValue(configFile, sectionName, "server_id", 0))
+	config.UuidServerId = getConfigItemUint8Value(configFile, sectionName, "server_id", 0)
 
 	return nil
 }
@@ -392,10 +392,10 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	config.SecretKey = getConfigItemStringValue(configFile, sectionName, "secret_key", defaultSecretKey)
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 
-	config.TokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "token_expired_time", defaultTokenExpiredTime)
+	config.TokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "token_expired_time", defaultTokenExpiredTime)
 	config.TokenExpiredTimeDuration = time.Duration(config.TokenExpiredTime) * time.Second
 
-	config.TemporaryTokenExpiredTime = getConfigItemIntValue(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
+	config.TemporaryTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
 	config.TemporaryTokenExpiredTimeDuration = time.Duration(config.TemporaryTokenExpiredTime) * time.Second
 
 	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
@@ -430,7 +430,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		return errs.ErrInvalidExchangeRatesDataSource
 	}
 
-	config.ExchangeRatesRequestTimeout = getConfigItemIntValue(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
+	config.ExchangeRatesRequestTimeout = getConfigItemUint32Value(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
 
 	return nil
 }
@@ -482,23 +482,73 @@ func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName
 	}
 }
 
-func getConfigItemIntValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...int) int {
+func getConfigItemUint8Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint8) uint8 {
 	environmentKey := getEnvironmentKey(sectionName, itemName)
 	environmentValue := os.Getenv(environmentKey)
 
 	if len(environmentValue) > 0 {
-		value, err := strconv.ParseInt(environmentValue, 0, 64)
+		value, err := strconv.ParseUint(environmentValue, 10, 8)
 
 		if err == nil {
-			return int(value)
+			return uint8(value)
 		}
 	}
 
 	section := configFile.Section(sectionName)
-	return section.Key(itemName).MustInt(defaultValue...)
+	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 8)
+
+	if err == nil {
+		return uint8(value)
+	}
+
+	return defaultValue
 }
 
-func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...bool) bool {
+func getConfigItemUint16Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint16) uint16 {
+	environmentKey := getEnvironmentKey(sectionName, itemName)
+	environmentValue := os.Getenv(environmentKey)
+
+	if len(environmentValue) > 0 {
+		value, err := strconv.ParseUint(environmentValue, 10, 16)
+
+		if err == nil {
+			return uint16(value)
+		}
+	}
+
+	section := configFile.Section(sectionName)
+	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 16)
+
+	if err == nil {
+		return uint16(value)
+	}
+
+	return defaultValue
+}
+
+func getConfigItemUint32Value(configFile *ini.File, sectionName string, itemName string, defaultValue uint32) uint32 {
+	environmentKey := getEnvironmentKey(sectionName, itemName)
+	environmentValue := os.Getenv(environmentKey)
+
+	if len(environmentValue) > 0 {
+		value, err := strconv.ParseUint(environmentValue, 10, 32)
+
+		if err == nil {
+			return uint32(value)
+		}
+	}
+
+	section := configFile.Section(sectionName)
+	value, err := strconv.ParseUint(section.Key(itemName).String(), 10, 32)
+
+	if err == nil {
+		return uint32(value)
+	}
+
+	return defaultValue
+}
+
+func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName string, defaultValue bool) bool {
 	environmentKey := getEnvironmentKey(sectionName, itemName)
 	environmentValue := os.Getenv(environmentKey)
 
@@ -511,7 +561,7 @@ func getConfigItemBoolValue(configFile *ini.File, sectionName string, itemName s
 	}
 
 	section := configFile.Section(sectionName)
-	return section.Key(itemName).MustBool(defaultValue...)
+	return section.Key(itemName).MustBool(defaultValue)
 }
 
 func getEnvironmentKey(sectionName string, itemName string) string {

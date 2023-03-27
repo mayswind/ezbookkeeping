@@ -85,7 +85,7 @@ func (s *TransactionTagService) GetTagsByTagIds(uid int64, tagIds []int64) (map[
 }
 
 // GetMaxDisplayOrder returns the max display order
-func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int, error) {
+func (s *TransactionTagService) GetMaxDisplayOrder(uid int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}

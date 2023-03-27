@@ -100,7 +100,7 @@ func (s *TransactionCategoryService) GetCategoriesByCategoryIds(uid int64, categ
 }
 
 // GetMaxDisplayOrder returns the max display order according to transaction category type
-func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int, error) {
+func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -120,7 +120,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType 
 }
 
 // GetMaxSubCategoryDisplayOrder returns the max display order of sub transaction category according to transaction category type and parent transaction category id
-func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int, error) {
+func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}

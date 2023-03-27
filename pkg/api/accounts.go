@@ -403,7 +403,7 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.
 	return true, nil
 }
 
-func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, order int) *models.Account {
+func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, order int32) *models.Account {
 	return &models.Account{
 		Uid:          uid,
 		Name:         accountCreateReq.Name,
@@ -425,7 +425,7 @@ func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models
 
 	childrenAccounts := make([]*models.Account, len(accountCreateReq.SubAccounts))
 
-	for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
+	for i := int32(0); i < int32(len(accountCreateReq.SubAccounts)); i++ {
 		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], i+1)
 	}
 

@@ -223,7 +223,7 @@ func (a *TransactionTagsApi) TagDeleteHandler(c *core.Context) (interface{}, *er
 	return true, nil
 }
 
-func (a *TransactionTagsApi) createNewTagModel(uid int64, tagCreateReq *models.TransactionTagCreateRequest, order int) *models.TransactionTag {
+func (a *TransactionTagsApi) createNewTagModel(uid int64, tagCreateReq *models.TransactionTagCreateRequest, order int32) *models.TransactionTag {
 	return &models.TransactionTag{
 		Uid:          uid,
 		Name:         tagCreateReq.Name,

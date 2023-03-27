@@ -2,26 +2,37 @@ package utils
 
 import "strconv"
 
-// Int32ToString returns the textual representation of this number
-func Int32ToString(num int) string {
+// IntToString returns the textual representation of this number
+func IntToString(num int) string {
 	return strconv.Itoa(num)
 }
 
-// StringToInt32 parses a textual representation of the number to int32
-func StringToInt32(str string) (int, error) {
+// StringToInt parses a textual representation of the number to int
+func StringToInt(str string) (int, error) {
 	return strconv.Atoi(str)
 }
 
-// StringTryToInt32 parses a textual representation of the number to int32 if str is valid,
+// StringTryToInt parses a textual representation of the number to int if str is valid,
 // or returns the default value
-func StringTryToInt32(str string, defaultValue int) int {
-	num, err := StringToInt32(str)
+func StringTryToInt(str string, defaultValue int) int {
+	num, err := StringToInt(str)
 
 	if err != nil {
 		return defaultValue
 	}
 
 	return num
+}
+
+// StringToInt32 parses a textual representation of the number to int32
+func StringToInt32(str string) (int32, error) {
+	val, err := strconv.ParseInt(str, 10, 32)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return int32(val), nil
 }
 
 // Int64ToString returns the textual representation of this number

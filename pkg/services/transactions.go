@@ -33,7 +33,7 @@ var (
 )
 
 // GetAllTransactions returns all transactions
-func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAllTransactions(uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
 	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	var allTransactions []*models.Transaction
 
@@ -46,7 +46,7 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDupl
 
 		allTransactions = append(allTransactions, transactions...)
 
-		if len(transactions) < pageCount {
+		if len(transactions) < int(pageCount) {
 			maxTransactionTime = 0
 			break
 		}
@@ -58,12 +58,12 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int, noDupl
 }
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
 	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, nil, "", count, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, count int, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, count int32, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -76,13 +76,13 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionT
 	var err error
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, noDuplicated)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, 0).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(count), 0).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
 
 // GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int, count int, utcOffset int16) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, utcOffset int16) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -109,7 +109,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int, m
 	var transactions []*models.Transaction
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(count, count*(page-1)).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(count), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
@@ -142,7 +142,7 @@ func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(uid int64, year int, month int, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
+func (s *TransactionService) GetMonthTransactionCount(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}

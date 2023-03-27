@@ -96,7 +96,7 @@ func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) 
 }
 
 // GetMaxDisplayOrder returns the max display order according to account category
-func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int, error) {
+func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -116,7 +116,7 @@ func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCa
 }
 
 // GetMaxSubAccountDisplayOrder returns the max display order of sub account according to account category and parent account id
-func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models.AccountCategory, parentAccountId int64) (int, error) {
+func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}

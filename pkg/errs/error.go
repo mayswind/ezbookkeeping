@@ -1,7 +1,7 @@
 package errs
 
 // ErrorCategory represents error category
-type ErrorCategory int
+type ErrorCategory int32
 
 // Error categories
 const (
@@ -32,8 +32,8 @@ const (
 // Error represents the specific error returned to user
 type Error struct {
 	Category       ErrorCategory
-	SubCategory    int
-	Index          int
+	SubCategory    int32
+	Index          int32
 	HttpStatusCode int
 	Message        string
 	BaseError      []error
@@ -45,12 +45,12 @@ func (err *Error) Error() string {
 }
 
 // Code returns the error code
-func (err *Error) Code() int {
-	return int(err.Category)*100000 + err.SubCategory*1000 + err.Index
+func (err *Error) Code() int32 {
+	return int32(err.Category)*100000 + err.SubCategory*1000 + err.Index
 }
 
 // New returns a new error instance
-func New(category ErrorCategory, subCategory int, index int, httpStatusCode int, message string, baseError ...error) *Error {
+func New(category ErrorCategory, subCategory int32, index int32, httpStatusCode int, message string, baseError ...error) *Error {
 	return &Error{
 		Category:       category,
 		SubCategory:    subCategory,
@@ -62,12 +62,12 @@ func New(category ErrorCategory, subCategory int, index int, httpStatusCode int,
 }
 
 // NewSystemError returns a new system error instance
-func NewSystemError(subCategory int, index int, httpStatusCode int, message string) *Error {
+func NewSystemError(subCategory int32, index int32, httpStatusCode int, message string) *Error {
 	return New(CATEGORY_SYSTEM, subCategory, index, httpStatusCode, message)
 }
 
 // NewNormalError returns a new normal error instance
-func NewNormalError(subCategory int, index int, httpStatusCode int, message string) *Error {
+func NewNormalError(subCategory int32, index int32, httpStatusCode int, message string) *Error {
 	return New(CATEGORY_NORMAL, subCategory, index, httpStatusCode, message)
 }
 

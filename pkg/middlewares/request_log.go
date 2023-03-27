@@ -18,7 +18,7 @@ func RequestLog(c *core.Context) {
 	now := time.Now()
 
 	statusCode := c.Writer.Status()
-	errorCode := 0
+	errorCode := int32(0)
 
 	userId := "-"
 	claims := c.GetTokenClaims()

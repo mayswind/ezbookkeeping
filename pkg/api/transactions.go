@@ -121,7 +121,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 	hasMore := false
 	var nextTimeSequenceId *int64
 
-	if len(transactions) > transactionListReq.Count {
+	if len(transactions) > int(transactionListReq.Count) {
 		hasMore = true
 		nextTimeSequenceId = &transactions[transactionListReq.Count].TransactionTime
 		transactions = transactions[:transactionListReq.Count]

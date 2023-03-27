@@ -21,7 +21,7 @@ type TransactionCategory struct {
 	Type             TransactionCategoryType `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	ParentCategoryId int64                   `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	Name             string                  `xorm:"VARCHAR(32) NOT NULL"`
-	DisplayOrder     int                     `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
+	DisplayOrder     int32                   `xorm:"INDEX(IDX_category_uid_deleted_type_parent_category_id_order) NOT NULL"`
 	Icon             int64                   `xorm:"NOT NULL"`
 	Color            string                  `xorm:"VARCHAR(6) NOT NULL"`
 	Hidden           bool                    `xorm:"NOT NULL"`
@@ -91,7 +91,7 @@ type TransactionCategoryMoveRequest struct {
 // TransactionCategoryNewDisplayOrderRequest represents a data pair of id and display order
 type TransactionCategoryNewDisplayOrderRequest struct {
 	Id           int64 `json:"id,string" binding:"required,min=1"`
-	DisplayOrder int   `json:"displayOrder"`
+	DisplayOrder int32 `json:"displayOrder"`
 }
 
 // TransactionCategoryDeleteRequest represents all parameters of transaction category deleting request
@@ -108,7 +108,7 @@ type TransactionCategoryInfoResponse struct {
 	Icon          int64                                `json:"icon,string"`
 	Color         string                               `json:"color"`
 	Comment       string                               `json:"comment"`
-	DisplayOrder  int                                  `json:"displayOrder"`
+	DisplayOrder  int32                                `json:"displayOrder"`
 	Hidden        bool                                 `json:"hidden"`
 	SubCategories TransactionCategoryInfoResponseSlice `json:"subCategories,omitempty"`
 }

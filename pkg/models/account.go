@@ -55,7 +55,7 @@ type Account struct {
 	Type            AccountType     `xorm:"NOT NULL"`
 	ParentAccountId int64           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Name            string          `xorm:"VARCHAR(32) NOT NULL"`
-	DisplayOrder    int             `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
+	DisplayOrder    int32           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Icon            int64           `xorm:"NOT NULL"`
 	Color           string          `xorm:"VARCHAR(6) NOT NULL"`
 	Currency        string          `xorm:"VARCHAR(3) NOT NULL"`
@@ -116,7 +116,7 @@ type AccountMoveRequest struct {
 // AccountNewDisplayOrderRequest represents a data pair of id and display order
 type AccountNewDisplayOrderRequest struct {
 	Id           int64 `json:"id,string" binding:"required,min=1"`
-	DisplayOrder int   `json:"displayOrder"`
+	DisplayOrder int32 `json:"displayOrder"`
 }
 
 // AccountDeleteRequest represents all parameters of account deleting request
@@ -136,7 +136,7 @@ type AccountInfoResponse struct {
 	Currency     string                   `json:"currency"`
 	Balance      int64                    `json:"balance"`
 	Comment      string                   `json:"comment"`
-	DisplayOrder int                      `json:"displayOrder"`
+	DisplayOrder int32                    `json:"displayOrder"`
 	IsAsset      bool                     `json:"isAsset,omitempty"`
 	IsLiability  bool                     `json:"isLiability,omitempty"`
 	Hidden       bool                     `json:"hidden"`

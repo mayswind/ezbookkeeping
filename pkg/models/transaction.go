@@ -102,7 +102,7 @@ type TransactionListByMaxTimeRequest struct {
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
 	MinTime      int64             `form:"min_time" binding:"min=0"`
-	Count        int               `form:"count" binding:"required,min=1,max=50"`
+	Count        int32             `form:"count" binding:"required,min=1,max=50"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -110,14 +110,14 @@ type TransactionListByMaxTimeRequest struct {
 
 // TransactionListInMonthByPageRequest represents all parameters of transaction listing by month request
 type TransactionListInMonthByPageRequest struct {
-	Year         int               `form:"year" binding:"required,min=1"`
-	Month        int               `form:"month" binding:"required,min=1"`
+	Year         int32             `form:"year" binding:"required,min=1"`
+	Month        int32             `form:"month" binding:"required,min=1"`
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryId   int64             `form:"category_id" binding:"min=0"`
 	AccountId    int64             `form:"account_id" binding:"min=0"`
 	Keyword      string            `form:"keyword"`
-	Page         int               `form:"page" binding:"required,min=1"`
-	Count        int               `form:"count" binding:"required,min=1,max=50"`
+	Page         int32             `form:"page" binding:"required,min=1"`
+	Count        int32             `form:"count" binding:"required,min=1,max=50"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -232,8 +232,8 @@ type TransactionAmountsResponseItem struct {
 
 // TransactionMonthAmountsResponseItem represents an item of transaction month amounts
 type TransactionMonthAmountsResponseItem struct {
-	Year    int                                         `json:"year"`
-	Month   int                                         `json:"month"`
+	Year    int32                                       `json:"year"`
+	Month   int32                                       `json:"month"`
 	Amounts []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
 }
 

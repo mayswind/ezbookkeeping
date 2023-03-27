@@ -6,17 +6,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInt32ToString(t *testing.T) {
+func TestIntToString(t *testing.T) {
 	expectedValue := "-123456789"
-	actualValue := Int32ToString(-123456789)
+	actualValue := IntToString(-123456789)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestStringToInt32(t *testing.T) {
+func TestStringToInt(t *testing.T) {
 	expectedValue := -123456789
+	actualValue, err := StringToInt("-123456789")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestStringToInt_InvalidNumber(t *testing.T) {
+	_, err := StringToInt("")
+	assert.NotEqual(t, nil, err)
+
+	_, err = StringToInt("null")
+	assert.NotEqual(t, nil, err)
+}
+
+func TestStringToInt32(t *testing.T) {
+	expectedValue := int32(-123456789)
 	actualValue, err := StringToInt32("-123456789")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestStringToInt32_OutOfRange(t *testing.T) {
+	_, err := StringToInt32("2147483648")
+	assert.NotEqual(t, nil, err)
+
+	_, err = StringToInt32("-2147483649")
+	assert.NotEqual(t, nil, err)
 }
 
 func TestStringToInt32_InvalidNumber(t *testing.T) {
@@ -29,10 +52,10 @@ func TestStringToInt32_InvalidNumber(t *testing.T) {
 
 func TestStringTryToInt32_InvalidNumber(t *testing.T) {
 	expectedValue := -1
-	actualValue := StringTryToInt32("", -1)
+	actualValue := StringTryToInt("", -1)
 	assert.Equal(t, expectedValue, actualValue)
 
-	actualValue = StringTryToInt32("null", -1)
+	actualValue = StringTryToInt("null", -1)
 	assert.Equal(t, expectedValue, actualValue)
 }
 

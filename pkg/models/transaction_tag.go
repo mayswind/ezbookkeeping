@@ -6,7 +6,7 @@ type TransactionTag struct {
 	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_name) NOT NULL"`
 	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_name) NOT NULL"`
 	Name            string `xorm:"INDEX(IDX_tag_uid_deleted_name) VARCHAR(32) NOT NULL"`
-	DisplayOrder    int    `xorm:"NOT NULL"`
+	DisplayOrder    int32  `xorm:"NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64
 	UpdatedUnixTime int64
@@ -43,7 +43,7 @@ type TransactionTagMoveRequest struct {
 // TransactionTagNewDisplayOrderRequest represents a data pair of id and display order
 type TransactionTagNewDisplayOrderRequest struct {
 	Id           int64 `json:"id,string" binding:"required,min=1"`
-	DisplayOrder int   `json:"displayOrder"`
+	DisplayOrder int32 `json:"displayOrder"`
 }
 
 // TransactionTagDeleteRequest represents all parameters of transaction tag deleting request
@@ -55,7 +55,7 @@ type TransactionTagDeleteRequest struct {
 type TransactionTagInfoResponse struct {
 	Id           int64  `json:"id,string"`
 	Name         string `json:"name"`
-	DisplayOrder int    `json:"displayOrder"`
+	DisplayOrder int32  `json:"displayOrder"`
 	Hidden       bool   `json:"hidden"`
 }
 

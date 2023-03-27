@@ -102,13 +102,13 @@ func ParseFromTimezoneOffset(tzOffset string) (*time.Location, error) {
 		return nil, errs.ErrFormatInvalid
 	}
 
-	hourAbsOffset, err := StringToInt32(offsets[0])
+	hourAbsOffset, err := StringToInt(offsets[0])
 
 	if err != nil {
 		return nil, err
 	}
 
-	minuteAbsOffset, err := StringToInt32(offsets[1])
+	minuteAbsOffset, err := StringToInt(offsets[1])
 
 	if err != nil {
 		return nil, err

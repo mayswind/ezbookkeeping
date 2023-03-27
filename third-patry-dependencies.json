@@ -119,7 +119,7 @@
     },
     {
         "name": "core-js",
-        "copyright": "Copyright (c) 2014-2022 Denis Pushkarev",
+        "copyright": "Copyright (c) 2014-2023 Denis Pushkarev",
         "url": "https://github.com/zloirock/core-js",
         "licenseUrl": "https://github.com/zloirock/core-js/blob/v3.29.1/LICENSE"
     },

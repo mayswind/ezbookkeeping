@@ -9,7 +9,7 @@
             </f7-nav-right>
 
             <f7-subnavbar>
-                <f7-segmented strong :class="{ 'disabled': mode !== 'add' }">
+                <f7-segmented strong :class="{ 'readonly': mode !== 'add' }">
                     <f7-button :text="$t('Expense')" :active="transaction.type === $constants.transaction.allTransactionTypes.Expense" @click="transaction.type = $constants.transaction.allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === $constants.transaction.allTransactionTypes.Income" @click="transaction.type = $constants.transaction.allTransactionTypes.Income"></f7-button>
                     <f7-button :text="$t('Transfer')" :active="transaction.type === $constants.transaction.allTransactionTypes.Transfer" @click="transaction.type = $constants.transaction.allTransactionTypes.Transfer"></f7-button>
@@ -25,11 +25,11 @@
                         style="font-size: 40px;"
                         header="Expense Amount" title="0.00">
                     </f7-list-item>
-                    <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names" link="#"></f7-list-item>
-                    <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name" link="#"></f7-list-item>
+                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names" link="#"></f7-list-item>
+                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title" header="Account" title="Account Name" link="#"></f7-list-item>
                     <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
-                    <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
-                    <f7-list-item header="Tags" link="#">
+                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
+                    <f7-list-item :no-chevron="mode === 'view'" header="Tags" link="#">
                         <f7-block class="margin-top-half no-padding" slot="footer">
                             <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
                         </f7-block>
@@ -41,7 +41,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form :class="{ 'disabled': mode === 'view' }">
+                <f7-list form :class="{ 'readonly': mode === 'view' }">
                     <f7-list-item
                         class="transaction-edit-amount"
                         link="#" no-chevron
@@ -77,7 +77,7 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="expenseCategorySelection"
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :class="{ 'disabled': !hasAvailableExpenseCategories }"
                         :header="$t('Category')"
                         @click="showCategorySheet = true"
@@ -102,7 +102,7 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="incomeCategorySelection"
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :class="{ 'disabled': !hasAvailableIncomeCategories }"
                         :header="$t('Category')"
                         @click="showCategorySheet = true"
@@ -127,7 +127,7 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-title-hide-overflow"
                         key="transferCategorySelection"
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :class="{ 'disabled': !hasAvailableTransferCategories }"
                         :header="$t('Category')"
                         @click="showCategorySheet = true"
@@ -151,7 +151,7 @@
 
                     <f7-list-item
                         class="list-item-with-header-and-title"
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t(sourceAccountName)"
                         :title="transaction.sourceAccountId | optionName(allAccounts, 'id', 'name')"
@@ -173,7 +173,7 @@
 
                     <f7-list-item
                         class="list-item-with-header-and-title"
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :class="{ 'disabled': !allVisibleAccounts.length }"
                         :header="$t('Destination Account')"
                         :title="transaction.destinationAccountId | optionName(allAccounts, 'id', 'name')"
@@ -215,6 +215,7 @@
                     </f7-list-input>
 
                     <f7-list-item
+                         :no-chevron="mode === 'view'"
                         class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                         :header="$t('Transaction Time Zone')"
                         smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Transaction Time Zone'), searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
@@ -230,7 +231,7 @@
                     </f7-list-item>
 
                     <f7-list-item
-                        link="#"
+                        link="#" :no-chevron="mode === 'view'"
                         :header="$t('Tags')"
                         @click="showTransactionTagSheet = true"
                     >

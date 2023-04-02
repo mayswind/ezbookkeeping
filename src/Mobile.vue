@@ -130,6 +130,16 @@ body {
     font-size: 10px;
 }
 
+.readonly {
+    pointer-events: none !important;
+}
+
+.segmented.readonly .button:not(.button-active) > span,
+.list.readonly .item-content .item-title.item-label,
+.list.readonly .item-content .item-title > .item-header {
+    opacity: 0.55 !important;
+}
+
 /** Replacing the default style of framework7 **/
 :root {
     --f7-theme-color: #c67e48;

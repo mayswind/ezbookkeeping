@@ -24,7 +24,7 @@
                     <f7-list-item
                         :key="currentLocale + '_lang'"
                         :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
                                     :key="locale"
@@ -60,7 +60,7 @@
                     <f7-list-item
                         :key="currentLocale + '_currency_display'"
                         :title="$t('Currency Display Mode')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done') }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currencyDisplayMode">
                             <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
                             <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>

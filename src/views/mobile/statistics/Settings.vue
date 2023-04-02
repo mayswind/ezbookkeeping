@@ -7,7 +7,7 @@
                 <f7-list>
                     <f7-list-item
                         :title="$t('Default Chart Type')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Default Chart Type'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="defaultChartType">
                             <option :value="$constants.statistics.allChartTypes.Pie">{{ $t('Pie Chart') }}</option>
                             <option :value="$constants.statistics.allChartTypes.Bar">{{ $t('Bar Chart') }}</option>
@@ -16,7 +16,7 @@
 
                     <f7-list-item
                         :title="$t('Default Chart Data Type')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Default Chart Data Type'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="defaultChartDataType">
                             <option v-for="chartDataType in allChartDataTypes"
                                     :key="chartDataType.type"
@@ -26,7 +26,7 @@
 
                     <f7-list-item
                         :title="$t('Default Date Range')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Default Date Range'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="defaultDateRange">
                             <option v-for="dateRange in allDateRanges"
                                     :key="dateRange.type"
@@ -40,7 +40,7 @@
 
                     <f7-list-item
                         :title="$t('Default Sort By')"
-                        smart-select :smart-select-params="{ openIn: 'sheet', closeOnSelect: true, sheetCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Default Sort By'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="defaultSortingType">
                             <option v-for="sortingType in allSortingTypes"
                                     :key="sortingType.type"

@@ -41,6 +41,10 @@ export default {
             'long': 'm/d/yyyy hh::mm A',
         },
     },
+    'dataExport': {
+        'defaultExportFilename': 'ezBookkeeping_export_data',
+        'exportFilename': 'ezBookkeeping_{nickname}_export_data'
+    },
     'datetime': {
         'Monday': {
             'min': 'Mo',
@@ -591,6 +595,7 @@ export default {
         'transaction tag name is empty': 'Transaction tag title is empty',
         'transaction tag name already exists': 'Transaction tag title already exists',
         'transaction tag is in use and cannot be deleted': 'Transaction tag is in use and it cannot be deleted',
+        'data export not allowed': 'User data export is not allowed',
         'query items cannot be empty': 'There are no query items',
         'query items too much': 'There are too many query items',
         'query items have invalid item': 'There is invalid item in query items',
@@ -901,6 +906,10 @@ export default {
     'Unable to get user statistics data': 'Unable to get user statistics data',
     'Export Data': 'Export Data',
     'Clear User Data': 'Clear User Data',
+    'Are you sure you want to export all data to csv file?': 'Are you sure you want to export all data to csv file?',
+    'It may take a long time, please wait for a few minutes.': 'It may take a long time, please wait for a few minutes.',
+    'Unable to get exported user data': 'Unable to get exported user data',
+    'Save Data': 'Save Data',
     'Are you sure you want to clear all data?': 'Are you sure you want to clear all data?',
     'You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.': 'You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.',
     'All user data has been cleared': 'All user data has been cleared',

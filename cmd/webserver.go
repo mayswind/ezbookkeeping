@@ -153,15 +153,6 @@ func startWebServer(c *cli.Context) error {
 			apiRoute.POST("/register.json", bindApi(api.Users.UserRegisterHandler))
 		}
 
-		if config.EnableDataExport {
-			dataRoute := apiRoute.Group("/data")
-			dataRoute.Use(bindMiddleware(middlewares.HeaderInQueryString))
-			dataRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
-			{
-				dataRoute.GET("/export.csv", bindCsv(api.DataManagements.ExportDataHandler))
-			}
-		}
-
 		apiRoute.GET("/logout.json", bindApi(api.Tokens.TokenRevokeCurrentHandler))
 
 		apiV1Route := apiRoute.Group("/v1")
@@ -189,6 +180,10 @@ func startWebServer(c *cli.Context) error {
 			// Data
 			apiV1Route.GET("/data/statistics.json", bindApi(api.DataManagements.DataStatisticsHandler))
 			apiV1Route.POST("/data/clear.json", bindApi(api.DataManagements.ClearDataHandler))
+
+			if config.EnableDataExport {
+				apiV1Route.GET("/data/export.csv", bindCsv(api.DataManagements.ExportDataHandler))
+			}
 
 			// Accounts
 			apiV1Route.GET("/accounts/list.json", bindApi(api.Accounts.AccountListHandler))

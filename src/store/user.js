@@ -307,6 +307,30 @@ export function getUserDataStatistics() {
     });
 }
 
+export function getExportedUserData() {
+    return new Promise((resolve, reject) => {
+        services.getExportedUserData().then(response => {
+            if (response && response.headers && response.headers['content-type'] !== 'text/csv') {
+                reject({ message: 'Unable to get exported user data' });
+                return;
+            }
+
+            const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            resolve(blob);
+        }).catch(error => {
+            logger.error('failed to get user statistics data', error);
+
+            if (error.response.headers['content-type'] === 'text/text' && error.response && error.response.data) {
+                reject({ message: 'error.' + error.response.data });
+            } else if (!error.processed) {
+                reject({ message: 'Unable to get exported user data' });
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
+
 export function clearUserData(context, { password }) {
     return new Promise((resolve, reject) => {
         services.clearData({

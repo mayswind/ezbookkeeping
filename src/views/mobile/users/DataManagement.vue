@@ -27,11 +27,27 @@
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
-                    <f7-list-button external no-chevron target="_blank" :link="`${$constants.api.baseUrlPath}/data/export.csv?token=${$user.getToken()}&utc_offset=${currentTimezoneOffsetMinutes}`" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
+                    <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
                     <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
                 </f7-list>
             </f7-card-content>
         </f7-card>
+
+        <f7-sheet style="height:auto" :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
+            <f7-page-content>
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div style="font-size: 18px"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="no-margin-top margin-bottom-half">{{ $t('It may take a long time, please wait for a few minutes.') }}</p>
+                    <f7-button large fill :class="{ 'disabled': exportingData }" :text="$t('Continue')" @click="exportData" v-if="!exportedData"></f7-button>
+                    <f7-button large fill external :text="$t('Save Data')" :download="exportFileName" :href="exportedData" target="_blank" v-if="exportedData"></f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link :class="{ 'disabled': exportingData }" @click="showExportDataSheet = false" :text="$t('Cancel')"></f7-link>
+                    </div>
+                </div>
+            </f7-page-content>
+        </f7-sheet>
 
         <password-input-sheet :title="$t('Are you sure you want to clear all data?')"
                               :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.')"
@@ -51,8 +67,11 @@ export default {
             loading: true,
             loadingError: null,
             dataStatistics: null,
+            exportingData: false,
+            exportedData: null,
             currentPasswordForClearData: '',
             clearingData: false,
+            showExportDataSheet: false,
             showInputPasswordSheetForClearData: false,
         };
     },
@@ -62,7 +81,18 @@ export default {
         },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
-        }
+        },
+        exportFileName() {
+            const nickname = this.$store.getters.currentUserNickname;
+
+            if (nickname) {
+                return this.$t('dataExport.exportFilename', {
+                    nickname: nickname
+                }) + '.csv';
+            }
+
+            return this.$t('dataExport.defaultExportFilename') + '.csv';
+        },
     },
     created() {
         const self = this;
@@ -84,6 +114,26 @@ export default {
     methods: {
         onPageAfterIn() {
             this.$routeBackOnError('loadingError');
+        },
+        exportData() {
+            const self = this;
+
+            self.$showLoading();
+            self.exportingData = true;
+
+            self.$store.dispatch('getExportedUserData').then(data => {
+                self.exportedData = URL.createObjectURL(data);
+                self.exportingData = false;
+                self.$hideLoading();
+            }).catch(error => {
+                self.exportedData = null;
+                self.exportingData = false;
+                self.$hideLoading();
+
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
         },
         clearData(password) {
             const self = this;

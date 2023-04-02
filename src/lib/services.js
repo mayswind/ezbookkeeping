@@ -170,6 +170,9 @@ export default {
     getUserDataStatistics: () => {
         return axios.get('v1/data/statistics.json');
     },
+    getExportedUserData: () => {
+        return axios.get('v1/data/export.csv');
+    },
     clearData: ({ password }) => {
         return axios.post('v1/data/clear.json', {
             password

@@ -41,6 +41,10 @@ export default {
             'long': 'yyyy年m月d日 HH::mm',
         },
     },
+    'dataExport': {
+        'defaultExportFilename': 'ezBookkeeping_导出数据',
+        'exportFilename': 'ezBookkeeping_{nickname}_导出数据'
+    },
     'datetime': {
         'Monday': {
             'min': '一',
@@ -591,6 +595,7 @@ export default {
         'transaction tag name is empty': '交易标签标题不能为空',
         'transaction tag name already exists': '交易标签标题已经存在',
         'transaction tag is in use and cannot be deleted': '交易标签正在被使用，无法删除',
+        'data export not allowed': '不允许用户数据导出',
         'query items cannot be empty': '请求项目不能为空',
         'query items too much': '请求项目过多',
         'query items have invalid item': '请求项目中有非法项目',
@@ -901,6 +906,10 @@ export default {
     'Unable to get user statistics data': '无法获取用户统计数据',
     'Export Data': '导出数据',
     'Clear User Data': '清除用户数据',
+    'Are you sure you want to export all data to csv file?': '您确定要导出所有数据到 csv 文件？',
+    'It may take a long time, please wait for a few minutes.': '这可能花费一些时间，请稍等几分钟。',
+    'Unable to get exported user data': '无法获取导出的用户数据',
+    'Save Data': '保存数据',
     'Are you sure you want to clear all data?': '您确定要清除所有数据？',
     'You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.': '您不能撤销该操作。该操作将会清除您的账户、分类、标签以及交易数据。请输入您当前的密码以确认。',
     'All user data has been cleared': '用户所有数据已经清空',

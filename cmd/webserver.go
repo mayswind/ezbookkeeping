@@ -187,6 +187,7 @@ func startWebServer(c *cli.Context) error {
 			}
 
 			// Data
+			apiV1Route.GET("/data/statistics.json", bindApi(api.DataManagements.DataStatisticsHandler))
 			apiV1Route.POST("/data/clear.json", bindApi(api.DataManagements.ClearDataHandler))
 
 			// Accounts

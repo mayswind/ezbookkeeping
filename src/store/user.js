@@ -282,6 +282,31 @@ export function updateUserProfile(context, { profile, currentPassword }) {
     });
 }
 
+export function getUserDataStatistics() {
+    return new Promise((resolve, reject) => {
+        services.getUserDataStatistics().then(response => {
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                reject({ message: 'Unable to get user statistics data' });
+                return;
+            }
+
+            resolve(data.result);
+        }).catch(error => {
+            logger.error('failed to get user statistics data', error);
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                reject({ error: error.response.data });
+            } else if (!error.processed) {
+                reject({ message: 'Unable to get user statistics data' });
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
+
 export function clearUserData(context, { password }) {
     return new Promise((resolve, reject) => {
         services.clearData({

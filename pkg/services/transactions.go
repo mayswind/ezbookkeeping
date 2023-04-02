@@ -32,6 +32,17 @@ var (
 	}
 )
 
+// GetTotalTransactionCountByUid returns total transaction count of user
+func (s *TransactionService) GetTotalTransactionCountByUid(uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Transaction{})
+
+	return count, err
+}
+
 // GetAllTransactions returns all transactions
 func (s *TransactionService) GetAllTransactions(uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
 	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())

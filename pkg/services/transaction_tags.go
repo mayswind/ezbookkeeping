@@ -29,6 +29,17 @@ var (
 	}
 )
 
+// GetTotalTagCountByUid returns total tag count of user
+func (s *TransactionTagService) GetTotalTagCountByUid(uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionTag{})
+
+	return count, err
+}
+
 // GetAllTagsByUid returns all transaction tag models of user
 func (s *TransactionTagService) GetAllTagsByUid(uid int64) ([]*models.TransactionTag, error) {
 	if uid <= 0 {

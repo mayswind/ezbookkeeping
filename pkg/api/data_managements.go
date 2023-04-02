@@ -118,6 +118,47 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 	return result, fileName, nil
 }
 
+// DataStatisticsHandler returns user data statistics
+func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (interface{}, *errs.Error) {
+	uid := c.GetCurrentUid()
+	totalAccountCount, err := a.accounts.GetTotalAccountCountByUid(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total account count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	totalTransactionCategoryCount, err := a.categories.GetTotalCategoryCountByUid(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction category count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	totalTransactionTagCount, err := a.tags.GetTotalTagCountByUid(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction tag count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	totalTransactionCount, err := a.transactions.GetTotalTransactionCountByUid(uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	dataStatisticsResp := &models.DataStatisticsResponse{
+		TotalAccountCount:             totalAccountCount,
+		TotalTransactionCategoryCount: totalTransactionCategoryCount,
+		TotalTransactionTagCount:      totalTransactionTagCount,
+		TotalTransactionCount:         totalTransactionCount,
+	}
+
+	return dataStatisticsResp, nil
+}
+
 // ClearDataHandler deletes all user data
 func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *errs.Error) {
 	var clearDataReq models.ClearDataRequest

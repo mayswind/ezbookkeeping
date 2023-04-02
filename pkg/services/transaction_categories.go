@@ -29,6 +29,17 @@ var (
 	}
 )
 
+// GetTotalCategoryCountByUid returns total category count of user
+func (s *TransactionCategoryService) GetTotalCategoryCountByUid(uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionCategory{})
+
+	return count, err
+}
+
 // GetAllCategoriesByUid returns all transaction category models of user
 func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {

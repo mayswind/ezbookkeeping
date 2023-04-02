@@ -1,6 +1,28 @@
 <template>
-    <f7-page>
+    <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
+
+        <f7-card class="skeleton-text" v-if="loading">
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list>
+                    <f7-list-item title="Accounts" after="Count"></f7-list-item>
+                    <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
+                    <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
+                    <f7-list-item title="Transactions" after="Count"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
+
+        <f7-card v-else-if="!loading">
+            <f7-card-content class="no-safe-areas" :padding="false">
+                <f7-list>
+                    <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
+                    <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
+                    <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
+                    <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
+                </f7-list>
+            </f7-card-content>
+        </f7-card>
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
@@ -26,6 +48,9 @@
 export default {
     data() {
         return {
+            loading: true,
+            loadingError: null,
+            dataStatistics: null,
             currentPasswordForClearData: '',
             clearingData: false,
             showInputPasswordSheetForClearData: false,
@@ -39,7 +64,27 @@ export default {
             return this.$settings.isDataExportingEnabled();
         }
     },
+    created() {
+        const self = this;
+
+        self.loading = true;
+
+        self.$store.dispatch('getUserDataStatistics').then(dataStatistics => {
+            self.dataStatistics = dataStatistics;
+            self.loading = false;
+        }).catch(error => {
+            if (error.processed) {
+                self.loading = false;
+            } else {
+                self.loadingError = error;
+                self.$toast(error.message || error);
+            }
+        });
+    },
     methods: {
+        onPageAfterIn() {
+            this.$routeBackOnError('loadingError');
+        },
         clearData(password) {
             const self = this;
 

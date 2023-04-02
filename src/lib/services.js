@@ -167,6 +167,9 @@ export default {
             password
         });
     },
+    getUserDataStatistics: () => {
+        return axios.get('v1/data/statistics.json');
+    },
     clearData: ({ password }) => {
         return axios.post('v1/data/clear.json', {
             password

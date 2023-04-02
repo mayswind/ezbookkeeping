@@ -30,6 +30,17 @@ var (
 	}
 )
 
+// GetTotalAccountCountByUid returns total account count of user
+func (s *AccountService) GetTotalAccountCountByUid(uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Account{})
+
+	return count, err
+}
+
 // GetAllAccountsByUid returns all account models of user
 func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, error) {
 	if uid <= 0 {

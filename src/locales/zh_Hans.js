@@ -1001,6 +1001,7 @@ export default {
     'No exchange rates data': '没有汇率数据',
     'There is no exchange rates data for your default currency': '没有您默认货币的汇率数据',
     'Exchange rates data has been updated': '汇率数据已更新',
+    'Exchange rates data is up to date': '汇率数据已是最新',
     'Unable to get exchange rates data': '无法获取汇率数据',
     'About': '关于',
     'Build Time': '编译时间',

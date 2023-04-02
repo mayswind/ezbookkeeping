@@ -1001,6 +1001,7 @@ export default {
     'No exchange rates data': 'No exchange rates data',
     'There is no exchange rates data for your default currency': 'There is no exchange rates data for your default currency',
     'Exchange rates data has been updated': 'Exchange rates data has been updated',
+    'Exchange rates data is up to date': 'Exchange rates data is up to date',
     'Unable to get exchange rates data': 'Unable to get exchange rates data',
     'About': 'About',
     'Build Time': 'Build Time',

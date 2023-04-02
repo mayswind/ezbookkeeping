@@ -35,6 +35,13 @@ export function getLatestExchangeRates(context, { silent, force }) {
                 return;
             }
 
+            const currentData = getExchangeRatesFromLocalStorage();
+
+            if (currentData && currentData.data && utils.isEquals(currentData.data, data.result)) {
+                reject({ message: 'Exchange rates data is up to date' });
+                return;
+            }
+
             context.commit(STORE_LATEST_EXCHANGE_RATES, {
                 time: now,
                 data: data.result

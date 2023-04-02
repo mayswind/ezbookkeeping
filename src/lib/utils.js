@@ -36,6 +36,57 @@ function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+function isEquals(obj1, obj2) {
+    if (obj1 === obj2) {
+        return true;
+    }
+
+    if (isArray(obj1) && isArray(obj2)) {
+        if (obj1.length !== obj2.length) {
+            return false;
+        }
+
+        for (let i = 0; i < obj1.length; i++) {
+            if (!isEquals(obj1[i], obj2[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    } else if (isObject(obj1) && isObject(obj2)) {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+
+        const keyExistsMap2 = {};
+
+        for (let i = 0; i < keys2.length; i++) {
+            const key = keys2[i];
+
+            keyExistsMap2[key] = true;
+        }
+
+        for (let i = 0; i < keys1.length; i++) {
+            const key = keys1[i];
+
+            if (!keyExistsMap2[key]) {
+                return false;
+            }
+
+            if (!isEquals(obj1[key], obj2[key])) {
+                return false;
+            }
+        }
+
+        return true;
+    } else {
+        return obj1 === obj2;
+    }
+}
+
 function getUtcOffsetMinutesByUtcOffset(utcOffset) {
     if (!utcOffset) {
         return 0;
@@ -677,6 +728,7 @@ export default {
     isString,
     isNumber,
     isBoolean,
+    isEquals,
     getUtcOffsetMinutesByUtcOffset,
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffset,

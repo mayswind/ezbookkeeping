@@ -3,7 +3,7 @@ package middlewares
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"runtime"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -49,7 +49,7 @@ func stack(skip int) []byte {
 		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 
 		if file != lastFile {
-			data, err := ioutil.ReadFile(file)
+			data, err := os.ReadFile(file)
 
 			if err != nil {
 				continue

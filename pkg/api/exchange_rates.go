@@ -1,7 +1,7 @@
 package api
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -53,7 +53,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 		}
 
 		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		exchangeRateResp, err := dataSource.Parse(c, body)
 
 		if err != nil {

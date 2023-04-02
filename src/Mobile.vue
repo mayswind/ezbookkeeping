@@ -144,6 +144,10 @@ body {
     --default-icon-color: var(--f7-text-color);
 }
 
+.ios .theme-dark, .ios.theme-dark {
+    --f7-list-item-header-text-color: inherit !important;
+}
+
 i.icon.la, i.icon.las, i.icon.lab {
     font-size: 28px;
 }

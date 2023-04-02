@@ -44,21 +44,21 @@
                         </div>
                         <div slot="title" class="padding-top-half">
                             <span v-if="loading">Today</span>
-                            <span v-else-if="!loading">{{ $t('Today' )}}</span>
+                            <span v-else-if="!loading">{{ $t('Today') }}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">MM/DD/YYYY</span>
                             <span v-else-if="!loading">{{ dateRange.today.startTime | moment($t('format.date.long')) }}</span>
                         </div>
-                         <div slot="after">
-                             <div class="text-color-red">
-                                 <small v-if="loading">0.00 USD</small>
+                        <div slot="after">
+                            <div class="text-color-red">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.incomeAmount | amount(transactionOverview.today.incompleteIncomeAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
-                             <div class="text-color-teal">
-                                 <small v-if="loading">0.00 USD</small>
+                            </div>
+                            <div class="text-color-teal">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.today">{{ transactionOverview.today.expenseAmount | amount(transactionOverview.today.incompleteExpenseAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
+                            </div>
                         </div>
                     </f7-list-item>
 
@@ -68,7 +68,7 @@
                         </div>
                         <div slot="title" class="padding-top-half">
                             <span v-if="loading">This Week</span>
-                            <span v-else-if="!loading">{{ $t('This Week' )}}</span>
+                            <span v-else-if="!loading">{{ $t('This Week') }}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">MM/DD</span>
@@ -77,15 +77,15 @@
                             <span v-if="loading">MM/DD</span>
                             <span v-else-if="!loading">{{ dateRange.thisWeek.endTime | moment($t('format.monthDay.long')) }}</span>
                         </div>
-                         <div slot="after">
-                             <div class="text-color-red">
-                                 <small v-if="loading">0.00 USD</small>
+                        <div slot="after">
+                            <div class="text-color-red">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.incomeAmount | amount(transactionOverview.thisWeek.incompleteIncomeAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
-                             <div class="text-color-teal">
-                                 <small v-if="loading">0.00 USD</small>
+                            </div>
+                            <div class="text-color-teal">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.thisWeek">{{ transactionOverview.thisWeek.expenseAmount | amount(transactionOverview.thisWeek.incompleteExpenseAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
+                            </div>
                         </div>
                     </f7-list-item>
 
@@ -95,7 +95,7 @@
                         </div>
                         <div slot="title" class="padding-top-half">
                             <span v-if="loading">This Month</span>
-                            <span v-else-if="!loading">{{ $t('This Month' )}}</span>
+                            <span v-else-if="!loading">{{ $t('This Month') }}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">MM/DD</span>
@@ -104,15 +104,15 @@
                             <span v-if="loading">MM/DD</span>
                             <span v-else-if="!loading">{{ dateRange.thisMonth.endTime | moment($t('format.monthDay.long')) }}</span>
                         </div>
-                         <div slot="after">
-                             <div class="text-color-red">
-                                 <small v-if="loading">0.00 USD</small>
+                        <div slot="after">
+                            <div class="text-color-red">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.incomeAmount | amount(transactionOverview.thisMonth.incompleteIncomeAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
-                             <div class="text-color-teal">
-                                 <small v-if="loading">0.00 USD</small>
+                            </div>
+                            <div class="text-color-teal">
+                                <small v-if="loading">0.00 USD</small>
                                  <small v-else-if="!loading && transactionOverview.thisMonth">{{ transactionOverview.thisMonth.expenseAmount | amount(transactionOverview.thisMonth.incompleteExpenseAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
-                             </div>
+                            </div>
                         </div>
                     </f7-list-item>
 
@@ -122,13 +122,13 @@
                         </div>
                         <div slot="title" class="padding-top-half">
                             <span v-if="loading">This Year</span>
-                            <span v-else-if="!loading">{{ $t('This Year' )}}</span>
+                            <span v-else-if="!loading">{{ $t('This Year') }}</span>
                         </div>
                         <div slot="footer" class="overview-transaction-footer padding-bottom-half">
                             <span v-if="loading">YYYY</span>
                             <span v-else-if="!loading">{{ dateRange.thisYear.startTime | moment($t('format.year.long')) }}</span>
                         </div>
-                         <div slot="after">
+                        <div slot="after">
                             <div class="text-color-red">
                                 <small v-if="loading">0.00 USD</small>
                                 <small v-else-if="!loading && transactionOverview.thisYear">{{ transactionOverview.thisYear.incomeAmount | amount(transactionOverview.thisYear.incompleteIncomeAmount, showAmountInHomePage) | currency(defaultCurrency) }}</small>
@@ -216,10 +216,10 @@ export default {
         thisMonthAmount() {
             if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
                 return {
-                    incomeAmount : 0,
-                    expenseAmount : 0,
+                    incomeAmount: 0,
+                    expenseAmount: 0,
                     incompleteIncomeAmount: false,
-                    incompleteExpenseAmount : false
+                    incompleteExpenseAmount: false
                 };
             }
 
@@ -325,7 +325,7 @@ export default {
 
 .home-summary-misc > span {
     margin-right: 4px;
- }
+}
 
 .home-summary-misc > span:last-child {
     margin-right: 0;

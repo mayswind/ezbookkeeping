@@ -121,7 +121,7 @@
         "name": "core-js",
         "copyright": "Copyright (c) 2014-2023 Denis Pushkarev",
         "url": "https://github.com/zloirock/core-js",
-        "licenseUrl": "https://github.com/zloirock/core-js/blob/v3.29.1/LICENSE"
+        "licenseUrl": "https://github.com/zloirock/core-js/blob/v3.30.0/LICENSE"
     },
     {
         "name": "Framework7",
@@ -145,7 +145,7 @@
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie",
         "url": "https://github.com/axios/axios",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.4/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.5/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -157,7 +157,7 @@
         "name": "Moment Timezone",
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
-        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.41/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.43/LICENSE"
     },
     {
         "name": "crypto-js",
@@ -181,7 +181,7 @@
         "name": "UAParser.js",
         "copyright": "Copyright (c) 2012-2021 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
-        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.34/license.md"
+        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.35/license.md"
     },
     {
         "name": "Icons8 Line Awesome",

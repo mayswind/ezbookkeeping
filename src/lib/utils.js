@@ -455,11 +455,11 @@ function appendThousandsSeparator(value) {
     const negative = value.charAt(0) === '-';
 
     if (negative) {
-        value = value.substr(1);
+        value = value.substring(1);
     }
 
     const dotPos = value.indexOf('.');
-    const integer = dotPos < 0 ? value : value.substr(0, dotPos);
+    const integer = dotPos < 0 ? value : value.substring(0, dotPos);
     const decimals = dotPos < 0 ? '' : value.substring(dotPos + 1, value.length);
 
     const finalChars = [];
@@ -492,7 +492,7 @@ function numericCurrencyToString(num) {
     const negative = str.charAt(0) === '-';
 
     if (negative) {
-        str = str.substr(1);
+        str = str.substring(1);
     }
 
     if (str.length === 0) {
@@ -502,8 +502,8 @@ function numericCurrencyToString(num) {
     } else if (str.length === 2) {
         str = '0.' + str;
     } else {
-        let integer = str.substr(0, str.length - 2);
-        let decimals = str.substr(str.length - 2, 2);
+        let integer = str.substring(0, str.length - 2);
+        let decimals = str.substring(str.length - 2);
 
         integer = appendThousandsSeparator(integer);
 
@@ -525,7 +525,7 @@ function stringCurrencyToNumeric(str) {
     const negative = str.charAt(0) === '-';
 
     if (negative) {
-        str = str.substr(1);
+        str = str.substring(1);
     }
 
     if (!str || str.length < 1) {
@@ -547,7 +547,7 @@ function stringCurrencyToNumeric(str) {
         dotPos++;
     }
 
-    const integer = str.substr(0, dotPos);
+    const integer = str.substring(0, dotPos);
     const decimals = str.substring(dotPos + 1, str.length);
 
     if (decimals.length < 1) {
@@ -557,7 +557,7 @@ function stringCurrencyToNumeric(str) {
     } else if (decimals.length === 2) {
         return sign * parseInt(integer) * 100 + sign * parseInt(decimals);
     } else {
-        return sign * parseInt(integer) * 100 + sign * parseInt(decimals.substr(0, 2));
+        return sign * parseInt(integer) * 100 + sign * parseInt(decimals.substring(0, 2));
     }
 }
 

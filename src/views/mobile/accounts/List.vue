@@ -478,7 +478,7 @@ export default {
                 return;
             }
 
-            const id = event.el.id.substr(8); // account_
+            const id = event.el.id.substring(8); // account_
 
             self.$store.dispatch('changeAccountDisplayOrder', {
                 accountId: id,

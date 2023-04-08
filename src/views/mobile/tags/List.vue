@@ -259,7 +259,7 @@ export default {
                 return;
             }
 
-            const id = event.el.id.substr(4); // tag_
+            const id = event.el.id.substring(4); // tag_
 
             self.$store.dispatch('changeTagDisplayOrder', {
                 tagId: id,

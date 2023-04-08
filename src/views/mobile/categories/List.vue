@@ -250,7 +250,7 @@ export default {
                 return;
             }
 
-            const id = event.el.id.substr(9); // category_
+            const id = event.el.id.substring(9); // category_
 
             self.$store.dispatch('changeCategoryDisplayOrder', {
                 categoryId: id,

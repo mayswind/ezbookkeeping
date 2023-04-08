@@ -125,7 +125,7 @@ export default {
                 return str;
             }
 
-            let integer = str.substr(0, dotPos);
+            let integer = str.substring(0, dotPos);
             let decimals = str.substring(dotPos + 1, str.length);
             let newDecimals = '';
 
@@ -232,7 +232,7 @@ export default {
                 return;
             }
 
-            this.currentValue = this.currentValue.substr(0, this.currentValue.length - 1);
+            this.currentValue = this.currentValue.substring(0, this.currentValue.length - 1);
         },
         clear() {
             this.currentValue = '';

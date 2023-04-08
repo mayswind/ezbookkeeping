@@ -15,5 +15,5 @@ export default function (value, maxLength) {
         return value;
     }
 
-    return value.substr(0, maxLength - 3) + '...';
+    return value.substring(0, maxLength - 3) + '...';
 }

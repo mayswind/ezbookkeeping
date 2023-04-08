@@ -13,6 +13,6 @@ export default function (rate) {
             }
         }
 
-        return rateStr.substr(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
+        return rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
     }
 }

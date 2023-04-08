@@ -14,7 +14,7 @@ const appLockStateSessionStorageKey = 'ebk_user_app_lock_state'; // { 'username'
 
 function getAppLockSecret(pinCode) {
     const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();
-    return hashedPinCode.substr(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
+    return hashedPinCode.substring(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 
 function getEncryptedToken(token, appLockState) {

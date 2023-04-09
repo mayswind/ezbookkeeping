@@ -8,16 +8,18 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top margin-bottom-half" v-if="hint">{{ hint }}</p>
                 <slot></slot>
-                <f7-list no-hairlines class="no-margin-top margin-bottom">
+                <f7-list no-hairlines strong class="no-margin-top margin-bottom">
                     <f7-list-input
                         type="number"
                         autocomplete="one-time-code"
                         outline
+                        floating-label
                         clear-button
+                        class="no-margin"
+                        :label="$t('Password')"
                         :placeholder="$t('Passcode')"
-                        :value="currentPasscode"
-                        @input="currentPasscode = $event.target.value"
-                        @keyup.enter.native="confirm()"
+                        v-model:value="currentPasscode"
+                        @keyup.enter="confirm()"
                     ></f7-list-input>
                 </f7-list>
                 <f7-button large fill
@@ -36,7 +38,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'title',
         'hint',
         'confirmDisabled',
@@ -60,7 +62,7 @@ export default {
                 return;
             }
 
-            this.$emit('input', this.currentPasscode);
+            this.$emit('update:modelValue', this.currentPasscode);
             this.$emit('passcode:confirm', this.currentPasscode);
         },
         cancel() {

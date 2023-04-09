@@ -10,16 +10,17 @@
             <f7-list no-hairlines class="no-margin-top no-margin-bottom">
                 <f7-list-item link="#" no-chevron
                               v-for="(item, index) in items"
-                              :key="item | itemKeyValue(index, keyField, valueType)"
+                              :key="getItemValue(item, index, keyField, valueType)"
                               :class="{ 'list-item-selected': isSelected(item, index) }"
-                              :value="item | itemKeyValue(index, valueField, valueType)"
-                              :title="item | itemFieldContent(titleField, item, titleI18n)"
+                              :value="getItemValue(item, index, valueField, valueType)"
+                              :title="getTranslateItemValue(item, titleField, item, titleI18n)"
                               @click="onItemClicked(item, index)">
-                    <f7-icon slot="media"
-                             :icon="item[iconField] | icon(iconType)"
-                             :style="item[colorField] | iconStyle(iconType, 'var(--default-icon-color)')"
-                             v-if="iconField"></f7-icon>
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
+                    <template #media>
+                        <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]" v-if="iconField"></ItemIcon>
+                    </template>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-page-content>
@@ -29,7 +30,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'valueType', // item or index
         'keyField', // for value type == item
         'valueField', // for value type == item
@@ -45,7 +46,7 @@ export default {
         const self = this;
 
         return {
-            currentValue: self.value
+            currentValue: self.modelValue
         }
     },
     computed: {
@@ -54,6 +55,28 @@ export default {
         }
     },
     methods: {
+        getItemValue(item, index, fieldName, valueType) {
+            if (valueType === 'index') {
+                return index;
+            } else if (fieldName) {
+                return item[fieldName];
+            } else {
+                return item;
+            }
+        },
+        getTranslateItemValue(item, fieldName, defaultValue, translate) {
+            let content = defaultValue;
+
+            if (fieldName) {
+                content = item[fieldName];
+            }
+
+            if (translate && content) {
+                content = this.$t(content);
+            }
+
+            return content;
+        },
         onItemClicked(item, index) {
             if (this.valueType === 'index') {
                 this.currentValue = index;
@@ -65,11 +88,11 @@ export default {
                 }
             }
 
-            this.$emit('input', this.currentValue);
+            this.$emit('update:modelValue', this.currentValue);
             this.$emit('update:show', false);
         },
         onSheetOpen(event) {
-            this.currentValue = this.value;
+            this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
@@ -106,17 +129,6 @@ export default {
             }
 
             container.scrollTop(targetPos);
-        }
-    },
-    filters: {
-        itemKeyValue(item, index, fieldName, valueType) {
-            if (valueType === 'index') {
-                return index;
-            } else if (fieldName) {
-                return item[fieldName];
-            } else {
-                return item;
-            }
         }
     }
 }

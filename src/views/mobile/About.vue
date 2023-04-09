@@ -4,16 +4,16 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
-                    <f7-list-item :title="$t('Build Time')" :after="buildTime | moment($t('format.datetime.long'))" v-if="buildTime"></f7-list-item>
+                    <f7-list-item :title="$t('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
                     <f7-list-item external :title="$t('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
                     <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-popup class="license-popup">
+        <f7-popup push swipe-to-close class="license-popup">
             <f7-page>
                 <f7-navbar>
                     <f7-nav-title :title="$t('License')"></f7-nav-title>
@@ -53,7 +53,11 @@ export default {
             return 'v' + this.$version;
         },
         buildTime() {
-            return this.$buildTime;
+            if (!this.$buildTime) {
+                return this.$buildTime;
+            }
+
+            return this.$utilities.formatUnixTime(this.$buildTime, this.$t('format.datetime.long'));
         },
         licenseLines() {
             return this.$licenses.license.replaceAll(/\r/g, '').split('\n');

@@ -10,7 +10,7 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
+                <f7-list form dividers>
                     <f7-list-input
                         type="text"
                         autocomplete="username"
@@ -68,13 +68,13 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
+                <f7-list form dividers>
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_lang'"
                         :header="$t('Language')"
-                        :title="currentLocale | languageName"
-                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Language'), searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        :title="currentLanguageName"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Language'), searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
@@ -87,12 +87,14 @@
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_currency'"
                         :header="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
-                        <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ $t(`currency.${user.defaultCurrency}`) }}&nbsp;</span>
-                            <small class="smaller">{{ user.defaultCurrency }}</small>
-                        </f7-block>
+                        <template #title>
+                            <f7-block class="no-padding no-margin">
+                                <span>{{ $t(`currency.${user.defaultCurrency}`) }}&nbsp;</span>
+                                <small class="smaller">{{ user.defaultCurrency }}</small>
+                            </f7-block>
+                        </template>
                         <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
                             <option v-for="currency in allCurrencies"
                                     :key="currency.code"
@@ -104,8 +106,8 @@
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_firstDayOfWeek'"
                         :header="$t('First Day of Week')"
-                        :title="user.firstDayOfWeek | optionName(allWeekDays, 'type', 'name') | format('datetime.#{value}.long') | localized"
-                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('First Day of Week'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        :title="getDayOfWeekName(user.firstDayOfWeek)"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('First Day of Week'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
                         <select v-model="user.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"
@@ -119,7 +121,7 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
+                <f7-list form dividers>
                     <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
                         <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
                     </f7-list-item>
@@ -127,7 +129,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popup :opened="showPresetCategories" @popup:closed="showPresetCategories = false">
+        <f7-popup push swipe-to-close :close-on-escape="false" :opened="showPresetCategories" @popup:closed="showPresetCategories = false">
             <f7-page>
                 <f7-navbar>
                     <f7-nav-left>
@@ -143,7 +145,7 @@
                 <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
                     <f7-card-header>
                         <small class="card-header-content">
-                            <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
+                            <span>{{ getCategoryTypeName(categoryType) }}</span>
                         </small>
                     </f7-card-header>
                     <f7-card-content class="no-safe-areas" :padding="false">
@@ -152,20 +154,18 @@
                                           :key="idx"
                                           :accordion-item="!!category.subCategories.length"
                                           :title="$t('category.' + category.name, currentLocale)">
-                                <f7-icon slot="media"
-                                         :icon="category.categoryIconId | categoryIcon"
-                                         :style="category.color | categoryIconStyle('var(--default-icon-color)')">
-                                </f7-icon>
+                                <template #media>
+                                    <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
+                                </template>
 
                                 <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                                     <f7-list>
                                         <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
                                                       :key="subIdx"
                                                       :title="$t('category.' + subCategory.name, currentLocale)">
-                                            <f7-icon slot="media"
-                                                     :icon="subCategory.categoryIconId | categoryIcon"
-                                                     :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
-                                            </f7-icon>
+                                            <template #media>
+                                                <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                            </template>
                                         </f7-list-item>
                                     </f7-list>
                                 </f7-accordion-content>
@@ -187,7 +187,7 @@
             <list-item-selection-sheet value-type="index"
                                        title-field="displayName"
                                        :items="allLanguages"
-                                       :show.sync="showPresetCategoriesChangeLocaleSheet"
+                                       v-model:show="showPresetCategoriesChangeLocaleSheet"
                                        v-model="currentLocale">
             </list-item-selection-sheet>
         </f7-popup>
@@ -196,6 +196,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         const self = this;
 
@@ -223,7 +226,7 @@ export default {
     },
     computed: {
         allLanguages() {
-            return this.$locale.getAllLanguages();
+            return this.$locale.getAllLanguageInfos();
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
@@ -249,6 +252,15 @@ export default {
                     this.user.firstDayOfWeek = this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0;
                 }
             }
+        },
+        currentLanguageName() {
+            const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
+
+            if (!languageInfo) {
+                return '';
+            }
+
+            return languageInfo.displayName;
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -284,7 +296,7 @@ export default {
     methods: {
         submit() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             let problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
 
@@ -384,19 +396,22 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        }
-    },
-    filters: {
-        categoryTypeName(categoryType, allCategoryTypes) {
+        },
+        getDayOfWeekName(dayOfWeek) {
+            const weekName = this.$utilities.getKeyByValue(this.$constants.datetime.allWeekDays, dayOfWeek, 'type', 'name');
+            const i18nWeekNameKey = `datetime.${weekName}.long`;
+            return this.$t(i18nWeekNameKey);
+        },
+        getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case allCategoryTypes.Income.toString():
-                    return 'Income Categories';
-                case allCategoryTypes.Expense.toString():
-                    return 'Expense Categories';
-                case allCategoryTypes.Transfer.toString():
-                    return 'Transfer Categories';
+                case this.$constants.category.allCategoryTypes.Income.toString():
+                    return this.$t('Income Categories');
+                case this.$constants.category.allCategoryTypes.Expense.toString():
+                    return this.$t('Expense Categories');
+                case this.$constants.category.allCategoryTypes.Transfer.toString():
+                    return this.$t('Transfer Categories');
                 default:
-                    return 'Transaction Categories';
+                    return this.$t('Transaction Categories');
             }
         }
     }

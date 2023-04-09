@@ -7,12 +7,13 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top margin-bottom-half" v-if="hint">
                     <span>{{ hint }}</span>
-                    <f7-link class="icon-after-text"
+                    <f7-link id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
+                             class="icon-after-text"
                              icon-only icon-f7="doc_on_doc" icon-size="16px"
                              v-if="enableCopy"
-                             v-clipboard:copy="information" v-clipboard:success="onCopied"></f7-link>
+                    ></f7-link>
                 </p>
-                <textarea class="information-content full-line" :rows="rowCount" readonly="readonly" v-model="information"></textarea>
+                <textarea class="information-content full-line" :rows="rowCount" :value="information"></textarea>
                 <div class="margin-top text-align-center">
                     <f7-link @click="cancel" :text="$t('Close')"></f7-link>
                 </div>
@@ -31,15 +32,47 @@ export default {
         'enableCopy',
         'show'
     ],
+    data() {
+        return {
+            clipboardHolder: null
+        }
+    },
+    mounted() {
+        this.makeCopyToClipboardClickable();
+    },
+    updated() {
+        this.makeCopyToClipboardClickable();
+    },
+    watch: {
+        'information': function (newValue) {
+            if (this.clipboardHolder) {
+                this.$utilities.changeClipboardObjectTxet(this.clipboardHolder, newValue);
+            }
+        }
+    },
     methods: {
         onSheetClosed() {
             this.$emit('update:show', false);
         },
-        onCopied() {
-            this.$emit('info:copied');
-        },
         cancel() {
             this.$emit('update:show', false);
+        },
+        makeCopyToClipboardClickable() {
+            const self = this;
+
+            if (self.clipboardHolder) {
+                return;
+            }
+
+            if (self.$refs.copyToClipboardIcon) {
+                self.clipboardHolder = self.$utilities.makeButtonCopyToClipboard({
+                    el: '#copy-to-clipboard-icon',
+                    text: self.information,
+                    successCallback: function () {
+                        self.$emit('info:copied');
+                    }
+                });
+            }
         }
     }
 }

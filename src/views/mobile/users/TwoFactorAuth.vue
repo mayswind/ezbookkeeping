@@ -4,60 +4,50 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item title="Status" after="Unknown"></f7-list-item>
                     <f7-list-button class="disabled">Operate</f7-list-button>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="!loading && status === true">
+        <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
-                    <f7-list-button :class="{ 'disabled': regenerating }" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
-                    <f7-list-button :class="{ 'disabled': disabling }" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
-
-        <f7-card v-else-if="!loading && status === false">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
-                    <f7-list-button :class="{ 'disabled': enabling }" @click="enable">{{ $t('Enable') }}</f7-list-button>
+                <f7-list dividers>
+                    <f7-list-item :title="$t('Status')" :after="$t(status ? 'Enabled' : 'Disabled')"></f7-list-item>
+                    <f7-list-button :class="{ 'disabled': regenerating }" v-if="status === true" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
+                    <f7-list-button :class="{ 'disabled': disabling }" v-if="status === true" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+                    <f7-list-button :class="{ 'disabled': enabling }" v-if="status === false" @click="enable">{{ $t('Enable') }}</f7-list-button>
                 </f7-list>
             </f7-card-content>
         </f7-card>
 
         <passcode-input-sheet :title="$t('Passcode')"
                               :hint="$t('Please use two factor authentication app scan the below qrcode and input current passcode')"
-                              :show.sync="showInputPasscodeSheetForEnable"
                               :confirm-disabled="enableConfirming"
                               :cancel-disabled="enableConfirming"
+                              v-model:show="showInputPasscodeSheetForEnable"
                               v-model="currentPasscodeForEnable"
                               @passcode:confirm="enableConfirm">
-            <div class="row">
-                <div class="col-100 text-align-center">
-                    <img alt="qrcode" width="240px" height="240px" :src="new2FAQRCode" />
-                </div>
+            <div class="col-100 text-align-center">
+                <img alt="qrcode" class="img-qrcode" :src="new2FAQRCode" />
             </div>
         </passcode-input-sheet>
 
         <password-input-sheet :title="$t('Current Password')"
                               :hint="$t('Please enter your current password when disable two factor authentication')"
-                              :show.sync="showInputPasswordSheetForDisable"
                               :confirm-disabled="disabling"
                               :cancel-disabled="disabling"
+                              v-model:show="showInputPasswordSheetForDisable"
                               v-model="currentPasswordForDisable"
                               @password:confirm="disable">
         </password-input-sheet>
 
         <password-input-sheet :title="$t('Current Password')"
                               :hint="$t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.')"
-                              :show.sync="showInputPasswordSheetForRegenerate"
                               :confirm-disabled="regenerating"
                               :cancel-disabled="regenerating"
+                              v-model:show="showInputPasswordSheetForRegenerate"
                               v-model="currentPasswordForRegenerate"
                               @password:confirm="regenerateBackupCode">
         </password-input-sheet>
@@ -68,7 +58,7 @@
                            :information="currentBackupCode"
                            :row-count="10"
                            :enable-copy="true"
-                           :show.sync="showBackupCodeSheet"
+                           v-model:show="showBackupCodeSheet"
                            @info:copied="onBackupCodeCopied">
         </information-sheet>
     </f7-page>
@@ -76,6 +66,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             status: null,
@@ -116,7 +109,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         enable() {
             const self = this;
@@ -245,6 +238,11 @@ export default {
 </script>
 
 <style>
+.img-qrcode {
+    width: 240px;
+    height: 240px
+}
+
 .backup-code-sheet .information-content {
     font-family: monospace;
 }

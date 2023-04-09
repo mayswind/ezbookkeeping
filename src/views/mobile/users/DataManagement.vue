@@ -15,7 +15,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
                     <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
                     <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
@@ -26,7 +26,7 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
                     <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
                 </f7-list>
@@ -51,9 +51,9 @@
 
         <password-input-sheet :title="$t('Are you sure you want to clear all data?')"
                               :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.')"
-                              :show.sync="showInputPasswordSheetForClearData"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
+                              v-model:show="showInputPasswordSheetForClearData"
                               v-model="currentPasswordForClearData"
                               @password:confirm="clearData">
         </password-input-sheet>
@@ -62,6 +62,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             loading: true,
@@ -113,7 +116,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         exportData() {
             const self = this;
@@ -155,6 +158,20 @@ export default {
 
                 self.showInputPasswordSheetForClearData = false;
                 self.$toast('All user data has been cleared');
+
+                self.loading = true;
+
+                self.$store.dispatch('getUserDataStatistics').then(dataStatistics => {
+                    self.dataStatistics = dataStatistics;
+                    self.loading = false;
+                }).catch(error => {
+                    if (error.processed) {
+                        self.loading = false;
+                    } else {
+                        self.loadingError = error;
+                        self.$toast(error.message || error);
+                    }
+                });
             }).catch(error => {
                 self.clearingData = false;
                 self.$hideLoading();

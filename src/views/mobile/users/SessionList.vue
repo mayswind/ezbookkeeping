@@ -4,18 +4,22 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Device & Sessions')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link :class="{ 'disabled': tokens.length < 2 }" :text="$t('Logout All')" @click="revokeAll"></f7-link>
+                <f7-link :class="{ 'disabled': sessions.length < 2 }" :text="$t('Logout All')" @click="revokeAll"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list media-list>
+                <f7-list media-list dividers>
                     <f7-list-item class="list-item-media-valign-middle"
                                   title="Current"
                                   text="Device Name (Browser xx.x.xxxx.xx)">
-                        <f7-icon slot="media" f7="device_phone_portrait"></f7-icon>
-                        <small slot="after">MM/DD/YYYY HH:mm:ss</small>
+                        <template #media>
+                            <f7-icon f7="device_phone_portrait"></f7-icon>
+                        </template>
+                        <template #after>
+                            <small>MM/DD/YYYY HH:mm:ss</small>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -23,17 +27,21 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list media-list>
+                <f7-list media-list dividers>
                     <f7-list-item class="list-item-media-valign-middle" swipeout
-                                  v-for="token in tokens"
-                                  :key="token.tokenId"
-                                  :id="token | tokenDomId"
-                                  :title="token | tokenTitle | localized"
-                                  :text="token | tokenDevice | localized">
-                        <f7-icon slot="media" :f7="token | tokenIcon"></f7-icon>
-                        <small slot="after">{{ token.createdAt | moment($t('format.datetime.long')) }}</small>
-                        <f7-swipeout-actions right v-if="!token.isCurrent">
-                            <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(token)"></f7-swipeout-button>
+                                  v-for="session in sessions"
+                                  :key="session.tokenId"
+                                  :id="session.domId"
+                                  :title="session.deviceType"
+                                  :text="session.deviceInfo">
+                        <template #media>
+                            <f7-icon :f7="session.icon"></f7-icon>
+                        </template>
+                        <template #after>
+                            <small>{{ session.createdAt }}</small>
+                        </template>
+                        <f7-swipeout-actions right v-if="!session.isCurrent">
+                            <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(session)"></f7-swipeout-button>
                         </f7-swipeout-actions>
                     </f7-list-item>
                 </f7-list>
@@ -44,12 +52,40 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             tokens: [],
             loading: true,
             loadingError: null
         };
+    },
+    computed: {
+        sessions() {
+            if (!this.tokens) {
+                return this.tokens;
+            }
+
+            const sessions = [];
+
+            for (let i = 0; i < this.tokens.length; i++) {
+                const token = this.tokens[i];
+
+                sessions.push({
+                    tokenId: token.tokenId,
+                    domId: this.getTokenDomId(token.tokenId),
+                    isCurrent: token.isCurrent,
+                    deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
+                    deviceInfo: this.$utilities.parseDeviceInfo(token.userAgent),
+                    icon: this.getTokenIcon(token),
+                    createdAt: this.$utilities.formatUnixTime(token.createdAt, this.$t('format.datetime.long'))
+                });
+            }
+
+            return sessions;
+        }
     },
     created() {
         const self = this;
@@ -70,7 +106,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         reload(done) {
             const self = this;
@@ -91,22 +127,20 @@ export default {
                 }
             });
         },
-        revoke(token) {
+        revoke(session) {
             const self = this;
-            const app = self.$f7;
-            const $$ = app.$;
 
             self.$confirm('Are you sure you want to logout from this session?', () => {
                 self.$showLoading();
 
                 self.$store.dispatch('revokeToken', {
-                    tokenId: token.tokenId
+                    tokenId: session.tokenId
                 }).then(() => {
                     self.$hideLoading();
 
-                    app.swipeout.delete($$(`#${self.$options.filters.tokenDomId(token)}`), () => {
+                    self.$ui.onSwipeoutDeleted(self.getTokenDomId(session.tokenId), () => {
                         for (let i = 0; i < self.tokens.length; i++) {
-                            if (self.tokens[i].tokenId === token.tokenId) {
+                            if (self.tokens[i].tokenId === session.tokenId) {
                                 self.tokens.splice(i, 1);
                             }
                         }
@@ -148,18 +182,28 @@ export default {
                     }
                 });
             });
-        }
-    },
-    filters: {
-        tokenTitle(token) {
-            if (token.isCurrent) {
-                return 'Current';
+        },
+        getTokenIcon(token) {
+            const ua = this.$utilities.parseUserAgent(token.userAgent);
+
+            if (!ua || !ua.device) {
+                return this.$constants.icons.deviceIcons.desktop.f7Icon;
             }
 
-            return 'Other Device';
+            if (ua.device.type === 'mobile') {
+                return this.$constants.icons.deviceIcons.mobile.f7Icon;
+            } else if (ua.device.type === 'wearable') {
+                return this.$constants.icons.deviceIcons.wearable.f7Icon;
+            } else if (ua.device.type === 'tablet') {
+                return this.$constants.icons.deviceIcons.tablet.f7Icon;
+            } else if (ua.device.type === 'smarttv') {
+                return this.$constants.icons.deviceIcons.tv.f7Icon;
+            } else {
+                return this.$constants.icons.deviceIcons.desktop.f7Icon;
+            }
         },
-        tokenDomId(token) {
-            return 'token_' + token.tokenId.replace(/:/g, '_');
+        getTokenDomId(tokenId) {
+            return 'token_' + tokenId.replace(/:/g, '_');
         }
     }
 };

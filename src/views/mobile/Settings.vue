@@ -5,7 +5,7 @@
         <f7-block-title class="margin-top">{{ currentNickName }}</f7-block-title>
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
                     <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
                     <f7-list-item :title="$t('Transaction Tags')" link="/tag/list"></f7-list-item>
@@ -20,11 +20,11 @@
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item
                         :key="currentLocale + '_lang'"
                         :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
                                     :key="locale"
@@ -35,7 +35,7 @@
                     <f7-list-item
                         :key="currentLocale + '_timezone'"
                         :title="$t('Timezone')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currentTimezone">
                             <option v-for="timezone in allTimezones"
                                     :key="timezone.name"
@@ -60,7 +60,7 @@
                     <f7-list-item
                         :key="currentLocale + '_currency_display'"
                         :title="$t('Currency Display Mode')"
-                        smart-select :smart-select-params="{ openIn: 'popup', searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
                         <select v-model="currencyDisplayMode">
                             <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
                             <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
@@ -105,6 +105,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         const self = this;
 
@@ -118,7 +121,7 @@ export default {
             return 'v' + this.$version;
         },
         allLanguages() {
-            return this.$locale.getAllLanguages();
+            return this.$locale.getAllLanguageInfos();
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -223,7 +226,7 @@ export default {
         },
         logout() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             self.$confirm('Are you sure you want to log out?', () => {
                 self.logouting = true;
@@ -234,7 +237,7 @@ export default {
                     self.$hideLoading();
 
                     self.$settings.clearSettings();
-                    self.$locale.init();
+                    self.$locale.initLocale();
 
                     router.navigate('/');
                 }).catch(error => {

@@ -1,7 +1,7 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
-            <img class="login-page-logo" src="img/ezbookkeeping-192.png" />
+            <img class="login-page-logo" src="/img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
@@ -23,7 +23,7 @@
                 :placeholder="$t('Your password')"
                 :value="password"
                 @input="password = $event.target.value; tempToken = ''"
-                @keyup.enter.native="loginByPressEnter"
+                @keyup.enter="loginByPressEnter"
             ></f7-list-input>
         </f7-list>
 
@@ -58,7 +58,9 @@
                     :title="lang.displayName"
                     @click="changeLanguage(locale)"
                 >
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -82,7 +84,7 @@
                             :placeholder="$t('Passcode')"
                             :value="passcode"
                             @input="passcode = $event.target.value"
-                            @keyup.enter.native="verify"
+                            @keyup.enter="verify"
                         ></f7-list-input>
                         <f7-list-input
                             outline
@@ -91,7 +93,7 @@
                             :placeholder="$t('Backup Code')"
                             :value="backupCode"
                             @input="backupCode = $event.target.value"
-                            @keyup.enter.native="verify"
+                            @keyup.enter="verify"
                         ></f7-list-input>
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty || verifying }" :text="$t('Verify')" @click="verify"></f7-button>
@@ -106,6 +108,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             username: '',
@@ -124,7 +129,7 @@ export default {
             return 'v' + this.$version;
         },
         allLanguages() {
-            return this.$locale.getAllLanguages();
+            return this.$locale.getAllLanguageInfos();
         },
         isUserRegistrationEnabled() {
             return this.$settings.isUserRegistrationEnabled();
@@ -148,10 +153,10 @@ export default {
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
-            let lang = this.$locale.getLanguage(currentLocale);
+            let lang = this.$locale.getLanguageInfo(currentLocale);
 
             if (!lang) {
-                lang = this.$locale.getLanguage(this.$locale.getDefaultLanguage());
+                lang = this.$locale.getLanguageInfo(this.$locale.getDefaultLanguage());
             }
 
             return lang.displayName;
@@ -160,7 +165,7 @@ export default {
     methods: {
         login() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             if (!this.username) {
                 self.$alert('Username cannot be empty');
@@ -208,10 +213,7 @@ export default {
             });
         },
         loginByPressEnter() {
-            const app = this.$f7;
-            const $$ = app.$;
-
-            if ($$('.modal-in').length) {
+            if (this.$ui.isModalShowing()) {
                 return;
             }
 
@@ -219,7 +221,7 @@ export default {
         },
         verify() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             if (self.twoFAInputIsEmpty || self.verifying) {
                 return;

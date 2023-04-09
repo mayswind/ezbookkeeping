@@ -33,14 +33,12 @@ import CategoryPresetPage from '../views/mobile/categories/Preset.vue';
 
 import TagListPage from '../views/mobile/tags/List.vue';
 
-function checkLogin(to, from, resolve, reject) {
-    const router = this;
-
+function checkLogin({ router, resolve, reject }) {
     if (!userState.isUserLogined()) {
         reject();
         router.navigate('/login', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -49,7 +47,7 @@ function checkLogin(to, from, resolve, reject) {
         reject();
         router.navigate('/unlock', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -57,14 +55,12 @@ function checkLogin(to, from, resolve, reject) {
     resolve();
 }
 
-function checkLocked(to, from, resolve, reject) {
-    const router = this;
-
+function checkLocked({ router, resolve, reject }) {
     if (!userState.isUserLogined()) {
         reject();
         router.navigate('/login', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -73,7 +69,7 @@ function checkLocked(to, from, resolve, reject) {
         reject();
         router.navigate('/', {
             clearPreviousHistory: true,
-            pushState: false
+            browserHistory: false
         });
         return;
     }
@@ -81,9 +77,7 @@ function checkLocked(to, from, resolve, reject) {
     resolve();
 }
 
-function checkNotLogin(to, from, resolve, reject) {
-    const router = this;
-
+function checkNotLogin({ router, resolve, reject }) {
     if (userState.isUserLogined() && !userState.isUserUnlocked()) {
         reject();
         router.navigate('/unlock', {

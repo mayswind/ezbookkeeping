@@ -1,10 +1,11 @@
 <template>
-    <f7-app :params="f7params">
+    <f7-app v-bind="f7params">
         <f7-view id="main-view" class="safe-areas" main url="/"></f7-view>
     </f7-app>
 </template>
 
 <script>
+import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
 export default {
@@ -14,14 +15,29 @@ export default {
         return {
             f7params: {
                 name: 'ezBookkeeping',
-                id: 'net.mayswind.ezbookkeeping',
                 theme: 'ios',
-                autoDarkTheme: self.$settings.isEnableAutoDarkMode(),
+                colors: {
+                    primary: '#c67e48',
+                },
                 routes: routes,
+                darkMode: self.$settings.isEnableAutoDarkMode() ? 'auto' : false,
+                touch: {
+                    disableContextMenu: true,
+                    tapHold: true
+                },
+                serviceWorker: {
+                    path: self.$settings.isProduction() ? './sw.js' : undefined,
+                    scope: './',
+                },
                 actions: {
                     animate: self.$settings.isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
+                },
+                calendar: {
+                    locale: 'en',
+                    openIn: 'auto',
+                    backdrop: true
                 },
                 dialog: {
                     animate: self.$settings.isEnableAnimate(),
@@ -46,25 +62,12 @@ export default {
                 smartSelect: {
                     routableModals: false
                 },
-                touch: {
-                    tapHold: true,
-                    disableContextMenu: true
-                },
                 view: {
                     animate: self.$settings.isEnableAnimate(),
-                    pushState: !self.isiOSHomeScreenMode(),
-                    pushStateAnimate: false,
+                    browserHistory: !self.isiOSHomeScreenMode(),
+                    browserHistoryAnimate: false,
                     iosSwipeBackAnimateShadow: false,
                     mdSwipeBackAnimateShadow: false
-                },
-                calendar: {
-                    locale: 'en',
-                    openIn: 'customModal',
-                    backdrop: true
-                },
-                serviceWorker: {
-                    path: self.$settings.isProduction() ? './sw.js' : undefined,
-                    scope: './',
                 }
             }
         }
@@ -81,6 +84,19 @@ export default {
                 }
             }
         }
+    },
+    mounted() {
+        f7ready((f7) => {
+            f7.on('pageBeforeOut',  () => {
+                if (this.$ui.isModalShowing()) {
+                    f7.actions.close('.actions-modal.modal-in', false);
+                    f7.dialog.close('.dialog.modal-in', false);
+                    f7.popover.close('.popover.modal-in', false);
+                    f7.popup.close('.popup.modal-in', false);
+                    f7.sheet.close('.sheet-modal.modal-in', false);
+                }
+            });
+        });
     },
     methods: {
         isiOSHomeScreenMode() {
@@ -142,19 +158,22 @@ body {
 
 /** Replacing the default style of framework7 **/
 :root {
-    --f7-theme-color: #c67e48;
-    --f7-theme-color-rgb: 198, 126, 72;
-    --f7-theme-color-shade: #af6a36;
-    --f7-theme-color-tint: #d09467;
-
+    --f7-toolbar-height: 50px;
     --default-icon-color: var(--f7-text-color);
 }
 
-:root .theme-dark {
+:root .dark {
     --default-icon-color: var(--f7-text-color);
 }
 
-.ios .theme-dark, .ios.theme-dark {
+.color-gray {
+    --f7-theme-color: #8e8e93;
+    --f7-theme-color-rgb: 142, 142, 147;
+    --f7-theme-color-shade: #79797f;
+    --f7-theme-color-tint: #a3a3a7;
+}
+
+.ios .dark, .ios.dark {
     --f7-list-item-header-text-color: inherit !important;
 }
 
@@ -227,7 +246,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-weight: bold;
 }
 
-.theme-dark .list .item-content .list-item-showing {
+.dark .list .item-content .list-item-showing {
     color: rgba(255, 255, 255, 0.2);
 }
 
@@ -238,6 +257,10 @@ i.icon.la, i.icon.las, i.icon.lab {
 .list .item-content .list-item-checked-icon {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));
+}
+
+.list li.no-margin .item-content.item-input {
+    margin: 0;
 }
 
 .ebk-list-item-error-info div.item-footer {
@@ -340,7 +363,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     box-shadow: 0 0 2px rgba(0,0,0,.5) !important;
 }
 
-.theme-dark .vue-pincode-input {
+.dark .vue-pincode-input {
     box-shadow: 0 0 2px rgba(255,255,255,.5) !important;
 }
 </style>

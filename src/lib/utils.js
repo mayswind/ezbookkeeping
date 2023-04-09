@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import Clipboard from 'clipboard';
 import uaParser from 'ua-parser-js';
 
 import dateTimeConstants from '../consts/datetime.js';
@@ -587,6 +588,48 @@ function stringToArrayBuffer(str){
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
 }
 
+function getKeyByValue(src, value, keyField, nameField, defaultKey) {
+    if (isArray(src)) {
+        if (keyField) {
+            for (let i = 0; i < src.length; i++) {
+                const option = src[i];
+
+                if (option[keyField] === value) {
+                    return option[nameField];
+                }
+            }
+        } else {
+            if (src[value]) {
+                const option = src[value];
+
+                return option[nameField];
+            }
+        }
+    } else if (isObject(src)) {
+        if (keyField) {
+            for (let key in src) {
+                if (!Object.prototype.hasOwnProperty.call(src, key)) {
+                    continue;
+                }
+
+                const option = src[key];
+
+                if (option[keyField] === value) {
+                    return option[nameField];
+                }
+            }
+        } else {
+            if (src[value]) {
+                const option = src[value];
+
+                return option[nameField];
+            }
+        }
+    }
+
+    return defaultKey;
+}
+
 function generateRandomString() {
     const baseString = 'ebk_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
     return CryptoJS.SHA256(baseString).toString();
@@ -610,6 +653,41 @@ function parseUserAgent(ua) {
             version: uaParseRet.browser.version
         }
     };
+}
+
+function parseDeviceInfo(ua) {
+    const uaInfo = parseUserAgent(ua);
+    let result = '';
+
+    if (uaInfo.device.model) {
+        result = uaInfo.device.model;
+    } else if (uaInfo.os.name) {
+        result = uaInfo.os.name;
+
+        if (uaInfo.os.version) {
+            result += ' ' + uaInfo.os.version;
+        }
+    }
+
+    if (uaInfo.browser.name) {
+        let browserInfo = uaInfo.browser.name;
+
+        if (uaInfo.browser.version) {
+            browserInfo += ' ' + uaInfo.browser.version;
+        }
+
+        if (result) {
+            result += ' (' + browserInfo + ')';
+        } else {
+            result = browserInfo;
+        }
+    }
+
+    if (!result) {
+        return 'Unknown Device';
+    }
+
+    return result;
 }
 
 function transactionTypeToCategroyType(transactionType) {
@@ -721,6 +799,38 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
     return ret;
 }
 
+function makeButtonCopyToClipboard({ text, el, successCallback, errorCallback }) {
+    const clipboard = new Clipboard(el, {
+        text: function () {
+            return text;
+        }
+    });
+
+    clipboard.on('success', (e) => {
+        if (successCallback) {
+            successCallback(e);
+        }
+    });
+
+    clipboard.on('error', (e) => {
+        if (errorCallback) {
+            errorCallback(e);
+        }
+    });
+
+    return clipboard;
+}
+
+function changeClipboardObjectTxet(clipboard, text) {
+    if (!clipboard) {
+        return;
+    }
+
+    clipboard.text = function () {
+        return text;
+    };
+}
+
 export default {
     isFunction,
     isObject,
@@ -776,11 +886,15 @@ export default {
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,
+    getKeyByValue,
     generateRandomString,
     parseUserAgent,
+    parseDeviceInfo,
     transactionTypeToCategroyType,
     categroyTypeToTransactionType,
     getCategoryInfo,
     getCategorizedAccounts,
     getAllFilteredAccountsBalance,
+    makeButtonCopyToClipboard,
+    changeClipboardObjectTxet,
 };

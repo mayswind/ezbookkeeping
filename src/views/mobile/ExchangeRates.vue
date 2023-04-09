@@ -10,16 +10,18 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :header="$t('Base Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Base Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Base Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
                     >
-                        <f7-block slot="title" class="no-padding no-margin">
-                            <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
-                            <small class="smaller">{{ baseCurrency }}</small>
-                        </f7-block>
+                        <template #title>
+                            <div class="no-padding no-margin">
+                                <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
+                                <small class="smaller">{{ baseCurrency }}</small>
+                            </div>
+                        </template>
                         <select v-model="baseCurrency">
                             <option v-for="exchangeRate in availableExchangeRates"
                                     :key="exchangeRate.currencyCode"
@@ -31,12 +33,12 @@
                         link="#" no-chevron
                         :style="{ fontSize: baseAmountFontSize + 'px' }"
                         :header="$t('Base Amount')"
-                        :title="baseAmount | currency"
+                        :title="displayBaseAmount"
                         @click="showBaseAmountSheet = true"
                     >
                         <number-pad-sheet :min-value="$constants.transaction.minAmount"
                                           :max-value="$constants.transaction.maxAmount"
-                                          :show.sync="showBaseAmountSheet"
+                                          v-model:show="showBaseAmountSheet"
                                           v-model="baseAmount"
                         ></number-pad-sheet>
                     </f7-list-item>
@@ -46,28 +48,32 @@
 
         <f7-card>
             <f7-card-content class="no-safe-areas" :padding="false" v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
                 </f7-list>
             </f7-card-content>
             <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
-                                  :after="getConvertedAmount(exchangeRate) | exchangeRate"
+                                  :after="getDisplayConvertedAmount(exchangeRate)"
                                   swipeout>
-                        <f7-block slot="title" class="no-padding no-margin">
-                            <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
-                            <small class="smaller">{{ exchangeRate.currencyCode }}</small>
-                        </f7-block>
+                        <template #title>
+                            <div class="no-padding no-margin">
+                                <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
+                                <small class="smaller">{{ exchangeRate.currencyCode }}</small>
+                            </div>
+                        </template>
                         <f7-swipeout-actions right>
                             <f7-swipeout-button color="primary" close :text="$t('Set As Baseline')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
                         </f7-swipeout-actions>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
-            <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+        </f7-card>
+        <f7-card footer-divider>
+            <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length && exchangeRatesDataUpdateTime">
                 <span>{{ $t('Last Updated') }}</span>
-                <span>{{ exchangeRatesData.updateTime | moment($t('format.date.long')) }}</span>
+                <span>{{ exchangeRatesDataUpdateTime }}</span>
             </f7-card-footer>
             <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                 <span>{{ $t('Data source') }}</span>
@@ -106,6 +112,13 @@ export default {
         exchangeRatesData() {
             return this.$store.state.latestExchangeRates.data;
         },
+        exchangeRatesDataUpdateTime() {
+            if (!this.exchangeRatesData) {
+                return '';
+            }
+
+            return this.$utilities.formatUnixTime(this.exchangeRatesData.updateTime, this.$t('format.date.long'));
+        },
         exchangeRateMap() {
             const exchangeRateMap = {};
 
@@ -142,6 +155,9 @@ export default {
             })
 
             return availableExchangeRates;
+        },
+        displayBaseAmount() {
+            return this.$locale.getDisplayCurrency(this.baseAmount);
         },
         baseAmountFontSize() {
             return this.getFontSizeByAmount(this.baseAmount);
@@ -212,6 +228,24 @@ export default {
             }
 
             return this.$utilities.getExchangedAmount(this.baseAmount / 100, fromExchangeRate.rate, toExchangeRate.rate);
+        },
+        getDisplayConvertedAmount(toExchangeRate) {
+            const rateStr = this.getConvertedAmount(toExchangeRate).toString();
+
+            if (rateStr.indexOf('.') < 0) {
+                return rateStr;
+            } else {
+                let firstNonZeroPos = 0;
+
+                for (let i = 0; i < rateStr.length; i++) {
+                    if (rateStr.charAt(i) !== '.' && rateStr.charAt(i) !== '0') {
+                        firstNonZeroPos = Math.min(i + 4, rateStr.length);
+                        break;
+                    }
+                }
+
+                return rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
+            }
         },
         setAsBaseline(currency, amount) {
             if (!this.$utilities.isNumber(amount)) {

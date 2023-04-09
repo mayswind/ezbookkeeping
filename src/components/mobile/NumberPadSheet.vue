@@ -1,53 +1,53 @@
 <template>
     <f7-sheet class="numpad-sheet" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-page-content class="no-margin no-padding-top">
-            <f7-row class="numpad-values">
+            <div class="numpad-values">
                 <span class="numpad-value" :style="{ fontSize: currentDisplayFontSize + 'px' }">{{ currentDisplay }}</span>
-            </f7-row>
-            <f7-row class="numpad-buttons">
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
+            </div>
+            <div class="numpad-buttons">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(7)">
                     <span class="numpad-button-text numpad-button-text-normal">7</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(8)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(8)">
                     <span class="numpad-button-text numpad-button-text-normal">8</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(9)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(9)">
                     <span class="numpad-button-text numpad-button-text-normal">9</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('×')">
+                <f7-button class="numpad-button numpad-button-function no-right-border" @mousedown="setSymbol('×')">
                     <span class="numpad-button-text numpad-button-text-normal">&times;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(4)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(4)">
                     <span class="numpad-button-text numpad-button-text-normal">4</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(5)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(5)">
                     <span class="numpad-button-text numpad-button-text-normal">5</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(6)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(6)">
                     <span class="numpad-button-text numpad-button-text-normal">6</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('−')">
+                <f7-button class="numpad-button numpad-button-function no-right-border" @mousedown="setSymbol('−')">
                     <span class="numpad-button-text numpad-button-text-normal">&minus;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(1)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(1)">
                     <span class="numpad-button-text numpad-button-text-normal">1</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(2)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(2)">
                     <span class="numpad-button-text numpad-button-text-normal">2</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(3)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(3)">
                     <span class="numpad-button-text numpad-button-text-normal">3</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
+                <f7-button class="numpad-button numpad-button-function no-right-border" @mousedown="setSymbol('+')">
                     <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputDot()">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputDot()">
                     <span class="numpad-button-text numpad-button-text-normal">.</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputNum(0)">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="inputNum(0)">
                     <span class="numpad-button-text numpad-button-text-normal">0</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="backspace" @taphold.native="clear()">
+                <f7-button class="numpad-button numpad-button-num" @mousedown="backspace" @taphold="clear()">
                 <span class="numpad-button-text numpad-button-text-normal">
                     <f7-icon f7="delete_left"></f7-icon>
                 </span>
@@ -55,7 +55,7 @@
                 <f7-button class="numpad-button numpad-button-confirm no-right-border no-bottom-border" fill @click="confirm()">
                     <span :class="{ 'numpad-button-text': true, 'numpad-button-text-confirm': !currentSymbol }">{{ confirmText }}</span>
                 </f7-button>
-            </f7-row>
+            </div>
         </f7-page-content>
     </f7-sheet>
 </template>
@@ -63,7 +63,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'minValue',
         'maxValue',
         'show'
@@ -74,7 +74,7 @@ export default {
         return {
             previousValue: '',
             currentSymbol: '',
-            currentValue: self.getStringValue(self.value)
+            currentValue: self.getStringValue(self.modelValue)
         }
     },
     computed: {
@@ -103,7 +103,7 @@ export default {
             if (this.currentSymbol) {
                 return '=';
             } else {
-                return this.$i18n.t('OK');
+                return this.$t('OK');
             }
         }
     },
@@ -291,14 +291,14 @@ export default {
             } else {
                 const value = this.$utilities.stringCurrencyToNumeric(this.currentValue);
 
-                this.$emit('input', value);
+                this.$emit('update:modelValue', value);
                 this.$emit('update:show', false);
 
                 return true;
             }
         },
         onSheetOpen() {
-            this.currentValue = this.getStringValue(this.value);
+            this.currentValue = this.getStringValue(this.modelValue);
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -322,7 +322,6 @@ export default {
     padding-left: 16px;
     line-height: 1;
     height: 50px;
-    justify-content: center;
     align-items: center;
     box-sizing: border-box;
     user-select: none;
@@ -371,7 +370,7 @@ export default {
     color: var(--f7-color-black);
 }
 
-.theme-dark .numpad-button-text-normal {
+.dark .numpad-button-text-normal {
     color: var(--f7-color-white);
 }
 

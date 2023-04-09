@@ -21,32 +21,52 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item checkbox class="disabled" title="Category Name">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
-                        <ul slot="root" class="padding-left">
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                        </ul>
+                        <template #media>
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </template>
+                        <template #root>
+                            <ul class="padding-left">
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                            </ul>
+                        </template>
                     </f7-list-item>
                     <f7-list-item checkbox class="disabled" title="Category Name 2">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
-                        <ul slot="root" class="padding-left">
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                            <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </f7-list-item>
-                        </ul>
+                        <template #media>
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </template>
+                        <template #root>
+                            <ul class="padding-left">
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                                <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
+                                    <template #media>
+                                        <f7-icon f7="app_fill"></f7-icon>
+                                    </template>
+                                </f7-list-item>
+                            </ul>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -60,7 +80,7 @@
                     <f7-card-header>
                         <f7-accordion-toggle class="full-line">
                             <small class="card-header-content">
-                                <span>{{ categoryType | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
+                                <span>{{ getCategoryTypeName(categoryType) }}</span>
                             </small>
                             <f7-icon class="card-chevron-icon float-right" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                         </f7-accordion-toggle>
@@ -73,28 +93,28 @@
                                               :key="category.id"
                                               :title="category.name"
                                               :value="category.id"
-                                              :checked="category | subCategoriesAllChecked(filterCategoryIds)"
-                                              :indeterminate="category | subCategoriesHasButNotAllChecked(filterCategoryIds)"
+                                              :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
+                                              :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                               @change="selectSubCategories">
-                                    <f7-icon slot="media"
-                                             :icon="category.icon | categoryIcon"
-                                             :style="category.color | categoryIconStyle('var(--default-icon-color)')">
-                                    </f7-icon>
+                                    <template #media>
+                                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                    </template>
 
-                                    <ul slot="root" v-if="category.subCategories.length" class="padding-left">
-                                        <f7-list-item checkbox v-for="subCategory in category.subCategories"
-                                                      v-show="!subCategory.hidden"
-                                                      :key="subCategory.id"
-                                                      :title="subCategory.name"
-                                                      :value="subCategory.id"
-                                                      :checked="subCategory | categoryChecked(filterCategoryIds) "
-                                                      @change="selectCategory">
-                                            <f7-icon slot="media"
-                                                     :icon="subCategory.icon | categoryIcon"
-                                                     :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
-                                            </f7-icon>
-                                        </f7-list-item>
-                                    </ul>
+                                    <template #root>
+                                        <ul v-if="category.subCategories.length" class="padding-left">
+                                            <f7-list-item checkbox v-for="subCategory in category.subCategories"
+                                                          v-show="!subCategory.hidden"
+                                                          :key="subCategory.id"
+                                                          :title="subCategory.name"
+                                                          :value="subCategory.id"
+                                                          :checked="isCategoryChecked(subCategory, filterCategoryIds) "
+                                                          @change="selectCategory">
+                                                <template #media>
+                                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                </template>
+                                            </f7-list-item>
+                                        </ul>
+                                    </template>
                                 </f7-list-item>
                             </f7-list>
                         </f7-accordion-content>
@@ -118,6 +138,10 @@
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data: function () {
         const self = this;
 
@@ -151,7 +175,7 @@ export default {
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         self.modifyDefault = !!query.modifyDefault;
 
@@ -187,11 +211,11 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         save() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             const filteredCategoryIds = {};
 
@@ -277,6 +301,43 @@ export default {
                 }
             }
         },
+        getCategoryTypeName(categoryType) {
+            switch (categoryType) {
+                case this.$constants.category.allCategoryTypes.Income.toString():
+                    return this.$t('Income Categories');
+                case this.$constants.category.allCategoryTypes.Expense.toString():
+                    return this.$t('Expense Categories');
+                case this.$constants.category.allCategoryTypes.Transfer.toString():
+                    return this.$t('Transfer Categories');
+                default:
+                    return this.$t('Transaction Categories');
+            }
+        },
+        isCategoryChecked(category, filterCategoryIds) {
+            return !filterCategoryIds[category.id];
+        },
+        isSubCategoriesAllChecked(category, filterCategoryIds) {
+            for (let i = 0; i < category.subCategories.length; i++) {
+                const subCategory = category.subCategories[i];
+                if (filterCategoryIds[subCategory.id]) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
+            let checkedCount = 0;
+
+            for (let i = 0; i < category.subCategories.length; i++) {
+                const subCategory = category.subCategories[i];
+                if (!filterCategoryIds[subCategory.id]) {
+                    checkedCount++;
+                }
+            }
+
+            return checkedCount > 0 && checkedCount < category.subCategories.length;
+        },
         getCollapseStates() {
             const collapseStates = {};
 
@@ -293,45 +354,6 @@ export default {
             }
 
             return collapseStates;
-        }
-    },
-    filters: {
-        categoryTypeName(categoryType, allCategoryTypes) {
-            switch (categoryType) {
-                case allCategoryTypes.Income.toString():
-                    return 'Income Categories';
-                case allCategoryTypes.Expense.toString():
-                    return 'Expense Categories';
-                case allCategoryTypes.Transfer.toString():
-                    return 'Transfer Categories';
-                default:
-                    return 'Transaction Categories';
-            }
-        },
-        categoryChecked(category, filterCategoryIds) {
-            return !filterCategoryIds[category.id];
-        },
-        subCategoriesAllChecked(category, filterCategoryIds) {
-            for (let i = 0; i < category.subCategories.length; i++) {
-                const subCategory = category.subCategories[i];
-                if (filterCategoryIds[subCategory.id]) {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-        subCategoriesHasButNotAllChecked(category, filterCategoryIds) {
-            let checkedCount = 0;
-
-            for (let i = 0; i < category.subCategories.length; i++) {
-                const subCategory = category.subCategories[i];
-                if (!filterCategoryIds[subCategory.id]) {
-                    checkedCount++;
-                }
-            }
-
-            return checkedCount > 0 && checkedCount < category.subCategories.length;
         }
     }
 }

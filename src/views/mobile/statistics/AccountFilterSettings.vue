@@ -22,7 +22,9 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item checkbox class="disabled" title="Account Name">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                        <template #media>
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -41,10 +43,14 @@
             <f7-card-content class="no-safe-areas" :padding="false">
                 <f7-list>
                     <f7-list-item checkbox class="disabled" title="Account Name">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                        <template #media>
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </template>
                     </f7-list-item>
                     <f7-list-item checkbox class="disabled" title="Account Name 2">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
+                        <template #media>
+                            <f7-icon f7="app_fill"></f7-icon>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -71,28 +77,28 @@
                                               :key="account.id"
                                               :title="account.name"
                                               :value="account.id"
-                                              :checked="account | accountOrSubAccountsAllChecked(filterAccountIds)"
-                                              :indeterminate="account | accountOrSubAccountsHasButNotAllChecked(filterAccountIds)"
+                                              :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
+                                              :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                               @change="selectAccountOrSubAccounts">
-                                    <f7-icon slot="media"
-                                             :icon="account.icon | accountIcon"
-                                             :style="account.color | accountIconStyle('var(--default-icon-color)')">
-                                    </f7-icon>
+                                    <template #media>
+                                        <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                    </template>
 
-                                    <ul slot="root" v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
-                                        <f7-list-item checkbox v-for="subAccount in account.subAccounts"
-                                                      v-show="!subAccount.hidden"
-                                                      :key="subAccount.id"
-                                                      :title="subAccount.name"
-                                                      :value="subAccount.id"
-                                                      :checked="subAccount | accountChecked(filterAccountIds) "
-                                                      @change="selectAccount">
-                                            <f7-icon slot="media"
-                                                     :icon="subAccount.icon | accountIcon"
-                                                     :style="subAccount.color | accountIconStyle('var(--default-icon-color)')">
-                                            </f7-icon>
-                                        </f7-list-item>
-                                    </ul>
+                                    <template #root>
+                                        <ul v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
+                                            <f7-list-item checkbox v-for="subAccount in account.subAccounts"
+                                                          v-show="!subAccount.hidden"
+                                                          :key="subAccount.id"
+                                                          :title="subAccount.name"
+                                                          :value="subAccount.id"
+                                                          :checked="isAccountChecked(subAccount, filterAccountIds) "
+                                                          @change="selectAccount">
+                                                <template #media>
+                                                    <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
+                                                </template>
+                                            </f7-list-item>
+                                        </ul>
+                                    </template>
                                 </f7-list-item>
                             </f7-list>
                         </f7-accordion-content>
@@ -116,6 +122,10 @@
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data: function () {
         const self = this;
 
@@ -152,7 +162,7 @@ export default {
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         self.modifyDefault = !!query.modifyDefault;
 
@@ -188,11 +198,11 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         save() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             const filteredAccountIds = {};
 
@@ -286,6 +296,39 @@ export default {
                 }
             }
         },
+        isAccountChecked(account, filterAccountIds) {
+            return !filterAccountIds[account.id];
+        },
+        isAccountOrSubAccountsAllChecked(account, filterAccountIds) {
+            if (!account.subAccounts) {
+                return !filterAccountIds[account.id];
+            }
+
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
+                if (filterAccountIds[subAccount.id]) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
+            if (!account.subAccounts) {
+                return false;
+            }
+
+            let checkedCount = 0;
+
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
+                if (!filterAccountIds[subAccount.id]) {
+                    checkedCount++;
+                }
+            }
+
+            return checkedCount > 0 && checkedCount < account.subAccounts.length;
+        },
         hasShownAccount(accountCategory) {
             if (!this.categorizedAccounts[accountCategory.id] ||
                 !this.categorizedAccounts[accountCategory.id].accounts ||
@@ -319,41 +362,6 @@ export default {
             }
 
             return collapseStates;
-        }
-    },
-    filters: {
-        accountChecked(account, filterAccountIds) {
-            return !filterAccountIds[account.id];
-        },
-        accountOrSubAccountsAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return !filterAccountIds[account.id];
-            }
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (filterAccountIds[subAccount.id]) {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-        accountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return false;
-            }
-
-            let checkedCount = 0;
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (!filterAccountIds[subAccount.id]) {
-                    checkedCount++;
-                }
-            }
-
-            return checkedCount > 0 && checkedCount < account.subAccounts.length;
         }
     }
 }

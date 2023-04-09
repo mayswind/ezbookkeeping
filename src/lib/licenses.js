@@ -1,8 +1,8 @@
 export default {
     getLicense: () => {
-        return process.env.LICENSE;
+        return __EZBOOKKEEPING_LICENSE__;
     },
     getThirdPartyLicenses: () => {
-        return process.env.THIRD_PARTY_LICENSES || [];
+        return __EZBOOKKEEPING_THIRD_PARTY_LICENSES__ || [];
     }
 };

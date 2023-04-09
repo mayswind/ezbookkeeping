@@ -1,3 +1,5 @@
+import 'moment/dist/locale/zh-cn.js';
+
 import en from './en.js'
 import zhHans from './zh_Hans.js'
 

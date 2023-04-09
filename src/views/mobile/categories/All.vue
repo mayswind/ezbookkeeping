@@ -4,7 +4,7 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item title="Expense" link="#"></f7-list-item>
                     <f7-list-item title="Income" link="#"></f7-list-item>
                     <f7-list-item title="Transfer" link="#"></f7-list-item>
@@ -14,7 +14,7 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers>
                     <f7-list-item :title="$t('Expense')" link="/category/list?type=2"></f7-list-item>
                     <f7-list-item :title="$t('Income')" link="/category/list?type=1"></f7-list-item>
                     <f7-list-item :title="$t('Transfer')" link="/category/list?type=3"></f7-list-item>
@@ -27,6 +27,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             loading: true,
@@ -53,7 +56,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         reload(done) {
             const self = this;

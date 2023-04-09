@@ -12,30 +12,42 @@
 
         <f7-card class="skeleton-text" v-if="loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
+                <f7-list dividers class="tag-item-list">
                     <f7-list-item>
-                        <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
-                                <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
+                        <template #media>
+                            <f7-icon f7="number"></f7-icon>
+                        </template>
+                        <template #title>
+                            <div class="no-padding">
+                                <div class="display-flex">
+                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
+                                </div>
                             </div>
-                        </f7-block>
+                        </template>
                     </f7-list-item>
                     <f7-list-item>
-                        <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
-                                <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
+                        <template #media>
+                            <f7-icon f7="number"></f7-icon>
+                        </template>
+                        <template #title>
+                            <div class="no-padding">
+                                <div class="display-flex">
+                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
+                                </div>
                             </div>
-                        </f7-block>
+                        </template>
                     </f7-list-item>
                     <f7-list-item>
-                        <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
-                                <f7-icon slot="media" f7="number"></f7-icon>
-                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
+                        <template #media>
+                            <f7-icon f7="number"></f7-icon>
+                        </template>
+                        <template #title>
+                            <div class="no-padding">
+                                <div class="display-flex">
+                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
+                                </div>
                             </div>
-                        </f7-block>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -43,54 +55,56 @@
 
         <f7-card v-else-if="!loading">
             <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list v-if="noAvailableTag && !newTag">
+                <f7-list dividers v-if="noAvailableTag && !newTag">
                     <f7-list-item :title="$t('No available tag')"></f7-list-item>
                 </f7-list>
 
-                <f7-list sortable :sortable-enabled="sortable" @sortable:sort="onSort">
+                <f7-list dividers sortable class="tag-item-list" :sortable-enabled="sortable" @sortable:sort="onSort">
                     <f7-list-item v-for="tag in tags"
                                   :key="tag.id"
-                                  :id="tag | tagDomId"
+                                  :id="getTagDomId(tag)"
                                   v-show="showHidden || !tag.hidden"
-                                  swipeout @taphold.native="setSortable()">
-                        <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
-                                <f7-icon slot="media" f7="number">
-                                    <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
-                                        <f7-icon f7="eye_slash_fill"></f7-icon>
-                                    </f7-badge>
-                                </f7-icon>
-
-                                <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
-                                     v-if="editingTag.id !== tag.id">
-                                    {{ tag.name }}
+                                  swipeout @taphold="setSortable()">
+                        <template #media>
+                            <f7-icon f7="number">
+                                <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
+                                    <f7-icon f7="eye_slash_fill"></f7-icon>
+                                </f7-badge>
+                            </f7-icon>
+                        </template>
+                        <template #title>
+                            <f7-block class="no-padding">
+                                <div class="display-flex">
+                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
+                                         v-if="editingTag.id !== tag.id">
+                                        {{ tag.name }}
+                                    </div>
+                                    <f7-input class="list-title-input padding-left-half"
+                                              type="text"
+                                              :placeholder="$t('Tag Title')"
+                                              v-else-if="editingTag.id === tag.id"
+                                              v-model:value="editingTag.name"
+                                              @keyup.enter="save(tag)">
+                                    </f7-input>
                                 </div>
-                                <f7-input class="list-title-input padding-left-half"
-                                          type="text"
-                                          :placeholder="$t('Tag Title')"
-                                          :value="editingTag.name"
-                                          v-else-if="editingTag.id === tag.id"
-                                          @input="editingTag.name = $event.target.value"
-                                          @keyup.enter.native="save(tag)">
-                                </f7-input>
-                            </div>
-                        </f7-block>
-                        <f7-button slot="after"
-                                   :class="{ 'no-padding': true, 'disabled': !isTagModified(tag) }"
-                                   raised fill
-                                   icon-f7="checkmark_alt"
-                                   color="blue"
-                                   v-if="editingTag.id === tag.id"
-                                   @click="save(editingTag)">
-                        </f7-button>
-                        <f7-button slot="after"
-                                   class="no-padding margin-left-half"
-                                   raised fill
-                                   icon-f7="xmark"
-                                   color="gray"
-                                   v-if="editingTag.id === tag.id"
-                                   @click="cancelSave(editingTag)">
-                        </f7-button>
+                            </f7-block>
+                        </template>
+                        <template #after>
+                            <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(tag) }"
+                                       raised fill
+                                       icon-f7="checkmark_alt"
+                                       color="blue"
+                                       v-if="editingTag.id === tag.id"
+                                       @click="save(editingTag)">
+                            </f7-button>
+                            <f7-button class="no-padding margin-left-half"
+                                       raised fill
+                                       icon-f7="xmark"
+                                       color="gray"
+                                       v-if="editingTag.id === tag.id"
+                                       @click="cancelSave(editingTag)">
+                            </f7-button>
+                        </template>
                         <f7-swipeout-actions left v-if="sortable && editingTag.id !== tag.id">
                             <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
                                                 overswipe close @click="hide(tag, !tag.hidden)">
@@ -106,32 +120,35 @@
                     </f7-list-item>
 
                     <f7-list-item v-if="newTag">
-                        <f7-block slot="title" class="no-padding">
-                            <div class="display-flex">
-                                <f7-icon slot="media" f7="number"></f7-icon>
-                                <f7-input class="list-title-input padding-left-half"
-                                          type="text"
-                                          :placeholder="$t('Tag Title')"
-                                          :value="newTag.name"
-                                          @input="newTag.name = $event.target.value"
-                                          @keyup.enter.native="save(newTag)">
-                                </f7-input>
+                        <template #media>
+                            <f7-icon f7="number"></f7-icon>
+                        </template>
+                        <template #title>
+                            <div class="no-padding">
+                                <div class="display-flex">
+                                    <f7-input class="list-title-input padding-left-half"
+                                              type="text"
+                                              :placeholder="$t('Tag Title')"
+                                              v-model:value="newTag.name"
+                                              @keyup.enter="save(newTag)">
+                                    </f7-input>
+                                </div>
                             </div>
-                        </f7-block>
-                        <f7-button slot="after"
-                                   :class="{ 'no-padding': true, 'disabled': !isTagModified(newTag) }"
-                                   raised fill
-                                   icon-f7="checkmark_alt"
-                                   color="blue"
-                                   @click="save(newTag)">
-                        </f7-button>
-                        <f7-button slot="after"
-                                   class="no-padding margin-left-half"
-                                   raised fill
-                                   icon-f7="xmark"
-                                   color="gray"
-                                   @click="cancelSave(newTag)">
-                        </f7-button>
+                        </template>
+                        <template #after>
+                            <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(newTag) }"
+                                       raised fill
+                                       icon-f7="checkmark_alt"
+                                       color="blue"
+                                       @click="save(newTag)">
+                            </f7-button>
+                            <f7-button class="no-padding margin-left-half"
+                                       raised fill
+                                       icon-f7="xmark"
+                                       color="gray"
+                                       @click="cancelSave(newTag)">
+                            </f7-button>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -160,6 +177,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             newTag: null,
@@ -216,7 +236,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         reload(done) {
             if (this.sortable || this.hasEditingTag) {
@@ -254,12 +274,17 @@ export default {
         onSort(event) {
             const self = this;
 
-            if (!event || !event.el || !event.el.id || event.el.id.indexOf('tag_') !== 0) {
+            if (!event || !event.el || !event.el.id) {
                 self.$toast('Unable to move tag');
                 return;
             }
 
-            const id = event.el.id.substring(4); // tag_
+            const id = self.parseTagIdFromDomId(event.el.id);
+
+            if (!id) {
+                self.$toast('Unable to move tag');
+                return;
+            }
 
             self.$store.dispatch('changeTagDisplayOrder', {
                 tagId: id,
@@ -367,8 +392,6 @@ export default {
         },
         remove(tag, confirm) {
             const self = this;
-            const app = self.$f7;
-            const $$ = app.$;
 
             if (!tag) {
                 self.$alert('An error has occurred');
@@ -388,9 +411,7 @@ export default {
             self.$store.dispatch('deleteTag', {
                 tag: tag,
                 beforeResolve: (done) => {
-                    app.swipeout.delete($$(`#${self.$options.filters.tagDomId(tag)}`), () => {
-                        done();
-                    });
+                    self.$ui.onSwipeoutDeleted(self.getTagDomId(tag), done);
                 }
             }).then(() => {
                 self.$hideLoading();
@@ -401,17 +422,26 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        }
-    },
-    filters: {
-        tagDomId(category) {
+        },
+        getTagDomId(category) {
             return 'tag_' + category.id;
+        },
+        parseTagIdFromDomId(domId) {
+            if (!domId || domId.indexOf('tag_') !== 0) {
+                return null;
+            }
+
+            return domId.substring(4); // tag_
         }
     }
 }
 </script>
 
 <style>
+.tag-item-list.list .item-media + .item-inner {
+    margin-left: 5px;
+}
+
 .transaction-tag-list-item-content {
     overflow: hidden;
     text-overflow: ellipsis;

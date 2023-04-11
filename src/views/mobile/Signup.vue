@@ -129,9 +129,11 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popup push swipe-to-close :close-on-escape="false" :opened="showPresetCategories" @popup:closed="showPresetCategories = false">
+        <f7-popup push backdrop swipe-to-close="to-bottom" swipe-handler=".swipe-navbar"
+                  :close-on-escape="false" :opened="showPresetCategories"
+                  @popup:closed="showPresetCategories = false">
             <f7-page>
-                <f7-navbar>
+                <f7-navbar class="swipe-navbar">
                     <f7-nav-left>
                         <f7-link popup-close :text="$t('Cancel')"></f7-link>
                     </f7-nav-left>
@@ -142,14 +144,14 @@
                         <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-link>
                     </f7-nav-right>
                 </f7-navbar>
-                <f7-card v-for="(categories, categoryType) in presetCategories" :key="categoryType">
+                <f7-card header-divider v-for="(categories, categoryType) in presetCategories" :key="categoryType">
                     <f7-card-header>
                         <small class="card-header-content">
                             <span>{{ getCategoryTypeName(categoryType) }}</span>
                         </small>
                     </f7-card-header>
                     <f7-card-content class="no-safe-areas" :padding="false">
-                        <f7-list v-if="showPresetCategories">
+                        <f7-list dividers v-if="showPresetCategories">
                             <f7-list-item v-for="(category, idx) in categories"
                                           :key="idx"
                                           :accordion-item="!!category.subCategories.length"
@@ -417,3 +419,4 @@ export default {
     }
 };
 </script>
+

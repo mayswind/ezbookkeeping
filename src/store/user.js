@@ -320,7 +320,7 @@ export function getExportedUserData() {
         }).catch(error => {
             logger.error('failed to get user statistics data', error);
 
-            if (error.response.headers['content-type'] === 'text/text' && error.response && error.response.data) {
+            if (error.response && error.response.headers['content-type'] === 'text/text' && error.response && error.response.data) {
                 reject({ message: 'error.' + error.response.data });
             } else if (!error.processed) {
                 reject({ message: 'Unable to get exported user data' });

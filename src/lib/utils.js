@@ -588,7 +588,7 @@ function stringToArrayBuffer(str){
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
 }
 
-function getKeyByValue(src, value, keyField, nameField, defaultKey) {
+function getNameByKeyValue(src, value, keyField, nameField, defaultName) {
     if (isArray(src)) {
         if (keyField) {
             for (let i = 0; i < src.length; i++) {
@@ -627,7 +627,7 @@ function getKeyByValue(src, value, keyField, nameField, defaultKey) {
         }
     }
 
-    return defaultKey;
+    return defaultName;
 }
 
 function generateRandomString() {
@@ -886,7 +886,7 @@ export default {
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,
-    getKeyByValue,
+    getNameByKeyValue,
     generateRandomString,
     parseUserAgent,
     parseDeviceInfo,

@@ -398,7 +398,7 @@ export default {
             });
         },
         getDayOfWeekName(dayOfWeek) {
-            const weekName = this.$utilities.getKeyByValue(this.$constants.datetime.allWeekDays, dayOfWeek, 'type', 'name');
+            const weekName = this.$utilities.getNameByKeyValue(this.$constants.datetime.allWeekDays, dayOfWeek, 'type', 'name');
             const i18nWeekNameKey = `datetime.${weekName}.long`;
             return this.$t(i18nWeekNameKey);
         },

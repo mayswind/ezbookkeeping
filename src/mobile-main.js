@@ -94,6 +94,7 @@ import {
     getAllLanguageInfos,
     getLanguageInfo,
     getDefaultLanguage,
+    transateIf,
     getAllLongMonthNames,
     getAllShortMonthNames,
     getAllLongWeekdayNames,
@@ -289,6 +290,7 @@ app.config.globalProperties.$locale = {
     getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18n.global.t),
     initLocale: initLocale
 };
+app.config.globalProperties.$tIf = (text, isTranslate) => transateIf(text, isTranslate, i18n.global.t);
 
 app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);
 app.config.globalProperties.$confirm = (message, confirmCallback, cancelCallback) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);

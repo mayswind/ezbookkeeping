@@ -172,6 +172,14 @@ export function getDefaultLanguage() {
     return browserLocale;
 }
 
+export function transateIf(text, isTranslate, translateFn) {
+    if (isTranslate) {
+        return translateFn(text);
+    }
+
+    return text;
+}
+
 export function getAllLongMonthNames(translateFn) {
     return [
         translateFn('datetime.January.long'),

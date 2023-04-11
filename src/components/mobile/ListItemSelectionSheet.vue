@@ -1,19 +1,22 @@
 <template>
-    <f7-sheet :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close backdrop swipe-handler=".swipe-handler"
+              :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show"
+              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler" @click="close"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
-            <f7-list no-hairlines class="no-margin-top no-margin-bottom">
+        <f7-page-content class="margin-top no-padding-top">
+            <f7-list dividers no-hairlines class="no-margin-top no-margin-bottom">
                 <f7-list-item link="#" no-chevron
                               v-for="(item, index) in items"
                               :key="getItemValue(item, index, keyField, valueType)"
                               :class="{ 'list-item-selected': isSelected(item, index) }"
                               :value="getItemValue(item, index, valueField, valueType)"
-                              :title="getTranslateItemValue(item, titleField, item, titleI18n)"
+                              :title="$tIf((titleField ? item[titleField] : item), titleI18n)"
                               @click="onItemClicked(item, index)">
                     <template #media>
                         <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]" v-if="iconField"></ItemIcon>
@@ -64,19 +67,6 @@ export default {
                 return item;
             }
         },
-        getTranslateItemValue(item, fieldName, defaultValue, translate) {
-            let content = defaultValue;
-
-            if (fieldName) {
-                content = item[fieldName];
-            }
-
-            if (translate && content) {
-                content = this.$t(content);
-            }
-
-            return content;
-        },
         onItemClicked(item, index) {
             if (this.valueType === 'index') {
                 this.currentValue = index;
@@ -89,14 +79,14 @@ export default {
             }
 
             this.$emit('update:modelValue', this.currentValue);
-            this.$emit('update:show', false);
+            this.close();
         },
         onSheetOpen(event) {
             this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         },
         isSelected(item, index) {
             if (this.valueType === 'index') {
@@ -129,6 +119,9 @@ export default {
             }
 
             container.scrollTop(targetPos);
+        },
+        close() {
+            this.$emit('update:show', false);
         }
     }
 }

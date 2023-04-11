@@ -1,6 +1,8 @@
 <template>
-    <f7-sheet style="height:auto" :opened="show" @sheet:closed="onSheetClosed">
-        <f7-page-content>
+    <f7-sheet swipe-to-close backdrop swipe-handler=".swipe-handler" style="height:auto"
+              :opened="show" @sheet:closed="onSheetClosed">
+        <div class="swipe-handler" @click="close"></div>
+        <f7-page-content class="margin-top no-padding-top">
             <div class="display-flex padding justify-content-space-between align-items-center">
                 <div style="font-size: 18px" v-if="title"><b>{{ title }}</b></div>
             </div>
@@ -52,10 +54,10 @@ export default {
     },
     methods: {
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         },
         cancel() {
-            this.$emit('update:show', false);
+            this.close();
         },
         makeCopyToClipboardClickable() {
             const self = this;
@@ -73,6 +75,9 @@ export default {
                     }
                 });
             }
+        },
+        close() {
+            this.$emit('update:show', false);
         }
     }
 }

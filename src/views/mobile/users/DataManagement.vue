@@ -33,8 +33,12 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet style="height:auto" :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
-            <f7-page-content>
+        <f7-sheet swipe-handler=".swipe-handler" backdrop style="height:auto"
+                  :swipe-to-close="!exportingData" :close-on-escape="!exportingData"
+                  :close-by-backdrop-click="!exportingData" :close-by-outside-click="!exportingData"
+                  :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
+            <div class="swipe-handler" @click="!exportingData && (showExportDataSheet = false)"></div>
+            <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
                 </div>

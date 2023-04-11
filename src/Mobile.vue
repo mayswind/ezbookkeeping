@@ -307,6 +307,30 @@ i.icon.la, i.icon.las, i.icon.lab {
     height: 13px;
 }
 
+/** Swipe handler **/
+.swipe-handler {
+    height: 16px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    cursor: pointer;
+    z-index: 10
+}
+
+.swipe-handler:after {
+    content: "";
+    width: 36px;
+    height: 6px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -18px;
+    margin-top: -3px;
+    border-radius: 3px;
+    background: #666
+}
+
 /** Nested List item for framework7 **/
 .nested-list-item .item-title {
     width: 100%;
@@ -354,16 +378,5 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {
     padding-right: var(--f7-safe-area-right) !important;
-}
-
-/** Replacing the default style of Vue-pincode-input **/
-.vue-pincode-input {
-    margin: 3px !important;
-    padding: 5px !important;
-    box-shadow: 0 0 2px rgba(0,0,0,.5) !important;
-}
-
-.dark .vue-pincode-input {
-    box-shadow: 0 0 2px rgba(255,255,255,.5) !important;
 }
 </style>

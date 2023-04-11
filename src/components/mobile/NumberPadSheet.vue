@@ -1,6 +1,8 @@
 <template>
-    <f7-sheet class="numpad-sheet" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-page-content class="no-margin no-padding-top">
+    <f7-sheet swipe-to-close backdrop swipe-handler=".swipe-handler" class="numpad-sheet" style="height: auto"
+              :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+        <div class="swipe-handler" @click="close"></div>
+        <f7-page-content class="margin-top no-padding-top">
             <div class="numpad-values">
                 <span class="numpad-value" :style="{ fontSize: currentDisplayFontSize + 'px' }">{{ currentDisplay }}</span>
             </div>
@@ -292,16 +294,19 @@ export default {
                 const value = this.$utilities.stringCurrencyToNumeric(this.currentValue);
 
                 this.$emit('update:modelValue', value);
-                this.$emit('update:show', false);
+                this.close();
 
                 return true;
             }
+        },
+        close() {
+            this.$emit('update:show', false);
         },
         onSheetOpen() {
             this.currentValue = this.getStringValue(this.modelValue);
         },
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         }
     }
 }

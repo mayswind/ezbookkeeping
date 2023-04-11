@@ -74,7 +74,7 @@
                         :key="currentLocale + '_lang'"
                         :header="$t('Language')"
                         :title="currentLanguageName"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Language'), searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
                     >
                         <select v-model="currentLocale">
                             <option v-for="(lang, locale) in allLanguages"
@@ -87,7 +87,7 @@
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :key="currentLocale + '_currency'"
                         :header="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Default Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
                     >
                         <template #title>
                             <f7-block class="no-padding no-margin">
@@ -107,7 +107,7 @@
                         :key="currentLocale + '_firstDayOfWeek'"
                         :header="$t('First Day of Week')"
                         :title="getDayOfWeekName(user.firstDayOfWeek)"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('First Day of Week'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
                     >
                         <select v-model="user.firstDayOfWeek">
                             <option v-for="weekDay in allWeekDays"

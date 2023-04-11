@@ -14,7 +14,7 @@
                     <f7-list-item
                         class="list-item-with-header-and-title list-item-no-item-after"
                         :header="$t('Base Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, pageTitle: $t('Base Currency'), searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }"
+                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Base Currency'), popupCloseLinkText: $t('Done') }"
                     >
                         <template #title>
                             <div class="no-padding no-margin">

@@ -53,26 +53,26 @@ export default defineConfig(async ({ command, mode }) => {
                 strategies: 'generateSW',
                 injectRegister: 'null',
                 manifest: {
-                    name: "ezBookkeeping",
-                    short_name: "ezBookkeeping",
-                    description: "A lightweight personal bookkeeping app hosted by yourself.",
-                    theme_color: "#C67E48",
-                    background_color: "#F6F7F8",
-                    start_url: "./",
-                    scope: "./",
-                    display: "standalone",
+                    name: 'ezBookkeeping',
+                    short_name: 'ezBookkeeping',
+                    description: 'A lightweight personal bookkeeping app hosted by yourself.',
+                    theme_color: '#C67E48',
+                    background_color: '#F6F7F8',
+                    start_url: './',
+                    scope: './',
+                    display: 'standalone',
                     related_applications: [],
                     prefer_related_applications: false,
                     icons: [
                         {
-                            "src": "img/ezbookkeeping-192.png",
-                            "sizes": "192x192",
-                            "type": "image/png"
+                            src: 'img/ezbookkeeping-192.png',
+                            sizes: '192x192',
+                            type: 'image/png'
                         },
                         {
-                            "src": "img/ezbookkeeping-512.png",
-                            "sizes": "512x512",
-                            "type": "image/png"
+                            src: 'img/ezbookkeeping-512.png',
+                            sizes: '512x512',
+                            type: 'image/png'
                         }
                     ]
                 },
@@ -120,13 +120,12 @@ export default defineConfig(async ({ command, mode }) => {
                     chunkFileNames: 'js/[name]-[hash].js',
                     entryFileNames: 'js/[name]-[hash].js',
                     manualChunks: function (id) {
-                        if (id.includes('node_modules')) {
+                        if (/[\\/]node_modules[\\/]/i.test(id)) {
                             return 'vendor';
                         }
                     }
                 },
-                treeshake: false,
-                makeAbsoluteExternalsRelative: true
+                treeshake: false
             },
         },
         resolve: {

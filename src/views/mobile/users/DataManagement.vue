@@ -33,7 +33,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-sheet swipe-handler=".swipe-handler" backdrop style="height:auto"
+        <f7-sheet swipe-handler=".swipe-handler" style="height:auto"
                   :swipe-to-close="!exportingData" :close-on-escape="!exportingData"
                   :close-by-backdrop-click="!exportingData" :close-by-outside-click="!exportingData"
                   :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">

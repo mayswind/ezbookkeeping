@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet swipe-to-close backdrop swipe-handler=".swipe-handler"
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
               :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>

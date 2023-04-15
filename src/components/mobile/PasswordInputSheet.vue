@@ -1,5 +1,5 @@
 <template>
-    <f7-sheet swipe-to-close backdrop swipe-handler=".swipe-handler" style="height:auto"
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" style="height:auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <div class="swipe-handler" @click="close"></div>
         <f7-page-content class="margin-top no-padding-top">

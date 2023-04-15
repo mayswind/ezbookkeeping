@@ -129,7 +129,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popup push backdrop swipe-to-close="to-bottom" swipe-handler=".swipe-navbar"
+        <f7-popup push swipe-to-close="to-bottom" swipe-handler=".swipe-navbar"
                   :close-on-escape="false" :opened="showPresetCategories"
                   @popup:closed="showPresetCategories = false">
             <f7-page>

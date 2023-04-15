@@ -13,15 +13,13 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popup push swipe-to-close class="license-popup">
+        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
-                <f7-navbar>
-                    <f7-nav-title :title="$t('License')"></f7-nav-title>
-                    <f7-nav-right>
-                        <f7-link popup-close :text="$t('Done')"></f7-link>
-                    </f7-nav-right>
-                </f7-navbar>
-                <f7-block>
+                <template #fixed>
+                    <div class="swipe-handler"></div>
+                </template>
+                <f7-block-title large>{{ $t('License') }}</f7-block-title>
+                <f7-block strong outline>
                     <p>
                         <span v-for="(line, num) in licenseLines" :key="num"
                               :style="{ 'display': line ? 'initial' : 'block', 'padding' : line ? '0' : '0 0 1em 0' }">

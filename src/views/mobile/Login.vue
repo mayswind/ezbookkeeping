@@ -74,21 +74,25 @@
                     <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list no-hairlines strong class="no-margin">
                         <f7-list-input
                             type="number"
                             autocomplete="one-time-code"
                             outline
+                            floating-label
                             clear-button
                             v-if="twoFAVerifyType === 'passcode'"
+                            :label="$t('Passcode')"
                             :placeholder="$t('Passcode')"
                             v-model:value="passcode"
                             @keyup.enter="verify"
                         ></f7-list-input>
                         <f7-list-input
                             outline
+                            floating-label
                             clear-button
                             v-if="twoFAVerifyType === 'backupcode'"
+                            :label="$t('Backup Code')"
                             :placeholder="$t('Backup Code')"
                             v-model:value="backupCode"
                             @keyup.enter="verify"

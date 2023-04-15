@@ -46,6 +46,9 @@ export default {
         'cancelDisabled',
         'show'
     ],
+    emits: [
+        'passcode:confirm'
+    ],
     data() {
         return {
             currentPasscode: ''

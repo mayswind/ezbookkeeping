@@ -38,159 +38,133 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-card header-divider class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <small class="card-header-content">Account Category</small>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers class="account-list">
-                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                    <div class="nested-list-item-title">Account Name</div>
-                                </div>
-                            </f7-block>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item group-title>
+                <small>Account Category</small>
+            </f7-list-item>
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                <template #title>
+                    <div class="display-flex padding-top-half padding-bottom-half">
+                        <f7-icon f7="app_fill"></f7-icon>
+                        <div class="nested-list-item-title">Account Name</div>
+                    </div>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card header-divider class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <small class="card-header-content">Account Category 2</small>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers class="account-list">
-                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                    <div class="nested-list-item-title">Account Name</div>
-                                </div>
-                            </f7-block>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                    <div class="nested-list-item-title">Account Name 2</div>
-                                </div>
-                            </f7-block>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item group-title>
+                <small>Account Category 2</small>
+            </f7-list-item>
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                <template #title>
+                    <div class="display-flex padding-top-half padding-bottom-half">
+                        <f7-icon f7="app_fill"></f7-icon>
+                        <div class="nested-list-item-title">Account Name</div>
+                    </div>
+                </template>
+            </f7-list-item>
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                <template #title>
+                    <div class="display-flex padding-top-half padding-bottom-half">
+                        <f7-icon f7="app_fill"></f7-icon>
+                        <div class="nested-list-item-title">Account Name 2</div>
+                    </div>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card header-divider class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <small class="card-header-content">Account Category 3</small>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers class="account-list">
-                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                    <div class="nested-list-item-title">Account Name</div>
-                                </div>
-                            </f7-block>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                    <div class="nested-list-item-title">Account Name 2</div>
-                                </div>
-                            </f7-block>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item group-title>
+                <small>Account Category 3</small>
+            </f7-list-item>
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                <template #title>
+                    <div class="display-flex padding-top-half padding-bottom-half">
+                        <f7-icon f7="app_fill"></f7-icon>
+                        <div class="nested-list-item-title">Account Name</div>
+                    </div>
+                </template>
+            </f7-list-item>
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+                <template #title>
+                    <div class="display-flex padding-top-half padding-bottom-half">
+                        <f7-icon f7="app_fill"></f7-icon>
+                        <div class="nested-list-item-title">Account Name 2</div>
+                    </div>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card header-divider v-if="!loading && noAvailableAccount">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('No available account')"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-vertical" v-if="!loading && noAvailableAccount">
+            <f7-list-item :title="$t('No available account')"></f7-list-item>
+        </f7-list>
 
-        <f7-card header-divider v-for="accountCategory in allAccountCategories"
-                 :key="accountCategory.id" v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
-            <f7-card-header>
-                <small class="card-header-content">
-                    <span>{{ $t(accountCategory.name) }}</span>
-                    <span style="margin-left: 10px">{{ $locale.getDisplayCurrency(accountCategoryTotalBalance(accountCategory), defaultCurrency) }}</span>
-                </small>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers sortable class="account-list" :sortable-enabled="sortable" @sortable:sort="onSort" v-if="categorizedAccounts[accountCategory.id]">
-                    <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
-                                  :key="account.id" :id="getAccountDomId(account)"
-                                  :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
-                                  :after="$locale.getDisplayCurrency(accountBalance(account), account.currency)"
-                                  :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
-                                  swipeout @taphold="setSortable()"
-                    >
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex padding-top-half padding-bottom-half">
-                                    <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
-                                        <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
-                                            <f7-icon f7="eye_slash_fill"></f7-icon>
-                                        </f7-badge>
-                                    </ItemIcon>
-                                    <div class="nested-list-item-title">
-                                        <span>{{ account.name }}</span>
-                                        <div class="item-footer" slot="footer" v-if="account.comment">{{ account.comment }}</div>
-                                    </div>
-                                </div>
-                                <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
-                                    <ul class="no-padding">
-                                        <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
-                                                      :key="subAccount.id" :id="getAccountDomId(subAccount)"
-                                                      :title="subAccount.name" :footer="subAccount.comment" :after="$locale.getDisplayCurrency(accountBalance(subAccount), subAccount.currency)"
-                                                      :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
-                                        >
-                                            <template #media>
-                                                <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
-                                                    <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
-                                                        <f7-icon f7="eye_slash_fill"></f7-icon>
-                                                    </f7-badge>
-                                                </ItemIcon>
-                                            </template>
-                                        </f7-list-item>
-                                    </ul>
-                                </li>
-                            </f7-block>
-                        </template>
-                        <f7-swipeout-actions left v-if="sortable">
-                            <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe close @click="hide(account, !account.hidden)">
-                                <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                        <f7-swipeout-actions right v-if="!sortable">
-                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
-                            <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account, false)">
-                                <f7-icon f7="trash"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <div :key="accountCategory.id"
+             v-for="accountCategory in allAccountCategories"
+             v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
+            <f7-list strong inset dividers sortable class="account-list margin-vertical"
+                     :sortable-enabled="sortable"
+                     v-if="categorizedAccounts[accountCategory.id]"
+                     @sortable:sort="onSort">
+                <f7-list-item group-title :sortable="false">
+                    <small>
+                        <span>{{ $t(accountCategory.name) }}</span>
+                        <span style="margin-left: 10px">{{ $locale.getDisplayCurrency(accountCategoryTotalBalance(accountCategory), defaultCurrency) }}</span>
+                    </small>
+                </f7-list-item>
+                <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
+                              :key="account.id" :id="getAccountDomId(account)"
+                              :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
+                              :after="$locale.getDisplayCurrency(accountBalance(account), account.currency)"
+                              :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
+                              swipeout @taphold="setSortable()"
+                >
+                    <template #title>
+                        <div class="display-flex padding-top-half padding-bottom-half">
+                            <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                                <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
+                                    <f7-icon f7="eye_slash_fill"></f7-icon>
+                                </f7-badge>
+                            </ItemIcon>
+                            <div class="nested-list-item-title">
+                                <span>{{ account.name }}</span>
+                                <div class="item-footer" slot="footer" v-if="account.comment">{{ account.comment }}</div>
+                            </div>
+                        </div>
+                        <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
+                            <ul class="no-padding">
+                                <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
+                                              :key="subAccount.id" :id="getAccountDomId(subAccount)"
+                                              :title="subAccount.name" :footer="subAccount.comment" :after="$locale.getDisplayCurrency(accountBalance(subAccount), subAccount.currency)"
+                                              :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
+                                >
+                                    <template #media>
+                                        <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
+                                            <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
+                                                <f7-icon f7="eye_slash_fill"></f7-icon>
+                                            </f7-badge>
+                                        </ItemIcon>
+                                    </template>
+                                </f7-list-item>
+                            </ul>
+                        </li>
+                    </template>
+                    <f7-swipeout-actions left v-if="sortable">
+                        <f7-swipeout-button :color="account.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                                            overswipe close @click="hide(account, !account.hidden)">
+                            <f7-icon :f7="account.hidden ? 'eye' : 'eye_slash'"></f7-icon>
+                        </f7-swipeout-button>
+                    </f7-swipeout-actions>
+                    <f7-swipeout-actions right v-if="!sortable">
+                        <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(account)"></f7-swipeout-button>
+                        <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(account, false)">
+                            <f7-icon f7="trash"></f7-icon>
+                        </f7-swipeout-button>
+                    </f7-swipeout-actions>
+                </f7-list-item>
+            </f7-list>
+        </div>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -503,8 +477,8 @@ export default {
 
             self.$store.dispatch('changeAccountDisplayOrder', {
                 accountId: id,
-                from: event.from,
-                to: event.to
+                from: event.from - 1, // first item in the list is title, so the index need minus one
+                to: event.to - 1
             }).then(() => {
                 self.displayOrderModified = true;
             }).catch(error => {
@@ -638,6 +612,7 @@ export default {
 }
 
 .account-list {
+    --f7-list-group-title-height: 36px;
     --f7-list-item-footer-font-size: 13px;
 }
 

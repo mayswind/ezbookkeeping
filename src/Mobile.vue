@@ -260,6 +260,18 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-weight: bold;
 }
 
+.list.list-dividers li.list-group-title:first-child {
+    border-radius: var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius) 0 0;
+}
+
+.list.list-dividers li.list-group-title:first-child:before {
+    background-color: transparent;
+}
+
+.list.inset li.list-group-title:first-child > a.button {
+    border-radius: var(--f7-button-border-radius);
+}
+
 .list .item-content .list-item-checked-icon {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));
@@ -374,6 +386,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     margin-right: var(--f7-list-item-media-margin);
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.nested-list-item:last-child > .swipeout-content > .item-link > .item-content > .item-inner:after {
+    background-color: transparent;
 }
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {

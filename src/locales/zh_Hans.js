@@ -547,6 +547,7 @@ export default {
         'user token id is invalid': '用户认证令牌ID无效',
         'token is not found': '认证令牌不存在',
         'token is expired': '认证令牌已过期',
+        'token is empty': '认证令牌为空',
         'passcode is invalid': '验证码无效',
         'two factor backup code is invalid': '两步验证备用码无效',
         'two factor is not enabled': '两步验证没有启用',

@@ -65,7 +65,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	_, claims, err := a.tokens.ParseToken(c)
 
 	if err != nil {
-		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))
 	}
 
 	uid, err := utils.StringToInt64(claims.Id)

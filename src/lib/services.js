@@ -47,6 +47,7 @@ axios.interceptors.response.use(response => {
             || errorCode === 202004 // current token type is invalid
             || errorCode === 202005 // current token requires two factor authorization
             || errorCode === 202006 // current token does not require two factor authorization
+            || errorCode === 202012 // token is empty
         ) {
             userState.clearTokenAndUserInfo(false);
             location.reload();

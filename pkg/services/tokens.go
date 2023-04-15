@@ -100,6 +100,10 @@ func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenC
 		}, request.WithClaims(claims))
 
 	if err != nil {
+		if err == request.ErrNoTokenInRequest {
+			return nil, nil, errs.ErrTokenIsEmpty
+		}
+
 		return nil, nil, err
 	}
 

@@ -547,6 +547,7 @@ export default {
         'user token id is invalid': 'User token ID is invalid',
         'token is not found': 'Token is not found',
         'token is expired': 'Token is expired',
+        'token is empty': 'Token is empty',
         'passcode is invalid': 'Passcode is invalid',
         'two factor backup code is invalid': 'Two factor backup code is invalid',
         'two factor is not enabled': 'Two factor is not enabled',

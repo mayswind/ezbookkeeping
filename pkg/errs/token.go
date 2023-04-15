@@ -18,4 +18,5 @@ var (
 	ErrInvalidUserTokenId        = NewNormalError(NormalSubcategoryToken, 9, http.StatusBadRequest, "user token id is invalid")
 	ErrTokenRecordNotFound       = NewNormalError(NormalSubcategoryToken, 10, http.StatusBadRequest, "token is not found")
 	ErrTokenExpired              = NewNormalError(NormalSubcategoryToken, 11, http.StatusBadRequest, "token is expired")
+	ErrTokenIsEmpty              = NewNormalError(NormalSubcategoryToken, 12, http.StatusBadRequest, "token is empty")
 )

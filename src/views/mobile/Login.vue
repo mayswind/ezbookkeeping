@@ -12,8 +12,8 @@
                 clear-button
                 :label="$t('Username')"
                 :placeholder="$t('Your username or email')"
-                :value="username"
-                @input="username = $event.target.value; tempToken = ''"
+                v-model:value="username"
+                @input="tempToken = ''"
             ></f7-list-input>
             <f7-list-input
                 type="password"
@@ -21,8 +21,8 @@
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password')"
-                :value="password"
-                @input="password = $event.target.value; tempToken = ''"
+                v-model:value="password"
+                @input="tempToken = ''"
                 @keyup.enter="loginByPressEnter"
             ></f7-list-input>
         </f7-list>
@@ -82,8 +82,7 @@
                             clear-button
                             v-if="twoFAVerifyType === 'passcode'"
                             :placeholder="$t('Passcode')"
-                            :value="passcode"
-                            @input="passcode = $event.target.value"
+                            v-model:value="passcode"
                             @keyup.enter="verify"
                         ></f7-list-input>
                         <f7-list-input
@@ -91,8 +90,7 @@
                             clear-button
                             v-if="twoFAVerifyType === 'backupcode'"
                             :placeholder="$t('Backup Code')"
-                            :value="backupCode"
-                            @input="backupCode = $event.target.value"
+                            v-model:value="backupCode"
                             @keyup.enter="verify"
                         ></f7-list-input>
                     </f7-list>

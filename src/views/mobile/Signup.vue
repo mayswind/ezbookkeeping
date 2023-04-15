@@ -15,8 +15,7 @@
                 clear-button
                 :label="$t('Username')"
                 :placeholder="$t('Your username')"
-                :value="user.username"
-                @input="user.username = $event.target.value"
+                v-model:value="user.username"
             ></f7-list-input>
 
             <f7-list-input
@@ -25,8 +24,7 @@
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password, at least 6 characters')"
-                :value="user.password"
-                @input="user.password = $event.target.value"
+                v-model:value="user.password"
             ></f7-list-input>
 
             <f7-list-input
@@ -35,8 +33,7 @@
                 clear-button
                 :label="$t('Confirmation Password')"
                 :placeholder="$t('Re-enter the password')"
-                :value="user.confirmPassword"
-                @input="user.confirmPassword = $event.target.value"
+                v-model:value="user.confirmPassword"
             ></f7-list-input>
 
             <f7-list-input
@@ -45,8 +42,7 @@
                 clear-button
                 :label="$t('E-mail')"
                 :placeholder="$t('Your email address')"
-                :value="user.email"
-                @input="user.email = $event.target.value"
+                v-model:value="user.email"
             ></f7-list-input>
 
             <f7-list-input
@@ -55,8 +51,7 @@
                 clear-button
                 :label="$t('Nickname')"
                 :placeholder="$t('Your nickname')"
-                :value="user.nickname"
-                @input="user.nickname = $event.target.value"
+                v-model:value="user.nickname"
             ></f7-list-input>
 
             <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>

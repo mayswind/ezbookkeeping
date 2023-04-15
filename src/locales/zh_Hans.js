@@ -979,6 +979,8 @@ export default {
     'You have logged out all other sessions': '您已经退出其他所有会话',
     'Unable to logout all other sessions': '无法退出其他所有会话',
     'Regenerate Backup Codes': '重新生成备用码',
+    'Enable Two-Factor Authentication': '启用两步验证',
+    'Disable Two-Factor Authentication': '禁用两步验证',
     'Please use two factor authentication app scan the below qrcode and input current passcode': '请使用两步验证应用扫描下方的二维码并输入当前的验证码',
     'Please enter your current password when disable two factor authentication': '禁用两步验证时需要输入您的当前密码',
     'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.': '重新生成两步验证备用码时需要输入您的当前密码。如果您重新生成备用码，之前的备用码将失效。',

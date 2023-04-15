@@ -35,137 +35,133 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-card :class="{ 'skeleton-text': loading }">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.Today.type" chevron-center>
-                        <template #media>
-                            <f7-icon f7="calendar_today"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="padding-top-half">
-                                <span v-if="loading">Today</span>
-                                <span v-else-if="!loading">{{ $t('Today') }}</span>
-                            </div>
-                        </template>
-                        <template #footer>
-                            <div class="overview-transaction-footer padding-bottom-half">
-                                <span v-if="loading">MM/DD/YYYY</span>
-                                <span v-else-if="!loading">{{ displayDateRange.today.displayTime }}</span>
-                            </div>
-                        </template>
-                        <template #after>
-                            <div>
-                                <div class="text-color-red">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.incomeAmount }}</small>
-                                </div>
-                                <div class="text-color-teal">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.expenseAmount }}</small>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
+        <f7-list strong inset dividers class="margin-top" :class="{ 'skeleton-text': loading }">
+            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.Today.type" chevron-center>
+                <template #media>
+                    <f7-icon f7="calendar_today"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="padding-top-half">
+                        <span v-if="loading">Today</span>
+                        <span v-else-if="!loading">{{ $t('Today') }}</span>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="overview-transaction-footer padding-bottom-half">
+                        <span v-if="loading">MM/DD/YYYY</span>
+                        <span v-else-if="!loading">{{ displayDateRange.today.displayTime }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>
+                        <div class="text-color-red">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.incomeAmount }}</small>
+                        </div>
+                        <div class="text-color-teal">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.expenseAmount }}</small>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisWeek.type" chevron-center>
-                        <template #media>
-                            <f7-icon f7="calendar"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="padding-top-half">
-                                <span v-if="loading">This Week</span>
-                                <span v-else-if="!loading">{{ $t('This Week') }}</span>
-                            </div>
-                        </template>
-                        <template #footer>
-                            <div class="overview-transaction-footer padding-bottom-half">
-                                <span v-if="loading">MM/DD</span>
-                                <span v-else-if="!loading">{{ displayDateRange.thisWeek.startTime }}</span>
-                                <span>-</span>
-                                <span v-if="loading">MM/DD</span>
-                                <span v-else-if="!loading">{{ displayDateRange.thisWeek.endTime }}</span>
-                            </div>
-                        </template>
-                        <template #after>
-                            <div>
-                                <div class="text-color-red">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.incomeAmount }}</small>
-                                </div>
-                                <div class="text-color-teal">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.expenseAmount }}</small>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
+            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisWeek.type" chevron-center>
+                <template #media>
+                    <f7-icon f7="calendar"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="padding-top-half">
+                        <span v-if="loading">This Week</span>
+                        <span v-else-if="!loading">{{ $t('This Week') }}</span>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="overview-transaction-footer padding-bottom-half">
+                        <span v-if="loading">MM/DD</span>
+                        <span v-else-if="!loading">{{ displayDateRange.thisWeek.startTime }}</span>
+                        <span>-</span>
+                        <span v-if="loading">MM/DD</span>
+                        <span v-else-if="!loading">{{ displayDateRange.thisWeek.endTime }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>
+                        <div class="text-color-red">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.incomeAmount }}</small>
+                        </div>
+                        <div class="text-color-teal">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.expenseAmount }}</small>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisMonth.type" chevron-center>
-                        <template #media>
-                            <f7-icon f7="calendar"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="padding-top-half">
-                                <span v-if="loading">This Month</span>
-                                <span v-else-if="!loading">{{ $t('This Month') }}</span>
-                            </div>
-                        </template>
-                        <template #footer>
-                            <div class="overview-transaction-footer padding-bottom-half">
-                                <span v-if="loading">MM/DD</span>
-                                <span v-else-if="!loading">{{ displayDateRange.thisMonth.startTime }}</span>
-                                <span>-</span>
-                                <span v-if="loading">MM/DD</span>
-                                <span v-else-if="!loading">{{ displayDateRange.thisMonth.endTime }}</span>
-                            </div>
-                        </template>
-                        <template #after>
-                            <div>
-                                <div class="text-color-red">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.incomeAmount }}</small>
-                                </div>
-                                <div class="text-color-teal">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.expenseAmount }}</small>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
+            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisMonth.type" chevron-center>
+                <template #media>
+                    <f7-icon f7="calendar"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="padding-top-half">
+                        <span v-if="loading">This Month</span>
+                        <span v-else-if="!loading">{{ $t('This Month') }}</span>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="overview-transaction-footer padding-bottom-half">
+                        <span v-if="loading">MM/DD</span>
+                        <span v-else-if="!loading">{{ displayDateRange.thisMonth.startTime }}</span>
+                        <span>-</span>
+                        <span v-if="loading">MM/DD</span>
+                        <span v-else-if="!loading">{{ displayDateRange.thisMonth.endTime }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>
+                        <div class="text-color-red">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.incomeAmount }}</small>
+                        </div>
+                        <div class="text-color-teal">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.expenseAmount }}</small>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisYear.type" chevron-center>
-                        <template #media>
-                            <f7-icon f7="square_stack_3d_up"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="padding-top-half">
-                                <span v-if="loading">This Year</span>
-                                <span v-else-if="!loading">{{ $t('This Year') }}</span>
-                            </div>
-                        </template>
-                        <template #footer>
-                            <div class="overview-transaction-footer padding-bottom-half">
-                                <span v-if="loading">YYYY</span>
-                                <span v-else-if="!loading">{{ displayDateRange.thisYear.displayTime }}</span>
-                            </div>
-                        </template>
-                        <template #after>
-                            <div>
-                                <div class="text-color-red">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.incomeAmount }}</small>
-                                </div>
-                                <div class="text-color-teal">
-                                    <small v-if="loading">0.00 USD</small>
-                                    <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.expenseAmount }}</small>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisYear.type" chevron-center>
+                <template #media>
+                    <f7-icon f7="square_stack_3d_up"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="padding-top-half">
+                        <span v-if="loading">This Year</span>
+                        <span v-else-if="!loading">{{ $t('This Year') }}</span>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="overview-transaction-footer padding-bottom-half">
+                        <span v-if="loading">YYYY</span>
+                        <span v-else-if="!loading">{{ displayDateRange.thisYear.displayTime }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>
+                        <div class="text-color-red">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.incomeAmount }}</small>
+                        </div>
+                        <div class="text-color-teal">
+                            <small v-if="loading">0.00 USD</small>
+                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.expenseAmount }}</small>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
         <f7-toolbar tabbar labels bottom>
             <f7-link href="/transaction/list">

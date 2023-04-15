@@ -10,149 +10,134 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers class="tag-item-list">
-                    <f7-list-item>
-                        <template #media>
-                            <f7-icon f7="number"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="no-padding">
-                                <div class="display-flex">
-                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item>
-                        <template #media>
-                            <f7-icon f7="number"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="no-padding">
-                                <div class="display-flex">
-                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item>
-                        <template #media>
-                            <f7-icon f7="number"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="no-padding">
-                                <div class="display-flex">
-                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
+            <f7-list-item>
+                <template #media>
+                    <f7-icon f7="number"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="display-flex">
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
+                    </div>
+                </template>
+            </f7-list-item>
+            <f7-list-item>
+                <template #media>
+                    <f7-icon f7="number"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="display-flex">
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
+                    </div>
+                </template>
+            </f7-list-item>
+            <f7-list-item>
+                <template #media>
+                    <f7-icon f7="number"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="display-flex">
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
+                    </div>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers v-if="noAvailableTag && !newTag">
-                    <f7-list-item :title="$t('No available tag')"></f7-list-item>
-                </f7-list>
+        <f7-list strong inset dividers class="tag-item-list margin-top" v-if="!loading && noAvailableTag && !newTag">
+            <f7-list-item :title="$t('No available tag')"></f7-list-item>
+        </f7-list>
 
-                <f7-list dividers sortable class="tag-item-list" :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item v-for="tag in tags"
-                                  :key="tag.id"
-                                  :id="getTagDomId(tag)"
-                                  v-show="showHidden || !tag.hidden"
-                                  swipeout @taphold="setSortable()">
-                        <template #media>
-                            <f7-icon f7="number">
-                                <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
-                                    <f7-icon f7="eye_slash_fill"></f7-icon>
-                                </f7-badge>
-                            </f7-icon>
-                        </template>
-                        <template #title>
-                            <f7-block class="no-padding">
-                                <div class="display-flex">
-                                    <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
-                                         v-if="editingTag.id !== tag.id">
-                                        {{ tag.name }}
-                                    </div>
-                                    <f7-input class="list-title-input padding-left-half"
-                                              type="text"
-                                              :placeholder="$t('Tag Title')"
-                                              v-else-if="editingTag.id === tag.id"
-                                              v-model:value="editingTag.name"
-                                              @keyup.enter="save(tag)">
-                                    </f7-input>
-                                </div>
-                            </f7-block>
-                        </template>
-                        <template #after>
-                            <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(tag) }"
-                                       raised fill
-                                       icon-f7="checkmark_alt"
-                                       color="blue"
-                                       v-if="editingTag.id === tag.id"
-                                       @click="save(editingTag)">
-                            </f7-button>
-                            <f7-button class="no-padding margin-left-half"
-                                       raised fill
-                                       icon-f7="xmark"
-                                       color="gray"
-                                       v-if="editingTag.id === tag.id"
-                                       @click="cancelSave(editingTag)">
-                            </f7-button>
-                        </template>
-                        <f7-swipeout-actions left v-if="sortable && editingTag.id !== tag.id">
-                            <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe close @click="hide(tag, !tag.hidden)">
-                                <f7-icon :f7="tag.hidden ? 'eye' : 'eye_slash'"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                        <f7-swipeout-actions right v-if="!sortable && editingTag.id !== tag.id">
-                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(tag)"></f7-swipeout-button>
-                            <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(tag, false)">
-                                <f7-icon f7="trash"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
+        <f7-list strong inset dividers sortable class="tag-item-list margin-top"
+                 :sortable-enabled="sortable" @sortable:sort="onSort"
+                 v-if="!loading">
 
-                    <f7-list-item v-if="newTag">
-                        <template #media>
-                            <f7-icon f7="number"></f7-icon>
-                        </template>
-                        <template #title>
-                            <div class="no-padding">
-                                <div class="display-flex">
-                                    <f7-input class="list-title-input padding-left-half"
-                                              type="text"
-                                              :placeholder="$t('Tag Title')"
-                                              v-model:value="newTag.name"
-                                              @keyup.enter="save(newTag)">
-                                    </f7-input>
-                                </div>
-                            </div>
-                        </template>
-                        <template #after>
-                            <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(newTag) }"
-                                       raised fill
-                                       icon-f7="checkmark_alt"
-                                       color="blue"
-                                       @click="save(newTag)">
-                            </f7-button>
-                            <f7-button class="no-padding margin-left-half"
-                                       raised fill
-                                       icon-f7="xmark"
-                                       color="gray"
-                                       @click="cancelSave(newTag)">
-                            </f7-button>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item v-for="tag in tags"
+                          :key="tag.id"
+                          :id="getTagDomId(tag)"
+                          v-show="showHidden || !tag.hidden"
+                          swipeout @taphold="setSortable()">
+                <template #media>
+                    <f7-icon f7="number">
+                        <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">
+                            <f7-icon f7="eye_slash_fill"></f7-icon>
+                        </f7-badge>
+                    </f7-icon>
+                </template>
+                <template #title>
+                    <div class="display-flex">
+                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half"
+                             v-if="editingTag.id !== tag.id">
+                            {{ tag.name }}
+                        </div>
+                        <f7-input class="list-title-input padding-left-half"
+                                  type="text"
+                                  :placeholder="$t('Tag Title')"
+                                  v-else-if="editingTag.id === tag.id"
+                                  v-model:value="editingTag.name"
+                                  @keyup.enter="save(tag)">
+                        </f7-input>
+                    </div>
+                </template>
+                <template #after>
+                    <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(tag) }"
+                               raised fill
+                               icon-f7="checkmark_alt"
+                               color="blue"
+                               v-if="editingTag.id === tag.id"
+                               @click="save(editingTag)">
+                    </f7-button>
+                    <f7-button class="no-padding margin-left-half"
+                               raised fill
+                               icon-f7="xmark"
+                               color="gray"
+                               v-if="editingTag.id === tag.id"
+                               @click="cancelSave(editingTag)">
+                    </f7-button>
+                </template>
+                <f7-swipeout-actions left v-if="sortable && editingTag.id !== tag.id">
+                    <f7-swipeout-button :color="tag.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                                        overswipe close @click="hide(tag, !tag.hidden)">
+                        <f7-icon :f7="tag.hidden ? 'eye' : 'eye_slash'"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+                <f7-swipeout-actions right v-if="!sortable && editingTag.id !== tag.id">
+                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(tag)"></f7-swipeout-button>
+                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(tag, false)">
+                        <f7-icon f7="trash"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+            </f7-list-item>
+
+            <f7-list-item v-if="newTag">
+                <template #media>
+                    <f7-icon f7="number"></f7-icon>
+                </template>
+                <template #title>
+                    <div class="display-flex">
+                        <f7-input class="list-title-input padding-left-half"
+                                  type="text"
+                                  :placeholder="$t('Tag Title')"
+                                  v-model:value="newTag.name"
+                                  @keyup.enter="save(newTag)">
+                        </f7-input>
+                    </div>
+                </template>
+                <template #after>
+                    <f7-button :class="{ 'no-padding': true, 'disabled': !isTagModified(newTag) }"
+                               raised fill
+                               icon-f7="checkmark_alt"
+                               color="blue"
+                               @click="save(newTag)">
+                    </f7-button>
+                    <f7-button class="no-padding margin-left-half"
+                               raised fill
+                               icon-f7="xmark"
+                               color="gray"
+                               @click="cancelSave(newTag)">
+                    </f7-button>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>

@@ -3,103 +3,95 @@
         <f7-navbar :title="$t('Settings')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-block-title class="margin-top">{{ currentNickName }}</f7-block-title>
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Tags')" link="/tag/list"></f7-list-item>
-                    <f7-list-item :title="$t('Data Management')" link="/user/data/management"></f7-list-item>
-                    <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
-                    <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
-                    <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers>
+            <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Tags')" link="/tag/list"></f7-list-item>
+            <f7-list-item :title="$t('Data Management')" link="/user/data/management"></f7-list-item>
+            <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
+            <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
+            <f7-list-button :class="{ 'disabled': logouting }" @click="logout">{{ $t('Log Out') }}</f7-list-button>
+        </f7-list>
 
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item
-                        :key="currentLocale + '_lang'"
-                        :title="$t('Language')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                        <select v-model="currentLocale">
-                            <option v-for="(lang, locale) in allLanguages"
-                                    :key="locale"
-                                    :value="locale">{{ lang.displayName }}</option>
-                        </select>
-                    </f7-list-item>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                :key="currentLocale + '_lang'"
+                :title="$t('Language')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="currentLocale">
+                    <option v-for="(lang, locale) in allLanguages"
+                            :key="locale"
+                            :value="locale">{{ lang.displayName }}</option>
+                </select>
+            </f7-list-item>
 
-                    <f7-list-item
-                        :key="currentLocale + '_timezone'"
-                        :title="$t('Timezone')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                        <select v-model="currentTimezone">
-                            <option v-for="timezone in allTimezones"
-                                    :key="timezone.name"
-                                    :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
-                        </select>
-                    </f7-list-item>
+            <f7-list-item
+                :key="currentLocale + '_timezone'"
+                :title="$t('Timezone')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="currentTimezone">
+                    <option v-for="timezone in allTimezones"
+                            :key="timezone.name"
+                            :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                </select>
+            </f7-list-item>
 
-                    <f7-list-item :title="$t('Application Lock')" :after="isEnableApplicationLock ? $t('Enabled') : $t('Disabled')" link="/app_lock"></f7-list-item>
+            <f7-list-item :title="$t('Application Lock')" :after="isEnableApplicationLock ? $t('Enabled') : $t('Disabled')" link="/app_lock"></f7-list-item>
 
-                    <f7-list-item :title="$t('Exchange Rates Data')" :after="exchangeRatesLastUpdateDate" link="/exchange_rates"></f7-list-item>
+            <f7-list-item :title="$t('Exchange Rates Data')" :after="exchangeRatesLastUpdateDate" link="/exchange_rates"></f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Auto Update Exchange Rates Data') }}</span>
-                        <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Auto Update Exchange Rates Data') }}</span>
+                <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Enable Thousands Separator') }}</span>
-                        <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Thousands Separator') }}</span>
+                <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item
-                        :key="currentLocale + '_currency_display'"
-                        :title="$t('Currency Display Mode')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                        <select v-model="currencyDisplayMode">
-                            <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
-                            <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
-                            <option :value="$constants.currency.allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
-                            <option :value="$constants.currency.allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
-                        </select>
-                    </f7-list-item>
+            <f7-list-item
+                :key="currentLocale + '_currency_display'"
+                :title="$t('Currency Display Mode')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="currencyDisplayMode">
+                    <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
+                    <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
+                    <option :value="$constants.currency.allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
+                    <option :value="$constants.currency.allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
+                </select>
+            </f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Show Amount In Home Page') }}</span>
-                        <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Show Amount In Home Page') }}</span>
+                <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Show Account Balance') }}</span>
-                        <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Show Account Balance') }}</span>
+                <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Show Total Amount In Transaction List Page') }}</span>
-                        <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Show Total Amount In Transaction List Page') }}</span>
+                <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item :title="$t('Statistics Settings')" link="/statistic/settings"></f7-list-item>
+            <f7-list-item :title="$t('Statistics Settings')" link="/statistic/settings"></f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Enable Animate') }}</span>
-                        <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Animate') }}</span>
+                <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item>
-                        <span>{{ $t('Enable Auto Dark Mode') }}</span>
-                        <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
-                    </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Enable Auto Dark Mode') }}</span>
+                <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
+            </f7-list-item>
 
-                    <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 

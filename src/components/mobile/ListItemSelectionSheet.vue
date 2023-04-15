@@ -3,7 +3,7 @@
               :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
-            <div class="swipe-handler" @click="close"></div>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
@@ -18,11 +18,11 @@
                               :value="getItemValue(item, index, valueField, valueType)"
                               :title="$tIf((titleField ? item[titleField] : item), titleI18n)"
                               @click="onItemClicked(item, index)">
+                    <template #content-start>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>
+                    </template>
                     <template #media>
                         <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]" v-if="iconField"></ItemIcon>
-                    </template>
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>

@@ -979,6 +979,8 @@ export default {
     'You have logged out all other sessions': 'You have logged out all other sessions',
     'Unable to logout all other sessions': 'Unable to logout all other sessions',
     'Regenerate Backup Codes': 'Regenerate Backup Codes',
+    'Enable Two-Factor Authentication': 'Enable Two-Factor Authentication',
+    'Disable Two-Factor Authentication': 'Disable Two-Factor Authentication',
     'Please use two factor authentication app scan the below qrcode and input current passcode': 'Please use two factor authentication app scan the below qrcode and input current passcode',
     'Please enter your current password when disable two factor authentication': 'Please enter your current password when disable two factor authentication',
     'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.': 'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.',

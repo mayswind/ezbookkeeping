@@ -8,45 +8,37 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list media-list dividers>
-                    <f7-list-item class="list-item-media-valign-middle"
-                                  title="Current"
-                                  text="Device Name (Browser xx.x.xxxx.xx)">
-                        <template #media>
-                            <f7-icon f7="device_phone_portrait"></f7-icon>
-                        </template>
-                        <template #after>
-                            <small>MM/DD/YYYY HH:mm:ss</small>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list media-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-item class="list-item-media-valign-middle"
+                          title="Current"
+                          text="Device Name (Browser xx.x.xxxx.xx)">
+                <template #media>
+                    <f7-icon f7="device_phone_portrait"></f7-icon>
+                </template>
+                <template #after>
+                    <small>MM/DD/YYYY HH:mm:ss</small>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list media-list dividers>
-                    <f7-list-item class="list-item-media-valign-middle" swipeout
-                                  v-for="session in sessions"
-                                  :key="session.tokenId"
-                                  :id="session.domId"
-                                  :title="session.deviceType"
-                                  :text="session.deviceInfo">
-                        <template #media>
-                            <f7-icon :f7="session.icon"></f7-icon>
-                        </template>
-                        <template #after>
-                            <small>{{ session.createdAt }}</small>
-                        </template>
-                        <f7-swipeout-actions right v-if="!session.isCurrent">
-                            <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(session)"></f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list media-list strong inset dividers class="margin-top" v-else-if="!loading">
+            <f7-list-item class="list-item-media-valign-middle" swipeout
+                          v-for="session in sessions"
+                          :key="session.tokenId"
+                          :id="session.domId"
+                          :title="session.deviceType"
+                          :text="session.deviceInfo">
+                <template #media>
+                    <f7-icon :f7="session.icon"></f7-icon>
+                </template>
+                <template #after>
+                    <small>{{ session.createdAt }}</small>
+                </template>
+                <f7-swipeout-actions right v-if="!session.isCurrent">
+                    <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(session)"></f7-swipeout-button>
+                </f7-swipeout-actions>
+            </f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 

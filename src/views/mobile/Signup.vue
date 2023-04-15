@@ -8,132 +8,119 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form dividers>
-                    <f7-list-input
-                        type="text"
-                        autocomplete="username"
-                        clear-button
-                        :label="$t('Username')"
-                        :placeholder="$t('Your username')"
-                        :value="user.username"
-                        @input="user.username = $event.target.value"
-                    ></f7-list-input>
+        <f7-list form strong inset dividers class="margin-top">
+            <f7-list-input
+                type="text"
+                autocomplete="username"
+                clear-button
+                :label="$t('Username')"
+                :placeholder="$t('Your username')"
+                :value="user.username"
+                @input="user.username = $event.target.value"
+            ></f7-list-input>
 
-                    <f7-list-input
-                        type="password"
-                        autocomplete="new-password"
-                        clear-button
-                        :label="$t('Password')"
-                        :placeholder="$t('Your password, at least 6 characters')"
-                        :value="user.password"
-                        @input="user.password = $event.target.value"
-                    ></f7-list-input>
+            <f7-list-input
+                type="password"
+                autocomplete="new-password"
+                clear-button
+                :label="$t('Password')"
+                :placeholder="$t('Your password, at least 6 characters')"
+                :value="user.password"
+                @input="user.password = $event.target.value"
+            ></f7-list-input>
 
-                    <f7-list-input
-                        type="password"
-                        autocomplete="new-password"
-                        clear-button
-                        :label="$t('Confirmation Password')"
-                        :placeholder="$t('Re-enter the password')"
-                        :value="user.confirmPassword"
-                        @input="user.confirmPassword = $event.target.value"
-                    ></f7-list-input>
+            <f7-list-input
+                type="password"
+                autocomplete="new-password"
+                clear-button
+                :label="$t('Confirmation Password')"
+                :placeholder="$t('Re-enter the password')"
+                :value="user.confirmPassword"
+                @input="user.confirmPassword = $event.target.value"
+            ></f7-list-input>
 
-                    <f7-list-input
-                        type="email"
-                        autocomplete="email"
-                        clear-button
-                        :label="$t('E-mail')"
-                        :placeholder="$t('Your email address')"
-                        :value="user.email"
-                        @input="user.email = $event.target.value"
-                    ></f7-list-input>
+            <f7-list-input
+                type="email"
+                autocomplete="email"
+                clear-button
+                :label="$t('E-mail')"
+                :placeholder="$t('Your email address')"
+                :value="user.email"
+                @input="user.email = $event.target.value"
+            ></f7-list-input>
 
-                    <f7-list-input
-                        type="text"
-                        autocomplete="nickname"
-                        clear-button
-                        :label="$t('Nickname')"
-                        :placeholder="$t('Your nickname')"
-                        :value="user.nickname"
-                        @input="user.nickname = $event.target.value"
-                    ></f7-list-input>
+            <f7-list-input
+                type="text"
+                autocomplete="nickname"
+                clear-button
+                :label="$t('Nickname')"
+                :placeholder="$t('Your nickname')"
+                :value="user.nickname"
+                @input="user.nickname = $event.target.value"
+            ></f7-list-input>
 
-                    <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
+        </f7-list>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form dividers>
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-no-item-after"
-                        :key="currentLocale + '_lang'"
-                        :header="$t('Language')"
-                        :title="currentLanguageName"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
-                    >
-                        <select v-model="currentLocale">
-                            <option v-for="(lang, locale) in allLanguages"
-                                    :key="locale"
-                                    :value="locale">{{ lang.displayName }}</option>
-                        </select>
-                    </f7-list-item>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :key="currentLocale + '_lang'"
+                :header="$t('Language')"
+                :title="currentLanguageName"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="currentLocale">
+                    <option v-for="(lang, locale) in allLanguages"
+                            :key="locale"
+                            :value="locale">{{ lang.displayName }}</option>
+                </select>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-no-item-after"
-                        :key="currentLocale + '_currency'"
-                        :header="$t('Default Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
-                    >
-                        <template #title>
-                            <f7-block class="no-padding no-margin">
-                                <span>{{ $t(`currency.${user.defaultCurrency}`) }}&nbsp;</span>
-                                <small class="smaller">{{ user.defaultCurrency }}</small>
-                            </f7-block>
-                        </template>
-                        <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
-                            <option v-for="currency in allCurrencies"
-                                    :key="currency.code"
-                                    :value="currency.code">{{ currency.displayName }}</option>
-                        </select>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :key="currentLocale + '_currency'"
+                :header="$t('Default Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
+            >
+                <template #title>
+                    <f7-block class="no-padding no-margin">
+                        <span>{{ $t(`currency.${user.defaultCurrency}`) }}&nbsp;</span>
+                        <small class="smaller">{{ user.defaultCurrency }}</small>
+                    </f7-block>
+                </template>
+                <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
+                    <option v-for="currency in allCurrencies"
+                            :key="currency.code"
+                            :value="currency.code">{{ currency.displayName }}</option>
+                </select>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-no-item-after"
-                        :key="currentLocale + '_firstDayOfWeek'"
-                        :header="$t('First Day of Week')"
-                        :title="getDayOfWeekName(user.firstDayOfWeek)"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
-                    >
-                        <select v-model="user.firstDayOfWeek">
-                            <option v-for="weekDay in allWeekDays"
-                                    :key="weekDay.type"
-                                    :value="weekDay.type">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
-                        </select>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :key="currentLocale + '_firstDayOfWeek'"
+                :header="$t('First Day of Week')"
+                :title="getDayOfWeekName(user.firstDayOfWeek)"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="user.firstDayOfWeek">
+                    <option v-for="weekDay in allWeekDays"
+                            :key="weekDay.type"
+                            :value="weekDay.type">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form dividers>
-                    <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
-                        <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers>
+            <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
+                <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-popup push swipe-to-close="to-bottom" swipe-handler=".swipe-navbar"
-                  :close-on-escape="false" :opened="showPresetCategories"
+        <f7-popup push :close-on-escape="false" :opened="showPresetCategories"
                   @popup:closed="showPresetCategories = false">
             <f7-page>
-                <f7-navbar class="swipe-navbar">
+                <f7-navbar>
                     <f7-nav-left>
                         <f7-link popup-close :text="$t('Cancel')"></f7-link>
                     </f7-nav-left>
@@ -144,37 +131,32 @@
                         <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ $t('Disable') }}</f7-link>
                     </f7-nav-right>
                 </f7-navbar>
-                <f7-card header-divider v-for="(categories, categoryType) in presetCategories" :key="categoryType">
-                    <f7-card-header>
-                        <small class="card-header-content">
-                            <span>{{ getCategoryTypeName(categoryType) }}</span>
-                        </small>
-                    </f7-card-header>
-                    <f7-card-content class="no-safe-areas" :padding="false">
-                        <f7-list dividers v-if="showPresetCategories">
-                            <f7-list-item v-for="(category, idx) in categories"
-                                          :key="idx"
-                                          :accordion-item="!!category.subCategories.length"
-                                          :title="$t('category.' + category.name, currentLocale)">
-                                <template #media>
-                                    <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
-                                </template>
+                <f7-block class="no-padding no-margin"
+                          :key="categoryType" v-for="(categories, categoryType) in presetCategories">
+                    <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
+                    <f7-list strong inset dividers v-if="showPresetCategories">
+                        <f7-list-item v-for="(category, idx) in categories"
+                                      :key="idx"
+                                      :accordion-item="!!category.subCategories.length"
+                                      :title="$t('category.' + category.name, currentLocale)">
+                            <template #media>
+                                <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
+                            </template>
 
-                                <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
-                                    <f7-list>
-                                        <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
-                                                      :key="subIdx"
-                                                      :title="$t('category.' + subCategory.name, currentLocale)">
-                                            <template #media>
-                                                <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
-                                            </template>
-                                        </f7-list-item>
-                                    </f7-list>
-                                </f7-accordion-content>
-                            </f7-list-item>
-                        </f7-list>
-                    </f7-card-content>
-                </f7-card>
+                            <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
+                                <f7-list>
+                                    <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
+                                                  :key="subIdx"
+                                                  :title="$t('category.' + subCategory.name, currentLocale)">
+                                        <template #media>
+                                            <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                        </template>
+                                    </f7-list-item>
+                                </f7-list>
+                            </f7-accordion-content>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-block>
             </f7-page>
 
             <f7-actions close-by-outside-click close-on-escape :opened="showPresetCategoriesMoreActionSheet" @actions:closed="showPresetCategoriesMoreActionSheet = false">

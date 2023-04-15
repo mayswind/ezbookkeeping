@@ -10,69 +10,64 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item title="Category Name">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item title="Category Name 2">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item title="Category Name 3">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-item title="Category Name">
+                <template #media>
+                    <f7-icon f7="app_fill"></f7-icon>
+                </template>
+            </f7-list-item>
+            <f7-list-item title="Category Name 2">
+                <template #media>
+                    <f7-icon f7="app_fill"></f7-icon>
+                </template>
+            </f7-list-item>
+            <f7-list-item title="Category Name 3">
+                <template #media>
+                    <f7-icon f7="app_fill"></f7-icon>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers v-if="noAvailableCategory">
-                    <f7-list-item :title="$t('No available category')"></f7-list-item>
-                    <f7-list-button v-if="hasSubCategories"
-                        :title="$t('Add Default Categories')"
-                        :href="'/category/preset?type=' + categoryType"></f7-list-button>
-                </f7-list>
+        <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableCategory">
+            <f7-list-item :title="$t('No available category')"></f7-list-item>
+            <f7-list-button v-if="hasSubCategories"
+                            :title="$t('Add Default Categories')"
+                            :href="'/category/preset?type=' + categoryType"></f7-list-button>
+        </f7-list>
 
-                <f7-list dividers sortable class="category-list" :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item v-for="category in categories"
-                                  :key="category.id"
-                                  :id="getCategoryDomId(category)"
-                                  :title="category.name"
-                                  :footer="category.comment"
-                                  :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
-                                  v-show="showHidden || !category.hidden"
-                                  swipeout @taphold="setSortable()">
-                        <template #media>
-                            <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
-                                <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
-                                    <f7-icon f7="eye_slash_fill"></f7-icon>
-                                </f7-badge>
-                            </ItemIcon>
-                        </template>
-                        <f7-swipeout-actions left v-if="sortable">
-                            <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe close @click="hide(category, !category.hidden)">
-                                <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                        <f7-swipeout-actions right v-if="!sortable">
-                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
-                            <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
-                                <f7-icon f7="trash"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers sortable class="margin-top category-list"
+                 :sortable-enabled="sortable"
+                 v-if="!loading"
+                 @sortable:sort="onSort">
+            <f7-list-item v-for="category in categories"
+                          :key="category.id"
+                          :id="getCategoryDomId(category)"
+                          :title="category.name"
+                          :footer="category.comment"
+                          :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
+                          v-show="showHidden || !category.hidden"
+                          swipeout @taphold="setSortable()">
+                <template #media>
+                    <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
+                        <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
+                            <f7-icon f7="eye_slash_fill"></f7-icon>
+                        </f7-badge>
+                    </ItemIcon>
+                </template>
+                <f7-swipeout-actions left v-if="sortable">
+                    <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                                        overswipe close @click="hide(category, !category.hidden)">
+                        <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+                <f7-swipeout-actions right v-if="!sortable">
+                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
+                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
+                        <f7-icon f7="trash"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+            </f7-list-item>
+        </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>

@@ -2,42 +2,30 @@
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item title="Accounts" after="Count"></f7-list-item>
-                    <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
-                    <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
-                    <f7-list-item title="Transactions" after="Count"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-item title="Accounts" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
+            <f7-list-item title="Transactions" after="Count"></f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top" v-else-if="!loading">
+            <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
+            <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
+        </f7-list>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
-                    <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers :class="{ 'disabled': loading }">
+            <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
+            <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
+        </f7-list>
 
         <f7-sheet swipe-handler=".swipe-handler" style="height:auto"
                   :swipe-to-close="!exportingData" :close-on-escape="!exportingData"
                   :close-by-backdrop-click="!exportingData" :close-by-outside-click="!exportingData"
                   :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
-            <div class="swipe-handler" @click="!exportingData && (showExportDataSheet = false)"></div>
+            <div class="swipe-handler"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>

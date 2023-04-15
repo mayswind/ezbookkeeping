@@ -2,16 +2,12 @@
     <f7-page>
         <f7-navbar :title="$t('About')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
-                    <f7-list-item :title="$t('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
-                    <f7-list-item external :title="$t('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
-                    <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top">
+            <f7-list-item :title="$t('Version')" :after="version"></f7-list-item>
+            <f7-list-item :title="$t('Build Time')" :after="buildTime" v-if="buildTime"></f7-list-item>
+            <f7-list-item external :title="$t('Official Website')" link="https://github.com/mayswind/ezbookkeeping" target="_blank"></f7-list-item>
+            <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
+        </f7-list>
 
         <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>

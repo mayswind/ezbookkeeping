@@ -2,27 +2,19 @@
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Two-Factor Authentication')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item title="Status" after="Unknown"></f7-list-item>
-                    <f7-list-button class="disabled">Operate</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-item title="Status" after="Unknown"></f7-list-item>
+            <f7-list-button class="disabled">Operate</f7-list-button>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list dividers>
-                    <f7-list-item :title="$t('Status')" :after="$t(status ? 'Enabled' : 'Disabled')"></f7-list-item>
-                    <f7-list-button :class="{ 'disabled': regenerating }" v-if="status === true" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
-                    <f7-list-button :class="{ 'disabled': disabling }" v-if="status === true" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
-                    <f7-list-button :class="{ 'disabled': enabling }" v-if="status === false" @click="enable">{{ $t('Enable') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top" v-else-if="!loading">
+            <f7-list-item :title="$t('Status')" :after="$t(status ? 'Enabled' : 'Disabled')"></f7-list-item>
+            <f7-list-button :class="{ 'disabled': regenerating }" v-if="status === true" @click="regenerateBackupCode(null)">{{ $t('Regenerate Backup Codes') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': disabling }" v-if="status === true" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': enabling }" v-if="status === false" @click="enable">{{ $t('Enable') }}</f7-list-button>
+        </f7-list>
 
-        <passcode-input-sheet :title="$t('Passcode')"
+        <passcode-input-sheet :title="$t('Enable Two-Factor Authentication')"
                               :hint="$t('Please use two factor authentication app scan the below qrcode and input current passcode')"
                               :confirm-disabled="enableConfirming"
                               :cancel-disabled="enableConfirming"
@@ -34,7 +26,7 @@
             </div>
         </passcode-input-sheet>
 
-        <password-input-sheet :title="$t('Current Password')"
+        <password-input-sheet :title="$t('Disable Two-Factor Authentication')"
                               :hint="$t('Please enter your current password when disable two factor authentication')"
                               :confirm-disabled="disabling"
                               :cancel-disabled="disabling"
@@ -43,7 +35,7 @@
                               @password:confirm="disable">
         </password-input-sheet>
 
-        <password-input-sheet :title="$t('Current Password')"
+        <password-input-sheet :title="$t('Regenerate Backup Codes')"
                               :hint="$t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.')"
                               :confirm-disabled="regenerating"
                               :cancel-disabled="regenerating"

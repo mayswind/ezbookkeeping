@@ -8,79 +8,73 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                <f7-list dividers>
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-no-item-after"
-                        :header="$t('Base Currency')"
-                        smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, popupSwipeToClose: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Base Currency'), popupCloseLinkText: $t('Done') }"
-                    >
-                        <template #title>
-                            <div class="no-padding no-margin">
-                                <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
-                                <small class="smaller">{{ baseCurrency }}</small>
-                            </div>
-                        </template>
-                        <select v-model="baseCurrency">
-                            <option v-for="exchangeRate in availableExchangeRates"
-                                    :key="exchangeRate.currencyCode"
-                                    :value="exchangeRate.currencyCode">{{ exchangeRate.currencyDisplayName }}</option>
-                        </select>
-                    </f7-list-item>
-                    <f7-list-item
-                        class="currency-base-amount"
-                        link="#" no-chevron
-                        :style="{ fontSize: baseAmountFontSize + 'px' }"
-                        :header="$t('Base Amount')"
-                        :title="displayBaseAmount"
-                        @click="showBaseAmountSheet = true"
-                    >
-                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                          :max-value="$constants.transaction.maxAmount"
-                                          v-model:show="showBaseAmountSheet"
-                                          v-model="baseAmount"
-                        ></number-pad-sheet>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Base Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Base Currency'), popupCloseLinkText: $t('Done') }"
+            >
+                <template #title>
+                    <div class="no-padding no-margin">
+                        <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
+                        <small class="smaller">{{ baseCurrency }}</small>
+                    </div>
+                </template>
+                <select v-model="baseCurrency">
+                    <option v-for="exchangeRate in availableExchangeRates"
+                            :key="exchangeRate.currencyCode"
+                            :value="exchangeRate.currencyCode">{{ exchangeRate.currencyDisplayName }}</option>
+                </select>
+            </f7-list-item>
+            <f7-list-item
+                class="currency-base-amount"
+                link="#" no-chevron
+                :style="{ fontSize: baseAmountFontSize + 'px' }"
+                :header="$t('Base Amount')"
+                :title="displayBaseAmount"
+                @click="showBaseAmountSheet = true"
+            >
+                <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                  :max-value="$constants.transaction.maxAmount"
+                                  v-model:show="showBaseAmountSheet"
+                                  v-model="baseAmount"
+                ></number-pad-sheet>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-                <f7-list dividers>
-                    <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-            <f7-card-content class="no-safe-areas" :padding="false" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                <f7-list dividers>
-                    <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
-                                  :after="getDisplayConvertedAmount(exchangeRate)"
-                                  swipeout>
-                        <template #title>
-                            <div class="no-padding no-margin">
-                                <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
-                                <small class="smaller">{{ exchangeRate.currencyCode }}</small>
-                            </div>
-                        </template>
-                        <f7-swipeout-actions right>
-                            <f7-swipeout-button color="primary" close :text="$t('Set As Baseline')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
-        <f7-card footer-divider>
-            <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length && exchangeRatesDataUpdateTime">
-                <span>{{ $t('Last Updated') }}</span>
-                <span>{{ exchangeRatesDataUpdateTime }}</span>
-            </f7-card-footer>
-            <f7-card-footer v-if="exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                <span>{{ $t('Data source') }}</span>
-                <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
-                <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
-            </f7-card-footer>
-        </f7-card>
+        <f7-list strong inset dividers v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+            <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
+                          :after="getDisplayConvertedAmount(exchangeRate)"
+                          swipeout>
+                <template #title>
+                    <div class="no-padding no-margin">
+                        <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
+                        <small class="smaller">{{ exchangeRate.currencyCode }}</small>
+                    </div>
+                </template>
+                <f7-swipeout-actions right>
+                    <f7-swipeout-button color="primary" close :text="$t('Set As Baseline')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
+                </f7-swipeout-actions>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+            <f7-list-item v-if="exchangeRatesDataUpdateTime">
+                <small>{{ $t('Last Updated') }}</small>
+                <small>{{ exchangeRatesDataUpdateTime }}</small>
+            </f7-list-item>
+            <f7-list-item>
+                <small>{{ $t('Data source') }}</small>
+                <small>
+                    <f7-link external target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</f7-link>
+                    <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                </small>
+            </f7-list-item>
+        </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>

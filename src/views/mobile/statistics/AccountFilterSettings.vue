@@ -9,102 +9,98 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <f7-accordion-toggle class="full-line">
-                    <small class="card-header-content">
+        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
+            <f7-accordion-item>
+                <f7-block-title class="margin-top">
+                    <f7-accordion-toggle class="full-line">
                         <span>Account Category</span>
-                    </small>
-                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
-                </f7-accordion-toggle>
-            </f7-card-header>
+                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
+                    </f7-accordion-toggle>
+                </f7-block-title>
+                <f7-accordion-content style="height: auto">
+                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                        <f7-list-item checkbox class="disabled" title="Account Name">
+                            <template #media>
+                                <f7-icon f7="app_fill"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-accordion-content>
+            </f7-accordion-item>
+        </f7-block>
 
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item checkbox class="disabled" title="Account Name">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
-
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <f7-accordion-toggle class="full-line">
-                    <small class="card-header-content">
+        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
+            <f7-accordion-item>
+                <f7-block-title class="margin-top">
+                    <f7-accordion-toggle class="full-line">
                         <span>Account Category 2</span>
-                    </small>
-                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
-                </f7-accordion-toggle>
-            </f7-card-header>
+                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
+                    </f7-accordion-toggle>
+                </f7-block-title>
+                <f7-accordion-content style="height: auto">
+                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                        <f7-list-item checkbox class="disabled" title="Account Name">
+                            <template #media>
+                                <f7-icon f7="app_fill"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                        <f7-list-item checkbox class="disabled" title="Account Name 2">
+                            <template #media>
+                                <f7-icon f7="app_fill"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-accordion-content>
+            </f7-accordion-item>
+        </f7-block>
 
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item checkbox class="disabled" title="Account Name">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item checkbox class="disabled" title="Account Name 2">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-block class="no-padding no-margin" v-else-if="!loading">
+            <f7-accordion-item :key="accountCategory.id"
+                               :opened="collapseStates[accountCategory.id].opened"
+                               v-show="hasShownAccount(accountCategory)"
+                               v-for="accountCategory in allAccountCategories"
+                               @accordion:open="collapseStates[accountCategory.id].opened = true"
+                               @accordion:close="collapseStates[accountCategory.id].opened = false">
+                <f7-block-title class="margin-top">
+                    <f7-accordion-toggle>
+                        <span>{{ $t(accountCategory.name) }}</span>
+                        <f7-icon class="float-right" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                    </f7-accordion-toggle>
+                </f7-block-title>
+                <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
+                    <f7-list strong inset dividers accordion-list class="margin-bottom"
+                             v-if="categorizedAccounts[accountCategory.id]">
+                        <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
+                                      v-show="!account.hidden"
+                                      :key="account.id"
+                                      :title="account.name"
+                                      :value="account.id"
+                                      :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
+                                      :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
+                                      @change="selectAccountOrSubAccounts">
+                            <template #media>
+                                <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                            </template>
 
-        <f7-block class="no-padding no-margin" v-if="!loading">
-            <f7-card v-for="accountCategory in allAccountCategories" :key="accountCategory.id" v-show="hasShownAccount(accountCategory)">
-                <f7-accordion-item :opened="collapseStates[accountCategory.id].opened"
-                                   @accordion:open="collapseStates[accountCategory.id].opened = true"
-                                   @accordion:close="collapseStates[accountCategory.id].opened = false">
-                    <f7-card-header>
-                        <f7-accordion-toggle class="full-line">
-                            <small class="card-header-content">
-                                <span>{{ $t(accountCategory.name) }}</span>
-                            </small>
-                            <f7-icon class="card-chevron-icon float-right" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
-                        </f7-accordion-toggle>
-                    </f7-card-header>
-                    <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
-                        <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
-                            <f7-list v-if="categorizedAccounts[accountCategory.id]">
-                                <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
-                                              v-show="!account.hidden"
-                                              :key="account.id"
-                                              :title="account.name"
-                                              :value="account.id"
-                                              :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
-                                              :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
-                                              @change="selectAccountOrSubAccounts">
-                                    <template #media>
-                                        <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
-                                    </template>
-
-                                    <template #root>
-                                        <ul v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
-                                            <f7-list-item checkbox v-for="subAccount in account.subAccounts"
-                                                          v-show="!subAccount.hidden"
-                                                          :key="subAccount.id"
-                                                          :title="subAccount.name"
-                                                          :value="subAccount.id"
-                                                          :checked="isAccountChecked(subAccount, filterAccountIds) "
-                                                          @change="selectAccount">
-                                                <template #media>
-                                                    <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
-                                                </template>
-                                            </f7-list-item>
-                                        </ul>
-                                    </template>
-                                </f7-list-item>
-                            </f7-list>
-                        </f7-accordion-content>
-                    </f7-card-content>
-                </f7-accordion-item>
-            </f7-card>
+                            <template #root>
+                                <ul v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
+                                    <f7-list-item checkbox v-for="subAccount in account.subAccounts"
+                                                  v-show="!subAccount.hidden"
+                                                  :key="subAccount.id"
+                                                  :title="subAccount.name"
+                                                  :value="subAccount.id"
+                                                  :checked="isAccountChecked(subAccount, filterAccountIds) "
+                                                  @change="selectAccount">
+                                        <template #media>
+                                            <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
+                                        </template>
+                                    </f7-list-item>
+                                </ul>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-accordion-content>
+            </f7-accordion-item>
         </f7-block>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">

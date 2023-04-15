@@ -9,118 +9,114 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-header>
-                <f7-accordion-toggle class="full-line">
-                    <small class="card-header-content">
+        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
+            <f7-accordion-item>
+                <f7-block-title class="margin-top">
+                    <f7-accordion-toggle class="full-line">
                         <span>Transaction Category</span>
-                    </small>
-                    <f7-icon class="card-chevron-icon float-right" f7="chevron_up"></f7-icon>
-                </f7-accordion-toggle>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item checkbox class="disabled" title="Category Name">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                        <template #root>
-                            <ul class="padding-left">
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                            </ul>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item checkbox class="disabled" title="Category Name 2">
-                        <template #media>
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </template>
-                        <template #root>
-                            <ul class="padding-left">
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                                <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
-                                    <template #media>
-                                        <f7-icon f7="app_fill"></f7-icon>
-                                    </template>
-                                </f7-list-item>
-                            </ul>
-                        </template>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
+                    </f7-accordion-toggle>
+                </f7-block-title>
+                <f7-accordion-content style="height: auto">
+                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                        <f7-list-item checkbox class="disabled" title="Category Name">
+                            <template #media>
+                                <f7-icon f7="app_fill"></f7-icon>
+                            </template>
+                            <template #root>
+                                <ul class="padding-left">
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                </ul>
+                            </template>
+                        </f7-list-item>
+                        <f7-list-item checkbox class="disabled" title="Category Name 2">
+                            <template #media>
+                                <f7-icon f7="app_fill"></f7-icon>
+                            </template>
+                            <template #root>
+                                <ul class="padding-left">
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
+                                        <template #media>
+                                            <f7-icon f7="app_fill"></f7-icon>
+                                        </template>
+                                    </f7-list-item>
+                                </ul>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-accordion-content>
+            </f7-accordion-item>
+        </f7-block>
 
-        <f7-block class="no-padding no-margin" v-if="!loading">
-            <f7-card v-for="(categories, categoryType) in allTransactionCategories" :key="categoryType">
-                <f7-accordion-item :opened="collapseStates[categoryType].opened"
-                                   @accordion:open="collapseStates[categoryType].opened = true"
-                                   @accordion:close="collapseStates[categoryType].opened = false">
-                    <f7-card-header>
-                        <f7-accordion-toggle class="full-line">
-                            <small class="card-header-content">
-                                <span>{{ getCategoryTypeName(categoryType) }}</span>
-                            </small>
-                            <f7-icon class="card-chevron-icon float-right" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
-                        </f7-accordion-toggle>
-                    </f7-card-header>
-                    <f7-card-content class="no-safe-areas" :padding="false" accordion-list>
-                        <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
-                            <f7-list>
-                                <f7-list-item checkbox v-for="category in categories"
-                                              v-show="!category.hidden"
-                                              :key="category.id"
-                                              :title="category.name"
-                                              :value="category.id"
-                                              :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
-                                              :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
-                                              @change="selectSubCategories">
-                                    <template #media>
-                                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                    </template>
+        <f7-block class="no-padding no-margin" v-else-if="!loading">
+            <f7-accordion-item :key="categoryType"
+                               :opened="collapseStates[categoryType].opened"
+                               v-for="(categories, categoryType) in allTransactionCategories"
+                               @accordion:open="collapseStates[categoryType].opened = true"
+                               @accordion:close="collapseStates[categoryType].opened = false">
+                <f7-block-title class="margin-top">
+                    <f7-accordion-toggle>
+                        <span>{{ getCategoryTypeName(categoryType) }}</span>
+                        <f7-icon class="float-right" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                    </f7-accordion-toggle>
+                </f7-block-title>
+                <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
+                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                        <f7-list-item checkbox v-for="category in categories"
+                                      v-show="!category.hidden"
+                                      :key="category.id"
+                                      :title="category.name"
+                                      :value="category.id"
+                                      :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
+                                      :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
+                                      @change="selectSubCategories">
+                            <template #media>
+                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                            </template>
 
-                                    <template #root>
-                                        <ul v-if="category.subCategories.length" class="padding-left">
-                                            <f7-list-item checkbox v-for="subCategory in category.subCategories"
-                                                          v-show="!subCategory.hidden"
-                                                          :key="subCategory.id"
-                                                          :title="subCategory.name"
-                                                          :value="subCategory.id"
-                                                          :checked="isCategoryChecked(subCategory, filterCategoryIds) "
-                                                          @change="selectCategory">
-                                                <template #media>
-                                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                                </template>
-                                            </f7-list-item>
-                                        </ul>
-                                    </template>
-                                </f7-list-item>
-                            </f7-list>
-                        </f7-accordion-content>
-                    </f7-card-content>
-                </f7-accordion-item>
-            </f7-card>
+                            <template #root>
+                                <ul v-if="category.subCategories.length" class="padding-left">
+                                    <f7-list-item checkbox v-for="subCategory in category.subCategories"
+                                                  v-show="!subCategory.hidden"
+                                                  :key="subCategory.id"
+                                                  :title="subCategory.name"
+                                                  :value="subCategory.id"
+                                                  :checked="isCategoryChecked(subCategory, filterCategoryIds) "
+                                                  @change="selectCategory">
+                                        <template #media>
+                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                        </template>
+                                    </f7-list-item>
+                                </ul>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-accordion-content>
+            </f7-accordion-item>
         </f7-block>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">

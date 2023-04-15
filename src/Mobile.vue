@@ -214,6 +214,12 @@ i.icon.la, i.icon.las, i.icon.lab {
     white-space: nowrap;
 }
 
+.block-title .accordion-item-toggle .icon {
+    color: var(--f7-list-chevron-icon-color);
+    font-size: var(--f7-list-chevron-icon-font-size);
+    font-weight: bolder;
+}
+
 .list-item-media-valign-middle .item-media {
     align-self: normal !important;
 }
@@ -282,12 +288,6 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .card-header-content {
     opacity: 0.6;
-}
-
-.card-chevron-icon {
-    color: var(--f7-list-chevron-icon-color);
-    font-size: var(--f7-list-chevron-icon-font-size);
-    font-weight: bolder;
 }
 
 .icon-after-text {

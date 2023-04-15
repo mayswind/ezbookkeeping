@@ -47,6 +47,8 @@ export default {
         'show'
     ],
     emits: [
+        'update:modelValue',
+        'update:show',
         'passcode:confirm'
     ],
     data() {

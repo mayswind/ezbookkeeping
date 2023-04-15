@@ -34,6 +34,10 @@ export default {
         'enableCopy',
         'show'
     ],
+    emits: [
+        'update:show',
+        'info:copied'
+    ],
     data() {
         return {
             clipboardHolder: null

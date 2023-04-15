@@ -45,6 +45,10 @@ export default {
         'items',
         'show'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 

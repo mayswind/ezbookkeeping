@@ -70,6 +70,10 @@ export default {
         'maxValue',
         'show'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 

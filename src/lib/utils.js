@@ -821,7 +821,7 @@ function makeButtonCopyToClipboard({ text, el, successCallback, errorCallback })
     return clipboard;
 }
 
-function changeClipboardObjectTxet(clipboard, text) {
+function changeClipboardObjectText(clipboard, text) {
     if (!clipboard) {
         return;
     }
@@ -896,5 +896,5 @@ export default {
     getCategorizedAccounts,
     getAllFilteredAccountsBalance,
     makeButtonCopyToClipboard,
-    changeClipboardObjectTxet,
+    changeClipboardObjectText,
 };

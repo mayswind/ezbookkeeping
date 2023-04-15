@@ -48,7 +48,7 @@ export default {
     watch: {
         'information': function (newValue) {
             if (this.clipboardHolder) {
-                this.$utilities.changeClipboardObjectTxet(this.clipboardHolder, newValue);
+                this.$utilities.changeClipboardObjectText(this.clipboardHolder, newValue);
             }
         }
     },

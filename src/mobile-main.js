@@ -26,7 +26,6 @@ import Framework7Radio from 'framework7/components/radio';
 import Framework7Toggle from 'framework7/components/toggle';
 import Framework7SmartSelect from 'framework7/components/smart-select';
 import Framework7Grid from 'framework7/components/grid';
-import Framework7Calendar from 'framework7/components/calendar';
 import Framework7Picker from 'framework7/components/picker';
 import Framework7InfiniteScroll from 'framework7/components/infinite-scroll';
 import Framework7PullToRefresh from 'framework7/components/pull-to-refresh';
@@ -59,7 +58,6 @@ import 'framework7/components/radio/css';
 import 'framework7/components/toggle/css';
 import 'framework7/components/smart-select/css';
 import 'framework7/components/grid/css';
-import 'framework7/components/calendar/css';
 import 'framework7/components/picker/css';
 import 'framework7/components/infinite-scroll/css';
 import 'framework7/components/pull-to-refresh/css';
@@ -71,6 +69,9 @@ import 'framework7/components/typography/css';
 
 import 'framework7-icons';
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
+
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
@@ -100,7 +101,6 @@ import {
     getAllLongWeekdayNames,
     getAllShortWeekdayNames,
     getAllMinWeekdayNames,
-    getInputTimeIntlDateTimeFormatOptions,
     getAllTimezones,
     getAllCurrencies,
     getDisplayCurrency,
@@ -160,7 +160,6 @@ Framework7.use([
     Framework7Toggle,
     Framework7SmartSelect,
     Framework7Grid,
-    Framework7Calendar,
     Framework7Picker,
     Framework7InfiniteScroll,
     Framework7PullToRefresh,
@@ -235,6 +234,8 @@ function initLocale() {
     }
 }
 
+app.component('VueDatePicker', VueDatePicker);
+
 app.component('ItemIcon', ItemIcon);
 app.component('PieChart', PieChart);
 app.component('PasswordInputSheet', PasswordInputSheet);
@@ -285,7 +286,6 @@ app.config.globalProperties.$locale = {
     getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18n.global.t),
     getAllShortWeekdayNames: () => getAllShortWeekdayNames(i18n.global.t),
     getAllMinWeekdayNames: () => getAllMinWeekdayNames(i18n.global.t),
-    getInputTimeIntlDateTimeFormatOptions: () => getInputTimeIntlDateTimeFormatOptions(i18n.global.t),
     setLanguage: setLanguage,
     getTimezone: settings.getTimezone,
     setTimezone: setTimezone,

@@ -250,19 +250,6 @@ export function getAllMinWeekdayNames(translateFn) {
     ];
 }
 
-export function getInputTimeIntlDateTimeFormatOptions(translateFn) {
-    const hourMinuteFormat = translateFn('input-format.datetime.long');
-    const is24HourFormat = hourMinuteFormat.indexOf('H') > 0;
-    const hour2Digits = (hourMinuteFormat.indexOf('HH') > 0) || (hourMinuteFormat.indexOf('hh') > 0);
-    const minute2Digits = hourMinuteFormat.indexOf(':mm') > 0;
-
-    return {
-        hour12: !is24HourFormat,
-        hour: hour2Digits ? '2-digit' : 'numeric',
-        minute: minute2Digits ? '2-digit' : 'numeric'
-    };
-}
-
 export function getAllTimezones(includeSystemDefault, translateFn) {
     const defaultTimezoneOffset = utils.getTimezoneOffset();
     const defaultTimezoneOffsetMinutes = utils.getTimezoneOffsetMinutes();

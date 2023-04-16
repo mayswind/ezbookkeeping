@@ -158,6 +158,10 @@ function getCurrentUnixTime() {
     return moment().unix();
 }
 
+function getCurrentDateTime() {
+    return moment();
+}
+
 function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     if (isNumber(utcOffset)) {
         if (!isNumber(currentUtcOffset)) {
@@ -168,6 +172,16 @@ function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     }
 
     return moment.unix(unixTime);
+}
+
+function is24HourFormat(format) {
+    if (format.indexOf('HH') >= 0 && format.indexOf('hh') < 0) {
+        return true;
+    } else if (format.indexOf('HH') < 0 && format.indexOf('hh') >= 0) {
+        return false;
+    }
+
+    return true;
 }
 
 function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
@@ -881,7 +895,9 @@ export default {
     getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
     getCurrentUnixTime,
+    getCurrentDateTime,
     parseDateFromUnixTime,
+    is24HourFormat,
     formatUnixTime,
     formatTime,
     getUnixTime,

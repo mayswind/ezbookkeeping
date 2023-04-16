@@ -69,7 +69,8 @@ export default {
                     iosSwipeBackAnimateShadow: false,
                     mdSwipeBackAnimateShadow: false
                 }
-            }
+            },
+            isDarkMode: undefined
         }
     },
     created() {
@@ -87,6 +88,8 @@ export default {
     },
     mounted() {
         f7ready((f7) => {
+            this.isDarkMode = f7.darkMode;
+
             f7.on('pageBeforeOut',  () => {
                 if (this.$ui.isModalShowing()) {
                     f7.actions.close('.actions-modal.modal-in', false);
@@ -95,6 +98,10 @@ export default {
                     f7.popup.close('.popup.modal-in', false);
                     f7.sheet.close('.sheet-modal.modal-in', false);
                 }
+            });
+
+            f7.on('darkModeChange', (isDarkMode) => {
+                this.isDarkMode = isDarkMode;
             });
         });
     },
@@ -182,6 +189,15 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .chip.chip-placeholder {
     border: 0;
+}
+
+/** Replacing the default style of vue-datepicker **/
+.dp__theme_light {
+    --dp-primary-color: #c67e48;
+}
+
+.dp__theme_dark {
+    --dp-primary-color: #c67e48;
 }
 
 /** Common class for replacing the default style of framework7 **/

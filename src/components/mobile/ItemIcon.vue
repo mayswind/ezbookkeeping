@@ -1,5 +1,5 @@
 <template>
-    <f7-icon :icon="icon" :style="style">
+    <f7-icon :f7="f7Icon" :icon="icon" :style="style">
         <slot></slot>
     </f7-icon>
 </template>
@@ -14,11 +14,20 @@ export default {
         'additionalColorAttr'
     ],
     computed: {
+        f7Icon() {
+            if (this.iconType === 'fixed-f7') {
+                return this.iconId;
+            } else {
+                return '';
+            }
+        },
         icon() {
             if (this.iconType === 'account') {
                 return this.getAccountIcon(this.iconId);
             } else if (this.iconType === 'category') {
                 return this.getCategoryIcon(this.iconId);
+            } else if (this.iconType === 'fixed') {
+                return this.iconId;
             } else {
                 return '';
             }

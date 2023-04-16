@@ -134,6 +134,8 @@ import InformationSheet from './components/mobile/InformationSheet.vue';
 import NumberPadSheet from './components/mobile/NumberPadSheet.vue';
 import TransactionTagSelectionSheet from './components/mobile/TransactionTagSelectionSheet.vue';
 
+import TextareaAutoSize from "./directives/mobile/textareaAutoSize.js";
+
 import App from './Mobile.vue';
 
 Framework7.use([
@@ -247,6 +249,8 @@ app.component('ColorSelectionSheet', ColorSelectionSheet);
 app.component('InformationSheet', InformationSheet);
 app.component('NumberPadSheet', NumberPadSheet);
 app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
+
+app.directive('TextareaAutoSize', TextareaAutoSize);
 
 app.config.globalProperties.$version = version.getVersion();
 app.config.globalProperties.$buildTime = version.getBuildTime();

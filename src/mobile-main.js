@@ -121,9 +121,10 @@ import stores from './store/index.js';
 
 import ItemIcon from './components/mobile/ItemIcon.vue';
 import PieChart from './components/mobile/PieChart.vue';
+import PinCodeInput from './components/mobile/PinCodeInput.vue';
+import PinCodeInputSheet from './components/mobile/PinCodeInputSheet.vue';
 import PasswordInputSheet from './components/mobile/PasswordInputSheet.vue';
 import PasscodeInputSheet from './components/mobile/PasscodeInputSheet.vue';
-import PinCodeInputSheet from './components/mobile/PinCodeInputSheet.vue';
 import DateRangeSelectionSheet from './components/mobile/DateRangeSelectionSheet.vue';
 import ListItemSelectionSheet from './components/mobile/ListItemSelectionSheet.vue';
 import TwoColumnListItemSelectionSheet from './components/mobile/TwoColumnListItemSelectionSheet.vue';
@@ -238,9 +239,10 @@ app.component('VueDatePicker', VueDatePicker);
 
 app.component('ItemIcon', ItemIcon);
 app.component('PieChart', PieChart);
+app.component('PinCodeInput', PinCodeInput);
+app.component('PinCodeInputSheet', PinCodeInputSheet);
 app.component('PasswordInputSheet', PasswordInputSheet);
 app.component('PasscodeInputSheet', PasscodeInputSheet);
-app.component('PinCodeInputSheet', PinCodeInputSheet);
 app.component('DateRangeSelectionSheet', DateRangeSelectionSheet);
 app.component('ListItemSelectionSheet', ListItemSelectionSheet);
 app.component('TwoColumnListItemSelectionSheet', TwoColumnListItemSelectionSheet);

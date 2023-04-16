@@ -6,8 +6,8 @@
                 <div style="font-size: 18px"><b>{{ title }}</b></div>
             </div>
             <div class="padding-horizontal padding-bottom">
-                <p class="no-margin-top margin-bottom-half">{{ hint }}</p>
-                <f7-list no-hairlines class="no-margin-top margin-bottom">
+                <p class="no-margin">{{ hint }}</p>
+                <f7-list no-hairlines class="no-margin">
                     <f7-list-item class="list-item-pincode-input">
                         <pin-code-input :secure="true" :length="6" v-model="currentPinCode"/>
                     </f7-list-item>

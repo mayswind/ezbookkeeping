@@ -1,56 +1,60 @@
 <template>
-    <f7-sheet style="height: auto" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              style="height: auto" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-row>
-                <f7-col width="50">
+            <div class="grid grid-cols-2 grid-gap">
+                <div>
                     <div class="primary-list-container">
-                        <f7-list no-hairlines class="primary-list no-margin-top no-margin-bottom">
+                        <f7-list dividers no-hairlines class="primary-list no-margin-top no-margin-bottom">
                             <f7-list-item link="#" no-chevron
                                           v-for="item in items"
-                                          :key="item | itemFieldContent(primaryKeyField, item, false)"
+                                          :key="primaryKeyField ? item[primaryKeyField] : item"
                                           :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
-                                          :value="item | itemFieldContent(primaryValueField, item, false)"
-                                          :title="item | itemFieldContent(primaryTitleField, null, primaryTitleI18n)"
-                                          :header="item | itemFieldContent(primaryHeaderField, null, primaryHeaderI18n)"
-                                          :footer="item | itemFieldContent(primaryFooterField, null, primaryFooterI18n)"
+                                          :value="primaryValueField ? item[primaryValueField] : item"
+                                          :title="$tIf(item[primaryTitleField], primaryTitleI18n)"
+                                          :header="$tIf(item[primaryHeaderField], primaryHeaderI18n)"
+                                          :footer="$tIf(item[primaryFooterField], primaryFooterI18n)"
                                           @click="onPrimaryItemClicked(item)">
-                                <f7-icon slot="media"
-                                         :icon="item[primaryIconField] | icon(primaryIconType)"
-                                         :style="item[primaryColorField] | iconStyle(primaryIconType, 'var(--default-icon-color)')"
-                                         v-if="primaryIconField"></f7-icon>
-                                <f7-icon slot="after" class="list-item-showing" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
+                                <template #media>
+                                    <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]" :color="item[primaryColorField]"></ItemIcon>
+                                </template>
+                                <template #after>
+                                    <f7-icon class="list-item-showing" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
+                                </template>
                             </f7-list-item>
                         </f7-list>
                     </div>
-                </f7-col>
-                <f7-col width="50">
+                </div>
+                <div>
                     <div class="secondary-list-container">
-                        <f7-list no-hairlines class="secondary-list no-margin-top no-margin-bottom" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
+                        <f7-list dividers no-hairlines class="secondary-list no-margin-top no-margin-bottom" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                             <f7-list-item link="#" no-chevron
                                           v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
-                                          :key="subItem | itemFieldContent(secondaryKeyField, subItem, false)"
+                                          :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                           :class="{ 'secondary-list-item-selected': isSecondarySelected(subItem) }"
-                                          :value="subItem | itemFieldContent(secondaryValueField, subItem, false)"
-                                          :title="subItem | itemFieldContent(secondaryTitleField, null, secondaryTitleI18n)"
-                                          :header="subItem | itemFieldContent(secondaryHeaderField, null, secondaryHeaderI18n)"
-                                          :footer="subItem | itemFieldContent(secondaryFooterField, null, secondaryFooterI18n)"
+                                          :value="secondaryValueField ? subItem[secondaryValueField] : subItem"
+                                          :title="$tIf(subItem[secondaryTitleField], secondaryTitleI18n)"
+                                          :header="$tIf(subItem[secondaryHeaderField], secondaryHeaderI18n)"
+                                          :footer="$tIf(subItem[secondaryFooterField], secondaryFooterI18n)"
                                           @click="onSecondaryItemClicked(subItem)">
-                                <f7-icon slot="media"
-                                         :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
-                                         :style="subItem[secondaryColorField] | iconStyle(secondaryIconType, 'var(--default-icon-color)')"
-                                         v-if="secondaryIconField"></f7-icon>
-                                <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
+                                <template #media>
+                                    <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]" :color="subItem[secondaryColorField]"></ItemIcon>
+                                </template>
+                                <template #after>
+                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
+                                </template>
                             </f7-list-item>
                         </f7-list>
                     </div>
-                </f7-col>
-            </f7-row>
+                </div>
+            </div>
         </f7-page-content>
     </f7-sheet>
 </template>
@@ -58,7 +62,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',
@@ -85,12 +89,16 @@ export default {
         'items',
         'show'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 
         return {
-            currentPrimaryValue: self.getPrimaryValueBySecondaryValue(self.value),
-            currentSecondaryValue: self.value
+            currentPrimaryValue: self.getPrimaryValueBySecondaryValue(self.modelValue),
+            currentSecondaryValue: self.modelValue
         }
     },
     computed: {
@@ -126,13 +134,13 @@ export default {
     },
     methods: {
         onSheetOpen(event) {
-            this.currentPrimaryValue = this.getPrimaryValueBySecondaryValue(this.value);
-            this.currentSecondaryValue = this.value;
+            this.currentPrimaryValue = this.getPrimaryValueBySecondaryValue(this.modelValue);
+            this.currentSecondaryValue = this.modelValue;
             this.scrollToSelectedItem(event.$el, '.primary-list-container', 'li.primary-list-item-selected');
             this.scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
         },
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         },
         onPrimaryItemClicked(item) {
             if (this.primaryValueField) {
@@ -148,8 +156,8 @@ export default {
                 this.currentSecondaryValue = subItem;
             }
 
-            this.$emit('input', this.currentSecondaryValue);
-            this.$emit('update:show', false);
+            this.$emit('update:modelValue', this.currentSecondaryValue);
+            this.close();
         },
         isSecondarySelected(subItem) {
             if (this.secondaryValueField) {
@@ -226,6 +234,9 @@ export default {
             }
 
             container.scrollTop(targetPos);
+        },
+        close() {
+            this.$emit('update:show', false);
         }
     }
 }

@@ -17,7 +17,9 @@
         </f7-list>
 
         <f7-list strong inset dividers :class="{ 'disabled': loading }">
-            <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
+            <f7-list-button :class="{ 'disabled': !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0' }"
+                            v-if="isDataExportingEnabled"
+                            @click="exportedData = null; showExportDataSheet = true">{{ $t('Export Data') }}</f7-list-button>
             <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
         </f7-list>
 

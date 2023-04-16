@@ -8,6 +8,7 @@
                    :type="codes[index].inputType"
                    @keydown="onKeydown(index, $event)"
                    @paste="onPaste(index, $event)"
+                   @change="onInput(index, $event)"
             />
         </div>
     </div>
@@ -85,6 +86,27 @@ export default {
                 }
 
                 this.codes.push(code);
+            }
+        },
+        autoFillText(index, text) {
+            let lastIndex = index;
+
+            for (let i = index, j = 0; i < this.codes.length && j < text.length; i++, j++) {
+                if (text[j] < '0' || text[j] > '9') {
+                    this.codes[i].value = '';
+                    this.$forceUpdate();
+                    break;
+                }
+
+                this.codes[i].value = text[j];
+                this.setInputType(i);
+                lastIndex = i;
+            }
+
+            this.setFocus(lastIndex);
+
+            if (this.finalPinCode.length === this.length) {
+                this.$emit('pincode:confirm', this.finalPinCode);
             }
         },
         setInputType(index) {
@@ -194,23 +216,17 @@ export default {
                 return;
             }
 
-            let lastIndex = index;
+            this.autoFillText(index, text);
 
-            for (let i = index, j = 0; i < this.codes.length && j < text.length; i++, j++) {
-                if (text[j] < '0' || text[j] > '9') {
-                    break;
-                }
-
-                this.codes[i].value = text[j];
-                this.setInputType(i);
-                lastIndex = i;
+            event.preventDefault();
+        },
+        onInput(index, event) {
+            if (!event.target.value) {
+                event.preventDefault();
+                return;
             }
 
-            this.setFocus(lastIndex);
-
-            if (this.finalPinCode.length === this.length) {
-                this.$emit('pincode:confirm', this.finalPinCode);
-            }
+            this.autoFillText(index, event.target.value);
 
             event.preventDefault();
         }

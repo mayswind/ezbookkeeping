@@ -71,9 +71,6 @@ export default {
         };
     },
     computed: {
-        currentTimezoneOffsetMinutes() {
-            return this.$utilities.getTimezoneOffsetMinutes();
-        },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
         },

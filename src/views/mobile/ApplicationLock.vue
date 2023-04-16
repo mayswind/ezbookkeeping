@@ -5,38 +5,26 @@
             <f7-nav-title :title="$t('Application Lock')"></f7-nav-title>
         </f7-navbar>
 
-        <f7-card v-if="isEnableApplicationLock">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('Status')" :after="$t('Enabled')"></f7-list-item>
-                    <f7-list-item v-if="isSupportedWebAuthn">
-                        <span>{{ $t('Face ID / Touch ID') }}</span>
-                        <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
-                    </f7-list-item>
-                    <f7-list-button @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
-
-        <f7-card v-else-if="!isEnableApplicationLock">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('Status')" :after="$t('Disabled')"></f7-list-item>
-                    <f7-list-button @click="enable(null)">{{ $t('Enable') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top">
+            <f7-list-item :title="$t('Status')" :after="$t(isEnableApplicationLock ? 'Enabled' : 'Disabled')"></f7-list-item>
+            <f7-list-item v-if="isEnableApplicationLock && isSupportedWebAuthn">
+                <span>{{ $t('Face ID / Touch ID') }}</span>
+                <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
+            </f7-list-item>
+            <f7-list-button v-if="isEnableApplicationLock" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
+            <f7-list-button v-if="!isEnableApplicationLock" @click="enable(null)">{{ $t('Enable') }}</f7-list-button>
+        </f7-list>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
                               :hint="$t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
-                              :show.sync="showInputPinCodeSheetForEnable"
+                              v-model:show="showInputPinCodeSheetForEnable"
                               v-model="currentPinCodeForEnable"
                               @pincode:confirm="enable">
         </pin-code-input-sheet>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
                               :hint="$t('Please enter your current PIN code when disable application lock')"
-                              :show.sync="showInputPinCodeSheetForDisable"
+                              v-model:show="showInputPinCodeSheetForDisable"
                               v-model="currentPinCodeForDisable"
                               @pincode:confirm="disable">
         </pin-code-input-sheet>

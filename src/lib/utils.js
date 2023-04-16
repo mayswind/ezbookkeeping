@@ -572,6 +572,38 @@ function getExchangedAmount(amount, fromRate, toRate) {
     return amount * exchangeRate;
 }
 
+function formatPercent(value, precision, lowPrecisionValue) {
+    const ratio = Math.pow(10, precision);
+    const normalizedValue = Math.floor(value * ratio);
+
+    if (value > 0 && normalizedValue < 1 && lowPrecisionValue) {
+        return lowPrecisionValue + '%';
+    }
+
+    const result = normalizedValue / ratio;
+    return result + '%';
+}
+
+function limitText(value, maxLength) {
+    let length = 0;
+
+    for (let i = 0; i < value.length; i++) {
+        const c = value.charCodeAt(i);
+
+        if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+            length++;
+        } else {
+            length += 2;
+        }
+    }
+
+    if (length <= maxLength || maxLength <= 3) {
+        return value;
+    }
+
+    return value.substring(0, maxLength - 3) + '...';
+}
+
 function base64encode(arrayBuffer) {
     if (!arrayBuffer || arrayBuffer.length === 0) {
         return null;
@@ -883,6 +915,8 @@ export default {
     numericCurrencyToString,
     stringCurrencyToNumeric,
     getExchangedAmount,
+    formatPercent,
+    limitText,
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,

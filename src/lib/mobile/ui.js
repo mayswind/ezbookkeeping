@@ -109,18 +109,18 @@ export function routeBackOnError(f7router, errorPropertyName) {
     });
 }
 
-export function autoChangeTextareaSize(el) {
-    f7.$(el).find('textarea').each(el => {
-        el.scrollTop = 0;
-        el.style.height = '';
-        el.style.height = el.scrollHeight + 'px';
-    });
-}
-
 export function isModalShowing() {
     return f7.$('.modal-in').length;
 }
 
 export function onSwipeoutDeleted(domId, callback) {
     f7.swipeout.delete(f7.$('#' + domId), callback);
+}
+
+export function autoChangeTextareaSize(el) {
+    f7.$(el).find('textarea').each(el => {
+        el.scrollTop = 0;
+        el.style.height = '';
+        el.style.height = el.scrollHeight + 'px';
+    });
 }

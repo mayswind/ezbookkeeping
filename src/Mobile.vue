@@ -328,6 +328,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 .list .item-content .list-item-checked-icon {
     font-size: 20px;
     color: var(--f7-radio-active-color, var(--f7-theme-color));
+    margin-right: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
 }
 
 .list li.no-margin .item-content.item-input {

@@ -9,8 +9,8 @@
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content class="margin-top no-padding-top">
-            <f7-list dividers no-hairlines class="no-margin-top no-margin-bottom">
+        <f7-page-content>
+            <f7-list dividers no-hairlines class="no-margin-vertical">
                 <f7-list-item link="#" no-chevron
                               v-for="(item, index) in items"
                               :key="getItemValue(item, index, keyField, valueType)"
@@ -21,8 +21,8 @@
                     <template #content-start>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>
                     </template>
-                    <template #media>
-                        <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]" v-if="iconField"></ItemIcon>
+                    <template #media v-if="iconField">
+                        <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]"></ItemIcon>
                     </template>
                 </f7-list-item>
             </f7-list>

@@ -1,4 +1,4 @@
-import { f7 } from 'framework7-vue';
+import { f7, f7ready } from 'framework7-vue';
 
 import settings from "../settings.js";
 import {
@@ -15,35 +15,39 @@ export function showAlert(message, confirmCallback, translateFn) {
         parameters = getLocalizedErrorParameters(localizedError.parameters, s => translateFn(s));
     }
 
-    f7.dialog.create({
-        title: translateFn('global.app.title'),
-        text: translateFn(message, parameters),
-        animate: settings.isEnableAnimate(),
-        buttons: [
-            {
-                text: translateFn('OK'),
-                onClick: confirmCallback
-            }
-        ]
-    }).open();
+    f7ready((f7) => {
+        f7.dialog.create({
+            title: translateFn('global.app.title'),
+            text: translateFn(message, parameters),
+            animate: settings.isEnableAnimate(),
+            buttons: [
+                {
+                    text: translateFn('OK'),
+                    onClick: confirmCallback
+                }
+            ]
+        }).open();
+    });
 }
 
 export function showConfirm(message, confirmCallback, cancelCallback, translateFn) {
-    f7.dialog.create({
-        title: translateFn('global.app.title'),
-        text: translateFn(message),
-        animate: settings.isEnableAnimate(),
-        buttons: [
-            {
-                text: translateFn('Cancel'),
-                onClick: cancelCallback
-            },
-            {
-                text: translateFn('OK'),
-                onClick: confirmCallback
-            }
-        ]
-    }).open();
+    f7ready((f7) => {
+        f7.dialog.create({
+            title: translateFn('global.app.title'),
+            text: translateFn(message),
+            animate: settings.isEnableAnimate(),
+            buttons: [
+                {
+                    text: translateFn('Cancel'),
+                    onClick: cancelCallback
+                },
+                {
+                    text: translateFn('OK'),
+                    onClick: confirmCallback
+                }
+            ]
+        }).open();
+    });
 }
 
 export function showToast(message, timeout, translateFn) {
@@ -55,27 +59,35 @@ export function showToast(message, timeout, translateFn) {
         parameters = getLocalizedErrorParameters(localizedError.parameters, s => translateFn(s));
     }
 
-    f7.toast.create({
-        text: translateFn(message, parameters),
-        position: 'center',
-        closeTimeout: timeout || 1500
-    }).open();
+    f7ready((f7) => {
+        f7.toast.create({
+            text: translateFn(message, parameters),
+            position: 'center',
+            closeTimeout: timeout || 1500
+        }).open();
+    });
 }
 
 export function showLoading(delayConditionFunc, delayMills) {
     if (!delayConditionFunc) {
-        return f7.preloader.show();
+        f7ready((f7) => {
+            return f7.preloader.show();
+        });
     }
 
-    setTimeout(() => {
-        if (delayConditionFunc()) {
-            f7.preloader.show();
-        }
-    }, delayMills || 200);
+    f7ready((f7) => {
+        setTimeout(() => {
+            if (delayConditionFunc()) {
+                f7.preloader.show();
+            }
+        }, delayMills || 200);
+    });
 }
 
 export function hideLoading() {
-    return f7.preloader.hide();
+    f7ready((f7) => {
+        return f7.preloader.hide();
+    });
 }
 
 export function routeBackOnError(f7router, errorPropertyName) {

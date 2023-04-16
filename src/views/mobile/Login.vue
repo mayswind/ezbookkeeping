@@ -1,7 +1,7 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
-            <img class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+            <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 

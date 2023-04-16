@@ -89,6 +89,7 @@ export default {
     mounted() {
         f7ready((f7) => {
             this.isDarkMode = f7.darkMode;
+            this.setThemeColorMeta(f7.darkMode);
 
             f7.on('pageBeforeOut',  () => {
                 if (this.$ui.isModalShowing()) {
@@ -102,6 +103,7 @@ export default {
 
             f7.on('darkModeChange', (isDarkMode) => {
                 this.isDarkMode = isDarkMode;
+                this.setThemeColorMeta(isDarkMode);
             });
         });
     },
@@ -114,6 +116,13 @@ export default {
             }
 
             return false;
+        },
+        setThemeColorMeta(isDarkMode) {
+            if (isDarkMode) {
+                document.querySelector('meta[name=theme-color]').setAttribute('content', '#121212');
+            } else {
+                document.querySelector('meta[name=theme-color]').setAttribute('content', '#f6f6f8');
+            }
         }
     }
 }

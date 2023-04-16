@@ -8,91 +8,134 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-input label="Category Name" placeholder="Your category name"></f7-list-input>
-                    <f7-list-item class="list-item-with-header-and-title" header="Category Icon" link="#">
-                        <f7-block slot="title" class="list-item-custom-title no-padding">
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </f7-block>
-                    </f7-list-item>
-                    <f7-list-item class="list-item-with-header-and-title" header="Category Color" link="#">
-                        <f7-block slot="title" class="list-item-custom-title no-padding">
-                            <f7-icon f7="app_fill"></f7-icon>
-                        </f7-block>
-                    </f7-list-item>
-                    <f7-list-item class="list-item-toggle" header="Visible" after="True"></f7-list-item>
-                    <f7-list-input label="Description" type="textarea" placeholder="Your category description (optional)"></f7-list-input>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-input label="Category Name" placeholder="Your category name"></f7-list-input>
+            <f7-list-item class="list-item-with-header-and-title list-item-with-multi-item">
+                <template #default>
+                    <div class="grid grid-cols-2">
+                        <div class="list-item-subitem no-chevron">
+                            <a class="item-link" href="#">
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-header">
+                                            <span>Category Icon</span>
+                                        </div>
+                                        <div class="item-title">
+                                            <div class="list-item-custom-title no-padding">
+                                                <f7-icon f7="app_fill"></f7-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="list-item-subitem no-chevron">
+                            <a class="item-link" href="#">
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-header">
+                                            <span>Category Color</span>
+                                        </div>
+                                        <div class="item-title">
+                                            <div class="list-item-custom-title no-padding">
+                                                <f7-icon f7="app_fill"></f7-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
+            <f7-list-item class="list-item-toggle" header="Visible" after="True"></f7-list-item>
+            <f7-list-input label="Description" type="textarea" placeholder="Your category description (optional)"></f7-list-input>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form>
-                    <f7-list-input
-                        type="text"
-                        clear-button
-                        :label="$t('Category Name')"
-                        :placeholder="$t('Your category name')"
-                        :value="category.name"
-                        @input="category.name = $event.target.value"
-                    ></f7-list-input>
+        <f7-list form strong inset dividers class="margin-top" v-else-if="!loading">
+            <f7-list-input
+                type="text"
+                clear-button
+                :label="$t('Category Name')"
+                :placeholder="$t('Your category name')"
+                v-model:value="category.name"
+            ></f7-list-input>
 
-                    <f7-list-item class="list-item-with-header-and-title"
-                                  key="singleTypeCategoryIconSelection" link="#"
-                                  :header="$t('Category Icon')"
-                                  @click="category.showIconSelectionSheet = true">
-                        <f7-block slot="title" class="list-item-custom-title no-padding">
-                            <f7-icon :icon="category.icon | categoryIcon"
-                                     :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
-                        </f7-block>
-                        <icon-selection-sheet :all-icon-infos="allCategoryIcons"
-                                              :show.sync="category.showIconSelectionSheet"
-                                              :color="category.color"
-                                              v-model="category.icon"
-                        ></icon-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-with-multi-item">
+                <template #default>
+                    <div class="grid grid-cols-2">
+                        <div class="list-item-subitem no-chevron">
+                            <a class="item-link" href="#" @click="category.showIconSelectionSheet = true">
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-header">
+                                            <span>{{ $t('Category Icon') }}</span>
+                                        </div>
+                                        <div class="item-title">
+                                            <div class="list-item-custom-title no-padding">
+                                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
 
-                    <f7-list-item class="list-item-with-header-and-title"
-                                  key="singleTypeCategoryColorSelection" link="#"
-                                  :header="$t('Category Color')"
-                                  @click="category.showColorSelectionSheet = true">
-                        <f7-block slot="title" class="list-item-custom-title no-padding">
-                            <f7-icon f7="app_fill"
-                                     :style="category.color | categoryIconStyle('var(--default-icon-color)')"></f7-icon>
-                        </f7-block>
-                        <color-selection-sheet :all-color-infos="allCategoryColors"
-                                               :show.sync="category.showColorSelectionSheet"
-                                               v-model="category.color"
-                        ></color-selection-sheet>
-                    </f7-list-item>
+                            <icon-selection-sheet :all-icon-infos="allCategoryIcons"
+                                                  :color="category.color"
+                                                  v-model:show="category.showIconSelectionSheet"
+                                                  v-model="category.icon"
+                            ></icon-selection-sheet>
+                        </div>
+                        <div class="list-item-subitem no-chevron">
+                            <a class="item-link" href="#" @click="category.showColorSelectionSheet = true">
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-header">
+                                            <span>{{ $t('Category Color') }}</span>
+                                        </div>
+                                        <div class="item-title">
+                                            <div class="list-item-custom-title no-padding">
+                                                <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="category.color"></ItemIcon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
 
-                    <f7-list-item :header="$t('Visible')" v-if="editCategoryId">
-                        <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
-                    </f7-list-item>
+                            <color-selection-sheet :all-color-infos="allCategoryColors"
+                                                   v-model:show="category.showColorSelectionSheet"
+                                                   v-model="category.color"
+                            ></color-selection-sheet>
+                        </div>
+                    </div>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-input
-                        type="textarea"
-                        class="textarea-auto-size"
-                        style="height: auto"
-                        :label="$t('Description')"
-                        :placeholder="$t('Your category description (optional)')"
-                        :value="category.comment"
-                        @input="category.comment = $event.target.value"
-                    ></f7-list-input>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-item :header="$t('Visible')" v-if="editCategoryId">
+                <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
+            </f7-list-item>
+
+            <f7-list-input
+                type="textarea"
+                style="height: auto"
+                :label="$t('Description')"
+                :placeholder="$t('Your category description (optional)')"
+                v-textarea-auto-size
+                v-model:value="category.comment"
+            ></f7-list-input>
+        </f7-list>
     </f7-page>
 </template>
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         return {
             editCategoryId: null,
@@ -150,7 +193,7 @@ export default {
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         if (!query.id && !query.parentId) {
             self.$toast('Parameter Invalid');
@@ -197,16 +240,13 @@ export default {
             self.loading = false;
         }
     },
-    updated: function () {
-        this.autoChangeCommentTextareaSize();
-    },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         save() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             const problemMessage = self.inputEmptyProblemMessage;
 
@@ -252,16 +292,6 @@ export default {
                 if (!error.processed) {
                     self.$toast(error.message || error);
                 }
-            });
-        },
-        autoChangeCommentTextareaSize() {
-            const app = this.$f7;
-            const $$ = app.$;
-
-            $$('.textarea-auto-size textarea').each((idx, el) => {
-                el.scrollTop = 0;
-                el.style.height = '';
-                el.style.height = el.scrollHeight + 'px';
             });
         }
     }

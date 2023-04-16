@@ -5,7 +5,7 @@
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
-        <f7-list form>
+        <f7-list form dividers>
             <f7-list-input
                 type="text"
                 autocomplete="username"
@@ -50,7 +50,7 @@
         </f7-list>
 
         <f7-popover class="lang-popover-menu">
-            <f7-list>
+            <f7-list dividers>
                 <f7-list-item
                     link="#" no-chevron popover-close
                     v-for="(lang, locale) in allLanguages"

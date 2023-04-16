@@ -158,7 +158,6 @@ body {
 
 /** Replacing the default style of framework7 **/
 :root {
-    --f7-toolbar-height: 50px;
     --default-icon-color: var(--f7-text-color);
 }
 

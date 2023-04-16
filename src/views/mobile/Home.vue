@@ -163,7 +163,7 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-toolbar tabbar labels bottom>
+        <f7-toolbar tabbar bottom class="main-tabbar">
             <f7-link href="/transaction/list">
                 <f7-icon f7="square_list"></f7-icon>
                 <span class="tabbar-label">{{ $t('Details') }}</span>
@@ -403,19 +403,23 @@ export default {
     margin-right: 4px;
 }
 
-.tabbar .link {
+.tabbar.main-tabbar {
+    --f7-toolbar-height: 50px;
+}
+
+.tabbar.main-tabbar .link {
     padding-top: 4px;
     padding-bottom: 4px;
     justify-content: space-between;
 }
 
-.tabbar .link i + span.tabbar-label {
+.tabbar.main-tabbar .link i + span.tabbar-label {
     margin: 0;
     font-size: 12px;
     line-height: 1;
 }
 
-.tabbar .link i.ebk-tarbar-big-icon {
+.tabbar.main-tabbar .link i.ebk-tarbar-big-icon {
     font-size: 42px;
     width: 42px;
     height: 42px;

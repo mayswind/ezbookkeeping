@@ -198,7 +198,7 @@ export default {
         }
     },
     watch: {
-        'items':  {
+        'items': {
             handler() {
                 this.selectedIndex = 0;
             },

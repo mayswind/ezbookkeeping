@@ -129,7 +129,7 @@
                             </ItemIcon>
                             <div class="nested-list-item-title">
                                 <span>{{ account.name }}</span>
-                                <div class="item-footer" slot="footer" v-if="account.comment">{{ account.comment }}</div>
+                                <div class="item-footer" v-if="account.comment">{{ account.comment }}</div>
                             </div>
                         </div>
                         <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">

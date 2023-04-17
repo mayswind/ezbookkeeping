@@ -321,6 +321,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     background-color: transparent;
 }
 
+.list.list-dividers li:last-child > .swipeout-content > .item-link > .item-content > .item-inner:after {
+    background-color: transparent;
+}
+
 .list.inset li.list-group-title:first-child > a.button {
     border-radius: var(--f7-button-border-radius);
 }

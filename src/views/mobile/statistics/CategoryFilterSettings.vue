@@ -9,16 +9,23 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
             <f7-accordion-item>
-                <f7-block-title class="margin-top">
-                    <f7-accordion-toggle class="full-line">
-                        <span>Transaction Category</span>
-                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
+                <f7-block-title>
+                    <f7-accordion-toggle>
+                        <f7-list strong inset dividers media-list
+                                 class="combination-list-header combination-list-opened">
+                            <f7-list-item>
+                                <template #title>
+                                    <span>Transaction Category</span>
+                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+                                </template>
+                            </f7-list-item>
+                        </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox class="disabled" title="Category Name" v-for="itemIdx in [ 1, 2 ]">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
@@ -38,20 +45,29 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-block class="no-padding no-margin" v-else-if="!loading">
-            <f7-accordion-item :key="categoryType"
-                               :opened="collapseStates[categoryType].opened"
-                               v-for="(categories, categoryType) in allTransactionCategories"
+        <f7-block class="combination-list-wrapper margin-vertical"
+                  :key="categoryType"
+                  v-for="(categories, categoryType) in allTransactionCategories"
+                  v-else-if="!loading">
+            <f7-accordion-item :opened="collapseStates[categoryType].opened"
                                @accordion:open="collapseStates[categoryType].opened = true"
                                @accordion:close="collapseStates[categoryType].opened = false">
-                <f7-block-title class="margin-top">
+                <f7-block-title>
                     <f7-accordion-toggle>
-                        <span>{{ getCategoryTypeName(categoryType) }}</span>
-                        <f7-icon class="float-right" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                        <f7-list strong inset dividers media-list
+                                 class="combination-list-header"
+                                 :class="collapseStates[categoryType].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                            <f7-list-item>
+                                <template #title>
+                                    <span>{{ getCategoryTypeName(categoryType) }}</span>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[categoryType].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                </template>
+                            </f7-list-item>
+                        </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox v-for="category in categories"
                                       v-show="!category.hidden"
                                       :key="category.id"

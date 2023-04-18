@@ -9,16 +9,23 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="no-padding no-margin skeleton-text" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
             <f7-accordion-item>
-                <f7-block-title class="margin-top">
-                    <f7-accordion-toggle class="full-line">
-                        <span>Account Category</span>
-                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
+                <f7-block-title>
+                    <f7-accordion-toggle>
+                        <f7-list strong inset dividers media-list
+                                 class="combination-list-header combination-list-opened">
+                            <f7-list-item>
+                                <template #title>
+                                    <span>Account Category</span>
+                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
+                                </template>
+                            </f7-list-item>
+                        </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers accordion-list class="margin-bottom">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox class="disabled" title="Account Name" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
@@ -29,21 +36,30 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-block class="no-padding no-margin" v-else-if="!loading">
-            <f7-accordion-item :key="accountCategory.id"
-                               :opened="collapseStates[accountCategory.id].opened"
+        <f7-block class="combination-list-wrapper margin-vertical"
+                  :key="accountCategory.id"
+                  v-for="accountCategory in allAccountCategories"
+                  v-else-if="!loading">
+            <f7-accordion-item :opened="collapseStates[accountCategory.id].opened"
                                v-show="hasShownAccount(accountCategory)"
-                               v-for="accountCategory in allAccountCategories"
                                @accordion:open="collapseStates[accountCategory.id].opened = true"
                                @accordion:close="collapseStates[accountCategory.id].opened = false">
-                <f7-block-title class="margin-top">
+                <f7-block-title>
                     <f7-accordion-toggle>
-                        <span>{{ $t(accountCategory.name) }}</span>
-                        <f7-icon class="float-right" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                        <f7-list strong inset dividers media-list
+                                 class="combination-list-header"
+                                 :class="collapseStates[accountCategory.id].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                            <f7-list-item>
+                                <template #title>
+                                    <span>{{ $t(accountCategory.name) }}</span>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                </template>
+                            </f7-list-item>
+                        </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers accordion-list class="margin-bottom"
+                    <f7-list strong inset dividers accordion-list class="combination-list-content"
                              v-if="categorizedAccounts[accountCategory.id]">
                         <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
                                       v-show="!account.hidden"

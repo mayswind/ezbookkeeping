@@ -36,11 +36,6 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
-    'input-format': {
-        'datetime': {
-            'long': 'yyyy年m月d日 HH::mm',
-        },
-    },
     'dataExport': {
         'defaultExportFilename': 'ezBookkeeping_导出数据',
         'exportFilename': 'ezBookkeeping_{nickname}_导出数据'

@@ -36,11 +36,6 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
-    'input-format': { // The type of date or time format is framework7 format, ref: https://v5.framework7.io/docs/calendar.html#calendar-parameters
-        'datetime': {
-            'long': 'm/d/yyyy hh::mm A',
-        },
-    },
     'dataExport': {
         'defaultExportFilename': 'ezBookkeeping_export_data',
         'exportFilename': 'ezBookkeeping_{nickname}_export_data'

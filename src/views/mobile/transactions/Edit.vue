@@ -17,255 +17,256 @@
             </f7-subnavbar>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item
-                        class="transaction-edit-amount"
-                        style="font-size: 40px;"
-                        header="Expense Amount" title="0.00">
-                    </f7-list-item>
-                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names" link="#"></f7-list-item>
-                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title" header="Account" title="Account Name" link="#"></f7-list-item>
-                    <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
-                    <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
-                    <f7-list-item :no-chevron="mode === 'view'" header="Tags" link="#">
-                        <f7-block class="margin-top-half no-padding" slot="footer">
-                            <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
-                        </f7-block>
-                    </f7-list-item>
-                    <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item
+                class="transaction-edit-amount"
+                style="font-size: 40px;"
+                header="Expense Amount" title="0.00">
+            </f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
+            <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
+            <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
+            <f7-list-item header="Tags">
+                <template #footer>
+                    <f7-block class="margin-top-half no-padding no-margin">
+                        <f7-chip class="transaction-edit-tag" text="None"></f7-chip>
+                    </f7-block>
+                </template>
+            </f7-list-item>
+            <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list form :class="{ 'readonly': mode === 'view' }">
-                    <f7-list-item
-                        class="transaction-edit-amount"
-                        link="#" no-chevron
-                        :class="{ 'color-theme-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-theme-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
-                        :style="{ fontSize: sourceAmountFontSize + 'px' }"
-                        :header="$t(sourceAmountName)"
-                        :title="transaction.sourceAmount | finalAmount(transaction.hideAmount) | currency"
-                        @click="showSourceAmountSheet = true"
-                    >
-                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                          :max-value="$constants.transaction.maxAmount"
-                                          :show.sync="showSourceAmountSheet"
-                                          v-model="transaction.sourceAmount"
-                        ></number-pad-sheet>
-                    </f7-list-item>
+        <f7-list form strong inset dividers
+                 class="margin-vertical" :class="{ 'readonly': mode === 'view' }"
+                 v-else-if="!loading">
+            <f7-list-item
+                class="transaction-edit-amount"
+                link="#" no-chevron
+                :class="{ 'color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
+                :style="{ fontSize: sourceAmountFontSize + 'px' }"
+                :header="$t(sourceAmountName)"
+                :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount)"
+                @click="showSourceAmountSheet = true"
+            >
+                <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                  :max-value="$constants.transaction.maxAmount"
+                                  v-model:show="showSourceAmountSheet"
+                                  v-model="transaction.sourceAmount"
+                ></number-pad-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="transaction-edit-amount"
-                        link="#" no-chevron
-                        :style="{ fontSize: destinationAmountFontSize + 'px' }"
-                        :header="$t('Transfer In Amount')"
-                        :title="transaction.destinationAmount | finalAmount(transaction.hideAmount) | currency"
-                        @click="showDestinationAmountSheet = true"
-                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
-                    >
-                        <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                          :max-value="$constants.transaction.maxAmount"
-                                          :show.sync="showDestinationAmountSheet"
-                                          v-model="transaction.destinationAmount"
-                        ></number-pad-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="transaction-edit-amount"
+                link="#" no-chevron
+                :style="{ fontSize: destinationAmountFontSize + 'px' }"
+                :header="$t('Transfer In Amount')"
+                :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
+                @click="showDestinationAmountSheet = true"
+                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+            >
+                <number-pad-sheet :min-value="$constants.transaction.minAmount"
+                                  :max-value="$constants.transaction.maxAmount"
+                                  v-model:show="showDestinationAmountSheet"
+                                  v-model="transaction.destinationAmount"
+                ></number-pad-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-title-hide-overflow"
-                        key="expenseCategorySelection"
-                        link="#" :no-chevron="mode === 'view'"
-                        :class="{ 'disabled': !hasAvailableExpenseCategories }"
-                        :header="$t('Category')"
-                        @click="showCategorySheet = true"
-                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
-                    >
-                        <div slot="title" class="list-item-custom-title">
-                            <span>{{ transaction.expenseCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
-                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                            <span>{{ transaction.expenseCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
-                        </div>
-                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                   primary-sub-items-field="subCategories"
-                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                   :items="allCategories[$constants.category.allCategoryTypes.Expense]"
-                                                   :show.sync="showCategorySheet"
-                                                   v-model="transaction.expenseCategory">
-                        </tree-view-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-title-hide-overflow"
+                key="expenseCategorySelection"
+                link="#" no-chevron
+                :class="{ 'disabled': !hasAvailableExpenseCategories }"
+                :header="$t('Category')"
+                @click="showCategorySheet = true"
+                v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
+            >
+                <template #title>
+                    <div class="list-item-custom-title">
+                        <span>{{ getPrimaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <span>{{ getSecondaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                    </div>
+                </template>
+                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-sub-items-field="subCategories"
+                                           secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           :items="allCategories[$constants.category.allCategoryTypes.Expense]"
+                                           v-model:show="showCategorySheet"
+                                           v-model="transaction.expenseCategory">
+                </tree-view-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-title-hide-overflow"
-                        key="incomeCategorySelection"
-                        link="#" :no-chevron="mode === 'view'"
-                        :class="{ 'disabled': !hasAvailableIncomeCategories }"
-                        :header="$t('Category')"
-                        @click="showCategorySheet = true"
-                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
-                    >
-                        <div slot="title" class="list-item-custom-title">
-                            <span>{{ transaction.incomeCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
-                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                            <span>{{ transaction.incomeCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
-                        </div>
-                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                   primary-sub-items-field="subCategories"
-                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                   :items="allCategories[$constants.category.allCategoryTypes.Income]"
-                                                   :show.sync="showCategorySheet"
-                                                   v-model="transaction.incomeCategory">
-                        </tree-view-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-title-hide-overflow"
+                key="incomeCategorySelection"
+                link="#" no-chevron
+                :class="{ 'disabled': !hasAvailableIncomeCategories }"
+                :header="$t('Category')"
+                @click="showCategorySheet = true"
+                v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
+            >
+                <template #title>
+                    <div class="list-item-custom-title">
+                        <span>{{ getPrimaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <span>{{ getSecondaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                    </div>
+                </template>
+                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-sub-items-field="subCategories"
+                                           secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           :items="allCategories[$constants.category.allCategoryTypes.Income]"
+                                           v-model:show="showCategorySheet"
+                                           v-model="transaction.incomeCategory">
+                </tree-view-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title list-item-title-hide-overflow"
-                        key="transferCategorySelection"
-                        link="#" :no-chevron="mode === 'view'"
-                        :class="{ 'disabled': !hasAvailableTransferCategories }"
-                        :header="$t('Category')"
-                        @click="showCategorySheet = true"
-                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
-                    >
-                        <div slot="title" class="list-item-custom-title">
-                            <span>{{ transaction.transferCategory | primaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
-                            <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                            <span>{{ transaction.transferCategory | secondaryCategoryName(allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
-                        </div>
-                        <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                   primary-sub-items-field="subCategories"
-                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                   :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
-                                                   :show.sync="showCategorySheet"
-                                                   v-model="transaction.transferCategory">
-                        </tree-view-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-title-hide-overflow"
+                key="transferCategorySelection"
+                link="#" no-chevron
+                :class="{ 'disabled': !hasAvailableTransferCategories }"
+                :header="$t('Category')"
+                @click="showCategorySheet = true"
+                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+            >
+                <template #title>
+                    <div class="list-item-custom-title">
+                        <span>{{ getPrimaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                        <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
+                        <span>{{ getSecondaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                    </div>
+                </template>
+                <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-sub-items-field="subCategories"
+                                           secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
+                                           v-model:show="showCategorySheet"
+                                           v-model="transaction.transferCategory">
+                </tree-view-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title"
-                        link="#" :no-chevron="mode === 'view'"
-                        :class="{ 'disabled': !allVisibleAccounts.length }"
-                        :header="$t(sourceAccountName)"
-                        :title="transaction.sourceAccountId | optionName(allAccounts, 'id', 'name')"
-                        @click="showSourceAccountSheet = true"
-                    >
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
-                                                              primary-title-field="name" primary-footer-field="displayBalance"
-                                                              primary-icon-field="icon" primary-icon-type="account"
-                                                              primary-sub-items-field="accounts"
-                                                              :primary-title-i18n="true"
-                                                              secondary-key-field="id" secondary-value-field="id"
-                                                              secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                              secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                              :items="categorizedAccounts"
-                                                              :show.sync="showSourceAccountSheet"
-                                                              v-model="transaction.sourceAccountId">
-                        </two-column-list-item-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title"
+                link="#" no-chevron
+                :class="{ 'disabled': !allVisibleAccounts.length }"
+                :header="$t(sourceAccountName)"
+                :title="$utilities.getNameByKeyValue(allAccounts, transaction.sourceAccountId, 'id', 'name')"
+                @click="showSourceAccountSheet = true"
+            >
+                <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
+                                                      primary-title-field="name" primary-footer-field="displayBalance"
+                                                      primary-icon-field="icon" primary-icon-type="account"
+                                                      primary-sub-items-field="accounts"
+                                                      :primary-title-i18n="true"
+                                                      secondary-key-field="id" secondary-value-field="id"
+                                                      secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                      secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                      :items="categorizedAccounts"
+                                                      v-model:show="showSourceAccountSheet"
+                                                      v-model="transaction.sourceAccountId">
+                </two-column-list-item-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                        class="list-item-with-header-and-title"
-                        link="#" :no-chevron="mode === 'view'"
-                        :class="{ 'disabled': !allVisibleAccounts.length }"
-                        :header="$t('Destination Account')"
-                        :title="transaction.destinationAccountId | optionName(allAccounts, 'id', 'name')"
-                        v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
-                        @click="showDestinationAccountSheet = true"
-                    >
-                        <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
-                                                              primary-title-field="name" primary-footer-field="displayBalance"
-                                                              primary-icon-field="icon" primary-icon-type="account"
-                                                              primary-sub-items-field="accounts"
-                                                              :primary-title-i18n="true"
-                                                              secondary-key-field="id" secondary-value-field="id"
-                                                              secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                              secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                              :items="categorizedAccounts"
-                                                              :show.sync="showDestinationAccountSheet"
-                                                              v-model="transaction.destinationAccountId">
-                        </two-column-list-item-selection-sheet>
-                    </f7-list-item>
+            <f7-list-item
+                class="list-item-with-header-and-title"
+                link="#" no-chevron
+                :class="{ 'disabled': !allVisibleAccounts.length }"
+                :header="$t('Destination Account')"
+                :title="$utilities.getNameByKeyValue(allAccounts, transaction.destinationAccountId, 'id', 'name')"
+                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+                @click="showDestinationAccountSheet = true"
+            >
+                <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
+                                                      primary-title-field="name" primary-footer-field="displayBalance"
+                                                      primary-icon-field="icon" primary-icon-type="account"
+                                                      primary-sub-items-field="accounts"
+                                                      :primary-title-i18n="true"
+                                                      secondary-key-field="id" secondary-value-field="id"
+                                                      secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                      secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                      :items="categorizedAccounts"
+                                                      v-model:show="showDestinationAccountSheet"
+                                                      v-model="transaction.destinationAccountId">
+                </two-column-list-item-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-input
-                        :label="$t('Transaction Time')"
-                        type="datepicker"
-                        class="transaction-edit-time"
-                        :calendar-params="{
-                            timePicker: true,
-                            dateFormat: $t('input-format.datetime.long'),
-                            firstDay: defaultFirstDayOfWeek,
-                            toolbarCloseText: $t('Done'),
-                            timePickerPlaceholder: $t('Select Time'),
-                            timePickerFormat: $locale.getInputTimeIntlDateTimeFormatOptions(),
-                            monthNames: $locale.getAllLongMonthNames(),
-                            monthNamesShort: $locale.getAllShortMonthNames(),
-                            dayNames: $locale.getAllLongWeekdayNames(),
-                            dayNamesShort: $locale.getAllShortWeekdayNames()}"
-                        :value="transaction.time"
-                        @calendar:change="transaction.time = $event"
-                    >
-                    </f7-list-input>
+            <f7-list-item
+                class="list-item-with-header-and-title"
+                link="#" no-chevron
+                :header="$t('Transaction Time')"
+                :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), this.$t('format.datetime.long'))"
+                @click="showTransactionDateTimeSheet = true"
+            >
+                <date-time-selection-sheet :title="$t('Transaction Time')"
+                                           v-model:show="showTransactionDateTimeSheet"
+                                           v-model="transaction.time">
+                </date-time-selection-sheet>
+            </f7-list-item>
 
-                    <f7-list-item
-                         :no-chevron="mode === 'view'"
-                        class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
-                        :header="$t('Transaction Time Zone')"
-                        smart-select :smart-select-params="{ openIn: 'popup', pageTitle: $t('Transaction Time Zone'), searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), closeOnSelect: true, popupCloseLinkText: $t('Done'), scrollToSelectedItem: true }">
-                        <select v-model="transaction.timeZone">
-                            <option v-for="timezone in allTimezones"
-                                    :key="timezone.name"
-                                    :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
-                        </select>
-                        <f7-block slot="title" class="list-item-custom-title no-padding">
-                            <span>{{ transaction.utcOffset | utcOffset }}</span>
-                            <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transaction.timeZone | optionName(allTimezones, 'name', 'displayName') }}</span>
-                        </f7-block>
-                    </f7-list-item>
+            <f7-list-item
+                :no-chevron="mode === 'view'"
+                class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
+                :header="$t('Transaction Time Zone')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Time Zone'), popupCloseLinkText: $t('Done') }">
+                <select v-model="transaction.timeZone">
+                    <option v-for="timezone in allTimezones"
+                            :key="timezone.name"
+                            :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                </select>
+                <template #title>
+                    <f7-block class="list-item-custom-title no-padding no-margin">
+                        <span>{{ `(UTC${$utilities.getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)})` }}</span>
+                        <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ $utilities.getNameByKeyValue(allTimezones, transaction.timeZone, 'name', 'displayName') }}</span>
+                    </f7-block>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-item
-                        link="#" :no-chevron="mode === 'view'"
-                        :header="$t('Tags')"
-                        @click="showTransactionTagSheet = true"
-                    >
-                        <transaction-tag-selection-sheet :items="allTags"
-                                                         :show.sync="showTransactionTagSheet"
-                                                         v-model="transaction.tagIds">
-                        </transaction-tag-selection-sheet>
+            <f7-list-item
+                link="#" no-chevron
+                :header="$t('Tags')"
+                @click="showTransactionTagSheet = true"
+            >
+                <transaction-tag-selection-sheet :items="allTags"
+                                                 v-model:show="showTransactionTagSheet"
+                                                 v-model="transaction.tagIds">
+                </transaction-tag-selection-sheet>
 
-                        <f7-block class="margin-top-half no-padding" slot="footer" v-if="transaction.tagIds && transaction.tagIds.length">
-                            <f7-chip class="transaction-edit-tag" media-bg-color="black"
-                                     v-for="tagId in transaction.tagIds"
-                                     :key="tagId"
-                                     :text="tagId | optionName(allTags, 'id', 'name')">
-                                <f7-icon slot="media" f7="number"></f7-icon>
-                            </f7-chip>
-                        </f7-block>
-                        <f7-block class="margin-top-half no-padding" slot="footer" v-else-if="!transaction.tagIds || !transaction.tagIds.length">
-                            <f7-chip class="transaction-edit-tag" :text="$t('None')">
-                            </f7-chip>
-                        </f7-block>
-                    </f7-list-item>
+                <template #footer>
+                    <f7-block class="margin-top-half no-padding no-margin" v-if="transaction.tagIds && transaction.tagIds.length">
+                        <f7-chip class="transaction-edit-tag" media-bg-color="black"
+                                 v-for="tagId in transaction.tagIds"
+                                 :key="tagId"
+                                 :text="$utilities.getNameByKeyValue(allTags, tagId, 'id', 'name')">
+                            <template #media>
+                                <f7-icon f7="number"></f7-icon>
+                            </template>
+                        </f7-chip>
+                    </f7-block>
+                    <f7-block class="margin-top-half no-padding no-margin" v-else-if="!transaction.tagIds || !transaction.tagIds.length">
+                        <f7-chip class="transaction-edit-tag" :text="$t('None')">
+                        </f7-chip>
+                    </f7-block>
+                </template>
+            </f7-list-item>
 
-                    <f7-list-input
-                        type="textarea"
-                        class="transaction-edit-comment textarea-auto-size"
-                        style="height: auto"
-                        :label="$t('Description')"
-                        :placeholder="mode !== 'view' ? $t('Your transaction description (optional)') : ''"
-                        :value="transaction.comment"
-                        @input="transaction.comment = $event.target.value"
-                    ></f7-list-input>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list-input
+                type="textarea"
+                class="transaction-edit-comment"
+                style="height: auto"
+                :label="$t('Description')"
+                :placeholder="mode !== 'view' ? $t('Your transaction description (optional)') : ''"
+                v-textarea-auto-size
+                v-model:value="transaction.comment"
+            ></f7-list-input>
+        </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -287,9 +288,13 @@
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
         const now = self.$utilities.getCurrentUnixTime();
         const currentTimezone = self.$locale.getTimezone();
 
@@ -306,8 +311,7 @@ export default {
             editTransactionId: null,
             transaction: {
                 type: defaultType,
-                unixTime: now,
-                time: self.$utilities.getLocalDatetimeFromUnixTime(now),
+                time: now,
                 timeZone: currentTimezone,
                 utcOffset: self.$utilities.getTimezoneOffsetMinutes(currentTimezone),
                 expenseCategory: '',
@@ -331,6 +335,7 @@ export default {
             showCategorySheet: false,
             showSourceAccountSheet: false,
             showDestinationAccountSheet: false,
+            showTransactionDateTimeSheet: false,
             showTransactionTagSheet: false
         };
     },
@@ -407,9 +412,9 @@ export default {
                         const account = accountCategory.accounts[i];
 
                         if (this.showAccountBalance && account.isAsset) {
-                            account.displayBalance = this.$options.filters.currency(account.balance, account.currency);
+                            account.displayBalance = this.$locale.getDisplayCurrency(account.balance, account.currency);
                         } else if (this.showAccountBalance && account.isLiability) {
-                            account.displayBalance = this.$options.filters.currency(-account.balance, account.currency);
+                            account.displayBalance = this.$locale.getDisplayCurrency(-account.balance, account.currency);
                         } else {
                             account.displayBalance = '***';
                         }
@@ -448,7 +453,7 @@ export default {
                         totalBalance = totalBalance + '+';
                     }
 
-                    accountCategory.displayBalance = this.$options.filters.currency(totalBalance, this.defaultCurrency);
+                    accountCategory.displayBalance = this.$locale.getDisplayCurrency(totalBalance, this.defaultCurrency);
                 } else {
                     accountCategory.displayBalance = '***';
                 }
@@ -543,20 +548,6 @@ export default {
                 this.transaction.sourceAmount = newValue;
             }
         },
-        'transaction.time': function (newValue) {
-            if (this.$utilities.isArray(newValue)) {
-                newValue = newValue[0];
-            }
-
-            if (!newValue) {
-                newValue = this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime());
-                this.transaction.time = [newValue];
-            }
-
-            if (this.$utilities.getUnixTimeFromLocalDatetime(newValue) !== this.transaction.unixTime) {
-                this.transaction.unixTime = this.$utilities.getUnixTimeFromLocalDatetime(newValue);
-            }
-        },
         'transaction.timeZone': function (newValue) {
             for (let i = 0; i < this.allTimezones.length; i++) {
                 if (this.allTimezones[i].name === newValue) {
@@ -568,11 +559,11 @@ export default {
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
-        if (self.$f7route.path === '/transaction/edit') {
+        if (self.f7route.path === '/transaction/edit') {
             self.mode = 'edit';
-        } else if (self.$f7route.path === '/transaction/detail') {
+        } else if (self.f7route.path === '/transaction/detail') {
             self.mode = 'view';
         }
 
@@ -695,8 +686,7 @@ export default {
                 if (self.mode === 'edit' || self.mode === 'view') {
                     self.transaction.utcOffset = transaction.utcOffset;
                     self.transaction.timeZone = null;
-                    self.transaction.unixTime = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes());
-                    self.transaction.time = [self.$utilities.getLocalDatetimeFromUnixTime(self.transaction.unixTime)];
+                    self.transaction.time = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes());
                 }
 
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
@@ -728,16 +718,13 @@ export default {
             }
         });
     },
-    updated: function () {
-        this.autoChangeCommentTextareaSize();
-    },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         save() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             if (self.mode === 'view') {
                 return;
@@ -745,7 +732,7 @@ export default {
 
             const submitTransaction = {
                 type: self.transaction.type,
-                time: self.$utilities.getActualUnixTimeForStore(self.transaction.unixTime, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes()),
+                time: self.$utilities.getActualUnixTimeForStore(self.transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes()),
                 sourceAccountId: self.transaction.sourceAccountId,
                 sourceAmount: self.transaction.sourceAmount,
                 destinationAccountId: '0',
@@ -809,16 +796,6 @@ export default {
                 doSubmit();
             }
         },
-        autoChangeCommentTextareaSize() {
-            const app = this.$f7;
-            const $$ = app.$;
-
-            $$('.textarea-auto-size textarea').each((idx, el) => {
-                el.scrollTop = 0;
-                el.style.height = '';
-                el.style.height = el.scrollHeight + 'px';
-            });
-        },
         isCategoryIdAvailable(categories, categoryId) {
             if (!categories || !categories.length) {
                 return false;
@@ -853,17 +830,15 @@ export default {
             } else {
                 return 40;
             }
-        }
-    },
-    filters: {
-        finalAmount(amount, hideAmount) {
+        },
+        getDisplayAmount(amount, currency, hideAmount) {
             if (hideAmount) {
-                return '***';
+                return this.$locale.getDisplayCurrency('***');
             }
 
-            return amount;
+            return this.$locale.getDisplayCurrency(amount);
         },
-        primaryCategoryName(categoryId, allCategories) {
+        getPrimaryCategoryName(categoryId, allCategories) {
             for (let i = 0; i < allCategories.length; i++) {
                 for (let j = 0; j < allCategories[i].subCategories.length; j++) {
                     const subCategory = allCategories[i].subCategories[j];
@@ -875,7 +850,7 @@ export default {
 
             return '';
         },
-        secondaryCategoryName(categoryId, allCategories) {
+        getSecondaryCategoryName(categoryId, allCategories) {
             for (let i = 0; i < allCategories.length; i++) {
                 for (let j = 0; j < allCategories[i].subCategories.length; j++) {
                     const subCategory = allCategories[i].subCategories[j];

@@ -109,6 +109,10 @@ export function routeBackOnError(f7router, errorPropertyName) {
     });
 }
 
+export function elements(selector) {
+    return f7.$(selector);
+}
+
 export function isModalShowing() {
     return f7.$('.modal-in').length;
 }

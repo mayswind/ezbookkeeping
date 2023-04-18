@@ -1,6 +1,9 @@
 <template>
-    <f7-sheet :class="{ 'tag-selection-huge-sheet': hugeListItemRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              :opened="show" :class="{ 'tag-selection-huge-sheet': hugeListItemRows }"
+              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link sheet-close :text="$t('Cancel')"></f7-link>
             </div>
@@ -16,9 +19,9 @@
                 <f7-list-item checkbox v-for="item in items"
                               v-show="!item.hidden"
                               :key="item.id"
-                              :class="item.id | tagItemClass(selectedItemIds)"
+                              :class="isChecked(item.id) ? 'list-item-selected' : ''"
                               :value="item.id"
-                              :checked="item.id | isChecked(selectedItemIds)"
+                              :checked="isChecked(item.id)"
                               @change="changeItemSelection">
                     <f7-block slot="title" class="no-padding no-margin">
                         <div class="display-flex">
@@ -37,15 +40,19 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'items',
         'show'
+    ],
+    emits: [
+        'update:modelValue',
+        'update:show'
     ],
     data() {
         const self = this;
 
         return {
-            selectedItemIds: self.$utilities.copyArrayTo(self.value, [])
+            selectedItemIds: self.$utilities.copyArrayTo(self.modelValue, [])
         }
     },
     computed: {
@@ -64,11 +71,11 @@ export default {
     },
     methods: {
         save() {
-            this.$emit('input', this.selectedItemIds);
+            this.$emit('update:modelValue', this.selectedItemIds);
             this.$emit('update:show', false);
         },
         onSheetOpen(event) {
-            this.selectedItemIds = this.$utilities.copyArrayTo(this.value, []);
+            this.selectedItemIds = this.$utilities.copyArrayTo(this.modelValue, []);
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
@@ -95,9 +102,6 @@ export default {
             }
         },
         scrollToSelectedItem(parent) {
-            const app = this.$f7;
-            const $$ = app.$;
-
             if (!parent || !parent.length) {
                 return;
             }
@@ -113,8 +117,8 @@ export default {
             let lastSelectedItem = selectedItem;
 
             if (selectedItem.length > 0) {
-                firstSelectedItem = $$(selectedItem[0]);
-                lastSelectedItem = $$(selectedItem[selectedItem.length - 1]);
+                firstSelectedItem = this.$ui.elements(selectedItem[0]);
+                lastSelectedItem = this.$ui.elements(selectedItem[selectedItem.length - 1]);
             }
 
             let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
@@ -133,26 +137,15 @@ export default {
             }
 
             container.scrollTop(targetPos);
-        }
-    },
-    filters: {
-        isChecked(itemId, selectedItemIds) {
-            for (let i = 0; i < selectedItemIds.length; i++) {
-                if (selectedItemIds[i] === itemId) {
+        },
+        isChecked(itemId) {
+            for (let i = 0; i < this.selectedItemIds.length; i++) {
+                if (this.selectedItemIds[i] === itemId) {
                     return true;
                 }
             }
 
             return false;
-        },
-        tagItemClass(itemId, selectedItemIds) {
-            for (let i = 0; i < selectedItemIds.length; i++) {
-                if (selectedItemIds[i] === itemId) {
-                    return 'list-item-selected';
-                }
-            }
-
-            return '';
         }
     }
 }
@@ -170,4 +163,3 @@ export default {
     text-overflow: ellipsis;
 }
 </style>
-self

@@ -113,6 +113,7 @@ import {
     showLoading,
     hideLoading,
     routeBackOnError,
+    elements,
     isModalShowing,
     onSwipeoutDeleted
 } from './lib/mobile/ui.js';
@@ -125,6 +126,7 @@ import PinCodeInput from './components/mobile/PinCodeInput.vue';
 import PinCodeInputSheet from './components/mobile/PinCodeInputSheet.vue';
 import PasswordInputSheet from './components/mobile/PasswordInputSheet.vue';
 import PasscodeInputSheet from './components/mobile/PasscodeInputSheet.vue';
+import DateTimeSelectionSheet from './components/mobile/DateTimeSelectionSheet.vue';
 import DateRangeSelectionSheet from './components/mobile/DateRangeSelectionSheet.vue';
 import ListItemSelectionSheet from './components/mobile/ListItemSelectionSheet.vue';
 import TwoColumnListItemSelectionSheet from './components/mobile/TwoColumnListItemSelectionSheet.vue';
@@ -243,6 +245,7 @@ app.component('PinCodeInput', PinCodeInput);
 app.component('PinCodeInputSheet', PinCodeInputSheet);
 app.component('PasswordInputSheet', PasswordInputSheet);
 app.component('PasscodeInputSheet', PasscodeInputSheet);
+app.component('DateTimeSelectionSheet', DateTimeSelectionSheet);
 app.component('DateRangeSelectionSheet', DateRangeSelectionSheet);
 app.component('ListItemSelectionSheet', ListItemSelectionSheet);
 app.component('TwoColumnListItemSelectionSheet', TwoColumnListItemSelectionSheet);
@@ -305,6 +308,7 @@ app.config.globalProperties.$showLoading = showLoading;
 app.config.globalProperties.$hideLoading = hideLoading;
 app.config.globalProperties.$routeBackOnError = routeBackOnError;
 app.config.globalProperties.$ui = {
+    elements: elements,
     isModalShowing: isModalShowing,
     onSwipeoutDeleted: onSwipeoutDeleted
 };

@@ -150,8 +150,8 @@ export default {
             const currentMinDate = this.dateRange[0];
             const currentMaxDate = this.dateRange[1];
 
-            let minUnixTime = this.$utilities.getMinuteFirstUnixTime(currentMinDate);
-            let maxUnixTime = this.$utilities.getMinuteLastUnixTime(currentMaxDate);
+            let minUnixTime = this.$utilities.getUnixTime(currentMinDate);
+            let maxUnixTime = this.$utilities.getUnixTime(currentMaxDate);
 
             if (minUnixTime < 0 || maxUnixTime < 0) {
                 this.$toast('Date is too early');

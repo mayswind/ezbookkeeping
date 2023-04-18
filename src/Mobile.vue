@@ -265,35 +265,6 @@ i.icon.la, i.icon.las, i.icon.lab {
     text-overflow: ellipsis;
 }
 
-.list-item-with-multi-item .item-content,
-.list-item-with-multi-item .item-inner {
-    padding: 0;
-}
-
-.list-item-with-multi-item .item-inner > div {
-    width: 100%;
-}
-
-.list-item-with-multi-item > .item-content > .item-inner:after {
-    background-color: transparent;
-}
-
-.list-item-with-multi-item .list-item-subitem:first-child .item-content {
-    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
-}
-
-.list-item-with-multi-item .list-item-subitem .item-inner {
-    display: block;
-    width: 100%;
-    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
-    padding-top: var(--f7-list-item-padding-vertical);
-    padding-bottom: var(--f7-list-item-padding-vertical);
-}
-
-.list-item-with-multi-item .list-item-subitem:first-child .item-inner {
-    padding-left: 0;
-}
-
 .list .item-content .input.list-title-input {
     margin-top: calc(-1 * var(--f7-list-item-padding-vertical));
     margin-bottom: calc(-1 * var(--f7-list-item-padding-vertical));
@@ -407,6 +378,76 @@ i.icon.la, i.icon.las, i.icon.lab {
     margin-top: -3px;
     border-radius: 3px;
     background: #666
+}
+
+/** list-item-with-multi-item for framework7 **/
+.list-item-with-multi-item .item-content,
+.list-item-with-multi-item .item-inner {
+    padding: 0;
+}
+
+.list-item-with-multi-item .item-inner > div {
+    width: 100%;
+}
+
+.list-item-with-multi-item > .item-content > .item-inner:after {
+    background-color: transparent;
+}
+
+.list-item-with-multi-item .list-item-subitem:first-child .item-content {
+    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
+}
+
+.list-item-with-multi-item .list-item-subitem .item-inner {
+    display: block;
+    width: 100%;
+    padding-left: calc(var(--f7-list-item-padding-horizontal) + var(--f7-safe-area-left));
+    padding-top: var(--f7-list-item-padding-vertical);
+    padding-bottom: var(--f7-list-item-padding-vertical);
+}
+
+.list-item-with-multi-item .list-item-subitem:first-child .item-inner {
+    padding-left: 0;
+}
+
+/** Combination list for framework7 **/
+.combination-list-wrapper {
+    margin: 0;
+    padding: 0;
+}
+
+.combination-list-wrapper .block-title {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.combination-list-wrapper .list.combination-list-header {
+    margin: 0;
+}
+
+.combination-list-wrapper .list.combination-list-header .item-title {
+    width: 100%;
+    display: flex;
+}
+
+.combination-list-wrapper .list.combination-list-header > ul {
+    background-color: var(--f7-list-group-title-bg-color);
+}
+
+.combination-list-wrapper .list.combination-list-header.combination-list-opened > ul {
+    border-radius: var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius) 0 0;
+}
+
+.combination-list-wrapper .list.combination-list-header.combination-list-closed > ul {
+    border-radius: var(--f7-list-inset-border-radius);
+}
+
+.combination-list-wrapper .list.combination-list-header .combination-list-chevron-icon {
+    margin-left: auto;
+}
+
+.combination-list-wrapper .list.combination-list-content.inset > ul {
+    border-radius: 0 0 var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius);
 }
 
 /** Nested List item for framework7 **/

@@ -39,12 +39,12 @@
             </f7-link>
         </f7-toolbar>
 
-        <f7-block class="no-padding no-margin skeleton-text" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
             <f7-accordion-item>
-                <f7-block-title class="no-margin-vertical" :class="{ 'margin-top': blockIdx === 1 }">
-                    <f7-accordion-toggle class="full-line">
+                <f7-block-title>
+                    <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
-                                 class="transaction-amount-list no-padding no-margin transaction-amount-opened">
+                                 class="transaction-amount-list combination-list-header combination-list-opened">
                             <f7-list-item>
                                 <template #title>
                                     <small>YYYY-MM</small>
@@ -52,14 +52,14 @@
                                         <span>0.00 USD</span>
                                         <span>0.00 USD</span>
                                     </small>
-                                    <f7-icon class="transaction-amount-chevron-icon" f7="chevron_up"></f7-icon>
+                                    <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list margin-bottom">
+                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
                         <f7-list-item link="#" chevron-center class="transaction-info" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5 ] : [ 1, 2, 3 ])">
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date">
@@ -107,15 +107,15 @@
             <f7-list-item :title="$t('No transaction data')"></f7-list-item>
         </f7-list>
 
-        <f7-block class="no-padding no-margin" :key="transactionMonthList.yearMonth" v-for="(transactionMonthList, index) in transactions">
+        <f7-block class="combination-list-wrapper margin-vertical" :key="transactionMonthList.yearMonth" v-for="(transactionMonthList, index) in transactions">
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
                                @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
-                <f7-block-title class="no-margin-vertical" :class="{ 'margin-top': (index === 0), 'margin-bottom': !transactionMonthList.opened }">
-                    <f7-accordion-toggle class="full-line">
+                <f7-block-title>
+                    <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
-                                 class="transaction-amount-list no-padding no-margin"
-                                 :class="transactionMonthList.opened ? 'transaction-amount-opened' : 'transaction-amount-closed'">
+                                 class="transaction-amount-list combination-list-header"
+                                 :class="transactionMonthList.opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item>
                                 <template #title>
                                     <small>
@@ -129,14 +129,14 @@
                                             {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.expense, defaultCurrency, '-', transactionMonthList.totalAmount.incompleteExpense) }}
                                         </span>
                                     </small>
-                                    <f7-icon class="transaction-amount-chevron-icon" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: transactionMonthList.opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list margin-bottom">
+                    <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
                         <f7-list-item class="transaction-info" chevron-center
                                       v-for="(transaction, idx) in transactionMonthList.items"
                                       :key="transaction.id" :id="getTransactionDomId(transaction)"
@@ -835,38 +835,9 @@ export default {
 </script>
 
 <style>
-.list.transaction-amount-list .item-title {
-    width: 100%;
-    display: flex;
-}
-
-.list.transaction-amount-list .item-content {
-    padding-left: 12px;
-}
-
-.list.transaction-amount-list > ul {
-    background-color: var(--f7-list-group-title-bg-color);
-}
-
-.list.transaction-amount-list.transaction-amount-opened > ul {
-    border-radius: var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius) 0 0;
-}
-
-.list.transaction-amount-list.transaction-amount-closed > ul {
-    border-radius: var(--f7-list-inset-border-radius);
-}
-
-.list.transaction-amount-list .transaction-amount-chevron-icon {
-    margin-left: auto;
-}
-
 .list.transaction-amount-list .transaction-amount-statistics > span {
     margin-left: 8px;
     font-weight: normal;
-}
-
-.list.inset.transaction-info-list > ul {
-    border-radius: 0 0 var(--f7-list-inset-border-radius) var(--f7-list-inset-border-radius);
 }
 
 .list.transaction-info-list li.transaction-info .item-media + .item-inner {

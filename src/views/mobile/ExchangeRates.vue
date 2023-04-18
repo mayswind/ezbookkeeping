@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+        <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Base Currency')"
@@ -42,11 +42,11 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+        <f7-list strong inset dividers class="margin-vertical" v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
             <f7-list-item :title="$t('No exchange rates data')"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+        <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
                           :after="getDisplayConvertedAmount(exchangeRate)"
                           swipeout>
@@ -62,7 +62,7 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+        <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item v-if="exchangeRatesDataUpdateTime">
                 <small>{{ $t('Last Updated') }}</small>
                 <small>{{ exchangeRatesDataUpdateTime }}</small>

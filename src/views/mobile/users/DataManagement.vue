@@ -2,21 +2,21 @@
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item title="Accounts" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
             <f7-list-item title="Transactions" after="Count"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-top" v-else-if="!loading">
+        <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
             <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
             <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers :class="{ 'disabled': loading }">
+        <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
             <f7-list-button :class="{ 'disabled': !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0' }"
                             v-if="isDataExportingEnabled"
                             @click="exportedData = null; showExportDataSheet = true">{{ $t('Export Data') }}</f7-list-button>

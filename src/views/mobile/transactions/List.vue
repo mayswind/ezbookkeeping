@@ -197,7 +197,7 @@
                                         </div>
                                         <div class="item-footer">
                                             <div class="transaction-footer">
-                                                <span>{{ $utilities.formatUnixTime(transaction.time, $t('format.hourMinute.long'), { utcOffset: transaction.utcOffset, currentUtcOffset: currentTimezoneOffsetMinutes }) }}</span>
+                                                <span>{{ $utilities.formatUnixTime(transaction.time, $t('format.hourMinute.long'), transaction.utcOffset, currentTimezoneOffsetMinutes) }}</span>
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(UTC${$utilities.getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>

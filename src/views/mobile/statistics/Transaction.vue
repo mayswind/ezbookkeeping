@@ -99,7 +99,7 @@
             </f7-card-header>
             <f7-card-content class="no-safe-areas" style="margin-top: -14px" :padding="false">
                 <f7-list dividers class="statistics-list-item skeleton-text" v-if="loading">
-                    <f7-list-item link="#">
+                    <f7-list-item link="#" v-for="itemIdx in [ 1, 2, 3 ]">
                         <template #media>
                             <div class="display-flex no-padding-horizontal">
                                 <div class="display-flex align-items-center statistics-icon">
@@ -107,74 +107,15 @@
                                 </div>
                             </div>
                         </template>
-
                         <template #title>
                             <div class="statistics-list-item-text">
-                                <span>Category Name 1</span>
+                                <span>Category Name</span>
                                 <small class="statistics-percent">33.33</small>
                             </div>
                         </template>
-
                         <template #after>
                             <span>0.00 USD</span>
                         </template>
-
-                        <template #inner-end>
-                            <div class="statistics-item-end">
-                                <div class="statistics-percent-line">
-                                    <f7-progressbar></f7-progressbar>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item link="#">
-                        <template #media>
-                            <div class="display-flex no-padding-horizontal">
-                                <div class="display-flex align-items-center statistics-icon">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #title>
-                            <div class="statistics-list-item-text">
-                                <span>Category Name 2</span>
-                                <small class="statistics-percent">33.33</small>
-                            </div>
-                        </template>
-
-                        <template #after>
-                            <span>0.00 USD</span>
-                        </template>
-
-                        <template #inner-end>
-                            <div class="statistics-item-end">
-                                <div class="statistics-percent-line">
-                                    <f7-progressbar></f7-progressbar>
-                                </div>
-                            </div>
-                        </template>
-                    </f7-list-item>
-                    <f7-list-item link="#">
-                        <template #media>
-                            <div class="display-flex no-padding-horizontal">
-                                <div class="display-flex align-items-center statistics-icon">
-                                    <f7-icon f7="app_fill"></f7-icon>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #title>
-                            <div class="statistics-list-item-text">
-                                <span>Category Name 3</span>
-                                <small class="statistics-percent">33.33</small>
-                            </div>
-                        </template>
-
-                        <template #after>
-                            <span>0.00 USD</span>
-                        </template>
-
                         <template #inner-end>
                             <div class="statistics-item-end">
                                 <div class="statistics-percent-line">
@@ -184,9 +125,11 @@
                         </template>
                     </f7-list-item>
                 </f7-list>
+
                 <f7-list dividers v-else-if="!loading && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
                     <f7-list-item :title="$t('No transaction data')"></f7-list-item>
                 </f7-list>
+
                 <f7-list dividers v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
                     <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
                                   class="statistics-list-item"

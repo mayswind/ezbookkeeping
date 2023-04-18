@@ -11,33 +11,13 @@
         </f7-navbar>
 
         <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
-            <f7-list-item>
+            <f7-list-item v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
                     <f7-icon f7="number"></f7-icon>
                 </template>
                 <template #title>
                     <div class="display-flex">
                         <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name</div>
-                    </div>
-                </template>
-            </f7-list-item>
-            <f7-list-item>
-                <template #media>
-                    <f7-icon f7="number"></f7-icon>
-                </template>
-                <template #title>
-                    <div class="display-flex">
-                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 2</div>
-                    </div>
-                </template>
-            </f7-list-item>
-            <f7-list-item>
-                <template #media>
-                    <f7-icon f7="number"></f7-icon>
-                </template>
-                <template #title>
-                    <div class="display-flex">
-                        <div class="transaction-tag-list-item-content list-item-valign-middle padding-left-half">Tag Name 3</div>
                     </div>
                 </template>
             </f7-list-item>

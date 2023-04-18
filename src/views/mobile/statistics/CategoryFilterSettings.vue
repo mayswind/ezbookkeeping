@@ -19,47 +19,13 @@
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers accordion-list class="margin-bottom">
-                        <f7-list-item checkbox class="disabled" title="Category Name">
+                        <f7-list-item checkbox class="disabled" title="Category Name" v-for="itemIdx in [ 1, 2 ]">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
                             </template>
                             <template #root>
                                 <ul class="padding-left">
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                </ul>
-                            </template>
-                        </f7-list-item>
-                        <f7-list-item checkbox class="disabled" title="Category Name 2">
-                            <template #media>
-                                <f7-icon f7="app_fill"></f7-icon>
-                            </template>
-                            <template #root>
-                                <ul class="padding-left">
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 2">
-                                        <template #media>
-                                            <f7-icon f7="app_fill"></f7-icon>
-                                        </template>
-                                    </f7-list-item>
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name 3">
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name" v-for="subItemIdx in [ 1, 2, 3 ]">
                                         <template #media>
                                             <f7-icon f7="app_fill"></f7-icon>
                                         </template>

@@ -38,59 +38,15 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
             <f7-list-item group-title>
                 <small>Account Category</small>
             </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#" v-for="itemIdx in (listIdx === 1 ? [ 1 ] : [ 1, 2 ])">
                 <template #title>
                     <div class="display-flex padding-top-half padding-bottom-half">
                         <f7-icon f7="app_fill"></f7-icon>
                         <div class="nested-list-item-title">Account Name</div>
-                    </div>
-                </template>
-            </f7-list-item>
-        </f7-list>
-
-        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
-            <f7-list-item group-title>
-                <small>Account Category 2</small>
-            </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                <template #title>
-                    <div class="display-flex padding-top-half padding-bottom-half">
-                        <f7-icon f7="app_fill"></f7-icon>
-                        <div class="nested-list-item-title">Account Name</div>
-                    </div>
-                </template>
-            </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                <template #title>
-                    <div class="display-flex padding-top-half padding-bottom-half">
-                        <f7-icon f7="app_fill"></f7-icon>
-                        <div class="nested-list-item-title">Account Name 2</div>
-                    </div>
-                </template>
-            </f7-list-item>
-        </f7-list>
-
-        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-if="loading">
-            <f7-list-item group-title>
-                <small>Account Category 3</small>
-            </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                <template #title>
-                    <div class="display-flex padding-top-half padding-bottom-half">
-                        <f7-icon f7="app_fill"></f7-icon>
-                        <div class="nested-list-item-title">Account Name</div>
-                    </div>
-                </template>
-            </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#">
-                <template #title>
-                    <div class="display-flex padding-top-half padding-bottom-half">
-                        <f7-icon f7="app_fill"></f7-icon>
-                        <div class="nested-list-item-title">Account Name 2</div>
                     </div>
                 </template>
             </f7-list-item>

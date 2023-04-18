@@ -11,17 +11,9 @@
         </f7-navbar>
 
         <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
-            <f7-list-item title="Category Name">
-                <template #media>
-                    <f7-icon f7="app_fill"></f7-icon>
-                </template>
-            </f7-list-item>
-            <f7-list-item title="Category Name 2">
-                <template #media>
-                    <f7-icon f7="app_fill"></f7-icon>
-                </template>
-            </f7-list-item>
-            <f7-list-item title="Category Name 3">
+            <f7-list-item title="Category Name"
+                          :link="hasSubCategories ? '#' : null"
+                          v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
                     <f7-icon f7="app_fill"></f7-icon>
                 </template>

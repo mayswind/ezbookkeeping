@@ -9,7 +9,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
+        <f7-block class="no-padding no-margin skeleton-text" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
             <f7-accordion-item>
                 <f7-block-title class="margin-top">
                     <f7-accordion-toggle class="full-line">
@@ -19,32 +19,7 @@
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers accordion-list class="margin-bottom">
-                        <f7-list-item checkbox class="disabled" title="Account Name">
-                            <template #media>
-                                <f7-icon f7="app_fill"></f7-icon>
-                            </template>
-                        </f7-list-item>
-                    </f7-list>
-                </f7-accordion-content>
-            </f7-accordion-item>
-        </f7-block>
-
-        <f7-block class="no-padding no-margin skeleton-text" v-if="loading">
-            <f7-accordion-item>
-                <f7-block-title class="margin-top">
-                    <f7-accordion-toggle class="full-line">
-                        <span>Account Category 2</span>
-                        <f7-icon class="float-right" f7="chevron_up"></f7-icon>
-                    </f7-accordion-toggle>
-                </f7-block-title>
-                <f7-accordion-content style="height: auto">
-                    <f7-list strong inset dividers accordion-list class="margin-bottom">
-                        <f7-list-item checkbox class="disabled" title="Account Name">
-                            <template #media>
-                                <f7-icon f7="app_fill"></f7-icon>
-                            </template>
-                        </f7-list-item>
-                        <f7-list-item checkbox class="disabled" title="Account Name 2">
+                        <f7-list-item checkbox class="disabled" title="Account Name" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
                             </template>

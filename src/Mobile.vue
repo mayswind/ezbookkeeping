@@ -166,6 +166,10 @@ body {
     pointer-events: none !important;
 }
 
+.skeleton-text {
+    pointer-events: none !important;
+}
+
 .segmented.readonly .button:not(.button-active) > span,
 .list.readonly .item-content .item-title.item-label,
 .list.readonly .item-content .item-title > .item-header {

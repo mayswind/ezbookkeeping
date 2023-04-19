@@ -109,13 +109,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.1/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.1/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
     },
     {
         "name": "Framework7-icons",

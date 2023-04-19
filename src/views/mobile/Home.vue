@@ -163,23 +163,23 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-toolbar tabbar bottom class="main-tabbar">
-            <f7-link href="/transaction/list">
+        <f7-toolbar tabbar icons bottom class="main-tabbar">
+            <f7-link class="link" href="/transaction/list">
                 <f7-icon f7="square_list"></f7-icon>
                 <span class="tabbar-label">{{ $t('Details') }}</span>
             </f7-link>
-            <f7-link href="/account/list">
+            <f7-link class="link" href="/account/list">
                 <f7-icon f7="creditcard"></f7-icon>
                 <span class="tabbar-label">{{ $t('Accounts') }}</span>
             </f7-link>
-            <f7-link href="/transaction/add">
+            <f7-link class="link" href="/transaction/add">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
             </f7-link>
-            <f7-link href="/statistic/transaction">
+            <f7-link class="link" href="/statistic/transaction">
                 <f7-icon f7="chart_pie"></f7-icon>
                 <span class="tabbar-label">{{ $t('Statistics') }}</span>
             </f7-link>
-            <f7-link href="/settings">
+            <f7-link class="link" href="/settings">
                 <f7-icon f7="gear_alt"></f7-icon>
                 <span class="tabbar-label">{{ $t('Settings') }}</span>
             </f7-link>
@@ -403,20 +403,8 @@ export default {
     margin-right: 4px;
 }
 
-.tabbar.main-tabbar {
-    --f7-toolbar-height: 50px;
-}
-
-.tabbar.main-tabbar .link {
-    padding-top: 4px;
-    padding-bottom: 4px;
-    justify-content: space-between;
-}
-
 .tabbar.main-tabbar .link i + span.tabbar-label {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1;
+    margin-top: 2px;
 }
 
 .tabbar.main-tabbar .link i.ebk-tarbar-big-icon {

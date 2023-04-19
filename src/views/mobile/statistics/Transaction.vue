@@ -97,7 +97,7 @@
                     </div>
                 </div>
             </f7-card-header>
-            <f7-card-content class="no-safe-areas" style="margin-top: -14px" :padding="false">
+            <f7-card-content style="margin-top: -14px" :padding="false">
                 <f7-list dividers class="statistics-list-item skeleton-text" v-if="loading">
                     <f7-list-item link="#" v-for="itemIdx in [ 1, 2, 3 ]">
                         <template #media>

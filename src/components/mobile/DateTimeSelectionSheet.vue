@@ -1,42 +1,32 @@
 <template>
-    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" style="height:auto"
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" class="date-time-selection-sheet" style="height:auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <div class="swipe-handler"></div>
+        <f7-toolbar>
+            <div class="swipe-handler"></div>
+            <div class="left">
+                <f7-link :text="$t('Current Time')" @click="setCurrentTime"></f7-link>
+            </div>
+            <div class="right">
+                <f7-link :text="$t('Done')" @click="confirm"></f7-link>
+            </div>
+        </f7-toolbar>
         <f7-page-content>
-            <div class="display-flex padding justify-content-space-between align-items-center">
-                <div style="font-size: 18px" v-if="title"><b>{{ title }}</b></div>
-            </div>
-            <div class="padding-horizontal padding-bottom">
-                <p class="no-margin-top" v-if="hint">{{ hint }}</p>
-                <p class="no-margin-top margin-bottom" v-if="displayDateTime">
-                    <span>{{ displayDateTime }}</span>
-                </p>
-                <slot></slot>
-                <VueDatePicker inline enable-seconds
-                               auto-apply month-name-format="long"
-                               class="margin-bottom"
-                               :dark="isDarkMode"
-                               :week-start="firstDayOfWeek"
-                               :year-range="yearRange"
-                               :day-names="dayNames"
-                               :is24="is24Hour"
-                               v-model="dateTime">
-                    <template #month="{ text, value }">
-                        {{ $t(`datetime.${text}.short`) }}
-                    </template>
-                    <template #month-overlay-value="{ text, value }">
-                        {{ $t(`datetime.${text}.short`) }}
-                    </template>
-                </VueDatePicker>
-                <f7-button large fill
-                           :class="{ 'disabled': !dateTime }"
-                           :text="$t('Continue')"
-                           @click="confirm">
-                </f7-button>
-                <div class="margin-top text-align-center">
-                    <f7-link @click="cancel" :text="$t('Cancel')"></f7-link>
-                </div>
-            </div>
+            <VueDatePicker inline enable-seconds
+                           auto-apply month-name-format="long"
+                           class="justify-content-center"
+                           :dark="isDarkMode"
+                           :week-start="firstDayOfWeek"
+                           :year-range="yearRange"
+                           :day-names="dayNames"
+                           :is24="is24Hour"
+                           v-model="dateTime">
+                <template #month="{ text, value }">
+                    {{ $t(`datetime.${text}.short`) }}
+                </template>
+                <template #month-overlay-value="{ text, value }">
+                    {{ $t(`datetime.${text}.short`) }}
+                </template>
+            </VueDatePicker>
         </f7-page-content>
     </f7-sheet>
 </template>
@@ -45,8 +35,6 @@
 export default {
     props: [
         'modelValue',
-        'title',
-        'hint',
         'show'
     ],
     emits: [
@@ -82,11 +70,6 @@ export default {
         is24Hour() {
             const datetimeFormat = this.$t('format.datetime.long');
             return this.$utilities.is24HourFormat(datetimeFormat);
-        },
-        displayDateTime() {
-            const unixTime = this.$utilities.getUnixTime(this.dateTime);
-            const actualUnixTime = this.$utilities.getActualUnixTimeForStore(unixTime, this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
-            return this.$utilities.formatUnixTime(actualUnixTime, this.$t('format.datetime.long'));
         }
     },
     methods: {
@@ -97,6 +80,9 @@ export default {
         },
         onSheetClosed() {
             this.$emit('update:show', false);
+        },
+        setCurrentTime() {
+            this.dateTime = this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime())
         },
         confirm() {
             if (!this.dateTime) {
@@ -112,10 +98,13 @@ export default {
 
             this.$emit('update:modelValue', unixTime);
             this.$emit('update:show', false);
-        },
-        cancel() {
-            this.$emit('update:show', false);
         }
     }
 }
 </script>
+
+<style>
+.date-time-selection-sheet .dp__menu {
+    border: 0;
+}
+</style>

@@ -686,6 +686,7 @@ export default {
     'End Time': '结束时间',
     'Select Date': '选择日期',
     'Select Time': '选择时间',
+    'Current Time': '当前时间',
     'Custom': '自定义',
     'Pie Chart': '饼图',
     'Bar Chart': '条形图',

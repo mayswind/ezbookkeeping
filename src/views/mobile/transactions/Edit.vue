@@ -205,8 +205,7 @@
                 :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), this.$t('format.datetime.long'))"
                 @click="showTransactionDateTimeSheet = true"
             >
-                <date-time-selection-sheet :title="$t('Transaction Time')"
-                                           v-model:show="showTransactionDateTimeSheet"
+                <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"
                                            v-model="transaction.time">
                 </date-time-selection-sheet>
             </f7-list-item>

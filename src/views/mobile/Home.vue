@@ -252,6 +252,10 @@ export default {
             };
         },
         transactionOverview() {
+            // make sure this computed property refers these property, so these property can trigger this computed property to update
+            const isEnableThousandsSeparator = this.isEnableThousandsSeparator;
+            const currencyDisplayMode = this.currencyDisplayMode;
+
             if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
                 return {
                     thisMonth: {

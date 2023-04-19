@@ -9,12 +9,12 @@
             <f7-list-item :title="$t('License')" link="#" popup-open=".license-popup"></f7-list-item>
         </f7-list>
 
-        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
+        <f7-popup push with-subnavbar swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
-                <template #fixed>
+                <f7-navbar>
                     <div class="swipe-handler"></div>
-                </template>
-                <f7-block-title large>{{ $t('License') }}</f7-block-title>
+                    <f7-subnavbar :title="$t('License') "></f7-subnavbar>
+                </f7-navbar>
                 <f7-block strong outline>
                     <p>
                         <span v-for="(line, num) in licenseLines" :key="num"
@@ -62,3 +62,17 @@ export default {
     }
 }
 </script>
+
+<style>
+.license-popup .navbar-bg {
+    background-color: rgb(var(--f7-navbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)));
+}
+
+.license-popup .subnavbar {
+    background-color: rgb(var(--f7-subnavbar-bg-color-rgb, var(--f7-bars-bg-color-rgb)));
+}
+
+.license-popup .subnavbar-title {
+    --f7-subnavbar-title-font-size: 30px;
+}
+</style>

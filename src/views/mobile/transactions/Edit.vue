@@ -1,5 +1,5 @@
 <template>
-    <f7-page @page:afterin="onPageAfterIn">
+    <f7-page with-subnavbar @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>

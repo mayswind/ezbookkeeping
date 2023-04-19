@@ -1,5 +1,6 @@
 <template>
-    <f7-page ptr
+    <f7-page with-subnavbar
+             ptr
              infinite
              :infinite-preloader="loadingMore"
              :infinite-distance="400"

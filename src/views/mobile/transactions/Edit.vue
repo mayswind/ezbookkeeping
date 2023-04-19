@@ -831,7 +831,7 @@ export default {
                 return 40;
             }
         },
-        getDisplayAmount(amount, currency, hideAmount) {
+        getDisplayAmount(amount, hideAmount) {
             if (hideAmount) {
                 return this.$locale.getDisplayCurrency('***');
             }

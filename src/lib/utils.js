@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import Clipboard from 'clipboard';
 import uaParser from 'ua-parser-js';
 
 import dateTimeConstants from '../consts/datetime.js';
@@ -157,6 +158,10 @@ function getCurrentUnixTime() {
     return moment().unix();
 }
 
+function getCurrentDateTime() {
+    return moment();
+}
+
 function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     if (isNumber(utcOffset)) {
         if (!isNumber(currentUtcOffset)) {
@@ -167,6 +172,16 @@ function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     }
 
     return moment.unix(unixTime);
+}
+
+function is24HourFormat(format) {
+    if (format.indexOf('HH') >= 0 && format.indexOf('hh') < 0) {
+        return true;
+    } else if (format.indexOf('HH') < 0 && format.indexOf('hh') >= 0) {
+        return false;
+    }
+
+    return true;
 }
 
 function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
@@ -571,6 +586,38 @@ function getExchangedAmount(amount, fromRate, toRate) {
     return amount * exchangeRate;
 }
 
+function formatPercent(value, precision, lowPrecisionValue) {
+    const ratio = Math.pow(10, precision);
+    const normalizedValue = Math.floor(value * ratio);
+
+    if (value > 0 && normalizedValue < 1 && lowPrecisionValue) {
+        return lowPrecisionValue + '%';
+    }
+
+    const result = normalizedValue / ratio;
+    return result + '%';
+}
+
+function limitText(value, maxLength) {
+    let length = 0;
+
+    for (let i = 0; i < value.length; i++) {
+        const c = value.charCodeAt(i);
+
+        if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+            length++;
+        } else {
+            length += 2;
+        }
+    }
+
+    if (length <= maxLength || maxLength <= 3) {
+        return value;
+    }
+
+    return value.substring(0, maxLength - 3) + '...';
+}
+
 function base64encode(arrayBuffer) {
     if (!arrayBuffer || arrayBuffer.length === 0) {
         return null;
@@ -585,6 +632,48 @@ function arrayBufferToString(arrayBuffer) {
 
 function stringToArrayBuffer(str){
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
+}
+
+function getNameByKeyValue(src, value, keyField, nameField, defaultName) {
+    if (isArray(src)) {
+        if (keyField) {
+            for (let i = 0; i < src.length; i++) {
+                const option = src[i];
+
+                if (option[keyField] === value) {
+                    return option[nameField];
+                }
+            }
+        } else {
+            if (src[value]) {
+                const option = src[value];
+
+                return option[nameField];
+            }
+        }
+    } else if (isObject(src)) {
+        if (keyField) {
+            for (let key in src) {
+                if (!Object.prototype.hasOwnProperty.call(src, key)) {
+                    continue;
+                }
+
+                const option = src[key];
+
+                if (option[keyField] === value) {
+                    return option[nameField];
+                }
+            }
+        } else {
+            if (src[value]) {
+                const option = src[value];
+
+                return option[nameField];
+            }
+        }
+    }
+
+    return defaultName;
 }
 
 function generateRandomString() {
@@ -610,6 +699,41 @@ function parseUserAgent(ua) {
             version: uaParseRet.browser.version
         }
     };
+}
+
+function parseDeviceInfo(ua) {
+    const uaInfo = parseUserAgent(ua);
+    let result = '';
+
+    if (uaInfo.device.model) {
+        result = uaInfo.device.model;
+    } else if (uaInfo.os.name) {
+        result = uaInfo.os.name;
+
+        if (uaInfo.os.version) {
+            result += ' ' + uaInfo.os.version;
+        }
+    }
+
+    if (uaInfo.browser.name) {
+        let browserInfo = uaInfo.browser.name;
+
+        if (uaInfo.browser.version) {
+            browserInfo += ' ' + uaInfo.browser.version;
+        }
+
+        if (result) {
+            result += ' (' + browserInfo + ')';
+        } else {
+            result = browserInfo;
+        }
+    }
+
+    if (!result) {
+        return 'Unknown Device';
+    }
+
+    return result;
 }
 
 function transactionTypeToCategroyType(transactionType) {
@@ -721,6 +845,38 @@ function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter) {
     return ret;
 }
 
+function makeButtonCopyToClipboard({ text, el, successCallback, errorCallback }) {
+    const clipboard = new Clipboard(el, {
+        text: function () {
+            return text;
+        }
+    });
+
+    clipboard.on('success', (e) => {
+        if (successCallback) {
+            successCallback(e);
+        }
+    });
+
+    clipboard.on('error', (e) => {
+        if (errorCallback) {
+            errorCallback(e);
+        }
+    });
+
+    return clipboard;
+}
+
+function changeClipboardObjectText(clipboard, text) {
+    if (!clipboard) {
+        return;
+    }
+
+    clipboard.text = function () {
+        return text;
+    };
+}
+
 export default {
     isFunction,
     isObject,
@@ -739,7 +895,9 @@ export default {
     getActualUnixTimeForStore,
     getDummyUnixTimeForLocalUsage,
     getCurrentUnixTime,
+    getCurrentDateTime,
     parseDateFromUnixTime,
+    is24HourFormat,
     formatUnixTime,
     formatTime,
     getUnixTime,
@@ -773,14 +931,20 @@ export default {
     numericCurrencyToString,
     stringCurrencyToNumeric,
     getExchangedAmount,
+    formatPercent,
+    limitText,
     base64encode,
     arrayBufferToString,
     stringToArrayBuffer,
+    getNameByKeyValue,
     generateRandomString,
     parseUserAgent,
+    parseDeviceInfo,
     transactionTypeToCategroyType,
     categroyTypeToTransactionType,
     getCategoryInfo,
     getCategorizedAccounts,
     getAllFilteredAccountsBalance,
+    makeButtonCopyToClipboard,
+    changeClipboardObjectText,
 };

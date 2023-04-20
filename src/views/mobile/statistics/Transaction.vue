@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title>
                 <f7-link popover-open=".chart-data-type-popover-menu">
-                    <span>{{ query.chartDataType | optionName(allChartDataTypes, 'type', 'name', 'Statistics') | localized }}</span>
+                    <span>{{ queryChartDataTypeName }}</span>
                     <f7-icon size="14px" :f7="showChartDataTypePopover ? 'arrowtriangle_up_fill' : 'arrowtriangle_down_fill'"></f7-icon>
                 </f7-link>
             </f7-nav-title>
@@ -15,11 +15,14 @@
 
         <f7-popover class="chart-data-type-popover-menu" :opened="showChartDataTypePopover"
                     @popover:open="showChartDataTypePopover = true" @popover:close="showChartDataTypePopover = false">
-            <f7-list>
-                <f7-list-item
-                    v-for="dataType in allChartDataTypes" :key="dataType.type"
-                    :title="$t(dataType.name)" @click="setChartDataType(dataType.type)">
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
+            <f7-list dividers>
+                <f7-list-item :title="$t(dataType.name)"
+                              :key="dataType.type"
+                              v-for="dataType in allChartDataTypes"
+                              @click="setChartDataType(dataType.type)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -28,7 +31,7 @@
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
-                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
+                    <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                 </div>
             </f7-card-header>
             <f7-card-content class="pie-chart-container" style="margin-top: -6px" :padding="false">
@@ -61,10 +64,10 @@
                     @click="clickPieChartItem"
                 >
                     <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length">
-                        {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
+                        {{ totalAmountName }}
                     </text>
                     <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
-                        {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) | textLimit(16) }}
+                        {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency, 16) }}
                     </text>
                     <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!statisticsData.items || !statisticsData.items.length">
                         {{ $t('No data') }}
@@ -77,128 +80,91 @@
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
-                        {{ query.chartDataType | totalAmountName(allChartDataTypes) | localized }}
+                        {{ totalAmountName }}
                     </div>
                     <div class="align-self-flex-end">
                         <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
-                        <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ query.sortingType | optionName(allSortingTypes, 'type', 'name', 'System Default') | localized }}</f7-link>
+                        <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                     </div>
                 </div>
                 <div class="display-flex full-line">
                     <div :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
                         <span v-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
-                            {{ statisticsData.totalAmount | currency(defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}
+                            {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
                         </span>
-                        <span v-else-if="loading || !statisticsData || !statisticsData.items || !statisticsData.items.length">
-                            {{ '---' | currency(defaultCurrency, true) }}
+                        <span :class="{ 'skeleton-text': loading }" v-else-if="loading || !statisticsData || !statisticsData.items || !statisticsData.items.length">
+                            ***.**
                         </span>
                     </div>
                 </div>
             </f7-card-header>
-            <f7-card-content class="no-safe-areas" style="margin-top: -14px" :padding="false">
+            <f7-card-content style="margin-top: -14px" :padding="false">
                 <f7-list class="statistics-list-item skeleton-text" v-if="loading">
-                    <f7-list-item link="#">
-                        <div slot="media" class="display-flex no-padding-horizontal">
-                            <div class="display-flex align-items-center statistics-icon">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
+                    <f7-list-item link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
+                        <template #media>
+                            <div class="display-flex no-padding-horizontal">
+                                <div class="display-flex align-items-center statistics-icon">
+                                    <f7-icon f7="app_fill"></f7-icon>
+                                </div>
                             </div>
-                        </div>
-
-                        <div slot="title" class="statistics-list-item-text">
-                            <span>Category Name 1</span>
-                            <small class="statistics-percent">33.33</small>
-                        </div>
-
-                        <div slot="after">
+                        </template>
+                        <template #title>
+                            <div class="statistics-list-item-text">
+                                <span>Category Name</span>
+                                <small class="statistics-percent">33.33</small>
+                            </div>
+                        </template>
+                        <template #after>
                             <span>0.00 USD</span>
-                        </div>
-
-                        <div slot="inner-end" class="statistics-item-end">
-                            <div class="statistics-percent-line">
-                                <f7-progressbar></f7-progressbar>
+                        </template>
+                        <template #inner-end>
+                            <div class="statistics-item-end">
+                                <div class="statistics-percent-line">
+                                    <f7-progressbar></f7-progressbar>
+                                </div>
                             </div>
-                        </div>
-                    </f7-list-item>
-                    <f7-list-item link="#">
-                        <div slot="media" class="display-flex no-padding-horizontal">
-                            <div class="display-flex align-items-center statistics-icon">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </div>
-                        </div>
-
-                        <div slot="title" class="statistics-list-item-text">
-                            <span>Category Name 2</span>
-                            <small class="statistics-percent">33.33</small>
-                        </div>
-
-                        <div slot="after">
-                            <span>0.00 USD</span>
-                        </div>
-
-                        <div slot="inner-end" class="statistics-item-end">
-                            <div class="statistics-percent-line">
-                                <f7-progressbar></f7-progressbar>
-                            </div>
-                        </div>
-                    </f7-list-item>
-                    <f7-list-item link="#">
-                        <div slot="media" class="display-flex no-padding-horizontal">
-                            <div class="display-flex align-items-center statistics-icon">
-                                <f7-icon slot="media" f7="app_fill"></f7-icon>
-                            </div>
-                        </div>
-
-                        <div slot="title" class="statistics-list-item-text">
-                            <span>Category Name 3</span>
-                            <small class="statistics-percent">33.33</small>
-                        </div>
-
-                        <div slot="after">
-                            <span>0.00 USD</span>
-                        </div>
-
-                        <div slot="inner-end" class="statistics-item-end">
-                            <div class="statistics-percent-line">
-                                <f7-progressbar></f7-progressbar>
-                            </div>
-                        </div>
+                        </template>
                     </f7-list-item>
                 </f7-list>
+
                 <f7-list v-else-if="!loading && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
                     <f7-list-item :title="$t('No transaction data')"></f7-list-item>
                 </f7-list>
+
                 <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
-                    <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
-                                  class="statistics-list-item"
-                                  :link="item | itemLinkUrl(query, allChartDataTypes)"
+                    <f7-list-item class="statistics-list-item"
+                                  :link="getItemLinkUrl(item)"
+                                  :key="idx"
+                                  v-for="(item, idx) in statisticsData.items"
                                   v-show="!item.hidden"
                     >
-                        <div slot="media" class="display-flex no-padding-horizontal">
-                            <div class="display-flex align-items-center statistics-icon">
-                                <f7-icon v-if="item.icon"
-                                         :icon="item.icon | icon(item.type)"
-                                         :style="item.color | iconStyle(item.type, 'var(--category-icon-color)')">
-                                </f7-icon>
-                                <f7-icon v-else-if="!item.icon"
-                                         f7="pencil_ellipsis_rectangle">
-                                </f7-icon>
+                        <template #media>
+                            <div class="display-flex no-padding-horizontal">
+                                <div class="display-flex align-items-center statistics-icon">
+                                    <ItemIcon icon-type="category" :icon-id="item.icon" :color="item.color" v-if="item.icon"></ItemIcon>
+                                    <f7-icon f7="pencil_ellipsis_rectangle" v-else-if="!item.icon"></f7-icon>
+                                </div>
                             </div>
-                        </div>
+                        </template>
 
-                        <div slot="title" class="statistics-list-item-text">
-                            <span>{{ item.name }}</span>
-                            <small class="statistics-percent" v-if="item.percent >= 0">{{ item.percent | percent(2, '&lt;0.01') }}</small>
-                        </div>
-
-                        <div slot="after">
-                            <span>{{ item.totalAmount | currency(item.currency || defaultCurrency) | finalAmount(showAccountBalance, query.chartDataType, allChartDataTypes) }}</span>
-                        </div>
-
-                        <div slot="inner-end" class="statistics-item-end">
-                            <div class="statistics-percent-line">
-                                <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
+                        <template #title>
+                            <div class="statistics-list-item-text">
+                                <span>{{ item.name }}</span>
+                                <small class="statistics-percent" v-if="item.percent >= 0">{{ $utilities.formatPercent(item.percent, 2, '&lt;0.01') }}</small>
                             </div>
-                        </div>
+                        </template>
+
+                        <template #after>
+                            <span>{{ getDisplayAmount(item.totalAmount, (item.currency || defaultCurrency)) }}</span>
+                        </template>
+
+                        <template #inner-end>
+                            <div class="statistics-item-end">
+                                <div class="statistics-percent-line">
+                                    <f7-progressbar :progress="item.percent >= 0 ? item.percent : 0" :style="{ '--f7-progressbar-progress-color': (item.color ? '#' + item.color : '') } "></f7-progressbar>
+                                </div>
+                            </div>
+                        </template>
                     </f7-list-item>
                 </f7-list>
             </f7-card-content>
@@ -207,13 +173,15 @@
         <f7-popover class="sorting-type-popover-menu" :opened="showSortingTypePopover"
                     @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showSortingTypePopover = true" @popover:closed="showSortingTypePopover = false">
-            <f7-list>
-                <f7-list-item v-for="sortingType in allSortingTypes"
-                              :key="sortingType.type"
+            <f7-list dividers>
+                <f7-list-item :title="$t(sortingType.name)"
                               :class="{ 'list-item-selected': query.sortingType === sortingType.type }"
-                              :title="$t(sortingType.name)"
+                              :key="sortingType.type"
+                              v-for="sortingType in allSortingTypes"
                               @click="setSortingType(sortingType.type)">
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.sortingType === sortingType.type"></f7-icon>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.sortingType === sortingType.type"></f7-icon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -239,28 +207,31 @@
         <f7-popover class="date-popover-menu" :opened="showDatePopover"
                     @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
-            <f7-list>
-                <f7-list-item v-for="dateRange in allDateRanges"
-                              :key="dateRange.type"
+            <f7-list dividers>
+                <f7-list-item :title="$t(dateRange.name)"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                              :title="$t(dateRange.name)"
+                              :key="dateRange.type"
+                              v-for="dateRange in allDateRanges"
                               @click="setDateFilter(dateRange.type)">
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
-                    <div slot="footer"
-                         v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
-                        <span>{{ query.startTime | moment($t('format.datetime.long-without-second')) }}</span>
-                        <span>&nbsp;-&nbsp;</span>
-                        <br/>
-                        <span>{{ query.endTime | moment($t('format.datetime.long-without-second')) }}</span>
-                    </div>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                    </template>
+                    <template #footer>
+                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
+                            <span>{{ $utilities.formatUnixTime(query.startTime, $t('format.datetime.long-without-second')) }}</span>
+                            <span>&nbsp;-&nbsp;</span>
+                            <br/>
+                            <span>{{ $utilities.formatUnixTime(query.endTime, $t('format.datetime.long-without-second')) }}</span>
+                        </div>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
 
         <date-range-selection-sheet :title="$t('Custom Date Range')"
-                                    :show.sync="showCustomDateRangeSheet"
                                     :min-time="query.startTime"
                                     :max-time="query.endTime"
+                                    v-model:show="showCustomDateRangeSheet"
                                     @dateRange:change="setCustomDateFilter">
         </date-range-selection-sheet>
 
@@ -281,6 +252,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         const self = this;
 
@@ -305,6 +279,14 @@ export default {
         query() {
             return this.$store.state.transactionStatisticsFilter;
         },
+        queryChartDataTypeName() {
+            const queryChartDataTypeName = this.$utilities.getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');
+            return this.$t(queryChartDataTypeName);
+        },
+        querySortingTypeName() {
+            const querySortingTypeName = this.$utilities.getNameByKeyValue(this.allSortingTypes, this.query.sortingType, 'type', 'name', 'System Default');
+            return this.$t(querySortingTypeName);
+        },
         allChartDataTypes() {
             return this.$constants.statistics.allChartDataTypes;
         },
@@ -313,6 +295,23 @@ export default {
         },
         allDateRanges() {
             return this.$constants.datetime.allDateRanges;
+        },
+        totalAmountName() {
+            if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.IncomeByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                return this.$t('Total Income');
+            } else if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                return this.$t('Total Expense');
+            } else if (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type) {
+                return this.$t('Total Assets');
+            } else if (this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
+                return this.$t('Total Liabilities');
+            }
+
+            return this.$t('Total Amount');
         },
         statisticsData() {
             const self = this;
@@ -466,7 +465,7 @@ export default {
                 this.reload(null);
             }
 
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         reload(done) {
             const self = this;
@@ -649,16 +648,16 @@ export default {
             return `${displayStartTime} ~ ${displayEndTime}`;
         },
         clickPieChartItem(item) {
-            this.$f7router.navigate(this.$options.filters.itemLinkUrl(item, this.query, this.allChartDataTypes));
+            this.f7router.navigate(this.getItemLinkUrl(item));
         },
         filterAccounts() {
-            this.$f7router.navigate('/statistic/filter/account');
+            this.f7router.navigate('/statistic/filter/account');
         },
         filterCategories() {
-            this.$f7router.navigate('/statistic/filter/category');
+            this.f7router.navigate('/statistic/filter/category');
         },
         settings() {
-            this.$f7router.navigate('/statistic/settings');
+            this.f7router.navigate('/statistic/settings');
         },
         scrollPopoverToSelectedItem(event) {
             if (!event || !event.$el || !event.$el.length) {
@@ -680,48 +679,53 @@ export default {
             }
 
             container.scrollTop(targetPos);
-        }
-    },
-    filters: {
-        finalAmount(amount, isShowAccountBalance, dataType, allChartDataTypes) {
-            if (!isShowAccountBalance && (dataType === allChartDataTypes.AccountTotalAssets.type || dataType === allChartDataTypes.AccountTotalLiabilities.type)) {
+        },
+        getDisplayAmount(amount, currency, textLimit) {
+            amount = this.$locale.getDisplayCurrency(amount, currency);
+
+            if (!this.showAccountBalance
+                && (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type
+                    || this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type)
+            ) {
                 return '***';
+            }
+
+            if (textLimit) {
+                this.$utilities.limitText(amount, textLimit);
             }
 
             return amount;
         },
-        totalAmountName(dataType, allChartDataTypes) {
-            if (dataType === allChartDataTypes.IncomeByAccount.type || dataType === allChartDataTypes.IncomeByPrimaryCategory.type || dataType === allChartDataTypes.IncomeBySecondaryCategory.type) {
-                return 'Total Income';
-            } else if (dataType === allChartDataTypes.ExpenseByAccount.type || dataType === allChartDataTypes.ExpenseByPrimaryCategory.type || dataType === allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                return 'Total Expense';
-            } else if (dataType === allChartDataTypes.AccountTotalAssets.type) {
-                return 'Total Assets';
-            } else if (dataType === allChartDataTypes.AccountTotalLiabilities.type) {
-                return 'Total Liabilities';
-            }
-
-            return 'Total Amount';
-        },
-        itemLinkUrl(item, query, allChartDataTypes) {
+        getItemLinkUrl(item) {
             const querys = [];
 
-            if (query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type) {
+            if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.IncomeByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.IncomeBySecondaryCategory.type) {
                 querys.push('type=2');
-            } else if (query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type) {
+            } else if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseBySecondaryCategory.type) {
                 querys.push('type=3');
             }
 
-            if (query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type) {
+            if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type
+                || this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type
+                || this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('accountId=' + item.id);
-            } else if (query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type) {
+            } else if (this.query.chartDataType === this.allChartDataTypes.IncomeByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.IncomeBySecondaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type
+                || this.query.chartDataType === this.allChartDataTypes.ExpenseBySecondaryCategory.type) {
                 querys.push('categoryId=' + item.id);
             }
 
-            if (query.chartDataType !== allChartDataTypes.AccountTotalAssets.type && query.chartDataType !== allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('dateType=' + query.dateType);
-                querys.push('minTime=' + query.startTime);
-                querys.push('maxTime=' + query.endTime);
+            if (this.query.chartDataType !== this.allChartDataTypes.AccountTotalAssets.type
+                && this.query.chartDataType !== this.allChartDataTypes.AccountTotalLiabilities.type) {
+                querys.push('dateType=' + this.query.dateType);
+                querys.push('minTime=' + this.query.startTime);
+                querys.push('maxTime=' + this.query.endTime);
             }
 
             return '/transaction/list?' + querys.join('&');
@@ -808,7 +812,7 @@ export default {
     --f7-progressbar-bg-color: #f8f8f8;
 }
 
-.theme-dark .statistics-percent-line .progressbar {
+.dark .statistics-percent-line .progressbar {
     --f7-progressbar-bg-color: #161616;
 }
 </style>

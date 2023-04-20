@@ -1,8 +1,6 @@
-import Vue from 'vue';
+import { createApp } from 'vue'
 
 import App from './Desktop.vue';
 
-new Vue({
-    el: '#app',
-    render: h => h(App),
-})
+const app = createApp(App);
+app.mount('#app');

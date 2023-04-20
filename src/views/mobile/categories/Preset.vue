@@ -4,44 +4,37 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Default Categories')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" v-if="allCategories && allCategories.length" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" v-if="allCategories && allCategories.length" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card v-for="categoryInfo in allCategories" :key="categoryInfo.type">
-            <f7-card-header>
-                <small class="card-header-content">
-                    <span>{{ categoryInfo.type | categoryTypeName($constants.category.allCategoryTypes) | localized }}</span>
-                </small>
-            </f7-card-header>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item v-for="(category, idx) in categoryInfo.categories"
-                                  :key="idx"
-                                  :accordion-item="!!category.subCategories.length"
-                                  :title="$t('category.' + category.name, currentLocale)">
-                        <f7-icon slot="media"
-                                 :icon="category.categoryIconId | categoryIcon"
-                                 :style="category.color | categoryIconStyle('var(--default-icon-color)')">
-                        </f7-icon>
+        <f7-block class="no-padding no-margin" :key="categoryInfo.type" v-for="categoryInfo in allCategories">
+            <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryInfo.type) }}</f7-block-title>
 
-                        <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
-                            <f7-list>
-                                <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
-                                              :key="subIdx"
-                                              :title="$t('category.' + subCategory.name, currentLocale)">
-                                    <f7-icon slot="media"
-                                             :icon="subCategory.categoryIconId | categoryIcon"
-                                             :style="subCategory.color | categoryIconStyle('var(--default-icon-color)')">
-                                    </f7-icon>
-                                </f7-list-item>
-                            </f7-list>
-                        </f7-accordion-content>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+            <f7-list strong inset dividers class="margin-top">
+                <f7-list-item :title="$t('category.' + category.name, currentLocale)"
+                              :accordion-item="!!category.subCategories.length"
+                              :key="idx"
+                              v-for="(category, idx) in categoryInfo.categories">
+                    <template #media>
+                        <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
+                    </template>
+
+                    <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
+                        <f7-list>
+                            <f7-list-item :title="$t('category.' + subCategory.name, currentLocale)"
+                                          :key="subIdx"
+                                          v-for="(subCategory, subIdx) in category.subCategories">
+                                <template #media>
+                                    <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                </template>
+                            </f7-list-item>
+                        </f7-list>
+                    </f7-accordion-content>
+                </f7-list-item>
+            </f7-list>
+        </f7-block>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -55,7 +48,7 @@
         <list-item-selection-sheet value-type="index"
                                    title-field="displayName"
                                    :items="allLanguages"
-                                   :show.sync="showChangeLocaleSheet"
+                                   v-model:show="showChangeLocaleSheet"
                                    v-model="currentLocale">
         </list-item-selection-sheet>
     </f7-page>
@@ -63,6 +56,10 @@
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data() {
         const self = this;
 
@@ -78,12 +75,12 @@ export default {
     },
     computed: {
         allLanguages() {
-            return this.$locale.getAllLanguages();
+            return this.$locale.getAllLanguageInfos();
         }
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         self.categoryType = parseInt(query.type);
 
@@ -112,7 +109,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         getDefaultCategories(categoryType) {
             switch (categoryType) {
@@ -128,7 +125,7 @@ export default {
         },
         save() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             self.submitting = true;
             self.$showLoading(() => self.submitting);
@@ -178,19 +175,17 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        }
-    },
-    filters: {
-        categoryTypeName(categoryType, allCategoryTypes) {
+        },
+        getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case allCategoryTypes.Income:
-                    return 'Income Categories';
-                case allCategoryTypes.Expense:
-                    return 'Expense Categories';
-                case allCategoryTypes.Transfer:
-                    return 'Transfer Categories';
+                case this.$constants.category.allCategoryTypes.Income:
+                    return this.$t('Income Categories');
+                case this.$constants.category.allCategoryTypes.Expense:
+                    return this.$t('Expense Categories');
+                case this.$constants.category.allCategoryTypes.Transfer:
+                    return this.$t('Transfer Categories');
                 default:
-                    return 'Transaction Categories';
+                    return this.$t('Transaction Categories');
             }
         }
     }

@@ -1,4 +1,8 @@
 import { defaultLanguage, allLanguages } from '../locales/index.js';
+import timezone from "../consts/timezone.js";
+import currency from "../consts/currency.js";
+import settings from "./settings";
+import utils from './utils.js';
 
 const apiNotFoundErrorCode = 100001;
 const specifiedApiNotFoundErrors = {
@@ -121,11 +125,11 @@ const parameterizedErrors = [
     }
 ];
 
-export function getAllLanguages() {
+export function getAllLanguageInfos() {
     return allLanguages;
 }
 
-export function getLanguage(locale) {
+export function getLanguageInfo(locale) {
     return allLanguages[locale];
 }
 
@@ -168,8 +172,196 @@ export function getDefaultLanguage() {
     return browserLocale;
 }
 
+export function transateIf(text, isTranslate, translateFn) {
+    if (isTranslate) {
+        return translateFn(text);
+    }
+
+    return text;
+}
+
+export function getAllLongMonthNames(translateFn) {
+    return [
+        translateFn('datetime.January.long'),
+        translateFn('datetime.February.long'),
+        translateFn('datetime.March.long'),
+        translateFn('datetime.April.long'),
+        translateFn('datetime.May.long'),
+        translateFn('datetime.June.long'),
+        translateFn('datetime.July.long'),
+        translateFn('datetime.August.long'),
+        translateFn('datetime.September.long'),
+        translateFn('datetime.October.long'),
+        translateFn('datetime.November.long'),
+        translateFn('datetime.December.long')
+    ];
+}
+
+export function getAllShortMonthNames(translateFn) {
+    return [
+        translateFn('datetime.January.short'),
+        translateFn('datetime.February.short'),
+        translateFn('datetime.March.short'),
+        translateFn('datetime.April.short'),
+        translateFn('datetime.May.short'),
+        translateFn('datetime.June.short'),
+        translateFn('datetime.July.short'),
+        translateFn('datetime.August.short'),
+        translateFn('datetime.September.short'),
+        translateFn('datetime.October.short'),
+        translateFn('datetime.November.short'),
+        translateFn('datetime.December.short')
+    ];
+}
+
+export function getAllLongWeekdayNames(translateFn) {
+    return [
+        translateFn('datetime.Sunday.long'),
+        translateFn('datetime.Monday.long'),
+        translateFn('datetime.Tuesday.long'),
+        translateFn('datetime.Wednesday.long'),
+        translateFn('datetime.Thursday.long'),
+        translateFn('datetime.Friday.long'),
+        translateFn('datetime.Saturday.long')
+    ];
+}
+
+export function getAllShortWeekdayNames(translateFn) {
+    return [
+        translateFn('datetime.Sunday.short'),
+        translateFn('datetime.Monday.short'),
+        translateFn('datetime.Tuesday.short'),
+        translateFn('datetime.Wednesday.short'),
+        translateFn('datetime.Thursday.short'),
+        translateFn('datetime.Friday.short'),
+        translateFn('datetime.Saturday.short')
+    ];
+}
+
+export function getAllMinWeekdayNames(translateFn) {
+    return [
+        translateFn('datetime.Sunday.min'),
+        translateFn('datetime.Monday.min'),
+        translateFn('datetime.Tuesday.min'),
+        translateFn('datetime.Wednesday.min'),
+        translateFn('datetime.Thursday.min'),
+        translateFn('datetime.Friday.min'),
+        translateFn('datetime.Saturday.min')
+    ];
+}
+
+export function getAllTimezones(includeSystemDefault, translateFn) {
+    const defaultTimezoneOffset = utils.getTimezoneOffset();
+    const defaultTimezoneOffsetMinutes = utils.getTimezoneOffsetMinutes();
+    const allTimezones = timezone.all;
+    const allTimezoneInfos = [];
+
+    for (let i = 0; i < allTimezones.length; i++) {
+        allTimezoneInfos.push({
+            name: allTimezones[i].timezoneName,
+            utcOffset: (allTimezones[i].timezoneName !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+            utcOffsetMinutes: utils.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
+            displayName: translateFn(`timezone.${allTimezones[i].displayName}`)
+        });
+    }
+
+    if (includeSystemDefault) {
+        allTimezoneInfos.push({
+            name: '',
+            utcOffset: defaultTimezoneOffset,
+            utcOffsetMinutes: defaultTimezoneOffsetMinutes,
+            displayName: translateFn('System Default')
+        });
+    }
+
+    allTimezoneInfos.sort(function(c1, c2){
+        const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
+        const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
+
+        if (utcOffset1 !== utcOffset2) {
+            return utcOffset1 - utcOffset2;
+        }
+
+        return c1.displayName.localeCompare(c2.displayName);
+    })
+
+    return allTimezoneInfos;
+}
+
+export function getAllCurrencies(translateFn) {
+    const allCurrencyCodes = currency.all;
+    const allCurrencies = [];
+
+    for (let currencyCode in allCurrencyCodes) {
+        if (!Object.prototype.hasOwnProperty.call(allCurrencyCodes, currencyCode)) {
+            return;
+        }
+
+        allCurrencies.push({
+            code: currencyCode,
+            displayName: translateFn(`currency.${currencyCode}`)
+        });
+    }
+
+    allCurrencies.sort(function(c1, c2){
+        return c1.displayName.localeCompare(c2.displayName);
+    })
+
+    return allCurrencies;
+}
+
+export function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
+    if (!utils.isNumber(value) && !utils.isString(value)) {
+        return value;
+    }
+
+    if (utils.isNumber(value)) {
+        value = value.toString();
+    }
+
+    if (!notConvertValue) {
+        const hasIncompleteFlag = utils.isString(value) && value.charAt(value.length - 1) === '+';
+
+        if (hasIncompleteFlag) {
+            value = value.substring(0, value.length - 1);
+        }
+
+        value = utils.numericCurrencyToString(value);
+
+        if (hasIncompleteFlag) {
+            value = value + '+';
+        }
+    }
+
+    const currencyDisplayMode = settings.getCurrencyDisplayMode();
+
+    if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
+        const currencyInfo = currency.all[currencyCode];
+        let currencySymbol = currency.defaultCurrencySymbol;
+
+        if (currencyInfo && currencyInfo.symbol) {
+            currencySymbol = currencyInfo.symbol;
+        } else if (currencyInfo && currencyInfo.code) {
+            currencySymbol = currencyInfo.code;
+        }
+
+        return translateFn('format.currency.symbol', {
+            amount: value,
+            symbol: currencySymbol
+        });
+    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Code) {
+        return `${value} ${currencyCode}`;
+    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Name) {
+        const currencyName = translateFn(`currency.${currencyCode}`);
+        return `${value} ${currencyName}`;
+    } else {
+        return value;
+    }
+}
+
 export function getI18nOptions() {
     return {
+        legacy: false,
         locale: defaultLanguage,
         fallbackLocale: defaultLanguage,
         formatFallbackMessages: true,

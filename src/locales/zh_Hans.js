@@ -36,11 +36,6 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
-    'input-format': {
-        'datetime': {
-            'long': 'yyyy年m月d日 HH::mm',
-        },
-    },
     'dataExport': {
         'defaultExportFilename': 'ezBookkeeping_导出数据',
         'exportFilename': 'ezBookkeeping_{nickname}_导出数据'
@@ -658,6 +653,7 @@ export default {
     'Update': '更新',
     'None': '无',
     'Not Specified': '未指定',
+    'No results': '无结果',
     'Done': '完成',
     'Continue': '继续',
     'Status': '状态',
@@ -690,6 +686,7 @@ export default {
     'End Time': '结束时间',
     'Select Date': '选择日期',
     'Select Time': '选择时间',
+    'Current Time': '当前时间',
     'Custom': '自定义',
     'Pie Chart': '饼图',
     'Bar Chart': '条形图',
@@ -865,8 +862,11 @@ export default {
     'Account Total Assets': '账户总资产',
     'Account Total Liabilities': '账户总负债',
     'Statistics Settings': '统计设置',
+    'Chart Type': '图表类型',
     'Default Chart Type': '默认图表类型',
+    'Chart Data Type': '图表数据类型',
     'Default Chart Data Type': '默认图表数据类型',
+    'Date Range': '时间范围',
     'Default Date Range': '默认时间范围',
     'Default Account Filter': '默认账号过滤',
     'Default Transaction Category Filter': '默认交易分类过滤',
@@ -975,6 +975,8 @@ export default {
     'You have logged out all other sessions': '您已经退出其他所有会话',
     'Unable to logout all other sessions': '无法退出其他所有会话',
     'Regenerate Backup Codes': '重新生成备用码',
+    'Enable Two-Factor Authentication': '启用两步验证',
+    'Disable Two-Factor Authentication': '禁用两步验证',
     'Please use two factor authentication app scan the below qrcode and input current passcode': '请使用两步验证应用扫描下方的二维码并输入当前的验证码',
     'Please enter your current password when disable two factor authentication': '禁用两步验证时需要输入您的当前密码',
     'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.': '重新生成两步验证备用码时需要输入您的当前密码。如果您重新生成备用码，之前的备用码将失效。',

@@ -2,39 +2,33 @@
     <f7-page @page:afterin="onPageAfterIn">
         <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item title="Accounts" after="Count"></f7-list-item>
-                    <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
-                    <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
-                    <f7-list-item title="Transactions" after="Count"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item title="Accounts" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
+            <f7-list-item title="Transactions" after="Count"></f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
-                    <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
+            <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
+            <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
+        </f7-list>
 
-        <f7-card>
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-button @click="exportedData = null; showExportDataSheet = true" v-if="isDataExportingEnabled">{{ $t('Export Data') }}</f7-list-button>
-                    <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
+            <f7-list-button :class="{ 'disabled': !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0' }"
+                            v-if="isDataExportingEnabled"
+                            @click="exportedData = null; showExportDataSheet = true">{{ $t('Export Data') }}</f7-list-button>
+            <f7-list-button color="red" @click="clearData(null)">{{ $t('Clear User Data') }}</f7-list-button>
+        </f7-list>
 
-        <f7-sheet style="height:auto" :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
-            <f7-page-content>
+        <f7-sheet swipe-handler=".swipe-handler" style="height:auto"
+                  :swipe-to-close="!exportingData" :close-on-escape="!exportingData"
+                  :close-by-backdrop-click="!exportingData" :close-by-outside-click="!exportingData"
+                  :opened="showExportDataSheet" @sheet:closed="showExportDataSheet = false; exportedData = null;">
+            <div class="swipe-handler"></div>
+            <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div style="font-size: 18px"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
                 </div>
@@ -51,9 +45,9 @@
 
         <password-input-sheet :title="$t('Are you sure you want to clear all data?')"
                               :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.')"
-                              :show.sync="showInputPasswordSheetForClearData"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
+                              v-model:show="showInputPasswordSheetForClearData"
                               v-model="currentPasswordForClearData"
                               @password:confirm="clearData">
         </password-input-sheet>
@@ -62,6 +56,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             loading: true,
@@ -76,9 +73,6 @@ export default {
         };
     },
     computed: {
-        currentTimezoneOffsetMinutes() {
-            return this.$utilities.getTimezoneOffsetMinutes();
-        },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
         },
@@ -113,7 +107,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         exportData() {
             const self = this;
@@ -155,6 +149,20 @@ export default {
 
                 self.showInputPasswordSheetForClearData = false;
                 self.$toast('All user data has been cleared');
+
+                self.loading = true;
+
+                self.$store.dispatch('getUserDataStatistics').then(dataStatistics => {
+                    self.dataStatistics = dataStatistics;
+                    self.loading = false;
+                }).catch(error => {
+                    if (error.processed) {
+                        self.loading = false;
+                    } else {
+                        self.loadingError = error;
+                        self.$toast(error.message || error);
+                    }
+                });
             }).catch(error => {
                 self.clearingData = false;
                 self.$hideLoading();

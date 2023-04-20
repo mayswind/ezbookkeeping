@@ -1,19 +1,19 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
-            <img class="login-page-logo" src="img/ezbookkeeping-192.png" />
+            <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
             <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
-        <f7-list form>
+        <f7-list form dividers>
             <f7-list-input
                 type="text"
                 autocomplete="username"
                 clear-button
                 :label="$t('Username')"
                 :placeholder="$t('Your username or email')"
-                :value="username"
-                @input="username = $event.target.value; tempToken = ''"
+                v-model:value="username"
+                @input="tempToken = ''"
             ></f7-list-input>
             <f7-list-input
                 type="password"
@@ -21,9 +21,9 @@
                 clear-button
                 :label="$t('Password')"
                 :placeholder="$t('Your password')"
-                :value="password"
-                @input="password = $event.target.value; tempToken = ''"
-                @keyup.enter.native="loginByPressEnter"
+                v-model:value="password"
+                @input="tempToken = ''"
+                @keyup.enter="loginByPressEnter"
             ></f7-list-input>
         </f7-list>
 
@@ -50,15 +50,17 @@
         </f7-list>
 
         <f7-popover class="lang-popover-menu">
-            <f7-list>
+            <f7-list dividers>
                 <f7-list-item
                     link="#" no-chevron popover-close
-                    v-for="(lang, locale) in allLanguages"
-                    :key="locale"
                     :title="lang.displayName"
+                    :key="locale"
+                    v-for="(lang, locale) in allLanguages"
                     @click="changeLanguage(locale)"
                 >
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-popover>
@@ -72,26 +74,28 @@
                     <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list no-hairlines class="no-margin-top margin-bottom">
+                    <f7-list no-hairlines strong class="no-margin">
                         <f7-list-input
                             type="number"
                             autocomplete="one-time-code"
                             outline
+                            floating-label
                             clear-button
                             v-if="twoFAVerifyType === 'passcode'"
+                            :label="$t('Passcode')"
                             :placeholder="$t('Passcode')"
-                            :value="passcode"
-                            @input="passcode = $event.target.value"
-                            @keyup.enter.native="verify"
+                            v-model:value="passcode"
+                            @keyup.enter="verify"
                         ></f7-list-input>
                         <f7-list-input
                             outline
+                            floating-label
                             clear-button
                             v-if="twoFAVerifyType === 'backupcode'"
+                            :label="$t('Backup Code')"
                             :placeholder="$t('Backup Code')"
-                            :value="backupCode"
-                            @input="backupCode = $event.target.value"
-                            @keyup.enter.native="verify"
+                            v-model:value="backupCode"
+                            @keyup.enter="verify"
                         ></f7-list-input>
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': twoFAInputIsEmpty || verifying }" :text="$t('Verify')" @click="verify"></f7-button>
@@ -106,6 +110,9 @@
 
 <script>
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
             username: '',
@@ -124,7 +131,7 @@ export default {
             return 'v' + this.$version;
         },
         allLanguages() {
-            return this.$locale.getAllLanguages();
+            return this.$locale.getAllLanguageInfos();
         },
         isUserRegistrationEnabled() {
             return this.$settings.isUserRegistrationEnabled();
@@ -148,10 +155,10 @@ export default {
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
-            let lang = this.$locale.getLanguage(currentLocale);
+            let lang = this.$locale.getLanguageInfo(currentLocale);
 
             if (!lang) {
-                lang = this.$locale.getLanguage(this.$locale.getDefaultLanguage());
+                lang = this.$locale.getLanguageInfo(this.$locale.getDefaultLanguage());
             }
 
             return lang.displayName;
@@ -160,7 +167,7 @@ export default {
     methods: {
         login() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             if (!this.username) {
                 self.$alert('Username cannot be empty');
@@ -208,10 +215,7 @@ export default {
             });
         },
         loginByPressEnter() {
-            const app = this.$f7;
-            const $$ = app.$;
-
-            if ($$('.modal-in').length) {
+            if (this.$ui.isModalShowing()) {
                 return;
             }
 
@@ -219,7 +223,7 @@ export default {
         },
         verify() {
             const self = this;
-            const router = self.$f7router;
+            const router = self.f7router;
 
             if (self.twoFAInputIsEmpty || self.verifying) {
                 return;

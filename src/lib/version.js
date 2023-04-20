@@ -1,15 +1,15 @@
 export default {
     getVersion: () => {
-        let version = process.env.VERSION || 'unknown';
-        let commitHash = process.env.COMMIT_HASH;
+        let version = __EZBOOKKEEPING_VERSION__ || 'unknown'; // eslint-disable-line
+        let commitHash = __EZBOOKKEEPING_BUILD_COMMIT_HASH__; // eslint-disable-line
 
         if (commitHash) {
-            return `${version} (${commitHash.substr(0, Math.min(7, commitHash.length))})`
+            return `${version} (${commitHash.substring(0, Math.min(7, commitHash.length))})`
         } else {
             return version;
         }
     },
     getBuildTime: () => {
-        return process.env.BUILD_UNIXTIME;
+        return __EZBOOKKEEPING_BUILD_UNIX_TIME__; // eslint-disable-line
     }
 };

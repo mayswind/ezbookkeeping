@@ -1,8 +1,8 @@
 export default {
     getLicense: () => {
-        return process.env.LICENSE;
+        return __EZBOOKKEEPING_LICENSE__; // eslint-disable-line
     },
     getThirdPartyLicenses: () => {
-        return process.env.THIRD_PARTY_LICENSES || [];
+        return __EZBOOKKEEPING_THIRD_PARTY_LICENSES__ || []; // eslint-disable-line
     }
 };

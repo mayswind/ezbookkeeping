@@ -1,27 +1,27 @@
 <template>
-    <f7-sheet :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              :opened="show"
+              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-block class="margin-vertical">
-                <f7-row class="padding-vertical padding-horizontal-half"
-                        :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
-                        v-for="(row, idx) in allColorRows" :key="idx">
-                    <f7-col class="text-align-center" v-for="colorInfo in row" :key="colorInfo.color">
-                        <f7-icon f7="app_fill"
-                                 :style="colorInfo.color | iconStyle('default', 'var(--default-icon-color)')"
-                                 @click.native="onColorClicked(colorInfo)">
+            <f7-block class="margin-vertical no-padding">
+                <div class="grid grid-cols-7 padding-vertical-half padding-horizontal-half"
+                     :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
+                     :key="idx" v-for="(row, idx) in allColorRows">
+                    <div class="text-align-center" :key="colorInfo.color" v-for="colorInfo in row">
+                        <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="colorInfo.color" @click="onColorClicked(colorInfo)">
                             <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === colorInfo.color">
                                 <f7-icon f7="checkmark_alt"></f7-icon>
                             </f7-badge>
-                        </f7-icon>
-                    </f7-col>
-                    <f7-col v-for="idx in (itemPerRow - row.length)" :key="idx"></f7-col>
-                </f7-row>
+                        </ItemIcon>
+                    </div>
+                </div>
             </f7-block>
         </f7-page-content>
     </f7-sheet>
@@ -30,16 +30,20 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'columnCount',
         'show',
         'allColorInfos'
+    ],
+    emits: [
+        'update:modelValue',
+        'update:show'
     ],
     data() {
         const self = this;
 
         return {
-            currentValue: self.value,
+            currentValue: self.modelValue,
             itemPerRow: self.columnCount || 7
         }
     },
@@ -64,11 +68,11 @@ export default {
     methods: {
         onColorClicked(colorInfo) {
             this.currentValue = colorInfo.color;
-            this.$emit('input', this.currentValue);
+            this.$emit('update:modelValue', this.currentValue);
             this.$emit('update:show', false);
         },
         onSheetOpen(event) {
-            this.currentValue = this.value;
+            this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {

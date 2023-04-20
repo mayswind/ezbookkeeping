@@ -1,25 +1,29 @@
 <template>
-    <f7-sheet :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show"
+              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-list no-hairlines class="no-margin-top no-margin-bottom">
+            <f7-list dividers no-hairlines class="no-margin-vertical">
                 <f7-list-item link="#" no-chevron
-                              v-for="(item, index) in items"
-                              :key="item | itemKeyValue(index, keyField, valueType)"
+                              :title="$tIf((titleField ? item[titleField] : item), titleI18n)"
+                              :value="getItemValue(item, index, valueField, valueType)"
                               :class="{ 'list-item-selected': isSelected(item, index) }"
-                              :value="item | itemKeyValue(index, valueField, valueType)"
-                              :title="item | itemFieldContent(titleField, item, titleI18n)"
+                              :key="getItemValue(item, index, keyField, valueType)"
+                              v-for="(item, index) in items"
                               @click="onItemClicked(item, index)">
-                    <f7-icon slot="media"
-                             :icon="item[iconField] | icon(iconType)"
-                             :style="item[colorField] | iconStyle(iconType, 'var(--default-icon-color)')"
-                             v-if="iconField"></f7-icon>
-                    <f7-icon slot="after" class="list-item-checked-icon" f7="checkmark_alt" v-if="isSelected(item, index)"></f7-icon>
+                    <template #content-start>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>
+                    </template>
+                    <template #media v-if="iconField">
+                        <ItemIcon :icon-type="iconType" :icon-id="item[iconField]" :color="item[colorField]"></ItemIcon>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-page-content>
@@ -29,7 +33,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'valueType', // item or index
         'keyField', // for value type == item
         'valueField', // for value type == item
@@ -41,11 +45,15 @@ export default {
         'items',
         'show'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 
         return {
-            currentValue: self.value
+            currentValue: self.modelValue
         }
     },
     computed: {
@@ -54,6 +62,15 @@ export default {
         }
     },
     methods: {
+        getItemValue(item, index, fieldName, valueType) {
+            if (valueType === 'index') {
+                return index;
+            } else if (fieldName) {
+                return item[fieldName];
+            } else {
+                return item;
+            }
+        },
         onItemClicked(item, index) {
             if (this.valueType === 'index') {
                 this.currentValue = index;
@@ -65,15 +82,15 @@ export default {
                 }
             }
 
-            this.$emit('input', this.currentValue);
-            this.$emit('update:show', false);
+            this.$emit('update:modelValue', this.currentValue);
+            this.close();
         },
         onSheetOpen(event) {
-            this.currentValue = this.value;
+            this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         },
         isSelected(item, index) {
             if (this.valueType === 'index') {
@@ -106,17 +123,9 @@ export default {
             }
 
             container.scrollTop(targetPos);
-        }
-    },
-    filters: {
-        itemKeyValue(item, index, fieldName, valueType) {
-            if (valueType === 'index') {
-                return index;
-            } else if (fieldName) {
-                return item[fieldName];
-            } else {
-                return item;
-            }
+        },
+        close() {
+            this.$emit('update:show', false);
         }
     }
 }

@@ -36,11 +36,6 @@ export default {
             'symbol': '{symbol} {amount}'
         }
     },
-    'input-format': { // The type of date or time format is framework7 format, ref: https://v5.framework7.io/docs/calendar.html#calendar-parameters
-        'datetime': {
-            'long': 'm/d/yyyy hh::mm A',
-        },
-    },
     'dataExport': {
         'defaultExportFilename': 'ezBookkeeping_export_data',
         'exportFilename': 'ezBookkeeping_{nickname}_export_data'
@@ -658,6 +653,7 @@ export default {
     'Update': 'Update',
     'None': 'None',
     'Not Specified': 'Not Specified',
+    'No results': 'No results',
     'Done': 'Done',
     'Continue': 'Continue',
     'Status': 'Status',
@@ -690,6 +686,7 @@ export default {
     'End Time': 'End Time',
     'Select Date': 'Select Date',
     'Select Time': 'Select Time',
+    'Current Time': 'Current Time',
     'Custom': 'Custom',
     'Pie Chart': 'Pie Chart',
     'Bar Chart': 'Bar Chart',
@@ -865,8 +862,11 @@ export default {
     'Account Total Assets': 'Account Total Assets',
     'Account Total Liabilities': 'Account Total Liabilities',
     'Statistics Settings': 'Statistics Settings',
+    'Chart Type': 'Chart Type',
     'Default Chart Type': 'Default Chart Type',
+    'Chart Data Type': 'Chart Data Type',
     'Default Chart Data Type': 'Default Chart Data Type',
+    'Date Range': 'Date Range',
     'Default Date Range': 'Default Date Range',
     'Default Account Filter': 'Default Account Filter',
     'Default Transaction Category Filter': 'Default Transaction Category Filter',
@@ -975,6 +975,8 @@ export default {
     'You have logged out all other sessions': 'You have logged out all other sessions',
     'Unable to logout all other sessions': 'Unable to logout all other sessions',
     'Regenerate Backup Codes': 'Regenerate Backup Codes',
+    'Enable Two-Factor Authentication': 'Enable Two-Factor Authentication',
+    'Disable Two-Factor Authentication': 'Disable Two-Factor Authentication',
     'Please use two factor authentication app scan the below qrcode and input current passcode': 'Please use two factor authentication app scan the below qrcode and input current passcode',
     'Please enter your current password when disable two factor authentication': 'Please enter your current password when disable two factor authentication',
     'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.': 'Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.',

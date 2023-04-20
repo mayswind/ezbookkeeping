@@ -10,63 +10,57 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="skeleton-text" v-if="loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list>
-                    <f7-list-item title="Category Name">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
-                    </f7-list-item>
-                    <f7-list-item title="Category Name 2">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
-                    </f7-list-item>
-                    <f7-list-item title="Category Name 3">
-                        <f7-icon slot="media" f7="app_fill"></f7-icon>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+            <f7-list-item title="Category Name"
+                          :link="hasSubCategories ? '#' : null"
+                          :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
+                <template #media>
+                    <f7-icon f7="app_fill"></f7-icon>
+                </template>
+            </f7-list-item>
+        </f7-list>
 
-        <f7-card v-else-if="!loading">
-            <f7-card-content class="no-safe-areas" :padding="false">
-                <f7-list v-if="noAvailableCategory">
-                    <f7-list-item :title="$t('No available category')"></f7-list-item>
-                    <f7-list-button v-if="hasSubCategories"
-                        :title="$t('Add Default Categories')"
-                        :href="'/category/preset?type=' + categoryType"></f7-list-button>
-                </f7-list>
+        <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableCategory">
+            <f7-list-item :title="$t('No available category')"></f7-list-item>
+            <f7-list-button v-if="hasSubCategories"
+                            :title="$t('Add Default Categories')"
+                            :href="'/category/preset?type=' + categoryType"></f7-list-button>
+        </f7-list>
 
-                <f7-list class="category-list" sortable :sortable-enabled="sortable" @sortable:sort="onSort">
-                    <f7-list-item v-for="category in categories"
-                                  :key="category.id"
-                                  :id="category | categoryDomId"
-                                  :title="category.name"
-                                  :footer="category.comment"
-                                  :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
-                                  v-show="showHidden || !category.hidden"
-                                  swipeout @taphold.native="setSortable()">
-                        <f7-icon slot="media"
-                                 :icon="category.icon | categoryIcon"
-                                 :style="category.color | categoryIconStyle('var(--default-icon-color)')">
-                            <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
-                                <f7-icon f7="eye_slash_fill"></f7-icon>
-                            </f7-badge>
-                        </f7-icon>
-                        <f7-swipeout-actions left v-if="sortable">
-                            <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
-                                                overswipe close @click="hide(category, !category.hidden)">
-                                <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                        <f7-swipeout-actions right v-if="!sortable">
-                            <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
-                            <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
-                                <f7-icon f7="trash"></f7-icon>
-                            </f7-swipeout-button>
-                        </f7-swipeout-actions>
-                    </f7-list-item>
-                </f7-list>
-            </f7-card-content>
-        </f7-card>
+        <f7-list strong inset dividers sortable class="margin-top category-list"
+                 :sortable-enabled="sortable"
+                 v-if="!loading"
+                 @sortable:sort="onSort">
+            <f7-list-item swipeout
+                          :id="getCategoryDomId(category)"
+                          :title="category.name"
+                          :footer="category.comment"
+                          :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
+                          :key="category.id"
+                          v-for="category in categories"
+                          v-show="showHidden || !category.hidden"
+                          @taphold="setSortable()">
+                <template #media>
+                    <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
+                        <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
+                            <f7-icon f7="eye_slash_fill"></f7-icon>
+                        </f7-badge>
+                    </ItemIcon>
+                </template>
+                <f7-swipeout-actions left v-if="sortable">
+                    <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-left padding-right"
+                                        overswipe close @click="hide(category, !category.hidden)">
+                        <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+                <f7-swipeout-actions right v-if="!sortable">
+                    <f7-swipeout-button color="orange" close :text="$t('Edit')" @click="edit(category)"></f7-swipeout-button>
+                    <f7-swipeout-button color="red" class="padding-left padding-right" @click="remove(category, false)">
+                        <f7-icon f7="trash"></f7-icon>
+                    </f7-swipeout-button>
+                </f7-swipeout-actions>
+            </f7-list-item>
+        </f7-list>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -91,6 +85,10 @@
 
 <script>
 export default {
+    props: [
+        'f7route',
+        'f7router'
+    ],
     data() {
         return {
             hasSubCategories: false,
@@ -166,7 +164,7 @@ export default {
     },
     created() {
         const self = this;
-        const query = self.$f7route.query;
+        const query = self.f7route.query;
 
         self.categoryType = parseInt(query.type);
 
@@ -207,7 +205,7 @@ export default {
                 this.reload(null);
             }
 
-            this.$routeBackOnError('loadingError');
+            this.$routeBackOnError(this.f7router, 'loadingError');
         },
         reload(done) {
             if (this.sortable) {
@@ -245,12 +243,17 @@ export default {
         onSort(event) {
             const self = this;
 
-            if (!event || !event.el || !event.el.id || event.el.id.indexOf('category_') !== 0) {
-                this.$toast('Unable to move category');
+            if (!event || !event.el || !event.el.id) {
+                self.$toast('Unable to move category');
                 return;
             }
 
-            const id = event.el.id.substring(9); // category_
+            const id = self.parseCategoryIdFromDomId(event.el.id);
+
+            if (!id) {
+                self.$toast('Unable to move category');
+                return;
+            }
 
             self.$store.dispatch('changeCategoryDisplayOrder', {
                 categoryId: id,
@@ -294,7 +297,7 @@ export default {
             });
         },
         edit(category) {
-            this.$f7router.navigate('/category/edit?id=' + category.id);
+            this.f7router.navigate('/category/edit?id=' + category.id);
         },
         hide(category, hidden) {
             const self = this;
@@ -316,8 +319,6 @@ export default {
         },
         remove(category, confirm) {
             const self = this;
-            const app = self.$f7;
-            const $$ = app.$;
 
             if (!category) {
                 self.$alert('An error has occurred');
@@ -337,9 +338,7 @@ export default {
             self.$store.dispatch('deleteCategory', {
                 category: category,
                 beforeResolve: (done) => {
-                    app.swipeout.delete($$(`#${self.$options.filters.categoryDomId(category)}`), () => {
-                        done();
-                    });
+                    self.$ui.onSwipeoutDeleted(self.getCategoryDomId(category), done);
                 }
             }).then(() => {
                 self.$hideLoading();
@@ -350,11 +349,16 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        }
-    },
-    filters: {
-        categoryDomId(category) {
+        },
+        getCategoryDomId(category) {
             return 'category_' + category.id;
+        },
+        parseCategoryIdFromDomId(domId) {
+            if (!domId || domId.indexOf('category_') !== 0) {
+                return null;
+            }
+
+            return domId.substring(9); // category_
         }
     }
 };

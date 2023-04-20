@@ -4,14 +4,15 @@
             <circle class="pie-chart-background" cx="0" cy="0" :r="diameter"></circle>
 
             <circle class="pie-chart-item"
-                    v-for="(item, idx) in validItems" :key="idx"
                     fill="transparent"
                     cx="0" cy="0"
                     :r="diameter / 2"
-                    :stroke="item.color | defaultIconColor('var(--default-icon-color)')"
+                    :stroke="getColor(item.color)"
                     :stroke-width="diameter"
-                    :stroke-dasharray="item | itemStrokeDash(circumference)"
-                    :stroke-dashoffset="item | itemDashOffset(validItems, circumference, itemCommonDashOffset)"
+                    :stroke-dasharray="getItemStrokeDash(item)"
+                    :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
+                    :key="idx"
+                    v-for="(item, idx) in validItems"
                     @click="switchSelectedIndex(idx)">
             </circle>
 
@@ -48,8 +49,8 @@
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
                         <f7-chip outline
-                                 :text="(selectedItem.percent) | percent(2, '&lt;0.01')"
-                                 :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)', '--f7-chip-outline-border-color')"
+                                 :text="$utilities.formatPercent(selectedItem.percent, 2, '&lt;0.01')"
+                                 :style="getColorStyle(selectedItem ? selectedItem.color : '', '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
                     <p v-else-if="!validItems || !validItems.length">
@@ -59,7 +60,7 @@
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
-                        <span v-else-if="!skeleton && showValue" :style="(selectedItem ? selectedItem.color : '') | iconStyle('default', 'var(--default-icon-color)')">{{ selectedItem.value | currency(selectedItem.currency || defaultCurrency) }}</span>
+                        <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ $locale.getDisplayCurrency(selectedItem.value, (selectedItem.currency || defaultCurrency)) }}</span>
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
@@ -106,6 +107,9 @@ export default {
         'showSelectedItemInfo',
         'enableClickItem',
         'centerTextBackground',
+    ],
+    emits: [
+        'click'
     ],
     data: function () {
         const diameter = 100;
@@ -195,8 +199,11 @@ export default {
         }
     },
     watch: {
-        'items': function () {
-            this.selectedIndex = 0;
+        'items': {
+            handler() {
+                this.selectedIndex = 0;
+            },
+            deep: true
         }
     },
     methods: {
@@ -216,14 +223,32 @@ export default {
             if (this.enableClickItem) {
                 this.$emit('click', item.sourceItem);
             }
-        }
-    },
-    filters: {
-        itemStrokeDash(item, circumference) {
-            const length = item.actualPercent * circumference;
-            return `${length} ${circumference - length}`;
         },
-        itemDashOffset(item, items, circumference, offset) {
+        getColor: function (color) {
+            if (color && color !== this.$constants.colors.defaultColor) {
+                color = '#' + color;
+            } else {
+                color = 'var(--default-icon-color)';
+            }
+
+            return color;
+        },
+        getColorStyle: function (color, additionalFieldName) {
+            const ret = {
+                color: this.getColor(color)
+            };
+
+            if (additionalFieldName) {
+                ret[additionalFieldName] = ret.color;
+            }
+
+            return ret;
+        },
+        getItemStrokeDash(item) {
+            const length = item.actualPercent * this.circumference;
+            return `${length} ${this.circumference - length}`;
+        },
+        getItemDashOffset(item, items, offset) {
             let allPreviousPercent = 0;
 
             for (let i = 0; i < items.length; i++) {
@@ -237,17 +262,17 @@ export default {
             }
 
             if (offset) {
-                offset += circumference / 4;
+                offset += this.circumference / 4;
             } else {
-                offset = circumference / 4;
+                offset = this.circumference / 4;
             }
 
             if (allPreviousPercent <= 0) {
                 return offset;
             }
 
-            const allPreviousLength = allPreviousPercent * circumference;
-            return circumference - allPreviousLength + offset;
+            const allPreviousLength = allPreviousPercent * this.circumference;
+            return this.circumference - allPreviousLength + offset;
         }
     }
 }
@@ -314,7 +339,7 @@ export default {
     fill: #f0f0f0;
 }
 
-.theme-dark .pie-chart-background {
+.dark .pie-chart-background {
     fill: #181818;
 }
 

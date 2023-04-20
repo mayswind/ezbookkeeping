@@ -1,27 +1,27 @@
 <template>
-    <f7-sheet :class="{ 'icon-selection-huge-sheet': hugeIconRows }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              :class="heightClass" :opened="show"
+              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-block class="margin-vertical">
-                <f7-row class="padding-vertical-half padding-horizontal-half"
-                        :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
-                        v-for="(row, idx) in allIconRows" :key="idx">
-                    <f7-col class="text-align-center" v-for="iconInfo in row" :key="iconInfo.id">
-                        <f7-icon :icon="iconInfo.icon"
-                                 :style="color | iconStyle('default', 'var(--default-icon-color)')"
-                                 @click.native="onIconClicked(iconInfo)">
+            <f7-block class="margin-vertical no-padding">
+                <div class="grid grid-cols-7 padding-vertical-half padding-horizontal-half"
+                     :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
+                     :key="idx" v-for="(row, idx) in allIconRows">
+                    <div class="text-align-center" :key="iconInfo.id" v-for="iconInfo in row">
+                        <ItemIcon icon-type="fixed" :icon-id="iconInfo.icon" :color="color" @click="onIconClicked(iconInfo)">
                             <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === iconInfo.id">
                                 <f7-icon f7="checkmark_alt"></f7-icon>
                             </f7-badge>
-                        </f7-icon>
-                    </f7-col>
-                    <f7-col v-for="idx in (itemPerRow - row.length)" :key="idx"></f7-col>
-                </f7-row>
+                        </ItemIcon>
+                    </div>
+                </div>
             </f7-block>
         </f7-page-content>
     </f7-sheet>
@@ -30,17 +30,21 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'color',
         'columnCount',
         'show',
         'allIconInfos'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 
         return {
-            currentValue: self.value,
+            currentValue: self.modelValue,
             itemPerRow: self.columnCount || 7
         }
     },
@@ -71,18 +75,24 @@ export default {
 
             return ret;
         },
-        hugeIconRows() {
-            return this.allIconRows.length > 10;
+        heightClass() {
+            if (this.allIconRows.length > 10) {
+                return 'icon-selection-huge-sheet';
+            } else if (this.allIconRows.length > 6) {
+                return 'icon-selection-large-sheet';
+            } else {
+                return '';
+            }
         }
     },
     methods: {
         onIconClicked(iconInfo) {
             this.currentValue = iconInfo.id;
-            this.$emit('input', this.currentValue);
+            this.$emit('update:modelValue', this.currentValue);
             this.$emit('update:show', false);
         },
         onSheetOpen(event) {
-            this.currentValue = this.value;
+            this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
@@ -128,6 +138,10 @@ export default {
 
 <style>
 @media (min-height: 630px) {
+    .icon-selection-large-sheet {
+        height: 310px;
+    }
+
     .icon-selection-huge-sheet {
         height: 400px;
     }

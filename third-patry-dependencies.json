@@ -82,34 +82,22 @@
         "licenseUrl": "https://github.com/stretchr/testify/blob/v1.8.2/LICENSE"
     },
     {
-        "name": "vue",
-        "copyright": "Copyright (c) 2013-present, Yuxi (Evan) You",
-        "url": "https://github.com/vuejs/vue",
-        "licenseUrl": "https://github.com/vuejs/vue/blob/v2.7.14/LICENSE"
+        "name": "vuejs/core",
+        "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
+        "url": "https://github.com/vuejs/core",
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.2.47/LICENSE"
     },
     {
         "name": "vuex",
         "copyright": "Copyright (c) 2015-present Evan You",
         "url": "https://github.com/vuejs/vuex",
-        "licenseUrl": "https://github.com/vuejs/vuex/blob/v3.6.2/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/vuex/blob/v4.1.0/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
-        "url": "https://github.com/kazupon/vue-i18n",
-        "licenseUrl": "https://github.com/kazupon/vue-i18n/blob/v8.28.2/LICENSE"
-    },
-    {
-        "name": "vue-clipboard2",
-        "copyright": "Copyright (c) 2017 Inndy <inndy \\dot tw \\at gmail \\dot com>",
-        "url": "https://github.com/Inndy/vue-clipboard2",
-        "licenseUrl": "https://github.com/Inndy/vue-clipboard2/blob/v0.3.3/LICENSE"
-    },
-    {
-        "name": "vue-pincode-input",
-        "copyright": "Copyright (c) 2019 Maxim Noverin",
-        "url": "https://github.com/Seokky/vue-pincode-input",
-        "licenseUrl": "https://github.com/Seokky/vue-pincode-input/blob/master/LICENSE"
+        "url": "https://github.com/intlify/vue-i18n-next",
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.2.2/LICENSE"
     },
     {
         "name": "register-service-worker",
@@ -118,22 +106,16 @@
         "licenseUrl": "https://github.com/yyx990803/register-service-worker/blob/v1.7.2/LICENSE"
     },
     {
-        "name": "core-js",
-        "copyright": "Copyright (c) 2014-2023 Denis Pushkarev",
-        "url": "https://github.com/zloirock/core-js",
-        "licenseUrl": "https://github.com/zloirock/core-js/blob/v3.30.0/LICENSE"
-    },
-    {
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v5.7.14/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v5.7.14/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -142,10 +124,34 @@
         "licenseUrl": "https://github.com/framework7io/framework7-icons/blob/v5.0.5/LICENSE"
     },
     {
+        "name": "Dom7",
+        "copyright": "Copyright (c) 2017 Vladimir Kharlampidi",
+        "url": "https://framework7.io/docs/dom7.html",
+        "licenseUrl": "https://github.com/nolimits4web/dom7/blob/v4.0.6/LICENSE"
+    },
+    {
+        "name": "Swiper",
+        "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
+        "url": "https://swiperjs.com",
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.2.3/LICENSE"
+    },
+    {
+        "name": "Skeleton Elements",
+        "copyright": "Copyright (c) 2020 Vladimir Kharlampidi",
+        "url": "https://github.com/nolimits4web/skeleton-elements",
+        "licenseUrl": "https://github.com/nolimits4web/skeleton-elements/blob/v4.0.1/LICENSE"
+    },
+    {
+        "name": "@vuepic/vue-datepicker",
+        "copyright": "Copyright (c) 2021-present Vuepic",
+        "url": "https://vue3datepicker.com/",
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v4.4.0/LICENSE"
+    },
+    {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie",
-        "url": "https://github.com/axios/axios",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.5/LICENSE"
+        "url": "https://axios-http.com",
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.6/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -170,6 +176,12 @@
         "copyright": "Copyright (c) 2014 Patrick Gansterer <paroga@paroga.com>",
         "url": "https://github.com/paroga/cbor-js",
         "licenseUrl": "https://github.com/paroga/cbor-js/blob/v0.1.0/LICENSE"
+    },
+    {
+        "name": "clipboard.js",
+        "copyright": "Copyright (c) Zeno Rocha",
+        "url": "https://clipboardjs.com",
+        "licenseUrl": "https://github.com/zenorocha/clipboard.js/blob/v2.0.11/LICENSE"
     },
     {
         "name": "js-cookie",

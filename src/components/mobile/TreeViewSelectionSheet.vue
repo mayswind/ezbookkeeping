@@ -1,6 +1,9 @@
 <template>
-    <f7-sheet :class="{ 'tree-view-selection-huge-sheet': hugeTreeViewItems }" :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
+              :class="{ 'tree-view-selection-huge-sheet': hugeTreeViewItems }"
+              :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
+            <div class="swipe-handler"></div>
             <div class="left"></div>
             <div class="right">
                 <f7-link sheet-close :text="$t('Done')"></f7-link>
@@ -8,26 +11,26 @@
         </f7-toolbar>
         <f7-page-content>
             <f7-treeview>
-                <f7-treeview-item v-for="item in items"
-                                  item-toggle
+                <f7-treeview-item item-toggle
                                   :opened="isPrimaryItemHasSecondaryValue(item)"
-                                  :key="item | itemFieldContent(primaryKeyField, item, false)"
-                                  :label="item | itemFieldContent(primaryTitleField, item, primaryTitleI18n)">
-                    <f7-icon slot="media"
-                             :icon="item[primaryIconField] | icon(primaryIconType)"
-                             :style="item[primaryColorField] | iconStyle(primaryIconType, 'var(--default-icon-color)')"
-                             v-if="primaryIconField"></f7-icon>
+                                  :label="$tIf((primaryTitleField ? item[primaryTitleField] : item), primaryTitleI18n)"
+                                  :key="primaryKeyField ? item[primaryKeyField] : item"
+                                  v-for="item in items">
+                    <template #media>
+                        <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]"
+                                  :color="item[primaryColorField]" v-if="primaryIconField"></ItemIcon>
+                    </template>
 
-                    <f7-treeview-item v-for="subItem in item[primarySubItemsField]"
-                                      selectable
+                    <f7-treeview-item selectable
                                       :selected="isSecondarySelected(subItem)"
-                                      :key="subItem | itemFieldContent(secondaryKeyField, subItem, false)"
-                                      :label="subItem | itemFieldContent(secondaryTitleField, subItem, secondaryTitleI18n)"
+                                      :label="$tIf((secondaryTitleField ? subItem[secondaryTitleField] : subItem), secondaryTitleI18n)"
+                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
+                                      v-for="subItem in item[primarySubItemsField]"
                                       @click="onSecondaryItemClicked(subItem)">
-                        <f7-icon slot="media"
-                                 :icon="subItem[secondaryIconField] | icon(secondaryIconType)"
-                                 :style="subItem[secondaryColorField] | iconStyle(secondaryIconType, 'var(--default-icon-color)')"
-                                 v-if="secondaryIconField"></f7-icon>
+                        <template #media>
+                            <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]"
+                                      :color="subItem[secondaryColorField]" v-if="secondaryIconField"></ItemIcon>
+                        </template>
                     </f7-treeview-item>
                 </f7-treeview-item>
             </f7-treeview>
@@ -38,7 +41,7 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',
@@ -57,11 +60,15 @@ export default {
         'items',
         'show'
     ],
+    emits: [
+        'update:modelValue',
+        'update:show'
+    ],
     data() {
         const self = this;
 
         return {
-            currentValue: self.value
+            currentValue: self.modelValue
         }
     },
     computed: {
@@ -85,7 +92,7 @@ export default {
     },
     methods: {
         onSheetOpen(event) {
-            this.currentValue = this.value;
+            this.currentValue = this.modelValue;
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
@@ -98,7 +105,7 @@ export default {
                 this.currentValue = subItem;
             }
 
-            this.$emit('input', this.currentValue);
+            this.$emit('update:modelValue', this.currentValue);
             this.$emit('update:show', false);
         },
         isPrimaryItemHasSecondaryValue(primaryItem) {

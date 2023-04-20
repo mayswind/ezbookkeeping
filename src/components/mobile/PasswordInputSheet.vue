@@ -1,22 +1,25 @@
 <template>
-    <f7-sheet style="height:auto" :opened="show"
-              @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <f7-page-content>
+    <f7-sheet swipe-to-close swipe-handler=".swipe-handler" style="height:auto"
+              :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
+        <div class="swipe-handler"></div>
+        <f7-page-content class="margin-top no-padding-top">
             <div class="display-flex padding justify-content-space-between align-items-center">
                 <div style="font-size: 18px" v-if="title"><b>{{ title }}</b></div>
             </div>
             <div class="padding-horizontal padding-bottom">
-                <p class="no-margin-top margin-bottom-half" v-if="hint">{{ hint }}</p>
-                <f7-list no-hairlines class="no-margin-top margin-bottom">
+                <p class="no-margin" v-if="hint">{{ hint }}</p>
+                <f7-list no-hairlines strong class="no-margin">
                     <f7-list-input
                         type="password"
                         autocomplete="current-password"
                         outline
+                        floating-label
                         clear-button
+                        class="no-margin no-padding-bottom"
+                        :label="$t('Password')"
                         :placeholder="$t('Password')"
-                        :value="currentPassword"
-                        @input="currentPassword = $event.target.value"
-                        @keyup.enter.native="confirm()"
+                        v-model:value="currentPassword"
+                        @keyup.enter="confirm()"
                     ></f7-list-input>
                 </f7-list>
                 <f7-button large fill
@@ -35,12 +38,17 @@
 <script>
 export default {
     props: [
-        'value',
+        'modelValue',
         'title',
         'hint',
         'confirmDisabled',
         'cancelDisabled',
         'show'
+    ],
+    emits: [
+        'update:modelValue',
+        'update:show',
+        'password:confirm'
     ],
     data() {
         return {
@@ -52,17 +60,20 @@ export default {
             this.currentPassword = '';
         },
         onSheetClosed() {
-            this.$emit('update:show', false);
+            this.close();
         },
         confirm() {
             if (!this.currentPassword || this.confirmDisabled) {
                 return;
             }
 
-            this.$emit('input', this.currentPassword);
+            this.$emit('update:modelValue', this.currentPassword);
             this.$emit('password:confirm', this.currentPassword);
         },
         cancel() {
+            this.close();
+        },
+        close() {
             this.$emit('update:show', false);
         }
     }

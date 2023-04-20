@@ -133,7 +133,7 @@
         "name": "Swiper",
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.2.0/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.2.3/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -151,7 +151,7 @@
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.5/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.6/LICENSE"
     },
     {
         "name": "Moment.js",

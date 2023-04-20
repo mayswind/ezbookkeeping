@@ -17,7 +17,7 @@ export default {
                 name: 'ezBookkeeping',
                 theme: 'ios',
                 colors: {
-                    primary: '#c67e48',
+                    primary: '#c67e48'
                 },
                 routes: routes,
                 darkMode: self.$settings.isEnableAutoDarkMode() ? 'auto' : false,
@@ -33,11 +33,6 @@ export default {
                     animate: self.$settings.isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
-                },
-                calendar: {
-                    locale: 'en',
-                    openIn: 'auto',
-                    backdrop: true
                 },
                 dialog: {
                     animate: self.$settings.isEnableAnimate(),

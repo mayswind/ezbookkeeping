@@ -21,9 +21,9 @@
                     </div>
                 </template>
                 <select v-model="baseCurrency">
-                    <option v-for="exchangeRate in availableExchangeRates"
+                    <option :value="exchangeRate.currencyCode"
                             :key="exchangeRate.currencyCode"
-                            :value="exchangeRate.currencyCode">{{ exchangeRate.currencyDisplayName }}</option>
+                            v-for="exchangeRate in availableExchangeRates">{{ exchangeRate.currencyDisplayName }}</option>
                 </select>
             </f7-list-item>
             <f7-list-item
@@ -47,9 +47,9 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-            <f7-list-item v-for="exchangeRate in availableExchangeRates" :key="exchangeRate.currencyCode"
+            <f7-list-item swipeout
                           :after="getDisplayConvertedAmount(exchangeRate)"
-                          swipeout>
+                          :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
                 <template #title>
                     <div class="no-padding no-margin">
                         <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>

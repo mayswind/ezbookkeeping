@@ -14,13 +14,13 @@
                     <div class="primary-list-container">
                         <f7-list dividers no-hairlines class="primary-list no-margin-vertical">
                             <f7-list-item link="#" no-chevron
-                                          v-for="item in items"
-                                          :key="primaryKeyField ? item[primaryKeyField] : item"
                                           :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
                                           :value="primaryValueField ? item[primaryValueField] : item"
                                           :title="$tIf(item[primaryTitleField], primaryTitleI18n)"
                                           :header="$tIf(item[primaryHeaderField], primaryHeaderI18n)"
                                           :footer="$tIf(item[primaryFooterField], primaryFooterI18n)"
+                                          :key="primaryKeyField ? item[primaryKeyField] : item"
+                                          v-for="item in items"
                                           @click="onPrimaryItemClicked(item)">
                                 <template #media>
                                     <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]" :color="item[primaryColorField]"></ItemIcon>
@@ -36,13 +36,13 @@
                     <div class="secondary-list-container">
                         <f7-list dividers no-hairlines class="secondary-list no-margin-vertical" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                             <f7-list-item link="#" no-chevron
-                                          v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
-                                          :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                           :class="{ 'secondary-list-item-selected': isSecondarySelected(subItem) }"
                                           :value="secondaryValueField ? subItem[secondaryValueField] : subItem"
                                           :title="$tIf(subItem[secondaryTitleField], secondaryTitleI18n)"
                                           :header="$tIf(subItem[secondaryHeaderField], secondaryHeaderI18n)"
                                           :footer="$tIf(subItem[secondaryFooterField], secondaryFooterI18n)"
+                                          :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
+                                          v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <template #media>
                                     <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]" :color="subItem[secondaryColorField]"></ItemIcon>

@@ -16,9 +16,10 @@
         <f7-popover class="chart-data-type-popover-menu" :opened="showChartDataTypePopover"
                     @popover:open="showChartDataTypePopover = true" @popover:close="showChartDataTypePopover = false">
             <f7-list dividers>
-                <f7-list-item
-                    v-for="dataType in allChartDataTypes" :key="dataType.type"
-                    :title="$t(dataType.name)" @click="setChartDataType(dataType.type)">
+                <f7-list-item :title="$t(dataType.name)"
+                              :key="dataType.type"
+                              v-for="dataType in allChartDataTypes"
+                              @click="setChartDataType(dataType.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
                     </template>
@@ -99,7 +100,7 @@
             </f7-card-header>
             <f7-card-content style="margin-top: -14px" :padding="false">
                 <f7-list class="statistics-list-item skeleton-text" v-if="loading">
-                    <f7-list-item link="#" v-for="itemIdx in [ 1, 2, 3 ]">
+                    <f7-list-item link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                         <template #media>
                             <div class="display-flex no-padding-horizontal">
                                 <div class="display-flex align-items-center statistics-icon">
@@ -131,9 +132,10 @@
                 </f7-list>
 
                 <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
-                    <f7-list-item v-for="(item, idx) in statisticsData.items" :key="idx"
-                                  class="statistics-list-item"
+                    <f7-list-item class="statistics-list-item"
                                   :link="getItemLinkUrl(item)"
+                                  :key="idx"
+                                  v-for="(item, idx) in statisticsData.items"
                                   v-show="!item.hidden"
                     >
                         <template #media>
@@ -172,10 +174,10 @@
                     @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showSortingTypePopover = true" @popover:closed="showSortingTypePopover = false">
             <f7-list dividers>
-                <f7-list-item v-for="sortingType in allSortingTypes"
-                              :key="sortingType.type"
+                <f7-list-item :title="$t(sortingType.name)"
                               :class="{ 'list-item-selected': query.sortingType === sortingType.type }"
-                              :title="$t(sortingType.name)"
+                              :key="sortingType.type"
+                              v-for="sortingType in allSortingTypes"
                               @click="setSortingType(sortingType.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.sortingType === sortingType.type"></f7-icon>
@@ -206,10 +208,10 @@
                     @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
             <f7-list dividers>
-                <f7-list-item v-for="dateRange in allDateRanges"
-                              :key="dateRange.type"
+                <f7-list-item :title="$t(dateRange.name)"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                              :title="$t(dateRange.name)"
+                              :key="dateRange.type"
+                              v-for="dateRange in allDateRanges"
                               @click="setDateFilter(dateRange.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>

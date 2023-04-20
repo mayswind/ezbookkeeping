@@ -13,9 +13,8 @@
             <f7-block class="margin-vertical no-padding">
                 <div class="grid grid-cols-7 padding-vertical-half padding-horizontal-half"
                      :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
-                     :key="idx"
-                     v-for="(row, idx) in allColorRows">
-                    <div class="text-align-center" v-for="colorInfo in row" :key="colorInfo.color">
+                     :key="idx" v-for="(row, idx) in allColorRows">
+                    <div class="text-align-center" :key="colorInfo.color" v-for="colorInfo in row">
                         <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="colorInfo.color" @click="onColorClicked(colorInfo)">
                             <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === colorInfo.color">
                                 <f7-icon f7="checkmark_alt"></f7-icon>

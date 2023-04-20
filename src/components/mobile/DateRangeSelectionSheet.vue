@@ -25,10 +25,10 @@
                                :partial-range="false"
                                :preset-ranges="presetRanges"
                                v-model="dateRange">
-                    <template #month="{ text, value }">
+                    <template #month="{ text }">
                         {{ $t(`datetime.${text}.short`) }}
                     </template>
-                    <template #month-overlay-value="{ text, value }">
+                    <template #month-overlay-value="{ text }">
                         {{ $t(`datetime.${text}.short`) }}
                     </template>
                 </VueDatePicker>

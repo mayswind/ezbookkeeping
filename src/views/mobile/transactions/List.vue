@@ -40,7 +40,8 @@
             </f7-link>
         </f7-toolbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
+                  :key="blockIdx" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
             <f7-accordion-item>
                 <f7-block-title>
                     <f7-accordion-toggle>
@@ -61,7 +62,8 @@
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
-                        <f7-list-item link="#" chevron-center class="transaction-info" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5 ] : [ 1, 2, 3 ])">
+                        <f7-list-item link="#" chevron-center class="transaction-info"
+                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5 ] : [ 1, 2, 3 ])">
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date">
                                     <span class="transaction-day full-line flex-direction-column">DD</span>
@@ -108,7 +110,8 @@
             <f7-list-item :title="$t('No transaction data')"></f7-list-item>
         </f7-list>
 
-        <f7-block class="combination-list-wrapper margin-vertical" :key="transactionMonthList.yearMonth" v-for="(transactionMonthList, index) in transactions">
+        <f7-block class="combination-list-wrapper margin-vertical"
+                  :key="transactionMonthList.yearMonth" v-for="(transactionMonthList) in transactions">
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
                                @accordion:close="collapseTransactionMonthList(transactionMonthList, true)">
@@ -138,11 +141,12 @@
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: transactionMonthList.opened ? 'auto' : '' }">
                     <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
-                        <f7-list-item class="transaction-info" chevron-center
-                                      v-for="(transaction, idx) in transactionMonthList.items"
-                                      :key="transaction.id" :id="getTransactionDomId(transaction)"
+                        <f7-list-item swipeout chevron-center
+                                      class="transaction-info"
+                                      :id="getTransactionDomId(transaction)"
                                       :link="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
-                                      swipeout
+                                      :key="transaction.id"
+                                      v-for="(transaction, idx) in transactionMonthList.items"
                         >
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : null)">
@@ -238,10 +242,10 @@
                     @popover:open="scrollPopoverToSelectedItem"
                     @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
             <f7-list dividers>
-                <f7-list-item v-for="dateRange in allDateRanges"
-                              :key="dateRange.type"
+                <f7-list-item :title="$t(dateRange.name)"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
-                              :title="$t(dateRange.name)"
+                              :key="dateRange.type"
+                              v-for="dateRange in allDateRanges"
                               @click="changeDateFilter(dateRange.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
@@ -312,16 +316,16 @@
             </f7-list>
             <f7-list dividers accordion-list
                      class="no-margin-vertical"
+                     :key="categoryType"
                      v-for="(categories, categoryType) in allPrimaryCategories"
                      v-show="!query.type || $utilities.categroyTypeToTransactionType(parseInt(categoryType)) === query.type"
-                     :key="categoryType"
             >
                 <f7-list-item divider :title="getTransactionTypeName($utilities.categroyTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
-                              v-for="category in categories"
-                              :key="category.id"
-                              :class="getCategoryListItemCheckedClass(category, query.categoryId)"
                               :title="category.name"
+                              :class="getCategoryListItemCheckedClass(category, query.categoryId)"
+                              :key="category.id"
+                              v-for="category in categories"
                 >
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -336,10 +340,10 @@
                                     <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
                                 </template>
                             </f7-list-item>
-                            <f7-list-item v-for="subCategory in category.subCategories"
-                                          :key="subCategory.id"
+                            <f7-list-item :title="subCategory.name"
                                           :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
-                                          :title="subCategory.name"
+                                          :key="subCategory.id"
+                                          v-for="subCategory in category.subCategories"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
                                 <template #media>
@@ -370,11 +374,11 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item v-for="account in allAccounts"
-                              v-show="!account.hidden"
-                              :key="account.id"
+                <f7-list-item :title="account.name"
                               :class="{ 'list-item-selected': query.accountId === account.id }"
-                              :title="account.name"
+                              :key="account.id"
+                              v-for="account in allAccounts"
+                              v-show="!account.hidden"
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>

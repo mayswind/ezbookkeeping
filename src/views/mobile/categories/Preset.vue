@@ -13,20 +13,19 @@
             <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryInfo.type) }}</f7-block-title>
 
             <f7-list strong inset dividers class="margin-top">
-                <f7-list-item v-for="(category, idx) in categoryInfo.categories"
-                              :key="idx"
+                <f7-list-item :title="$t('category.' + category.name, currentLocale)"
                               :accordion-item="!!category.subCategories.length"
-                              :title="$t('category.' + category.name, currentLocale)">
+                              :key="idx"
+                              v-for="(category, idx) in categoryInfo.categories">
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
                     </template>
 
                     <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                         <f7-list>
-                            <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
+                            <f7-list-item :title="$t('category.' + subCategory.name, currentLocale)"
                                           :key="subIdx"
-                                          :title="$t('category.' + subCategory.name, currentLocale)">
-
+                                          v-for="(subCategory, subIdx) in category.subCategories">
                                 <template #media>
                                     <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
                                 </template>

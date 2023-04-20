@@ -9,7 +9,8 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
+                  :key="blockIdx" v-for="blockIdx in [ 1, 2, 3 ]" v-if="loading">
             <f7-accordion-item>
                 <f7-block-title>
                     <f7-accordion-toggle>
@@ -26,7 +27,8 @@
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
-                        <f7-list-item checkbox class="disabled" title="Account Name" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
+                        <f7-list-item checkbox class="disabled" title="Account Name"
+                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1 ] : [ 1, 2 ])">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
                             </template>
@@ -61,13 +63,14 @@
                 <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content"
                              v-if="categorizedAccounts[accountCategory.id]">
-                        <f7-list-item checkbox v-for="account in categorizedAccounts[accountCategory.id].accounts"
-                                      v-show="!account.hidden"
-                                      :key="account.id"
+                        <f7-list-item checkbox
                                       :title="account.name"
                                       :value="account.id"
                                       :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                       :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
+                                      :key="account.id"
+                                      v-for="account in categorizedAccounts[accountCategory.id].accounts"
+                                      v-show="!account.hidden"
                                       @change="selectAccountOrSubAccounts">
                             <template #media>
                                 <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
@@ -75,12 +78,13 @@
 
                             <template #root>
                                 <ul v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
-                                    <f7-list-item checkbox v-for="subAccount in account.subAccounts"
-                                                  v-show="!subAccount.hidden"
-                                                  :key="subAccount.id"
+                                    <f7-list-item checkbox
                                                   :title="subAccount.name"
                                                   :value="subAccount.id"
-                                                  :checked="isAccountChecked(subAccount, filterAccountIds) "
+                                                  :checked="isAccountChecked(subAccount, filterAccountIds)"
+                                                  :key="subAccount.id"
+                                                  v-for="subAccount in account.subAccounts"
+                                                  v-show="!subAccount.hidden"
                                                   @change="selectAccount">
                                         <template #media>
                                             <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>

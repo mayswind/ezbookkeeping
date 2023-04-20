@@ -13,7 +13,7 @@
         <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
             <f7-list-item title="Category Name"
                           :link="hasSubCategories ? '#' : null"
-                          v-for="itemIdx in [ 1, 2, 3 ]">
+                          :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
                     <f7-icon f7="app_fill"></f7-icon>
                 </template>
@@ -31,14 +31,15 @@
                  :sortable-enabled="sortable"
                  v-if="!loading"
                  @sortable:sort="onSort">
-            <f7-list-item v-for="category in categories"
-                          :key="category.id"
+            <f7-list-item swipeout
                           :id="getCategoryDomId(category)"
                           :title="category.name"
                           :footer="category.comment"
                           :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
+                          :key="category.id"
+                          v-for="category in categories"
                           v-show="showHidden || !category.hidden"
-                          swipeout @taphold="setSortable()">
+                          @taphold="setSortable()">
                 <template #media>
                     <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">

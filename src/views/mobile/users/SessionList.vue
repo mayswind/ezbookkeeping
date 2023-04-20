@@ -23,11 +23,11 @@
 
         <f7-list media-list strong inset dividers class="margin-top" v-else-if="!loading">
             <f7-list-item class="list-item-media-valign-middle" swipeout
-                          v-for="session in sessions"
-                          :key="session.tokenId"
                           :id="session.domId"
                           :title="session.deviceType"
-                          :text="session.deviceInfo">
+                          :text="session.deviceInfo"
+                          :key="session.tokenId"
+                          v-for="session in sessions">
                 <template #media>
                     <f7-icon :f7="session.icon"></f7-icon>
                 </template>

@@ -11,21 +11,21 @@
         </f7-toolbar>
         <f7-page-content>
             <f7-treeview>
-                <f7-treeview-item v-for="item in items"
-                                  item-toggle
+                <f7-treeview-item item-toggle
                                   :opened="isPrimaryItemHasSecondaryValue(item)"
+                                  :label="$tIf((primaryTitleField ? item[primaryTitleField] : item), primaryTitleI18n)"
                                   :key="primaryKeyField ? item[primaryKeyField] : item"
-                                  :label="$tIf((primaryTitleField ? item[primaryTitleField] : item), primaryTitleI18n)">
+                                  v-for="item in items">
                     <template #media>
                         <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]"
                                   :color="item[primaryColorField]" v-if="primaryIconField"></ItemIcon>
                     </template>
 
-                    <f7-treeview-item v-for="subItem in item[primarySubItemsField]"
-                                      selectable
+                    <f7-treeview-item selectable
                                       :selected="isSecondarySelected(subItem)"
-                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                       :label="$tIf((secondaryTitleField ? subItem[secondaryTitleField] : subItem), secondaryTitleI18n)"
+                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
+                                      v-for="subItem in item[primarySubItemsField]"
                                       @click="onSecondaryItemClicked(subItem)">
                         <template #media>
                             <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]"

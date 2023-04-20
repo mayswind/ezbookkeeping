@@ -12,7 +12,7 @@ const SRC_DIR = resolve(__dirname, './src');
 const PUBLIC_DIR = resolve(__dirname, './public');
 const BUILD_DIR = resolve(__dirname, './dist',);
 
-export default defineConfig(async ({ command, mode }) => {
+export default defineConfig(async () => {
     const licenseContent = fs.readFileSync('./LICENSE', 'UTF-8');
     let buildUnixTime = '';
 

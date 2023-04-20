@@ -38,11 +38,13 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
+        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text"
+                 :key="listIdx" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
             <f7-list-item group-title>
                 <small>Account Category</small>
             </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#" v-for="itemIdx in (listIdx === 1 ? [ 1 ] : [ 1, 2 ])">
+            <f7-list-item class="nested-list-item" after="0.00 USD" link="#"
+                          :key="itemIdx" v-for="itemIdx in (listIdx === 1 ? [ 1 ] : [ 1, 2 ])">
                 <template #title>
                     <div class="display-flex padding-top-half padding-bottom-half">
                         <f7-icon f7="app_fill"></f7-icon>
@@ -69,12 +71,15 @@
                         <span style="margin-left: 10px">{{ $locale.getDisplayCurrency(accountCategoryTotalBalance(accountCategory), defaultCurrency) }}</span>
                     </small>
                 </f7-list-item>
-                <f7-list-item v-for="account in categorizedAccounts[accountCategory.id].accounts" v-show="showHidden || !account.hidden"
-                              :key="account.id" :id="getAccountDomId(account)"
+                <f7-list-item swipeout
+                              :id="getAccountDomId(account)"
                               :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
                               :after="$locale.getDisplayCurrency(accountBalance(account), account.currency)"
                               :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
-                              swipeout @taphold="setSortable()"
+                              :key="account.id"
+                              v-for="account in categorizedAccounts[accountCategory.id].accounts"
+                              v-show="showHidden || !account.hidden"
+                              @taphold="setSortable()"
                 >
                     <template #title>
                         <div class="display-flex padding-top-half padding-bottom-half">
@@ -90,10 +95,13 @@
                         </div>
                         <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
                             <ul class="no-padding">
-                                <f7-list-item class="no-sortable nested-list-item-child" v-for="subAccount in account.subAccounts" v-show="showHidden || !subAccount.hidden"
-                                              :key="subAccount.id" :id="getAccountDomId(subAccount)"
+                                <f7-list-item class="no-sortable nested-list-item-child"
+                                              :id="getAccountDomId(subAccount)"
                                               :title="subAccount.name" :footer="subAccount.comment" :after="$locale.getDisplayCurrency(accountBalance(subAccount), subAccount.currency)"
                                               :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
+                                              :key="subAccount.id"
+                                              v-for="subAccount in account.subAccounts"
+                                              v-show="showHidden || !subAccount.hidden"
                                 >
                                     <template #media>
                                         <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">

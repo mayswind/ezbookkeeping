@@ -17,7 +17,7 @@
                 </f7-navbar>
                 <f7-block strong outline>
                     <p>
-                        <span v-for="(line, num) in licenseLines" :key="num"
+                        <span :key="num" v-for="(line, num) in licenseLines"
                               :style="{ 'display': line ? 'initial' : 'block', 'padding' : line ? '0' : '0 0 1em 0' }">
                             {{ line }}
                         </span>
@@ -28,7 +28,7 @@
                         <span>All the third party software included or linked is redistributed under the terms and conditions of their original licenses.</span>
                     </p>
                     <p></p>
-                    <p v-for="license in thirdPartyLicenses" :key="license.name">
+                    <p :key="license.name" v-for="license in thirdPartyLicenses">
                         <strong>{{ license.name }}</strong>
                         <br v-if="license.copyright"/><span v-if="license.copyright">{{ license.copyright }}</span>
                         <br v-if="license.url"/><span class="work-break-all" v-if="license.url">{{ license.url }}</span>

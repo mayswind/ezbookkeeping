@@ -38,7 +38,6 @@
                 :class="{ 'disabled': editAccountId }"
                 :header="$t('Account Type')"
                 :title="this.getAccountTypeName(account.type)"
-                :no-chevron="!!editAccountId"
                 @click="showAccountTypeSheet = true"
             >
                 <list-item-selection-sheet value-type="item"
@@ -170,9 +169,9 @@
                     </div>
                 </template>
                 <select autocomplete="transaction-currency" v-model="account.currency">
-                    <option v-for="currency in allCurrencies"
+                    <option :value="currency.code"
                             :key="currency.code"
-                            :value="currency.code">{{ currency.displayName }}</option>
+                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -363,9 +362,9 @@
                         </div>
                     </template>
                     <select autocomplete="transaction-currency" v-model="subAccount.currency">
-                        <option v-for="currency in allCurrencies"
+                        <option :value="currency.code"
                                 :key="currency.code"
-                                :value="currency.code">{{ currency.displayName }}</option>
+                                v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                     </select>
                 </f7-list-item>
 

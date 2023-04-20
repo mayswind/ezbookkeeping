@@ -11,7 +11,7 @@
         </f7-navbar>
 
         <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
-            <f7-list-item v-for="itemIdx in [ 1, 2, 3 ]">
+            <f7-list-item :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
                     <f7-icon f7="number"></f7-icon>
                 </template>
@@ -31,11 +31,12 @@
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
 
-            <f7-list-item v-for="tag in tags"
-                          :key="tag.id"
+            <f7-list-item swipeout
                           :id="getTagDomId(tag)"
+                          :key="tag.id"
+                          v-for="tag in tags"
                           v-show="showHidden || !tag.hidden"
-                          swipeout @taphold="setSortable()">
+                          @taphold="setSortable()">
                 <template #media>
                     <f7-icon f7="number">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="tag.hidden">

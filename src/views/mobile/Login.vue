@@ -53,9 +53,9 @@
             <f7-list dividers>
                 <f7-list-item
                     link="#" no-chevron popover-close
-                    v-for="(lang, locale) in allLanguages"
-                    :key="locale"
                     :title="lang.displayName"
+                    :key="locale"
+                    v-for="(lang, locale) in allLanguages"
                     @click="changeLanguage(locale)"
                 >
                     <template #after>

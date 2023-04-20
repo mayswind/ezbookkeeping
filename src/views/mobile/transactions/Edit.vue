@@ -216,9 +216,9 @@
                 :header="$t('Transaction Time Zone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Time Zone'), popupCloseLinkText: $t('Done') }">
                 <select v-model="transaction.timeZone">
-                    <option v-for="timezone in allTimezones"
+                    <option :value="timezone.name"
                             :key="timezone.name"
-                            :value="timezone.name">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                            v-for="timezone in allTimezones">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
                 </select>
                 <template #title>
                     <f7-block class="list-item-custom-title no-padding no-margin">
@@ -240,10 +240,10 @@
 
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin" v-if="transaction.tagIds && transaction.tagIds.length">
-                        <f7-chip class="transaction-edit-tag" media-bg-color="black"
-                                 v-for="tagId in transaction.tagIds"
+                        <f7-chip media-bg-color="black" class="transaction-edit-tag"
+                                 :text="$utilities.getNameByKeyValue(allTags, tagId, 'id', 'name')"
                                  :key="tagId"
-                                 :text="$utilities.getNameByKeyValue(allTags, tagId, 'id', 'name')">
+                                 v-for="tagId in transaction.tagIds">
                             <template #media>
                                 <f7-icon f7="number"></f7-icon>
                             </template>

@@ -66,9 +66,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="currentLocale">
-                    <option v-for="(lang, locale) in allLanguages"
+                    <option :value="locale"
                             :key="locale"
-                            :value="locale">{{ lang.displayName }}</option>
+                            v-for="(lang, locale) in allLanguages">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -85,9 +85,9 @@
                     </f7-block>
                 </template>
                 <select autocomplete="transaction-currency" v-model="user.defaultCurrency">
-                    <option v-for="currency in allCurrencies"
+                    <option :value="currency.code"
                             :key="currency.code"
-                            :value="currency.code">{{ currency.displayName }}</option>
+                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -99,9 +99,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="user.firstDayOfWeek">
-                    <option v-for="weekDay in allWeekDays"
+                    <option :value="weekDay.type"
                             :key="weekDay.type"
-                            :value="weekDay.type">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
                 </select>
             </f7-list-item>
         </f7-list>
@@ -130,19 +130,19 @@
                           :key="categoryType" v-for="(categories, categoryType) in presetCategories">
                     <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
                     <f7-list strong inset dividers v-if="showPresetCategories">
-                        <f7-list-item v-for="(category, idx) in categories"
-                                      :key="idx"
+                        <f7-list-item :title="$t('category.' + category.name, currentLocale)"
                                       :accordion-item="!!category.subCategories.length"
-                                      :title="$t('category.' + category.name, currentLocale)">
+                                      :key="idx"
+                                      v-for="(category, idx) in categories">
                             <template #media>
                                 <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
                             </template>
 
                             <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                                 <f7-list>
-                                    <f7-list-item v-for="(subCategory, subIdx) in category.subCategories"
+                                    <f7-list-item :title="$t('category.' + subCategory.name, currentLocale)"
                                                   :key="subIdx"
-                                                  :title="$t('category.' + subCategory.name, currentLocale)">
+                                                  v-for="(subCategory, subIdx) in category.subCategories">
                                         <template #media>
                                             <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
                                         </template>

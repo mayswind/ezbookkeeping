@@ -16,9 +16,9 @@
                 :title="$t('Default Chart Data Type')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Data Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultChartDataType">
-                    <option v-for="chartDataType in allChartDataTypes"
+                    <option :value="chartDataType.type"
                             :key="chartDataType.type"
-                            :value="chartDataType.type">{{ $t(chartDataType.name) }}</option>
+                            v-for="chartDataType in allChartDataTypes">{{ $t(chartDataType.name) }}</option>
                 </select>
             </f7-list-item>
 
@@ -26,9 +26,9 @@
                 :title="$t('Default Date Range')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultDateRange">
-                    <option v-for="dateRange in allDateRanges"
+                    <option :value="dateRange.type"
                             :key="dateRange.type"
-                            :value="dateRange.type">{{ $t(dateRange.name) }}</option>
+                            v-for="dateRange in allDateRanges">{{ $t(dateRange.name) }}</option>
                 </select>
             </f7-list-item>
 
@@ -40,9 +40,9 @@
                 :title="$t('Default Sort By')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Sort By'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultSortingType">
-                    <option v-for="sortingType in allSortingTypes"
+                    <option :value="sortingType.type"
                             :key="sortingType.type"
-                            :value="sortingType.type">{{ $t(sortingType.name) }}</option>
+                            v-for="sortingType in allSortingTypes">{{ $t(sortingType.name) }}</option>
                 </select>
             </f7-list-item>
         </f7-list>

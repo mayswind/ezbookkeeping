@@ -75,9 +75,9 @@
                     </f7-block>
                 </template>
                 <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
-                    <option v-for="currency in allCurrencies"
+                    <option :value="currency.code"
                             :key="currency.code"
-                            :value="currency.code">{{ currency.displayName }}</option>
+                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -110,9 +110,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.firstDayOfWeek">
-                    <option v-for="weekDay in allWeekDays"
+                    <option :value="weekDay.type"
                             :key="weekDay.type"
-                            :value="weekDay.type">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
                 </select>
             </f7-list-item>
 
@@ -123,9 +123,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Scope'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.transactionEditScope">
-                    <option v-for="option in allTransactionEditScopeTypes"
+                    <option :value="option.value"
                             :key="option.value"
-                            :value="option.value">{{ $t(option.name) }}</option>
+                            v-for="option in allTransactionEditScopeTypes">{{ $t(option.name) }}</option>
                 </select>
             </f7-list-item>
 

@@ -12,11 +12,11 @@
         <f7-page-content>
             <f7-list dividers no-hairlines class="no-margin-vertical">
                 <f7-list-item link="#" no-chevron
-                              v-for="(item, index) in items"
-                              :key="getItemValue(item, index, keyField, valueType)"
-                              :class="{ 'list-item-selected': isSelected(item, index) }"
-                              :value="getItemValue(item, index, valueField, valueType)"
                               :title="$tIf((titleField ? item[titleField] : item), titleI18n)"
+                              :value="getItemValue(item, index, valueField, valueType)"
+                              :class="{ 'list-item-selected': isSelected(item, index) }"
+                              :key="getItemValue(item, index, keyField, valueType)"
+                              v-for="(item, index) in items"
                               @click="onItemClicked(item, index)">
                     <template #content-start>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>

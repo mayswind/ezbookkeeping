@@ -15,22 +15,25 @@
             <f7-list no-hairlines class="no-margin-top no-margin-bottom" v-if="!items || !items.length || noAvailableTag">
                 <f7-list-item :title="$t('No available tag')"></f7-list-item>
             </f7-list>
-            <f7-list no-hairlines class="no-margin-top no-margin-bottom" v-else-if="items && items.length && !noAvailableTag">
-                <f7-list-item checkbox v-for="item in items"
+            <f7-list dividers no-hairlines class="no-margin-top no-margin-bottom" v-else-if="items && items.length && !noAvailableTag">
+                <f7-list-item checkbox
                               v-show="!item.hidden"
-                              :key="item.id"
                               :class="isChecked(item.id) ? 'list-item-selected' : ''"
                               :value="item.id"
                               :checked="isChecked(item.id)"
+                              :key="item.id"
+                              v-for="item in items"
                               @change="changeItemSelection">
-                    <f7-block slot="title" class="no-padding no-margin">
-                        <div class="display-flex">
-                            <f7-icon slot="media" f7="number"></f7-icon>
-                            <div class="tag-selection-list-item list-item-valign-middle padding-left-half">
-                                {{ item.name }}
+                    <template #title>
+                        <f7-block class="no-padding no-margin">
+                            <div class="display-flex">
+                                <f7-icon f7="number"></f7-icon>
+                                <div class="tag-selection-list-item list-item-valign-middle padding-left-half">
+                                    {{ item.name }}
+                                </div>
                             </div>
-                        </div>
-                    </f7-block>
+                        </f7-block>
+                    </template>
                 </f7-list-item>
             </f7-list>
         </f7-page-content>

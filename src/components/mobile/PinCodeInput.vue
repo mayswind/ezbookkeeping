@@ -1,7 +1,7 @@
 <template>
     <div class="pin-code-input grid grid-gap" :class="'grid-cols-' + length">
         <div class="input input-outline input-with-value"
-             v-for="(code, index) in codes">
+             :key="index" v-for="(code, index) in codes">
             <input min="0" maxlength="1" pattern="[0-9]*"
                    :ref="`pin-code-input-${index}`"
                    :value="codes[index].value"

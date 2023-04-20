@@ -4,7 +4,6 @@
             <circle class="pie-chart-background" cx="0" cy="0" :r="diameter"></circle>
 
             <circle class="pie-chart-item"
-                    v-for="(item, idx) in validItems" :key="idx"
                     fill="transparent"
                     cx="0" cy="0"
                     :r="diameter / 2"
@@ -12,6 +11,8 @@
                     :stroke-width="diameter"
                     :stroke-dasharray="getItemStrokeDash(item)"
                     :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
+                    :key="idx"
+                    v-for="(item, idx) in validItems"
                     @click="switchSelectedIndex(idx)">
             </circle>
 

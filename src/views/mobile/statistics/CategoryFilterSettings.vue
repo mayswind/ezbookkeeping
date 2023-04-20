@@ -9,7 +9,8 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="combination-list-wrapper margin-vertical skeleton-text" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
+        <f7-block class="combination-list-wrapper margin-vertical skeleton-text"
+                  :key="blockIdx" v-for="blockIdx in [ 1, 2 ]" v-if="loading">
             <f7-accordion-item>
                 <f7-block-title>
                     <f7-accordion-toggle>
@@ -26,13 +27,15 @@
                 </f7-block-title>
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
-                        <f7-list-item checkbox class="disabled" title="Category Name" v-for="itemIdx in [ 1, 2 ]">
+                        <f7-list-item checkbox class="disabled" title="Category Name"
+                                      :key="itemIdx" v-for="itemIdx in [ 1, 2 ]">
                             <template #media>
                                 <f7-icon f7="app_fill"></f7-icon>
                             </template>
                             <template #root>
                                 <ul class="padding-left">
-                                    <f7-list-item checkbox class="disabled" title="Sub Category Name" v-for="subItemIdx in [ 1, 2, 3 ]">
+                                    <f7-list-item checkbox class="disabled" title="Sub Category Name"
+                                                  :key="subItemIdx" v-for="subItemIdx in [ 1, 2, 3 ]">
                                         <template #media>
                                             <f7-icon f7="app_fill"></f7-icon>
                                         </template>
@@ -68,13 +71,14 @@
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
-                        <f7-list-item checkbox v-for="category in categories"
-                                      v-show="!category.hidden"
-                                      :key="category.id"
+                        <f7-list-item checkbox
                                       :title="category.name"
                                       :value="category.id"
                                       :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
                                       :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
+                                      :key="category.id"
+                                      v-for="category in categories"
+                                      v-show="!category.hidden"
                                       @change="selectSubCategories">
                             <template #media>
                                 <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -82,12 +86,13 @@
 
                             <template #root>
                                 <ul v-if="category.subCategories.length" class="padding-left">
-                                    <f7-list-item checkbox v-for="subCategory in category.subCategories"
-                                                  v-show="!subCategory.hidden"
-                                                  :key="subCategory.id"
+                                    <f7-list-item checkbox
                                                   :title="subCategory.name"
                                                   :value="subCategory.id"
-                                                  :checked="isCategoryChecked(subCategory, filterCategoryIds) "
+                                                  :checked="isCategoryChecked(subCategory, filterCategoryIds)"
+                                                  :key="subCategory.id"
+                                                  v-for="subCategory in category.subCategories"
+                                                  v-show="!subCategory.hidden"
                                                   @change="selectCategory">
                                         <template #media>
                                             <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>

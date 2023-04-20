@@ -227,7 +227,7 @@ export default {
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
 
             if (rateStr.indexOf('.') < 0) {
-                return rateStr;
+                return this.$utilities.appendThousandsSeparator(rateStr);
             } else {
                 let firstNonZeroPos = 0;
 
@@ -238,7 +238,8 @@ export default {
                     }
                 }
 
-                return rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
+                const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
+                return this.$utilities.appendThousandsSeparator(trimmedRateStr);
             }
         },
         setAsBaseline(currency, amount) {

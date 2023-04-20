@@ -60,6 +60,7 @@ export default {
                 view: {
                     animate: self.$settings.isEnableAnimate(),
                     browserHistory: !self.isiOSHomeScreenMode(),
+                    browserHistoryInitialMatch: true,
                     browserHistoryAnimate: false,
                     iosSwipeBackAnimateShadow: false,
                     mdSwipeBackAnimateShadow: false

@@ -102,160 +102,160 @@ function checkNotLogin({ router, resolve, reject }) {
 const routes = [
     {
         path: '/',
-        component: HomePage,
-        beforeEnter: checkLogin,
+        async: ({resolve}) => resolve({component: HomePage}),
+        beforeEnter: [checkLogin],
         options: {
             animate: false,
         }
     },
     {
         path: '/login',
-        component: LoginPage,
-        beforeEnter: checkNotLogin,
+        async: ({resolve}) => resolve({component: LoginPage}),
+        beforeEnter: [checkNotLogin],
         options: {
             animate: false,
         }
     },
     {
         path: '/signup',
-        component: SignUpPage,
-        beforeEnter: checkNotLogin,
+        async: ({resolve}) => resolve({component: SignUpPage}),
+        beforeEnter: [checkNotLogin],
         options: {
             animate: false,
         }
     },
     {
         path: '/unlock',
-        component: UnlockPage,
-        beforeEnter: checkLocked,
+        async: ({resolve}) => resolve({component: UnlockPage}),
+        beforeEnter: [checkLocked],
         options: {
             animate: false,
         }
     },
     {
         path: '/transaction/list',
-        component: TransactionListPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TransactionListPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/add',
-        component: TransactionEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/edit',
-        component: TransactionEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/detail',
-        component: TransactionEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/account/list',
-        component: AccountListPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: AccountListPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/account/add',
-        component: AccountEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: AccountEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/account/edit',
-        component: AccountEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: AccountEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/transaction',
-        component: StatisticsTransactionPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: StatisticsTransactionPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/settings',
-        component: StatisticsSettingsPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: StatisticsSettingsPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/filter/account',
-        component: StatisticsAccountFilterSettingsPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: StatisticsAccountFilterSettingsPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/filter/category',
-        component: StatisticsCategoryFilterSettingsPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: StatisticsCategoryFilterSettingsPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/settings',
-        component: SettingsPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: SettingsPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/app_lock',
-        component: ApplicationLockPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: ApplicationLockPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/exchange_rates',
-        component: ExchangeRatesPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: ExchangeRatesPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/about',
-        component: AboutPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: AboutPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/user/profile',
-        component: UserProfilePage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: UserProfilePage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/user/data/management',
-        component: DataManagementPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: DataManagementPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/user/2fa',
-        component: TwoFactorAuthPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TwoFactorAuthPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/user/sessions',
-        component: SessionListPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: SessionListPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/category/all',
-        component: CategoryAllPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: CategoryAllPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/category/list',
-        component: CategoryListPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: CategoryListPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/category/add',
-        component: CategoryEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: CategoryEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/category/edit',
-        component: CategoryEditPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: CategoryEditPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/category/preset',
-        component: CategoryPresetPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: CategoryPresetPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '/tag/list',
-        component: TagListPage,
-        beforeEnter: checkLogin
+        async: ({resolve}) => resolve({component: TagListPage}),
+        beforeEnter: [checkLogin]
     },
     {
         path: '(.*)',

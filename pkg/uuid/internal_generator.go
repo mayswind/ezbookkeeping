@@ -35,8 +35,8 @@ type InternalUuidInfo struct {
 
 // InternalUuidGenerator represents internal bundled uuid generator
 type InternalUuidGenerator struct {
-	uuidServerId   uint8
 	uuidSeqNumbers [1 << internalUuidTypeBits]uint64
+	uuidServerId   uint8
 }
 
 // NewInternalUuidGenerator returns a new internal uuid generator

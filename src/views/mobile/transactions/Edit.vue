@@ -37,8 +37,7 @@
             <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers
-                 class="margin-vertical" :class="{ 'readonly': mode === 'view' }"
+        <f7-list form strong inset dividers class="margin-vertical" :class="{ 'readonly': mode === 'view' }"
                  v-else-if="!loading">
             <f7-list-item
                 class="transaction-edit-amount"

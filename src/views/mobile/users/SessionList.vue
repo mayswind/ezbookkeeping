@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list media-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers media-list class="margin-top skeleton-text" v-if="loading">
             <f7-list-item class="list-item-media-valign-middle"
                           title="Current"
                           text="Device Name (Browser xx.x.xxxx.xx)">
@@ -21,7 +21,7 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list media-list strong inset dividers class="margin-top" v-else-if="!loading">
+        <f7-list strong inset dividers media-list class="margin-top" v-else-if="!loading">
             <f7-list-item class="list-item-media-valign-middle" swipeout
                           :id="session.domId"
                           :title="session.deviceType"

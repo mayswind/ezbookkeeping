@@ -3,7 +3,7 @@
              ptr
              infinite
              :infinite-preloader="loadingMore"
-             :infinite-distance="400"
+             :infinite-distance="600"
              @ptr:refresh="reload"
              @page:afterin="onPageAfterIn"
              @infinite="loadMore(true)">

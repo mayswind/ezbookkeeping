@@ -462,6 +462,24 @@ function copyArrayTo(fromArray, toArray) {
     return toArray;
 }
 
+function arrangeArrayWithNewStartIndex(array, startIndex) {
+    if (startIndex <= 0 || startIndex >= array.length) {
+        return array;
+    }
+
+    const newArray = [];
+
+    for (let i = startIndex; i < array.length; i++) {
+        newArray.push(array[i]);
+    }
+
+    for (let i = 0; i < startIndex; i++) {
+        newArray.push(array[i]);
+    }
+
+    return newArray;
+}
+
 function appendThousandsSeparator(value) {
     if (!settings.isEnableThousandsSeparator() || value.length <= 3) {
         return value;
@@ -927,6 +945,7 @@ export default {
     isDateRangeMatchFullMonths,
     copyObjectTo,
     copyArrayTo,
+    arrangeArrayWithNewStartIndex,
     appendThousandsSeparator,
     numericCurrencyToString,
     stringCurrencyToNumeric,

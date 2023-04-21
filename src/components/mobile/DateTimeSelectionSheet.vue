@@ -66,7 +66,7 @@ export default {
             return this.$store.getters.currentUserFirstDayOfWeek;
         },
         dayNames() {
-            return this.$locale.getAllMinWeekdayNames();
+            return this.$utilities.arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
         },
         is24Hour() {
             const datetimeFormat = this.$t('format.datetime.long');

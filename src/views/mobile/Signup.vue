@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list form strong inset dividers class="margin-top">
+        <f7-list form strong inset dividers class="margin-vertical">
             <f7-list-input
                 type="text"
                 autocomplete="username"
@@ -57,7 +57,7 @@
             <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="$t(inputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="margin-vertical">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_lang'"
@@ -106,7 +106,7 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers>
+        <f7-list strong inset dividers class="margin-vertical">
             <f7-list-item :title="$t('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
                 <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
             </f7-list-item>

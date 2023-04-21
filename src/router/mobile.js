@@ -33,6 +33,14 @@ import CategoryPresetPage from '../views/mobile/categories/Preset.vue';
 
 import TagListPage from '../views/mobile/tags/List.vue';
 
+function asyncResolve(component) {
+    return function({ resolve }) {
+        return resolve({
+            component: component
+        });
+    };
+}
+
 function checkLogin({ router, resolve, reject }) {
     if (!userState.isUserLogined()) {
         reject();
@@ -102,7 +110,7 @@ function checkNotLogin({ router, resolve, reject }) {
 const routes = [
     {
         path: '/',
-        async: ({resolve}) => resolve({component: HomePage}),
+        async: asyncResolve(HomePage),
         beforeEnter: [checkLogin],
         options: {
             animate: false,
@@ -110,7 +118,7 @@ const routes = [
     },
     {
         path: '/login',
-        async: ({resolve}) => resolve({component: LoginPage}),
+        async: asyncResolve(LoginPage),
         beforeEnter: [checkNotLogin],
         options: {
             animate: false,
@@ -118,7 +126,7 @@ const routes = [
     },
     {
         path: '/signup',
-        async: ({resolve}) => resolve({component: SignUpPage}),
+        async: asyncResolve(SignUpPage),
         beforeEnter: [checkNotLogin],
         options: {
             animate: false,
@@ -126,7 +134,7 @@ const routes = [
     },
     {
         path: '/unlock',
-        async: ({resolve}) => resolve({component: UnlockPage}),
+        async: asyncResolve(UnlockPage),
         beforeEnter: [checkLocked],
         options: {
             animate: false,
@@ -134,127 +142,127 @@ const routes = [
     },
     {
         path: '/transaction/list',
-        async: ({resolve}) => resolve({component: TransactionListPage}),
+        async: asyncResolve(TransactionListPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/add',
-        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        async: asyncResolve(TransactionEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/edit',
-        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        async: asyncResolve(TransactionEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/transaction/detail',
-        async: ({resolve}) => resolve({component: TransactionEditPage}),
+        async: asyncResolve(TransactionEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/account/list',
-        async: ({resolve}) => resolve({component: AccountListPage}),
+        async: asyncResolve(AccountListPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/account/add',
-        async: ({resolve}) => resolve({component: AccountEditPage}),
+        async: asyncResolve(AccountEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/account/edit',
-        async: ({resolve}) => resolve({component: AccountEditPage}),
+        async: asyncResolve(AccountEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/transaction',
-        async: ({resolve}) => resolve({component: StatisticsTransactionPage}),
+        async: asyncResolve(StatisticsTransactionPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/settings',
-        async: ({resolve}) => resolve({component: StatisticsSettingsPage}),
+        async: asyncResolve(StatisticsSettingsPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/filter/account',
-        async: ({resolve}) => resolve({component: StatisticsAccountFilterSettingsPage}),
+        async: asyncResolve(StatisticsAccountFilterSettingsPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/statistic/filter/category',
-        async: ({resolve}) => resolve({component: StatisticsCategoryFilterSettingsPage}),
+        async: asyncResolve(StatisticsCategoryFilterSettingsPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/settings',
-        async: ({resolve}) => resolve({component: SettingsPage}),
+        async: asyncResolve(SettingsPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/app_lock',
-        async: ({resolve}) => resolve({component: ApplicationLockPage}),
+        async: asyncResolve(ApplicationLockPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/exchange_rates',
-        async: ({resolve}) => resolve({component: ExchangeRatesPage}),
+        async: asyncResolve(ExchangeRatesPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/about',
-        async: ({resolve}) => resolve({component: AboutPage}),
+        async: asyncResolve(AboutPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/user/profile',
-        async: ({resolve}) => resolve({component: UserProfilePage}),
+        async: asyncResolve(UserProfilePage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/user/data/management',
-        async: ({resolve}) => resolve({component: DataManagementPage}),
+        async: asyncResolve(DataManagementPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/user/2fa',
-        async: ({resolve}) => resolve({component: TwoFactorAuthPage}),
+        async: asyncResolve(TwoFactorAuthPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/user/sessions',
-        async: ({resolve}) => resolve({component: SessionListPage}),
+        async: asyncResolve(SessionListPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/category/all',
-        async: ({resolve}) => resolve({component: CategoryAllPage}),
+        async: asyncResolve(CategoryAllPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/category/list',
-        async: ({resolve}) => resolve({component: CategoryListPage}),
+        async: asyncResolve(CategoryListPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/category/add',
-        async: ({resolve}) => resolve({component: CategoryEditPage}),
+        async: asyncResolve(CategoryEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/category/edit',
-        async: ({resolve}) => resolve({component: CategoryEditPage}),
+        async: asyncResolve(CategoryEditPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/category/preset',
-        async: ({resolve}) => resolve({component: CategoryPresetPage}),
+        async: asyncResolve(CategoryPresetPage),
         beforeEnter: [checkLogin]
     },
     {
         path: '/tag/list',
-        async: ({resolve}) => resolve({component: TagListPage}),
+        async: asyncResolve(TagListPage),
         beforeEnter: [checkLogin]
     },
     {

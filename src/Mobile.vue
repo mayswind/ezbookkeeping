@@ -310,7 +310,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     margin-right: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
 }
 
-.popover .popover-inner .list .item-content .list-item-checked-icon {
+.list .item-content > .item-inner > .item-after .list-item-checked-icon {
     margin-right: 0;
 }
 

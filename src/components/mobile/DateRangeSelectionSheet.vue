@@ -14,24 +14,24 @@
                     <span>{{ endDateTime }}</span>
                 </p>
                 <slot></slot>
-                <VueDatePicker range inline enable-seconds six-weeks
-                               auto-apply month-name-format="long"
-                               class="margin-bottom"
-                               :dark="isDarkMode"
-                               :week-start="firstDayOfWeek"
-                               :year-range="yearRange"
-                               :day-names="dayNames"
-                               :is24="is24Hour"
-                               :partial-range="false"
-                               :preset-ranges="presetRanges"
-                               v-model="dateRange">
+                <vue-date-picker range inline enable-seconds six-weeks
+                                 auto-apply month-name-format="long"
+                                 class="justify-content-center margin-bottom"
+                                 :dark="isDarkMode"
+                                 :week-start="firstDayOfWeek"
+                                 :year-range="yearRange"
+                                 :day-names="dayNames"
+                                 :is24="is24Hour"
+                                 :partial-range="false"
+                                 :preset-ranges="presetRanges"
+                                 v-model="dateRange">
                     <template #month="{ text }">
                         {{ $t(`datetime.${text}.short`) }}
                     </template>
                     <template #month-overlay-value="{ text }">
                         {{ $t(`datetime.${text}.short`) }}
                     </template>
-                </VueDatePicker>
+                </vue-date-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
                            :text="$t('Continue')"

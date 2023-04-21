@@ -289,21 +289,23 @@ export default {
     created() {
         const self = this;
 
-        self.loading = true;
+        if (self.$user.isUserLogined() && self.$user.isUserUnlocked()) {
+            self.loading = true;
 
-        self.$store.dispatch('loadTransactionOverview', {
-            defaultCurrency: self.defaultCurrency,
-            dateRange: self.dateRange,
-            force: false
-        }).then(() => {
-            self.loading = false;
-        }).catch(error => {
-            self.loading = false;
+            self.$store.dispatch('loadTransactionOverview', {
+                defaultCurrency: self.defaultCurrency,
+                dateRange: self.dateRange,
+                force: false
+            }).then(() => {
+                self.loading = false;
+            }).catch(error => {
+                self.loading = false;
 
-            if (!error.processed) {
-                self.$toast(error.message || error);
-            }
-        });
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
+        }
     },
     methods: {
         onPageAfterIn() {

@@ -93,7 +93,7 @@
                             {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
                         </span>
                         <span :class="{ 'skeleton-text': loading }" v-else-if="loading || !statisticsData || !statisticsData.items || !statisticsData.items.length">
-                            ***.**
+                            {{ loading ? '***.**' : '---' }}
                         </span>
                     </div>
                 </div>

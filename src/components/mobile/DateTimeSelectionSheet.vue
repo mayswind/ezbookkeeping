@@ -14,6 +14,7 @@
             <vue-date-picker inline enable-seconds
                              auto-apply month-name-format="long"
                              class="justify-content-center"
+                             :clearable="false"
                              :dark="isDarkMode"
                              :week-start="firstDayOfWeek"
                              :year-range="yearRange"

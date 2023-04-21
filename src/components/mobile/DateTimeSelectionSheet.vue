@@ -11,7 +11,7 @@
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <vue-date-picker inline enable-seconds
+            <vue-date-picker inline enable-seconds six-weeks
                              auto-apply month-name-format="long"
                              class="justify-content-center"
                              :clearable="false"

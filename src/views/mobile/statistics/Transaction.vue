@@ -171,8 +171,7 @@
         </f7-card>
 
         <f7-popover class="sorting-type-popover-menu"
-                    v-model:opened="showSortingTypePopover"
-                    @popover:open="scrollPopoverToSelectedItem">
+                    v-model:opened="showSortingTypePopover">
             <f7-list dividers>
                 <f7-list-item :title="$t(sortingType.name)"
                               :class="{ 'list-item-selected': query.sortingType === sortingType.type }"

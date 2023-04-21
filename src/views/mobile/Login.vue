@@ -74,7 +74,7 @@
                     <div style="font-size: 18px"><b>{{ $t('Two-Factor Authentication') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
-                    <f7-list no-hairlines strong class="no-margin">
+                    <f7-list strong class="no-margin">
                         <f7-list-input
                             type="number"
                             autocomplete="one-time-code"

@@ -12,10 +12,10 @@
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-list no-hairlines class="no-margin-top no-margin-bottom" v-if="!items || !items.length || noAvailableTag">
+            <f7-list class="no-margin-top no-margin-bottom" v-if="!items || !items.length || noAvailableTag">
                 <f7-list-item :title="$t('No available tag')"></f7-list-item>
             </f7-list>
-            <f7-list dividers no-hairlines class="no-margin-top no-margin-bottom" v-else-if="items && items.length && !noAvailableTag">
+            <f7-list dividers class="no-margin-top no-margin-bottom" v-else-if="items && items.length && !noAvailableTag">
                 <f7-list-item checkbox
                               :class="isChecked(item.id) ? 'list-item-selected' : ''"
                               :value="item.id"

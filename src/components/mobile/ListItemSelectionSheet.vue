@@ -10,7 +10,7 @@
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <f7-list dividers no-hairlines class="no-margin-vertical">
+            <f7-list dividers class="no-margin-vertical">
                 <f7-list-item link="#" no-chevron
                               :title="$tIf((titleField ? item[titleField] : item), titleI18n)"
                               :value="getItemValue(item, index, valueField, valueType)"

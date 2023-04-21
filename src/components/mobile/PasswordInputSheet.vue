@@ -8,7 +8,7 @@
             </div>
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin" v-if="hint">{{ hint }}</p>
-                <f7-list no-hairlines strong class="no-margin">
+                <f7-list strong class="no-margin">
                     <f7-list-input
                         type="password"
                         autocomplete="current-password"

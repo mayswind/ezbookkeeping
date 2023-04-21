@@ -12,7 +12,7 @@
             <div class="grid grid-cols-2 grid-gap">
                 <div>
                     <div class="primary-list-container">
-                        <f7-list dividers no-hairlines class="primary-list no-margin-vertical">
+                        <f7-list dividers class="primary-list no-margin-vertical">
                             <f7-list-item link="#" no-chevron
                                           :class="{ 'primary-list-item-selected': item === selectedPrimaryItem }"
                                           :value="primaryValueField ? item[primaryValueField] : item"
@@ -34,7 +34,7 @@
                 </div>
                 <div>
                     <div class="secondary-list-container">
-                        <f7-list dividers no-hairlines class="secondary-list no-margin-vertical" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
+                        <f7-list dividers class="secondary-list no-margin-vertical" v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                             <f7-list-item link="#" no-chevron
                                           :class="{ 'secondary-list-item-selected': isSecondarySelected(subItem) }"
                                           :value="secondaryValueField ? subItem[secondaryValueField] : subItem"

@@ -174,6 +174,10 @@ body {
 
 /** Replacing the default style of framework7 **/
 :root {
+    --f7-color-gray: #8e8e93;
+    --f7-color-gray-rgb: 142, 142, 147;
+    --f7-color-gray-shade: #79797f;
+    --f7-color-gray-tint: #a3a3a7;
     --default-icon-color: var(--f7-text-color);
 }
 
@@ -182,10 +186,10 @@ body {
 }
 
 .color-gray {
-    --f7-theme-color: #8e8e93;
-    --f7-theme-color-rgb: 142, 142, 147;
-    --f7-theme-color-shade: #79797f;
-    --f7-theme-color-tint: #a3a3a7;
+    --f7-theme-color: var(--f7-color-gray);
+    --f7-theme-color-rgb: var(--f7-color-gray-rgb);
+    --f7-theme-color-shade: var(--f7-color-gray-shade);
+    --f7-theme-color-tint: var(--f7-color-gray-tint);
 }
 
 .ios .dark, .ios.dark {

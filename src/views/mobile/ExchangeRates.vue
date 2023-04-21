@@ -144,7 +144,7 @@ export default {
                 });
             }
 
-            availableExchangeRates.sort(function(c1, c2){
+            availableExchangeRates.sort(function(c1, c2) {
                 return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
             })
 

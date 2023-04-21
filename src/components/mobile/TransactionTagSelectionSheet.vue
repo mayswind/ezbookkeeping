@@ -17,12 +17,12 @@
             </f7-list>
             <f7-list dividers no-hairlines class="no-margin-top no-margin-bottom" v-else-if="items && items.length && !noAvailableTag">
                 <f7-list-item checkbox
-                              v-show="!item.hidden"
                               :class="isChecked(item.id) ? 'list-item-selected' : ''"
                               :value="item.id"
                               :checked="isChecked(item.id)"
                               :key="item.id"
                               v-for="item in items"
+                              v-show="!item.hidden"
                               @change="changeItemSelection">
                     <template #title>
                         <f7-block class="no-padding no-margin">

@@ -593,5 +593,6 @@ const allAvailableTimezones = [
 ];
 
 export default {
-    all: allAvailableTimezones
+    all: allAvailableTimezones,
+    utcTimezoneName: 'Etc/GMT'
 };

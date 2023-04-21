@@ -11,22 +11,22 @@
             </div>
         </f7-toolbar>
         <f7-page-content>
-            <VueDatePicker inline enable-seconds
-                           auto-apply month-name-format="long"
-                           class="justify-content-center"
-                           :dark="isDarkMode"
-                           :week-start="firstDayOfWeek"
-                           :year-range="yearRange"
-                           :day-names="dayNames"
-                           :is24="is24Hour"
-                           v-model="dateTime">
+            <vue-date-picker inline enable-seconds
+                             auto-apply month-name-format="long"
+                             class="justify-content-center"
+                             :dark="isDarkMode"
+                             :week-start="firstDayOfWeek"
+                             :year-range="yearRange"
+                             :day-names="dayNames"
+                             :is24="is24Hour"
+                             v-model="dateTime">
                 <template #month="{ text }">
                     {{ $t(`datetime.${text}.short`) }}
                 </template>
                 <template #month-overlay-value="{ text }">
                     {{ $t(`datetime.${text}.short`) }}
                 </template>
-            </VueDatePicker>
+            </vue-date-picker>
         </f7-page-content>
     </f7-sheet>
 </template>

@@ -30,7 +30,6 @@
         <f7-list strong inset dividers sortable class="tag-item-list margin-top"
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
-
             <f7-list-item swipeout
                           :id="getTagDomId(tag)"
                           :key="tag.id"

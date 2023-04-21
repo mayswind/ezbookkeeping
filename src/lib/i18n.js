@@ -1,7 +1,7 @@
 import { defaultLanguage, allLanguages } from '../locales/index.js';
 import timezone from "../consts/timezone.js";
 import currency from "../consts/currency.js";
-import settings from "./settings";
+import settings from "./settings.js";
 import utils from './utils.js';
 
 const apiNotFoundErrorCode = 100001;
@@ -259,7 +259,7 @@ export function getAllTimezones(includeSystemDefault, translateFn) {
     for (let i = 0; i < allTimezones.length; i++) {
         allTimezoneInfos.push({
             name: allTimezones[i].timezoneName,
-            utcOffset: (allTimezones[i].timezoneName !== 'Etc/GMT' ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
             utcOffsetMinutes: utils.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
             displayName: translateFn(`timezone.${allTimezones[i].displayName}`)
         });
@@ -274,7 +274,7 @@ export function getAllTimezones(includeSystemDefault, translateFn) {
         });
     }
 
-    allTimezoneInfos.sort(function(c1, c2){
+    allTimezoneInfos.sort(function(c1, c2) {
         const utcOffset1 = parseInt(c1.utcOffset.replace(':', ''));
         const utcOffset2 = parseInt(c2.utcOffset.replace(':', ''));
 
@@ -303,7 +303,7 @@ export function getAllCurrencies(translateFn) {
         });
     }
 
-    allCurrencies.sort(function(c1, c2){
+    allCurrencies.sort(function(c1, c2) {
         return c1.displayName.localeCompare(c2.displayName);
     })
 

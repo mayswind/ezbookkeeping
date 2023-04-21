@@ -21,7 +21,7 @@
                               v-model:show="showInputPasscodeSheetForEnable"
                               v-model="currentPasscodeForEnable"
                               @passcode:confirm="enableConfirm">
-            <div class="col-100 text-align-center">
+            <div class="text-align-center">
                 <img alt="qrcode" class="img-qrcode" :src="new2FAQRCode" />
             </div>
         </passcode-input-sheet>

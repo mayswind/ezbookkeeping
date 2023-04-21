@@ -8,7 +8,7 @@ module.exports = {
         'plugin:vue/vue3-essential'
     ],
     'rules': {
-        "vue/multi-word-component-names": "off",
-        "vue/no-use-v-if-with-v-for": "off"
+        'vue/multi-word-component-names': 'off',
+        'vue/no-use-v-if-with-v-for': 'off'
     }
 }

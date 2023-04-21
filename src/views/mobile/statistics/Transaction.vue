@@ -13,8 +13,8 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-popover class="chart-data-type-popover-menu" :opened="showChartDataTypePopover"
-                    @popover:open="showChartDataTypePopover = true" @popover:close="showChartDataTypePopover = false">
+        <f7-popover class="chart-data-type-popover-menu"
+                    v-model:opened="showChartDataTypePopover">
             <f7-list dividers>
                 <f7-list-item :title="$t(dataType.name)"
                               :key="dataType.type"
@@ -170,9 +170,9 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-popover class="sorting-type-popover-menu" :opened="showSortingTypePopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showSortingTypePopover = true" @popover:closed="showSortingTypePopover = false">
+        <f7-popover class="sorting-type-popover-menu"
+                    v-model:opened="showSortingTypePopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :title="$t(sortingType.name)"
                               :class="{ 'list-item-selected': query.sortingType === sortingType.type }"
@@ -204,9 +204,9 @@
             </f7-link>
         </f7-toolbar>
 
-        <f7-popover class="date-popover-menu" :opened="showDatePopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
+        <f7-popover class="date-popover-menu"
+                    v-model:opened="showDatePopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :title="$t(dateRange.name)"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"

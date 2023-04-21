@@ -238,9 +238,9 @@
             <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
         </f7-block>
 
-        <f7-popover class="date-popover-menu" :opened="showDatePopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showDatePopover = true" @popover:closed="showDatePopover = false">
+        <f7-popover class="date-popover-menu"
+                    v-model:opened="showDatePopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :title="$t(dateRange.name)"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
@@ -269,9 +269,9 @@
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
 
-        <f7-popover class="type-popover-menu" :opened="showTypePopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showTypePopover = true" @popover:closed="showTypePopover = false">
+        <f7-popover class="type-popover-menu"
+                    v-model:opened="showTypePopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="$t('All')" @click="changeTypeFilter(0)">
                     <template #after>
@@ -301,9 +301,9 @@
             </f7-list>
         </f7-popover>
 
-        <f7-popover class="category-popover-menu" :opened="showCategoryPopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showCategoryPopover = true" @popover:closed="showCategoryPopover = false">
+        <f7-popover class="category-popover-menu"
+                    v-model:opened="showCategoryPopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers accordion-list>
                 <f7-list-item :class="{ 'list-item-selected': query.categoryId === '0' }" :title="$t('All')" @click="changeCategoryFilter('0')">
                     <template #media>
@@ -362,9 +362,9 @@
             </f7-list>
         </f7-popover>
 
-        <f7-popover class="account-popover-menu" :opened="showAccountPopover"
-                    @popover:open="scrollPopoverToSelectedItem"
-                    @popover:opened="showAccountPopover = true" @popover:closed="showAccountPopover = false">
+        <f7-popover class="account-popover-menu"
+                    v-model:opened="showAccountPopover"
+                    @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
                 <f7-list-item :class="{ 'list-item-selected': query.accountId === '0' }" :title="$t('All')" @click="changeAccountFilter('0')">
                     <template #media>

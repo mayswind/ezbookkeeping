@@ -14,19 +14,7 @@ const BUILD_DIR = resolve(__dirname, './dist',);
 
 export default defineConfig(async () => {
     const licenseContent = fs.readFileSync('./LICENSE', 'UTF-8');
-    let buildUnixTime = '';
-
-    for (let i = 0; i < process.argv.length; i++) {
-        if (process.argv[i].indexOf('--') !== 0) {
-            continue;
-        }
-
-        const pairs = process.argv[i].split('=');
-
-        if (pairs[0] === '--buildUnixTime') {
-            buildUnixTime = pairs[1];
-        }
-    }
+    let buildUnixTime = process.env.buildUnixTime || '';
 
     return {
         root: SRC_DIR,

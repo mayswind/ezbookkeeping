@@ -125,17 +125,16 @@ build_backend() {
 }
 
 build_frontend() {
-    frontend_build_arguments="";
-
-    if [ "$RELEASE" = "0" ]; then
-        frontend_build_arguments="--buildUnixTime=$BUILD_UNIXTIME"
-    fi
-
     echo "Pulling frontend dependencies..."
     npm install
 
     echo "Building frontend files ($RELEASE_TYPE)..."
-    npm run build -- "$frontend_build_arguments"
+
+    if [ "$RELEASE" = "0" ]; then
+        buildUnixTime=$BUILD_UNIXTIME npm run build
+    else
+        npm run build
+    fi
 }
 
 build_package() {

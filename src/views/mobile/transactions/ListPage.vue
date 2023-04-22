@@ -234,8 +234,8 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-block class="text-align-center" v-if="!loading && hasMoreTransaction">
-            <f7-link :class="{ 'disabled': loadingMore }" href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
+        <f7-block class="text-align-center" :class="{ 'disabled': loadingMore }" v-show="!loading && hasMoreTransaction">
+            <f7-link href="#" @click="loadMore(false)">{{ $t('Load More') }}</f7-link>
         </f7-block>
 
         <f7-popover class="date-popover-menu"

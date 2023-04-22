@@ -1087,7 +1087,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(uid i
 	}
 
 	var transactionTotalAmounts []*models.Transaction
-	err := s.UserDataDB(uid).Select("uid, category_id, account_id, SUM(amount) as amount").Where(condition, conditionParams...).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
+	err := s.UserDataDB(uid).Select("category_id, account_id, SUM(amount) as amount").Where(condition, conditionParams...).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
 
 	if err != nil {
 		return nil, err

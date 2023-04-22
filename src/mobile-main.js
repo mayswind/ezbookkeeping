@@ -187,7 +187,7 @@ function setLanguage(locale) {
     }
 
     i18n.global.locale.value = locale;
-    moment.locale(locale, {
+    moment.updateLocale(locale, {
         months : app.config.globalProperties.$locale.getAllLongMonthNames(),
         monthsShort : app.config.globalProperties.$locale.getAllShortMonthNames(),
         weekdays : app.config.globalProperties.$locale.getAllLongWeekdayNames(),

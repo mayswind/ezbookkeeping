@@ -361,7 +361,7 @@ export function getDisplayCurrency(value, currencyCode, notConvertValue, transla
 
 export function getI18nOptions() {
     return {
-        legacy: false,
+        legacy: true,
         locale: defaultLanguage,
         fallbackLocale: defaultLanguage,
         formatFallbackMessages: true,

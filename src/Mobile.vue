@@ -66,7 +66,9 @@ export default {
                     mdSwipeBackAnimateShadow: false
                 }
             },
-            isDarkMode: undefined
+            isDarkMode: undefined,
+            hasPushPopupBackdrop: undefined,
+            hasBackdrop: undefined
         }
     },
     created() {
@@ -86,6 +88,17 @@ export default {
         f7ready((f7) => {
             this.isDarkMode = f7.darkMode;
             this.setThemeColorMeta(f7.darkMode);
+
+            f7.on('actionsOpen', (event) => this.onBackdropChanged(event));
+            f7.on('actionsClose', (event) => this.onBackdropChanged(event));
+            f7.on('dialogOpen', (event) => this.onBackdropChanged(event));
+            f7.on('dialogClose', (event) => this.onBackdropChanged(event));
+            f7.on('popoverOpen', (event) => this.onBackdropChanged(event));
+            f7.on('popoverClose', (event) => this.onBackdropChanged(event));
+            f7.on('popupOpen', (event) => this.onBackdropChanged(event));
+            f7.on('popupClose', (event) => this.onBackdropChanged(event));
+            f7.on('sheetOpen', (event) => this.onBackdropChanged(event));
+            f7.on('sheetClose', (event) => this.onBackdropChanged(event));
 
             f7.on('pageBeforeOut',  () => {
                 if (this.$ui.isModalShowing()) {
@@ -113,11 +126,33 @@ export default {
 
             return false;
         },
-        setThemeColorMeta(isDarkMode) {
-            if (isDarkMode) {
-                document.querySelector('meta[name=theme-color]').setAttribute('content', '#121212');
+        onBackdropChanged(event) {
+            if (event.push) {
+                this.hasPushPopupBackdrop = event.opened;
             } else {
-                document.querySelector('meta[name=theme-color]').setAttribute('content', '#f6f6f8');
+                this.hasBackdrop = event.opened;
+            }
+
+            this.setThemeColorMeta(this.isDarkMode);
+        },
+        setThemeColorMeta(isDarkMode) {
+            if (this.hasPushPopupBackdrop) {
+                document.querySelector('meta[name=theme-color]').setAttribute('content', '#000');
+                return;
+            }
+
+            if (isDarkMode) {
+                if (this.hasBackdrop) {
+                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#0b0b0b');
+                } else {
+                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#121212');
+                }
+            } else {
+                if (this.hasBackdrop) {
+                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#949495');
+                } else {
+                    document.querySelector('meta[name=theme-color]').setAttribute('content', '#f6f6f8');
+                }
             }
         }
     }
@@ -174,6 +209,7 @@ body {
 
 /** Replacing the default style of framework7 **/
 :root {
+    --f7-popup-push-offset: 5px;
     --f7-color-gray: #8e8e93;
     --f7-color-gray-rgb: 142, 142, 147;
     --f7-color-gray-shade: #79797f;

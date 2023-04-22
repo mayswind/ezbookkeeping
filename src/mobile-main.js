@@ -139,7 +139,7 @@ import TransactionTagSelectionSheet from './components/mobile/TransactionTagSele
 
 import TextareaAutoSize from "./directives/mobile/textareaAutoSize.js";
 
-import App from './Mobile.vue';
+import App from './MobileApp.vue';
 
 Framework7.use([
     Framework7Dialog,

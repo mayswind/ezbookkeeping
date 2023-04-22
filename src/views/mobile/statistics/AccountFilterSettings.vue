@@ -4,8 +4,8 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t(applyText)" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableAccount }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyAvailableAccount }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -38,10 +38,14 @@
             </f7-accordion-item>
         </f7-block>
 
+        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!hasAnyAvailableAccount">
+            <f7-list-item :title="$t('No available account')"></f7-list-item>
+        </f7-list>
+
         <f7-block class="combination-list-wrapper margin-vertical"
                   :key="accountCategory.id"
                   v-for="accountCategory in allAccountCategories"
-                  v-else-if="!loading">
+                  v-else-if="!loading && hasAnyAvailableAccount">
             <f7-accordion-item :opened="collapseStates[accountCategory.id].opened"
                                v-show="hasShownAccount(accountCategory)"
                                @accordion:open="collapseStates[accountCategory.id].opened = true"
@@ -149,6 +153,9 @@ export default {
         },
         categorizedAccounts() {
             return this.$store.state.allCategorizedAccounts;
+        },
+        hasAnyAvailableAccount() {
+            return this.$store.getters.allVisibleAccountsCount > 0;
         }
     },
     created() {

@@ -4,8 +4,8 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t(applyText)" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -70,7 +70,10 @@
                     </f7-accordion-toggle>
                 </f7-block-title>
                 <f7-accordion-content :style="{ height: collapseStates[categoryType].opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers accordion-list class="combination-list-content">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-if="!hasAvailableCategory[categoryType]">
+                        <f7-list-item :title="$t('No available category')"></f7-list-item>
+                    </f7-list>
+                    <f7-list strong inset dividers accordion-list class="combination-list-content" v-else-if="hasAvailableCategory[categoryType]">
                         <f7-list-item checkbox
                                       :title="category.name"
                                       :value="category.id"
@@ -154,6 +157,47 @@ export default {
         },
         allTransactionCategories: function () {
             return this.$store.state.allTransactionCategories;
+        },
+        hasAnyAvailableCategory() {
+            for (let categoryType in this.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                const categories = this.allTransactionCategories[categoryType];
+
+                for (let i = 0; i < categories.length; i++) {
+                    if (!categories[i].hidden) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        },
+        hasAvailableCategory() {
+            const result = {};
+
+            for (let categoryType in this.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                const categories = this.allTransactionCategories[categoryType];
+
+                for (let i = 0; i < categories.length; i++) {
+                    if (!categories[i].hidden) {
+                        result[categoryType] = true;
+                        break;
+                    }
+                }
+
+                if (!result[categoryType]) {
+                    result[categoryType] = false;
+                }
+            }
+
+            return result;
         }
     },
     created() {

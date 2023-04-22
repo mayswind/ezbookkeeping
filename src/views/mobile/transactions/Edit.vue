@@ -81,10 +81,13 @@
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
             >
                 <template #title>
-                    <div class="list-item-custom-title">
+                    <div class="list-item-custom-title" v-if="hasAvailableExpenseCategories">
                         <span>{{ getPrimaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                         <span>{{ getSecondaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                    </div>
+                    <div class="list-item-custom-title" v-else-if="!hasAvailableExpenseCategories">
+                        <span>{{ $t('None') }}</span>
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -108,10 +111,13 @@
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
             >
                 <template #title>
-                    <div class="list-item-custom-title">
+                    <div class="list-item-custom-title" v-if="hasAvailableIncomeCategories">
                         <span>{{ getPrimaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                         <span>{{ getSecondaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                    </div>
+                    <div class="list-item-custom-title" v-else-if="!hasAvailableIncomeCategories">
+                        <span>{{ $t('None') }}</span>
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -135,10 +141,13 @@
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
             >
                 <template #title>
-                    <div class="list-item-custom-title">
+                    <div class="list-item-custom-title" v-if="hasAvailableTransferCategories">
                         <span>{{ getPrimaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
                         <span>{{ getSecondaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                    </div>
+                    <div class="list-item-custom-title" v-else-if="!hasAvailableTransferCategories">
+                        <span>{{ $t('None') }}</span>
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
@@ -157,7 +166,7 @@
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
                 :header="$t(sourceAccountName)"
-                :title="$utilities.getNameByKeyValue(allAccounts, transaction.sourceAccountId, 'id', 'name')"
+                :title="transaction.sourceAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.sourceAccountId, 'id', 'name') : $t('None')"
                 @click="showSourceAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -179,7 +188,7 @@
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
                 :header="$t('Destination Account')"
-                :title="$utilities.getNameByKeyValue(allAccounts, transaction.destinationAccountId, 'id', 'name')"
+                :title="transaction.destinationAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.destinationAccountId, 'id', 'name') : $t('None')"
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
                 @click="showDestinationAccountSheet = true"
             >

@@ -83,6 +83,8 @@ export function getAccount(context, { accountId }) {
 }
 
 export function saveAccount(context, { account }) {
+    const oldAccount = account.id ? context.state.allAccountsMap[account.id] : null;
+
     return new Promise((resolve, reject) => {
         let promise = null;
 
@@ -107,7 +109,11 @@ export function saveAccount(context, { account }) {
             if (!account.id) {
                 context.commit(ADD_ACCOUNT_TO_ACCOUNT_LIST, data.result);
             } else {
-                context.commit(SAVE_ACCOUNT_IN_ACCOUNT_LIST, data.result);
+                if (oldAccount && oldAccount.category === data.result.category) {
+                    context.commit(SAVE_ACCOUNT_IN_ACCOUNT_LIST, data.result);
+                } else {
+                    context.commit(UPDATE_ACCOUNT_LIST_INVALID_STATE, true);
+                }
             }
 
             resolve(data.result);

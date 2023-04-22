@@ -686,7 +686,7 @@ export default {
     'End Time': 'End Time',
     'Select Date': 'Select Date',
     'Select Time': 'Select Time',
-    'Current Time': 'Current Time',
+    'Now': 'Now',
     'Custom': 'Custom',
     'Pie Chart': 'Pie Chart',
     'Bar Chart': 'Bar Chart',

@@ -4,7 +4,7 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="$t('Current Time')" @click="setCurrentTime"></f7-link>
+                <f7-link :text="$t('Now')" @click="setCurrentTime"></f7-link>
             </div>
             <div class="right">
                 <f7-link :text="$t('Done')" @click="confirm"></f7-link>

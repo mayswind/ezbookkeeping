@@ -4,8 +4,8 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction Tags')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" v-if="!sortable && !hasEditingTag && tags.length" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="plus" v-if="!sortable && !hasEditingTag" @click="add"></f7-link>
+                <f7-link :class="{ 'disabled': hasEditingTag || !tags.length }" icon-f7="ellipsis" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :class="{ 'disabled': hasEditingTag }" icon-f7="plus" v-if="!sortable" @click="add"></f7-link>
                 <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving || hasEditingTag }" v-else-if="sortable" @click="saveSortResult"></f7-link>
             </f7-nav-right>
         </f7-navbar>

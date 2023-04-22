@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 
 TYPE=""
+NO_LINT="0"
+NO_TEST="0"
 RELEASE=${RELEASE_BUILD:-"0"}
 RELEASE_TYPE="unknown"
 VERSION=""
@@ -40,6 +42,8 @@ Options:
     -r, --release           Build release (The script will use environment variable "RELEASE_BUILD" to detect whether this is release building by default)
     -o, --output <filename> Package file name (For "package" type only)
     -t, --tag               Docker tag (For "docker" type only)
+    --no-lint               Do not execute lint check before building
+    --no-test               Do not execute unit testing before building
     -h, --help              Show help
 EOF
 }
@@ -62,6 +66,12 @@ parse_args() {
             --tag | -t)
                 DOCKER_TAG="$2"
                 shift
+                ;;
+            --no-lint)
+                NO_LINT="1"
+                ;;
+            --no-test)
+                NO_TEST="1"
                 ;;
             --help | -h)
                 show_help
@@ -111,6 +121,27 @@ set_build_parameters() {
 }
 
 build_backend() {
+    if [ "$NO_LINT" = "0" ]; then
+        echo "Executing backend lint checking..."
+        go vet -v ./...
+
+        if [ "$?" != "0" ]; then
+            echo_red "Error: Failed to pass lint checking"
+            exit 1
+        fi
+    fi
+
+    if [ "$NO_TEST" = "0" ]; then
+        echo "Executing backend unit testing..."
+        go clean -cache
+        go test ./... -v
+
+        if [ "$?" != "0" ]; then
+            echo_red "Error: Failed to pass unit testing"
+            exit 1
+        fi
+    fi
+
     backend_build_extra_arguments="-X main.Version=$VERSION"
     backend_build_extra_arguments="$backend_build_extra_arguments -X main.CommitHash=$COMMIT_HASH"
 
@@ -127,6 +158,16 @@ build_backend() {
 build_frontend() {
     echo "Pulling frontend dependencies..."
     npm install
+
+    if [ "$NO_LINT" = "0" ]; then
+        echo "Executing frontend lint checking..."
+        npm run lint
+
+        if [ "$?" != "0" ]; then
+            echo_red "Error: Failed to pass lint checking"
+            exit 1
+        fi
+    fi
 
     echo "Building frontend files ($RELEASE_TYPE)..."
 

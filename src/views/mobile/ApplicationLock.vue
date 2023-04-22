@@ -7,8 +7,12 @@
 
         <f7-list strong inset dividers class="margin-top">
             <f7-list-item :title="$t('Status')" :after="$t(isEnableApplicationLock ? 'Enabled' : 'Disabled')"></f7-list-item>
+            <f7-list-item v-if="isEnableApplicationLock">
+                <span>{{ $t('Unlock By PIN Code') }}</span>
+                <f7-toggle checked disabled></f7-toggle>
+            </f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock && isSupportedWebAuthn">
-                <span>{{ $t('Face ID / Touch ID') }}</span>
+                <span>{{ $t('Unlock By WebAuthn') }}</span>
                 <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
             </f7-list-item>
             <f7-list-button v-if="isEnableApplicationLock" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
@@ -16,7 +20,7 @@
         </f7-list>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
-                              :hint="$t('Please input a new PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
+                              :hint="$t('Please input a new 6-digit PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
                               v-model:show="showInputPinCodeSheetForEnable"
                               v-model="currentPinCodeForEnable"
                               @pincode:confirm="enable">
@@ -59,20 +63,20 @@ export default {
 
                     self.$user.saveWebAuthnConfig(id);
                     self.$settings.setEnableApplicationLockWebAuthn(true);
-                    self.$toast('You have enabled Face ID/Touch ID successfully');
+                    self.$toast('You have enabled WebAuthn successfully');
                 }).catch(error => {
-                    self.$logger.error('failed to enable FaceID/Touch ID', error);
+                    self.$logger.error('failed to enable WebAuthn', error);
 
                     self.$hideLoading();
 
                     if (error.notSupported) {
-                        self.$toast('This device does not support Face ID/Touch ID');
+                        self.$toast('This device does not support WebAuthn');
                     } else if (error.name === 'NotAllowedError') {
                         self.$toast('User has canceled authentication');
                     } else if (error.invalid) {
-                        self.$toast('Failed to enable Face ID/Touch ID');
+                        self.$toast('Failed to enable WebAuthn');
                     } else {
-                        self.$toast('User has canceled or this device does not support Face ID/Touch ID');
+                        self.$toast('User has canceled or this device does not support WebAuthn');
                     }
 
                     self.isEnableApplicationLockWebAuthn = false;

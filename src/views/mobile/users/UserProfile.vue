@@ -132,7 +132,7 @@
             <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
-        <password-input-sheet :title="$t('Current Password')"
+        <password-input-sheet :title="$t('Modify Password')"
                               :hint="$t('Please enter your current password when modifying your password')"
                               :confirm-disabled="saving"
                               :cancel-disabled="saving"

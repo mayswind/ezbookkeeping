@@ -17,7 +17,7 @@
                         floating-label
                         clear-button
                         class="no-margin no-padding-bottom"
-                        :label="$t('Password')"
+                        :label="$t('Passcode')"
                         :placeholder="$t('Passcode')"
                         v-model:value="currentPasscode"
                         @keyup.enter="confirm()"

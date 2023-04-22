@@ -18,7 +18,7 @@
 
         <f7-list>
             <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="$t('Unlock By PIN Code')" @click="unlockByPin"></f7-list-button>
-            <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock By Face ID/Touch ID')" @click="unlockByWebAuthn"></f7-list-button>
+            <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock By WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
             <f7-block-footer>
                 <f7-link :text="$t('Re-login')" @click="relogin"></f7-link>
             </f7-block-footer>
@@ -95,12 +95,12 @@ export default {
             const router = self.f7router;
 
             if (!self.$settings.isEnableApplicationLockWebAuthn() || !self.$user.getWebAuthnCredentialId()) {
-                self.$toast('Face ID/Touch ID authentication is not enabled');
+                self.$toast('WebAuthn is not enabled');
                 return;
             }
 
             if (!self.$webauthn.isSupported()) {
-                self.$toast('This device does not support Face ID/Touch ID');
+                self.$toast('This device does not support WebAuthn');
                 return;
             }
 
@@ -125,13 +125,13 @@ export default {
                 self.$logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {
-                    self.$toast('This device does not support Face ID/Touch ID');
+                    self.$toast('This device does not support WebAuthn');
                 } else if (error.name === 'NotAllowedError') {
                     self.$toast('User has canceled authentication');
                 } else if (error.invalid) {
-                    self.$toast('Failed to authenticate by Face ID/Touch ID');
+                    self.$toast('Failed to authenticate by WebAuthn');
                 } else {
-                    self.$toast('User has canceled or this device does not support Face ID/Touch ID');
+                    self.$toast('User has canceled or this device does not support WebAuthn');
                 }
             });
         },

@@ -1,7 +1,7 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler" class="numpad-sheet" style="height: auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <div class="swipe-handler"></div>
+        <div class="swipe-handler" style="z-index: 10"></div>
         <f7-page-content class="margin-top no-padding-top">
             <div class="numpad-values">
                 <span class="numpad-value" :style="{ fontSize: currentDisplayFontSize + 'px' }">{{ currentDisplay }}</span>

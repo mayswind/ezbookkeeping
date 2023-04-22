@@ -1,7 +1,7 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler" style="height:auto"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
-        <div class="swipe-handler"></div>
+        <div class="swipe-handler" style="z-index: 10"></div>
         <f7-page-content class="margin-top no-padding-top">
             <div class="display-flex padding justify-content-space-between align-items-center">
                 <div style="font-size: 18px" v-if="title"><b>{{ title }}</b></div>

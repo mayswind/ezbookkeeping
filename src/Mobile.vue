@@ -394,13 +394,12 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 /** Swipe handler **/
 .swipe-handler {
-    height: 16px;
+    height: 26px;
     position: absolute;
     left: 0;
     width: 100%;
     top: 0;
     cursor: pointer;
-    z-index: 10
 }
 
 .swipe-handler:after {
@@ -411,7 +410,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     left: 50%;
     top: 50%;
     margin-left: -18px;
-    margin-top: -3px;
+    margin-top: -8px;
     border-radius: 3px;
     background: #666
 }

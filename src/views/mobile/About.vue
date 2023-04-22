@@ -12,7 +12,7 @@
         <f7-popup push with-subnavbar swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
             <f7-page>
                 <f7-navbar>
-                    <div class="swipe-handler"></div>
+                    <div class="swipe-handler" style="z-index: 10"></div>
                     <f7-subnavbar :title="$t('License') "></f7-subnavbar>
                 </f7-navbar>
                 <f7-block strong outline>

@@ -190,7 +190,7 @@
                 ></number-pad-sheet>
             </f7-list-item>
 
-            <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+            <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                 <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
             </f7-list-item>
 
@@ -263,7 +263,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+            <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                 <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
             </f7-list-item>
 
@@ -383,7 +383,7 @@
                     ></number-pad-sheet>
                 </f7-list-item>
 
-                <f7-list-item :header="$t('Visible')" v-if="editAccountId">
+                <f7-list-item :title="$t('Visible')" v-if="editAccountId">
                     <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
                 </f7-list-item>
 

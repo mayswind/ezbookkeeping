@@ -62,6 +62,11 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{},
 
 	totalCount, err := a.transactions.GetTransactionCount(uid, transactionCountReq.MaxTime, transactionCountReq.MinTime, transactionCountReq.Type, allCategoryIds, allAccountIds, transactionCountReq.Keyword)
 
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionCountHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	countResp := &models.TransactionCountResponse{
 		TotalCount: totalCount,
 	}
@@ -229,6 +234,11 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interfa
 	uid := c.GetCurrentUid()
 	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalIncomeAndExpense(uid, statisticReq.StartTime, statisticReq.EndTime)
 
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionStatisticsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	statisticResp := &models.TransactionStatisticResponse{
 		StartTime: statisticReq.StartTime,
 		EndTime:   statisticReq.EndTime,
@@ -394,6 +404,12 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 	}
 
 	totalAmounts, err := a.transactions.GetAccountsMonthTotalIncomeAndExpense(uid, startTime, endTime, pageCountForLoadTransactionAmounts)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] failed to get accounts month total income and expense for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	amountsMap := make(map[string]map[string]*models.TransactionAmountsResponseItemAmountInfo)
 
 	for yearMonth, monthAccountsAmounts := range totalAmounts {

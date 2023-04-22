@@ -130,7 +130,7 @@
                           :key="categoryType" v-for="(categories, categoryType) in presetCategories">
                     <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
                     <f7-list strong inset dividers v-if="showPresetCategories">
-                        <f7-list-item :title="$t('category.' + category.name, currentLocale)"
+                        <f7-list-item :title="$t('category.' + category.name)"
                                       :accordion-item="!!category.subCategories.length"
                                       :key="idx"
                                       v-for="(category, idx) in categories">
@@ -140,7 +140,7 @@
 
                             <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                                 <f7-list>
-                                    <f7-list-item :title="$t('category.' + subCategory.name, currentLocale)"
+                                    <f7-list-item :title="$t('category.' + subCategory.name)"
                                                   :key="subIdx"
                                                   v-for="(subCategory, subIdx) in category.subCategories">
                                         <template #media>
@@ -300,7 +300,7 @@ export default {
                     for (let j = 0; j < categories.length; j++) {
                         const category = categories[j];
                         const submitCategory = {
-                            name: self.$t('category.' + category.name, self.currentLocale),
+                            name: self.$t('category.' + category.name),
                             type: parseInt(categoryType),
                             icon: category.categoryIconId,
                             color: category.color,
@@ -310,7 +310,7 @@ export default {
                         for (let k = 0; k < category.subCategories.length; k++) {
                             const subCategory = category.subCategories[k];
                             submitCategory.subCategories.push({
-                                name: self.$t('category.' + subCategory.name, self.currentLocale),
+                                name: self.$t('category.' + subCategory.name),
                                 type: parseInt(categoryType),
                                 icon: subCategory.categoryIconId,
                                 color: subCategory.color

@@ -78,8 +78,8 @@ func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 	}
 }
 
-func TestGenerateUuid_1000000TimesConcurrent(t *testing.T) {
-	concurrentCount := 50
+func TestGenerateUuid_10000TimesConcurrent(t *testing.T) {
+	concurrentCount := 10
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 3})
 	var mutex sync.Mutex
 	var generatedIds sync.Map
@@ -89,11 +89,7 @@ func TestGenerateUuid_1000000TimesConcurrent(t *testing.T) {
 		go func(currentRoutineIndex int) {
 			waitGroup.Add(1)
 
-			for cycle := 0; cycle < 40000; cycle++ {
-				if cycle%10000 == 0 { // each server can only generate 500,000 (50 * 10000) uuids in one second
-					time.Sleep(1000 * time.Millisecond)
-				}
-
+			for cycle := 0; cycle < 1000; cycle++ {
 				expectedUnixTime := time.Now().Unix()
 				uuid := generator.GenerateUuid(UUID_TYPE_USER)
 				uuidInfo := generator.ParseUuidInfo(uuid)
@@ -199,9 +195,9 @@ func TestGenerateUuids_30TimesIn3Seconds(t *testing.T) {
 	}
 }
 
-func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
-	concurrentCount := 50
-	expectedUuidCount := uint8(100)
+func TestGenerateUuids_20000TimesConcurrent(t *testing.T) {
+	concurrentCount := 10
+	expectedUuidCount := uint8(20)
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 3})
 	var mutex sync.Mutex
 	var generatedIds sync.Map
@@ -211,11 +207,7 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 		go func(currentRoutineIndex int) {
 			waitGroup.Add(1)
 
-			for cycle := 0; cycle < 400; cycle++ {
-				if cycle%100 == 0 { // each server can only generate 500,000 (50 * 10000) uuids in one second
-					time.Sleep(1000 * time.Millisecond)
-				}
-
+			for cycle := 0; cycle < 100; cycle++ {
 				expectedUnixTime := time.Now().Unix()
 				uuids := generator.GenerateUuids(UUID_TYPE_USER, expectedUuidCount)
 

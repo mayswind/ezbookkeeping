@@ -86,7 +86,7 @@ func TestGenerateUuid_1000000TimesConcurrent(t *testing.T) {
 	var waitGroup sync.WaitGroup
 
 	for routineIndex := 0; routineIndex < concurrentCount; routineIndex++ {
-		go func() {
+		go func(currentRoutineIndex int) {
 			waitGroup.Add(1)
 
 			for cycle := 0; cycle < 40000; cycle++ {
@@ -105,18 +105,18 @@ func TestGenerateUuid_1000000TimesConcurrent(t *testing.T) {
 				}
 
 				if uuidInfo.SequentialId == 0 {
-					if existedUnixTime, exists := generatedIds.Load(uuid); exists {
+					if existedRoutineIndex, exists := generatedIds.Load(uuid); exists {
 						mutex.Lock()
-						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, seq id is %d, existed unixtime is %d, current unix time is %d", uuid, uuidInfo.SequentialId, existedUnixTime, uuidInfo.UnixTime))
+						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuid, uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
 						mutex.Unlock()
 					}
 
-					generatedIds.Store(uuid, uuidInfo.UnixTime)
+					generatedIds.Store(uuid, currentRoutineIndex)
 				}
 			}
 
 			waitGroup.Done()
-		}()
+		}(routineIndex)
 	}
 
 	waitGroup.Wait()
@@ -208,7 +208,7 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 	var waitGroup sync.WaitGroup
 
 	for routineIndex := 0; routineIndex < concurrentCount; routineIndex++ {
-		go func() {
+		go func(currentRoutineIndex int) {
 			waitGroup.Add(1)
 
 			for cycle := 0; cycle < 400; cycle++ {
@@ -228,18 +228,18 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 						mutex.Unlock()
 					}
 
-					if existedUnixTime, exists := generatedIds.Load(uuids[i]); exists {
+					if existedRoutineIndex, exists := generatedIds.Load(uuids[i]); exists {
 						mutex.Lock()
-						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, seq id is %d, existed unixtime is %d, current unix time is %d", uuids[i], uuidInfo.SequentialId, existedUnixTime, uuidInfo.UnixTime))
+						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuids[i], uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
 						mutex.Unlock()
 					}
 
-					generatedIds.Store(uuids[i], uuidInfo.UnixTime)
+					generatedIds.Store(uuids[i], currentRoutineIndex)
 				}
 			}
 
 			waitGroup.Done()
-		}()
+		}(routineIndex)
 	}
 
 	waitGroup.Wait()

@@ -54,11 +54,11 @@
                 </template>
                 <template #after>
                     <div>
-                        <div class="text-color-red">
+                        <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.incomeAmount }}</small>
                         </div>
-                        <div class="text-color-teal">
+                        <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.expenseAmount }}</small>
                         </div>
@@ -87,11 +87,11 @@
                 </template>
                 <template #after>
                     <div>
-                        <div class="text-color-red">
+                        <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.incomeAmount }}</small>
                         </div>
-                        <div class="text-color-teal">
+                        <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.expenseAmount }}</small>
                         </div>
@@ -120,11 +120,11 @@
                 </template>
                 <template #after>
                     <div>
-                        <div class="text-color-red">
+                        <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.incomeAmount }}</small>
                         </div>
-                        <div class="text-color-teal">
+                        <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.expenseAmount }}</small>
                         </div>
@@ -150,11 +150,11 @@
                 </template>
                 <template #after>
                     <div>
-                        <div class="text-color-red">
+                        <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.incomeAmount }}</small>
                         </div>
-                        <div class="text-color-teal">
+                        <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.expenseAmount }}</small>
                         </div>

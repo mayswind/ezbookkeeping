@@ -47,6 +47,11 @@
             </f7-list-item>
 
             <f7-list-item>
+                <span>{{ $t('Auto Get Current Geographic Location') }}</span>
+                <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
+            </f7-list-item>
+
+            <f7-list-item>
                 <span>{{ $t('Enable Thousands Separator') }}</span>
                 <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
             </f7-list-item>
@@ -147,6 +152,14 @@ export default {
             },
             set: function (value) {
                 this.$settings.setAutoUpdateExchangeRatesData(value);
+            }
+        },
+        isAutoGetCurrentGeoLocation: {
+            get: function () {
+                return this.$settings.isAutoGetCurrentGeoLocation();
+            },
+            set: function (value) {
+                this.$settings.setAutoGetCurrentGeoLocation(value);
             }
         },
         isEnableThousandsSeparator: {

@@ -27,6 +27,7 @@
             <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
             <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
             <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location" link="#"></f7-list-item>
             <f7-list-item header="Tags">
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin">
@@ -238,6 +239,20 @@
 
             <f7-list-item
                 link="#" no-chevron
+                class="list-item-with-header-and-title list-item-title-hide-overflow"
+                :header="$t('Geographic Location')"
+                @click="showGeoLocationActionSheet = true"
+            >
+                <template #title>
+                    <f7-block class="list-item-custom-title no-padding no-margin">
+                        <span v-if="transaction.geoLocation">{{ `(${transaction.geoLocation.longitude}, ${transaction.geoLocation.latitude})` }}</span>
+                        <span v-else-if="!transaction.geoLocation">{{ geoLocationStatusInfo }}</span>
+                    </f7-block>
+                </template>
+            </f7-list-item>
+
+            <f7-list-item
+                link="#" no-chevron
                 :header="$t('Tags')"
                 @click="showTransactionTagSheet = true"
             >
@@ -274,6 +289,16 @@
                 v-model:value="transaction.comment"
             ></f7-list-input>
         </f7-list>
+
+        <f7-actions close-by-outside-click close-on-escape :opened="showGeoLocationActionSheet" @actions:closed="showGeoLocationActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</f7-actions-button>
+                <f7-actions-button v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
@@ -330,12 +355,16 @@ export default {
                 destinationAmount: 0,
                 hideAmount: false,
                 tagIds: [],
-                comment: ''
+                comment: '',
+                geoLocation: null
             },
             loading: true,
             loadingError: null,
+            geoLocationStatus: null,
             submitting: false,
+            isSupportGeoLocation: !!navigator.geolocation,
             showAccountBalance: self.$settings.isShowAccountBalance(),
+            showGeoLocationActionSheet: false,
             showMoreActionSheet: false,
             showSourceAmountSheet: false,
             showDestinationAmountSheet: false,
@@ -506,6 +535,15 @@ export default {
         },
         destinationAmountFontSize() {
             return this.getFontSizeByAmount(this.transaction.destinationAmount);
+        },
+        geoLocationStatusInfo() {
+            if (this.geoLocationStatus === 'success') {
+                return '';
+            } else if (this.geoLocationStatus === 'getting') {
+                return this.$t('Getting Location...');
+            } else {
+                return this.$t('No Location');
+            }
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -711,6 +749,10 @@ export default {
                 self.transaction.hideAmount = transaction.hideAmount;
                 self.transaction.tagIds = transaction.tagIds || [];
                 self.transaction.comment = transaction.comment;
+
+                if (self.mode === 'edit' || self.mode === 'view') {
+                    self.transaction.geoLocation = transaction.geoLocation;
+                }
             }
 
             self.loading = false;
@@ -728,6 +770,11 @@ export default {
     methods: {
         onPageAfterIn() {
             this.$routeBackOnError(this.f7router, 'loadingError');
+
+            if (this.$settings.isAutoGetCurrentGeoLocation() && this.mode === 'add'
+                && !this.geoLocationStatus && !this.transaction.geoLocation) {
+                this.updateGeoLocation(false);
+            }
         },
         save() {
             const self = this;
@@ -747,6 +794,7 @@ export default {
                 hideAmount: self.transaction.hideAmount,
                 tagIds: self.transaction.tagIds,
                 comment: self.transaction.comment,
+                geoLocation: self.transaction.geoLocation,
                 utcOffset: self.transaction.utcOffset
             };
 
@@ -802,6 +850,51 @@ export default {
             } else {
                 doSubmit();
             }
+        },
+        updateGeoLocation(forceUpdate) {
+            const self = this;
+
+            if (!self.isSupportGeoLocation) {
+                self.$logger.warn('this browser does not support geo location');
+
+                if (forceUpdate) {
+                    self.$toast('Unable to get current position');
+                }
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(function (position) {
+                if (!position || !position.coords) {
+                    self.$logger.error('current position is null');
+                    self.geoLocationStatus = 'error';
+
+                    if (forceUpdate) {
+                        self.$toast('Unable to get current position');
+                    }
+
+                    return;
+                }
+
+                self.geoLocationStatus = 'success';
+
+                self.transaction.geoLocation = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                };
+            }, function (err) {
+                self.$logger.error('cannot get current position', err);
+                self.geoLocationStatus = 'error';
+
+                if (forceUpdate) {
+                    self.$toast('Unable to get current position');
+                }
+            });
+
+            self.geoLocationStatus = 'getting';
+        },
+        clearGeoLocation() {
+            this.geoLocationStatus = null;
+            this.transaction.geoLocation = null;
         },
         isCategoryIdAvailable(categories, categoryId) {
             if (!categories || !categories.length) {

@@ -1,11 +1,14 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -48,40 +51,49 @@ type Transaction struct {
 	RelatedAccountAmount int64             `xorm:"NOT NULL"`
 	HideAmount           bool              `xorm:"NOT NULL"`
 	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
+	GeoLocation          string            `xorm:"VARCHAR(255)"`
 	CreatedIp            string            `xorm:"VARCHAR(39)"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
 	DeletedUnixTime      int64
 }
 
+// TransactionGeoLocationRequest represents all parameters of transaction geographic location info update request
+type TransactionGeoLocationRequest struct {
+	Latitude  float64 `json:"latitude" binding:"required"`
+	Longitude float64 `json:"longitude" binding:"required"`
+}
+
 // TransactionCreateRequest represents all parameters of transaction creation request
 type TransactionCreateRequest struct {
-	Type                 TransactionType `json:"type" binding:"required"`
-	CategoryId           int64           `json:"categoryId,string"`
-	Time                 int64           `json:"time" binding:"required,min=1"`
-	UtcOffset            int16           `json:"utcOffset" binding:"min=-720,max=840"`
-	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
-	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
-	HideAmount           bool            `json:"hideAmount"`
-	TagIds               []string        `json:"tagIds"`
-	Comment              string          `json:"comment" binding:"max=255"`
+	Type                 TransactionType                `json:"type" binding:"required"`
+	CategoryId           int64                          `json:"categoryId,string"`
+	Time                 int64                          `json:"time" binding:"required,min=1"`
+	UtcOffset            int16                          `json:"utcOffset" binding:"min=-720,max=840"`
+	SourceAccountId      int64                          `json:"sourceAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64                          `json:"destinationAccountId,string" binding:"min=0"`
+	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool                           `json:"hideAmount"`
+	TagIds               []string                       `json:"tagIds"`
+	Comment              string                         `json:"comment" binding:"max=255"`
+	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 }
 
 // TransactionModifyRequest represents all parameters of transaction modification request
 type TransactionModifyRequest struct {
-	Id                   int64    `json:"id,string" binding:"required,min=1"`
-	CategoryId           int64    `json:"categoryId,string"`
-	Time                 int64    `json:"time" binding:"required,min=1"`
-	UtcOffset            int16    `json:"utcOffset" binding:"min=-720,max=840"`
-	SourceAccountId      int64    `json:"sourceAccountId,string" binding:"required,min=1"`
-	DestinationAccountId int64    `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount         int64    `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
-	DestinationAmount    int64    `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
-	HideAmount           bool     `json:"hideAmount"`
-	TagIds               []string `json:"tagIds"`
-	Comment              string   `json:"comment" binding:"max=255"`
+	Id                   int64                          `json:"id,string" binding:"required,min=1"`
+	CategoryId           int64                          `json:"categoryId,string"`
+	Time                 int64                          `json:"time" binding:"required,min=1"`
+	UtcOffset            int16                          `json:"utcOffset" binding:"min=-720,max=840"`
+	SourceAccountId      int64                          `json:"sourceAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64                          `json:"destinationAccountId,string" binding:"min=0"`
+	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool                           `json:"hideAmount"`
+	TagIds               []string                       `json:"tagIds"`
+	Comment              string                         `json:"comment" binding:"max=255"`
+	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 }
 
 // TransactionCountRequest represents transaction count request
@@ -170,6 +182,12 @@ type TransactionAccountAmount struct {
 	TotalExpenseAmount int64
 }
 
+// TransactionGeoLocationResponse represents a view-object of transaction geographic location info
+type TransactionGeoLocationResponse struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
 // TransactionInfoResponse represents a view-object of transaction
 type TransactionInfoResponse struct {
 	Id                   int64                            `json:"id,string"`
@@ -189,6 +207,7 @@ type TransactionInfoResponse struct {
 	TagIds               []string                         `json:"tagIds"`
 	Tags                 []*TransactionTagInfoResponse    `json:"tags,omitempty"`
 	Comment              string                           `json:"comment"`
+	GeoLocation          *TransactionGeoLocationResponse  `json:"geoLocation,omitempty"`
 	Editable             bool                             `json:"editable"`
 }
 
@@ -264,7 +283,7 @@ func (t *Transaction) IsEditable(currentUser *User, utcOffset int16, account *Ac
 }
 
 // ToTransactionInfoResponse returns a view-object according to database model
-func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
+func (t *Transaction) ToTransactionInfoResponse(c *core.Context, tagIds []int64, editable bool) *TransactionInfoResponse {
 	var transactionType TransactionType
 
 	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
@@ -298,6 +317,17 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		destinationAmount = t.Amount
 	}
 
+	geoLocation := &TransactionGeoLocationResponse{}
+
+	if t.GeoLocation != "" {
+		err := json.Unmarshal([]byte(t.GeoLocation), geoLocation)
+		if err != nil {
+			log.WarnfWithRequestId(c, "[transaction.ToTransactionInfoResponse] cannot unmarshal geo location \"%s\", because %s", t.GeoLocation, err.Error())
+		}
+	} else {
+		geoLocation = nil
+	}
+
 	return &TransactionInfoResponse{
 		Id:                   t.TransactionId,
 		TimeSequenceId:       t.TransactionTime,
@@ -312,6 +342,7 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		HideAmount:           t.HideAmount,
 		TagIds:               utils.Int64ArrayToStringArray(tagIds),
 		Comment:              t.Comment,
+		GeoLocation:          geoLocation,
 		Editable:             editable,
 	}
 }

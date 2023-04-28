@@ -266,7 +266,7 @@ export default {
     getTransaction: ({ id }) => {
         return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, utcOffset }) => {
+    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset }) => {
         return axios.post('v1/transactions/add.json', {
             type,
             categoryId,
@@ -278,10 +278,11 @@ export default {
             hideAmount,
             tagIds,
             comment,
+            geoLocation,
             utcOffset
         });
     },
-    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, utcOffset }) => {
+    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset }) => {
         return axios.post('v1/transactions/modify.json', {
             id,
             type,
@@ -294,6 +295,7 @@ export default {
             hideAmount,
             tagIds,
             comment,
+            geoLocation,
             utcOffset
         });
     },

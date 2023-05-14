@@ -542,8 +542,12 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 			updateCols = append(updateCols, "comment")
 		}
 
-		if transaction.GeoLocation != oldTransaction.GeoLocation {
-			updateCols = append(updateCols, "geo_location")
+		if transaction.GeoLongitude != oldTransaction.GeoLongitude {
+			updateCols = append(updateCols, "geo_longitude")
+		}
+
+		if transaction.GeoLatitude != oldTransaction.GeoLatitude {
+			updateCols = append(updateCols, "geo_latitude")
 		}
 
 		// Get and verify tags
@@ -959,7 +963,8 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 		RelatedAccountId:     originalTransaction.AccountId,
 		RelatedAccountAmount: originalTransaction.Amount,
 		Comment:              originalTransaction.Comment,
-		GeoLocation:          originalTransaction.GeoLocation,
+		GeoLongitude:         originalTransaction.GeoLongitude,
+		GeoLatitude:          originalTransaction.GeoLatitude,
 		CreatedIp:            originalTransaction.CreatedIp,
 		CreatedUnixTime:      originalTransaction.CreatedUnixTime,
 		UpdatedUnixTime:      originalTransaction.UpdatedUnixTime,

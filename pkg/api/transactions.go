@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"sort"
 	"strings"
 
@@ -573,7 +572,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 
 	transactionEditable := transaction.IsEditable(user, utcOffset, accountMap[transaction.AccountId], accountMap[transaction.RelatedAccountId])
 	transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-	transactionResp := transaction.ToTransactionInfoResponse(c, transactionTagIds, transactionEditable)
+	transactionResp := transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 
 	if !transactionGetReq.TrimAccount {
 		if sourceAccount := accountMap[transaction.AccountId]; sourceAccount != nil {
@@ -665,7 +664,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 
 	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
-	transactionResp := transaction.ToTransactionInfoResponse(c, tagIds, transactionEditable)
+	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return transactionResp, nil
 }
@@ -723,12 +722,6 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		transactionTagIds = make([]int64, 0, 0)
 	}
 
-	var geoLocation []byte
-
-	if transactionModifyReq.GeoLocation != nil {
-		geoLocation, _ = json.Marshal(transactionModifyReq.GeoLocation)
-	}
-
 	newTransaction := &models.Transaction{
 		TransactionId:     transaction.TransactionId,
 		Uid:               uid,
@@ -739,12 +732,16 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		Amount:            transactionModifyReq.SourceAmount,
 		HideAmount:        transactionModifyReq.HideAmount,
 		Comment:           transactionModifyReq.Comment,
-		GeoLocation:       string(geoLocation),
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		newTransaction.RelatedAccountId = transactionModifyReq.DestinationAccountId
 		newTransaction.RelatedAccountAmount = transactionModifyReq.DestinationAmount
+	}
+
+	if transactionModifyReq.GeoLocation != nil {
+		newTransaction.GeoLongitude = transactionModifyReq.GeoLocation.Longitude
+		newTransaction.GeoLatitude = transactionModifyReq.GeoLocation.Latitude
 	}
 
 	if newTransaction.CategoryId == transaction.CategoryId &&
@@ -756,7 +753,8 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
 		newTransaction.HideAmount == transaction.HideAmount &&
 		newTransaction.Comment == transaction.Comment &&
-		newTransaction.GeoLocation == transaction.GeoLocation &&
+		newTransaction.GeoLongitude == transaction.GeoLongitude &&
+		newTransaction.GeoLatitude == transaction.GeoLatitude &&
 		utils.Int64SliceEquals(tagIds, transactionTagIds) {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
@@ -786,7 +784,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 	log.InfofWithRequestId(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
 	newTransaction.Type = transaction.Type
-	newTransactionResp := newTransaction.ToTransactionInfoResponse(c, tagIds, transactionEditable)
+	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return newTransactionResp, nil
 }
@@ -1013,7 +1011,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 
 		transactionEditable := transaction.IsEditable(user, utcOffset, allAccounts[transaction.AccountId], allAccounts[transaction.RelatedAccountId])
 		transactionTagIds := allTransactionTagIds[transaction.TransactionId]
-		result[i] = transaction.ToTransactionInfoResponse(c, transactionTagIds, transactionEditable)
+		result[i] = transaction.ToTransactionInfoResponse(transactionTagIds, transactionEditable)
 
 		if !trimAccount {
 			if sourceAccount := allAccounts[transaction.AccountId]; sourceAccount != nil {
@@ -1054,12 +1052,6 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		transactionDbType = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
 	}
 
-	var geoLocation []byte
-
-	if transactionCreateReq.GeoLocation != nil {
-		geoLocation, _ = json.Marshal(transactionCreateReq.GeoLocation)
-	}
-
 	transaction := &models.Transaction{
 		Uid:               uid,
 		Type:              transactionDbType,
@@ -1070,13 +1062,17 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 		Amount:            transactionCreateReq.SourceAmount,
 		HideAmount:        transactionCreateReq.HideAmount,
 		Comment:           transactionCreateReq.Comment,
-		GeoLocation:       string(geoLocation),
 		CreatedIp:         clientIp,
 	}
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {
 		transaction.RelatedAccountId = transactionCreateReq.DestinationAccountId
 		transaction.RelatedAccountAmount = transactionCreateReq.DestinationAmount
+	}
+
+	if transactionCreateReq.GeoLocation != nil {
+		transaction.GeoLongitude = transactionCreateReq.GeoLocation.Longitude
+		transaction.GeoLatitude = transactionCreateReq.GeoLocation.Latitude
 	}
 
 	return transaction

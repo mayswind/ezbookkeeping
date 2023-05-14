@@ -1,14 +1,11 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -38,8 +35,8 @@ const (
 // Transaction represents transaction data stored in database
 type Transaction struct {
 	TransactionId        int64             `xorm:"PK"`
-	Uid                  int64             `xorm:"UNIQUE(UQE_transaction_uid_time) INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
-	Deleted              bool              `xorm:"INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
+	Uid                  int64             `xorm:"UNIQUE(UQE_transaction_uid_time) INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) INDEX(IDX_transaction_uid_deleted_time_longitude_latitude) NOT NULL"`
+	Deleted              bool              `xorm:"INDEX(IDX_transaction_uid_deleted_time) INDEX(IDX_transaction_uid_deleted_type_time) INDEX(IDX_transaction_uid_deleted_category_id_time) INDEX(IDX_transaction_uid_deleted_account_id_time) INDEX(IDX_transaction_uid_deleted_time_longitude_latitude) NOT NULL"`
 	Type                 TransactionDbType `xorm:"INDEX(IDX_transaction_uid_deleted_type_time) NOT NULL"`
 	CategoryId           int64             `xorm:"INDEX(IDX_transaction_uid_deleted_category_id_time) NOT NULL"`
 	AccountId            int64             `xorm:"INDEX(IDX_transaction_uid_deleted_account_id_time) NOT NULL"`
@@ -51,7 +48,8 @@ type Transaction struct {
 	RelatedAccountAmount int64             `xorm:"NOT NULL"`
 	HideAmount           bool              `xorm:"NOT NULL"`
 	Comment              string            `xorm:"VARCHAR(255) NOT NULL"`
-	GeoLocation          string            `xorm:"VARCHAR(255)"`
+	GeoLongitude         float64           `xorm:"INDEX(IDX_transaction_uid_deleted_time_longitude_latitude)"`
+	GeoLatitude          float64           `xorm:"INDEX(IDX_transaction_uid_deleted_time_longitude_latitude)"`
 	CreatedIp            string            `xorm:"VARCHAR(39)"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
@@ -283,7 +281,7 @@ func (t *Transaction) IsEditable(currentUser *User, utcOffset int16, account *Ac
 }
 
 // ToTransactionInfoResponse returns a view-object according to database model
-func (t *Transaction) ToTransactionInfoResponse(c *core.Context, tagIds []int64, editable bool) *TransactionInfoResponse {
+func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
 	var transactionType TransactionType
 
 	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
@@ -319,11 +317,9 @@ func (t *Transaction) ToTransactionInfoResponse(c *core.Context, tagIds []int64,
 
 	geoLocation := &TransactionGeoLocationResponse{}
 
-	if t.GeoLocation != "" {
-		err := json.Unmarshal([]byte(t.GeoLocation), geoLocation)
-		if err != nil {
-			log.WarnfWithRequestId(c, "[transaction.ToTransactionInfoResponse] cannot unmarshal geo location \"%s\", because %s", t.GeoLocation, err.Error())
-		}
+	if t.GeoLongitude != 0 || t.GeoLatitude != 0 {
+		geoLocation.Longitude = t.GeoLongitude
+		geoLocation.Latitude = t.GeoLatitude
 	} else {
 		geoLocation = nil
 	}

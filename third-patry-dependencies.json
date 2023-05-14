@@ -166,6 +166,12 @@
         "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.5.43/LICENSE"
     },
     {
+        "name": "Leaflet",
+        "copyright": "Copyright (c) 2010-2022, Vladimir Agafonkin, Copyright (c) 2010-2011, CloudMade, All rights reserved.",
+        "url": "https://leafletjs.com/",
+        "licenseUrl": "https://github.com/Leaflet/Leaflet/blob/v1.9.3/LICENSE"
+    },
+    {
         "name": "crypto-js",
         "copyright": "Copyright (c) 2009-2013 Jeff Mott, Copyright (c) 2013-2016 Evan Vosberg",
         "url": "https://github.com/brix/crypto-js",

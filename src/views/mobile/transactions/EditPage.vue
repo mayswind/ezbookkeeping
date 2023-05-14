@@ -38,12 +38,12 @@
             <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" :class="{ 'readonly': mode === 'view' }"
+        <f7-list form strong inset dividers class="margin-vertical"
                  v-else-if="!loading">
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
-                :class="{ 'color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
+                :class="{ 'readonly': mode === 'view', 'color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
                 :style="{ fontSize: sourceAmountFontSize + 'px' }"
                 :header="$t(sourceAmountName)"
                 :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount)"
@@ -59,6 +59,7 @@
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
+                :class="{ 'readonly': mode === 'view' }"
                 :style="{ fontSize: destinationAmountFontSize + 'px' }"
                 :header="$t('Transfer In Amount')"
                 :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
@@ -76,7 +77,7 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="expenseCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableExpenseCategories }"
+                :class="{ 'disabled': !hasAvailableExpenseCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
@@ -106,7 +107,7 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="incomeCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableIncomeCategories }"
+                :class="{ 'disabled': !hasAvailableIncomeCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
@@ -136,7 +137,7 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
                 key="transferCategorySelection"
                 link="#" no-chevron
-                :class="{ 'disabled': !hasAvailableTransferCategories }"
+                :class="{ 'disabled': !hasAvailableTransferCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
@@ -165,7 +166,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
-                :class="{ 'disabled': !allVisibleAccounts.length }"
+                :class="{ 'disabled': !allVisibleAccounts.length, 'readonly': mode === 'view' }"
                 :header="$t(sourceAccountName)"
                 :title="transaction.sourceAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.sourceAccountId, 'id', 'name') : $t('None')"
                 @click="showSourceAccountSheet = true"
@@ -187,7 +188,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
-                :class="{ 'disabled': !allVisibleAccounts.length }"
+                :class="{ 'disabled': !allVisibleAccounts.length, 'readonly': mode === 'view' }"
                 :header="$t('Destination Account')"
                 :title="transaction.destinationAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.destinationAccountId, 'id', 'name') : $t('None')"
                 v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
@@ -210,6 +211,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
+                :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Time')"
                 :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), this.$t('format.datetime.long'))"
                 @click="showTransactionDateTimeSheet = true"
@@ -222,6 +224,7 @@
             <f7-list-item
                 :no-chevron="mode === 'view'"
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
+                :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Time Zone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Time Zone'), popupCloseLinkText: $t('Done') }">
                 <select v-model="transaction.timeZone">
@@ -240,6 +243,7 @@
             <f7-list-item
                 link="#" no-chevron
                 class="list-item-with-header-and-title list-item-title-hide-overflow"
+                :class="{ 'readonly': mode === 'view' && !transaction.geoLocation }"
                 :header="$t('Geographic Location')"
                 @click="showGeoLocationActionSheet = true"
             >
@@ -249,10 +253,15 @@
                         <span v-else-if="!transaction.geoLocation">{{ geoLocationStatusInfo }}</span>
                     </f7-block>
                 </template>
+
+                <map-sheet v-model="transaction.geoLocation"
+                           v-model:show="showGeoLocationMapSheet">
+                </map-sheet>
             </f7-list-item>
 
             <f7-list-item
                 link="#" no-chevron
+                :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Tags')"
                 @click="showTransactionTagSheet = true"
             >
@@ -283,6 +292,7 @@
                 type="textarea"
                 class="transaction-edit-comment"
                 style="height: auto"
+                :class="{ 'readonly': mode === 'view' }"
                 :label="$t('Description')"
                 :placeholder="mode !== 'view' ? $t('Your transaction description (optional)') : ''"
                 v-textarea-auto-size
@@ -294,6 +304,9 @@
             <f7-actions-group>
                 <f7-actions-button v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</f7-actions-button>
                 <f7-actions-button v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': !transaction.geoLocation }" @click="showGeoLocationMapSheet = true">{{ $t('Show on the map') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -372,6 +385,7 @@ export default {
             showSourceAccountSheet: false,
             showDestinationAccountSheet: false,
             showTransactionDateTimeSheet: false,
+            showGeoLocationMapSheet: false,
             showTransactionTagSheet: false
         };
     },

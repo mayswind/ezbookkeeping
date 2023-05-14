@@ -28,6 +28,7 @@
     "framework7-icons": "^5.0.5",
     "framework7-vue": "^8.0.3",
     "js-cookie": "^3.0.1",
+    "leaflet": "^1.9.3",
     "line-awesome": "^1.3.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",

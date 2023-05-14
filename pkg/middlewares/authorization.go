@@ -37,6 +37,21 @@ func JWTAuthorization(c *core.Context) {
 	c.Next()
 }
 
+// JWTAuthorizationByQueryString verifies whether current request is valid by jwt token
+func JWTAuthorizationByQueryString(c *core.Context) {
+	token, exists := c.GetQuery(tokenQueryStringParam)
+
+	if !exists {
+		log.WarnfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] no token provided")
+		utils.PrintJsonErrorResult(c, errs.ErrUnauthorizedAccess)
+		return
+	}
+
+	c.Request.Header.Set("Authorization", token)
+
+	JWTAuthorization(c)
+}
+
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func JWTTwoFactorAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c)

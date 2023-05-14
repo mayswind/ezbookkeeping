@@ -137,6 +137,12 @@ func startWebServer(c *cli.Context) error {
 
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
 
+	proxyRoute := router.Group("/proxy")
+	proxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
+	{
+		proxyRoute.GET("/openstreetmap/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.OpenStreetMapTileImageProxyHandler))
+	}
+
 	apiRoute := router.Group("/api")
 
 	apiRoute.Use(bindMiddleware(middlewares.RequestId(config)))
@@ -285,6 +291,19 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
 			utils.PrintDataSuccessResult(c, "text/csv", fileName, result)
+		}
+	}
+}
+
+func bindProxy(fn core.ProxyHandlerFunc) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		proxy, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			proxy.ServeHTTP(c.Writer, c.Request)
 		}
 	}
 }

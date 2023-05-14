@@ -73,6 +73,9 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
+import * as Leaflet from 'leaflet/dist/leaflet-src.esm.js';
+import 'leaflet/dist/leaflet.css';
+
 import api from './consts/api.js';
 import datetime from './consts/datetime.js';
 import currency from './consts/currency.js';
@@ -135,6 +138,7 @@ import IconSelectionSheet from './components/mobile/IconSelectionSheet.vue';
 import ColorSelectionSheet from './components/mobile/ColorSelectionSheet.vue';
 import InformationSheet from './components/mobile/InformationSheet.vue';
 import NumberPadSheet from './components/mobile/NumberPadSheet.vue';
+import MapSheet from './components/mobile/MapSheet.vue';
 import TransactionTagSelectionSheet from './components/mobile/TransactionTagSelectionSheet.vue';
 
 import TextareaAutoSize from "./directives/mobile/textareaAutoSize.js";
@@ -254,6 +258,7 @@ app.component('IconSelectionSheet', IconSelectionSheet);
 app.component('ColorSelectionSheet', ColorSelectionSheet);
 app.component('InformationSheet', InformationSheet);
 app.component('NumberPadSheet', NumberPadSheet);
+app.component('MapSheet', MapSheet);
 app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
@@ -298,6 +303,10 @@ app.config.globalProperties.$locale = {
     getAllCurrencies: () => getAllCurrencies(i18n.global.t),
     getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18n.global.t),
     initLocale: initLocale
+};
+app.config.globalProperties.$map = {
+    leaflet: Leaflet,
+    generateOpenStreetMapTileImageUrl: services.generateOpenStreetMapTileImageUrl
 };
 app.config.globalProperties.$tIf = (text, isTranslate) => transateIf(text, isTranslate, i18n.global.t);
 

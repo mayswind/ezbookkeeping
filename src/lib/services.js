@@ -392,6 +392,6 @@ export default {
     generateOpenStreetMapTileImageUrl: () => {
         const token = userState.getToken();
 
-        return 'proxy/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token;
+        return '/proxy/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token;
     },
 };

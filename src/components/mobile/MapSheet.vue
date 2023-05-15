@@ -81,8 +81,9 @@ export default {
                 this.zoomControl.addTo(this.leaflet);
 
                 this.attribution = this.$map.leaflet.control.attribution({
-                    prefix: '&copy; <a href="http://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a>'
+                    prefix: false
                 });
+                this.attribution.addAttribution('&copy; <a href="http://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a>');
                 this.attribution.addTo(this.leaflet);
 
                 isFirstInit = true;

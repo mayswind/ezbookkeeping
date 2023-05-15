@@ -1,5 +1,7 @@
-const baseUrlPath = '/api';
+const baseApiUrlPath = '/api';
+const baseProxyUrlPath = '/proxy';
 
 export default {
-    baseUrlPath: baseUrlPath
+    baseApiUrlPath: baseApiUrlPath,
+    baseProxyUrlPath: baseProxyUrlPath
 }

@@ -7,7 +7,7 @@ import utils from './utils.js';
 let needBlockRequest = false;
 let blockedRequests = [];
 
-axios.defaults.baseURL = api.baseUrlPath;
+axios.defaults.baseURL = api.baseApiUrlPath;
 axios.defaults.timeout = 10000; // 10s
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
@@ -392,6 +392,6 @@ export default {
     generateOpenStreetMapTileImageUrl: () => {
         const token = userState.getToken();
 
-        return '/proxy/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token;
+        return api.baseProxyUrlPath + '/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token;
     },
 };

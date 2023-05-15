@@ -95,7 +95,18 @@ export default {
 
             if (centerChanged && this.zoomLevel > 1) {
                 if (!this.marker) {
-                    this.marker = this.$map.leaflet.marker(this.initCenter).addTo(this.leaflet);
+                    const markerIcon = this.$map.leaflet.icon({
+                        iconUrl: 'img/map-marker-icon.png',
+                        iconRetinaUrl: 'img/map-marker-icon-2x.png',
+                        iconSize:    [25, 32],
+                        iconAnchor:  [12, 32],
+                        shadowUrl: 'img/map-marker-shadow.png',
+                        shadowSize: [41, 32]
+                    });
+                    this.marker = this.$map.leaflet.marker(this.initCenter, {
+                        icon: markerIcon
+                    });
+                    this.marker.addTo(this.leaflet);
                 } else {
                     this.marker.setLatLng(this.initCenter);
                 }

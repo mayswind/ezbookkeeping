@@ -1,0 +1,50 @@
+name: Docker Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.DOCKER_REPO }}/mayswind/ezbookkeeping
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - name: Set up the environment
+        run: |
+          cat >> docker/custom-backend-pre-setup.sh <<EOF
+          #!/bin/sh
+          ${{ secrets.CUSTOM_BACKEND_PRE_SETUP }}
+          EOF
+          cat >> docker/custom-frontend-pre-setup.sh <<EOF
+          #!/bin/sh
+          ${{ secrets.CUSTOM_FRONTEND_PRE_SETUP }}
+          EOF
+          chmod +x docker/custom-backend-pre-setup.sh
+          chmod +x docker/custom-frontend-pre-setup.sh
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          ACTIONS_RUNTIME_TOKEN: '' # See https://gitea.com/gitea/act_runner/issues/119
+        with:
+          file: Dockerfile
+          context: .
+          push: true
+          build-args: |
+            RELEASE_BUILD=1
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

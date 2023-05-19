@@ -1,0 +1,47 @@
+name: Docker Snapshot
+
+on:
+  push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.DOCKER_REPO }}/mayswind/ezbookkeeping
+          tags: |
+            type=raw,value=SNAPSHOT-{{date 'YYYYMMDD'}}
+            type=raw,value=latest-snapshot
+            type=sha,format=short,prefix=SNAPSHOT-
+
+      - name: Set up the environment
+        run: |
+          sed -i 's#FROM #FROM ${{ secrets.DOCKER_REPO }}/mirrors/#g' Dockerfile
+          cat >> docker/custom-backend-pre-setup.sh <<EOF
+          #!/bin/sh
+          ${{ secrets.CUSTOM_BACKEND_PRE_SETUP }}
+          EOF
+          cat >> docker/custom-frontend-pre-setup.sh <<EOF
+          #!/bin/sh
+          ${{ secrets.CUSTOM_FRONTEND_PRE_SETUP }}
+          EOF
+          chmod +x docker/custom-backend-pre-setup.sh
+          chmod +x docker/custom-frontend-pre-setup.sh
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          ACTIONS_RUNTIME_TOKEN: '' # See https://gitea.com/gitea/act_runner/issues/119
+        with:
+          file: Dockerfile
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

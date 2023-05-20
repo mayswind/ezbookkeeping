@@ -9,35 +9,44 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up docker tag
-        id: vars
-        run: echo ::set-output name=RELEASE_TAG::${GITHUB_REF/refs\/tags\/v/}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile
           context: .
-          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6
+          platforms: |
+            linux/amd64
+            linux/arm64/v8
+            linux/arm/v7
+            linux/arm/v6
           push: true
           build-args: |
             RELEASE_BUILD=1
-          tags:  |
-            ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:${{ steps.vars.outputs.RELEASE_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/ezbookkeeping:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

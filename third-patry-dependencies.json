@@ -27,7 +27,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.25.0/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.25.4/LICENSE"
     },
     {
         "name": "INI",
@@ -39,13 +39,13 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.12.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.14.0/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v4.5.0/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.0.0/LICENSE"
     },
     {
         "name": "otp",
@@ -55,13 +55,13 @@
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.7.0/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.7.1/LICENSE"
     },
     {
         "name": "pq",
         "copyright": "Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany",
         "url": "https://github.com/lib/pq",
-        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.7/LICENSE.md"
+        "licenseUrl": "https://github.com/lib/pq/blob/v1.10.9/LICENSE.md"
     },
     {
         "name": "go-sqlite3",
@@ -73,7 +73,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/630584e8d5aaa1472863b49679b2d5548d80dcba:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.9.0:LICENSE"
     },
     {
         "name": "Testify",
@@ -85,7 +85,7 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.2.47/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.3.4/LICENSE"
     },
     {
         "name": "vuex",
@@ -109,13 +109,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.5/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.3/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.0.5/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -133,7 +133,7 @@
         "name": "Swiper",
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.2.3/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.3.2/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -145,13 +145,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v4.4.0/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v5.1.2/LICENSE"
     },
     {
         "name": "axios",
-        "copyright": "Copyright (c) 2014-present Matt Zabriskie",
+        "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.3.6/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.4.0/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -167,9 +167,9 @@
     },
     {
         "name": "Leaflet",
-        "copyright": "Copyright (c) 2010-2022, Vladimir Agafonkin, Copyright (c) 2010-2011, CloudMade, All rights reserved.",
+        "copyright": "Copyright (c) 2010-2023, Volodymyr Agafonkin, Copyright (c) 2010-2011, CloudMade, All rights reserved.",
         "url": "https://leafletjs.com/",
-        "licenseUrl": "https://github.com/Leaflet/Leaflet/blob/v1.9.3/LICENSE"
+        "licenseUrl": "https://github.com/Leaflet/Leaflet/blob/v1.9.4/LICENSE"
     },
     {
         "name": "crypto-js",
@@ -193,7 +193,7 @@
         "name": "js-cookie",
         "copyright": "Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors",
         "url": "https://github.com/js-cookie/js-cookie",
-        "licenseUrl": "https://github.com/js-cookie/js-cookie/blob/v3.0.1/LICENSE"
+        "licenseUrl": "https://github.com/js-cookie/js-cookie/blob/v3.0.5/LICENSE"
     },
     {
         "name": "UAParser.js",

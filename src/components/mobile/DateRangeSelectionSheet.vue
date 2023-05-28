@@ -14,8 +14,9 @@
                     <span>{{ endDateTime }}</span>
                 </p>
                 <slot></slot>
-                <vue-date-picker range inline enable-seconds six-weeks
-                                 auto-apply month-name-format="long"
+                <vue-date-picker range inline enable-seconds auto-apply
+                                 month-name-format="long"
+                                 six-weeks="center"
                                  class="justify-content-center margin-bottom"
                                  :clearable="false"
                                  :dark="isDarkMode"

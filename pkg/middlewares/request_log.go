@@ -5,6 +5,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // RequestLog logs the http request log
@@ -28,7 +29,7 @@ func RequestLog(c *core.Context) {
 	method := c.Request.Method
 
 	if claims != nil {
-		userId = claims.Id
+		userId = utils.Int64ToString(claims.Uid)
 	}
 
 	if err != nil {

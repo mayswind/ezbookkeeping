@@ -48,7 +48,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 			ExpiredAt: token.ExpiredUnixTime,
 		}
 
-		if utils.Int64ToString(token.Uid) == claims.Id && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
+		if token.Uid == claims.Uid && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
 			tokenResp.IsCurrent = true
 		}
 
@@ -68,13 +68,6 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))
 	}
 
-	uid, err := utils.StringToInt64(claims.Id)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[tokens.TokenRevokeCurrentHandler] parse user id failed, because %s", err.Error())
-		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
-	}
-
 	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 
 	if err != nil {
@@ -83,7 +76,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	}
 
 	tokenRecord := &models.TokenRecord{
-		Uid:             uid,
+		Uid:             claims.Uid,
 		UserTokenId:     userTokenId,
 		CreatedUnixTime: claims.IssuedAt,
 	}
@@ -92,11 +85,11 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	err = a.tokens.DeleteToken(tokenRecord)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[token.TokenRevokeCurrentHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenId, uid, err.Error())
+		log.ErrorfWithRequestId(c, "[token.TokenRevokeCurrentHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenId, claims.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[token.TokenRevokeCurrentHandler] user \"uid:%d\" has revoked token \"id:%s\"", uid, tokenId)
+	log.InfofWithRequestId(c, "[token.TokenRevokeCurrentHandler] user \"uid:%d\" has revoked token \"id:%s\"", claims.Uid, tokenId)
 	return true, nil
 }
 
@@ -154,7 +147,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 
-		if utils.Int64ToString(token.Uid) == claims.Id && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
+		if token.Uid == claims.Uid && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
 			currentTokenIndex = i
 			break
 		}

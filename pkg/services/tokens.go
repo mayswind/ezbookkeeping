@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/golang-jwt/jwt/v4/request"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5/request"
 	"xorm.io/xorm"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -69,39 +69,49 @@ func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenC
 
 	token, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor,
 		func(token *jwt.Token) (interface{}, error) {
-			uid, err := utils.StringToInt64(claims.Id)
 			now := time.Now().Unix()
-
-			if err != nil {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] user \"uid:%s\" in token is invalid, because %s", claims.Id, err.Error())
-				return nil, errs.ErrInvalidToken
-			}
-
 			userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 
 			if err != nil {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" in token of user \"uid:%s\" is invalid, because %s", claims.UserTokenId, claims.Id, err.Error())
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" in token of user \"uid:%d\" is invalid, because %s", claims.UserTokenId, claims.Uid, err.Error())
 				return nil, errs.ErrInvalidUserTokenId
 			}
 
-			tokenRecord, err := s.getTokenRecord(uid, userTokenId, claims.IssuedAt)
+			tokenRecord, err := s.getTokenRecord(claims.Uid, userTokenId, claims.IssuedAt)
 
 			if err != nil {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%s\" record not found, because %s", claims.UserTokenId, claims.Id, err.Error())
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record not found, because %s", claims.UserTokenId, claims.Uid, err.Error())
 				return nil, errs.ErrTokenRecordNotFound
 			}
 
 			if tokenRecord.ExpiredUnixTime < now {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%s\" record is expired", claims.UserTokenId, claims.Id)
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record is expired", claims.UserTokenId, claims.Uid)
 				return nil, errs.ErrTokenExpired
 			}
 
 			return []byte(tokenRecord.Secret), nil
-		}, request.WithClaims(claims))
+		},
+		request.WithClaims(claims),
+		request.WithParser(jwt.NewParser(jwt.WithIssuedAt())),
+	)
 
 	if err != nil {
 		if err == request.ErrNoTokenInRequest {
 			return nil, nil, errs.ErrTokenIsEmpty
+		}
+
+		if err == jwt.ErrTokenMalformed || err == jwt.ErrTokenUnverifiable || err == jwt.ErrTokenSignatureInvalid {
+			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because %s", err.Error())
+			return nil, nil, errs.ErrCurrentInvalidToken
+		}
+
+		if err == jwt.ErrTokenExpired {
+			return nil, nil, errs.ErrCurrentTokenExpired
+		}
+
+		if err == jwt.ErrTokenUsedBeforeIssued {
+			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because issue time is later than now")
+			return nil, nil, errs.ErrCurrentInvalidToken
 		}
 
 		return nil, nil, err
@@ -167,19 +177,17 @@ func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecor
 
 // DeleteTokenByClaims deletes given token from database
 func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
-	uid, err := utils.StringToInt64(claims.Id)
-
-	if err != nil {
-		return errs.ErrUserIdInvalid
-	}
-
 	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 
 	if err != nil {
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.DeleteToken(&models.TokenRecord{Uid: uid, UserTokenId: userTokenId, CreatedUnixTime: claims.IssuedAt})
+	return s.DeleteToken(&models.TokenRecord{
+		Uid:             claims.Uid,
+		UserTokenId:     userTokenId,
+		CreatedUnixTime: claims.IssuedAt,
+	})
 }
 
 // DeleteTokensBeforeTime deletes tokens that is created before specific tim
@@ -253,13 +261,11 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 
 	claims := &core.UserTokenClaims{
 		UserTokenId: utils.Int64ToString(tokenRecord.UserTokenId),
+		Uid:         tokenRecord.Uid,
 		Username:    user.Username,
 		Type:        tokenRecord.TokenType,
-		StandardClaims: jwt.StandardClaims{
-			Id:        utils.Int64ToString(tokenRecord.Uid),
-			IssuedAt:  tokenRecord.CreatedUnixTime,
-			ExpiresAt: tokenRecord.ExpiredUnixTime,
-		},
+		IssuedAt:    tokenRecord.CreatedUnixTime,
+		ExpiresAt:   tokenRecord.ExpiredUnixTime,
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

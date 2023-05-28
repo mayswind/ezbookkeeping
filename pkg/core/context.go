@@ -61,13 +61,7 @@ func (c *Context) GetCurrentUid() int64 {
 		return 0
 	}
 
-	uid, err := strconv.ParseInt(claims.Id, 10, 64)
-
-	if err != nil {
-		return 0
-	}
-
-	return uid
+	return claims.Uid
 }
 
 // GetClientTimezoneOffset returns the client timezone offset

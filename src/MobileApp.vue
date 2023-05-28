@@ -240,7 +240,7 @@ i.icon.la, i.icon.las, i.icon.lab {
     border: 0;
 }
 
-/** Replacing the default style of vue-datepicker **/
+/** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;
 }
@@ -536,5 +536,41 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .sortable-enabled .nested-list-item .nested-list-item-child .item-inner {
     padding-right: var(--f7-safe-area-right) !important;
+}
+
+/** Fix @vuepic/vue-datepicker style issue **/
+.dp__main.dp__flex_display {
+    flex-direction: column
+}
+
+.dp__main .dp__preset_range {
+    white-space: inherit;
+}
+
+.dp__main .dp__menu_inner {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.dp__main .dp__menu_inner .dp__month_year_row > button {
+    width: inherit;
+}
+
+.dp__main .dp__menu_inner .dp__month_year_row > button.dp__button {
+    width: 100%;
+}
+
+.dp__main .dp__menu_inner .dp__month_year_row .dp__month_year_wrap > button {
+    line-height: inherit;
+}
+
+.dp__main .dp__calendar .dp__calendar_item {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}
+
+.dp__main .dp__calendar .dp__calendar_item > .dp__cell_inner {
+    width: 100%;
 }
 </style>

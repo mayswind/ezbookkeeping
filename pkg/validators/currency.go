@@ -132,7 +132,8 @@ var AllCurrencyNames = map[string]bool{
 	"SEK": true, //Swedish Krona
 	"SGD": true, //Singapore Dollar
 	"SHP": true, //Saint Helena Pound
-	"SLL": true, //Leone
+	"SLE": true, //Leone (new leone)
+	"SLL": true, //Leone (old leone)
 	"SOS": true, //Somali Shilling
 	"SRD": true, //Surinam Dollar
 	"SSP": true, //South Sudanese Pound
@@ -154,6 +155,8 @@ var AllCurrencyNames = map[string]bool{
 	"USD": true, //US Dollar
 	"UYU": true, //Peso Uruguayo
 	"UZS": true, //Uzbekistan Sum
+	"VED": true, //Bolívar Digital
+	"VEF": true, //Bolívar Fuerte
 	"VES": true, //Bolívar Soberano
 	"VND": true, //Dong
 	"VUV": true, //Vatu

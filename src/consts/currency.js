@@ -495,7 +495,11 @@ const allCurrencies = {
         code: 'SHP',
         symbol: '£'
     },
-    'SLL': { // Leone
+    'SLE': { // Leone (new leone)
+        code: 'SLE',
+        symbol: 'Le'
+    },
+    'SLL': { // Leone (old leone)
         code: 'SLL',
         symbol: 'Le'
     },
@@ -582,9 +586,17 @@ const allCurrencies = {
     'UZS': { // Uzbekistan Sum
         code: 'UZS'
     },
+    'VED': { // Bolívar Digital
+        code: 'VED',
+        symbol: 'Bs.D'
+    },
+    'VEF': { // Bolívar Fuerte
+        code: 'VEF',
+        symbol: 'Bs.F'
+    },
     'VES': { // Bolívar Soberano
         code: 'VES',
-        symbol: 'Bs.S.'
+        symbol: 'Bs.S'
     },
     'VND': { // Dong
         code: 'VND',

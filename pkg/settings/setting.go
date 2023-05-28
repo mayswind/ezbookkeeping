@@ -64,11 +64,12 @@ const (
 
 // Exchange rates data source types
 const (
-	EuroCentralBankDataSource        string = "euro_central_bank"
-	BankOfCanadaDataSource           string = "bank_of_canada"
-	ReserveBankOfAustraliaDataSource string = "reserve_bank_of_australia"
-	CzechNationalBankDataSource      string = "czech_national_bank"
-	NationalBankOfPolandDataSource   string = "national_bank_of_poland"
+	EuroCentralBankDataSource              string = "euro_central_bank"
+	BankOfCanadaDataSource                 string = "bank_of_canada"
+	ReserveBankOfAustraliaDataSource       string = "reserve_bank_of_australia"
+	CzechNationalBankDataSource            string = "czech_national_bank"
+	NationalBankOfPolandDataSource         string = "national_bank_of_poland"
+	MonetaryAuthorityOfSingaporeDataSource string = "monetary_authority_of_singapore"
 )
 
 const (
@@ -426,6 +427,8 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		config.ExchangeRatesDataSource = CzechNationalBankDataSource
 	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == NationalBankOfPolandDataSource {
 		config.ExchangeRatesDataSource = NationalBankOfPolandDataSource
+	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == MonetaryAuthorityOfSingaporeDataSource {
+		config.ExchangeRatesDataSource = MonetaryAuthorityOfSingaporeDataSource
 	} else {
 		return errs.ErrInvalidExchangeRatesDataSource
 	}

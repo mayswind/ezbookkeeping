@@ -1,7 +1,9 @@
 name: Docker Snapshot
 
 on:
-  push
+  push:
+    branches:
+      - main
 
 jobs:
   build:

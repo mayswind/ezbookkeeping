@@ -256,6 +256,9 @@ const allCategoryIcons = {
     '211': {
         icon: 'las la-umbrella'
     },
+    '212': {
+        icon: 'las la-baby-carriage'
+    },
     '220': {
         icon: 'las la-couch'
     },
@@ -436,6 +439,9 @@ const allCategoryIcons = {
     '517': {
         icon: 'las la-snowboarding'
     },
+    '518': {
+        icon: 'las la-hiking'
+    },
     '520': {
         icon: 'las la-futbol'
     },
@@ -507,6 +513,9 @@ const allCategoryIcons = {
     },
     '570': {
         icon: 'las la-id-card-alt'
+    },
+    '571': {
+        icon: 'las la-podcast'
     },
     '580': {
         icon: 'las la-dog'
@@ -581,6 +590,9 @@ const allCategoryIcons = {
     },
     '720': {
         icon: 'las la-birthday-cake'
+    },
+    '760': {
+        icon: 'las la-ribbon'
     },
     '780': {
         icon: 'las la-donate'

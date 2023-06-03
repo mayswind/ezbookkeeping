@@ -61,7 +61,7 @@
         <div :key="accountCategory.id"
              v-for="accountCategory in allAccountCategories"
              v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
-            <f7-list strong inset dividers sortable class="account-list margin-vertical"
+            <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
                      :sortable-enabled="sortable"
                      v-if="categorizedAccounts[accountCategory.id]"
                      @sortable:sort="onSort">
@@ -72,8 +72,9 @@
                     </small>
                 </f7-list-item>
                 <f7-list-item swipeout
+                              class="nested-list-item"
                               :id="getAccountDomId(account)"
-                              :class="{ 'nested-list-item': true, 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts }"
+                              :class="{ 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.id], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.id] }"
                               :after="$locale.getDisplayCurrency(accountBalance(account), account.currency)"
                               :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
                               :key="account.id"
@@ -81,9 +82,18 @@
                               v-show="showHidden || !account.hidden"
                               @taphold="setSortable()"
                 >
+                    <template #media v-if="account.type !== $constants.account.allAccountTypes.MultiSubAccounts || !hasVisibleSubAccount(account)">
+                        <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                            <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
+                                <f7-icon f7="eye_slash_fill"></f7-icon>
+                            </f7-badge>
+                        </ItemIcon>
+                    </template>
+
                     <template #title>
                         <div class="display-flex padding-top-half padding-bottom-half">
-                            <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                            <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"
+                                      v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account)">
                                 <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                     <f7-icon f7="eye_slash_fill"></f7-icon>
                                 </f7-badge>
@@ -96,6 +106,7 @@
                         <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
                             <ul class="no-padding">
                                 <f7-list-item class="no-sortable nested-list-item-child"
+                                              :class="{ 'actual-first-child': subAccount.id === firstShowingIds.subAccounts[account.id], 'actual-last-child': subAccount.id === lastShowingIds.subAccounts[account.id] }"
                                               :id="getAccountDomId(subAccount)"
                                               :title="subAccount.name" :footer="subAccount.comment" :after="$locale.getDisplayCurrency(accountBalance(subAccount), subAccount.currency)"
                                               :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
@@ -184,6 +195,86 @@ export default {
         },
         allAccountCount() {
             return this.$store.getters.allAvailableAccountsCount;
+        },
+        firstShowingIds() {
+            const ret = {
+                accounts: {},
+                subAccounts: {}
+            };
+
+            for (let category in this.categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
+                    continue;
+                }
+
+                if (!this.categorizedAccounts[category] || !this.categorizedAccounts[category].accounts) {
+                    continue;
+                }
+
+                const accounts = this.categorizedAccounts[category].accounts;
+
+                for (let i = 0; i < accounts.length; i++) {
+                    const account = accounts[i];
+
+                    if (account.type === this.$constants.account.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+                        for (let j = 0; j < account.subAccounts.length; j++) {
+                            const subAccount = account.subAccounts[j];
+
+                            if (this.showHidden || !subAccount.hidden) {
+                                ret.subAccounts[account.id] = subAccount.id;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (this.showHidden || !account.hidden) {
+                        ret.accounts[category] = account.id;
+                        break;
+                    }
+                }
+            }
+
+            return ret;
+        },
+        lastShowingIds() {
+            const ret = {
+                accounts: {},
+                subAccounts: {}
+            };
+
+            for (let category in this.categorizedAccounts) {
+                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
+                    continue;
+                }
+
+                if (!this.categorizedAccounts[category] || !this.categorizedAccounts[category].accounts) {
+                    continue;
+                }
+
+                const accounts = this.categorizedAccounts[category].accounts;
+
+                for (let i = accounts.length - 1; i >= 0; i--) {
+                    const account = accounts[i];
+
+                    if (account.type === this.$constants.account.allAccountTypes.MultiSubAccounts && account.subAccounts) {
+                        for (let j = account.subAccounts.length - 1; j >= 0; j--) {
+                            const subAccount = account.subAccounts[j];
+
+                            if (this.showHidden || !subAccount.hidden) {
+                                ret.subAccounts[account.id] = subAccount.id;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (this.showHidden || !account.hidden) {
+                        ret.accounts[category] = account.id;
+                        break;
+                    }
+                }
+            }
+
+            return ret;
         },
         noAvailableAccount() {
             if (this.showHidden) {
@@ -351,6 +442,19 @@ export default {
             }
 
             return shownCount > 0;
+        },
+        hasVisibleSubAccount(account) {
+            if (!account || account.type !== this.$constants.account.allAccountTypes.MultiSubAccounts || !account.subAccounts) {
+                return false;
+            }
+
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                if (this.showHidden || !account.subAccounts[i].hidden) {
+                    return true;
+                }
+            }
+
+            return false;
         },
         toggleShowAccountBalance() {
             this.showAccountBalance = !this.showAccountBalance;

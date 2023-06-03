@@ -32,6 +32,7 @@
                  v-if="!loading"
                  @sortable:sort="onSort">
             <f7-list-item swipeout
+                          :class="{ 'actual-first-child': category.id === firstShowingId, 'actual-last-child': category.id === lastShowingId }"
                           :id="getCategoryDomId(category)"
                           :title="category.name"
                           :footer="category.comment"
@@ -153,6 +154,24 @@ export default {
             }
 
             return title + ' Categories';
+        },
+        firstShowingId() {
+            for (let i = 0; i < this.categories.length; i++) {
+                if (this.showHidden || !this.categories[i].hidden) {
+                    return this.categories[i].id;
+                }
+            }
+
+            return null;
+        },
+        lastShowingId() {
+            for (let i = this.categories.length - 1; i >= 0; i--) {
+                if (this.showHidden || !this.categories[i].hidden) {
+                    return this.categories[i].id;
+                }
+            }
+
+            return null;
         },
         noAvailableCategory() {
             for (let i = 0; i < this.categories.length; i++) {

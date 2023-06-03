@@ -31,6 +31,7 @@
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
             <f7-list-item swipeout
+                          :class="{ 'actual-first-child': tag.id === firstShowingId, 'actual-last-child': tag.id === lastShowingId }"
                           :id="getTagDomId(tag)"
                           :key="tag.id"
                           v-for="tag in tags"
@@ -169,6 +170,24 @@ export default {
     computed: {
         tags() {
             return this.$store.state.allTransactionTags;
+        },
+        firstShowingId() {
+            for (let i = 0; i < this.tags.length; i++) {
+                if (this.showHidden || !this.tags[i].hidden) {
+                    return this.tags[i].id;
+                }
+            }
+
+            return null;
+        },
+        lastShowingId() {
+            for (let i = this.tags.length - 1; i >= 0; i--) {
+                if (this.showHidden || !this.tags[i].hidden) {
+                    return this.tags[i].id;
+                }
+            }
+
+            return null;
         },
         noAvailableTag() {
             for (let i = 0; i < this.tags.length; i++) {

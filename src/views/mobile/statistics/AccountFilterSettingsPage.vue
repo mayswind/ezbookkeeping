@@ -38,57 +38,55 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!hasAnyAvailableAccount">
+        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!loading && !hasAnyAvailableAccount">
             <f7-list-item :title="$t('No available account')"></f7-list-item>
         </f7-list>
 
         <f7-block class="combination-list-wrapper margin-vertical"
-                  :key="accountCategory.id"
-                  v-for="accountCategory in allAccountCategories"
+                  :key="accountCategory.category"
+                  v-for="accountCategory in allVisibleCategorizedAccounts"
                   v-else-if="!loading && hasAnyAvailableAccount">
-            <f7-accordion-item :opened="collapseStates[accountCategory.id].opened"
-                               v-show="hasShownAccount(accountCategory)"
-                               @accordion:open="collapseStates[accountCategory.id].opened = true"
-                               @accordion:close="collapseStates[accountCategory.id].opened = false">
+            <f7-accordion-item :opened="collapseStates[accountCategory.category].opened"
+                               @accordion:open="collapseStates[accountCategory.category].opened = true"
+                               @accordion:close="collapseStates[accountCategory.category].opened = false">
                 <f7-block-title>
                     <f7-accordion-toggle>
                         <f7-list strong inset dividers media-list
                                  class="combination-list-header"
-                                 :class="collapseStates[accountCategory.id].opened ? 'combination-list-opened' : 'combination-list-closed'">
+                                 :class="collapseStates[accountCategory.category].opened ? 'combination-list-opened' : 'combination-list-closed'">
                             <f7-list-item>
                                 <template #title>
                                     <span>{{ $t(accountCategory.name) }}</span>
-                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.id].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
+                                    <f7-icon class="combination-list-chevron-icon" :f7="collapseStates[accountCategory.category].opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
                     </f7-accordion-toggle>
                 </f7-block-title>
-                <f7-accordion-content :style="{ height: collapseStates[accountCategory.id].opened ? 'auto' : '' }">
-                    <f7-list strong inset dividers accordion-list class="combination-list-content"
-                             v-if="categorizedAccounts[accountCategory.id]">
+                <f7-accordion-content :style="{ height: collapseStates[accountCategory.category].opened ? 'auto' : '' }">
+                    <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox
+                                      :class="{ 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id] }"
                                       :title="account.name"
                                       :value="account.id"
                                       :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                       :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                       :key="account.id"
-                                      v-for="account in categorizedAccounts[accountCategory.id].accounts"
-                                      v-show="!account.hidden"
+                                      v-for="account in accountCategory.visibleAccounts"
                                       @change="selectAccountOrSubAccounts">
                             <template #media>
                                 <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
                             </template>
 
                             <template #root>
-                                <ul v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts" class="padding-left">
+                                <ul class="padding-left"
+                                    v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]">
                                     <f7-list-item checkbox
                                                   :title="subAccount.name"
                                                   :value="subAccount.id"
                                                   :checked="isAccountChecked(subAccount, filterAccountIds)"
                                                   :key="subAccount.id"
-                                                  v-for="subAccount in account.subAccounts"
-                                                  v-show="!subAccount.hidden"
+                                                  v-for="subAccount in accountCategory.visibleSubAccounts[account.id]"
                                                   @change="selectAccount">
                                         <template #media>
                                             <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
@@ -148,11 +146,8 @@ export default {
                 return 'Apply';
             }
         },
-        allAccountCategories() {
-            return this.$constants.account.allCategories;
-        },
-        categorizedAccounts() {
-            return this.$store.state.allCategorizedAccounts;
+        allVisibleCategorizedAccounts() {
+            return this.$utilities.getVisibleCategorizedAccounts(this.$store.state.allCategorizedAccounts);
         },
         hasAnyAvailableAccount() {
             return this.$store.getters.allVisibleAccountsCount > 0;
@@ -326,23 +321,6 @@ export default {
             }
 
             return checkedCount > 0 && checkedCount < account.subAccounts.length;
-        },
-        hasShownAccount(accountCategory) {
-            if (!this.categorizedAccounts[accountCategory.id] ||
-                !this.categorizedAccounts[accountCategory.id].accounts ||
-                !this.categorizedAccounts[accountCategory.id].accounts.length) {
-                return false;
-            }
-
-            for (let i = 0; i < this.categorizedAccounts[accountCategory.id].accounts.length; i++) {
-                const account = this.categorizedAccounts[accountCategory.id].accounts[i];
-
-                if (!account.hidden) {
-                    return true;
-                }
-            }
-
-            return false;
         },
         getCollapseStates() {
             const collapseStates = {};

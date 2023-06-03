@@ -16,6 +16,7 @@
                         floating-label
                         clear-button
                         class="no-margin no-padding-bottom"
+                        :class="color ? 'color-' + color : ''"
                         :label="$t('Current Password')"
                         :placeholder="$t('Current Password')"
                         v-model:value="currentPassword"
@@ -24,6 +25,7 @@
                 </f7-list>
                 <f7-button large fill
                            :class="{ 'disabled': !currentPassword || confirmDisabled }"
+                           :color="color || 'primary'"
                            :text="$t('Continue')"
                            @click="confirm">
                 </f7-button>
@@ -41,6 +43,7 @@ export default {
         'modelValue',
         'title',
         'hint',
+        'color',
         'confirmDisabled',
         'cancelDisabled',
         'show'

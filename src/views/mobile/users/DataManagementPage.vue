@@ -47,6 +47,7 @@
                               :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.')"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
+                              color="red"
                               v-model:show="showInputPasswordSheetForClearData"
                               v-model="currentPasswordForClearData"
                               @password:confirm="clearData">

@@ -754,7 +754,7 @@ function parseDeviceInfo(ua) {
     return result;
 }
 
-function transactionTypeToCategroyType(transactionType) {
+function transactionTypeToCategoryType(transactionType) {
     if (transactionType === transactionConstants.allTransactionTypes.Income) {
         return categoryConstants.allCategoryTypes.Income;
     } else if (transactionType === transactionConstants.allTransactionTypes.Expense) {
@@ -766,7 +766,7 @@ function transactionTypeToCategroyType(transactionType) {
     }
 }
 
-function categroyTypeToTransactionType(categoryType) {
+function categoryTypeToTransactionType(categoryType) {
     if (categoryType === categoryConstants.allCategoryTypes.Income) {
         return transactionConstants.allTransactionTypes.Income;
     } else if (categoryType === categoryConstants.allCategoryTypes.Expense) {
@@ -1067,8 +1067,8 @@ export default {
     generateRandomString,
     parseUserAgent,
     parseDeviceInfo,
-    transactionTypeToCategroyType,
-    categroyTypeToTransactionType,
+    transactionTypeToCategoryType,
+    categoryTypeToTransactionType,
     allVisibleTransactionCategories,
     getCategoryInfo,
     getCategorizedAccounts,

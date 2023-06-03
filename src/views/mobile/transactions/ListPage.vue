@@ -318,9 +318,9 @@
                      class="no-margin-vertical"
                      :key="categoryType"
                      v-for="(categories, categoryType) in allPrimaryCategories"
-                     v-show="!query.type || $utilities.categroyTypeToTransactionType(parseInt(categoryType)) === query.type"
+                     v-show="!query.type || $utilities.categoryTypeToTransactionType(parseInt(categoryType)) === query.type"
             >
-                <f7-list-item divider :title="getTransactionTypeName($utilities.categroyTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
+                <f7-list-item divider :title="getTransactionTypeName($utilities.categoryTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
                               :title="category.name"
                               :class="getCategoryListItemCheckedClass(category, query.categoryId)"
@@ -672,7 +672,7 @@ export default {
             if (type && this.query.categoryId) {
                 const category = this.allCategories[this.query.categoryId];
 
-                if (category && category.type !== this.$utilities.transactionTypeToCategroyType(type)) {
+                if (category && category.type !== this.$utilities.transactionTypeToCategoryType(type)) {
                     removeCategoryFilter = true;
                 }
             }

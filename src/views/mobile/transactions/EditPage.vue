@@ -657,7 +657,7 @@ export default {
 
             if ((!query.type || query.type === '0') && query.categoryId && query.categoryId !== '0' && self.allCategoriesMap[query.categoryId]) {
                 const category = self.allCategoriesMap[query.categoryId];
-                const type = self.$utilities.categroyTypeToTransactionType(category.type);
+                const type = self.$utilities.categoryTypeToTransactionType(category.type);
 
                 if (self.$utilities.isNumber(type)) {
                     self.transaction.type = type;

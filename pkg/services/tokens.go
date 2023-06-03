@@ -63,61 +63,14 @@ func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.To
 	return tokenRecords, err
 }
 
-// ParseToken returns the token model according to request data
-func (s *TokenService) ParseToken(c *core.Context) (*jwt.Token, *core.UserTokenClaims, error) {
-	claims := &core.UserTokenClaims{}
+// ParseTokenByHeader returns the token model according to request data
+func (s *TokenService) ParseTokenByHeader(c *core.Context) (*jwt.Token, *core.UserTokenClaims, error) {
+	return s.parseToken(c, request.BearerExtractor{})
+}
 
-	token, err := request.ParseFromRequest(c.Request, request.AuthorizationHeaderExtractor,
-		func(token *jwt.Token) (interface{}, error) {
-			now := time.Now().Unix()
-			userTokenId, err := utils.StringToInt64(claims.UserTokenId)
-
-			if err != nil {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" in token of user \"uid:%d\" is invalid, because %s", claims.UserTokenId, claims.Uid, err.Error())
-				return nil, errs.ErrInvalidUserTokenId
-			}
-
-			tokenRecord, err := s.getTokenRecord(claims.Uid, userTokenId, claims.IssuedAt)
-
-			if err != nil {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record not found, because %s", claims.UserTokenId, claims.Uid, err.Error())
-				return nil, errs.ErrTokenRecordNotFound
-			}
-
-			if tokenRecord.ExpiredUnixTime < now {
-				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record is expired", claims.UserTokenId, claims.Uid)
-				return nil, errs.ErrTokenExpired
-			}
-
-			return []byte(tokenRecord.Secret), nil
-		},
-		request.WithClaims(claims),
-		request.WithParser(jwt.NewParser(jwt.WithIssuedAt())),
-	)
-
-	if err != nil {
-		if err == request.ErrNoTokenInRequest {
-			return nil, nil, errs.ErrTokenIsEmpty
-		}
-
-		if err == jwt.ErrTokenMalformed || err == jwt.ErrTokenUnverifiable || err == jwt.ErrTokenSignatureInvalid {
-			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because %s", err.Error())
-			return nil, nil, errs.ErrCurrentInvalidToken
-		}
-
-		if err == jwt.ErrTokenExpired {
-			return nil, nil, errs.ErrCurrentTokenExpired
-		}
-
-		if err == jwt.ErrTokenUsedBeforeIssued {
-			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because issue time is later than now")
-			return nil, nil, errs.ErrCurrentInvalidToken
-		}
-
-		return nil, nil, err
-	}
-
-	return token, claims, err
+// ParseTokenByArgument returns the token model according to request data
+func (s *TokenService) ParseTokenByArgument(c *core.Context, tokenParameterName string) (*jwt.Token, *core.UserTokenClaims, error) {
+	return s.parseToken(c, request.ArgumentExtractor{tokenParameterName})
 }
 
 // CreateToken generates a new normal token and saves to database
@@ -240,6 +193,62 @@ func (s *TokenService) ParseFromTokenId(tokenId string) (*models.TokenRecord, er
 // GenerateTokenId generates token id according to token model
 func (s *TokenService) GenerateTokenId(tokenRecord *models.TokenRecord) string {
 	return fmt.Sprintf("%d:%d:%d", tokenRecord.Uid, tokenRecord.CreatedUnixTime, tokenRecord.UserTokenId)
+}
+
+func (s *TokenService) parseToken(c *core.Context, extractor request.Extractor) (*jwt.Token, *core.UserTokenClaims, error) {
+	claims := &core.UserTokenClaims{}
+
+	token, err := request.ParseFromRequest(c.Request, extractor,
+		func(token *jwt.Token) (interface{}, error) {
+			now := time.Now().Unix()
+			userTokenId, err := utils.StringToInt64(claims.UserTokenId)
+
+			if err != nil {
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" in token of user \"uid:%d\" is invalid, because %s", claims.UserTokenId, claims.Uid, err.Error())
+				return nil, errs.ErrInvalidUserTokenId
+			}
+
+			tokenRecord, err := s.getTokenRecord(claims.Uid, userTokenId, claims.IssuedAt)
+
+			if err != nil {
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record not found, because %s", claims.UserTokenId, claims.Uid, err.Error())
+				return nil, errs.ErrTokenRecordNotFound
+			}
+
+			if tokenRecord.ExpiredUnixTime < now {
+				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record is expired", claims.UserTokenId, claims.Uid)
+				return nil, errs.ErrTokenExpired
+			}
+
+			return []byte(tokenRecord.Secret), nil
+		},
+		request.WithClaims(claims),
+		request.WithParser(jwt.NewParser(jwt.WithIssuedAt())),
+	)
+
+	if err != nil {
+		if err == request.ErrNoTokenInRequest {
+			return nil, nil, errs.ErrTokenIsEmpty
+		}
+
+		if err == jwt.ErrTokenMalformed || err == jwt.ErrTokenUnverifiable || err == jwt.ErrTokenSignatureInvalid {
+			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because %s", err.Error())
+			return nil, nil, errs.ErrCurrentInvalidToken
+		}
+
+		if err == jwt.ErrTokenExpired {
+			return nil, nil, errs.ErrCurrentTokenExpired
+		}
+
+		if err == jwt.ErrTokenUsedBeforeIssued {
+			log.WarnfWithRequestId(c, "[tokens.ParseToken] token is invalid, because issue time is later than now")
+			return nil, nil, errs.ErrCurrentInvalidToken
+		}
+
+		return nil, nil, err
+	}
+
+	return token, claims, err
 }
 
 func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, error) {

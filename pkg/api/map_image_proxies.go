@@ -31,7 +31,6 @@ func (p *MapImageProxy) OpenStreetMapTileImageProxyHandler(c *core.Context) (*ht
 		imageRawUrl := fmt.Sprintf(openStreetMapTileImageUrlFormat, zoomLevel, coordinateX, fileName)
 		imageUrl, _ := url.Parse(imageRawUrl)
 
-		req.Header.Del("Authorization")
 		req.URL = imageUrl
 		req.RequestURI = req.URL.RequestURI()
 		req.Host = imageUrl.Host

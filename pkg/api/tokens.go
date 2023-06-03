@@ -62,7 +62,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 
 // TokenRevokeCurrentHandler revokes current token of current user
 func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *errs.Error) {
-	_, claims, err := a.tokens.ParseToken(c)
+	_, claims, err := a.tokens.ParseTokenByHeader(c)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))

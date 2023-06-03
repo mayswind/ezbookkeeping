@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -8,11 +10,20 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+// TokenSourceType represents token source
+type TokenSourceType byte
+
+// Token source types
+const (
+	TOKEN_SOURCE_TYPE_HEADER   TokenSourceType = 1
+	TOKEN_SOURCE_TYPE_ARGUMENT TokenSourceType = 2
+)
+
 const tokenQueryStringParam = "token"
 
 // JWTAuthorization verifies whether current request is valid by jwt token
 func JWTAuthorization(c *core.Context) {
-	claims, err := getTokenClaims(c)
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, err)
@@ -37,22 +48,32 @@ func JWTAuthorization(c *core.Context) {
 
 // JWTAuthorizationByQueryString verifies whether current request is valid by jwt token
 func JWTAuthorizationByQueryString(c *core.Context) {
-	token, exists := c.GetQuery(tokenQueryStringParam)
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
-	if !exists {
-		log.WarnfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] no token provided")
-		utils.PrintJsonErrorResult(c, errs.ErrUnauthorizedAccess)
+	if err != nil {
+		utils.PrintJsonErrorResult(c, err)
 		return
 	}
 
-	c.Request.Header.Set("Authorization", token)
+	if claims.Type == core.USER_TOKEN_TYPE_REQUIRE_2FA {
+		log.WarnfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] user \"uid:%d\" token requires 2fa", claims.Uid)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenRequire2FA)
+		return
+	}
 
-	JWTAuthorization(c)
+	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.WarnfWithRequestId(c, "[authorization.JWTAuthorizationByQueryString] user \"uid:%d\" token type is invalid", claims.Uid)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
+		return
+	}
+
+	c.SetTokenClaims(claims)
+	c.Next()
 }
 
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func JWTTwoFactorAuthorization(c *core.Context) {
-	claims, err := getTokenClaims(c)
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
 		utils.PrintJsonErrorResult(c, err)
@@ -69,8 +90,8 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 	c.Next()
 }
 
-func getTokenClaims(c *core.Context) (*core.UserTokenClaims, *errs.Error) {
-	token, claims, err := services.Tokens.ParseToken(c)
+func getTokenClaims(c *core.Context, source TokenSourceType) (*core.UserTokenClaims, *errs.Error) {
+	token, claims, err := parseToken(c, source)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
@@ -88,4 +109,12 @@ func getTokenClaims(c *core.Context) (*core.UserTokenClaims, *errs.Error) {
 	}
 
 	return claims, nil
+}
+
+func parseToken(c *core.Context, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, error) {
+	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
+		return services.Tokens.ParseTokenByArgument(c, tokenQueryStringParam)
+	}
+
+	return services.Tokens.ParseTokenByHeader(c)
 }

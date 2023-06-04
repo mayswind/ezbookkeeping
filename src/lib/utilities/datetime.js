@@ -89,16 +89,6 @@ export function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
     return moment.unix(unixTime);
 }
 
-export function is24HourFormat(format) {
-    if (format.indexOf('HH') >= 0 && format.indexOf('hh') < 0) {
-        return true;
-    } else if (format.indexOf('HH') < 0 && format.indexOf('hh') >= 0) {
-        return false;
-    }
-
-    return true;
-}
-
 export function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
     return parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format);
 }
@@ -212,6 +202,16 @@ export function getThisYearFirstUnixTime() {
 
 export function getThisYearLastUnixTime() {
     return moment.unix(getThisYearFirstUnixTime()).add(1, 'years').subtract(1, 'seconds').unix();
+}
+
+export function getDateTimeFormatType(allFormatMap, allFormatArray, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
+    if (formatTypeValue > dateTimeConstants.defaultDateTimeFormatValue && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
+        return allFormatArray[formatTypeValue - 1];
+    } else if (formatTypeValue === dateTimeConstants.defaultDateTimeFormatValue && allFormatMap[localeDefaultFormatTypeName] && allFormatMap[localeDefaultFormatTypeName].key) {
+        return allFormatMap[localeDefaultFormatTypeName];
+    } else {
+        return systemDefaultFormatType;
+    }
 }
 
 export function getShiftedDateRange(minTime, maxTime, scale) {

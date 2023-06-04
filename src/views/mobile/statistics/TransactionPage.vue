@@ -217,10 +217,10 @@
                     </template>
                     <template #footer>
                         <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
-                            <span>{{ $utilities.formatUnixTime(query.startTime, $t('format.datetime.long-without-second')) }}</span>
+                            <span>{{ $utilities.formatUnixTime(query.startTime, $locale.getLongDateTimeFormat()) }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
-                            <span>{{ $utilities.formatUnixTime(query.endTime, $t('format.datetime.long-without-second')) }}</span>
+                            <span>{{ $utilities.formatUnixTime(query.endTime, $locale.getLongDateTimeFormat()) }}</span>
                         </div>
                     </template>
                 </f7-list-item>
@@ -618,15 +618,15 @@ export default {
             }
 
             if (this.$utilities.isDateRangeMatchFullYears(query.startTime, query.endTime)) {
-                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$t('format.year.short'));
-                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t('format.year.short'));
+                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortYearFormat());
+                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortYearFormat());
 
                 return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
             }
 
             if (this.$utilities.isDateRangeMatchFullMonths(query.startTime, query.endTime)) {
-                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$t('format.yearMonth.short'));
-                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t('format.yearMonth.short'));
+                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortYearMonthFormat());
+                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortYearMonthFormat());
 
                 return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
             }
@@ -634,13 +634,13 @@ export default {
             const startTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.startTime));
             const endTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.endTime));
 
-            const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$t('format.date.short'));
-            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t('format.date.short'));
+            const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortDateFormat());
+            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortDateFormat());
 
             if (displayStartTime === displayEndTime) {
                 return displayStartTime;
             } else if (startTimeYear === endTimeYear) {
-                const displayShortEndTime = this.$utilities.formatUnixTime(query.endTime, this.$t('format.monthDay.short'));
+                const displayShortEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortMonthDayFormat());
                 return `${displayStartTime} ~ ${displayShortEndTime}`;
             }
 

@@ -7,45 +7,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-// WeekDay represents week day
-type WeekDay byte
-
-// Week days
-const (
-	WEEKDAY_SUNDAY    WeekDay = 0
-	WEEKDAY_MONDAY    WeekDay = 1
-	WEEKDAY_TUESDAY   WeekDay = 2
-	WEEKDAY_WEDNESDAY WeekDay = 3
-	WEEKDAY_THURSDAY  WeekDay = 4
-	WEEKDAY_FRIDAY    WeekDay = 5
-	WEEKDAY_SATURDAY  WeekDay = 6
-	WEEKDAY_INVALID   WeekDay = 255
-)
-
-// String returns a textual representation of the week day enum
-func (d WeekDay) String() string {
-	switch d {
-	case WEEKDAY_SUNDAY:
-		return "Sunday"
-	case WEEKDAY_MONDAY:
-		return "Monday"
-	case WEEKDAY_TUESDAY:
-		return "Tuesday"
-	case WEEKDAY_WEDNESDAY:
-		return "Wednesday"
-	case WEEKDAY_THURSDAY:
-		return "Thursday"
-	case WEEKDAY_FRIDAY:
-		return "Friday"
-	case WEEKDAY_SATURDAY:
-		return "Saturday"
-	case WEEKDAY_INVALID:
-		return "Invalid"
-	default:
-		return fmt.Sprintf("Invalid(%d)", int(d))
-	}
-}
-
 // TransactionEditScope represents the scope which transaction can be edited
 type TransactionEditScope byte
 
@@ -93,10 +54,15 @@ type User struct {
 	Nickname             string `xorm:"VARCHAR(64) NOT NULL"`
 	Password             string `xorm:"VARCHAR(64) NOT NULL"`
 	Salt                 string `xorm:"VARCHAR(10) NOT NULL"`
-	DefaultCurrency      string `xorm:"VARCHAR(3) NOT NULL"`
 	DefaultAccountId     int64
-	FirstDayOfWeek       WeekDay              `xorm:"TINYINT NOT NULL"`
 	TransactionEditScope TransactionEditScope `xorm:"TINYINT NOT NULL"`
+	Language             string               `xorm:"VARCHAR(10)"`
+	DefaultCurrency      string               `xorm:"VARCHAR(3) NOT NULL"`
+	FirstDayOfWeek       WeekDay              `xorm:"TINYINT NOT NULL"`
+	LongDateFormat       LongDateFormat       `xorm:"TINYINT"`
+	ShortDateFormat      ShortDateFormat      `xorm:"TINYINT"`
+	LongTimeFormat       LongTimeFormat       `xorm:"TINYINT"`
+	ShortTimeFormat      ShortTimeFormat      `xorm:"TINYINT"`
 	Deleted              bool                 `xorm:"NOT NULL"`
 	EmailVerified        bool                 `xorm:"NOT NULL"`
 	CreatedUnixTime      int64
@@ -110,10 +76,15 @@ type UserBasicInfo struct {
 	Username             string               `json:"username"`
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
-	DefaultCurrency      string               `json:"defaultCurrency"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
-	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
+	Language             string               `json:"language"`
+	DefaultCurrency      string               `json:"defaultCurrency"`
+	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
+	LongDateFormat       LongDateFormat       `json:"longDateFormat"`
+	ShortDateFormat      ShortDateFormat      `json:"shortDateFormat"`
+	LongTimeFormat       LongTimeFormat       `json:"longTimeFormat"`
+	ShortTimeFormat      ShortTimeFormat      `json:"shortTimeFormat"`
 }
 
 // UserLoginRequest represents all parameters of user login request
@@ -128,6 +99,7 @@ type UserRegisterRequest struct {
 	Email           string  `json:"email" binding:"required,notBlank,max=100,validEmail"`
 	Nickname        string  `json:"nickname" binding:"required,notBlank,max=64"`
 	Password        string  `json:"password" binding:"required,min=6,max=128"`
+	Language        string  `json:"language" binding:"required,min=2,max=16"`
 	DefaultCurrency string  `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
 	FirstDayOfWeek  WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
 }
@@ -138,10 +110,15 @@ type UserProfileUpdateRequest struct {
 	Nickname             string                `json:"nickname" binding:"omitempty,notBlank,max=64"`
 	Password             string                `json:"password" binding:"omitempty,min=6,max=128"`
 	OldPassword          string                `json:"oldPassword" binding:"omitempty,min=6,max=128"`
-	DefaultCurrency      string                `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
 	DefaultAccountId     int64                 `json:"defaultAccountId,string" binding:"omitempty,min=1"`
-	FirstDayOfWeek       *WeekDay              `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
 	TransactionEditScope *TransactionEditScope `json:"transactionEditScope" binding:"omitempty,min=0,max=7"`
+	Language             string                `json:"language" binding:"omitempty,min=2,max=16"`
+	DefaultCurrency      string                `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
+	FirstDayOfWeek       *WeekDay              `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
+	LongDateFormat       *LongDateFormat       `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
+	ShortDateFormat      *ShortDateFormat      `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
+	LongTimeFormat       *LongTimeFormat       `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
+	ShortTimeFormat      *ShortTimeFormat      `json:"shortTimeFormat" binding:"omitempty,min=0,max=3"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile
@@ -155,10 +132,15 @@ type UserProfileResponse struct {
 	Username             string               `json:"username"`
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
-	DefaultCurrency      string               `json:"defaultCurrency"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
-	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
+	Language             string               `json:"language"`
+	DefaultCurrency      string               `json:"defaultCurrency"`
+	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
+	LongDateFormat       LongDateFormat       `json:"longDateFormat"`
+	ShortDateFormat      ShortDateFormat      `json:"shortDateFormat"`
+	LongTimeFormat       LongTimeFormat       `json:"longTimeFormat"`
+	ShortTimeFormat      ShortTimeFormat      `json:"shortTimeFormat"`
 	LastLoginAt          int64                `json:"lastLoginAt"`
 }
 
@@ -210,10 +192,15 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
-		DefaultCurrency:      u.DefaultCurrency,
 		DefaultAccountId:     u.DefaultAccountId,
-		FirstDayOfWeek:       u.FirstDayOfWeek,
 		TransactionEditScope: u.TransactionEditScope,
+		Language:             u.Language,
+		DefaultCurrency:      u.DefaultCurrency,
+		FirstDayOfWeek:       u.FirstDayOfWeek,
+		LongDateFormat:       u.LongDateFormat,
+		ShortDateFormat:      u.ShortDateFormat,
+		LongTimeFormat:       u.LongTimeFormat,
+		ShortTimeFormat:      u.ShortTimeFormat,
 	}
 }
 
@@ -223,10 +210,15 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
-		DefaultCurrency:      u.DefaultCurrency,
 		DefaultAccountId:     u.DefaultAccountId,
-		FirstDayOfWeek:       u.FirstDayOfWeek,
 		TransactionEditScope: u.TransactionEditScope,
+		Language:             u.Language,
+		DefaultCurrency:      u.DefaultCurrency,
+		FirstDayOfWeek:       u.FirstDayOfWeek,
+		LongDateFormat:       u.LongDateFormat,
+		ShortDateFormat:      u.ShortDateFormat,
+		LongTimeFormat:       u.LongTimeFormat,
+		ShortTimeFormat:      u.ShortTimeFormat,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}
 }

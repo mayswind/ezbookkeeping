@@ -16,18 +16,6 @@
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
-                :key="currentLocale + '_lang'"
-                :title="$t('Language')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                <select v-model="currentLocale">
-                    <option :value="locale"
-                            :key="locale"
-                            v-for="(lang, locale) in allLanguages">{{ lang.displayName }}</option>
-                </select>
-            </f7-list-item>
-
-            <f7-list-item
-                :key="currentLocale + '_timezone'"
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currentTimezone">
@@ -57,7 +45,6 @@
             </f7-list-item>
 
             <f7-list-item
-                :key="currentLocale + '_currency_display'"
                 :title="$t('Currency Display Mode')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currencyDisplayMode">
@@ -117,19 +104,8 @@ export default {
         version() {
             return 'v' + this.$version;
         },
-        allLanguages() {
-            return this.$locale.getAllLanguageInfos();
-        },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
-        },
-        currentLocale: {
-            get: function () {
-                return this.$i18n.locale;
-            },
-            set: function (value) {
-                this.$locale.setLanguage(value);
-            }
         },
         currentTimezone: {
             get: function () {
@@ -144,7 +120,7 @@ export default {
         },
         exchangeRatesLastUpdateDate() {
             const exchangeRatesLastUpdateTime = this.$store.getters.exchangeRatesLastUpdateTime;
-            return exchangeRatesLastUpdateTime ? this.$utilities.formatUnixTime(exchangeRatesLastUpdateTime, this.$t('format.date.long')) : '';
+            return exchangeRatesLastUpdateTime ? this.$utilities.formatUnixTime(exchangeRatesLastUpdateTime, this.$locale.getLongDateFormat()) : '';
         },
         isAutoUpdateExchangeRatesData: {
             get: function () {

@@ -6,31 +6,62 @@ export default {
     },
     'default': {
         'currency': 'USD',
-        'firstDayOfWeek': 'Sunday'
+        'firstDayOfWeek': 'Sunday',
+        'longDateFormat': 'MMDDYYYY',
+        'shortDateFormat': 'MMDDYYYY',
+        'longTimeFormat': 'HHMMSSA',
+        'shortTimeFormat': 'HHMMA'
     },
     'format': { // The type of date or time format is moment format, ref: https://momentjs.com/docs/#/displaying/
-        'date': {
-            'long': 'M/D/YYYY',
-            'short': 'M/D/YYYY'
+        'longDate': {
+            'yyyy_mm_dd': 'YYYY MMMM DD',
+            'mm_dd_yyyy': 'MMMM D, YYYY',
+            'dd_mm_yyyy': 'D MMMM, YYYY'
         },
-        'datetime': {
-            'long': 'M/D/YYYY hh:mm:ss A',
-            'long-without-second': 'M/D/YYYY hh:mm A',
+        'shortDate': {
+            'yyyy_mm_dd': 'YYYY-M-D',
+            'mm_dd_yyyy': 'M/D/YYYY',
+            'dd_mm_yyyy': 'D/M/YYYY'
         },
-        'year': {
-            'long': 'YYYY',
-            'short': 'YYYY'
+        'longYear': { // used in home page
+            'yyyy_mm_dd': 'YYYY',
+            'mm_dd_yyyy': 'YYYY',
+            'dd_mm_yyyy': 'YYYY'
         },
-        'yearMonth': {
-            'long': 'YYYY-M',
-            'short': 'YYYY-M'
+        'shortYear': {// used in transaction statistics page
+            'yyyy_mm_dd': 'YYYY',
+            'mm_dd_yyyy': 'YYYY',
+            'dd_mm_yyyy': 'YYYY'
         },
-        'monthDay': {
-            'long': 'M/D',
-            'short': 'M/D'
+        'longYearMonth': { // used in transaction list page
+            'yyyy_mm_dd': 'YYYY MMMM',
+            'mm_dd_yyyy': 'MMMM, YYYY',
+            'dd_mm_yyyy': 'MMMM, YYYY'
         },
-        'hourMinute': {
-            'long': 'hh:mm A'
+        'shortYearMonth': { // used in transaction statistics page
+            'yyyy_mm_dd': 'YYYY-M',
+            'mm_dd_yyyy': 'MMM, YYYY',
+            'dd_mm_yyyy': 'MMM, YYYY'
+        },
+        'longMonthDay': { // used in home page
+            'yyyy_mm_dd': 'MMMM D',
+            'mm_dd_yyyy': 'MMMM D',
+            'dd_mm_yyyy': 'D MMMM'
+        },
+        'shortMonthDay': { // should be similar to the shortDate. it would be next to the shortDate content on the transaction statistics page
+            'yyyy_mm_dd': 'M/D',
+            'mm_dd_yyyy': 'M/D',
+            'dd_mm_yyyy': 'D/M'
+        },
+        'longTime': {
+            'hh_mm_ss': 'HH:mm:ss',
+            'a_hh_mm_ss': 'A hh:mm:ss',
+            'hh_mm_ss_a': 'hh:mm:ss A'
+        },
+        'shortTime': {
+            'hh_mm': 'HH:mm',
+            'a_hh_mm': 'A hh:mm',
+            'hh_mm_a': 'hh:mm A'
         },
         'currency': {
             'symbol': '{symbol} {amount}'
@@ -41,6 +72,12 @@ export default {
         'exportFilename': 'ezBookkeeping_{nickname}_export_data'
     },
     'datetime': {
+        'AM': {
+            'upperCase': 'AM'
+        },
+        'PM': {
+            'upperCase': 'PM'
+        },
         'Monday': {
             'min': 'Mo',
             'short': 'Mon',
@@ -657,6 +694,7 @@ export default {
     'None': 'None',
     'Not Specified': 'Not Specified',
     'No results': 'No results',
+    'Unknown': 'Unknown',
     'Done': 'Done',
     'Continue': 'Continue',
     'Status': 'Status',
@@ -727,6 +765,10 @@ export default {
     'Default Currency': 'Default Currency',
     'Default Account': 'Default Account',
     'First Day of Week': 'First Day of Week',
+    'Long Date Format': 'Long Date Format',
+    'Short Date Format': 'Short Date Format',
+    'Long Time Format': 'Long Time Format',
+    'Short Time Format': 'Short Time Format',
     'Editable Transaction Scope': 'Editable Transaction Scope',
     'Today or later': 'Today or later',
     'Recent 24 hours or later': 'Recent 24 hours or later',
@@ -894,6 +936,7 @@ export default {
     'Language': 'Language',
     'Timezone': 'Timezone',
     'System Default': 'System Default',
+    'Language Default': 'Language Default',
     'Auto Update Exchange Rates Data': 'Auto Update Exchange Rates Data',
     'Auto Get Current Geographic Location': 'Auto Get Current Geographic Location',
     'Enable Thousands Separator': 'Enable Thousands Separator',

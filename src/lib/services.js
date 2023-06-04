@@ -87,12 +87,13 @@ export default {
             }
         });
     },
-    register: ({ username, email, nickname, password, defaultCurrency, firstDayOfWeek }) => {
+    register: ({ username, email, nickname, password, language, defaultCurrency, firstDayOfWeek }) => {
         return axios.post('register.json', {
             username,
             email,
             nickname,
             password,
+            language,
             defaultCurrency,
             firstDayOfWeek
         });
@@ -135,16 +136,21 @@ export default {
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },
-    updateProfile: ({ email, nickname, password, oldPassword, defaultCurrency, defaultAccountId, firstDayOfWeek, transactionEditScope }) => {
+    updateProfile: ({ email, nickname, password, oldPassword, defaultAccountId, transactionEditScope, language, defaultCurrency, firstDayOfWeek, longDateFormat, shortDateFormat, longTimeFormat, shortTimeFormat }) => {
         return axios.post('v1/users/profile/update.json', {
             email,
             nickname,
             password,
             oldPassword,
-            defaultCurrency,
             defaultAccountId,
+            transactionEditScope,
+            language,
+            defaultCurrency,
             firstDayOfWeek,
-            transactionEditScope
+            longDateFormat,
+            shortDateFormat,
+            longTimeFormat,
+            shortTimeFormat
         });
     },
     get2FAStatus: () => {

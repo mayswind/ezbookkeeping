@@ -104,6 +104,22 @@ import {
     getAllLongWeekdayNames,
     getAllShortWeekdayNames,
     getAllMinWeekdayNames,
+    getAllLongDateFormats,
+    getAllShortDateFormats,
+    getAllLongTimeFormats,
+    getAllShortTimeFormats,
+    getI18nLongDateFormat,
+    getI18nShortDateFormat,
+    getI18nLongTimeFormat,
+    getI18nShortTimeFormat,
+    getI18nLongYearFormat,
+    getI18nShortYearFormat,
+    getI18nLongYearMonthFormat,
+    getI18nShortYearMonthFormat,
+    getI18nLongMonthDayFormat,
+    getI18nShortMonthDayFormat,
+    isLongTime24HourFormat,
+    isShortTime24HourFormat,
     getAllTimezones,
     getAllCurrencies,
     getDisplayCurrency,
@@ -186,9 +202,21 @@ app.use(store);
 app.use(i18n);
 
 function setLanguage(locale) {
-    if (settings.getLanguage() !== locale) {
-        settings.setLanguage(locale);
+    if (!locale) {
+        locale = getDefaultLanguage();
+        logger.info(`No specified language, use browser default language ${locale}`);
     }
+
+    if (!getLanguageInfo(locale)) {
+        logger.warn(`Not found language ${locale}`);
+        return null;
+    }
+
+    if (i18n.global.locale === locale) {
+        return locale;
+    }
+
+    logger.info(`Apply current language to ${locale}`);
 
     i18n.global.locale = locale;
     moment.updateLocale(locale, {
@@ -197,6 +225,13 @@ function setLanguage(locale) {
         weekdays : app.config.globalProperties.$locale.getAllLongWeekdayNames(),
         weekdaysShort : app.config.globalProperties.$locale.getAllShortWeekdayNames(),
         weekdaysMin : app.config.globalProperties.$locale.getAllMinWeekdayNames(),
+        meridiem: function (hours) {
+            if (hours > 11) {
+                return i18n.global.t('datetime.PM.upperCase');
+            } else {
+                return i18n.global.t('datetime.AM.upperCase');
+            }
+        }
     });
     services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
@@ -225,12 +260,13 @@ function setTimezone(timezone) {
 }
 
 function initLocale() {
-    if (settings.getLanguage()) {
-        logger.info(`Current language is ${settings.getLanguage()}`);
-        setLanguage(settings.getLanguage());
+    const lastUserLanguage = store.getters.currentUserLanguage;
+
+    if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
+        logger.info(`Last user language is ${lastUserLanguage}`);
+        setLanguage(lastUserLanguage);
     } else {
-        logger.info(`No language is set, use browser default ${getDefaultLanguage()}`);
-        setLanguage(getDefaultLanguage());
+        setLanguage(null);
     }
 
     if (settings.getTimezone()) {
@@ -296,6 +332,24 @@ app.config.globalProperties.$locale = {
     getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18n.global.t),
     getAllShortWeekdayNames: () => getAllShortWeekdayNames(i18n.global.t),
     getAllMinWeekdayNames: () => getAllMinWeekdayNames(i18n.global.t),
+    getAllLongDateFormats: () => getAllLongDateFormats(i18n.global.t),
+    getAllShortDateFormats: () => getAllShortDateFormats(i18n.global.t),
+    getAllLongTimeFormats: () => getAllLongTimeFormats(i18n.global.t),
+    getAllShortTimeFormats: () => getAllShortTimeFormats(i18n.global.t),
+    getLongDateTimeFormat: () => getI18nLongDateFormat(i18n.global.t, store.getters.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
+    getShortDateTimeFormat: () => getI18nShortDateFormat(i18n.global.t, store.getters.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
+    getLongDateFormat: () => getI18nLongDateFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
+    getShortDateFormat: () => getI18nShortDateFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
+    getLongYearFormat: () => getI18nLongYearFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
+    getShortYearFormat: () => getI18nShortYearFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
+    getLongYearMonthFormat: () => getI18nLongYearMonthFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
+    getShortYearMonthFormat: () => getI18nShortYearMonthFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
+    getLongMonthDayFormat: () => getI18nLongMonthDayFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
+    getShortMonthDayFormat: () => getI18nShortMonthDayFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
+    getLongTimeFormat: () => getI18nLongTimeFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
+    getShortTimeFormat: () => getI18nShortTimeFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
+    isLongTime24HourFormat: () => isLongTime24HourFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
+    isShortTime24HourFormat: () => isShortTime24HourFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
     setLanguage: setLanguage,
     getTimezone: settings.getTimezone,
     setTimezone: setTimezone,

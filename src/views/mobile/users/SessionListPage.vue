@@ -72,7 +72,7 @@ export default {
                     deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
                     deviceInfo: this.$utilities.parseDeviceInfo(token.userAgent),
                     icon: this.getTokenIcon(token),
-                    createdAt: this.$utilities.formatUnixTime(token.createdAt, this.$t('format.datetime.long'))
+                    createdAt: this.$utilities.formatUnixTime(token.createdAt, this.$locale.getLongDateTimeFormat())
                 });
             }
 

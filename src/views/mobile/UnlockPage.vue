@@ -113,7 +113,11 @@ export default {
                 self.$hideLoading();
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
-                self.$store.dispatch('refreshTokenAndRevokeOldToken');
+                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                    if (response.user && response.user.language) {
+                        self.$locale.setLanguage(response.user.language);
+                    }
+                });
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
@@ -136,34 +140,40 @@ export default {
             });
         },
         unlockByPin(pinCode) {
-            if (!this.isPinCodeValid(pinCode)) {
+            const self = this;
+
+            if (!self.isPinCodeValid(pinCode)) {
                 return;
             }
 
-            if (this.$ui.isModalShowing()) {
+            if (self.$ui.isModalShowing()) {
                 return;
             }
 
-            const router = this.f7router;
-            const user = this.$store.state.currentUserInfo;
+            const router = self.f7router;
+            const user = self.$store.state.currentUserInfo;
 
             if (!user || !user.username) {
-                this.$alert('An error has occurred');
+                self.$alert('An error has occurred');
                 return;
             }
 
             try {
-                this.$user.unlockTokenByPinCode(user.username, pinCode);
-                this.$store.dispatch('refreshTokenAndRevokeOldToken');
+                self.$user.unlockTokenByPinCode(user.username, pinCode);
+                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                    if (response.user && response.user.language) {
+                        self.$locale.setLanguage(response.user.language);
+                    }
+                });
 
-                if (this.$settings.isAutoUpdateExchangeRatesData()) {
-                    this.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
 
                 router.refreshPage();
             } catch (ex) {
-                this.$logger.error('failed to unlock by pin code', ex);
-                this.$toast('PIN code is wrong');
+                self.$logger.error('failed to unlock by pin code', ex);
+                self.$toast('PIN code is wrong');
             }
         },
         relogin() {

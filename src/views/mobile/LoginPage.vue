@@ -200,6 +200,10 @@ export default {
                     return;
                 }
 
+                if (authResponse.user && authResponse.user.language) {
+                    self.$locale.setLanguage(authResponse.user.language);
+                }
+
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
@@ -244,9 +248,13 @@ export default {
                 token: self.tempToken,
                 passcode: self.twoFAVerifyType === 'passcode' ? self.passcode : null,
                 recoveryCode: self.twoFAVerifyType === 'backupcode' ? self.backupCode : null
-            }).then(() => {
+            }).then(authResponse => {
                 self.verifying = false;
                 self.$hideLoading();
+
+                if (authResponse.user && authResponse.user.language) {
+                    self.$locale.setLanguage(authResponse.user.language);
+                }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
                     self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });

@@ -95,16 +95,15 @@ export default {
             return this.$utilities.arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
         },
         is24Hour() {
-            const datetimeFormat = this.$t('format.datetime.long');
-            return this.$utilities.is24HourFormat(datetimeFormat);
+            return this.$locale.isLongTime24HourFormat();
         },
         beginDateTime() {
             const actualBeginUnixTime = this.$utilities.getActualUnixTimeForStore(this.$utilities.getUnixTime(this.dateRange[0]), this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
-            return this.$utilities.formatUnixTime(actualBeginUnixTime, this.$t('format.datetime.long'));
+            return this.$utilities.formatUnixTime(actualBeginUnixTime, this.$locale.getLongDateTimeFormat());
         },
         endDateTime() {
             const actualEndUnixTime = this.$utilities.getActualUnixTimeForStore(this.$utilities.getUnixTime(this.dateRange[1]), this.$utilities.getTimezoneOffsetMinutes(), this.$utilities.getBrowserTimezoneOffsetMinutes());
-            return this.$utilities.formatUnixTime(actualEndUnixTime, this.$t('format.datetime.long'));
+            return this.$utilities.formatUnixTime(actualEndUnixTime, this.$locale.getLongDateTimeFormat());
         },
         presetRanges() {
             const presetRanges = [];

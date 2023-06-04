@@ -213,7 +213,7 @@
                 link="#" no-chevron
                 :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Time')"
-                :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), this.$t('format.datetime.long'))"
+                :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), $locale.getLongDateTimeFormat())"
                 @click="showTransactionDateTimeSheet = true"
             >
                 <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"

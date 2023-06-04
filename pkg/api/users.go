@@ -57,6 +57,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		Email:                userRegisterReq.Email,
 		Nickname:             userRegisterReq.Nickname,
 		Password:             userRegisterReq.Password,
+		Language:             userRegisterReq.Language,
 		DefaultCurrency:      userRegisterReq.DefaultCurrency,
 		FirstDayOfWeek:       userRegisterReq.FirstDayOfWeek,
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
@@ -161,12 +162,6 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		anythingUpdate = true
 	}
 
-	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
-		user.DefaultCurrency = userUpdateReq.DefaultCurrency
-		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
-		anythingUpdate = true
-	}
-
 	if userUpdateReq.DefaultAccountId > 0 && userUpdateReq.DefaultAccountId != user.DefaultAccountId {
 		accounts, err := a.accounts.GetAccountsByAccountIds(uid, []int64{userUpdateReq.DefaultAccountId})
 
@@ -179,14 +174,6 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		anythingUpdate = true
 	}
 
-	if userUpdateReq.FirstDayOfWeek != nil && *userUpdateReq.FirstDayOfWeek != user.FirstDayOfWeek {
-		user.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
-		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
-		anythingUpdate = true
-	} else {
-		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID
-	}
-
 	if userUpdateReq.TransactionEditScope != nil && *userUpdateReq.TransactionEditScope != user.TransactionEditScope {
 		user.TransactionEditScope = *userUpdateReq.TransactionEditScope
 		userNew.TransactionEditScope = *userUpdateReq.TransactionEditScope
@@ -195,11 +182,66 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		userNew.TransactionEditScope = models.TRANSACTION_EDIT_SCOPE_INVALID
 	}
 
+	modifyUserLanguage := false
+
+	if userUpdateReq.Language != user.Language {
+		user.Language = userUpdateReq.Language
+		userNew.Language = userUpdateReq.Language
+		modifyUserLanguage = true
+		anythingUpdate = true
+	}
+
+	if userUpdateReq.DefaultCurrency != "" && userUpdateReq.DefaultCurrency != user.DefaultCurrency {
+		user.DefaultCurrency = userUpdateReq.DefaultCurrency
+		userNew.DefaultCurrency = userUpdateReq.DefaultCurrency
+		anythingUpdate = true
+	}
+
+	if userUpdateReq.FirstDayOfWeek != nil && *userUpdateReq.FirstDayOfWeek != user.FirstDayOfWeek {
+		user.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
+		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
+		anythingUpdate = true
+	} else {
+		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID
+	}
+
+	if userUpdateReq.LongDateFormat != nil && *userUpdateReq.LongDateFormat != user.LongDateFormat {
+		user.LongDateFormat = *userUpdateReq.LongDateFormat
+		userNew.LongDateFormat = *userUpdateReq.LongDateFormat
+		anythingUpdate = true
+	} else {
+		userNew.LongDateFormat = models.LONG_DATE_FORMAT_INVALID
+	}
+
+	if userUpdateReq.ShortDateFormat != nil && *userUpdateReq.ShortDateFormat != user.ShortDateFormat {
+		user.ShortDateFormat = *userUpdateReq.ShortDateFormat
+		userNew.ShortDateFormat = *userUpdateReq.ShortDateFormat
+		anythingUpdate = true
+	} else {
+		userNew.ShortDateFormat = models.SHORT_DATE_FORMAT_INVALID
+	}
+
+	if userUpdateReq.LongTimeFormat != nil && *userUpdateReq.LongTimeFormat != user.LongTimeFormat {
+		user.LongTimeFormat = *userUpdateReq.LongTimeFormat
+		userNew.LongTimeFormat = *userUpdateReq.LongTimeFormat
+		anythingUpdate = true
+	} else {
+		userNew.LongTimeFormat = models.LONG_TIME_FORMAT_INVALID
+	}
+
+	if userUpdateReq.ShortTimeFormat != nil && *userUpdateReq.ShortTimeFormat != user.ShortTimeFormat {
+		user.ShortTimeFormat = *userUpdateReq.ShortTimeFormat
+		userNew.ShortTimeFormat = *userUpdateReq.ShortTimeFormat
+		anythingUpdate = true
+	} else {
+		userNew.ShortTimeFormat = models.SHORT_TIME_FORMAT_INVALID
+	}
+
 	if !anythingUpdate {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	keyProfileUpdated, err := a.users.UpdateUser(userNew)
+	keyProfileUpdated, err := a.users.UpdateUser(userNew, modifyUserLanguage)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())

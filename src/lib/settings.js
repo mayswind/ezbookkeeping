@@ -7,7 +7,6 @@ const settingsLocalStorageKey = 'ebk_app_settings';
 const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
-    lang: 'en',
     timeZone: '',
     debug: false,
     applicationLock: false,
@@ -129,8 +128,6 @@ function clearSettings() {
 
 export default {
     isProduction: () => process.env.NODE_ENV === 'production',
-    getLanguage: () => getOriginalOption('lang'),
-    setLanguage: value => setOption('lang', value),
     getTimezone: () => getOption('timeZone'),
     setTimezone: value => setOption('timeZone', value),
     isEnableDebug: () => getOption('debug'),

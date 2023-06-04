@@ -188,6 +188,7 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
+                language: self.$i18n.locale,
                 defaultCurrency: self.$store.state.defaultSetting.currency,
                 firstDayOfWeek: self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')] ? self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
             },
@@ -221,6 +222,7 @@ export default {
                 const isCurrencyDefault = this.user.defaultCurrency === this.$store.state.defaultSetting.currency;
                 const isFirstWeekDayDefault = this.user.firstDayOfWeek === (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
 
+                this.user.language = value;
                 this.$locale.setLanguage(value);
 
                 if (isCurrencyDefault) {
@@ -324,7 +326,7 @@ export default {
 
             self.$store.dispatch('register', {
                 user: self.user
-            }).then(() => {
+            }).then(response => {
                 if (!self.$user.isUserLogined()) {
                     self.submitting = false;
                     self.$hideLoading();
@@ -337,6 +339,10 @@ export default {
 
                     router.navigate('/');
                     return;
+                }
+
+                if (response.user && response.user.language) {
+                    self.$locale.setLanguage(response.user.language);
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {

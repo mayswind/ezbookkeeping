@@ -16,10 +16,18 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Account" title="Not Specified"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Editable Transaction Scope" title="All" link="#"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Language" title="Language" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Time Format" title="HH:mm:ss" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Time Format" title="HH:mm" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
@@ -64,24 +72,6 @@
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
-                class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Default Currency')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
-            >
-                <template #title>
-                    <f7-block class="no-padding no-margin">
-                        <span>{{ $t(`currency.${newProfile.defaultCurrency}`) }}&nbsp;</span>
-                        <small class="smaller">{{ newProfile.defaultCurrency }}</small>
-                    </f7-block>
-                </template>
-                <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
-                    <option :value="currency.code"
-                            :key="currency.code"
-                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
-                </select>
-            </f7-list-item>
-
-            <f7-list-item
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
@@ -105,19 +95,6 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('First Day of Week')"
-                :title="getDayOfWeekName(newProfile.firstDayOfWeek)"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
-            >
-                <select v-model="newProfile.firstDayOfWeek">
-                    <option :value="weekDay.type"
-                            :key="weekDay.type"
-                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
-                </select>
-            </f7-list-item>
-
-            <f7-list-item
-                class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Editable Transaction Scope')"
                 :title="$t($utilities.getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'value', 'name'))"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Scope'), popupCloseLinkText: $t('Done') }"
@@ -130,6 +107,105 @@
             </f7-list-item>
 
             <f7-list-item class="ebk-list-item-error-info" v-if="extendInputIsInvalid" :footer="$t(extendInputInvalidProblemMessage)"></f7-list-item>
+        </f7-list>
+
+        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Language')"
+                :title="currentLanguageName"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }">
+                <select v-model="newProfile.language">
+                    <option :value="language.code"
+                            :key="language.code"
+                            v-for="language in allLanguages">{{ language.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Default Currency')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Name'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Default Currency'), popupCloseLinkText: $t('Done') }"
+            >
+                <template #title>
+                    <f7-block class="no-padding no-margin">
+                        <span>{{ $t(`currency.${newProfile.defaultCurrency}`) }}&nbsp;</span>
+                        <small class="smaller">{{ newProfile.defaultCurrency }}</small>
+                    </f7-block>
+                </template>
+                <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
+                    <option :value="currency.code"
+                            :key="currency.code"
+                            v-for="currency in allCurrencies">{{ currency.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('First Day of Week')"
+                :title="currentDayOfWeekName"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.firstDayOfWeek">
+                    <option :value="weekDay.type"
+                            :key="weekDay.type"
+                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Long Date Format')"
+                :title="$utilities.getNameByKeyValue(allLongDateFormats, newProfile.longDateFormat, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Date Format'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.longDateFormat">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allLongDateFormats">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Short Date Format')"
+                :title="$utilities.getNameByKeyValue(allShortDateFormats, newProfile.shortDateFormat, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Short Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Date Format'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.shortDateFormat">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allShortDateFormats">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Long Time Format')"
+                :title="$utilities.getNameByKeyValue(allLongTimeFormats, newProfile.longTimeFormat, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Time Format'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.longTimeFormat">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allLongTimeFormats">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Short Time Format')"
+                :title="$utilities.getNameByKeyValue(allShortTimeFormats, newProfile.shortTimeFormat, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Time Format'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.shortTimeFormat">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allShortTimeFormats">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
         <password-input-sheet :title="$t('Modify Password')"
@@ -155,18 +231,28 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                defaultCurrency: '',
                 defaultAccountId: '',
+                transactionEditScope: 1,
+                language: '',
+                defaultCurrency: '',
                 firstDayOfWeek: 0,
-                transactionEditScope: 1
+                longDateFormat: 0,
+                shortDateFormat: 0,
+                longTimeFormat: 0,
+                shortTimeFormat: 0
             },
             oldProfile: {
                 email: '',
                 nickname: '',
-                defaultCurrency: '',
                 defaultAccountId: '',
+                transactionEditScope: 1,
+                language: '',
+                defaultCurrency: '',
                 firstDayOfWeek: 0,
-                transactionEditScope: 1
+                longDateFormat: 0,
+                shortDateFormat: 0,
+                longTimeFormat: 0,
+                shortTimeFormat: 0
             },
             currentPassword: '',
             loading: true,
@@ -177,6 +263,30 @@ export default {
         };
     },
     computed: {
+        allLanguages() {
+            const ret = [];
+            const allLanguageInfo = this.$locale.getAllLanguageInfos();
+
+            ret.push({
+                code: '',
+                displayName: this.$t('System Default')
+            });
+
+            for (let code in allLanguageInfo) {
+                if (!Object.prototype.hasOwnProperty.call(allLanguageInfo, code)) {
+                    continue;
+                }
+
+                const languageInfo = allLanguageInfo[code];
+
+                ret.push({
+                    code: code,
+                    displayName: languageInfo.displayName
+                });
+            }
+
+            return ret;
+        },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
         },
@@ -191,6 +301,18 @@ export default {
         },
         allWeekDays() {
             return this.$constants.datetime.allWeekDays;
+        },
+        allLongDateFormats() {
+            return this.$locale.getAllLongDateFormats();
+        },
+        allShortDateFormats() {
+            return this.$locale.getAllShortDateFormats();
+        },
+        allLongTimeFormats() {
+            return this.$locale.getAllLongTimeFormats();
+        },
+        allShortTimeFormats() {
+            return this.$locale.getAllShortTimeFormats();
         },
         allTransactionEditScopeTypes() {
             return [{
@@ -216,6 +338,20 @@ export default {
                 name: 'This year or later'
             }];
         },
+        currentLanguageName() {
+            for (let i = 0; i < this.allLanguages.length; i++) {
+                if (this.allLanguages[i].code === this.newProfile.language) {
+                    return this.allLanguages[i].displayName;
+                }
+            }
+
+            return this.$t('Unknown');
+        },
+        currentDayOfWeekName() {
+            const weekName = this.$utilities.getNameByKeyValue(this.$constants.datetime.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'name');
+            const i18nWeekNameKey = `datetime.${weekName}.long`;
+            return this.$t(i18nWeekNameKey);
+        },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
         },
@@ -225,16 +361,24 @@ export default {
         extendInputIsInvalid() {
             return !!this.extendInputInvalidProblemMessage;
         },
+        langAndRegionInputIsInvalid() {
+            return !!this.langAndRegionInputInvalidProblemMessage;
+        },
         inputIsNotChangedProblemMessage() {
             if (!this.newProfile.password && !this.newProfile.confirmPassword && !this.newProfile.email && !this.newProfile.nickname) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && !this.newProfile.confirmPassword &&
                 this.newProfile.email === this.oldProfile.email &&
                 this.newProfile.nickname === this.oldProfile.nickname &&
-                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
                 this.newProfile.defaultAccountId === this.oldProfile.defaultAccountId &&
+                this.newProfile.transactionEditScope === this.oldProfile.transactionEditScope &&
+                this.newProfile.language === this.oldProfile.language &&
+                this.newProfile.defaultCurrency === this.oldProfile.defaultCurrency &&
                 this.newProfile.firstDayOfWeek === this.oldProfile.firstDayOfWeek &&
-                this.newProfile.transactionEditScope === this.oldProfile.transactionEditScope) {
+                this.newProfile.longDateFormat === this.oldProfile.longDateFormat &&
+                this.newProfile.shortDateFormat === this.oldProfile.shortDateFormat &&
+                this.newProfile.longTimeFormat === this.oldProfile.longTimeFormat &&
+                this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be empty';
@@ -258,6 +402,9 @@ export default {
             }
         },
         extendInputInvalidProblemMessage() {
+            return null;
+        },
+        langAndRegionInputInvalidProblemMessage() {
             if (!this.newProfile.defaultCurrency) {
                 return 'Default currency cannot be empty';
             } else {
@@ -277,21 +424,7 @@ export default {
 
         Promise.all(promises).then(responses => {
             const profile = responses[1];
-
-            self.oldProfile.email = profile.email;
-            self.oldProfile.nickname = profile.nickname;
-            self.oldProfile.defaultCurrency = profile.defaultCurrency;
-            self.oldProfile.defaultAccountId = profile.defaultAccountId;
-            self.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
-            self.oldProfile.transactionEditScope = profile.transactionEditScope;
-
-            self.newProfile.email = self.oldProfile.email
-            self.newProfile.nickname = self.oldProfile.nickname;
-            self.newProfile.defaultCurrency = self.oldProfile.defaultCurrency;
-            self.newProfile.defaultAccountId = self.oldProfile.defaultAccountId;
-            self.newProfile.firstDayOfWeek = self.oldProfile.firstDayOfWeek;
-            self.newProfile.transactionEditScope = self.oldProfile.transactionEditScope;
-
+            self.setCurrentUserProfile(profile);
             self.loading = false;
         }).catch(error => {
             if (error.processed) {
@@ -312,7 +445,7 @@ export default {
 
             self.showInputPasswordSheet = false;
 
-            let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage;
+            let problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage || self.langAndRegionInputInvalidProblemMessage;
 
             if (problemMessage) {
                 self.$alert(problemMessage);
@@ -330,10 +463,15 @@ export default {
             self.$store.dispatch('updateUserProfile', {
                 profile: self.newProfile,
                 currentPassword: self.currentPassword
-            }).then(() => {
+            }).then(response => {
                 self.saving = false;
                 self.$hideLoading();
                 self.currentPassword = '';
+
+                if (response.user) {
+                    self.setCurrentUserProfile(response.user);
+                    self.$locale.setLanguage(response.user.language);
+                }
 
                 self.$toast('Your profile has been successfully updated');
                 router.back();
@@ -347,10 +485,30 @@ export default {
                 }
             });
         },
-        getDayOfWeekName(dayOfWeek) {
-            const weekName = this.$utilities.getNameByKeyValue(this.$constants.datetime.allWeekDays, dayOfWeek, 'type', 'name');
-            const i18nWeekNameKey = `datetime.${weekName}.long`;
-            return this.$t(i18nWeekNameKey);
+        setCurrentUserProfile(profile) {
+            this.oldProfile.email = profile.email;
+            this.oldProfile.nickname = profile.nickname;
+            this.oldProfile.defaultAccountId = profile.defaultAccountId;
+            this.oldProfile.transactionEditScope = profile.transactionEditScope;
+            this.oldProfile.language = profile.language;
+            this.oldProfile.defaultCurrency = profile.defaultCurrency;
+            this.oldProfile.firstDayOfWeek = profile.firstDayOfWeek;
+            this.oldProfile.longDateFormat = profile.longDateFormat;
+            this.oldProfile.shortDateFormat = profile.shortDateFormat;
+            this.oldProfile.longTimeFormat = profile.longTimeFormat;
+            this.oldProfile.shortTimeFormat = profile.shortTimeFormat;
+
+            this.newProfile.email = this.oldProfile.email
+            this.newProfile.nickname = this.oldProfile.nickname;
+            this.newProfile.defaultAccountId = this.oldProfile.defaultAccountId;
+            this.newProfile.transactionEditScope = this.oldProfile.transactionEditScope;
+            this.newProfile.language = this.oldProfile.language;
+            this.newProfile.defaultCurrency = this.oldProfile.defaultCurrency;
+            this.newProfile.firstDayOfWeek = this.oldProfile.firstDayOfWeek;
+            this.newProfile.longDateFormat = this.oldProfile.longDateFormat;
+            this.newProfile.shortDateFormat = this.oldProfile.shortDateFormat;
+            this.newProfile.longTimeFormat = this.oldProfile.longTimeFormat;
+            this.newProfile.shortTimeFormat = this.oldProfile.shortTimeFormat;
         }
     }
 };

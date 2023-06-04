@@ -73,9 +73,14 @@ import {
     clearUserInfoState,
     resetState,
     currentUserNickname,
-    currentUserDefaultCurrency,
     currentUserDefaultAccountId,
+    currentUserLanguage,
+    currentUserDefaultCurrency,
     currentUserFirstDayOfWeek,
+    currentUserLongDateFormat,
+    currentUserShortDateFormat,
+    currentUserLongTimeFormat,
+    currentUserShortTimeFormat,
 } from './user.js';
 
 import {
@@ -166,8 +171,13 @@ const stores = {
     strict: !settings.isProduction(),
     state: {
         defaultSetting: {
+            language: '',
             currency: currencyConstants.defaultCurrency,
-            firstDayOfWeek: datetimeConstants.defaultFirstDayOfWeek
+            firstDayOfWeek: datetimeConstants.defaultFirstDayOfWeek,
+            longDateFormat: 0,
+            shortDateFormat: 0,
+            longTimeFormat: 0,
+            shortTimeFormat: 0
         },
         currentUserInfo: userState.getUserInfo(),
         latestExchangeRates: getExchangeRatesFromLocalStorage(),
@@ -210,9 +220,14 @@ const stores = {
     getters: {
         // user
         currentUserNickname,
-        currentUserDefaultCurrency,
         currentUserDefaultAccountId,
+        currentUserLanguage,
+        currentUserDefaultCurrency,
         currentUserFirstDayOfWeek,
+        currentUserLongDateFormat,
+        currentUserShortDateFormat,
+        currentUserLongTimeFormat,
+        currentUserShortTimeFormat,
 
         // exchange rates
         exchangeRatesLastUpdateTime,

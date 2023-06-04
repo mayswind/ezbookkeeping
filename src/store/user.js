@@ -133,6 +133,7 @@ export function register(context, { user }) {
             password: user.password,
             email: user.email,
             nickname: user.nickname,
+            language: user.language,
             defaultCurrency: user.defaultCurrency,
             firstDayOfWeek: user.firstDayOfWeek
         }).then(response => {
@@ -235,10 +236,15 @@ export function updateUserProfile(context, { profile, currentPassword }) {
             oldPassword: currentPassword,
             email: profile.email,
             nickname: profile.nickname,
-            defaultCurrency: profile.defaultCurrency,
             defaultAccountId: profile.defaultAccountId,
+            transactionEditScope: profile.transactionEditScope,
+            language: profile.language,
+            defaultCurrency: profile.defaultCurrency,
             firstDayOfWeek: profile.firstDayOfWeek,
-            transactionEditScope: profile.transactionEditScope
+            longDateFormat: profile.longDateFormat,
+            shortDateFormat: profile.shortDateFormat,
+            longTimeFormat: profile.longTimeFormat,
+            shortTimeFormat: profile.shortTimeFormat
         }).then(response => {
             const data = response.data;
 
@@ -391,17 +397,42 @@ export function currentUserNickname(state) {
     return userInfo.nickname || userInfo.username || null;
 }
 
-export function currentUserDefaultCurrency(state) {
-    const userInfo = state.currentUserInfo || {};
-    return userInfo.defaultCurrency || state.defaultSetting.currency;
-}
-
 export function currentUserDefaultAccountId(state) {
     const userInfo = state.currentUserInfo || {};
     return userInfo.defaultAccountId || '';
 }
 
+export function currentUserLanguage(state) {
+    const userInfo = state.currentUserInfo || {};
+    return userInfo.language || state.defaultSetting.language;
+}
+
+export function currentUserDefaultCurrency(state) {
+    const userInfo = state.currentUserInfo || {};
+    return userInfo.defaultCurrency || state.defaultSetting.currency;
+}
+
 export function currentUserFirstDayOfWeek(state) {
     const userInfo = state.currentUserInfo || {};
     return utilities.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : state.defaultSetting.firstDayOfWeek;
+}
+
+export function currentUserLongDateFormat(state) {
+    const userInfo = state.currentUserInfo || {};
+    return utilities.isNumber(userInfo.longDateFormat) ? userInfo.longDateFormat : state.defaultSetting.longDateFormat;
+}
+
+export function currentUserShortDateFormat(state) {
+    const userInfo = state.currentUserInfo || {};
+    return utilities.isNumber(userInfo.shortDateFormat) ? userInfo.shortDateFormat : state.defaultSetting.shortDateFormat;
+}
+
+export function currentUserLongTimeFormat(state) {
+    const userInfo = state.currentUserInfo || {};
+    return utilities.isNumber(userInfo.longTimeFormat) ? userInfo.longTimeFormat : state.defaultSetting.longTimeFormat;
+}
+
+export function currentUserShortTimeFormat(state) {
+    const userInfo = state.currentUserInfo || {};
+    return utilities.isNumber(userInfo.shortTimeFormat) ? userInfo.shortTimeFormat : state.defaultSetting.shortTimeFormat;
 }

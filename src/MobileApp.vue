@@ -75,14 +75,20 @@ export default {
         }
     },
     created() {
-        if (this.$user.isUserLogined()) {
-            if (!this.$settings.isEnableApplicationLock()) {
+        const self = this;
+
+        if (self.$user.isUserLogined()) {
+            if (!self.$settings.isEnableApplicationLock()) {
                 // refresh token if user is logined
-                this.$store.dispatch('refreshTokenAndRevokeOldToken');
+                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                    if (response.user && response.user.language) {
+                        self.$locale.setLanguage(response.user.language);
+                    }
+                });
 
                 // auto refresh exchange rates data
-                if (this.$settings.isAutoUpdateExchangeRatesData()) {
-                    this.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
                 }
             }
         }

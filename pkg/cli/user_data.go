@@ -142,7 +142,7 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 		Password: password,
 	}
 
-	_, err = l.users.UpdateUser(userNew)
+	_, err = l.users.UpdateUser(userNew, false)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ModifyUserPassword] failed to update user \"%s\" password, because %s", user.Username, err.Error())

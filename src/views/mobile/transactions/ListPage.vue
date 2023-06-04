@@ -123,7 +123,7 @@
                             <f7-list-item>
                                 <template #title>
                                     <small>
-                                        <span>{{ $utilities.formatTime(transactionMonthList.yearMonth, $t('format.yearMonth.long')) }}</span>
+                                        <span>{{ $utilities.formatTime(transactionMonthList.yearMonth, $locale.getLongYearMonthFormat()) }}</span>
                                     </small>
                                     <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
                                         <span class="text-color-red">
@@ -202,7 +202,7 @@
                                         </div>
                                         <div class="item-footer">
                                             <div class="transaction-footer">
-                                                <span>{{ $utilities.formatUnixTime(transaction.time, $t('format.hourMinute.long'), transaction.utcOffset, currentTimezoneOffsetMinutes) }}</span>
+                                                <span>{{ $utilities.formatUnixTime(transaction.time, $locale.getShortTimeFormat(), transaction.utcOffset, currentTimezoneOffsetMinutes) }}</span>
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(UTC${$utilities.getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
@@ -252,10 +252,10 @@
                     </template>
                     <template #footer>
                         <div v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.minTime && query.maxTime">
-                            <span>{{ $utilities.formatUnixTime(query.minTime, $t('format.datetime.long-without-second')) }}</span>
+                            <span>{{ $utilities.formatUnixTime(query.minTime, $locale.getLongDateTimeFormat()) }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
-                            <span>{{ $utilities.formatUnixTime(query.maxTime, $t('format.datetime.long-without-second')) }}</span>
+                            <span>{{ $utilities.formatUnixTime(query.maxTime, $locale.getLongDateTimeFormat()) }}</span>
                         </div>
                     </template>
                 </f7-list-item>
@@ -840,6 +840,11 @@ export default {
 </script>
 
 <style>
+.list.transaction-amount-list .transaction-amount-statistics {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .list.transaction-amount-list .transaction-amount-statistics > span {
     margin-left: 8px;
     font-weight: normal;

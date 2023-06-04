@@ -6,31 +6,62 @@ export default {
     },
     'default': {
         'currency': 'CNY',
-        'firstDayOfWeek': 'Monday'
+        'firstDayOfWeek': 'Monday',
+        'longDateFormat': 'YYYYMMDD',
+        'shortDateFormat': 'YYYYMMDD',
+        'longTimeFormat': 'HHMMSS',
+        'shortTimeFormat': 'HHMM'
     },
     'format': {
-        'date': {
-            'long': 'YYYY年M月D日',
-            'short': 'YYYY-M-D'
+        'longDate': {
+            'yyyy_mm_dd': 'YYYY年M月D日',
+            'mm_dd_yyyy': 'M/D/YYYY',
+            'dd_mm_yyyy': 'D/M/YYYY'
         },
-        'datetime': {
-            'long': 'YYYY年M月D日 HH:mm:ss',
-            'long-without-second': 'YYYY年M月D日 HH:mm',
+        'shortDate': {
+            'yyyy_mm_dd': 'YYYY-M-D',
+            'mm_dd_yyyy': 'M/D/YYYY',
+            'dd_mm_yyyy': 'D/M/YYYY'
         },
-        'year': {
-            'long': 'YYYY年',
-            'short': 'YYYY'
+        'longYear': {
+            'yyyy_mm_dd': 'YYYY年',
+            'mm_dd_yyyy': 'YYYY年',
+            'dd_mm_yyyy': 'YYYY年'
         },
-        'yearMonth': {
-            'long': 'YYYY年M月',
-            'short': 'YYYY-M'
+        'shortYear': {
+            'yyyy_mm_dd': 'YYYY',
+            'mm_dd_yyyy': 'YYYY',
+            'dd_mm_yyyy': 'YYYY'
         },
-        'monthDay': {
-            'long': 'M月D日',
-            'short': 'M-D'
+        'longYearMonth': {
+            'yyyy_mm_dd': 'YYYY年M月',
+            'mm_dd_yyyy': 'M/YYYY',
+            'dd_mm_yyyy': 'M/YYYY'
         },
-        'hourMinute': {
-            'long': 'HH:mm'
+        'shortYearMonth': {
+            'yyyy_mm_dd': 'YYYY-M',
+            'mm_dd_yyyy': 'M/YYYY',
+            'dd_mm_yyyy': 'M/YYYY'
+        },
+        'longMonthDay': {
+            'yyyy_mm_dd': 'M月D日',
+            'mm_dd_yyyy': 'M/D',
+            'dd_mm_yyyy': 'D/M'
+        },
+        'shortMonthDay': {
+            'yyyy_mm_dd': 'M-D',
+            'mm_dd_yyyy': 'M/D',
+            'dd_mm_yyyy': 'D/M'
+        },
+        'longTime': {
+            'hh_mm_ss': 'HH:mm:ss',
+            'a_hh_mm_ss': 'A hh:mm:ss',
+            'hh_mm_ss_a': 'hh:mm:ss A'
+        },
+        'shortTime': {
+            'hh_mm': 'HH:mm',
+            'a_hh_mm': 'A hh:mm',
+            'hh_mm_a': 'hh:mm A'
         },
         'currency': {
             'symbol': '{symbol} {amount}'
@@ -41,6 +72,12 @@ export default {
         'exportFilename': 'ezBookkeeping_{nickname}_导出数据'
     },
     'datetime': {
+        'AM': {
+            'upperCase': '上午'
+        },
+        'PM': {
+            'upperCase': '下午'
+        },
         'Monday': {
             'min': '一',
             'short': '周一',
@@ -657,6 +694,7 @@ export default {
     'None': '无',
     'Not Specified': '未指定',
     'No results': '无结果',
+    'Unknown': '未知',
     'Done': '完成',
     'Continue': '继续',
     'Status': '状态',
@@ -727,6 +765,10 @@ export default {
     'Default Currency': '默认货币',
     'Default Account': '默认账户',
     'First Day of Week': '每周第一天',
+    'Long Date Format': '长日期格式',
+    'Short Date Format': '短日期格式',
+    'Long Time Format': '长时间格式',
+    'Short Time Format': '短时间格式',
     'Editable Transaction Scope': '可编辑交易范围',
     'Today or later': '今天或更晚',
     'Recent 24 hours or later': '最近24小时或更晚',
@@ -894,6 +936,7 @@ export default {
     'Language': '语言',
     'Timezone': '时区',
     'System Default': '系统默认',
+    'Language Default': '语言默认',
     'Auto Update Exchange Rates Data': '自动更新汇率数据',
     'Auto Get Current Geographic Location': '自动获取当前地理位置',
     'Enable Thousands Separator': '启用千位分隔符',

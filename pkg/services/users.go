@@ -150,7 +150,7 @@ func (s *UserService) CreateUser(user *models.User) error {
 }
 
 // UpdateUser saves an existed user model to database
-func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err error) {
+func (s *UserService) UpdateUser(user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, err error) {
 	if user.Uid <= 0 {
 		return false, errs.ErrUserIdInvalid
 	}
@@ -186,20 +186,40 @@ func (s *UserService) UpdateUser(user *models.User) (keyProfileUpdated bool, err
 		updateCols = append(updateCols, "nickname")
 	}
 
-	if user.DefaultCurrency != "" {
-		updateCols = append(updateCols, "default_currency")
-	}
-
 	if user.DefaultAccountId > 0 {
 		updateCols = append(updateCols, "default_account_id")
+	}
+
+	if models.TRANSACTION_EDIT_SCOPE_NONE <= user.TransactionEditScope && user.TransactionEditScope <= models.TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER {
+		updateCols = append(updateCols, "transaction_edit_scope")
+	}
+
+	if modifyUserLanguage || user.Language != "" {
+		updateCols = append(updateCols, "language")
+	}
+
+	if user.DefaultCurrency != "" {
+		updateCols = append(updateCols, "default_currency")
 	}
 
 	if models.WEEKDAY_SUNDAY <= user.FirstDayOfWeek && user.FirstDayOfWeek <= models.WEEKDAY_SATURDAY {
 		updateCols = append(updateCols, "first_day_of_week")
 	}
 
-	if models.TRANSACTION_EDIT_SCOPE_NONE <= user.TransactionEditScope && user.TransactionEditScope <= models.TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER {
-		updateCols = append(updateCols, "transaction_edit_scope")
+	if models.LONG_DATE_FORMAT_DEFAULT <= user.LongDateFormat && user.LongDateFormat <= models.LONG_DATE_FORMAT_D_M_YYYY {
+		updateCols = append(updateCols, "long_date_format")
+	}
+
+	if models.SHORT_DATE_FORMAT_DEFAULT <= user.ShortDateFormat && user.ShortDateFormat <= models.SHORT_DATE_FORMAT_D_M_YYYY {
+		updateCols = append(updateCols, "short_date_format")
+	}
+
+	if models.LONG_TIME_FORMAT_DEFAULT <= user.LongTimeFormat && user.LongTimeFormat <= models.LONG_TIME_FORMAT_HH_MM_SS_A {
+		updateCols = append(updateCols, "long_time_format")
+	}
+
+	if models.SHORT_TIME_FORMAT_DEFAULT <= user.ShortTimeFormat && user.ShortTimeFormat <= models.SHORT_TIME_FORMAT_HH_MM_A {
+		updateCols = append(updateCols, "short_time_format")
 	}
 
 	user.UpdatedUnixTime = now

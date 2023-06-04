@@ -111,7 +111,7 @@ export default {
                 return '';
             }
 
-            return this.$utilities.formatUnixTime(this.exchangeRatesData.updateTime, this.$t('format.date.long'));
+            return this.$utilities.formatUnixTime(this.exchangeRatesData.updateTime, this.$locale.getLongDateFormat());
         },
         exchangeRateMap() {
             const exchangeRateMap = {};

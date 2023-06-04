@@ -51,7 +51,7 @@ export default {
                 return this.$buildTime;
             }
 
-            return this.$utilities.formatUnixTime(this.$buildTime, this.$t('format.datetime.long'));
+            return this.$utilities.formatUnixTime(this.$buildTime, this.$locale.getLongDateTimeFormat());
         },
         licenseLines() {
             return this.$licenses.license.replaceAll(/\r/g, '').split('\n');

@@ -235,19 +235,19 @@ export default {
 
             return {
                 today: {
-                    displayTime: self.$utilities.formatUnixTime(self.dateRange.today.startTime, self.$t('format.date.long')),
+                    displayTime: self.$utilities.formatUnixTime(self.dateRange.today.startTime, self.$locale.getLongDateFormat()),
                 },
                 thisWeek: {
-                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.startTime, self.$t('format.monthDay.long')),
-                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.endTime, self.$t('format.monthDay.long'))
+                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.startTime, self.$locale.getLongMonthDayFormat()),
+                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.endTime, self.$locale.getLongMonthDayFormat())
                 },
                 thisMonth: {
                     displayTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.startTime, self.$t('format.monthDay.long')),
-                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.endTime, self.$t('format.monthDay.long'))
+                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.startTime, self.$locale.getLongMonthDayFormat()),
+                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.endTime, self.$locale.getLongMonthDayFormat())
                 },
                 thisYear: {
-                    displayTime: self.$utilities.formatUnixTime(self.dateRange.thisYear.startTime, self.$t('format.year.long'))
+                    displayTime: self.$utilities.formatUnixTime(self.dateRange.thisYear.startTime, self.$locale.getLongYearFormat())
                 }
             };
         },

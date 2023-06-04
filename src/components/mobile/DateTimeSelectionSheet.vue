@@ -70,8 +70,7 @@ export default {
             return this.$utilities.arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
         },
         is24Hour() {
-            const datetimeFormat = this.$t('format.datetime.long');
-            return this.$utilities.is24HourFormat(datetimeFormat);
+            return this.$locale.isLongTime24HourFormat();
         }
     },
     methods: {

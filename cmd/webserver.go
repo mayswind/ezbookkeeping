@@ -137,6 +137,11 @@ func startWebServer(c *cli.Context) error {
 
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
 
+	if config.Mode == settings.MODE_DEVELOPMENT {
+		devRoute := router.Group("/dev")
+		devRoute.GET("/cookies", bindMiddleware(middlewares.ServerSettingsCookie(config)))
+	}
+
 	proxyRoute := router.Group("/proxy")
 	proxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
 	{

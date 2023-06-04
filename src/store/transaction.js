@@ -1,7 +1,7 @@
 import transactionConstants from '../consts/transaction.js';
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import { getExchangedAmount } from './exchangeRates.js';
 
@@ -284,10 +284,10 @@ export function fillTransactionObject(state, transaction, currentUtcOffset) {
         return;
     }
 
-    const transactionTime = utils.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+    const transactionTime = utilities.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
 
-    transaction.day = utils.getDay(transactionTime);
-    transaction.dayOfWeek = utils.getDayOfWeekName(transactionTime);
+    transaction.day = utilities.getDay(transactionTime);
+    transaction.dayOfWeek = utilities.getDayOfWeekName(transactionTime);
 
     if (transaction.sourceAccountId) {
         transaction.sourceAccount = state.allAccountsMap[transaction.sourceAccountId];
@@ -332,7 +332,7 @@ export function calculateMonthTotalAmount(state, transactionMonthList, defaultCu
         if (account.currency !== defaultCurrency) {
             const balance = getExchangedAmount(state)(amount, account.currency, defaultCurrency);
 
-            if (!utils.isNumber(balance)) {
+            if (!utilities.isNumber(balance)) {
                 if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
                     hasUnCalculatedTotalExpense = true;
                 } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {

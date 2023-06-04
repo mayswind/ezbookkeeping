@@ -4,7 +4,7 @@ import iconConstants from '../consts/icon.js';
 import colorConstants from '../consts/color.js';
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import { getExchangedAmount } from './exchangeRates.js';
 
@@ -102,7 +102,7 @@ export function statisticsItemsByTransactionStatisticsData(state) {
 
         if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
             state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type) {
-            if (utils.isNumber(item.amountInDefaultCurrency)) {
+            if (utilities.isNumber(item.amountInDefaultCurrency)) {
                 let data = allDataItems[item.account.id];
 
                 if (data) {
@@ -130,7 +130,7 @@ export function statisticsItemsByTransactionStatisticsData(state) {
             }
         } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
             state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type) {
-            if (utils.isNumber(item.amountInDefaultCurrency)) {
+            if (utilities.isNumber(item.amountInDefaultCurrency)) {
                 let data = allDataItems[item.primaryCategory.id];
 
                 if (data) {
@@ -158,7 +158,7 @@ export function statisticsItemsByTransactionStatisticsData(state) {
             }
         } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
             state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
-            if (utils.isNumber(item.amountInDefaultCurrency)) {
+            if (utilities.isNumber(item.amountInDefaultCurrency)) {
                 let data = allDataItems[item.category.id];
 
                 if (data) {
@@ -231,7 +231,7 @@ export function statisticsItemsByAccountsData(state, getters) {
         if (account.currency !== getters.currentUserDefaultCurrency) {
             amount = Math.floor(getExchangedAmount(state)(amount, account.currency, getters.currentUserDefaultCurrency));
 
-            if (!utils.isNumber(amount)) {
+            if (!utilities.isNumber(amount)) {
                 continue;
             }
         }

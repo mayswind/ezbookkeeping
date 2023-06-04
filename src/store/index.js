@@ -3,7 +3,7 @@ import currencyConstants from '../consts/currency.js';
 import statisticsConstants from '../consts/statistics.js';
 import userState from '../lib/userstate.js';
 import settings from '../lib/settings.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import {
     RESET_STATE,
@@ -307,7 +307,7 @@ const stores = {
                 }
             }
 
-            state.allCategorizedAccounts = utils.getCategorizedAccounts(accounts);
+            state.allCategorizedAccounts = utilities.getCategorizedAccounts(accounts);
         },
         [ADD_ACCOUNT_TO_ACCOUNT_LIST] (state, account) {
             let insertIndexToAllList = 0;
@@ -334,7 +334,7 @@ const stores = {
                 const accountList = state.allCategorizedAccounts[account.category].accounts;
                 accountList.push(account);
             } else {
-                state.allCategorizedAccounts = utils.getCategorizedAccounts(state.allAccounts);
+                state.allCategorizedAccounts = utilities.getCategorizedAccounts(state.allAccounts);
             }
         },
         [SAVE_ACCOUNT_IN_ACCOUNT_LIST] (state, account) {
@@ -442,7 +442,7 @@ const stores = {
             }
 
             if (transactions.items && transactions.items.length) {
-                const currentUtcOffset = utils.getTimezoneOffsetMinutes();
+                const currentUtcOffset = utilities.getTimezoneOffsetMinutes();
                 let currentMonthListIndex = -1;
                 let currentMonthList = null;
 
@@ -450,10 +450,10 @@ const stores = {
                     const item = transactions.items[i];
                     fillTransactionObject(state, item, currentUtcOffset);
 
-                    const transactionTime = utils.parseDateFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
-                    const transactionYear = utils.getYear(transactionTime);
-                    const transactionMonth = utils.getMonth(transactionTime);
-                    const transactionYearMonth = utils.getYearAndMonth(transactionTime);
+                    const transactionTime = utilities.parseDateFromUnixTime(item.time, item.utcOffset, currentUtcOffset);
+                    const transactionYear = utilities.getYear(transactionTime);
+                    const transactionMonth = utilities.getMonth(transactionTime);
+                    const transactionYearMonth = utilities.getYearAndMonth(transactionTime);
 
                     if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                         currentMonthList.items.push(Object.freeze(item));
@@ -496,74 +496,74 @@ const stores = {
             }
         },
         [INIT_TRANSACTION_LIST_FILTER] (state, filter) {
-            if (filter && utils.isNumber(filter.dateType)) {
+            if (filter && utilities.isNumber(filter.dateType)) {
                 state.transactionsFilter.dateType = filter.dateType;
             } else {
                 state.transactionsFilter.dateType = datetimeConstants.allDateRanges.All.type;
             }
 
-            if (filter && utils.isNumber(filter.maxTime)) {
+            if (filter && utilities.isNumber(filter.maxTime)) {
                 state.transactionsFilter.maxTime = filter.maxTime;
             } else {
                 state.transactionsFilter.maxTime = 0;
             }
 
-            if (filter && utils.isNumber(filter.minTime)) {
+            if (filter && utilities.isNumber(filter.minTime)) {
                 state.transactionsFilter.minTime = filter.minTime;
             } else {
                 state.transactionsFilter.minTime = 0;
             }
 
-            if (filter && utils.isNumber(filter.type)) {
+            if (filter && utilities.isNumber(filter.type)) {
                 state.transactionsFilter.type = filter.type;
             } else {
                 state.transactionsFilter.type = 0;
             }
 
-            if (filter && utils.isString(filter.categoryId)) {
+            if (filter && utilities.isString(filter.categoryId)) {
                 state.transactionsFilter.categoryId = filter.categoryId;
             } else {
                 state.transactionsFilter.categoryId = '0';
             }
 
-            if (filter && utils.isString(filter.accountId)) {
+            if (filter && utilities.isString(filter.accountId)) {
                 state.transactionsFilter.accountId = filter.accountId;
             } else {
                 state.transactionsFilter.accountId = '0';
             }
 
-            if (filter && utils.isString(filter.keyword)) {
+            if (filter && utilities.isString(filter.keyword)) {
                 state.transactionsFilter.keyword = filter.keyword;
             } else {
                 state.transactionsFilter.keyword = '';
             }
         },
         [UPDATE_TRANSACTION_LIST_FILTER] (state, filter) {
-            if (filter && utils.isNumber(filter.dateType)) {
+            if (filter && utilities.isNumber(filter.dateType)) {
                 state.transactionsFilter.dateType = filter.dateType;
             }
 
-            if (filter && utils.isNumber(filter.maxTime)) {
+            if (filter && utilities.isNumber(filter.maxTime)) {
                 state.transactionsFilter.maxTime = filter.maxTime;
             }
 
-            if (filter && utils.isNumber(filter.minTime)) {
+            if (filter && utilities.isNumber(filter.minTime)) {
                 state.transactionsFilter.minTime = filter.minTime;
             }
 
-            if (filter && utils.isNumber(filter.type)) {
+            if (filter && utilities.isNumber(filter.type)) {
                 state.transactionsFilter.type = filter.type;
             }
 
-            if (filter && utils.isString(filter.categoryId)) {
+            if (filter && utilities.isString(filter.categoryId)) {
                 state.transactionsFilter.categoryId = filter.categoryId;
             }
 
-            if (filter && utils.isString(filter.accountId)) {
+            if (filter && utilities.isString(filter.accountId)) {
                 state.transactionsFilter.accountId = filter.accountId;
             }
 
-            if (filter && utils.isString(filter.keyword)) {
+            if (filter && utilities.isString(filter.keyword)) {
                 state.transactionsFilter.keyword = filter.keyword;
             }
         },
@@ -573,10 +573,10 @@ const stores = {
             }
         },
         [SAVE_TRANSACTION_IN_TRANSACTION_LIST] (state, { transaction, defaultCurrency }) {
-            const currentUtcOffset = utils.getTimezoneOffsetMinutes();
-            const transactionTime = utils.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
-            const transactionYear = utils.getYear(transactionTime);
-            const transactionMonth = utils.getMonth(transactionTime);
+            const currentUtcOffset = utilities.getTimezoneOffsetMinutes();
+            const transactionTime = utilities.parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
+            const transactionYear = utilities.getYear(transactionTime);
+            const transactionMonth = utilities.getMonth(transactionTime);
 
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
@@ -837,7 +837,7 @@ const stores = {
                     if (item.account && item.account.currency !== defaultCurrency) {
                         const amount = getExchangedAmount(state)(item.amount, item.account.currency, defaultCurrency);
 
-                        if (utils.isNumber(amount)) {
+                        if (utilities.isNumber(amount)) {
                             item.amountInDefaultCurrency = Math.floor(amount);
                         }
                     } else if (item.account && item.account.currency === defaultCurrency) {
@@ -851,84 +851,84 @@ const stores = {
             state.transactionStatistics = statistics;
         },
         [INIT_TRANSACTION_STATISTICS_FILTER] (state, filter) {
-            if (filter && utils.isNumber(filter.dateType)) {
+            if (filter && utilities.isNumber(filter.dateType)) {
                 state.transactionStatisticsFilter.dateType = filter.dateType;
             } else {
                 state.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
             }
 
-            if (filter && utils.isNumber(filter.startTime)) {
+            if (filter && utilities.isNumber(filter.startTime)) {
                 state.transactionStatisticsFilter.startTime = filter.startTime;
             } else {
                 state.transactionStatisticsFilter.startTime = 0;
             }
 
-            if (filter && utils.isNumber(filter.endTime)) {
+            if (filter && utilities.isNumber(filter.endTime)) {
                 state.transactionStatisticsFilter.endTime = filter.endTime;
             } else {
                 state.transactionStatisticsFilter.endTime = 0;
             }
 
-            if (filter && utils.isNumber(filter.chartType)) {
+            if (filter && utilities.isNumber(filter.chartType)) {
                 state.transactionStatisticsFilter.chartType = filter.chartType;
             } else {
                 state.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
             }
 
-            if (filter && utils.isNumber(filter.chartDataType)) {
+            if (filter && utilities.isNumber(filter.chartDataType)) {
                 state.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             } else {
                 state.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             }
 
-            if (filter && utils.isObject(filter.filterAccountIds)) {
+            if (filter && utilities.isObject(filter.filterAccountIds)) {
                 state.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
             } else {
                 state.transactionStatisticsFilter.filterAccountIds = {};
             }
 
-            if (filter && utils.isObject(filter.filterCategoryIds)) {
+            if (filter && utilities.isObject(filter.filterCategoryIds)) {
                 state.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
             } else {
                 state.transactionStatisticsFilter.filterCategoryIds = {};
             }
 
-            if (filter && utils.isNumber(filter.sortingType)) {
+            if (filter && utilities.isNumber(filter.sortingType)) {
                 state.transactionStatisticsFilter.sortingType = filter.sortingType;
             } else {
                 state.transactionStatisticsFilter.sortingType = statisticsConstants.defaultSortingType;
             }
         },
         [UPDATE_TRANSACTION_STATISTICS_FILTER] (state, filter) {
-            if (filter && utils.isNumber(filter.dateType)) {
+            if (filter && utilities.isNumber(filter.dateType)) {
                 state.transactionStatisticsFilter.dateType = filter.dateType;
             }
 
-            if (filter && utils.isNumber(filter.startTime)) {
+            if (filter && utilities.isNumber(filter.startTime)) {
                 state.transactionStatisticsFilter.startTime = filter.startTime;
             }
 
-            if (filter && utils.isNumber(filter.endTime)) {
+            if (filter && utilities.isNumber(filter.endTime)) {
                 state.transactionStatisticsFilter.endTime = filter.endTime;
             }
 
-            if (filter && utils.isNumber(filter.chartType)) {
+            if (filter && utilities.isNumber(filter.chartType)) {
                 state.transactionStatisticsFilter.chartType = filter.chartType;
             }
 
-            if (filter && utils.isNumber(filter.chartDataType)) {
+            if (filter && utilities.isNumber(filter.chartDataType)) {
                 state.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             }
 
-            if (filter && utils.isObject(filter.filterAccountIds)) {
+            if (filter && utilities.isObject(filter.filterAccountIds)) {
                 state.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
             }
 
-            if (filter && utils.isObject(filter.filterCategoryIds)) {
+            if (filter && utilities.isObject(filter.filterCategoryIds)) {
                 state.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
             }
 
-            if (filter && utils.isNumber(filter.sortingType)) {
+            if (filter && utilities.isNumber(filter.sortingType)) {
                 state.transactionStatisticsFilter.sortingType = filter.sortingType;
             }
         },

@@ -1,6 +1,6 @@
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import { getExchangedAmount } from './exchangeRates.js';
 
@@ -55,13 +55,13 @@ export function loadTransactionOverview(context, { defaultCurrency, dateRange, f
                         const incomeAmount = getExchangedAmount(context.state)(amount.incomeAmount, amount.currency, defaultCurrency);
                         const expenseAmount = getExchangedAmount(context.state)(amount.expenseAmount, amount.currency, defaultCurrency);
 
-                        if (utils.isNumber(incomeAmount)) {
+                        if (utilities.isNumber(incomeAmount)) {
                             totalIncomeAmount += Math.floor(incomeAmount);
                         } else {
                             hasUnCalculatedTotalIncome = true;
                         }
 
-                        if (utils.isNumber(expenseAmount)) {
+                        if (utilities.isNumber(expenseAmount)) {
                             totalExpenseAmount += Math.floor(expenseAmount);
                         } else {
                             hasUnCalculatedTotalExpense = true;

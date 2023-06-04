@@ -2,7 +2,7 @@ import userState from '../lib/userstate.js';
 import services from '../lib/services.js';
 import settings from '../lib/settings.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import {
     RESET_STATE,
@@ -48,7 +48,7 @@ export function authorize(context, { loginName, password }) {
 
             userState.updateToken(data.result.token);
 
-            if (data.result.user && utils.isObject(data.result.user)) {
+            if (data.result.user && utilities.isObject(data.result.user)) {
                 context.commit(STORE_USER_INFO, data.result.user);
             }
 
@@ -107,7 +107,7 @@ export function authorize2FA(context, { token, passcode, recoveryCode }) {
 
             userState.updateToken(data.result.token);
 
-            if (data.result.user && utils.isObject(data.result.user)) {
+            if (data.result.user && utilities.isObject(data.result.user)) {
                 context.commit(STORE_USER_INFO, data.result.user);
             }
 
@@ -149,11 +149,11 @@ export function register(context, { user }) {
                 userState.clearWebAuthnConfig();
             }
 
-            if (data.result.token && utils.isString(data.result.token)) {
+            if (data.result.token && utilities.isString(data.result.token)) {
                 userState.updateToken(data.result.token);
             }
 
-            if (data.result.user && utils.isObject(data.result.user)) {
+            if (data.result.user && utilities.isObject(data.result.user)) {
                 context.commit(STORE_USER_INFO, data.result.user);
             }
 
@@ -247,11 +247,11 @@ export function updateUserProfile(context, { profile, currentPassword }) {
                 return;
             }
 
-            if (data.result.newToken && utils.isString(data.result.newToken)) {
+            if (data.result.newToken && utilities.isString(data.result.newToken)) {
                 userState.updateToken(data.result.newToken);
             }
 
-            if (data.result.user && utils.isObject(data.result.user)) {
+            if (data.result.user && utilities.isObject(data.result.user)) {
                 context.commit(STORE_USER_INFO, data.result.user);
             }
 
@@ -403,5 +403,5 @@ export function currentUserDefaultAccountId(state) {
 
 export function currentUserFirstDayOfWeek(state) {
     const userInfo = state.currentUserInfo || {};
-    return utils.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : state.defaultSetting.firstDayOfWeek;
+    return utilities.isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : state.defaultSetting.firstDayOfWeek;
 }

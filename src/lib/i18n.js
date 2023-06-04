@@ -2,7 +2,7 @@ import { defaultLanguage, allLanguages } from '../locales/index.js';
 import timezone from "../consts/timezone.js";
 import currency from "../consts/currency.js";
 import settings from "./settings.js";
-import utils from './utils.js';
+import utilities from './utilities/index.js';
 
 const apiNotFoundErrorCode = 100001;
 const specifiedApiNotFoundErrors = {
@@ -251,16 +251,16 @@ export function getAllMinWeekdayNames(translateFn) {
 }
 
 export function getAllTimezones(includeSystemDefault, translateFn) {
-    const defaultTimezoneOffset = utils.getTimezoneOffset();
-    const defaultTimezoneOffsetMinutes = utils.getTimezoneOffsetMinutes();
+    const defaultTimezoneOffset = utilities.getTimezoneOffset();
+    const defaultTimezoneOffsetMinutes = utilities.getTimezoneOffsetMinutes();
     const allTimezones = timezone.all;
     const allTimezoneInfos = [];
 
     for (let i = 0; i < allTimezones.length; i++) {
         allTimezoneInfos.push({
             name: allTimezones[i].timezoneName,
-            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? utils.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
-            utcOffsetMinutes: utils.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
+            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? utilities.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+            utcOffsetMinutes: utilities.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
             displayName: translateFn(`timezone.${allTimezones[i].displayName}`)
         });
     }
@@ -311,22 +311,22 @@ export function getAllCurrencies(translateFn) {
 }
 
 export function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
-    if (!utils.isNumber(value) && !utils.isString(value)) {
+    if (!utilities.isNumber(value) && !utilities.isString(value)) {
         return value;
     }
 
-    if (utils.isNumber(value)) {
+    if (utilities.isNumber(value)) {
         value = value.toString();
     }
 
     if (!notConvertValue) {
-        const hasIncompleteFlag = utils.isString(value) && value.charAt(value.length - 1) === '+';
+        const hasIncompleteFlag = utilities.isString(value) && value.charAt(value.length - 1) === '+';
 
         if (hasIncompleteFlag) {
             value = value.substring(0, value.length - 1);
         }
 
-        value = utils.numericCurrencyToString(value);
+        value = utilities.numericCurrencyToString(value);
 
         if (hasIncompleteFlag) {
             value = value + '+';

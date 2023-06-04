@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 
 import settings from './settings.js';
-import utils from './utils.js';
+import utilities from './utilities/index.js';
 
 const appLockSecretBaseStringPrefix = 'EBK_LOCK_SECRET_';
 
@@ -141,7 +141,7 @@ function isCorrectPinCode(pinCode) {
 }
 
 function updateToken(token) {
-    if (utils.isString(token)) {
+    if (utilities.isString(token)) {
         if (settings.isEnableApplicationLock()) {
             sessionStorage.setItem(tokenSessionStorageKey, token);
 
@@ -155,7 +155,7 @@ function updateToken(token) {
 }
 
 function updateUserInfo(user) {
-    if (utils.isObject(user)) {
+    if (utilities.isObject(user)) {
         localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(user));
     }
 }

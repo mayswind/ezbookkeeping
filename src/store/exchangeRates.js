@@ -1,6 +1,6 @@
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import {
     STORE_LATEST_EXCHANGE_RATES
@@ -10,16 +10,16 @@ const exchangeRatesLocalStorageKey = 'ebk_app_exchange_rates';
 
 export function getLatestExchangeRates(context, { silent, force }) {
     const currentExchangeRateData = context.state.latestExchangeRates;
-    const now = utils.getCurrentUnixTime();
+    const now = utilities.getCurrentUnixTime();
 
     if (!force) {
         if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-            utils.formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === utils.formatUnixTime(now, 'YYYY-MM-DD')) {
+            utilities.formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === utilities.formatUnixTime(now, 'YYYY-MM-DD')) {
             return currentExchangeRateData.data;
         }
 
         if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
-            utils.formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === utils.formatUnixTime(now, 'YYYY-MM-DD HH')) {
+            utilities.formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === utilities.formatUnixTime(now, 'YYYY-MM-DD HH')) {
             return currentExchangeRateData.data;
         }
     }
@@ -37,7 +37,7 @@ export function getLatestExchangeRates(context, { silent, force }) {
 
             const currentData = getExchangeRatesFromLocalStorage();
 
-            if (currentData && currentData.data && utils.isEquals(currentData.data, data.result)) {
+            if (currentData && currentData.data && utilities.isEquals(currentData.data, data.result)) {
                 reject({ message: 'Exchange rates data is up to date' });
                 return;
             }
@@ -88,7 +88,7 @@ export function getExchangedAmount(state) {
             return null;
         }
 
-        return utils.getExchangedAmount(amount, fromCurrencyExchangeRate.rate, toCurrencyExchangeRate.rate)
+        return utilities.getExchangedAmount(amount, fromCurrencyExchangeRate.rate, toCurrencyExchangeRate.rate)
     };
 }
 

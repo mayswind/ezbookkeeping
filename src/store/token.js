@@ -1,7 +1,7 @@
 import userState from '../lib/userstate.js';
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 import {
     STORE_USER_INFO
@@ -40,7 +40,7 @@ export function refreshTokenAndRevokeOldToken(context) {
             if (data && data.success && data.result && data.result.newToken) {
                 userState.updateToken(data.result.newToken);
 
-                if (data.result.user && utils.isObject(data.result.user)) {
+                if (data.result.user && utilities.isObject(data.result.user)) {
                     context.commit(STORE_USER_INFO, data.result.user);
                 }
 

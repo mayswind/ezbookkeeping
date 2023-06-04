@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import api from '../consts/api.js';
 import userState from './userstate.js';
-import utils from './utils.js';
+import utilities from './utilities/index.js';
 
 let needBlockRequest = false;
 let blockedRequests = [];
@@ -16,7 +16,7 @@ axios.interceptors.request.use(config => {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
-    config.headers['X-Timezone-Offset'] = utils.getTimezoneOffsetMinutes();
+    config.headers['X-Timezone-Offset'] = utilities.getTimezoneOffsetMinutes();
 
     if (needBlockRequest && !config.ignoreBlocked) {
         return new Promise(resolve => {

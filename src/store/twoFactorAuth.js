@@ -1,14 +1,14 @@
 import userState from '../lib/userstate.js';
 import services from '../lib/services.js';
 import logger from '../lib/logger.js';
-import utils from '../lib/utils.js';
+import utilities from '../lib/utilities/index.js';
 
 export function get2FAStatus() {
     return new Promise((resolve, reject) => {
         services.get2FAStatus().then(response => {
             const data = response.data;
 
-            if (!data || !data.success || !data.result || !utils.isBoolean(data.result.enable)) {
+            if (!data || !data.success || !data.result || !utilities.isBoolean(data.result.enable)) {
                 reject({ message: 'Unable to get current two factor authentication status' });
                 return;
             }

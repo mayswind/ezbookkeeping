@@ -93,7 +93,7 @@ import settings from './lib/settings.js';
 import services from './lib/services.js';
 import userstate from './lib/userstate.js';
 import webauthn from './lib/webauthn.js';
-import utils from './lib/utils.js';
+import utilities from './lib/utilities/index.js';
 import {
     getAllLanguageInfos,
     getLanguageInfo,
@@ -237,7 +237,7 @@ function initLocale() {
         logger.info(`Current timezone is ${settings.getTimezone()}`);
         setTimezone(settings.getTimezone());
     } else {
-        logger.info(`No timezone is set, use browser default ${utils.getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
+        logger.info(`No timezone is set, use browser default ${utilities.getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
     }
 }
 
@@ -283,7 +283,7 @@ app.config.globalProperties.$constants = {
     statistics: statistics,
 };
 
-app.config.globalProperties.$utilities = utils;
+app.config.globalProperties.$utilities = utilities;
 app.config.globalProperties.$logger = logger;
 app.config.globalProperties.$webauthn = webauthn;
 app.config.globalProperties.$settings = settings;

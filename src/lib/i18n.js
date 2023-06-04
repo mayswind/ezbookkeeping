@@ -164,6 +164,15 @@ export function getDefaultLanguage() {
                 browserLocale = locale;
             }
         }
+
+        if (!allLanguages[browserLocale]) {
+            browserLocale = localeParts[0];
+            const locale = getLocaleFromLanguageAlias(browserLocale);
+
+            if (locale) {
+                browserLocale = locale;
+            }
+        }
     }
 
     if (!allLanguages[browserLocale]) {

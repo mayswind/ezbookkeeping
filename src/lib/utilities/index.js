@@ -78,6 +78,8 @@ import {
 import {
     transactionTypeToCategoryType,
     categoryTypeToTransactionType,
+    getTransactionPrimaryCategoryName,
+    getTransactionSecondaryCategoryName,
     allVisibleTransactionCategories,
 } from './category.js'
 
@@ -165,6 +167,8 @@ export default {
     // category.js
     transactionTypeToCategoryType,
     categoryTypeToTransactionType,
+    getTransactionPrimaryCategoryName,
+    getTransactionSecondaryCategoryName,
     allVisibleTransactionCategories,
 
     // account.js

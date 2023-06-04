@@ -25,6 +25,32 @@ export function categoryTypeToTransactionType(categoryType) {
     }
 }
 
+export function getTransactionPrimaryCategoryName(categoryId, allCategories) {
+    for (let i = 0; i < allCategories.length; i++) {
+        for (let j = 0; j < allCategories[i].subCategories.length; j++) {
+            const subCategory = allCategories[i].subCategories[j];
+            if (subCategory.id === categoryId) {
+                return allCategories[i].name;
+            }
+        }
+    }
+
+    return '';
+}
+
+export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
+    for (let i = 0; i < allCategories.length; i++) {
+        for (let j = 0; j < allCategories[i].subCategories.length; j++) {
+            const subCategory = allCategories[i].subCategories[j];
+            if (subCategory.id === categoryId) {
+                return subCategory.name;
+            }
+        }
+    }
+
+    return '';
+}
+
 export function allVisibleTransactionCategories(allTransactionCategories) {
     const ret = {};
 

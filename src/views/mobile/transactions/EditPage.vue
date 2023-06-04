@@ -953,28 +953,10 @@ export default {
             return this.$locale.getDisplayCurrency(amount);
         },
         getPrimaryCategoryName(categoryId, allCategories) {
-            for (let i = 0; i < allCategories.length; i++) {
-                for (let j = 0; j < allCategories[i].subCategories.length; j++) {
-                    const subCategory = allCategories[i].subCategories[j];
-                    if (subCategory.id === categoryId) {
-                        return allCategories[i].name;
-                    }
-                }
-            }
-
-            return '';
+            return this.$utilities.getTransactionPrimaryCategoryName(categoryId, allCategories);
         },
         getSecondaryCategoryName(categoryId, allCategories) {
-            for (let i = 0; i < allCategories.length; i++) {
-                for (let j = 0; j < allCategories[i].subCategories.length; j++) {
-                    const subCategory = allCategories[i].subCategories[j];
-                    if (subCategory.id === categoryId) {
-                        return subCategory.name;
-                    }
-                }
-            }
-
-            return '';
+            return this.$utilities.getTransactionSecondaryCategoryName(categoryId, allCategories);
         }
     }
 };

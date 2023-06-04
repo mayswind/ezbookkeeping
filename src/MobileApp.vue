@@ -1,5 +1,5 @@
 <template>
-    <img src="/dev/cookies" style="display: none;" v-if="!isProduction" />
+    <img style="display: none;" :src="devCookiePath" v-if="!isProduction" />
     <f7-app v-bind="f7params">
         <f7-view id="main-view" class="safe-areas" main url="/"></f7-view>
     </f7-app>
@@ -15,6 +15,7 @@ export default {
 
         return {
             isProduction: self.$settings.isProduction(),
+            devCookiePath: self.$settings.isProduction() ? '' : '/dev/cookies',
             f7params: {
                 name: 'ezBookkeeping',
                 theme: 'ios',

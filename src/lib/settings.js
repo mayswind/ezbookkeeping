@@ -171,5 +171,7 @@ export default {
     setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1',
     isDataExportingEnabled: () => getServerSetting('e') === '1',
+    getMapProvider: () => getServerSetting('m'),
+    isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
     clearSettings: clearSettings
 };

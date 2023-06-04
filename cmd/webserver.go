@@ -145,7 +145,11 @@ func startWebServer(c *cli.Context) error {
 	proxyRoute := router.Group("/proxy")
 	proxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
 	{
-		proxyRoute.GET("/openstreetmap/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.OpenStreetMapTileImageProxyHandler))
+		if config.EnableMapDataFetchProxy {
+			if config.MapProvider == settings.OpenStreetMapProvider {
+				proxyRoute.GET("/openstreetmap/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.OpenStreetMapTileImageProxyHandler))
+			}
+		}
 	}
 
 	apiRoute := router.Group("/api")

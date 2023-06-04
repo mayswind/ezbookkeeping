@@ -16,6 +16,8 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 		settingsArr := []string{
 			buildBooleanSetting("r", config.EnableUserRegister),
 			buildBooleanSetting("e", config.EnableDataExport),
+			buildStringSetting("m", config.MapProvider),
+			buildBooleanSetting("mp", config.EnableMapDataFetchProxy),
 		}
 
 		bundledSettings := strings.Join(settingsArr, "_")
@@ -23,6 +25,10 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 
 		c.Next()
 	}
+}
+
+func buildStringSetting(key string, value string) string {
+	return fmt.Sprintf("%s.%s", key, strings.Replace(value, ".", "-", -1))
 }
 
 func buildBooleanSetting(key string, value bool) string {

@@ -62,6 +62,11 @@ const (
 	InternalUuidGeneratorType string = "internal"
 )
 
+// Map provider types
+const (
+	OpenStreetMapProvider string = "openstreetmap"
+)
+
 // Exchange rates data source types
 const (
 	EuroCentralBankDataSource              string = "euro_central_bank"
@@ -169,6 +174,10 @@ type Config struct {
 	// Data
 	EnableDataExport bool
 
+	// Map
+	MapProvider             string
+	EnableMapDataFetchProxy bool
+
 	// Exchange Rates
 	ExchangeRatesDataSource     string
 	ExchangeRatesRequestTimeout uint32
@@ -234,6 +243,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadDataConfiguration(config, cfgFile, "data")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadMapConfiguration(config, cfgFile, "map")
 
 	if err != nil {
 		return nil, err
@@ -416,6 +431,17 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 	return nil
 }
 
+func loadMapConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
+		config.MapProvider = OpenStreetMapProvider
+	} else {
+		return errs.ErrInvalidMapProvider
+	}
+
+	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+
+	return nil
+}
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	if getConfigItemStringValue(configFile, sectionName, "data_source") == EuroCentralBankDataSource {
 		config.ExchangeRatesDataSource = EuroCentralBankDataSource

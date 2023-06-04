@@ -842,6 +842,8 @@ export default {
     'Update Geographic Location': '更新地理位置',
     'Clear Geographic Location': '清除地理位置',
     'Unable to get current position': '无法获取当前地理位置',
+    'Unsupported Map Provider': '不支持的地图提供方',
+    'Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.': '请刷新页面并重试。如果仍然显示错误，请确保正确设置了服务器地图设置。',
     'Tags': '标签',
     'Your transaction description (optional)': '你的交易描述 (可选)',
     'Are you sure you want to save this transaction whose amount is 0?': '您确定要保存这个金额为0的交易？',

@@ -842,6 +842,8 @@ export default {
     'Update Geographic Location': 'Update Geographic Location',
     'Clear Geographic Location': 'Clear Geographic Location',
     'Unable to get current position': 'Unable to get current position',
+    'Unsupported Map Provider': 'Unsupported Map Provider',
+    'Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.': 'Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.',
     'Tags': 'Tags',
     'Your transaction description (optional)': 'Your transaction description (optional)',
     'Are you sure you want to save this transaction whose amount is 0?': 'Are you sure you want to save this transaction whose amount is 0?',

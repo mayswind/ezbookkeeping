@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import api from '../consts/api.js';
 import userState from './userstate.js';
+import settings from './settings.js';
 import utilities from './utilities/index.js';
 
 let needBlockRequest = false;
@@ -390,8 +391,18 @@ export default {
         });
     },
     generateOpenStreetMapTileImageUrl: () => {
-        const token = userState.getToken();
+        if (settings.isMapDataFetchProxyEnabled()) {
+            const token = userState.getToken();
 
-        return api.baseProxyUrlPath + '/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token;
+            return {
+                url: api.baseProxyUrlPath + '/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token,
+                subDomains: ''
+            };
+        } else {
+            return {
+                url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subDomains: 'abc'
+            };
+        }
     },
 };

@@ -9,4 +9,5 @@ var (
 	ErrGettingLocalAddress            = NewSystemError(SystemSubcategorySetting, 2, http.StatusInternalServerError, "failed to get local address")
 	ErrInvalidUuidMode                = NewSystemError(SystemSubcategorySetting, 3, http.StatusInternalServerError, "invalid uuid mode")
 	ErrInvalidExchangeRatesDataSource = NewSystemError(SystemSubcategorySetting, 4, http.StatusInternalServerError, "invalid exchange rates data source")
+	ErrInvalidMapProvider             = NewSystemError(SystemSubcategorySetting, 5, http.StatusInternalServerError, "invalid map provider")
 )

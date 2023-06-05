@@ -1,6 +1,6 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
-              :class="{ 'list-item-selection-huge-sheet': hugeListItemRows }" :opened="show"
+              :class="heightClass" :opened="show"
               @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
@@ -57,8 +57,14 @@ export default {
         }
     },
     computed: {
-        hugeListItemRows() {
-            return this.items.length > 10;
+        heightClass() {
+            if (this.items.length > 10) {
+                return 'list-item-selection-huge-sheet';
+            } else if (this.items.length > 6) {
+                return 'list-item-selection-large-sheet';
+            } else {
+                return '';
+            }
         }
     },
     methods: {
@@ -133,6 +139,10 @@ export default {
 
 <style>
 @media (min-height: 630px) {
+    .list-item-selection-large-sheet {
+        height: 310px;
+    }
+
     .list-item-selection-huge-sheet {
         height: 400px;
     }

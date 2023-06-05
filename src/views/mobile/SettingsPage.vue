@@ -16,6 +16,7 @@
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
+                :key="currentLocale + '_theme'"
                 :title="$t('Theme')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Theme'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="theme">
@@ -26,6 +27,7 @@
             </f7-list-item>
 
             <f7-list-item
+                :key="currentLocale + '_timezone'"
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currentTimezone">
@@ -55,6 +57,7 @@
             </f7-list-item>
 
             <f7-list-item
+                :key="currentLocale + '_currency_display'"
                 :title="$t('Currency Display Mode')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currencyDisplayMode">
@@ -101,6 +104,7 @@ export default {
         const self = this;
 
         return {
+            currentLocale: this.$i18n.locale,
             isEnableApplicationLock: self.$settings.isEnableApplicationLock(),
             logouting: false
         };
@@ -208,6 +212,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
+            this.currentLocale = this.$i18n.locale;
             this.isEnableApplicationLock = this.$settings.isEnableApplicationLock();
         },
         logout() {

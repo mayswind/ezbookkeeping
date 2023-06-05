@@ -16,6 +16,16 @@
         <f7-block-title>{{ $t('Application') }}</f7-block-title>
         <f7-list strong inset dividers>
             <f7-list-item
+                :title="$t('Theme')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Theme'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="theme">
+                    <option value="auto">{{ $t('System Default') }}</option>
+                    <option value="light">{{ $t('Light') }}</option>
+                    <option value="dark">{{ $t('Dark') }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currentTimezone">
@@ -77,11 +87,6 @@
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item>
-                <span>{{ $t('Enable Auto Dark Mode') }}</span>
-                <f7-toggle :checked="isEnableAutoDarkMode" @toggle:change="isEnableAutoDarkMode = $event"></f7-toggle>
-            </f7-list-item>
-
             <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>
     </f7-page>
@@ -106,6 +111,17 @@ export default {
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
+        },
+        theme: {
+            get: function () {
+                return this.$settings.getTheme();
+            },
+            set: function (value) {
+                if (value !== this.$settings.getTheme()) {
+                    this.$settings.setTheme(value);
+                    location.reload();
+                }
+            }
         },
         currentTimezone: {
             get: function () {
@@ -185,17 +201,6 @@ export default {
             set: function (value) {
                 if (value !== this.$settings.isEnableAnimate()) {
                     this.$settings.setEnableAnimate(value);
-                    location.reload();
-                }
-            }
-        },
-        isEnableAutoDarkMode: {
-            get: function () {
-                return this.$settings.isEnableAutoDarkMode();
-            },
-            set: function (value) {
-                if (value !== this.$settings.isEnableAutoDarkMode()) {
-                    this.$settings.setEnableAutoDarkMode(value);
                     location.reload();
                 }
             }

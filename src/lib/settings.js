@@ -7,6 +7,7 @@ const settingsLocalStorageKey = 'ebk_app_settings';
 const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
+    theme: 'auto',
     timeZone: '',
     debug: false,
     applicationLock: false,
@@ -26,8 +27,7 @@ const defaultSettings = {
         defaultTransactionCategoryFilter: {},
         defaultSortingType: statisticsConstants.defaultSortingType
     },
-    animate: true,
-    autoDarkMode: true
+    animate: true
 };
 
 function getOriginalSettings() {
@@ -124,6 +124,8 @@ function clearSettings() {
 
 export default {
     isProduction: () => process.env.NODE_ENV === 'production',
+    getTheme: () => getOption('theme'),
+    setTheme: value => setOption('theme', value),
     getTimezone: () => getOption('timeZone'),
     setTimezone: value => setOption('timeZone', value),
     isEnableDebug: () => getOption('debug'),
@@ -160,8 +162,6 @@ export default {
     setStatisticsSortingType: value => setSubOption('statistics', 'defaultSortingType', value),
     isEnableAnimate: () => getOption('animate'),
     setEnableAnimate: value => setOption('animate', value),
-    isEnableAutoDarkMode: () => getOption('autoDarkMode'),
-    setEnableAutoDarkMode: value => setOption('autoDarkMode', value),
     isUserRegistrationEnabled: () => getServerSetting('r') === '1',
     isDataExportingEnabled: () => getServerSetting('e') === '1',
     getMapProvider: () => getServerSetting('m'),

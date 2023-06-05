@@ -12,6 +12,13 @@ import routes from './router/mobile.js';
 export default {
     data() {
         const self = this;
+        let darkMode = 'auto';
+
+        if (self.$settings.getTheme() === 'light') {
+            darkMode = false;
+        } else if (self.$settings.getTheme() === 'dark') {
+            darkMode = true;
+        }
 
         return {
             isProduction: self.$settings.isProduction(),
@@ -23,7 +30,7 @@ export default {
                     primary: '#c67e48'
                 },
                 routes: routes,
-                darkMode: self.$settings.isEnableAutoDarkMode() ? 'auto' : false,
+                darkMode: darkMode,
                 touch: {
                     disableContextMenu: true,
                     tapHold: true

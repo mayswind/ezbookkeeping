@@ -61,10 +61,6 @@ function setSettings(settings) {
     return localStorage.setItem(settingsLocalStorageKey, storageData);
 }
 
-function getOriginalOption(key) {
-    return getOriginalSettings()[key];
-}
-
 function getOption(key) {
     return getFinalSettings()[key];
 }

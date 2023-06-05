@@ -35,7 +35,7 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-list strong inset dividers class="margin-top" :class="{ 'skeleton-text': loading }">
+        <f7-list strong inset dividers class="margin-top overview-transaction-list" :class="{ 'skeleton-text': loading }">
             <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.Today.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar_today"></f7-icon>
@@ -53,7 +53,7 @@
                     </div>
                 </template>
                 <template #after>
-                    <div>
+                    <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.incomeAmount }}</small>
@@ -86,7 +86,7 @@
                     </div>
                 </template>
                 <template #after>
-                    <div>
+                    <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.incomeAmount }}</small>
@@ -119,7 +119,7 @@
                     </div>
                 </template>
                 <template #after>
-                    <div>
+                    <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.incomeAmount }}</small>
@@ -149,7 +149,7 @@
                     </div>
                 </template>
                 <template #after>
-                    <div>
+                    <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
                             <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.incomeAmount }}</small>
@@ -400,13 +400,35 @@ export default {
     opacity: 0.6;
 }
 
-.overview-transaction-footer {
-    padding-top: 6px;
-    font-size: 13px;
+.overview-transaction-list .item-title > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.overview-transaction-footer > span {
+.overview-transaction-list .item-after {
+    max-width: 100%;
+}
+
+.overview-transaction-list .overview-transaction-footer {
+    padding-top: 6px;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.overview-transaction-list .overview-transaction-footer > span {
     margin-right: 4px;
+}
+
+.overview-transaction-list .overview-transaction-amount {
+    max-width: 100%;
+}
+
+.overview-transaction-list .overview-transaction-amount > div {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tabbar.main-tabbar .link i + span.tabbar-label {

@@ -857,6 +857,11 @@ export default {
 .list.transaction-info-list li.transaction-info .actual-item-inner {
     width: 100%;
     margin-left: 10px;
+    overflow: hidden;
+}
+
+.list.transaction-info-list li.transaction-info .actual-item-inner .item-after {
+    max-width: 100%;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-date {

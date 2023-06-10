@@ -18,7 +18,7 @@
                 </p>
                 <p class="no-margin">
                     <span class="net-assets" v-if="loading">0.00 USD</span>
-                    <span class="net-assets" v-else-if="!loading">{{ $locale.getDisplayCurrency(netAssets, defaultCurrency) }}</span>
+                    <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
                     <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
                         <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
                     </f7-link>
@@ -29,10 +29,10 @@
                     </small>
                     <small class="account-overview-info" v-else-if="!loading">
                         <span>{{ $t('Total assets') }}</span>
-                        <span>{{ $locale.getDisplayCurrency(totalAssets, defaultCurrency) }}</span>
+                        <span>{{ totalAssets }}</span>
                         <span>|</span>
                         <span>{{ $t('Total liabilities') }}</span>
-                        <span>{{ $locale.getDisplayCurrency(totalLiabilities, defaultCurrency) }}</span>
+                        <span>{{ totalLiabilities }}</span>
                     </small>
                 </p>
             </f7-card-header>
@@ -68,21 +68,21 @@
                 <f7-list-item group-title :sortable="false">
                     <small>
                         <span>{{ $t(accountCategory.name) }}</span>
-                        <span style="margin-left: 10px">{{ $locale.getDisplayCurrency(accountCategoryTotalBalance(accountCategory), defaultCurrency) }}</span>
+                        <span style="margin-left: 10px">{{ accountCategoryTotalBalance(accountCategory) }}</span>
                     </small>
                 </f7-list-item>
                 <f7-list-item swipeout
                               class="nested-list-item"
                               :id="getAccountDomId(account)"
-                              :class="{ 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.id], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.id] }"
-                              :after="$locale.getDisplayCurrency(accountBalance(account), account.currency)"
+                              :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.id], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.id] }"
+                              :after="accountBalance(account)"
                               :link="!sortable ? '/transaction/list?accountId=' + account.id : null"
                               :key="account.id"
                               v-for="account in categorizedAccounts[accountCategory.id].accounts"
                               v-show="showHidden || !account.hidden"
                               @taphold="setSortable()"
                 >
-                    <template #media v-if="account.type !== $constants.account.allAccountTypes.MultiSubAccounts || !hasVisibleSubAccount(account)">
+                    <template #media v-if="account.type !== allAccountTypes.MultiSubAccounts || !hasVisibleSubAccount(account)">
                         <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
                             <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                 <f7-icon f7="eye_slash_fill"></f7-icon>
@@ -93,7 +93,7 @@
                     <template #title>
                         <div class="display-flex padding-top-half padding-bottom-half">
                             <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"
-                                      v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account)">
+                                      v-if="account.type === allAccountTypes.MultiSubAccounts && hasVisibleSubAccount(account)">
                                 <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                     <f7-icon f7="eye_slash_fill"></f7-icon>
                                 </f7-badge>
@@ -103,12 +103,12 @@
                                 <div class="item-footer" v-if="account.comment">{{ account.comment }}</div>
                             </div>
                         </div>
-                        <li v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts">
+                        <li v-if="account.type === allAccountTypes.MultiSubAccounts">
                             <ul class="no-padding">
                                 <f7-list-item class="no-sortable nested-list-item-child"
                                               :class="{ 'actual-first-child': subAccount.id === firstShowingIds.subAccounts[account.id], 'actual-last-child': subAccount.id === lastShowingIds.subAccounts[account.id] }"
                                               :id="getAccountDomId(subAccount)"
-                                              :title="subAccount.name" :footer="subAccount.comment" :after="$locale.getDisplayCurrency(accountBalance(subAccount), subAccount.currency)"
+                                              :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(subAccount)"
                                               :link="!sortable ? '/transaction/list?accountId=' + subAccount.id : null"
                                               :key="subAccount.id"
                                               v-for="subAccount in account.subAccounts"
@@ -165,6 +165,14 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import accountConstants from '@/consts/account.js';
+import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7router'
@@ -184,194 +192,46 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useAccountsStore, useExchangeRatesStore),
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency;
+            return this.userStore.currentUserDefaultCurrency;
+        },
+        allAccountTypes() {
+            return accountConstants.allAccountTypes;
         },
         allAccountCategories() {
-            return this.$constants.account.allCategories;
+            return accountConstants.allCategories;
         },
         categorizedAccounts() {
-            return this.$store.state.allCategorizedAccounts;
+            return this.accountsStore.allCategorizedAccounts;
         },
         allAccountCount() {
-            return this.$store.getters.allAvailableAccountsCount;
+            return this.accountsStore.allAvailableAccountsCount;
         },
         firstShowingIds() {
-            const ret = {
-                accounts: {},
-                subAccounts: {}
-            };
-
-            for (let category in this.categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
-                    continue;
-                }
-
-                if (!this.categorizedAccounts[category] || !this.categorizedAccounts[category].accounts) {
-                    continue;
-                }
-
-                const accounts = this.categorizedAccounts[category].accounts;
-
-                for (let i = 0; i < accounts.length; i++) {
-                    const account = accounts[i];
-
-                    if (account.type === this.$constants.account.allAccountTypes.MultiSubAccounts && account.subAccounts) {
-                        for (let j = 0; j < account.subAccounts.length; j++) {
-                            const subAccount = account.subAccounts[j];
-
-                            if (this.showHidden || !subAccount.hidden) {
-                                ret.subAccounts[account.id] = subAccount.id;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (this.showHidden || !account.hidden) {
-                        ret.accounts[category] = account.id;
-                        break;
-                    }
-                }
-            }
-
-            return ret;
+            return this.accountsStore.getFirstShowingIds(this.showHidden);
         },
         lastShowingIds() {
-            const ret = {
-                accounts: {},
-                subAccounts: {}
-            };
-
-            for (let category in this.categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.categorizedAccounts, category)) {
-                    continue;
-                }
-
-                if (!this.categorizedAccounts[category] || !this.categorizedAccounts[category].accounts) {
-                    continue;
-                }
-
-                const accounts = this.categorizedAccounts[category].accounts;
-
-                for (let i = accounts.length - 1; i >= 0; i--) {
-                    const account = accounts[i];
-
-                    if (account.type === this.$constants.account.allAccountTypes.MultiSubAccounts && account.subAccounts) {
-                        for (let j = account.subAccounts.length - 1; j >= 0; j--) {
-                            const subAccount = account.subAccounts[j];
-
-                            if (this.showHidden || !subAccount.hidden) {
-                                ret.subAccounts[account.id] = subAccount.id;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (this.showHidden || !account.hidden) {
-                        ret.accounts[category] = account.id;
-                        break;
-                    }
-                }
-            }
-
-            return ret;
+            return this.accountsStore.getLastShowingIds(this.showHidden);
         },
         noAvailableAccount() {
             if (this.showHidden) {
-                return this.$store.getters.allAvailableAccountsCount < 1;
+                return this.accountsStore.allAvailableAccountsCount < 1;
             } else {
-                return this.$store.getters.allVisibleAccountsCount < 1;
+                return this.accountsStore.allVisibleAccountsCount < 1;
             }
         },
         netAssets() {
-            if (!this.showAccountBalance) {
-                return '***';
-            }
-
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, () => true);
-            let netAssets = 0;
-            let hasUnCalculatedAmount = false;
-
-            for (let i = 0; i < accountsBalance.length; i++) {
-                if (accountsBalance[i].currency === this.defaultCurrency) {
-                    netAssets += accountsBalance[i].balance;
-                } else {
-                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                    if (!this.$utilities.isNumber(balance)) {
-                        hasUnCalculatedAmount = true;
-                        continue;
-                    }
-
-                    netAssets += Math.floor(balance);
-                }
-            }
-
-            if (hasUnCalculatedAmount) {
-                return netAssets + '+';
-            } else {
-                return netAssets;
-            }
+            const netAssets = this.accountsStore.getNetAssets(this.showAccountBalance);
+            return this.$locale.getDisplayCurrency(netAssets, this.defaultCurrency);
         },
         totalAssets() {
-            if (!this.showAccountBalance) {
-                return '***';
-            }
-
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.isAsset);
-            let totalAssets = 0;
-            let hasUnCalculatedAmount = false;
-
-            for (let i = 0; i < accountsBalance.length; i++) {
-                if (accountsBalance[i].currency === this.defaultCurrency) {
-                    totalAssets += accountsBalance[i].balance;
-                } else {
-                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                    if (!this.$utilities.isNumber(balance)) {
-                        hasUnCalculatedAmount = true;
-                        continue;
-                    }
-
-                    totalAssets += Math.floor(balance);
-                }
-            }
-
-            if (hasUnCalculatedAmount) {
-                return totalAssets + '+';
-            } else {
-                return totalAssets;
-            }
+            const totalAssets = this.accountsStore.getTotalAssets(this.showAccountBalance);
+            return this.$locale.getDisplayCurrency(totalAssets, this.defaultCurrency);
         },
         totalLiabilities() {
-            if (!this.showAccountBalance) {
-                return '***';
-            }
-
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.isLiability);
-            let totalLiabilities = 0;
-            let hasUnCalculatedAmount = false;
-
-            for (let i = 0; i < accountsBalance.length; i++) {
-                if (accountsBalance[i].currency === this.defaultCurrency) {
-                    totalLiabilities -= accountsBalance[i].balance;
-                } else {
-                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                    if (!this.$utilities.isNumber(balance)) {
-                        hasUnCalculatedAmount = true;
-                        continue;
-                    }
-
-                    totalLiabilities -= Math.floor(balance);
-                }
-            }
-
-            if (hasUnCalculatedAmount) {
-                return totalLiabilities + '+';
-            } else {
-                return totalLiabilities;
-            }
+            const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAccountBalance);
+            return this.$locale.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
         }
     },
     created() {
@@ -379,7 +239,7 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('loadAllAccounts', {
+        self.accountsStore.loadAllAccounts({
             force: false
         }).then(() => {
             self.loading = false;
@@ -394,7 +254,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            if (this.$store.state.accountListStateInvalid && !this.loading) {
+            if (this.accountsStore.accountListStateInvalid && !this.loading) {
                 this.reload(null);
             }
 
@@ -408,7 +268,7 @@ export default {
 
             const self = this;
 
-            self.$store.dispatch('loadAllAccounts', {
+            self.accountsStore.loadAllAccounts({
                 force: true
             }).then(() => {
                 if (done) {
@@ -425,99 +285,22 @@ export default {
             });
         },
         hasAccount(accountCategory, visibleOnly) {
-            if (!this.categorizedAccounts[accountCategory.id] ||
-                !this.categorizedAccounts[accountCategory.id].accounts ||
-                !this.categorizedAccounts[accountCategory.id].accounts.length) {
-                return false;
-            }
-
-            let shownCount = 0;
-
-            for (let i = 0; i < this.categorizedAccounts[accountCategory.id].accounts.length; i++) {
-                const account = this.categorizedAccounts[accountCategory.id].accounts[i];
-
-                if (!visibleOnly || !account.hidden) {
-                    shownCount++;
-                }
-            }
-
-            return shownCount > 0;
+            return this.accountsStore.hasAccount(accountCategory, visibleOnly);
         },
         hasVisibleSubAccount(account) {
-            if (!account || account.type !== this.$constants.account.allAccountTypes.MultiSubAccounts || !account.subAccounts) {
-                return false;
-            }
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                if (this.showHidden || !account.subAccounts[i].hidden) {
-                    return true;
-                }
-            }
-
-            return false;
+            return this.accountsStore.hasVisibleSubAccount(this.showHidden, account);
         },
         toggleShowAccountBalance() {
             this.showAccountBalance = !this.showAccountBalance;
             this.$settings.setShowAccountBalance(this.showAccountBalance);
         },
         accountBalance(account) {
-            if (account.type !== this.$constants.account.allAccountTypes.SingleAccount) {
-                return null;
-            }
-
-            if (this.showAccountBalance) {
-                if (account.isAsset) {
-                    return account.balance;
-                } else if (account.isLiability) {
-                    return -account.balance;
-                } else {
-                    return account.balance;
-                }
-            } else {
-                return '***';
-            }
+            const balance = this.accountsStore.getAccountBalance(this.showAccountBalance, account);
+            return this.$locale.getDisplayCurrency(balance, account.currency);
         },
         accountCategoryTotalBalance(accountCategory) {
-            if (!this.showAccountBalance) {
-                return '***';
-            }
-
-            const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(this.categorizedAccounts, account => account.category === accountCategory.id);
-            let totalBalance = 0;
-            let hasUnCalculatedAmount = false;
-
-            for (let i = 0; i < accountsBalance.length; i++) {
-                if (accountsBalance[i].currency === this.defaultCurrency) {
-                    if (accountsBalance[i].isAsset) {
-                        totalBalance += accountsBalance[i].balance;
-                    } else if (accountsBalance[i].isLiability) {
-                        totalBalance -= accountsBalance[i].balance;
-                    } else {
-                        totalBalance += accountsBalance[i].balance;
-                    }
-                } else {
-                    const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                    if (!this.$utilities.isNumber(balance)) {
-                        hasUnCalculatedAmount = true;
-                        continue;
-                    }
-
-                    if (accountsBalance[i].isAsset) {
-                        totalBalance += Math.floor(balance);
-                    } else if (accountsBalance[i].isLiability) {
-                        totalBalance -= Math.floor(balance);
-                    } else {
-                        totalBalance += Math.floor(balance);
-                    }
-                }
-            }
-
-            if (hasUnCalculatedAmount) {
-                return totalBalance + '+';
-            } else {
-                return totalBalance;
-            }
+            const totalBalance = this.accountsStore.getAccountCategoryTotalBalance(this.showAccountBalance, accountCategory);
+            return this.$locale.getDisplayCurrency(totalBalance, this.defaultCurrency);
         },
         setSortable() {
             if (this.sortable) {
@@ -543,7 +326,7 @@ export default {
                 return;
             }
 
-            self.$store.dispatch('changeAccountDisplayOrder', {
+            self.accountsStore.changeAccountDisplayOrder({
                 accountId: id,
                 from: event.from - 1, // first item in the list is title, so the index need minus one
                 to: event.to - 1
@@ -565,7 +348,7 @@ export default {
             self.displayOrderSaving = true;
             self.$showLoading();
 
-            self.$store.dispatch('updateAccountDisplayOrders').then(() => {
+            self.accountsStore.updateAccountDisplayOrders().then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
@@ -589,7 +372,7 @@ export default {
 
             self.$showLoading();
 
-            self.$store.dispatch('hideAccount', {
+            self.accountsStore.hideAccount({
                 account: account,
                 hidden: hidden
             }).then(() => {
@@ -620,10 +403,10 @@ export default {
             self.accountToDelete = null;
             self.$showLoading();
 
-            self.$store.dispatch('deleteAccount', {
+            self.accountsStore.deleteAccount({
                 account: account,
                 beforeResolve: (done) => {
-                    self.$ui.onSwipeoutDeleted(self.getAccountDomId(account), done);
+                    onSwipeoutDeleted(self.getAccountDomId(account), done);
                 }
             }).then(() => {
                 self.$hideLoading();

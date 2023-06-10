@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
-import { createStore } from 'vuex';
+import { createPinia } from 'pinia';
 import { createI18n } from 'vue-i18n';
 
-import moment from "moment-timezone";
+import moment from 'moment-timezone';
 
 import Framework7 from 'framework7/lite';
 import Framework7Dialog from 'framework7/components/dialog';
@@ -76,24 +76,18 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import * as Leaflet from 'leaflet/dist/leaflet-src.esm.js';
 import 'leaflet/dist/leaflet.css';
 
-import api from './consts/api.js';
-import datetime from './consts/datetime.js';
-import currency from './consts/currency.js';
-import colors from './consts/color.js';
-import icons from './consts/icon.js';
-import account from './consts/account.js';
-import transaction from './consts/transaction.js';
-import category from './consts/category.js';
-import statistics from './consts/statistics.js';
+import datetimeConstants from '@/consts/datetime.js';
 
-import licenses from './lib/licenses.js';
-import version from './lib/version.js';
-import logger from './lib/logger.js';
-import settings from './lib/settings.js';
-import services from './lib/services.js';
-import userstate from './lib/userstate.js';
-import webauthn from './lib/webauthn.js';
-import utilities from './lib/utilities/index.js';
+import version from '@/lib/version.js';
+import logger from '@/lib/logger.js';
+import settings from '@/lib/settings.js';
+import services from '@/lib/services.js';
+import userstate from '@/lib/userstate.js';
+import {
+    formatUnixTime,
+    formatTime,
+    getTimezoneOffset
+} from '@/lib/datetime.js';
 import {
     getAllLanguageInfos,
     getLanguageInfo,
@@ -124,42 +118,40 @@ import {
     getAllCurrencies,
     getDisplayCurrency,
     getI18nOptions,
-} from './lib/i18n.js';
+} from '@/lib/i18n.js';
 import {
     showAlert,
     showConfirm,
     showToast,
     showLoading,
     hideLoading,
-    routeBackOnError,
-    elements,
-    isModalShowing,
-    onSwipeoutDeleted
-} from './lib/mobile/ui.js';
+    routeBackOnError
+} from '@/lib/ui.mobile.js';
 
-import stores from './store/index.js';
+import ItemIcon from '@/components/mobile/ItemIcon.vue';
+import PieChart from '@/components/mobile/PieChart.vue';
+import PinCodeInput from '@/components/mobile/PinCodeInput.vue';
+import PinCodeInputSheet from '@/components/mobile/PinCodeInputSheet.vue';
+import PasswordInputSheet from '@/components/mobile/PasswordInputSheet.vue';
+import PasscodeInputSheet from '@/components/mobile/PasscodeInputSheet.vue';
+import DateTimeSelectionSheet from '@/components/mobile/DateTimeSelectionSheet.vue';
+import DateRangeSelectionSheet from '@/components/mobile/DateRangeSelectionSheet.vue';
+import ListItemSelectionSheet from '@/components/mobile/ListItemSelectionSheet.vue';
+import TwoColumnListItemSelectionSheet from '@/components/mobile/TwoColumnListItemSelectionSheet.vue';
+import TreeViewSelectionSheet from '@/components/mobile/TreeViewSelectionSheet.vue';
+import IconSelectionSheet from '@/components/mobile/IconSelectionSheet.vue';
+import ColorSelectionSheet from '@/components/mobile/ColorSelectionSheet.vue';
+import InformationSheet from '@/components/mobile/InformationSheet.vue';
+import NumberPadSheet from '@/components/mobile/NumberPadSheet.vue';
+import MapSheet from '@/components/mobile/MapSheet.vue';
+import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSelectionSheet.vue';
 
-import ItemIcon from './components/mobile/ItemIcon.vue';
-import PieChart from './components/mobile/PieChart.vue';
-import PinCodeInput from './components/mobile/PinCodeInput.vue';
-import PinCodeInputSheet from './components/mobile/PinCodeInputSheet.vue';
-import PasswordInputSheet from './components/mobile/PasswordInputSheet.vue';
-import PasscodeInputSheet from './components/mobile/PasscodeInputSheet.vue';
-import DateTimeSelectionSheet from './components/mobile/DateTimeSelectionSheet.vue';
-import DateRangeSelectionSheet from './components/mobile/DateRangeSelectionSheet.vue';
-import ListItemSelectionSheet from './components/mobile/ListItemSelectionSheet.vue';
-import TwoColumnListItemSelectionSheet from './components/mobile/TwoColumnListItemSelectionSheet.vue';
-import TreeViewSelectionSheet from './components/mobile/TreeViewSelectionSheet.vue';
-import IconSelectionSheet from './components/mobile/IconSelectionSheet.vue';
-import ColorSelectionSheet from './components/mobile/ColorSelectionSheet.vue';
-import InformationSheet from './components/mobile/InformationSheet.vue';
-import NumberPadSheet from './components/mobile/NumberPadSheet.vue';
-import MapSheet from './components/mobile/MapSheet.vue';
-import TransactionTagSelectionSheet from './components/mobile/TransactionTagSelectionSheet.vue';
+import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
 
-import TextareaAutoSize from "./directives/mobile/textareaAutoSize.js";
+import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
 
-import App from './MobileApp.vue';
+import App from '@/MobileApp.vue';
 
 Framework7.use([
     Framework7Dialog,
@@ -195,10 +187,10 @@ Framework7.use([
 ]);
 
 const app = createApp(App);
-const store = createStore(stores);
+const pinia = createPinia();
 const i18n = createI18n(getI18nOptions());
 registerComponents(app);
-app.use(store);
+app.use(pinia);
 app.use(i18n);
 
 function setLanguage(locale) {
@@ -238,13 +230,14 @@ function setLanguage(locale) {
 
     const defaultCurrency = i18n.global.t('default.currency');
     const defaultFirstDayOfWeekName = i18n.global.t('default.firstDayOfWeek');
-    let defaultFirstDayOfWeek = datetime.defaultFirstDayOfWeek;
+    let defaultFirstDayOfWeek = datetimeConstants.defaultFirstDayOfWeek;
 
-    if (datetime.allWeekDays[defaultFirstDayOfWeekName]) {
-        defaultFirstDayOfWeek = datetime.allWeekDays[defaultFirstDayOfWeekName].type;
+    if (datetimeConstants.allWeekDays[defaultFirstDayOfWeekName]) {
+        defaultFirstDayOfWeek = datetimeConstants.allWeekDays[defaultFirstDayOfWeekName].type;
     }
 
-    store.dispatch('updateLocalizedDefaultSettings', { defaultCurrency, defaultFirstDayOfWeek });
+    const settingsStore = useSettingsStore();
+    settingsStore.updateLocalizedDefaultSettings({ defaultCurrency, defaultFirstDayOfWeek });
 
     return locale;
 }
@@ -260,7 +253,8 @@ function setTimezone(timezone) {
 }
 
 function initLocale() {
-    const lastUserLanguage = store.getters.currentUserLanguage;
+    const userStore = useUserStore();
+    const lastUserLanguage = userStore.currentUserLanguage;
 
     if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
         logger.info(`Last user language is ${lastUserLanguage}`);
@@ -273,7 +267,7 @@ function initLocale() {
         logger.info(`Current timezone is ${settings.getTimezone()}`);
         setTimezone(settings.getTimezone());
     } else {
-        logger.info(`No timezone is set, use browser default ${utilities.getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
+        logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
     }
 }
 
@@ -302,26 +296,6 @@ app.directive('TextareaAutoSize', TextareaAutoSize);
 app.config.globalProperties.$version = version.getVersion();
 app.config.globalProperties.$buildTime = version.getBuildTime();
 
-app.config.globalProperties.$licenses = {
-    license: licenses.getLicense(),
-    thirdPartyLicenses: licenses.getThirdPartyLicenses()
-};
-
-app.config.globalProperties.$constants = {
-    api: api,
-    datetime: datetime,
-    currency: currency,
-    colors: colors,
-    icons: icons,
-    account: account,
-    transaction: transaction,
-    category: category,
-    statistics: statistics,
-};
-
-app.config.globalProperties.$utilities = utilities;
-app.config.globalProperties.$logger = logger;
-app.config.globalProperties.$webauthn = webauthn;
 app.config.globalProperties.$settings = settings;
 app.config.globalProperties.$locale = {
     getDefaultLanguage: getDefaultLanguage,
@@ -336,20 +310,22 @@ app.config.globalProperties.$locale = {
     getAllShortDateFormats: () => getAllShortDateFormats(i18n.global.t),
     getAllLongTimeFormats: () => getAllLongTimeFormats(i18n.global.t),
     getAllShortTimeFormats: () => getAllShortTimeFormats(i18n.global.t),
-    getLongDateTimeFormat: () => getI18nLongDateFormat(i18n.global.t, store.getters.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
-    getShortDateTimeFormat: () => getI18nShortDateFormat(i18n.global.t, store.getters.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
-    getLongDateFormat: () => getI18nLongDateFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
-    getShortDateFormat: () => getI18nShortDateFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
-    getLongYearFormat: () => getI18nLongYearFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
-    getShortYearFormat: () => getI18nShortYearFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
-    getLongYearMonthFormat: () => getI18nLongYearMonthFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
-    getShortYearMonthFormat: () => getI18nShortYearMonthFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
-    getLongMonthDayFormat: () => getI18nLongMonthDayFormat(i18n.global.t, store.getters.currentUserLongDateFormat),
-    getShortMonthDayFormat: () => getI18nShortMonthDayFormat(i18n.global.t, store.getters.currentUserShortDateFormat),
-    getLongTimeFormat: () => getI18nLongTimeFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
-    getShortTimeFormat: () => getI18nShortTimeFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
-    isLongTime24HourFormat: () => isLongTime24HourFormat(i18n.global.t, store.getters.currentUserLongTimeFormat),
-    isShortTime24HourFormat: () => isShortTime24HourFormat(i18n.global.t, store.getters.currentUserShortTimeFormat),
+    formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18n.global.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18n.global.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18n.global.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18n.global.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToLongYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToLongYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearMonthFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearMonthFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToLongMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongMonthDayFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortMonthDayFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18n.global.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
+    formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18n.global.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
+    formatTimeToLongYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nLongYearMonthFormat(i18n.global.t, userStore.currentUserLongDateFormat)),
+    formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18n.global.t, userStore.currentUserShortDateFormat)),
+    isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18n.global.t, userStore.currentUserLongTimeFormat),
+    isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18n.global.t, userStore.currentUserShortTimeFormat),
     setLanguage: setLanguage,
     getTimezone: settings.getTimezone,
     setTimezone: setTimezone,
@@ -370,11 +346,6 @@ app.config.globalProperties.$toast = (message, timeout) => showToast(message, ti
 app.config.globalProperties.$showLoading = showLoading;
 app.config.globalProperties.$hideLoading = hideLoading;
 app.config.globalProperties.$routeBackOnError = routeBackOnError;
-app.config.globalProperties.$ui = {
-    elements: elements,
-    isModalShowing: isModalShowing,
-    onSwipeoutDeleted: onSwipeoutDeleted
-};
 
 app.config.globalProperties.$user = userstate;
 

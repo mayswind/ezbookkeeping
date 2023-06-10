@@ -174,12 +174,23 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import datetimeConstants from '@/consts/datetime.js';
+import categoryConstants from '@/consts/category.js';
+import { getNameByKeyValue, copyArrayTo } from '@/lib/common.js';
+
 export default {
     props: [
         'f7router'
     ],
     data() {
         const self = this;
+        const settingsStore = useSettingsStore();
 
         return {
             user: {
@@ -189,14 +200,14 @@ export default {
                 email: '',
                 nickname: '',
                 language: self.$i18n.locale,
-                defaultCurrency: self.$store.state.defaultSetting.currency,
-                firstDayOfWeek: self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')] ? self.$constants.datetime.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
+                defaultCurrency: settingsStore.defaultSetting.currency,
+                firstDayOfWeek: datetimeConstants.allWeekDays[self.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
             },
             submitting: false,
             presetCategories: {
-                [self.$constants.category.allCategoryTypes.Income]: self.$utilities.copyArrayTo(self.$constants.category.defaultIncomeCategories, []),
-                [self.$constants.category.allCategoryTypes.Expense]: self.$utilities.copyArrayTo(self.$constants.category.defaultExpenseCategories, []),
-                [self.$constants.category.allCategoryTypes.Transfer]: self.$utilities.copyArrayTo(self.$constants.category.defaultTransferCategories, [])
+                [categoryConstants.allCategoryTypes.Income]: copyArrayTo(categoryConstants.defaultIncomeCategories, []),
+                [categoryConstants.allCategoryTypes.Expense]: copyArrayTo(categoryConstants.defaultExpenseCategories, []),
+                [categoryConstants.allCategoryTypes.Transfer]: copyArrayTo(categoryConstants.defaultTransferCategories, [])
             },
             usePresetCategories: false,
             showPresetCategories: false,
@@ -205,6 +216,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
         allLanguages() {
             return this.$locale.getAllLanguageInfos();
         },
@@ -212,25 +224,25 @@ export default {
             return this.$locale.getAllCurrencies();
         },
         allWeekDays() {
-            return this.$constants.datetime.allWeekDays;
+            return datetimeConstants.allWeekDays;
         },
         currentLocale: {
             get: function () {
                 return this.$i18n.locale;
             },
             set: function (value) {
-                const isCurrencyDefault = this.user.defaultCurrency === this.$store.state.defaultSetting.currency;
-                const isFirstWeekDayDefault = this.user.firstDayOfWeek === (this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
+                const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.defaultSetting.currency;
+                const isFirstWeekDayDefault = this.user.firstDayOfWeek === (datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
 
                 this.user.language = value;
                 this.$locale.setLanguage(value);
 
                 if (isCurrencyDefault) {
-                    this.user.defaultCurrency = this.$store.state.defaultSetting.currency;
+                    this.user.defaultCurrency = this.settingsStore.defaultSetting.currency;
                 }
 
                 if (isFirstWeekDayDefault) {
-                    this.user.firstDayOfWeek = this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')] ? this.$constants.datetime.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0;
+                    this.user.firstDayOfWeek = datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0;
                 }
             }
         },
@@ -324,7 +336,7 @@ export default {
                 }
             }
 
-            self.$store.dispatch('register', {
+            self.rootStore.register({
                 user: self.user
             }).then(response => {
                 if (!self.$user.isUserLogined()) {
@@ -346,7 +358,7 @@ export default {
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 if (!self.usePresetCategories) {
@@ -358,7 +370,7 @@ export default {
                     return;
                 }
 
-                self.$store.dispatch('addCategories', {
+                self.transactionCategoriesStore.addCategories({
                     categories: allCategories
                 }).then(() => {
                     self.submitting = false;
@@ -383,17 +395,17 @@ export default {
             });
         },
         getDayOfWeekName(dayOfWeek) {
-            const weekName = this.$utilities.getNameByKeyValue(this.$constants.datetime.allWeekDays, dayOfWeek, 'type', 'name');
+            const weekName = getNameByKeyValue(datetimeConstants.allWeekDays, dayOfWeek, 'type', 'name');
             const i18nWeekNameKey = `datetime.${weekName}.long`;
             return this.$t(i18nWeekNameKey);
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case this.$constants.category.allCategoryTypes.Income.toString():
+                case categoryConstants.allCategoryTypes.Income.toString():
                     return this.$t('Income Categories');
-                case this.$constants.category.allCategoryTypes.Expense.toString():
+                case categoryConstants.allCategoryTypes.Expense.toString():
                     return this.$t('Expense Categories');
-                case this.$constants.category.allCategoryTypes.Transfer.toString():
+                case categoryConstants.allCategoryTypes.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

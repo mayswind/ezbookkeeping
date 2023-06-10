@@ -109,6 +109,12 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import { isModalShowing } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7router'
@@ -127,6 +133,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useRootStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -187,7 +194,7 @@ export default {
             self.logining = true;
             self.$showLoading(() => self.logining);
 
-            self.$store.dispatch('authorize', {
+            self.rootStore.authorize({
                 loginName: self.username,
                 password: self.password
             }).then(authResponse => {
@@ -205,7 +212,7 @@ export default {
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 router.refreshPage();
@@ -219,7 +226,7 @@ export default {
             });
         },
         loginByPressEnter() {
-            if (this.$ui.isModalShowing()) {
+            if (isModalShowing()) {
                 return;
             }
 
@@ -244,7 +251,7 @@ export default {
             self.verifying = true;
             self.$showLoading(() => self.verifying);
 
-            self.$store.dispatch('authorize2FA', {
+            self.rootStore.authorize2FA({
                 token: self.tempToken,
                 passcode: self.twoFAVerifyType === 'passcode' ? self.passcode : null,
                 recoveryCode: self.twoFAVerifyType === 'backupcode' ? self.backupCode : null
@@ -257,7 +264,7 @@ export default {
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 self.show2faSheet = false;

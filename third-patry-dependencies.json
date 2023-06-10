@@ -88,10 +88,10 @@
         "licenseUrl": "https://github.com/vuejs/core/blob/v3.3.4/LICENSE"
     },
     {
-        "name": "vuex",
-        "copyright": "Copyright (c) 2015-present Evan You",
-        "url": "https://github.com/vuejs/vuex",
-        "licenseUrl": "https://github.com/vuejs/vuex/blob/v4.1.0/LICENSE"
+        "name": "Pinia",
+        "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
+        "url": "https://github.com/vuejs/pinia",
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.3/LICENSE"
     },
     {
         "name": "vue-i18n",

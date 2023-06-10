@@ -43,6 +43,15 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useTokensStore } from '@/stores/token.js';
+
+import iconConstants from '@/consts/icon.js';
+import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
+
+import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7router'
@@ -55,6 +64,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useTokensStore),
         sessions() {
             if (!this.tokens) {
                 return this.tokens;
@@ -70,9 +80,9 @@ export default {
                     domId: this.getTokenDomId(token.tokenId),
                     isCurrent: token.isCurrent,
                     deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
-                    deviceInfo: this.$utilities.parseDeviceInfo(token.userAgent),
+                    deviceInfo: parseDeviceInfo(token.userAgent),
                     icon: this.getTokenIcon(token),
-                    createdAt: this.$utilities.formatUnixTime(token.createdAt, this.$locale.getLongDateTimeFormat())
+                    createdAt: this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.createdAt)
                 });
             }
 
@@ -84,7 +94,7 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('getAllTokens').then(tokens => {
+        self.tokensStore.getAllTokens().then(tokens => {
             self.tokens = tokens;
             self.loading = false;
         }).catch(error => {
@@ -103,7 +113,7 @@ export default {
         reload(done) {
             const self = this;
 
-            self.$store.dispatch('getAllTokens').then(tokens => {
+            self.tokensStore.getAllTokens().then(tokens => {
                 if (done) {
                     done();
                 }
@@ -125,12 +135,12 @@ export default {
             self.$confirm('Are you sure you want to logout from this session?', () => {
                 self.$showLoading();
 
-                self.$store.dispatch('revokeToken', {
+                self.tokensStore.revokeToken({
                     tokenId: session.tokenId
                 }).then(() => {
                     self.$hideLoading();
 
-                    self.$ui.onSwipeoutDeleted(self.getTokenDomId(session.tokenId), () => {
+                    onSwipeoutDeleted(self.getTokenDomId(session.tokenId), () => {
                         for (let i = 0; i < self.tokens.length; i++) {
                             if (self.tokens[i].tokenId === session.tokenId) {
                                 self.tokens.splice(i, 1);
@@ -156,7 +166,7 @@ export default {
             self.$confirm('Are you sure you want to logout all other sessions?', () => {
                 self.$showLoading();
 
-                self.$store.dispatch('revokeAllTokens').then(() => {
+                self.tokensStore.revokeAllTokens().then(() => {
                     self.$hideLoading();
 
                     for (let i = self.tokens.length - 1; i >= 0; i--) {
@@ -176,22 +186,22 @@ export default {
             });
         },
         getTokenIcon(token) {
-            const ua = this.$utilities.parseUserAgent(token.userAgent);
+            const ua = parseUserAgent(token.userAgent);
 
             if (!ua || !ua.device) {
-                return this.$constants.icons.deviceIcons.desktop.f7Icon;
+                return iconConstants.deviceIcons.desktop.f7Icon;
             }
 
             if (ua.device.type === 'mobile') {
-                return this.$constants.icons.deviceIcons.mobile.f7Icon;
+                return iconConstants.deviceIcons.mobile.f7Icon;
             } else if (ua.device.type === 'wearable') {
-                return this.$constants.icons.deviceIcons.wearable.f7Icon;
+                return iconConstants.deviceIcons.wearable.f7Icon;
             } else if (ua.device.type === 'tablet') {
-                return this.$constants.icons.deviceIcons.tablet.f7Icon;
+                return iconConstants.deviceIcons.tablet.f7Icon;
             } else if (ua.device.type === 'smarttv') {
-                return this.$constants.icons.deviceIcons.tv.f7Icon;
+                return iconConstants.deviceIcons.tv.f7Icon;
             } else {
-                return this.$constants.icons.deviceIcons.desktop.f7Icon;
+                return iconConstants.deviceIcons.desktop.f7Icon;
             }
         },
         getTokenDomId(tokenId) {

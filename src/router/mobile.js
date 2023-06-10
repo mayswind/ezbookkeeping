@@ -1,37 +1,37 @@
-import userState from '../lib/userstate.js';
+import userState from '@/lib/userstate.js';
 
-import HomePage from '../views/mobile/HomePage.vue';
-import LoginPage from '../views/mobile/LoginPage.vue';
-import SignUpPage from '../views/mobile/SignupPage.vue';
-import UnlockPage from '../views/mobile/UnlockPage.vue';
+import HomePage from '@/views/mobile/HomePage.vue';
+import LoginPage from '@/views/mobile/LoginPage.vue';
+import SignUpPage from '@/views/mobile/SignupPage.vue';
+import UnlockPage from '@/views/mobile/UnlockPage.vue';
 
-import TransactionListPage from '../views/mobile/transactions/ListPage.vue';
-import TransactionEditPage from '../views/mobile/transactions/EditPage.vue';
+import TransactionListPage from '@/views/mobile/transactions/ListPage.vue';
+import TransactionEditPage from '@/views/mobile/transactions/EditPage.vue';
 
-import AccountListPage from '../views/mobile/accounts/ListPage.vue';
-import AccountEditPage from '../views/mobile/accounts/EditPage.vue';
+import AccountListPage from '@/views/mobile/accounts/ListPage.vue';
+import AccountEditPage from '@/views/mobile/accounts/EditPage.vue';
 
-import StatisticsTransactionPage from '../views/mobile/statistics/TransactionPage.vue';
-import StatisticsSettingsPage from '../views/mobile/statistics/SettingsPage.vue';
-import StatisticsAccountFilterSettingsPage from '../views/mobile/statistics/AccountFilterSettingsPage.vue';
-import StatisticsCategoryFilterSettingsPage from '../views/mobile/statistics/CategoryFilterSettingsPage.vue';
+import StatisticsTransactionPage from '@/views/mobile/statistics/TransactionPage.vue';
+import StatisticsSettingsPage from '@/views/mobile/statistics/SettingsPage.vue';
+import StatisticsAccountFilterSettingsPage from '@/views/mobile/statistics/AccountFilterSettingsPage.vue';
+import StatisticsCategoryFilterSettingsPage from '@/views/mobile/statistics/CategoryFilterSettingsPage.vue';
 
-import SettingsPage from '../views/mobile/SettingsPage.vue';
-import ApplicationLockPage from '../views/mobile/ApplicationLockPage.vue';
-import ExchangeRatesPage from '../views/mobile/ExchangeRatesPage.vue';
-import AboutPage from '../views/mobile/AboutPage.vue';
+import SettingsPage from '@/views/mobile/SettingsPage.vue';
+import ApplicationLockPage from '@/views/mobile/ApplicationLockPage.vue';
+import ExchangeRatesPage from '@/views/mobile/ExchangeRatesPage.vue';
+import AboutPage from '@/views/mobile/AboutPage.vue';
 
-import UserProfilePage from '../views/mobile/users/UserProfilePage.vue';
-import DataManagementPage from '../views/mobile/users/DataManagementPage.vue';
-import TwoFactorAuthPage from '../views/mobile/users/TwoFactorAuthPage.vue';
-import SessionListPage from '../views/mobile/users/SessionListPage.vue';
+import UserProfilePage from '@/views/mobile/users/UserProfilePage.vue';
+import DataManagementPage from '@/views/mobile/users/DataManagementPage.vue';
+import TwoFactorAuthPage from '@/views/mobile/users/TwoFactorAuthPage.vue';
+import SessionListPage from '@/views/mobile/users/SessionListPage.vue';
 
-import CategoryAllPage from '../views/mobile/categories/AllPage.vue';
-import CategoryListPage from '../views/mobile/categories/ListPage.vue';
-import CategoryEditPage from '../views/mobile/categories/EditPage.vue';
-import CategoryPresetPage from '../views/mobile/categories/PresetPage.vue';
+import CategoryAllPage from '@/views/mobile/categories/AllPage.vue';
+import CategoryListPage from '@/views/mobile/categories/ListPage.vue';
+import CategoryEditPage from '@/views/mobile/categories/EditPage.vue';
+import CategoryPresetPage from '@/views/mobile/categories/PresetPage.vue';
 
-import TagListPage from '../views/mobile/tags/ListPage.vue';
+import TagListPage from '@/views/mobile/tags/ListPage.vue';
 
 function asyncResolve(component) {
     return function({ resolve }) {

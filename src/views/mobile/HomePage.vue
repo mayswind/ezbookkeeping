@@ -36,7 +36,7 @@
         </f7-card>
 
         <f7-list strong inset dividers class="margin-top overview-transaction-list" :class="{ 'skeleton-text': loading }">
-            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.Today.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.Today.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar_today"></f7-icon>
                 </template>
@@ -66,7 +66,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisWeek.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisWeek.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
@@ -99,7 +99,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisMonth.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisMonth.type" chevron-center>
                 <template #media>
                     <f7-icon f7="calendar"></f7-icon>
                 </template>
@@ -132,7 +132,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-item :link="'/transaction/list?dateType=' + $constants.datetime.allDateRanges.ThisYear.type" chevron-center>
+            <f7-list-item :link="'/transaction/list?dateType=' + allDateRanges.ThisYear.type" chevron-center>
                 <template #media>
                     <f7-icon f7="square_stack_3d_up"></f7-icon>
                 </template>
@@ -188,25 +188,46 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useOverviewStore } from '@/stores/overview.js';
+
+import datetimeConstants from '@/consts/datetime.js';
+import {
+    formatUnixTime,
+    getTodayFirstUnixTime,
+    getTodayLastUnixTime,
+    getThisWeekFirstUnixTime,
+    getThisWeekLastUnixTime,
+    getThisMonthFirstUnixTime,
+    getThisMonthLastUnixTime,
+    getThisYearFirstUnixTime,
+    getThisYearLastUnixTime
+} from '@/lib/datetime.js';
+
 export default {
     data() {
         const self = this;
 
         return {
             loading: true,
-            todayFirstUnixTime: self.$utilities.getTodayFirstUnixTime(),
-            todayLastUnixTime: self.$utilities.getTodayLastUnixTime(),
+            todayFirstUnixTime: getTodayFirstUnixTime(),
+            todayLastUnixTime: getTodayLastUnixTime(),
             showAmountInHomePage: self.$settings.isShowAmountInHomePage(),
             isEnableThousandsSeparator: self.$settings.isEnableThousandsSeparator(),
             currencyDisplayMode: self.$settings.getCurrencyDisplayMode()
         };
     },
     computed: {
+        ...mapStores(useUserStore, useOverviewStore),
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency;
+            return this.userStore.currentUserDefaultCurrency;
         },
         firstDayOfWeek() {
-            return this.$store.getters.currentUserFirstDayOfWeek;
+            return this.userStore.currentUserFirstDayOfWeek;
+        },
+        allDateRanges() {
+            return datetimeConstants.allDateRanges;
         },
         dateRange() {
             const self = this;
@@ -217,16 +238,16 @@ export default {
                     endTime: self.todayLastUnixTime
                 },
                 thisWeek: {
-                    startTime: self.$utilities.getThisWeekFirstUnixTime(self.firstDayOfWeek),
-                    endTime: self.$utilities.getThisWeekLastUnixTime(self.firstDayOfWeek)
+                    startTime: getThisWeekFirstUnixTime(self.firstDayOfWeek),
+                    endTime: getThisWeekLastUnixTime(self.firstDayOfWeek)
                 },
                 thisMonth: {
-                    startTime: self.$utilities.getThisMonthFirstUnixTime(),
-                    endTime: self.$utilities.getThisMonthLastUnixTime()
+                    startTime: getThisMonthFirstUnixTime(),
+                    endTime: getThisMonthLastUnixTime()
                 },
                 thisYear: {
-                    startTime: self.$utilities.getThisYearFirstUnixTime(),
-                    endTime: self.$utilities.getThisYearLastUnixTime()
+                    startTime: getThisYearFirstUnixTime(),
+                    endTime: getThisYearLastUnixTime()
                 }
             };
         },
@@ -235,19 +256,19 @@ export default {
 
             return {
                 today: {
-                    displayTime: self.$utilities.formatUnixTime(self.dateRange.today.startTime, self.$locale.getLongDateFormat()),
+                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.dateRange.today.startTime),
                 },
                 thisWeek: {
-                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.startTime, self.$locale.getLongMonthDayFormat()),
-                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisWeek.endTime, self.$locale.getLongMonthDayFormat())
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.endTime)
                 },
                 thisMonth: {
-                    displayTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.startTime, self.$locale.getLongMonthDayFormat()),
-                    endTime: self.$utilities.formatUnixTime(self.dateRange.thisMonth.endTime, self.$locale.getLongMonthDayFormat())
+                    displayTime: formatUnixTime(self.dateRange.thisMonth.startTime, 'MMMM'),
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.endTime)
                 },
                 thisYear: {
-                    displayTime: self.$utilities.formatUnixTime(self.dateRange.thisYear.startTime, self.$locale.getLongYearFormat())
+                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.dateRange.thisYear.startTime)
                 }
             };
         },
@@ -256,7 +277,7 @@ export default {
             const isEnableThousandsSeparator = this.isEnableThousandsSeparator; // eslint-disable-line
             const currencyDisplayMode = this.currencyDisplayMode; // eslint-disable-line
 
-            if (!this.$store.state.transactionOverview || !this.$store.state.transactionOverview.thisMonth) {
+            if (!this.overviewStore.transactionOverview || !this.overviewStore.transactionOverview.thisMonth) {
                 return {
                     thisMonth: {
                         valid: false,
@@ -266,7 +287,7 @@ export default {
                 };
             }
 
-            const originalOverview = this.$store.state.transactionOverview;
+            const originalOverview = this.overviewStore.transactionOverview;
             const displayOverview = {};
 
             [ 'today', 'thisWeek', 'thisMonth', 'thisYear' ].forEach(key => {
@@ -292,7 +313,7 @@ export default {
         if (self.$user.isUserLogined() && self.$user.isUserUnlocked()) {
             self.loading = true;
 
-            self.$store.dispatch('loadTransactionOverview', {
+            self.overviewStore.loadTransactionOverview({
                 defaultCurrency: self.defaultCurrency,
                 dateRange: self.dateRange,
                 force: false
@@ -319,21 +340,21 @@ export default {
 
             let dateChanged = false;
 
-            if (this.todayFirstUnixTime !== this.$utilities.getTodayFirstUnixTime()) {
+            if (this.todayFirstUnixTime !== getTodayFirstUnixTime()) {
                 dateChanged = true;
 
-                this.todayFirstUnixTime = this.$utilities.getTodayFirstUnixTime();
-                this.todayLastUnixTime = this.$utilities.getTodayLastUnixTime();
+                this.todayFirstUnixTime = getTodayFirstUnixTime();
+                this.todayLastUnixTime = getTodayLastUnixTime();
             }
 
-            if ((dateChanged || this.$store.state.transactionOverviewStateInvalid) && !this.loading) {
+            if ((dateChanged || this.overviewStore.transactionOverviewStateInvalid) && !this.loading) {
                 this.reload(null);
             }
         },
         reload(done) {
             const self = this;
 
-            self.$store.dispatch('loadTransactionOverview', {
+            self.overviewStore.loadTransactionOverview({
                 defaultCurrency: self.defaultCurrency,
                 dateRange: self.dateRange,
                 force: true

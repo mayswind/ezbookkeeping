@@ -66,7 +66,7 @@
                 <f7-accordion-content :style="{ height: collapseStates[accountCategory.category].opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox
-                                      :class="{ 'has-child-list-item': account.type === $constants.account.allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id] }"
+                                      :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id] }"
                                       :title="account.name"
                                       :value="account.id"
                                       :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
@@ -80,7 +80,7 @@
 
                             <template #root>
                                 <ul class="padding-left"
-                                    v-if="account.type === $constants.account.allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]">
+                                    v-if="account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]">
                                     <f7-list-item checkbox
                                                   :title="subAccount.name"
                                                   :value="subAccount.id"
@@ -114,6 +114,14 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useAccountsStore } from '@/stores/account.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
+
+import accountConstants from '@/consts/account.js';
+import { copyObjectTo } from '@/lib/common.js';
+import { getVisibleCategorizedAccounts } from '@/lib/account.js';
+
 export default {
     props: [
         'f7route',
@@ -132,6 +140,7 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useAccountsStore, useStatisticsStore),
         title() {
             if (this.modifyDefault) {
                 return 'Default Account Filter';
@@ -146,11 +155,14 @@ export default {
                 return 'Apply';
             }
         },
+        allAccountTypes() {
+            return accountConstants.allAccountTypes;
+        },
         allVisibleCategorizedAccounts() {
-            return this.$utilities.getVisibleCategorizedAccounts(this.$store.state.allCategorizedAccounts);
+            return getVisibleCategorizedAccounts(this.accountsStore.allCategorizedAccounts);
         },
         hasAnyAvailableAccount() {
-            return this.$store.getters.allVisibleAccountsCount > 0;
+            return this.accountsStore.allVisibleAccountsCount > 0;
         }
     },
     created() {
@@ -159,26 +171,26 @@ export default {
 
         self.modifyDefault = !!query.modifyDefault;
 
-        self.$store.dispatch('loadAllAccounts', {
+        self.accountsStore.loadAllAccounts({
             force: false
         }).then(() => {
             self.loading = false;
 
             const allAccountIds = {};
 
-            for (let accountId in self.$store.state.allAccountsMap) {
-                if (!Object.prototype.hasOwnProperty.call(self.$store.state.allAccountsMap, accountId)) {
+            for (let accountId in self.accountsStore.allAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(self.accountsStore.allAccountsMap, accountId)) {
                     continue;
                 }
 
-                const account = self.$store.state.allAccountsMap[accountId];
+                const account = self.accountsStore.allAccountsMap[accountId];
                 allAccountIds[account.id] = false;
             }
 
             if (self.modifyDefault) {
-                self.filterAccountIds = self.$utilities.copyObjectTo(self.$settings.getStatisticsDefaultAccountFilter(), allAccountIds);
+                self.filterAccountIds = copyObjectTo(self.$settings.getStatisticsDefaultAccountFilter(), allAccountIds);
             } else {
-                self.filterAccountIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterAccountIds, allAccountIds);
+                self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
             }
         }).catch(error => {
             if (error.processed) {
@@ -212,7 +224,7 @@ export default {
             if (self.modifyDefault) {
                 self.$settings.setStatisticsDefaultAccountFilter(filteredAccountIds);
             } else {
-                self.$store.dispatch('updateTransactionStatisticsFilter', {
+                self.statisticsStore.updateTransactionStatisticsFilter({
                     filterAccountIds: filteredAccountIds
                 });
             }
@@ -221,15 +233,15 @@ export default {
         },
         selectAccountOrSubAccounts(e) {
             const accountId = e.target.value;
-            const account = this.$store.state.allAccountsMap[accountId];
+            const account = this.accountsStore.allAccountsMap[accountId];
 
             if (!account) {
                 return;
             }
 
-            if (account.type === this.$constants.account.allAccountTypes.SingleAccount) {
+            if (account.type === this.allAccountTypes.SingleAccount) {
                 this.filterAccountIds[account.id] = !e.target.checked;
-            } else if (account.type === this.$constants.account.allAccountTypes.MultiSubAccounts) {
+            } else if (account.type === this.allAccountTypes.MultiSubAccounts) {
                 if (!account.subAccounts || !account.subAccounts.length) {
                     return;
                 }
@@ -242,7 +254,7 @@ export default {
         },
         selectAccount(e) {
             const accountId = e.target.value;
-            const account = this.$store.state.allAccountsMap[accountId];
+            const account = this.accountsStore.allAccountsMap[accountId];
 
             if (!account) {
                 return;
@@ -256,9 +268,9 @@ export default {
                     continue;
                 }
 
-                const account = this.$store.state.allAccountsMap[accountId];
+                const account = this.accountsStore.allAccountsMap[accountId];
 
-                if (account && account.type === this.$constants.account.allAccountTypes.SingleAccount) {
+                if (account && account.type === this.allAccountTypes.SingleAccount) {
                     this.filterAccountIds[account.id] = false;
                 }
             }
@@ -269,9 +281,9 @@ export default {
                     continue;
                 }
 
-                const account = this.$store.state.allAccountsMap[accountId];
+                const account = this.accountsStore.allAccountsMap[accountId];
 
-                if (account && account.type === this.$constants.account.allAccountTypes.SingleAccount) {
+                if (account && account.type === this.allAccountTypes.SingleAccount) {
                     this.filterAccountIds[account.id] = true;
                 }
             }
@@ -282,9 +294,9 @@ export default {
                     continue;
                 }
 
-                const account = this.$store.state.allAccountsMap[accountId];
+                const account = this.accountsStore.allAccountsMap[accountId];
 
-                if (account && account.type === this.$constants.account.allAccountTypes.SingleAccount) {
+                if (account && account.type === this.allAccountTypes.SingleAccount) {
                     this.filterAccountIds[account.id] = !this.filterAccountIds[account.id];
                 }
             }
@@ -325,12 +337,12 @@ export default {
         getCollapseStates() {
             const collapseStates = {};
 
-            for (let categoryType in this.$constants.account.allCategories) {
-                if (!Object.prototype.hasOwnProperty.call(this.$constants.account.allCategories, categoryType)) {
+            for (let categoryType in accountConstants.allCategories) {
+                if (!Object.prototype.hasOwnProperty.call(accountConstants.allCategories, categoryType)) {
                     continue;
                 }
 
-                const accountCategory = this.$constants.account.allCategories[categoryType];
+                const accountCategory = accountConstants.allCategories[categoryType];
 
                 collapseStates[accountCategory.id] = {
                     opened: true

@@ -144,6 +144,11 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionTagsStore } from '@/stores/transactionTag.js';
+
+import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7router'
@@ -168,8 +173,10 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useTransactionTagsStore),
+
         tags() {
-            return this.$store.state.allTransactionTags;
+            return this.transactionTagsStore.allTransactionTags;
         },
         firstShowingId() {
             for (let i = 0; i < this.tags.length; i++) {
@@ -207,7 +214,7 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('loadAllTags', {
+        self.transactionTagsStore.loadAllTags({
             force: false
         }).then(() => {
             self.loading = false;
@@ -232,7 +239,7 @@ export default {
 
             const self = this;
 
-            self.$store.dispatch('loadAllTags', {
+            self.transactionTagsStore.loadAllTags({
                 force: true
             }).then(() => {
                 if (done) {
@@ -272,7 +279,7 @@ export default {
                 return;
             }
 
-            self.$store.dispatch('changeTagDisplayOrder', {
+            self.transactionTagsStore.changeTagDisplayOrder({
                 tagId: id,
                 from: event.from,
                 to: event.to
@@ -294,7 +301,7 @@ export default {
             self.displayOrderSaving = true;
             self.$showLoading();
 
-            self.$store.dispatch('updateTagDisplayOrders').then(() => {
+            self.transactionTagsStore.updateTagDisplayOrders().then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();
 
@@ -324,7 +331,7 @@ export default {
 
             self.$showLoading();
 
-            self.$store.dispatch('saveTag', {
+            self.transactionTagsStore.saveTag({
                 tag: tag
             }).then(() => {
                 self.$hideLoading();
@@ -363,7 +370,7 @@ export default {
 
             self.$showLoading();
 
-            self.$store.dispatch('hideTag', {
+            self.transactionTagsStore.hideTag({
                 tag: tag,
                 hidden: hidden
             }).then(() => {
@@ -394,10 +401,10 @@ export default {
             self.tagToDelete = null;
             self.$showLoading();
 
-            self.$store.dispatch('deleteTag', {
+            self.transactionTagsStore.deleteTag({
                 tag: tag,
                 beforeResolve: (done) => {
-                    self.$ui.onSwipeoutDeleted(self.getTagDomId(tag), done);
+                    onSwipeoutDeleted(self.getTagDomId(tag), done);
                 }
             }).then(() => {
                 self.$hideLoading();

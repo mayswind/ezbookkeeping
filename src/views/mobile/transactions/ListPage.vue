@@ -123,7 +123,7 @@
                             <f7-list-item>
                                 <template #title>
                                     <small>
-                                        <span>{{ $utilities.formatTime(transactionMonthList.yearMonth, $locale.getLongYearMonthFormat()) }}</span>
+                                        <span>{{ getDisplayYearMonth(transactionMonthList) }}</span>
                                     </small>
                                     <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
                                         <span class="text-color-red">
@@ -144,7 +144,7 @@
                         <f7-list-item swipeout chevron-center
                                       class="transaction-info"
                                       :id="getTransactionDomId(transaction)"
-                                      :link="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
+                                      :link="transaction.type !== allTransactionTypes.ModifyBalance ? `/transaction/detail?id=${transaction.id}&type=${transaction.type}` : null"
                                       :key="transaction.id"
                                       v-for="(transaction, idx) in transactionMonthList.items"
                         >
@@ -175,20 +175,20 @@
                                         <div class="item-title-row">
                                             <div class="item-title">
                                                 <div class="transaction-category-name no-padding">
-                                                    <span v-if="transaction.type === $constants.transaction.allTransactionTypes.ModifyBalance">
+                                                    <span v-if="transaction.type === allTransactionTypes.ModifyBalance">
                                                         {{ $t('Modify Balance') }}
                                                     </span>
-                                                        <span v-else-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance && transaction.category">
+                                                        <span v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
                                                         {{ transaction.category.name }}
                                                     </span>
-                                                        <span v-else-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance && !transaction.category">
+                                                        <span v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
                                                         {{ getTransactionTypeName(transaction.type, 'Transaction') }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
-                                                     :class="{ 'text-color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'text-color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }">
+                                                     :class="{ 'text-color-teal': transaction.type === allTransactionTypes.Expense, 'text-color-red': transaction.type === allTransactionTypes.Income }">
                                                     <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
                                                     <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
                                                     <span v-else></span>
@@ -202,12 +202,12 @@
                                         </div>
                                         <div class="item-footer">
                                             <div class="transaction-footer">
-                                                <span>{{ $utilities.formatUnixTime(transaction.time, $locale.getShortTimeFormat(), transaction.utcOffset, currentTimezoneOffsetMinutes) }}</span>
-                                                <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(UTC${$utilities.getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)})` }}</span>
+                                                <span>{{ getDisplayTime(transaction) }}</span>
+                                                <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>
-                                                <span v-if="transaction.sourceAccount && transaction.type === $constants.transaction.allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
+                                                <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>
+                                                <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -216,11 +216,11 @@
                             <f7-swipeout-actions right>
                                 <f7-swipeout-button color="primary" close
                                                     :text="$t('Duplicate')"
-                                                    v-if="transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
+                                                    v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                                     @click="duplicate(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="orange" close
                                                     :text="$t('Edit')"
-                                                    v-if="transaction.editable && transaction.type !== $constants.transaction.allTransactionTypes.ModifyBalance"
+                                                    v-if="transaction.editable && transaction.type !== allTransactionTypes.ModifyBalance"
                                                     @click="edit(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="red" class="padding-left padding-right"
                                                     v-if="transaction.editable"
@@ -251,11 +251,11 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="dateRange.type === $constants.datetime.allDateRanges.Custom.type && query.dateType === $constants.datetime.allDateRanges.Custom.type && query.minTime && query.maxTime">
-                            <span>{{ $utilities.formatUnixTime(query.minTime, $locale.getLongDateTimeFormat()) }}</span>
+                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.minTime && query.maxTime">
+                            <span>{{ queryMinTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
-                            <span>{{ $utilities.formatUnixTime(query.maxTime, $locale.getLongDateTimeFormat()) }}</span>
+                            <span>{{ queryMaxTime }}</span>
                         </div>
                     </template>
                 </f7-list-item>
@@ -318,9 +318,9 @@
                      class="no-margin-vertical"
                      :key="categoryType"
                      v-for="(categories, categoryType) in allPrimaryCategories"
-                     v-show="!query.type || $utilities.categoryTypeToTransactionType(parseInt(categoryType)) === query.type"
+                     v-show="!query.type || getTransactionTypeFromCategoryType(categoryType) === query.type"
             >
-                <f7-list-item divider :title="getTransactionTypeName($utilities.categoryTypeToTransactionType(parseInt(categoryType)), 'Type')"></f7-list-item>
+                <f7-list-item divider :title="getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
                               :title="category.name"
                               :class="getCategoryListItemCheckedClass(category, query.categoryId)"
@@ -407,6 +407,25 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
+
+import datetimeConstants from '@/consts/datetime.js';
+import currencyConstants from '@/consts/currency.js';
+import accountConstants from '@/consts/account.js';
+import transactionConstants from '@/consts/transaction.js';
+import { getNameByKeyValue } from '@/lib/common.js';
+import {
+    getUtcOffsetByUtcOffsetMinutes,
+    getTimezoneOffsetMinutes,
+    getDateRangeByDateType
+} from '@/lib/datetime.js';
+import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
+import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7route',
@@ -430,22 +449,23 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
         defaultCurrency() {
             if (this.query.accountId && this.query.accountId !== '0') {
                 const account = this.allAccounts[this.query.accountId];
 
-                if (account && account.currency && account.currency !== this.$constants.currency.parentAccountCurrencyPlaceholder) {
+                if (account && account.currency && account.currency !== currencyConstants.parentAccountCurrencyPlaceholder) {
                     return account.currency;
                 }
             }
 
-            return this.$store.getters.currentUserDefaultCurrency;
+            return this.userStore.currentUserDefaultCurrency;
         },
         canAddTransaction() {
             if (this.query.accountId && this.query.accountId !== '0') {
                 const account = this.allAccounts[this.query.accountId];
 
-                if (account && account.type === this.$constants.account.allAccountTypes.MultiSubAccounts) {
+                if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
                     return false;
                 }
             }
@@ -453,38 +473,13 @@ export default {
             return true;
         },
         currentTimezoneOffsetMinutes() {
-            return this.$utilities.getTimezoneOffsetMinutes();
+            return getTimezoneOffsetMinutes();
         },
         firstDayOfWeek() {
-            return this.$store.getters.currentUserFirstDayOfWeek;
+            return this.userStore.currentUserFirstDayOfWeek;
         },
         query() {
-            return this.$store.state.transactionsFilter;
-        },
-        transactions() {
-            if (this.loading) {
-                return [];
-            }
-
-            return this.$store.state.transactions;
-        },
-        noTransaction() {
-            return this.$store.getters.noTransaction;
-        },
-        hasMoreTransaction() {
-            return this.$store.getters.hasMoreTransaction;
-        },
-        allAccounts() {
-            return this.$store.state.allAccountsMap;
-        },
-        allCategories() {
-            return this.$store.state.allTransactionCategoriesMap;
-        },
-        allPrimaryCategories() {
-            return this.$store.state.allTransactionCategories;
-        },
-        allDateRanges() {
-            return this.$constants.datetime.allDateRanges;
+            return this.transactionsStore.transactionsFilter;
         },
         queryDateRangeName() {
             if (this.query.dateType === this.allDateRanges.All.type) {
@@ -505,24 +500,58 @@ export default {
 
             return this.$t('Date');
         },
+        queryMinTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.minTime);
+        },
+        queryMaxTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.maxTime);
+        },
         queryTransactionTypeName() {
             return this.getTransactionTypeName(this.query.type, 'Type');
         },
         queryCategoryName() {
-            return this.$utilities.getNameByKeyValue(this.allCategories, this.query.categoryId, null, 'name', this.$t('Category'));
+            return getNameByKeyValue(this.allCategories, this.query.categoryId, null, 'name', this.$t('Category'));
         },
         queryAccountName() {
-            return this.$utilities.getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
+            return getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
+        },
+        transactions() {
+            if (this.loading) {
+                return [];
+            }
+
+            return this.transactionsStore.transactions;
+        },
+        noTransaction() {
+            return this.transactionsStore.noTransaction;
+        },
+        hasMoreTransaction() {
+            return this.transactionsStore.hasMoreTransaction;
+        },
+        allTransactionTypes() {
+            return transactionConstants.allTransactionTypes;
+        },
+        allAccounts() {
+            return this.accountsStore.allAccountsMap;
+        },
+        allCategories() {
+            return this.transactionCategoriesStore.allTransactionCategoriesMap;
+        },
+        allPrimaryCategories() {
+            return this.transactionCategoriesStore.allTransactionCategories;
+        },
+        allDateRanges() {
+            return datetimeConstants.allDateRanges;
         }
     },
     created() {
         const self = this;
         const query = self.f7route.query;
 
-        let dateRange = self.$utilities.getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
+        let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
 
         if (!dateRange &&
-            query.dateType === self.$constants.datetime.allDateRanges.Custom.type.toString() &&
+            query.dateType === self.allDateRanges.Custom.type.toString() &&
             parseInt(query.maxTime) > 0 && parseInt(query.minTime) > 0) {
             dateRange = {
                 dateType: parseInt(query.dateType),
@@ -531,7 +560,7 @@ export default {
             };
         }
 
-        this.$store.dispatch('initTransactionListFilter', {
+        this.transactionsStore.initTransactionListFilter({
             dateType: dateRange ? dateRange.dateType : undefined,
             maxTime: dateRange ? dateRange.maxTime : undefined,
             minTime: dateRange ? dateRange.minTime : undefined,
@@ -544,7 +573,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            if (this.$store.state.transactionListStateInvalid && !this.loading) {
+            if (this.transactionsStore.transactionListStateInvalid && !this.loading) {
                 this.reload(null);
             }
 
@@ -558,10 +587,10 @@ export default {
             }
 
             Promise.all([
-                self.$store.dispatch('loadAllAccounts', { force: false }),
-                self.$store.dispatch('loadAllCategories', { force: false })
+                self.accountsStore.loadAllAccounts({ force: false }),
+                self.transactionCategoriesStore.loadAllCategories({ force: false })
             ]).then(() => {
-                return self.$store.dispatch('loadTransactions', {
+                return self.transactionsStore.loadTransactions({
                     reload: true,
                     autoExpand: true,
                     defaultCurrency: self.defaultCurrency
@@ -603,7 +632,7 @@ export default {
 
             self.loadingMore = true;
 
-            self.$store.dispatch('loadTransactions', {
+            self.transactionsStore.loadTransactions({
                 reload: false,
                 autoExpand: autoExpand,
                 defaultCurrency: self.defaultCurrency
@@ -618,13 +647,13 @@ export default {
             });
         },
         collapseTransactionMonthList(month, collapse) {
-            this.$store.dispatch('collapseMonthInTransactionList', {
+            this.transactionsStore.collapseMonthInTransactionList({
                 month: month,
                 collapse: collapse
             });
         },
         changeDateFilter(dateType) {
-            if (dateType === this.$constants.datetime.allDateRanges.Custom.type) { // Custom
+            if (dateType === this.allDateRanges.Custom.type) { // Custom
                 this.showCustomDateRangeSheet = true;
                 this.showDatePopover = false;
                 return;
@@ -632,13 +661,13 @@ export default {
                 return;
             }
 
-            const dateRange = this.$utilities.getDateRangeByDateType(dateType, this.firstDayOfWeek);
+            const dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
 
             if (!dateRange) {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
+            this.transactionsStore.updateTransactionListFilter({
                 dateType: dateRange.dateType,
                 maxTime: dateRange.maxTime,
                 minTime: dateRange.minTime
@@ -652,8 +681,8 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
-                dateType: this.$constants.datetime.allDateRanges.Custom.type,
+            this.transactionsStore.updateTransactionListFilter({
+                dateType: this.allDateRanges.Custom.type,
                 maxTime: maxTime,
                 minTime: minTime
             });
@@ -672,12 +701,12 @@ export default {
             if (type && this.query.categoryId) {
                 const category = this.allCategories[this.query.categoryId];
 
-                if (category && category.type !== this.$utilities.transactionTypeToCategoryType(type)) {
+                if (category && category.type !== transactionTypeToCategoryType(type)) {
                     removeCategoryFilter = true;
                 }
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
+            this.transactionsStore.updateTransactionListFilter({
                 type: type,
                 categoryId: removeCategoryFilter ? '0' : undefined
             });
@@ -690,7 +719,7 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
+            this.transactionsStore.updateTransactionListFilter({
                 categoryId: categoryId
             });
 
@@ -702,7 +731,7 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
+            this.transactionsStore.updateTransactionListFilter({
                 accountId: accountId
             });
 
@@ -714,7 +743,7 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionListFilter', {
+            this.transactionsStore.updateTransactionListFilter({
                 keyword: keyword
             });
 
@@ -744,11 +773,11 @@ export default {
             self.transactionToDelete = null;
             self.$showLoading();
 
-            self.$store.dispatch('deleteTransaction', {
+            self.transactionsStore.deleteTransaction({
                 transaction: transaction,
                 defaultCurrency: self.defaultCurrency,
                 beforeResolve: (done) => {
-                    self.$ui.onSwipeoutDeleted(self.getTransactionDomId(transaction), done);
+                    onSwipeoutDeleted(self.getTransactionDomId(transaction), done);
                 }
             }).then(() => {
                 self.$hideLoading();
@@ -781,6 +810,15 @@ export default {
 
             container.scrollTop(targetPos);
         },
+        getDisplayYearMonth(transactionMonthList) {
+            return this.$locale.formatTimeToLongYearMonth(this.userStore, transactionMonthList.yearMonth);
+        },
+        getDisplayTime(transaction) {
+            return this.$locale.formatUnixTimeToShortTime(this.userStore, transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes);
+        },
+        getDisplayTimezone(transaction) {
+            return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
+        },
         getDisplayAmount(amount, currency, hideAmount) {
             if (hideAmount) {
                 return this.$locale.getDisplayCurrency('***', currency);
@@ -794,17 +832,20 @@ export default {
         },
         getTransactionTypeName(type, defaultName) {
             switch (type){
-                case this.$constants.transaction.allTransactionTypes.ModifyBalance:
+                case this.allTransactionTypes.ModifyBalance:
                     return this.$t('Modify Balance');
-                case this.$constants.transaction.allTransactionTypes.Income:
+                case this.allTransactionTypes.Income:
                     return this.$t('Income');
-                case this.$constants.transaction.allTransactionTypes.Expense:
+                case this.allTransactionTypes.Expense:
                     return this.$t('Expense');
-                case this.$constants.transaction.allTransactionTypes.Transfer:
+                case this.allTransactionTypes.Transfer:
                     return this.$t('Transfer');
                 default:
                     return this.$t(defaultName);
             }
+        },
+        getTransactionTypeFromCategoryType(categoryType) {
+            return categoryTypeToTransactionType(parseInt(categoryType));
         },
         getTransactionDomId(transaction) {
             return 'transaction_' + transaction.id;

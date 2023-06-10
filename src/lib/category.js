@@ -1,5 +1,5 @@
-import categoryConstants from '../../consts/category.js';
-import transactionConstants from '../../consts/transaction.js';
+import categoryConstants from '@/consts/category.js';
+import transactionConstants from '@/consts/transaction.js';
 
 export function transactionTypeToCategoryType(transactionType) {
     if (transactionType === transactionConstants.allTransactionTypes.Income) {

@@ -41,6 +41,9 @@
 </template>
 
 <script>
+import { copyArrayTo } from '@/lib/common.js';
+import { elements } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'modelValue',
@@ -55,7 +58,7 @@ export default {
         const self = this;
 
         return {
-            selectedItemIds: self.$utilities.copyArrayTo(self.modelValue, [])
+            selectedItemIds: copyArrayTo(self.modelValue, [])
         }
     },
     computed: {
@@ -78,7 +81,7 @@ export default {
             this.$emit('update:show', false);
         },
         onSheetOpen(event) {
-            this.selectedItemIds = this.$utilities.copyArrayTo(this.modelValue, []);
+            this.selectedItemIds = copyArrayTo(this.modelValue, []);
             this.scrollToSelectedItem(event.$el);
         },
         onSheetClosed() {
@@ -120,8 +123,8 @@ export default {
             let lastSelectedItem = selectedItem;
 
             if (selectedItem.length > 0) {
-                firstSelectedItem = this.$ui.elements(selectedItem[0]);
-                lastSelectedItem = this.$ui.elements(selectedItem[selectedItem.length - 1]);
+                firstSelectedItem = elements(selectedItem[0]);
+                lastSelectedItem = elements(selectedItem[selectedItem.length - 1]);
             }
 
             let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);

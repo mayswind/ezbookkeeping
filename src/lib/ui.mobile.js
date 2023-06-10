@@ -1,10 +1,10 @@
 import { f7, f7ready } from 'framework7-vue';
 
-import settings from "../settings.js";
+import settings from './settings.js';
 import {
     getLocalizedError,
     getLocalizedErrorParameters
-} from "../i18n.js";
+} from './i18n.js';
 
 export function showAlert(message, confirmCallback, translateFn) {
     let parameters = {};

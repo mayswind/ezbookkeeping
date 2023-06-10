@@ -1,6 +1,14 @@
 import CBOR from 'cbor-js';
 import logger from './logger.js';
-import utilities from './utilities/index.js';
+import {
+    isFunction,
+    stringToArrayBuffer,
+    arrayBufferToString,
+    base64encode
+} from './common.js';
+import {
+    generateRandomString
+} from './misc.js';
 
 const publicKeyCredentialCreationOptionsBaseTemplate = {
     attestation: "none",
@@ -28,7 +36,7 @@ const publicKeyCredentialRequestOptionsBaseTemplate = {
 function isSupported() {
     return !!window.PublicKeyCredential
         && !!navigator.credentials
-        && utilities.isFunction(window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable);
+        && isFunction(window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable);
 }
 
 function isCompletelySupported() {
@@ -52,17 +60,17 @@ function registerCredential({ username, secret }, { nickname }) {
         });
     }
 
-    const challenge = utilities.generateRandomString();
+    const challenge = generateRandomString();
     const userId = `${username}|${secret}`; // username 32bytes(max) + secret 24bytes = 56bytes(max)
 
     const publicKeyCredentialCreationOptions = Object.assign({}, publicKeyCredentialCreationOptionsBaseTemplate, {
-        challenge: utilities.stringToArrayBuffer(challenge),
+        challenge: stringToArrayBuffer(challenge),
         rp: {
             name: window.location.hostname,
             id: window.location.hostname
         },
         user: {
-            id: utilities.stringToArrayBuffer(userId),
+            id: stringToArrayBuffer(userId),
             name: username,
             displayName: nickname
         }
@@ -83,7 +91,7 @@ function registerCredential({ username, secret }, { nickname }) {
         if (rawCredential && rawCredential.rawId &&
             clientData && clientData.type === 'webauthn.create' && challengeFromClientData === challenge) {
             const ret = {
-                id: utilities.base64encode(rawCredential.rawId),
+                id: base64encode(rawCredential.rawId),
                 clientData: clientData,
                 publicKey: publicKey,
                 rawCredential: rawCredential
@@ -133,12 +141,12 @@ function verifyCredential({ username }, credentialId) {
         });
     }
 
-    const challenge = utilities.generateRandomString();
+    const challenge = generateRandomString();
     const publicKeyCredentialRequestOptions = Object.assign({}, publicKeyCredentialRequestOptionsBaseTemplate, {
-        challenge: utilities.stringToArrayBuffer(challenge),
+        challenge: stringToArrayBuffer(challenge),
         rpId: window.location.hostname
     });
-    publicKeyCredentialRequestOptions.allowCredentials[0].id = utilities.stringToArrayBuffer(atob(credentialId));
+    publicKeyCredentialRequestOptions.allowCredentials[0].id = stringToArrayBuffer(atob(credentialId));
 
     logger.debug('webauthn get options', publicKeyCredentialRequestOptions);
 
@@ -147,7 +155,7 @@ function verifyCredential({ username }, credentialId) {
     }).then(rawCredential => {
         const clientData = rawCredential ? parseClientData(rawCredential) : null;
         const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
-        const userIdParts = rawCredential && rawCredential.response && rawCredential.response.userHandle ? utilities.arrayBufferToString(rawCredential.response.userHandle).split('|') : null;
+        const userIdParts = rawCredential && rawCredential.response && rawCredential.response.userHandle ? arrayBufferToString(rawCredential.response.userHandle).split('|') : null;
 
         logger.debug('webauthn get raw response', rawCredential);
 
@@ -155,7 +163,7 @@ function verifyCredential({ username }, credentialId) {
             clientData && clientData.type === 'webauthn.get' && challengeFromClientData === challenge &&
             userIdParts && userIdParts.length === 2 && userIdParts[0] === username) {
             const ret = {
-                id: utilities.base64encode(rawCredential.rawId),
+                id: base64encode(rawCredential.rawId),
                 userName: userIdParts[0],
                 userSecret: userIdParts[1],
                 clientData: clientData,

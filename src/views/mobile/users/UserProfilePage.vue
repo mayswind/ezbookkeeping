@@ -76,7 +76,7 @@
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
                 :header="$t('Default Account')"
-                :title="$utilities.getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Not Specified'))"
+                :title="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Not Specified'))"
                 @click="showAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -96,7 +96,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Editable Transaction Scope')"
-                :title="$t($utilities.getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'value', 'name'))"
+                :title="$t(getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'value', 'name'))"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Scope'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.transactionEditScope">
@@ -156,7 +156,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Long Date Format')"
-                :title="$utilities.getNameByKeyValue(allLongDateFormats, newProfile.longDateFormat, 'type', 'displayName')"
+                :title="getNameByKeyValue(allLongDateFormats, newProfile.longDateFormat, 'type', 'displayName')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Date Format'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.longDateFormat">
@@ -169,7 +169,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Short Date Format')"
-                :title="$utilities.getNameByKeyValue(allShortDateFormats, newProfile.shortDateFormat, 'type', 'displayName')"
+                :title="getNameByKeyValue(allShortDateFormats, newProfile.shortDateFormat, 'type', 'displayName')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Short Date Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Date Format'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.shortDateFormat">
@@ -182,7 +182,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Long Time Format')"
-                :title="$utilities.getNameByKeyValue(allLongTimeFormats, newProfile.longTimeFormat, 'type', 'displayName')"
+                :title="getNameByKeyValue(allLongTimeFormats, newProfile.longTimeFormat, 'type', 'displayName')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Long Time Format'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.longTimeFormat">
@@ -195,7 +195,7 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Short Time Format')"
-                :title="$utilities.getNameByKeyValue(allShortTimeFormats, newProfile.shortTimeFormat, 'type', 'displayName')"
+                :title="getNameByKeyValue(allShortTimeFormats, newProfile.shortTimeFormat, 'type', 'displayName')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Time Format'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.shortTimeFormat">
@@ -220,6 +220,15 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+
+import datetimeConstants from '@/consts/datetime.js';
+import { getNameByKeyValue } from '@/lib/common.js';
+import { getCategorizedAccounts } from '@/lib/account.js';
+
 export default {
     props: [
         'f7router'
@@ -263,6 +272,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useRootStore, useUserStore, useAccountsStore),
         allLanguages() {
             const ret = [];
             const allLanguageInfo = this.$locale.getAllLanguageInfos();
@@ -291,16 +301,16 @@ export default {
             return this.$locale.getAllCurrencies();
         },
         allAccounts() {
-            return this.$store.getters.allPlainAccounts;
+            return this.accountsStore.allPlainAccounts;
         },
         allVisibleAccounts() {
-            return this.$store.getters.allVisiblePlainAccounts;
+            return this.accountsStore.allVisiblePlainAccounts;
         },
         allCategorizedAccounts() {
-            return this.$utilities.getCategorizedAccounts(this.allVisibleAccounts);
+            return getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {
-            return this.$constants.datetime.allWeekDays;
+            return datetimeConstants.allWeekDays;
         },
         allLongDateFormats() {
             return this.$locale.getAllLongDateFormats();
@@ -348,7 +358,7 @@ export default {
             return this.$t('Unknown');
         },
         currentDayOfWeekName() {
-            const weekName = this.$utilities.getNameByKeyValue(this.$constants.datetime.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'name');
+            const weekName = getNameByKeyValue(datetimeConstants.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'name');
             const i18nWeekNameKey = `datetime.${weekName}.long`;
             return this.$t(i18nWeekNameKey);
         },
@@ -418,8 +428,8 @@ export default {
         self.loading = true;
 
         const promises = [
-            self.$store.dispatch('loadAllAccounts', { force: false }),
-            self.$store.dispatch('getCurrentUserProfile')
+            self.accountsStore.loadAllAccounts({ force: false }),
+            self.userStore.getCurrentUserProfile()
         ];
 
         Promise.all(promises).then(responses => {
@@ -460,7 +470,7 @@ export default {
             self.saving = true;
             self.$showLoading(() => self.saving);
 
-            self.$store.dispatch('updateUserProfile', {
+            self.rootStore.updateUserProfile({
                 profile: self.newProfile,
                 currentPassword: self.currentPassword
             }).then(response => {
@@ -484,6 +494,9 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getNameByKeyValue(src, value, keyField, nameField, defaultName) {
+            return getNameByKeyValue(src, value, keyField, nameField, defaultName);
         },
         setCurrentUserProfile(profile) {
             this.oldProfile.email = profile.email;

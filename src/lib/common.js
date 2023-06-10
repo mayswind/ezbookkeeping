@@ -1,4 +1,4 @@
-import settings from "../../lib/settings";
+import settings from './settings.js';
 
 export function isFunction(val) {
     return typeof(val) === 'function';
@@ -227,9 +227,9 @@ export function copyObjectTo(fromObject, toObject) {
         const toValue = toObject[key];
 
         if (isArray(fromValue)) {
-            toObject[key] = this.copyArrayTo(fromValue, toValue);
+            toObject[key] = copyArrayTo(fromValue, toValue);
         } else if (isObject(fromValue)) {
-            toObject[key] = this.copyObjectTo(fromValue, toValue);
+            toObject[key] = copyObjectTo(fromValue, toValue);
         } else {
             if (fromValue !== toValue) {
                 toObject[key] = fromValue;
@@ -256,9 +256,9 @@ export function copyArrayTo(fromArray, toArray) {
             const toValue = toArray[i];
 
             if (isArray(fromValue)) {
-                toArray[i] = this.copyArrayTo(fromValue, toValue);
+                toArray[i] = copyArrayTo(fromValue, toValue);
             } else if (isObject(fromValue)) {
-                toArray[i] = this.copyObjectTo(fromValue, toValue);
+                toArray[i] = copyObjectTo(fromValue, toValue);
             } else {
                 if (fromValue !== toValue) {
                     toArray[i] = fromValue;
@@ -266,9 +266,9 @@ export function copyArrayTo(fromArray, toArray) {
             }
         } else {
             if (isArray(fromValue)) {
-                toArray.push(this.copyArrayTo(fromValue, []));
+                toArray.push(copyArrayTo(fromValue, []));
             } else if (isObject(fromValue)) {
-                toArray.push(this.copyObjectTo(fromValue, {}));
+                toArray.push(copyObjectTo(fromValue, {}));
             } else {
                 toArray.push(fromValue);
             }

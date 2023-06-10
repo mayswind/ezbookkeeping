@@ -49,7 +49,7 @@
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
                         <f7-chip outline
-                                 :text="$utilities.formatPercent(selectedItem.percent, 2, '&lt;0.01')"
+                                 :text="selectedItem.displayPercent"
                                  :style="getColorStyle(selectedItem ? selectedItem.color : '', '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
@@ -60,7 +60,7 @@
                         <span class="skeleton-text" v-if="skeleton">Name</span>
                         <span v-else-if="!skeleton && selectedItem.name">{{ selectedItem.name }}</span>
                         <span class="skeleton-text" v-if="skeleton">Value</span>
-                        <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ $locale.getDisplayCurrency(selectedItem.value, (selectedItem.currency || defaultCurrency)) }}</span>
+                        <span v-else-if="!skeleton && showValue" :style="getColorStyle(selectedItem ? selectedItem.color : '')">{{ selectedItem.displayValue }}</span>
                         <f7-icon class="item-navigate-icon" f7="chevron_right" v-if="enableClickItem"></f7-icon>
                     </f7-link>
                     <f7-link :no-link-class="true" v-else-if="!validItems || !validItems.length">
@@ -77,6 +77,9 @@
 </template>
 
 <script>
+import colorConstants from '@/consts/color.js';
+import { formatPercent } from '@/lib/common.js';
+
 const defaultColors = [
     'cc4a66',
     'e3564a',
@@ -140,7 +143,7 @@ export default {
                 if (item[this.valueField] && item[this.valueField] > 0 &&
                     (!this.hiddenField || !item[this.hiddenField]) &&
                     (!this.minValidPercent || item[this.valueField] / totalValidValue > this.minValidPercent)) {
-                    validItems.push({
+                    const finalItem = {
                         name: item[this.nameField],
                         value: item[this.valueField],
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
@@ -148,7 +151,12 @@ export default {
                         currency: item[this.currencyField],
                         color: item[this.colorField] ? item[this.colorField] : defaultColors[validItems.length % defaultColors.length],
                         sourceItem: item
-                    });
+                    };
+
+                    finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
+                    finalItem.displayValue = this.$locale.getDisplayCurrency(finalItem.value, (finalItem.currency || this.defaultCurrency));
+
+                    validItems.push(finalItem);
                 }
             }
 
@@ -225,7 +233,7 @@ export default {
             }
         },
         getColor: function (color) {
-            if (color && color !== this.$constants.colors.defaultColor) {
+            if (color && color !== colorConstants.defaultColor) {
                 color = '#' + color;
             } else {
                 color = 'var(--default-icon-color)';

@@ -1,4 +1,4 @@
-import accountConstants from '../../consts/account.js';
+import accountConstants from '@/consts/account.js';
 
 export function getAccountCategoryInfo(categoryId) {
     for (let i = 0; i < accountConstants.allCategories.length; i++) {

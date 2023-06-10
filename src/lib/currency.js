@@ -1,4 +1,4 @@
-import { isNumber, appendThousandsSeparator } from "./common.js";
+import { isNumber, appendThousandsSeparator } from './common.js';
 
 export function numericCurrencyToString(num) {
     let str = num.toString();

@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { makeButtonCopyToClipboard, changeClipboardObjectText } from '@/lib/misc.js';
+
 export default {
     props: [
         'title',
@@ -52,7 +54,7 @@ export default {
     watch: {
         'information': function (newValue) {
             if (this.clipboardHolder) {
-                this.$utilities.changeClipboardObjectText(this.clipboardHolder, newValue);
+                changeClipboardObjectText(this.clipboardHolder, newValue);
             }
         }
     },
@@ -71,7 +73,7 @@ export default {
             }
 
             if (self.$refs.copyToClipboardIcon) {
-                self.clipboardHolder = self.$utilities.makeButtonCopyToClipboard({
+                self.clipboardHolder = makeButtonCopyToClipboard({
                     el: '#copy-to-clipboard-icon',
                     text: self.information,
                     successCallback: function () {

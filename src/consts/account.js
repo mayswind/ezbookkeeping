@@ -39,8 +39,18 @@ const allAccountTypes = {
     SingleAccount: 1,
     MultiSubAccounts: 2
 };
+const allAccountTypesArray = [
+    {
+        id: allAccountTypes.SingleAccount,
+        name: 'Single Account'
+    }, {
+        id: allAccountTypes.MultiSubAccounts,
+        name: 'Multi Sub Accounts'
+    }
+];
 
 export default {
     allCategories: allAccountCategories,
     allAccountTypes: allAccountTypes,
+    allAccountTypesArray: allAccountTypesArray,
 };

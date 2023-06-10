@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import { isArray } from '@/lib/common.js';
+
 export default {
     props: [
         'modelValue',
@@ -73,7 +75,7 @@ export default {
     },
     computed: {
         hugeTreeViewItems() {
-            if (this.$utilities.isArray(this.items)) {
+            if (isArray(this.items)) {
                 return this.items.length > 10;
             } else {
                 let count = 0;

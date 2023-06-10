@@ -61,10 +61,10 @@
                 :title="$t('Currency Display Mode')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="currencyDisplayMode">
-                    <option :value="$constants.currency.allCurrencyDisplayModes.None">{{ $t('None') }}</option>
-                    <option :value="$constants.currency.allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
-                    <option :value="$constants.currency.allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
-                    <option :value="$constants.currency.allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
+                    <option :value="allCurrencyDisplayModes.None">{{ $t('None') }}</option>
+                    <option :value="allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
+                    <option :value="allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
+                    <option :value="allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
                 </select>
             </f7-list-item>
 
@@ -96,6 +96,13 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useUserStore } from '@/stores/user.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import currencyConstants from '@/consts/currency.js';
+
 export default {
     props: [
         'f7router'
@@ -110,6 +117,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useRootStore, useUserStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -136,11 +144,14 @@ export default {
             }
         },
         currentNickName() {
-            return this.$store.getters.currentUserNickname || this.$t('User');
+            return this.userStore.currentUserNickname || this.$t('User');
         },
         exchangeRatesLastUpdateDate() {
-            const exchangeRatesLastUpdateTime = this.$store.getters.exchangeRatesLastUpdateTime;
-            return exchangeRatesLastUpdateTime ? this.$utilities.formatUnixTime(exchangeRatesLastUpdateTime, this.$locale.getLongDateFormat()) : '';
+            const exchangeRatesLastUpdateTime = this.exchangeRatesStore.exchangeRatesLastUpdateTime;
+            return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
+        },
+        allCurrencyDisplayModes() {
+            return currencyConstants.allCurrencyDisplayModes;
         },
         isAutoUpdateExchangeRatesData: {
             get: function () {
@@ -223,7 +234,7 @@ export default {
                 self.logouting = true;
                 self.$showLoading(() => self.logouting);
 
-                self.$store.dispatch('logout').then(() => {
+                self.rootStore.logout().then(() => {
                     self.logouting = false;
                     self.$hideLoading();
 

@@ -57,6 +57,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.js';
+
 export default {
     props: [
         'f7router'
@@ -82,12 +85,15 @@ export default {
             showBackupCodeSheet: false
         };
     },
+    computed: {
+        ...mapStores(useTwoFactorAuthStore),
+    },
     created() {
         const self = this;
 
         self.loading = true;
 
-        self.$store.dispatch('get2FAStatus').then(response => {
+        self.twoFactorAuthStore.get2FAStatus().then(response => {
             self.status = response.enable;
             self.loading = false;
         }).catch(error => {
@@ -112,7 +118,7 @@ export default {
             self.enabling = true;
             self.$showLoading(() => self.enabling);
 
-            self.$store.dispatch('enable2FA').then(response => {
+            self.twoFactorAuthStore.enable2FA().then(response => {
                 self.enabling = false;
                 self.$hideLoading();
 
@@ -135,7 +141,7 @@ export default {
             self.enableConfirming = true;
             self.$showLoading(() => self.enableConfirming);
 
-            self.$store.dispatch('confirmEnable2FA', {
+            self.twoFactorAuthStore.confirmEnable2FA({
                 secret: self.new2FASecret,
                 passcode: self.currentPasscodeForEnable
             }).then(response => {
@@ -173,7 +179,7 @@ export default {
             self.disabling = true;
             self.$showLoading(() => self.disabling);
 
-            self.$store.dispatch('disable2FA', {
+            self.twoFactorAuthStore.disable2FA({
                 password: password
             }).then(() => {
                 self.disabling = false;
@@ -203,7 +209,7 @@ export default {
             self.regenerating = true;
             self.$showLoading(() => self.regenerating);
 
-            self.$store.dispatch('regenerate2FARecoveryCode', {
+            self.twoFactorAuthStore.regenerate2FARecoveryCode({
                 password: password
             }).then(response => {
                 self.regenerating = false;

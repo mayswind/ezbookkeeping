@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" v-if="!editAccountId && account.type === $constants.account.allAccountTypes.MultiSubAccounts" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" v-if="!editAccountId && account.type === allAccountTypes.MultiSubAccounts" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -42,7 +42,7 @@
             >
                 <list-item-selection-sheet value-type="item"
                                            key-field="id" value-field="id" title-field="name"
-                                           :items="allAccountTypes"
+                                           :items="allAccountTypesArray"
                                            :title-i18n="true"
                                            v-model:show="showAccountTypeSheet"
                                            v-model="account.type">
@@ -96,7 +96,7 @@
             <f7-list-input label="Description" type="textarea" placeholder="Your account description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === $constants.account.allAccountTypes.SingleAccount">
+        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.SingleAccount">
             <f7-list-input
                 type="text"
                 clear-button
@@ -180,11 +180,11 @@
                 class="list-item-with-header-and-title"
                 :class="{ 'disabled': editAccountId }"
                 :header="$t('Account Balance')"
-                :title="$locale.getDisplayCurrency(account.balance, account.currency)"
+                :title="getAccountBalance(account)"
                 @click="account.showBalanceSheet = true"
             >
-                <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                  :max-value="$constants.transaction.maxAmount"
+                <number-pad-sheet :min-value="allowedMinAmount"
+                                  :max-value="allowedMaxAmount"
                                   v-model:show="account.showBalanceSheet"
                                   v-model="account.balance"
                 ></number-pad-sheet>
@@ -204,7 +204,7 @@
             ></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts">
+        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === allAccountTypes.MultiSubAccounts">
             <f7-list-input
                 type="text"
                 clear-button
@@ -277,7 +277,7 @@
             ></f7-list-input>
         </f7-list>
 
-        <f7-block class="no-padding no-margin" v-if="!loading && account.type === $constants.account.allAccountTypes.MultiSubAccounts">
+        <f7-block class="no-padding no-margin" v-if="!loading && account.type === allAccountTypes.MultiSubAccounts">
             <f7-list strong inset dividers class="subaccount-edit-list margin-vertical"
                      :key="idx"
                      v-for="(subAccount, idx) in subAccounts">
@@ -373,11 +373,11 @@
                     class="list-item-with-header-and-title"
                     :class="{ 'disabled': editAccountId }"
                     :header="$t('Sub Account Balance')"
-                    :title="$locale.getDisplayCurrency(subAccount.balance, subAccount.currency)"
+                    :title="getAccountBalance(subAccount)"
                     @click="subAccount.showBalanceSheet = true"
                 >
-                    <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                      :max-value="$constants.transaction.maxAmount"
+                    <number-pad-sheet :min-value="allowedMinAmount"
+                                      :max-value="allowedMaxAmount"
                                       v-model:show="subAccount.showBalanceSheet"
                                       v-model="subAccount.balance"
                     ></number-pad-sheet>
@@ -420,13 +420,24 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+
+import accountConstants from '@/consts/account.js';
+import iconConstants from '@/consts/icon.js';
+import colorConstants from '@/consts/color.js';
+import currencyConstants from '@/consts/currency.js';
+import transactionConstants from '@/consts/transaction.js';
+import { getNameByKeyValue } from '@/lib/common.js';
+
 export default {
     props: [
         'f7route',
         'f7router'
     ],
     data() {
-        const self = this;
+        const userStore = useUserStore();
 
         return {
             editAccountId: null,
@@ -434,11 +445,11 @@ export default {
             loadingError: null,
             account: {
                 category: 1,
-                type: self.$constants.account.allAccountTypes.SingleAccount,
+                type: accountConstants.allAccountTypes.SingleAccount,
                 name: '',
-                icon: self.$constants.icons.defaultAccountIconId,
-                color: self.$constants.colors.defaultAccountColor,
-                currency: self.$store.getters.currentUserDefaultCurrency,
+                icon: iconConstants.defaultAccountIconId,
+                color: colorConstants.defaultAccountColor,
+                currency: userStore.currentUserDefaultCurrency,
                 balance: 0,
                 comment: '',
                 visible: true,
@@ -456,6 +467,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useAccountsStore),
         title() {
             if (!this.editAccountId) {
                 return 'Add Account';
@@ -470,26 +482,29 @@ export default {
                 return 'Save';
             }
         },
-        allAccountCategories() {
-            return this.$constants.account.allCategories;
-        },
         allAccountTypes() {
-            return [{
-                id: 1,
-                name: 'Single Account'
-            }, {
-                id: 2,
-                name: 'Multi Sub Accounts'
-            }];
+            return accountConstants.allAccountTypes;
+        },
+        allAccountCategories() {
+            return accountConstants.allCategories;
+        },
+        allAccountTypesArray() {
+            return accountConstants.allAccountTypesArray;
         },
         allAccountIcons() {
-            return this.$constants.icons.allAccountIcons;
+            return iconConstants.allAccountIcons;
         },
         allAccountColors() {
-            return this.$constants.colors.allAccountColors;
+            return colorConstants.allAccountColors;
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();
+        },
+        allowedMinAmount() {
+            return transactionConstants.minAmount;
+        },
+        allowedMaxAmount() {
+            return transactionConstants.maxAmount;
         }
     },
     watch: {
@@ -511,7 +526,7 @@ export default {
 
             self.editAccountId = query.id;
 
-            self.$store.dispatch('getAccount', {
+            self.accountsStore.getAccount({
                 accountId: self.editAccountId
             }).then(account => {
                 self.account.id = account.id;
@@ -568,7 +583,7 @@ export default {
         addSubAccount() {
             const self = this;
 
-            if (self.account.type !== self.$constants.account.allAccountTypes.MultiSubAccounts) {
+            if (self.account.type !== this.allAccountTypes.MultiSubAccounts) {
                 return;
             }
 
@@ -578,7 +593,7 @@ export default {
                 name: '',
                 icon: self.account.icon,
                 color: self.account.color,
-                currency: self.$store.getters.currentUserDefaultCurrency,
+                currency: self.userStore.currentUserDefaultCurrency,
                 balance: 0,
                 comment: '',
                 visible: true,
@@ -614,7 +629,7 @@ export default {
 
             let problemMessage = self.getInputEmptyProblemMessage(self.account, false);
 
-            if (!problemMessage && self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts) {
+            if (!problemMessage && self.account.type === self.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     problemMessage = self.getInputEmptyProblemMessage(self.subAccounts[i], true);
 
@@ -634,12 +649,12 @@ export default {
 
             const subAccounts = [];
 
-            if (self.account.type === self.$constants.account.allAccountTypes.MultiSubAccounts) {
+            if (self.account.type === self.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     const subAccount = self.subAccounts[i];
                     const submitAccount = {
                         category: self.account.category,
-                        type: self.$constants.account.allAccountTypes.SingleAccount,
+                        type: self.allAccountTypes.SingleAccount,
                         name: subAccount.name,
                         icon: subAccount.icon,
                         color: subAccount.color,
@@ -663,10 +678,10 @@ export default {
                 name: self.account.name,
                 icon: self.account.icon,
                 color: self.account.color,
-                currency: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? self.account.currency : self.$constants.currency.parentAccountCurrencyPlaceholder,
-                balance: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? self.account.balance : 0,
+                currency: self.account.type === self.allAccountTypes.SingleAccount ? self.account.currency : currencyConstants.parentAccountCurrencyPlaceholder,
+                balance: self.account.type === self.allAccountTypes.SingleAccount ? self.account.balance : 0,
                 comment: self.account.comment,
-                subAccounts: self.account.type === self.$constants.account.allAccountTypes.SingleAccount ? null : subAccounts,
+                subAccounts: self.account.type === self.allAccountTypes.SingleAccount ? null : subAccounts,
             };
 
             if (self.editAccountId) {
@@ -674,7 +689,7 @@ export default {
                 submitAccount.hidden = !self.account.visible;
             }
 
-            self.$store.dispatch('saveAccount', {
+            self.accountsStore.saveAccount({
                 account: submitAccount
             }).then(() => {
                 self.submitting = false;
@@ -697,19 +712,20 @@ export default {
             });
         },
         getAccountTypeName(accountType) {
-            const typeName = this.$utilities.getNameByKeyValue(this.allAccountTypes, accountType, 'id', 'name');
+            const typeName = getNameByKeyValue(this.allAccountTypesArray, accountType, 'id', 'name');
             return this.$t(typeName);
         },
         getAccountCategoryName(accountCategory) {
-            const categoryName = this.$utilities.getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'name');
+            const categoryName = getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'name');
             return this.$t(categoryName);
         },
+        getAccountBalance(account) {
+            return this.$locale.getDisplayCurrency(account.balance, account.currency)
+        },
         chooseSuitableIcon(oldCategory, newCategory) {
-            const allCategories = this.$constants.account.allCategories;
-
-            for (let i = 0; i < allCategories.length; i++) {
-                if (allCategories[i].id === oldCategory) {
-                    if (this.account.icon !== allCategories[i].defaultAccountIconId) {
+            for (let i = 0; i < this.allAccountCategories.length; i++) {
+                if (this.allAccountCategories[i].id === oldCategory) {
+                    if (this.account.icon !== this.allAccountCategories[i].defaultAccountIconId) {
                         return;
                     } else {
                         break;
@@ -717,9 +733,9 @@ export default {
                 }
             }
 
-            for (let i = 0; i < allCategories.length; i++) {
-                if (allCategories[i].id === newCategory) {
-                    this.account.icon = allCategories[i].defaultAccountIconId;
+            for (let i = 0; i < this.allAccountCategories.length; i++) {
+                if (this.allAccountCategories[i].id === newCategory) {
+                    this.account.icon = this.allAccountCategories[i].defaultAccountIconId;
                 }
             }
         },
@@ -730,7 +746,7 @@ export default {
                 return true;
             }
 
-            if (this.account.type === this.$constants.account.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type === this.allAccountTypes.MultiSubAccounts) {
                 for (let i = 0; i < this.subAccounts.length; i++) {
                     const isSubAccountEmpty = !!this.getInputEmptyProblemMessage(this.subAccounts[i], true);
 
@@ -749,7 +765,7 @@ export default {
                 return 'Account type cannot be empty';
             } else if (!account.name) {
                 return 'Account name cannot be empty';
-            } else if (account.type === this.$constants.account.allAccountTypes.SingleAccount && !account.currency) {
+            } else if (account.type === this.allAccountTypes.SingleAccount && !account.currency) {
                 return 'Account currency cannot be empty';
             } else {
                 return null;

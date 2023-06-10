@@ -18,6 +18,9 @@
 
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+
 export default {
     props: [
         'f7router'
@@ -28,12 +31,15 @@ export default {
             loadingError: null
         };
     },
+    computed: {
+        ...mapStores(useTransactionCategoriesStore)
+    },
     created() {
         const self = this;
 
         self.loading = true;
 
-        self.$store.dispatch('loadAllCategories', {
+        self.transactionCategoriesStore.loadAllCategories({
             force: false
         }).then(() => {
             self.loading = false;
@@ -53,7 +59,7 @@ export default {
         reload(done) {
             const self = this;
 
-            self.$store.dispatch('loadAllCategories', {
+            self.transactionCategoriesStore.loadAllCategories({
                 force: true
             }).then(() => {
                 if (done) {

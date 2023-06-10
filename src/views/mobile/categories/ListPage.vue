@@ -87,6 +87,12 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+
+import categoryConstants from '@/consts/category.js';
+import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7route',
@@ -109,19 +115,20 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useTransactionCategoriesStore),
         categories() {
             if (!this.categoryId || this.categoryId === '' || this.categoryId === '0') {
-                if (!this.$store.state.allTransactionCategories || !this.$store.state.allTransactionCategories[this.categoryType]) {
+                if (!this.transactionCategoriesStore.allTransactionCategories || !this.transactionCategoriesStore.allTransactionCategories[this.categoryType]) {
                     return [];
                 }
 
-                return this.$store.state.allTransactionCategories[this.categoryType];
+                return this.transactionCategoriesStore.allTransactionCategories[this.categoryType];
             } else if (this.categoryId && this.categoryId !== '' && this.categoryId !== '0') {
-                if (!this.$store.state.allTransactionCategoriesMap || !this.$store.state.allTransactionCategoriesMap[this.categoryId]) {
+                if (!this.transactionCategoriesStore.allTransactionCategoriesMap || !this.transactionCategoriesStore.allTransactionCategoriesMap[this.categoryId]) {
                     return [];
                 }
 
-                return this.$store.state.allTransactionCategoriesMap[this.categoryId].subCategories;
+                return this.transactionCategoriesStore.allTransactionCategoriesMap[this.categoryId].subCategories;
             } else {
                 return [];
             }
@@ -130,13 +137,13 @@ export default {
             let title = '';
 
             switch (this.categoryType) {
-                case this.$constants.category.allCategoryTypes.Income:
+                case categoryConstants.allCategoryTypes.Income:
                     title = 'Income';
                     break;
-                case this.$constants.category.allCategoryTypes.Expense:
+                case categoryConstants.allCategoryTypes.Expense:
                     title = 'Expense';
                     break;
-                case this.$constants.category.allCategoryTypes.Transfer:
+                case categoryConstants.allCategoryTypes.Transfer:
                     title = 'Transfer';
                     break;
                 default:
@@ -189,9 +196,9 @@ export default {
 
         self.categoryType = parseInt(query.type);
 
-        if (self.categoryType !== this.$constants.category.allCategoryTypes.Income &&
-            self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
-            self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
+        if (self.categoryType !== categoryConstants.allCategoryTypes.Income &&
+            self.categoryType !== categoryConstants.allCategoryTypes.Expense &&
+            self.categoryType !== categoryConstants.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             self.loadingError = 'Parameter Invalid';
             return;
@@ -207,7 +214,7 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('loadAllCategories', {
+        self.transactionCategoriesStore.loadAllCategories({
             force: false
         }).then(() => {
             self.loading = false;
@@ -222,7 +229,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            if (this.$store.state.transactionCategoryListStateInvalid && !this.loading) {
+            if (this.transactionCategoriesStore.transactionCategoryListStateInvalid && !this.loading) {
                 this.reload(null);
             }
 
@@ -236,7 +243,7 @@ export default {
 
             const self = this;
 
-            self.$store.dispatch('loadAllCategories', {
+            self.transactionCategoriesStore.loadAllCategories({
                 force: true
             }).then(() => {
                 if (done) {
@@ -276,7 +283,7 @@ export default {
                 return;
             }
 
-            self.$store.dispatch('changeCategoryDisplayOrder', {
+            self.transactionCategoriesStore.changeCategoryDisplayOrder({
                 categoryId: id,
                 from: event.from,
                 to: event.to
@@ -298,7 +305,7 @@ export default {
             self.displayOrderSaving = true;
             self.$showLoading();
 
-            self.$store.dispatch('updateCategoryDisplayOrders', {
+            self.transactionCategoriesStore.updateCategoryDisplayOrders({
                 type: self.categoryType,
                 parentId: self.categoryId,
             }).then(() => {
@@ -325,7 +332,7 @@ export default {
 
             self.$showLoading();
 
-            self.$store.dispatch('hideCategory', {
+            self.transactionCategoriesStore.hideCategory({
                 category: category,
                 hidden: hidden
             }).then(() => {
@@ -356,10 +363,10 @@ export default {
             self.categoryToDelete = null;
             self.$showLoading();
 
-            self.$store.dispatch('deleteCategory', {
+            self.transactionCategoriesStore.deleteCategory({
                 category: category,
                 beforeResolve: (done) => {
-                    self.$ui.onSwipeoutDeleted(self.getCategoryDomId(category), done);
+                    onSwipeoutDeleted(self.getCategoryDomId(category), done);
                 }
             }).then(() => {
                 self.$hideLoading();

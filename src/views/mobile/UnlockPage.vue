@@ -57,6 +57,16 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useUserStore } from '@/stores/user.js';
+import { useTokensStore } from '@/stores/token.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import logger from '@/lib/logger.js';
+import webauthn from '@/lib/webauthn.js';
+import { isModalShowing } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'f7router'
@@ -67,6 +77,7 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useRootStore, useUserStore, useTokensStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -76,7 +87,7 @@ export default {
         isWebAuthnAvailable() {
             return this.$settings.isEnableApplicationLockWebAuthn()
                 && this.$user.getWebAuthnCredentialId()
-                && this.$webauthn.isSupported();
+                && webauthn.isSupported();
         },
         currentLanguageName() {
             const currentLocale = this.$i18n.locale;
@@ -99,34 +110,34 @@ export default {
                 return;
             }
 
-            if (!self.$webauthn.isSupported()) {
+            if (!webauthn.isSupported()) {
                 self.$toast('This device does not support WebAuthn');
                 return;
             }
 
             self.$showLoading();
 
-            self.$webauthn.verifyCredential(
-                self.$store.state.currentUserInfo,
+            webauthn.verifyCredential(
+                self.userStore.currentUserInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
                 self.$hideLoading();
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
-                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
                         self.$locale.setLanguage(response.user.language);
                     }
                 });
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 router.refreshPage();
             }).catch(error => {
                 self.$hideLoading();
-                self.$logger.error('failed to use webauthn to verify', error);
+                logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {
                     self.$toast('This device does not support WebAuthn');
@@ -146,12 +157,12 @@ export default {
                 return;
             }
 
-            if (self.$ui.isModalShowing()) {
+            if (isModalShowing()) {
                 return;
             }
 
             const router = self.f7router;
-            const user = self.$store.state.currentUserInfo;
+            const user = self.userStore.currentUserInfo;
 
             if (!user || !user.username) {
                 self.$alert('An error has occurred');
@@ -160,19 +171,19 @@ export default {
 
             try {
                 self.$user.unlockTokenByPinCode(user.username, pinCode);
-                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
                         self.$locale.setLanguage(response.user.language);
                     }
                 });
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 router.refreshPage();
             } catch (ex) {
-                self.$logger.error('failed to unlock by pin code', ex);
+                logger.error('failed to unlock by pin code', ex);
                 self.$toast('PIN code is wrong');
             }
         },
@@ -181,10 +192,7 @@ export default {
             const router = self.f7router;
 
             self.$confirm('Are you sure you want to re-login?', () => {
-                self.$user.clearTokenAndUserInfo(true);
-                self.$user.clearWebAuthnConfig();
-                self.$store.dispatch('clearUserInfoState');
-                self.$store.dispatch('resetState');
+                self.rootStore.forceLogout();
                 self.$settings.clearSettings();
                 self.$locale.initLocale();
 

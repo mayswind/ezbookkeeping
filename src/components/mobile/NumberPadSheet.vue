@@ -63,6 +63,9 @@
 </template>
 
 <script>
+import { isString, appendThousandsSeparator } from '@/lib/common.js';
+import { numericCurrencyToString, stringCurrencyToNumeric } from '@/lib/currency.js';
+
 export default {
     props: [
         'modelValue',
@@ -85,8 +88,8 @@ export default {
     },
     computed: {
         currentDisplay() {
-            const previousValue = this.$utilities.appendThousandsSeparator(this.previousValue);
-            const currentValue = this.$utilities.appendThousandsSeparator(this.currentValue);
+            const previousValue = appendThousandsSeparator(this.previousValue);
+            const currentValue = appendThousandsSeparator(this.currentValue);
 
             if (this.currentSymbol) {
                 return `${previousValue} ${this.currentSymbol} ${currentValue}`;
@@ -115,7 +118,7 @@ export default {
     },
     methods: {
         getStringValue(value) {
-            let str = this.$utilities.numericCurrencyToString(value);
+            let str = numericCurrencyToString(value);
 
             if (str.indexOf(',')) {
                 str = str.replaceAll(/,/g, '');
@@ -173,18 +176,18 @@ export default {
 
             const newValue = this.currentValue + num.toString();
 
-            if (this.$utilities.isString(this.minValue) && this.minValue !== '') {
-                const min = this.$utilities.stringCurrencyToNumeric(this.minValue);
-                const current = this.$utilities.stringCurrencyToNumeric(newValue);
+            if (isString(this.minValue) && this.minValue !== '') {
+                const min = stringCurrencyToNumeric(this.minValue);
+                const current = stringCurrencyToNumeric(newValue);
 
                 if (current < min) {
                     return;
                 }
             }
 
-            if (this.$utilities.isString(this.maxValue) && this.maxValue !== '') {
-                const max = this.$utilities.stringCurrencyToNumeric(this.maxValue);
-                const current = this.$utilities.stringCurrencyToNumeric(newValue);
+            if (isString(this.maxValue) && this.maxValue !== '') {
+                const max = stringCurrencyToNumeric(this.maxValue);
+                const current = stringCurrencyToNumeric(newValue);
 
                 if (current > max) {
                     return;
@@ -247,8 +250,8 @@ export default {
         },
         confirm() {
             if (this.currentSymbol && this.currentValue.length >= 1) {
-                const previousValue = this.$utilities.stringCurrencyToNumeric(this.previousValue);
-                const currentValue = this.$utilities.stringCurrencyToNumeric(this.currentValue);
+                const previousValue = stringCurrencyToNumeric(this.previousValue);
+                const currentValue = stringCurrencyToNumeric(this.currentValue);
                 let finalValue = 0;
 
                 switch (this.currentSymbol) {
@@ -265,8 +268,8 @@ export default {
                         finalValue = previousValue;
                 }
 
-                if (this.$utilities.isString(this.minValue) && this.minValue !== '') {
-                    const min = this.$utilities.stringCurrencyToNumeric(this.minValue);
+                if (isString(this.minValue) && this.minValue !== '') {
+                    const min = stringCurrencyToNumeric(this.minValue);
 
                     if (finalValue < min) {
                         this.$toast('Numeric Overflow');
@@ -274,8 +277,8 @@ export default {
                     }
                 }
 
-                if (this.$utilities.isString(this.maxValue) && this.maxValue !== '') {
-                    const max = this.$utilities.stringCurrencyToNumeric(this.maxValue);
+                if (isString(this.maxValue) && this.maxValue !== '') {
+                    const max = stringCurrencyToNumeric(this.maxValue);
 
                     if (finalValue > max) {
                         this.$toast('Numeric Overflow');
@@ -295,7 +298,7 @@ export default {
 
                 return true;
             } else {
-                const value = this.$utilities.stringCurrencyToNumeric(this.currentValue);
+                const value = stringCurrencyToNumeric(this.currentValue);
 
                 this.$emit('update:modelValue', value);
                 this.close();

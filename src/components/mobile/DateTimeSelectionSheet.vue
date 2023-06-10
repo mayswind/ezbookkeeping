@@ -34,6 +34,18 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+
+import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
+import {
+    getCurrentUnixTime,
+    getCurrentDateTime,
+    getUnixTime,
+    getLocalDatetimeFromUnixTime,
+    getYear
+} from '@/lib/datetime.js';
+
 export default {
     props: [
         'modelValue',
@@ -45,7 +57,7 @@ export default {
     ],
     data() {
         const self = this;
-        let value = self.$utilities.getCurrentUnixTime();
+        let value = getCurrentUnixTime();
 
         if (self.modelValue) {
             value = self.modelValue;
@@ -54,43 +66,44 @@ export default {
         return {
             yearRange: [
                 2000,
-                this.$utilities.getYear(this.$utilities.getCurrentDateTime()) + 1
+                getYear(getCurrentDateTime()) + 1
             ],
-            dateTime: this.$utilities.getLocalDatetimeFromUnixTime(value),
+            dateTime: getLocalDatetimeFromUnixTime(value),
         }
     },
     computed: {
+        ...mapStores(useUserStore),
         isDarkMode() {
             return this.$root.isDarkMode;
         },
         firstDayOfWeek() {
-            return this.$store.getters.currentUserFirstDayOfWeek;
+            return this.userStore.currentUserFirstDayOfWeek;
         },
         dayNames() {
-            return this.$utilities.arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
+            return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
         },
         is24Hour() {
-            return this.$locale.isLongTime24HourFormat();
+            return this.$locale.isLongTime24HourFormat(this.userStore);
         }
     },
     methods: {
         onSheetOpen() {
             if (this.modelValue) {
-                this.dateTime = this.$utilities.getLocalDatetimeFromUnixTime(this.modelValue)
+                this.dateTime = getLocalDatetimeFromUnixTime(this.modelValue)
             }
         },
         onSheetClosed() {
             this.$emit('update:show', false);
         },
         setCurrentTime() {
-            this.dateTime = this.$utilities.getLocalDatetimeFromUnixTime(this.$utilities.getCurrentUnixTime())
+            this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime())
         },
         confirm() {
             if (!this.dateTime) {
                 return;
             }
 
-            const unixTime = this.$utilities.getUnixTime(this.dateTime);
+            const unixTime = getUnixTime(this.dateTime);
 
             if (unixTime < 0) {
                 this.$toast('Date is too early');

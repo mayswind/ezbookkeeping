@@ -123,6 +123,14 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
+
+import categoryConstants from '@/consts/category.js';
+import { copyObjectTo } from '@/lib/common.js';
+import { allVisibleTransactionCategories } from '@/lib/category.js';
+
 export default {
     props: [
         'f7route',
@@ -141,6 +149,8 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useTransactionCategoriesStore, useStatisticsStore),
+
         title() {
             if (this.modifyDefault) {
                 return 'Default Transaction Category Filter';
@@ -156,7 +166,7 @@ export default {
             }
         },
         allVisibleTransactionCategories() {
-            return this.$utilities.allVisibleTransactionCategories(this.$store.state.allTransactionCategories);
+            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories);
         },
         hasAnyAvailableCategory() {
             for (let type in this.allVisibleTransactionCategories) {
@@ -194,26 +204,26 @@ export default {
 
         self.modifyDefault = !!query.modifyDefault;
 
-        self.$store.dispatch('loadAllCategories', {
+        self.transactionCategoriesStore.loadAllCategories({
             force: false
         }).then(() => {
             self.loading = false;
 
             const allCategoryIds = {};
 
-            for (let categoryId in self.$store.state.allTransactionCategoriesMap) {
-                if (!Object.prototype.hasOwnProperty.call(self.$store.state.allTransactionCategoriesMap, categoryId)) {
+            for (let categoryId in self.transactionCategoriesStore.allTransactionCategoriesMap) {
+                if (!Object.prototype.hasOwnProperty.call(self.transactionCategoriesStore.allTransactionCategoriesMap, categoryId)) {
                     continue;
                 }
 
-                const category = self.$store.state.allTransactionCategoriesMap[categoryId];
+                const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
                 allCategoryIds[category.id] = false;
             }
 
             if (self.modifyDefault) {
-                self.filterCategoryIds = self.$utilities.copyObjectTo(self.$settings.getStatisticsDefaultTransactionCategoryFilter(), allCategoryIds);
+                self.filterCategoryIds = copyObjectTo(self.$settings.getStatisticsDefaultTransactionCategoryFilter(), allCategoryIds);
             } else {
-                self.filterCategoryIds = self.$utilities.copyObjectTo(self.$store.state.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
+                self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
             }
         }).catch(error => {
             if (error.processed) {
@@ -247,7 +257,7 @@ export default {
             if (self.modifyDefault) {
                 self.$settings.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
             } else {
-                self.$store.dispatch('updateTransactionStatisticsFilter', {
+                self.statisticsStore.updateTransactionStatisticsFilter({
                     filterCategoryIds: filteredCategoryIds
                 });
             }
@@ -256,7 +266,7 @@ export default {
         },
         selectCategory(e) {
             const categoryId = e.target.value;
-            const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+            const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
             if (!category) {
                 return;
@@ -266,7 +276,7 @@ export default {
         },
         selectSubCategories(e) {
             const categoryId = e.target.value;
-            const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+            const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
             if (!category || !category.subCategories || !category.subCategories.length) {
                 return;
@@ -283,7 +293,7 @@ export default {
                     continue;
                 }
 
-                const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
                 if (category) {
                     this.filterCategoryIds[category.id] = false;
@@ -296,7 +306,7 @@ export default {
                     continue;
                 }
 
-                const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
                 if (category) {
                     this.filterCategoryIds[category.id] = true;
@@ -309,7 +319,7 @@ export default {
                     continue;
                 }
 
-                const category = this.$store.state.allTransactionCategoriesMap[categoryId];
+                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
                 if (category) {
                     this.filterCategoryIds[category.id] = !this.filterCategoryIds[category.id];
@@ -318,11 +328,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case this.$constants.category.allCategoryTypes.Income.toString():
+                case categoryConstants.allCategoryTypes.Income.toString():
                     return this.$t('Income Categories');
-                case this.$constants.category.allCategoryTypes.Expense.toString():
+                case categoryConstants.allCategoryTypes.Expense.toString():
                     return this.$t('Expense Categories');
-                case this.$constants.category.allCategoryTypes.Transfer.toString():
+                case categoryConstants.allCategoryTypes.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');
@@ -356,12 +366,12 @@ export default {
         getCollapseStates() {
             const collapseStates = {};
 
-            for (let categoryTypeField in this.$constants.category.allCategoryTypes) {
-                if (!Object.prototype.hasOwnProperty.call(this.$constants.category.allCategoryTypes, categoryTypeField)) {
+            for (let categoryTypeField in categoryConstants.allCategoryTypes) {
+                if (!Object.prototype.hasOwnProperty.call(categoryConstants.allCategoryTypes, categoryTypeField)) {
                     continue;
                 }
 
-                const categoryType = this.$constants.category.allCategoryTypes[categoryTypeField];
+                const categoryType = categoryConstants.allCategoryTypes[categoryTypeField];
 
                 collapseStates[categoryType] = {
                     opened: true

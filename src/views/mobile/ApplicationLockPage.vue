@@ -36,6 +36,12 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+
+import logger from '@/lib/logger.js';
+import webauthn from '@/lib/webauthn.js';
+
 export default {
     data() {
         return {
@@ -48,6 +54,9 @@ export default {
             showInputPinCodeSheetForDisable: false
         };
     },
+    computed: {
+        ...mapStores(useUserStore)
+    },
     watch: {
         isEnableApplicationLockWebAuthn: function (newValue) {
             const self = this;
@@ -55,9 +64,9 @@ export default {
             if (newValue) {
                 self.$showLoading();
 
-                self.$webauthn.registerCredential(
+                webauthn.registerCredential(
                     self.$user.getUserAppLockState(),
-                    self.$store.state.currentUserInfo,
+                    self.userStore.currentUserInfo,
                 ).then(({ id }) => {
                     self.$hideLoading();
 
@@ -65,7 +74,7 @@ export default {
                     self.$settings.setEnableApplicationLockWebAuthn(true);
                     self.$toast('You have enabled WebAuthn successfully');
                 }).catch(error => {
-                    self.$logger.error('failed to enable WebAuthn', error);
+                    logger.error('failed to enable WebAuthn', error);
 
                     self.$hideLoading();
 
@@ -91,7 +100,7 @@ export default {
     },
     created() {
         const self = this;
-        self.$webauthn.isCompletelySupported().then(result => {
+        webauthn.isCompletelySupported().then(result => {
             self.isSupportedWebAuthn = result;
         });
     },
@@ -112,7 +121,7 @@ export default {
                 return;
             }
 
-            const user = this.$store.state.currentUserInfo;
+            const user = this.userStore.currentUserInfo;
 
             if (!user || !user.username) {
                 this.$alert('An error has occurred');

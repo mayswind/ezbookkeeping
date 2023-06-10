@@ -55,6 +55,12 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+
+import categoryConstants from '@/consts/category.js';
+import { copyArrayTo } from '@/lib/common.js';
+
 export default {
     props: [
         'f7route',
@@ -74,6 +80,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useTransactionCategoriesStore),
         allLanguages() {
             return this.$locale.getAllLanguageInfos();
         }
@@ -85,9 +92,9 @@ export default {
         self.categoryType = parseInt(query.type);
 
         if (self.categoryType !== 0 &&
-            self.categoryType !== this.$constants.category.allCategoryTypes.Income &&
-            self.categoryType !== this.$constants.category.allCategoryTypes.Expense &&
-            self.categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
+            self.categoryType !== categoryConstants.allCategoryTypes.Income &&
+            self.categoryType !== categoryConstants.allCategoryTypes.Expense &&
+            self.categoryType !== categoryConstants.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             self.loadingError = 'Parameter Invalid';
             return;
@@ -97,13 +104,13 @@ export default {
             for (let i = 1; i <= 3; i++) {
                 self.allCategories.push({
                     type: i,
-                    categories: self.$utilities.copyArrayTo(self.getDefaultCategories(i), [])
+                    categories: copyArrayTo(self.getDefaultCategories(i), [])
                 });
             }
         } else {
             self.allCategories.push({
                 type: self.categoryType,
-                categories: self.$utilities.copyArrayTo(self.getDefaultCategories(self.categoryType), [])
+                categories: copyArrayTo(self.getDefaultCategories(self.categoryType), [])
             });
         }
     },
@@ -113,12 +120,12 @@ export default {
         },
         getDefaultCategories(categoryType) {
             switch (categoryType) {
-                case this.$constants.category.allCategoryTypes.Income:
-                    return this.$constants.category.defaultIncomeCategories;
-                case this.$constants.category.allCategoryTypes.Expense:
-                    return this.$constants.category.defaultExpenseCategories;
-                case this.$constants.category.allCategoryTypes.Transfer:
-                    return this.$constants.category.defaultTransferCategories;
+                case categoryConstants.allCategoryTypes.Income:
+                    return categoryConstants.defaultIncomeCategories;
+                case categoryConstants.allCategoryTypes.Expense:
+                    return categoryConstants.defaultExpenseCategories;
+                case categoryConstants.allCategoryTypes.Transfer:
+                    return categoryConstants.defaultTransferCategories;
                 default:
                     return [];
             }
@@ -159,7 +166,7 @@ export default {
                 }
             }
 
-            self.$store.dispatch('addCategories', {
+            self.transactionCategoriesStore.addCategories({
                 categories: categories
             }).then(() => {
                 self.submitting = false;
@@ -178,11 +185,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case this.$constants.category.allCategoryTypes.Income:
+                case categoryConstants.allCategoryTypes.Income:
                     return this.$t('Income Categories');
-                case this.$constants.category.allCategoryTypes.Expense:
+                case categoryConstants.allCategoryTypes.Expense:
                     return this.$t('Expense Categories');
-                case this.$constants.category.allCategoryTypes.Transfer:
+                case categoryConstants.allCategoryTypes.Transfer:
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

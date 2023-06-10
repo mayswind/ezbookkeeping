@@ -1,9 +1,22 @@
-import { defaultLanguage, allLanguages } from '../locales/index.js';
-import datetime from "../consts/datetime.js";
-import timezone from "../consts/timezone.js";
-import currency from "../consts/currency.js";
-import settings from "./settings.js";
-import utilities from './utilities/index.js';
+import { defaultLanguage, allLanguages } from '@/locales/index.js';
+import datetime from '@/consts/datetime.js';
+import timezone from '@/consts/timezone.js';
+import currency from '@/consts/currency.js';
+import settings from './settings.js';
+import {
+    isString,
+    isNumber
+} from './common.js';
+import {
+    formatTime,
+    getCurrentDateTime,
+    getTimezoneOffset,
+    getTimezoneOffsetMinutes,
+    getDateTimeFormatType
+} from './datetime.js';
+import {
+    numericCurrencyToString
+} from './currency.js';
 
 const apiNotFoundErrorCode = 100001;
 const specifiedApiNotFoundErrors = {
@@ -332,27 +345,27 @@ export function getI18nShortTimeFormat(translateFn, formatTypeValue) {
 
 export function isLongTime24HourFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
-    const type = utilities.getDateTimeFormatType(datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
+    const type = getDateTimeFormatType(datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
     return type.is24HourFormat;
 }
 
 export function isShortTime24HourFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
-    const type = utilities.getDateTimeFormatType(datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
+    const type = getDateTimeFormatType(datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
     return type.is24HourFormat;
 }
 
 export function getAllTimezones(includeSystemDefault, translateFn) {
-    const defaultTimezoneOffset = utilities.getTimezoneOffset();
-    const defaultTimezoneOffsetMinutes = utilities.getTimezoneOffsetMinutes();
+    const defaultTimezoneOffset = getTimezoneOffset();
+    const defaultTimezoneOffsetMinutes = getTimezoneOffsetMinutes();
     const allTimezones = timezone.all;
     const allTimezoneInfos = [];
 
     for (let i = 0; i < allTimezones.length; i++) {
         allTimezoneInfos.push({
             name: allTimezones[i].timezoneName,
-            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? utilities.getTimezoneOffset(allTimezones[i].timezoneName) : ''),
-            utcOffsetMinutes: utilities.getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
+            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+            utcOffsetMinutes: getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
             displayName: translateFn(`timezone.${allTimezones[i].displayName}`)
         });
     }
@@ -403,22 +416,22 @@ export function getAllCurrencies(translateFn) {
 }
 
 export function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
-    if (!utilities.isNumber(value) && !utilities.isString(value)) {
+    if (!isNumber(value) && !isString(value)) {
         return value;
     }
 
-    if (utilities.isNumber(value)) {
+    if (isNumber(value)) {
         value = value.toString();
     }
 
     if (!notConvertValue) {
-        const hasIncompleteFlag = utilities.isString(value) && value.charAt(value.length - 1) === '+';
+        const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
 
         if (hasIncompleteFlag) {
             value = value.substring(0, value.length - 1);
         }
 
-        value = utilities.numericCurrencyToString(value);
+        value = numericCurrencyToString(value);
 
         if (hasIncompleteFlag) {
             value = value + '+';
@@ -563,7 +576,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
     ret.push({
         type: datetime.defaultDateTimeFormatValue,
         format: defaultFormat,
-        displayName: `${translateFn('Language Default')} (${utilities.formatTime(utilities.getCurrentDateTime(), defaultFormat)})`
+        displayName: `${translateFn('Language Default')} (${formatTime(getCurrentDateTime(), defaultFormat)})`
     });
 
     for (let i = 0; i < allFormatArray.length; i++) {
@@ -573,7 +586,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
         ret.push({
             type: formatType.type,
             format: format,
-            displayName: utilities.formatTime(utilities.getCurrentDateTime(), format)
+            displayName: formatTime(getCurrentDateTime(), format)
         });
     }
 
@@ -581,7 +594,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
 }
 
 function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
-    const type = utilities.getDateTimeFormatType(allFormatMap, allFormatArray,
+    const type = getDateTimeFormatType(allFormatMap, allFormatArray,
         localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue);
     return translateFn(`${localeFormatPathPrefix}.${type.key}`);
 }

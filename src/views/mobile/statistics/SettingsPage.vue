@@ -7,8 +7,8 @@
                 :title="$t('Default Chart Type')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultChartType">
-                    <option :value="$constants.statistics.allChartTypes.Pie">{{ $t('Pie Chart') }}</option>
-                    <option :value="$constants.statistics.allChartTypes.Bar">{{ $t('Bar Chart') }}</option>
+                    <option :value="allChartTypes.Pie">{{ $t('Pie Chart') }}</option>
+                    <option :value="allChartTypes.Bar">{{ $t('Bar Chart') }}</option>
                 </select>
             </f7-list-item>
 
@@ -50,25 +50,31 @@
 </template>
 
 <script>
+import datetimeConstants from '@/consts/datetime.js';
+import statisticsConstants from '@/consts/statistics.js';
+
 export default {
     computed: {
+        allChartTypes() {
+            return statisticsConstants.allChartTypes;
+        },
         allChartDataTypes() {
-            return this.$constants.statistics.allChartDataTypes;
+            return statisticsConstants.allChartDataTypes;
         },
         allSortingTypes() {
-            return this.$constants.statistics.allSortingTypes;
+            return statisticsConstants.allSortingTypes;
         },
         allDateRanges() {
             const allDateRanges = [];
 
-            for (let dateRangeField in this.$constants.datetime.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(this.$constants.datetime.allDateRanges, dateRangeField)) {
+            for (let dateRangeField in datetimeConstants.allDateRanges) {
+                if (!Object.prototype.hasOwnProperty.call(datetimeConstants.allDateRanges, dateRangeField)) {
                     continue;
                 }
 
-                const dateRangeType = this.$constants.datetime.allDateRanges[dateRangeField];
+                const dateRangeType = datetimeConstants.allDateRanges[dateRangeField];
 
-                if (dateRangeType.type !== this.$constants.datetime.allDateRanges.Custom.type) {
+                if (dateRangeType.type !== datetimeConstants.allDateRanges.Custom.type) {
                     allDateRanges.push(dateRangeType);
                 }
             }

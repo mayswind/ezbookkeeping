@@ -60,6 +60,8 @@
 </template>
 
 <script>
+import { isArray } from '@/lib/common.js';
+
 export default {
     props: [
         'modelValue',
@@ -104,7 +106,7 @@ export default {
     computed: {
         selectedPrimaryItem() {
             if (this.primaryValueField) {
-                if (this.$utilities.isArray(this.items)) {
+                if (isArray(this.items)) {
                     for (let i = 0; i < this.items.length; i++) {
                         const item = this.items[i];
 
@@ -181,7 +183,7 @@ export default {
         },
         getPrimaryValueBySecondaryValue(secondaryValue) {
             if (this.primarySubItemsField) {
-                if (this.$utilities.isArray(this.items)) {
+                if (isArray(this.items)) {
                     for (let i = 0; i < this.items.length; i++) {
                         const primaryItem = this.items[i];
 

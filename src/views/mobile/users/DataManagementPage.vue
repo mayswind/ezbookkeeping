@@ -10,10 +10,10 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
-            <f7-list-item :title="$t('Accounts')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalAccountCount)"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Categories')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionCategoryCount)"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Tags')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionTagCount)"></f7-list-item>
-            <f7-list-item :title="$t('Transactions')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionCount)"></f7-list-item>
+            <f7-list-item :title="$t('Accounts')" :after="displayDataStatistics.totalAccountCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Categories')" :after="displayDataStatistics.totalTransactionCategoryCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Tags')" :after="displayDataStatistics.totalTransactionTagCount"></f7-list-item>
+            <f7-list-item :title="$t('Transactions')" :after="displayDataStatistics.totalTransactionCount"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
@@ -56,6 +56,12 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
+import { useUserStore } from '@/stores/user.js';
+
+import { appendThousandsSeparator } from '@/lib/common.js';
+
 export default {
     props: [
         'f7router'
@@ -74,11 +80,26 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useRootStore, useUserStore),
+        displayDataStatistics() {
+            const self = this;
+
+            if (!self.dataStatistics) {
+                return null;
+            }
+
+            return {
+                totalAccountCount: appendThousandsSeparator(self.dataStatistics.totalAccountCount),
+                totalTransactionCategoryCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCategoryCount),
+                totalTransactionTagCount: appendThousandsSeparator(self.dataStatistics.totalTransactionTagCount),
+                totalTransactionCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCount)
+            };
+        },
         isDataExportingEnabled() {
             return this.$settings.isDataExportingEnabled();
         },
         exportFileName() {
-            const nickname = this.$store.getters.currentUserNickname;
+            const nickname = this.userStore.currentUserNickname;
 
             if (nickname) {
                 return this.$t('dataExport.exportFilename', {
@@ -94,7 +115,7 @@ export default {
 
         self.loading = true;
 
-        self.$store.dispatch('getUserDataStatistics').then(dataStatistics => {
+        self.userStore.getUserDataStatistics().then(dataStatistics => {
             self.dataStatistics = dataStatistics;
             self.loading = false;
         }).catch(error => {
@@ -116,7 +137,7 @@ export default {
             self.$showLoading();
             self.exportingData = true;
 
-            self.$store.dispatch('getExportedUserData').then(data => {
+            self.userStore.getExportedUserData().then(data => {
                 self.exportedData = URL.createObjectURL(data);
                 self.exportingData = false;
                 self.$hideLoading();
@@ -142,7 +163,7 @@ export default {
             self.clearingData = true;
             self.$showLoading(() => self.clearingData);
 
-            self.$store.dispatch('clearUserData', {
+            self.rootStore.clearUserData({
                 password: password
             }).then(() => {
                 self.clearingData = false;
@@ -153,7 +174,7 @@ export default {
 
                 self.loading = true;
 
-                self.$store.dispatch('getUserDataStatistics').then(dataStatistics => {
+                self.userStore.getUserDataStatistics().then(dataStatistics => {
                     self.dataStatistics = dataStatistics;
                     self.loading = false;
                 }).catch(error => {

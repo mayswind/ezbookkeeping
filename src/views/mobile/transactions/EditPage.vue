@@ -10,9 +10,9 @@
 
             <f7-subnavbar>
                 <f7-segmented strong :class="{ 'readonly': mode !== 'add' }">
-                    <f7-button :text="$t('Expense')" :active="transaction.type === $constants.transaction.allTransactionTypes.Expense" @click="transaction.type = $constants.transaction.allTransactionTypes.Expense"></f7-button>
-                    <f7-button :text="$t('Income')" :active="transaction.type === $constants.transaction.allTransactionTypes.Income" @click="transaction.type = $constants.transaction.allTransactionTypes.Income"></f7-button>
-                    <f7-button :text="$t('Transfer')" :active="transaction.type === $constants.transaction.allTransactionTypes.Transfer" @click="transaction.type = $constants.transaction.allTransactionTypes.Transfer"></f7-button>
+                    <f7-button :text="$t('Expense')" :active="transaction.type === allTransactionTypes.Expense" @click="transaction.type = allTransactionTypes.Expense"></f7-button>
+                    <f7-button :text="$t('Income')" :active="transaction.type === allTransactionTypes.Income" @click="transaction.type = allTransactionTypes.Income"></f7-button>
+                    <f7-button :text="$t('Transfer')" :active="transaction.type === allTransactionTypes.Transfer" @click="transaction.type = allTransactionTypes.Transfer"></f7-button>
                 </f7-segmented>
             </f7-subnavbar>
         </f7-navbar>
@@ -43,14 +43,14 @@
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
-                :class="{ 'readonly': mode === 'view', 'color-teal': transaction.type === $constants.transaction.allTransactionTypes.Expense, 'color-red': transaction.type === $constants.transaction.allTransactionTypes.Income }"
+                :class="{ 'readonly': mode === 'view', 'color-teal': transaction.type === allTransactionTypes.Expense, 'color-red': transaction.type === allTransactionTypes.Income }"
                 :style="{ fontSize: sourceAmountFontSize + 'px' }"
                 :header="$t(sourceAmountName)"
                 :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount)"
                 @click="showSourceAmountSheet = true"
             >
-                <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                  :max-value="$constants.transaction.maxAmount"
+                <number-pad-sheet :min-value="allowedMinAmount"
+                                  :max-value="allowedMaxAmount"
                                   v-model:show="showSourceAmountSheet"
                                   v-model="transaction.sourceAmount"
                 ></number-pad-sheet>
@@ -64,10 +64,10 @@
                 :header="$t('Transfer In Amount')"
                 :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
                 @click="showDestinationAmountSheet = true"
-                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+                v-if="transaction.type === allTransactionTypes.Transfer"
             >
-                <number-pad-sheet :min-value="$constants.transaction.minAmount"
-                                  :max-value="$constants.transaction.maxAmount"
+                <number-pad-sheet :min-value="allowedMinAmount"
+                                  :max-value="allowedMaxAmount"
                                   v-model:show="showDestinationAmountSheet"
                                   v-model="transaction.destinationAmount"
                 ></number-pad-sheet>
@@ -80,13 +80,13 @@
                 :class="{ 'disabled': !hasAvailableExpenseCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
-                v-if="transaction.type === $constants.transaction.allTransactionTypes.Expense"
+                v-if="transaction.type === allTransactionTypes.Expense"
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableExpenseCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.expenseCategory, allCategories[$constants.category.allCategoryTypes.Expense]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableExpenseCategories">
                         <span>{{ $t('None') }}</span>
@@ -97,7 +97,7 @@
                                            primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                           :items="allCategories[$constants.category.allCategoryTypes.Expense]"
+                                           :items="allCategories[allCategoryTypes.Expense]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.expenseCategory">
                 </tree-view-selection-sheet>
@@ -110,13 +110,13 @@
                 :class="{ 'disabled': !hasAvailableIncomeCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
-                v-if="transaction.type === $constants.transaction.allTransactionTypes.Income"
+                v-if="transaction.type === allTransactionTypes.Income"
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableIncomeCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.incomeCategory, allCategories[$constants.category.allCategoryTypes.Income]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableIncomeCategories">
                         <span>{{ $t('None') }}</span>
@@ -127,7 +127,7 @@
                                            primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                           :items="allCategories[$constants.category.allCategoryTypes.Income]"
+                                           :items="allCategories[allCategoryTypes.Income]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.incomeCategory">
                 </tree-view-selection-sheet>
@@ -140,13 +140,13 @@
                 :class="{ 'disabled': !hasAvailableTransferCategories, 'readonly': mode === 'view' }"
                 :header="$t('Category')"
                 @click="showCategorySheet = true"
-                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+                v-if="transaction.type === allTransactionTypes.Transfer"
             >
                 <template #title>
                     <div class="list-item-custom-title" v-if="hasAvailableTransferCategories">
-                        <span>{{ getPrimaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                        <span>{{ getPrimaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer]) }}</span>
                         <f7-icon class="category-separate-icon" f7="chevron_right"></f7-icon>
-                        <span>{{ getSecondaryCategoryName(transaction.transferCategory, allCategories[$constants.category.allCategoryTypes.Transfer]) }}</span>
+                        <span>{{ getSecondaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer]) }}</span>
                     </div>
                     <div class="list-item-custom-title" v-else-if="!hasAvailableTransferCategories">
                         <span>{{ $t('None') }}</span>
@@ -157,7 +157,7 @@
                                            primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                           :items="allCategories[$constants.category.allCategoryTypes.Transfer]"
+                                           :items="allCategories[allCategoryTypes.Transfer]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.transferCategory">
                 </tree-view-selection-sheet>
@@ -167,8 +167,8 @@
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length, 'readonly': mode === 'view' }"
-                :header="$t(sourceAccountName)"
-                :title="transaction.sourceAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.sourceAccountId, 'id', 'name') : $t('None')"
+                :header="$t(sourceAccountTitle)"
+                :title="sourceAccountName"
                 @click="showSourceAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -190,8 +190,8 @@
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length, 'readonly': mode === 'view' }"
                 :header="$t('Destination Account')"
-                :title="transaction.destinationAccountId ? $utilities.getNameByKeyValue(allAccounts, transaction.destinationAccountId, 'id', 'name') : $t('None')"
-                v-if="transaction.type === $constants.transaction.allTransactionTypes.Transfer"
+                :title="destinationAccountName"
+                v-if="transaction.type === allTransactionTypes.Transfer"
                 @click="showDestinationAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -213,7 +213,7 @@
                 link="#" no-chevron
                 :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Time')"
-                :title="$utilities.formatUnixTime($utilities.getActualUnixTimeForStore(transaction.time, $utilities.getTimezoneOffsetMinutes(), $utilities.getBrowserTimezoneOffsetMinutes()), $locale.getLongDateTimeFormat())"
+                :title="transactionDisplayTime"
                 @click="showTransactionDateTimeSheet = true"
             >
                 <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"
@@ -234,8 +234,8 @@
                 </select>
                 <template #title>
                     <f7-block class="list-item-custom-title no-padding no-margin">
-                        <span>{{ `(UTC${$utilities.getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)})` }}</span>
-                        <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ $utilities.getNameByKeyValue(allTimezones, transaction.timeZone, 'name', 'displayName') }}</span>
+                        <span>{{ `(${transactionDisplayTimezone})` }}</span>
+                        <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transactionDisplayTimezoneName }}</span>
                     </f7-block>
                 </template>
             </f7-list-item>
@@ -273,7 +273,7 @@
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin" v-if="transaction.tagIds && transaction.tagIds.length">
                         <f7-chip media-bg-color="black" class="transaction-edit-tag"
-                                 :text="$utilities.getNameByKeyValue(allTags, tagId, 'id', 'name')"
+                                 :text="getTagName(tagId)"
                                  :key="tagId"
                                  v-for="tagId in transaction.tagIds">
                             <template #media>
@@ -332,6 +332,43 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionTagsStore } from '@/stores/transactionTag.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import categoryConstants from '@/consts/category.js';
+import transactionConstants from '@/consts/transaction.js';
+import logger from '@/lib/logger.js';
+import {
+    isNumber,
+    copyObjectTo,
+    getNameByKeyValue
+} from '@/lib/common.js';
+import {
+    getCurrentUnixTime,
+    getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffsetMinutes,
+    getUtcOffsetByUtcOffsetMinutes,
+    getDummyUnixTimeForLocalUsage,
+    getActualUnixTimeForStore
+} from '@/lib/datetime.js';
+import {
+    stringCurrencyToNumeric
+} from '@/lib/currency.js';
+import {
+    getCategorizedAccounts,
+    getAllFilteredAccountsBalance
+} from '@/lib/account.js';
+import {
+    categoryTypeToTransactionType,
+    getTransactionPrimaryCategoryName,
+    getTransactionSecondaryCategoryName
+} from '@/lib/category.js';
+
 export default {
     props: [
         'f7route',
@@ -340,15 +377,15 @@ export default {
     data() {
         const self = this;
         const query = self.f7route.query;
-        const now = self.$utilities.getCurrentUnixTime();
+        const now = getCurrentUnixTime();
         const currentTimezone = self.$locale.getTimezone();
 
-        let defaultType = self.$constants.transaction.allTransactionTypes.Expense;
+        let defaultType = transactionConstants.allTransactionTypes.Expense;
 
-        if (query.type === self.$constants.transaction.allTransactionTypes.Income.toString()) {
-            defaultType = self.$constants.transaction.allTransactionTypes.Income;
-        } else if (query.type === self.$constants.transaction.allTransactionTypes.Transfer.toString()) {
-            defaultType = self.$constants.transaction.allTransactionTypes.Transfer;
+        if (query.type === transactionConstants.allTransactionTypes.Income.toString()) {
+            defaultType = transactionConstants.allTransactionTypes.Income;
+        } else if (query.type === transactionConstants.allTransactionTypes.Transfer.toString()) {
+            defaultType = transactionConstants.allTransactionTypes.Transfer;
         }
 
         return {
@@ -358,7 +395,7 @@ export default {
                 type: defaultType,
                 time: now,
                 timeZone: currentTimezone,
-                utcOffset: self.$utilities.getTimezoneOffsetMinutes(currentTimezone),
+                utcOffset: getTimezoneOffsetMinutes(currentTimezone),
                 expenseCategory: '',
                 incomeCategory: '',
                 transferCategory: '',
@@ -390,6 +427,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useExchangeRatesStore),
         title() {
             if (this.mode === 'add') {
                 return 'Add Transaction';
@@ -407,48 +445,51 @@ export default {
             }
         },
         sourceAmountName() {
-            if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense) {
+            if (this.transaction.type === this.allTransactionTypes.Expense) {
                 return 'Expense Amount';
-            } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+            } else if (this.transaction.type === this.allTransactionTypes.Income) {
                 return 'Income Amount';
-            } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
+            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 return 'Transfer Out Amount';
             } else {
                 return '';
             }
         },
-        sourceAccountName() {
-            if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense || this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+        sourceAccountTitle() {
+            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
                 return 'Account';
-            } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
+            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 return 'Source Account';
             } else {
                 return '';
             }
         },
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency;
+            return this.userStore.currentUserDefaultCurrency;
         },
         defaultAccountId() {
-            return this.$store.getters.currentUserDefaultAccountId;
+            return this.userStore.currentUserDefaultAccountId;
         },
-        defaultFirstDayOfWeek() {
-            return this.$store.getters.currentUserFirstDayOfWeek;
+        allTransactionTypes() {
+            return transactionConstants.allTransactionTypes;
+        },
+        allCategoryTypes() {
+            return categoryConstants.allCategoryTypes;
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
         },
         allAccounts() {
-            return this.$store.getters.allPlainAccounts;
+            return this.accountsStore.allPlainAccounts;
         },
         allVisibleAccounts() {
-            return this.$store.getters.allVisiblePlainAccounts;
+            return this.accountsStore.allVisiblePlainAccounts;
         },
         allAccountsMap() {
-            return this.$store.state.allAccountsMap;
+            return this.accountsStore.allAccountsMap;
         },
         categorizedAccounts() {
-            const categorizedAccounts = this.$utilities.copyObjectTo(this.$utilities.getCategorizedAccounts(this.allVisibleAccounts), {});
+            const categorizedAccounts = copyObjectTo(getCategorizedAccounts(this.allVisibleAccounts), {});
 
             for (let category in categorizedAccounts) {
                 if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
@@ -472,7 +513,7 @@ export default {
                 }
 
                 if (this.showAccountBalance) {
-                    const accountsBalance = this.$utilities.getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+                    const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
                     let totalBalance = 0;
                     let hasUnCalculatedAmount = false;
 
@@ -484,9 +525,9 @@ export default {
                                 totalBalance -= accountsBalance[i].balance;
                             }
                         } else {
-                            const balance = this.$store.getters.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
+                            const balance = this.exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
 
-                            if (!this.$utilities.isNumber(balance)) {
+                            if (!isNumber(balance)) {
                                 hasUnCalculatedAmount = true;
                                 continue;
                             }
@@ -512,37 +553,60 @@ export default {
             return categorizedAccounts;
         },
         allCategories() {
-            return this.$store.state.allTransactionCategories;
+            return this.transactionCategoriesStore.allTransactionCategories;
         },
         allCategoriesMap() {
-            return this.$store.state.allTransactionCategoriesMap;
+            return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allTags() {
-            return this.$store.state.allTransactionTags;
+            return this.transactionTagsStore.allTransactionTags;
         },
         hasAvailableExpenseCategories() {
-            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Expense] || !this.allCategories[this.$constants.category.allCategoryTypes.Expense].length) {
+            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Expense]);
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableIncomeCategories() {
-            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Income] || !this.allCategories[this.$constants.category.allCategoryTypes.Income].length) {
+            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Income] || !this.allCategories[this.allCategoryTypes.Income].length) {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Income]);
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableTransferCategories() {
-            if (!this.allCategories || !this.allCategories[this.$constants.category.allCategoryTypes.Transfer] || !this.allCategories[this.$constants.category.allCategoryTypes.Transfer].length) {
+            if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Transfer] || !this.allCategories[this.allCategoryTypes.Transfer].length) {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.$constants.category.allCategoryTypes.Transfer]);
+            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
             return firstAvailableCategoryId !== '';
+        },
+        sourceAccountName() {
+            if (this.transaction.sourceAccountId) {
+                return getNameByKeyValue(this.allAccounts, this.transaction.sourceAccountId, 'id', 'name');
+            } else {
+                return this.$t('None');
+            }
+        },
+        destinationAccountName() {
+            if (this.transaction.destinationAccountId) {
+                return getNameByKeyValue(this.allAccounts, this.transaction.destinationAccountId, 'id', 'name');
+            } else {
+                return this.$t('None');
+            }
+        },
+        transactionDisplayTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+        },
+        transactionDisplayTimezone() {
+            return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;
+        },
+        transactionDisplayTimezoneName() {
+            return getNameByKeyValue(this.allTimezones, this.transaction.timeZone, 'name', 'displayName');
         },
         sourceAmountFontSize() {
             return this.getFontSizeByAmount(this.transaction.sourceAmount);
@@ -559,6 +623,12 @@ export default {
                 return this.$t('No Location');
             }
         },
+        allowedMinAmount() {
+            return transactionConstants.minAmount;
+        },
+        allowedMaxAmount() {
+            return transactionConstants.maxAmount;
+        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -572,28 +642,28 @@ export default {
                 return;
             }
 
-            if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense || this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
                 this.transaction.destinationAmount = newValue;
-            } else if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Transfer) {
+            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId]
                 const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId]
 
                 if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                    const exchangedOldValue = this.$store.getters.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
-                    const exchangedNewValue = this.$store.getters.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedOldValue = this.exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedNewValue = this.exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
 
-                    if (this.$utilities.isNumber(exchangedOldValue)) {
+                    if (isNumber(exchangedOldValue)) {
                         oldValue = Math.floor(exchangedOldValue);
                     }
 
-                    if (this.$utilities.isNumber(exchangedNewValue)) {
+                    if (isNumber(exchangedNewValue)) {
                         newValue = Math.floor(exchangedNewValue);
                     }
                 }
 
                 if ((!sourceAccount || !destinationAccount || this.transaction.destinationAmount === oldValue) &&
-                    (this.$utilities.stringCurrencyToNumeric(this.$constants.transaction.minAmount) <= newValue &&
-                        newValue <= this.$utilities.stringCurrencyToNumeric(this.$constants.transaction.maxAmount))) {
+                    (stringCurrencyToNumeric(this.allowedMinAmount) <= newValue &&
+                        newValue <= stringCurrencyToNumeric(this.allowedMaxAmount))) {
                     this.transaction.destinationAmount = newValue;
                 }
             }
@@ -603,7 +673,7 @@ export default {
                 return;
             }
 
-            if (this.transaction.type === this.$constants.transaction.allTransactionTypes.Expense || this.transaction.type === this.$constants.transaction.allTransactionTypes.Income) {
+            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
                 this.transaction.sourceAmount = newValue;
             }
         },
@@ -629,9 +699,9 @@ export default {
         self.loading = true;
 
         const promises = [
-            self.$store.dispatch('loadAllAccounts', { force: false }),
-            self.$store.dispatch('loadAllCategories', { force: false }),
-            self.$store.dispatch('loadAllTags', { force: false })
+            self.accountsStore.loadAllAccounts({ force: false }),
+            self.transactionCategoriesStore.loadAllCategories({ force: false }),
+            self.transactionTagsStore.loadAllTags({ force: false })
         ];
 
         if (query.id) {
@@ -639,12 +709,12 @@ export default {
                 self.editTransactionId = query.id;
             }
 
-            promises.push(self.$store.dispatch('getTransaction', { transactionId: query.id }));
+            promises.push(self.transactionsStore.getTransaction({ transactionId: query.id }));
         }
 
         if (query.type && query.type !== '0' &&
-            query.type >= self.$constants.transaction.allTransactionTypes.Income &&
-            query.type <= self.$constants.transaction.allTransactionTypes.Transfer) {
+            query.type >= self.allTransactionTypes.Income &&
+            query.type <= self.allTransactionTypes.Transfer) {
             self.transaction.type = parseInt(query.type);
         }
 
@@ -657,43 +727,43 @@ export default {
 
             if ((!query.type || query.type === '0') && query.categoryId && query.categoryId !== '0' && self.allCategoriesMap[query.categoryId]) {
                 const category = self.allCategoriesMap[query.categoryId];
-                const type = self.$utilities.categoryTypeToTransactionType(category.type);
+                const type = categoryTypeToTransactionType(category.type);
 
-                if (self.$utilities.isNumber(type)) {
+                if (isNumber(type)) {
                     self.transaction.type = type;
                 }
             }
 
-            if (self.allCategories[self.$constants.category.allCategoryTypes.Expense] &&
-                self.allCategories[self.$constants.category.allCategoryTypes.Expense].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Expense], query.categoryId)) {
+            if (self.allCategories[self.allCategoryTypes.Expense] &&
+                self.allCategories[self.allCategoryTypes.Expense].length) {
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Expense], query.categoryId)) {
                     self.transaction.expenseCategory = query.categoryId;
                 }
 
                 if (!self.transaction.expenseCategory) {
-                    self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Expense]);
+                    self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Expense]);
                 }
             }
 
-            if (self.allCategories[self.$constants.category.allCategoryTypes.Income] &&
-                self.allCategories[self.$constants.category.allCategoryTypes.Income].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Income], query.categoryId)) {
+            if (self.allCategories[self.allCategoryTypes.Income] &&
+                self.allCategories[self.allCategoryTypes.Income].length) {
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Income], query.categoryId)) {
                     self.transaction.incomeCategory = query.categoryId;
                 }
 
                 if (!self.transaction.incomeCategory) {
-                    self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Income]);
+                    self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Income]);
                 }
             }
 
-            if (self.allCategories[self.$constants.category.allCategoryTypes.Transfer] &&
-                self.allCategories[self.$constants.category.allCategoryTypes.Transfer].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.$constants.category.allCategoryTypes.Transfer], query.categoryId)) {
+            if (self.allCategories[self.allCategoryTypes.Transfer] &&
+                self.allCategories[self.allCategoryTypes.Transfer].length) {
+                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Transfer], query.categoryId)) {
                     self.transaction.transferCategory = query.categoryId;
                 }
 
                 if (!self.transaction.transferCategory) {
-                    self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.$constants.category.allCategoryTypes.Transfer]);
+                    self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Transfer]);
                 }
             }
 
@@ -734,18 +804,18 @@ export default {
 
                 self.transaction.type = transaction.type;
 
-                if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
+                if (self.transaction.type === self.allTransactionTypes.Expense) {
                     self.transaction.expenseCategory = transaction.categoryId;
-                } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Income) {
+                } else if (self.transaction.type === self.allTransactionTypes.Income) {
                     self.transaction.incomeCategory = transaction.categoryId;
-                } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Transfer) {
+                } else if (self.transaction.type === self.allTransactionTypes.Transfer) {
                     self.transaction.transferCategory = transaction.categoryId;
                 }
 
                 if (self.mode === 'edit' || self.mode === 'view') {
                     self.transaction.utcOffset = transaction.utcOffset;
                     self.transaction.timeZone = null;
-                    self.transaction.time = self.$utilities.getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes());
+                    self.transaction.time = getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
                 }
 
                 self.transaction.sourceAccountId = transaction.sourceAccountId;
@@ -771,7 +841,7 @@ export default {
 
             self.loading = false;
         }).catch(error => {
-            self.$logger.error('failed to load essential data for editing transaction', error);
+            logger.error('failed to load essential data for editing transaction', error);
 
             if (error.processed) {
                 self.loading = false;
@@ -800,7 +870,7 @@ export default {
 
             const submitTransaction = {
                 type: self.transaction.type,
-                time: self.$utilities.getActualUnixTimeForStore(self.transaction.time, self.transaction.utcOffset, self.$utilities.getBrowserTimezoneOffsetMinutes()),
+                time: getActualUnixTimeForStore(self.transaction.time, self.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()),
                 sourceAccountId: self.transaction.sourceAccountId,
                 sourceAmount: self.transaction.sourceAmount,
                 destinationAccountId: '0',
@@ -812,11 +882,11 @@ export default {
                 utcOffset: self.transaction.utcOffset
             };
 
-            if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Expense) {
+            if (self.transaction.type === self.allTransactionTypes.Expense) {
                 submitTransaction.categoryId = self.transaction.expenseCategory;
-            } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Income) {
+            } else if (self.transaction.type === self.allTransactionTypes.Income) {
                 submitTransaction.categoryId = self.transaction.incomeCategory;
-            } else if (self.transaction.type === self.$constants.transaction.allTransactionTypes.Transfer) {
+            } else if (self.transaction.type === self.allTransactionTypes.Transfer) {
                 submitTransaction.categoryId = self.transaction.transferCategory;
                 submitTransaction.destinationAccountId = self.transaction.destinationAccountId;
                 submitTransaction.destinationAmount = self.transaction.destinationAmount;
@@ -833,7 +903,7 @@ export default {
                 self.submitting = true;
                 self.$showLoading(() => self.submitting);
 
-                self.$store.dispatch('saveTransaction', {
+                self.transactionsStore.saveTransaction({
                     transaction: submitTransaction,
                     defaultCurrency: self.defaultCurrency
                 }).then(() => {
@@ -869,7 +939,7 @@ export default {
             const self = this;
 
             if (!self.isSupportGeoLocation) {
-                self.$logger.warn('this browser does not support geo location');
+                logger.warn('this browser does not support geo location');
 
                 if (forceUpdate) {
                     self.$toast('Unable to get current position');
@@ -879,7 +949,7 @@ export default {
 
             navigator.geolocation.getCurrentPosition(function (position) {
                 if (!position || !position.coords) {
-                    self.$logger.error('current position is null');
+                    logger.error('current position is null');
                     self.geoLocationStatus = 'error';
 
                     if (forceUpdate) {
@@ -896,7 +966,7 @@ export default {
                     longitude: position.coords.longitude
                 };
             }, function (err) {
-                self.$logger.error('cannot get current position', err);
+                logger.error('cannot get current position', err);
                 self.geoLocationStatus = 'error';
 
                 if (forceUpdate) {
@@ -953,10 +1023,13 @@ export default {
             return this.$locale.getDisplayCurrency(amount);
         },
         getPrimaryCategoryName(categoryId, allCategories) {
-            return this.$utilities.getTransactionPrimaryCategoryName(categoryId, allCategories);
+            return getTransactionPrimaryCategoryName(categoryId, allCategories);
         },
         getSecondaryCategoryName(categoryId, allCategories) {
-            return this.$utilities.getTransactionSecondaryCategoryName(categoryId, allCategories);
+            return getTransactionSecondaryCategoryName(categoryId, allCategories);
+        },
+        getTagName(tagId) {
+            return getNameByKeyValue(this.allTags, tagId, 'id', 'name');
         }
     }
 };

@@ -128,6 +128,13 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+
+import categoryConstants from '@/consts/category.js';
+import iconConstants from '@/consts/icon.js';
+import colorConstants from '@/consts/color.js';
+
 export default {
     props: [
         'f7route',
@@ -145,8 +152,8 @@ export default {
                 type: parseInt(query.type),
                 name: '',
                 parentId: query.parentId,
-                icon: self.$constants.icons.defaultCategoryIconId,
-                color: self.$constants.colors.defaultCategoryColor,
+                icon: iconConstants.defaultCategoryIconId,
+                color: colorConstants.defaultCategoryColor,
                 comment: '',
                 visible: true,
                 showIconSelectionSheet: false,
@@ -156,6 +163,7 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useTransactionCategoriesStore),
         title() {
             if (!this.editCategoryId) {
                 if (this.category.parentId === '0') {
@@ -175,10 +183,10 @@ export default {
             }
         },
         allCategoryIcons() {
-            return this.$constants.icons.allCategoryIcons;
+            return iconConstants.allCategoryIcons;
         },
         allCategoryColors() {
-            return this.$constants.colors.allCategoryColors;
+            return colorConstants.allCategoryColors;
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -205,7 +213,7 @@ export default {
             self.loading = true;
 
             self.editCategoryId = query.id;
-            self.$store.dispatch('getCategory', {
+            self.transactionCategoriesStore.getCategory({
                 categoryId: self.editCategoryId
             }).then(category => {
                 self.category.id = category.id;
@@ -229,9 +237,9 @@ export default {
         } else if (query.parentId) {
             const categoryType = parseInt(query.type);
 
-            if (categoryType !== this.$constants.category.allCategoryTypes.Income &&
-                categoryType !== this.$constants.category.allCategoryTypes.Expense &&
-                categoryType !== this.$constants.category.allCategoryTypes.Transfer) {
+            if (categoryType !== categoryConstants.allCategoryTypes.Income &&
+                categoryType !== categoryConstants.allCategoryTypes.Expense &&
+                categoryType !== categoryConstants.allCategoryTypes.Transfer) {
                 self.$toast('Parameter Invalid');
                 self.loadingError = 'Parameter Invalid';
                 return;
@@ -272,7 +280,7 @@ export default {
                 submitCategory.hidden = !self.category.visible;
             }
 
-            self.$store.dispatch('saveCategory', {
+            self.transactionCategoriesStore.saveCategory({
                 category: submitCategory
             }).then(() => {
                 self.submitting = false;

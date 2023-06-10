@@ -27,7 +27,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-card v-if="query.chartType === $constants.statistics.allChartTypes.Pie">
+        <f7-card v-if="query.chartType === allChartTypes.Pie">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
@@ -76,7 +76,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="query.chartType === $constants.statistics.allChartTypes.Bar">
+        <f7-card v-else-if="query.chartType === allChartTypes.Bar">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
@@ -150,7 +150,7 @@
                         <template #title>
                             <div class="statistics-list-item-text">
                                 <span>{{ item.name }}</span>
-                                <small class="statistics-percent" v-if="item.percent >= 0">{{ $utilities.formatPercent(item.percent, 2, '&lt;0.01') }}</small>
+                                <small class="statistics-percent" v-if="item.percent >= 0">{{ getDisplayPercent(item.percent, 2, '&lt;0.01') }}</small>
                             </div>
                         </template>
 
@@ -195,11 +195,11 @@
             <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Pie)">
-                <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Pie }">{{ $t('Pie Chart') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType(allChartTypes.Pie)">
+                <span :class="{ 'tabbar-item-changed': query.chartType === allChartTypes.Pie }">{{ $t('Pie Chart') }}</span>
             </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType($constants.statistics.allChartTypes.Bar)">
-                <span :class="{ 'tabbar-item-changed': query.chartType === $constants.statistics.allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType(allChartTypes.Bar)">
+                <span :class="{ 'tabbar-item-changed': query.chartType === allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -217,10 +217,10 @@
                     </template>
                     <template #footer>
                         <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
-                            <span>{{ $utilities.formatUnixTime(query.startTime, $locale.getLongDateTimeFormat()) }}</span>
+                            <span>{{ queryStartTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
-                            <span>{{ $utilities.formatUnixTime(query.endTime, $locale.getLongDateTimeFormat()) }}</span>
+                            <span>{{ queryEndTime }}</span>
                         </div>
                     </template>
                 </f7-list-item>
@@ -250,6 +250,24 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
+
+import datetimeConstants from '@/consts/datetime.js';
+import statisticsConstants from '@/consts/statistics.js';
+import { getNameByKeyValue, limitText, formatPercent } from '@/lib/common.js'
+import {
+    parseDateFromUnixTime,
+    getYear,
+    getShiftedDateRange,
+    getDateRangeByDateType,
+    isDateRangeMatchFullYears,
+    isDateRangeMatchFullMonths
+} from '@/lib/datetime.js';
+
 export default {
     props: [
         'f7router'
@@ -269,31 +287,41 @@ export default {
         };
     },
     computed: {
+        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
         defaultCurrency() {
-            return this.$store.getters.currentUserDefaultCurrency;
+            return this.userStore.currentUserDefaultCurrency;
         },
         firstDayOfWeek() {
-            return this.$store.getters.currentUserFirstDayOfWeek;
+            return this.userStore.currentUserFirstDayOfWeek;
         },
         query() {
-            return this.$store.state.transactionStatisticsFilter;
+            return this.statisticsStore.transactionStatisticsFilter;
         },
         queryChartDataTypeName() {
-            const queryChartDataTypeName = this.$utilities.getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');
+            const queryChartDataTypeName = getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');
             return this.$t(queryChartDataTypeName);
         },
         querySortingTypeName() {
-            const querySortingTypeName = this.$utilities.getNameByKeyValue(this.allSortingTypes, this.query.sortingType, 'type', 'name', 'System Default');
+            const querySortingTypeName = getNameByKeyValue(this.allSortingTypes, this.query.sortingType, 'type', 'name', 'System Default');
             return this.$t(querySortingTypeName);
         },
+        queryStartTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.startTime);
+        },
+        queryEndTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
+        },
+        allChartTypes() {
+            return statisticsConstants.allChartTypes;
+        },
         allChartDataTypes() {
-            return this.$constants.statistics.allChartDataTypes;
+            return statisticsConstants.allChartDataTypes;
         },
         allSortingTypes() {
-            return this.$constants.statistics.allSortingTypes;
+            return statisticsConstants.allSortingTypes;
         },
         allDateRanges() {
-            return this.$constants.datetime.allDateRanges;
+            return datetimeConstants.allDateRanges;
         },
         totalAmountName() {
             if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
@@ -325,10 +353,10 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                combinedData = this.$store.getters.statisticsItemsByTransactionStatisticsData;
+                combinedData = this.statisticsStore.statisticsItemsByTransactionStatisticsData;
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
-                combinedData = this.$store.getters.statisticsItemsByAccountsData;
+                combinedData = this.statisticsStore.statisticsItemsByAccountsData;
             }
 
             const allStatisticsItems = [];
@@ -405,31 +433,31 @@ export default {
 
         let defaultChartType = self.$settings.getStatisticsDefaultChartType();
 
-        if (defaultChartType !== self.$constants.statistics.allChartTypes.Pie && defaultChartType !== self.$constants.statistics.allChartTypes.Bar) {
-            defaultChartType = self.$constants.statistics.defaultChartType;
+        if (defaultChartType !== self.allChartTypes.Pie && defaultChartType !== self.allChartTypes.Bar) {
+            defaultChartType = statisticsConstants.defaultChartType;
         }
 
         let defaultChartDataType = self.$settings.getStatisticsDefaultChartDataType();
 
         if (defaultChartDataType < self.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.allChartDataTypes.AccountTotalLiabilities.type) {
-            defaultChartDataType = self.$constants.statistics.defaultChartDataType;
+            defaultChartDataType = statisticsConstants.defaultChartDataType;
         }
 
         let defaultDateRange = self.$settings.getStatisticsDefaultDateRange();
 
         if (defaultDateRange < self.allDateRanges.All.type || defaultDateRange >= self.allDateRanges.Custom.type) {
-            defaultDateRange = self.$constants.statistics.defaultDataRangeType;
+            defaultDateRange = statisticsConstants.defaultDataRangeType;
         }
 
         let defaultSortType = self.$settings.getStatisticsSortingType();
 
         if (defaultSortType < self.allSortingTypes.Amount.type || defaultSortType > self.allSortingTypes.Name.type) {
-            defaultSortType = self.$constants.statistics.defaultSortingType;
+            defaultSortType = statisticsConstants.defaultSortingType;
         }
 
-        const dateRange = self.$utilities.getDateRangeByDateType(defaultDateRange, self.firstDayOfWeek);
+        const dateRange = getDateRangeByDateType(defaultDateRange, self.firstDayOfWeek);
 
-        self.$store.dispatch('initTransactionStatisticsFilter', {
+        self.statisticsStore.initTransactionStatisticsFilter({
             dateType: dateRange ? dateRange.dateType : undefined,
             startTime: dateRange ? dateRange.minTime : undefined,
             endTime: dateRange ? dateRange.maxTime : undefined,
@@ -441,10 +469,10 @@ export default {
         });
 
         Promise.all([
-            self.$store.dispatch('loadAllAccounts', { force: false }),
-            self.$store.dispatch('loadAllCategories', { force: false })
+            self.accountsStore.loadAllAccounts({ force: false }),
+            self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
-            return self.$store.dispatch('loadTransactionStatistics', {
+            return self.statisticsStore.loadTransactionStatistics({
                 defaultCurrency: self.defaultCurrency
             });
         }).then(() => {
@@ -460,7 +488,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            if (this.$store.state.transactionStatisticsStateInvalid && !this.loading) {
+            if (this.statisticsStore.transactionStatisticsStateInvalid && !this.loading) {
                 this.reload(null);
             }
 
@@ -476,12 +504,12 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                dispatchPromise = self.$store.dispatch('loadTransactionStatistics', {
+                dispatchPromise = self.statisticsStore.loadTransactionStatistics({
                     defaultCurrency: self.defaultCurrency
                 });
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
-                dispatchPromise = self.$store.dispatch('loadAllAccounts', {
+                dispatchPromise = self.accountsStore.loadAllAccounts({
                     force: true
                 });
             }
@@ -503,12 +531,12 @@ export default {
             }
         },
         setChartType(chartType) {
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 chartType: chartType
             });
         },
         setChartDataType(chartDataType) {
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 chartDataType: chartDataType
             });
             this.showChartDataTypePopover = false;
@@ -519,7 +547,7 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 sortingType: sortingType
             });
 
@@ -535,13 +563,13 @@ export default {
                 return;
             }
 
-            const dateRange = this.$utilities.getDateRangeByDateType(dateType, this.firstDayOfWeek);
+            const dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
 
             if (!dateRange) {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 dateType: dateRange.dateType,
                 startTime: dateRange.minTime,
                 endTime: dateRange.maxTime
@@ -555,7 +583,7 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 dateType: this.allDateRanges.Custom.type,
                 startTime: startTime,
                 endTime: endTime
@@ -570,7 +598,7 @@ export default {
                 return;
             }
 
-            const newDateRange = this.$utilities.getShiftedDateRange(startTime, endTime, scale);
+            const newDateRange = getShiftedDateRange(startTime, endTime, scale);
             let newDateType = this.allDateRanges.Custom.type;
 
             for (let dateRangeField in this.allDateRanges) {
@@ -579,7 +607,7 @@ export default {
                 }
 
                 const dateRangeType = this.allDateRanges[dateRangeField];
-                const dateRange = this.$utilities.getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
+                const dateRange = getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
 
                 if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
                     newDateType = dateRangeType.type;
@@ -587,7 +615,7 @@ export default {
                 }
             }
 
-            this.$store.dispatch('updateTransactionStatisticsFilter', {
+            this.statisticsStore.updateTransactionStatisticsFilter({
                 dateType: newDateType,
                 startTime: newDateRange.minTime,
                 endTime: newDateRange.maxTime
@@ -617,30 +645,30 @@ export default {
                 }
             }
 
-            if (this.$utilities.isDateRangeMatchFullYears(query.startTime, query.endTime)) {
-                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortYearFormat());
-                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortYearFormat());
+            if (isDateRangeMatchFullYears(query.startTime, query.endTime)) {
+                const displayStartTime = this.$locale.formatUnixTimeToShortYear(this.userStore, query.startTime);
+                const displayEndTime = this.$locale.formatUnixTimeToShortYear(this.userStore, query.endTime);
 
                 return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
             }
 
-            if (this.$utilities.isDateRangeMatchFullMonths(query.startTime, query.endTime)) {
-                const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortYearMonthFormat());
-                const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortYearMonthFormat());
+            if (isDateRangeMatchFullMonths(query.startTime, query.endTime)) {
+                const displayStartTime = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, query.startTime);
+                const displayEndTime = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, query.endTime);
 
                 return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
             }
 
-            const startTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.startTime));
-            const endTimeYear = this.$utilities.getYear(this.$utilities.parseDateFromUnixTime(query.endTime));
+            const startTimeYear = getYear(parseDateFromUnixTime(query.startTime));
+            const endTimeYear = getYear(parseDateFromUnixTime(query.endTime));
 
-            const displayStartTime = this.$utilities.formatUnixTime(query.startTime, this.$locale.getShortDateFormat());
-            const displayEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortDateFormat());
+            const displayStartTime = this.$locale.formatUnixTimeToShortDate(this.userStore, query.startTime);
+            const displayEndTime = this.$locale.formatUnixTimeToShortDate(this.userStore, query.endTime);
 
             if (displayStartTime === displayEndTime) {
                 return displayStartTime;
             } else if (startTimeYear === endTimeYear) {
-                const displayShortEndTime = this.$utilities.formatUnixTime(query.endTime, this.$locale.getShortMonthDayFormat());
+                const displayShortEndTime = this.$locale.formatUnixTimeToShortMonthDay(this.userStore, query.endTime);
                 return `${displayStartTime} ~ ${displayShortEndTime}`;
             }
 
@@ -690,10 +718,13 @@ export default {
             }
 
             if (textLimit) {
-                this.$utilities.limitText(amount, textLimit);
+                return limitText(amount, textLimit);
             }
 
             return amount;
+        },
+        getDisplayPercent(value, precision, lowPrecisionValue) {
+            return formatPercent(value, precision, lowPrecisionValue);
         },
         getItemLinkUrl(item) {
             const querys = [];

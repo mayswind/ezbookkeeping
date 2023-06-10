@@ -9,6 +9,12 @@
 import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
+import { mapStores } from 'pinia';
+import { useTokensStore } from '@/stores/token.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
+
+import { isModalShowing } from '@/lib/ui.mobile.js';
+
 export default {
     data() {
         const self = this;
@@ -81,13 +87,16 @@ export default {
             hasBackdrop: undefined
         }
     },
+    computed: {
+        ...mapStores(useTokensStore, useExchangeRatesStore),
+    },
     created() {
         const self = this;
 
         if (self.$user.isUserLogined()) {
             if (!self.$settings.isEnableApplicationLock()) {
                 // refresh token if user is logined
-                self.$store.dispatch('refreshTokenAndRevokeOldToken').then(response => {
+                self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
                         self.$locale.setLanguage(response.user.language);
                     }
@@ -95,7 +104,7 @@ export default {
 
                 // auto refresh exchange rates data
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.$store.dispatch('getLatestExchangeRates', { silent: true, force: false });
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
             }
         }
@@ -117,7 +126,7 @@ export default {
             f7.on('sheetClose', (event) => this.onBackdropChanged(event));
 
             f7.on('pageBeforeOut',  () => {
-                if (this.$ui.isModalShowing()) {
+                if (isModalShowing()) {
                     f7.actions.close('.actions-modal.modal-in', false);
                     f7.dialog.close('.dialog.modal-in', false);
                     f7.popover.close('.popover.modal-in', false);

@@ -1,4 +1,4 @@
-import { autoChangeTextareaSize } from '../../lib/mobile/ui.js';
+import { autoChangeTextareaSize } from '@/lib/ui.mobile.js';
 
 export default {
     mounted(el) {

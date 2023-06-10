@@ -41,8 +41,14 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useUserStore } from '@/stores/user.js';
+
+import licenses from '@/lib/licenses.js';
+
 export default {
     computed: {
+        ...mapStores(useUserStore),
         version() {
             return 'v' + this.$version;
         },
@@ -51,13 +57,13 @@ export default {
                 return this.$buildTime;
             }
 
-            return this.$utilities.formatUnixTime(this.$buildTime, this.$locale.getLongDateTimeFormat());
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.$buildTime);
         },
         licenseLines() {
-            return this.$licenses.license.replaceAll(/\r/g, '').split('\n');
+            return licenses.getLicense().replaceAll(/\r/g, '').split('\n');
         },
         thirdPartyLicenses() {
-            return this.$licenses.thirdPartyLicenses;
+            return licenses.getThirdPartyLicenses();
         }
     }
 }

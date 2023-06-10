@@ -32,13 +32,13 @@
     "line-awesome": "^1.3.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
+    "pinia": "^2.1.3",
     "register-service-worker": "^1.7.2",
     "skeleton-elements": "^4.0.1",
     "swiper": "^9.3.2",
     "ua-parser-js": "^1.0.35",
     "vue": "^3.3.4",
-    "vue-i18n": "^9.2.2",
-    "vuex": "^4.1.0"
+    "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.0",

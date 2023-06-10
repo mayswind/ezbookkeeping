@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import dateTimeConstants from '../../consts/datetime.js';
-import { isNumber } from "./common.js";
+import dateTimeConstants from '@/consts/datetime.js';
+import { isNumber } from './common.js';
 
 export function getUtcOffsetMinutesByUtcOffset(utcOffset) {
     if (!utcOffset) {

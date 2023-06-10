@@ -13,12 +13,13 @@ ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It c
 2. Lightweight & Fast
 3. Easy to install
     * Docker support
-    * Multiple database support (sqlite, mysql, etc.)
-    * Multiple os & architecture support (Windows, macOS, Linux & x86, amd64, ARM)
+    * Multiple database support (SQLite, MySQL, PostgreSQL, etc.)
+    * Multiple operation system & hardware support (Windows, macOS, Linux & x86, amd64, ARM)
 4. User-friendly interface
     * Close to native app experience (for mobile device)
     * Two-level account & two-level category support
     * Plentiful preset categories
+    * Geographic location and map support
     * Searching & filtering history records
     * Data statistics
     * Dark theme
@@ -26,7 +27,7 @@ ezBookkeeping is a lightweight personal bookkeeping app hosted by yourself. It c
 6. Multiple timezone support
 7. Multi-language support
 8. Two-factor authentication
-9. Application lock (WebAuthn support)
+9. Application lock (PIN code / WebAuthn)
 10. Data export
 
 ## Screenshots

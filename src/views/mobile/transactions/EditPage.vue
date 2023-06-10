@@ -305,7 +305,7 @@
                 <f7-actions-button v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</f7-actions-button>
                 <f7-actions-button v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group>
+            <f7-actions-group v-if="$settings.getMapProvider()">
                 <f7-actions-button :class="{ 'disabled': !transaction.geoLocation }" @click="showGeoLocationMapSheet = true">{{ $t('Show on the map') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>

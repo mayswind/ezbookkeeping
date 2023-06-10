@@ -432,7 +432,9 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadMapConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
+	if getConfigItemStringValue(configFile, sectionName, "map_provider") == "" {
+		config.MapProvider = ""
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
 		config.MapProvider = OpenStreetMapProvider
 	} else {
 		return errs.ErrInvalidMapProvider

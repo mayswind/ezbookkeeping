@@ -10,10 +10,10 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
-            <f7-list-item :title="$t('Accounts')" :after="dataStatistics.totalAccountCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Categories')" :after="dataStatistics.totalTransactionCategoryCount"></f7-list-item>
-            <f7-list-item :title="$t('Transaction Tags')" :after="dataStatistics.totalTransactionTagCount"></f7-list-item>
-            <f7-list-item :title="$t('Transactions')" :after="dataStatistics.totalTransactionCount"></f7-list-item>
+            <f7-list-item :title="$t('Accounts')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalAccountCount)"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Categories')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionCategoryCount)"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Tags')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionTagCount)"></f7-list-item>
+            <f7-list-item :title="$t('Transactions')" :after="$utilities.appendThousandsSeparator(dataStatistics.totalTransactionCount)"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">

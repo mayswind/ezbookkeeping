@@ -31,7 +31,7 @@
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
             <f7-list-item swipeout
-                          :class="{ 'actual-first-child': tag.id === firstShowingId, 'actual-last-child': tag.id === lastShowingId }"
+                          :class="{ 'actual-first-child': tag.id === firstShowingId, 'actual-last-child': tag.id === lastShowingId && !newTag }"
                           :id="getTagDomId(tag)"
                           :key="tag.id"
                           v-for="tag in tags"

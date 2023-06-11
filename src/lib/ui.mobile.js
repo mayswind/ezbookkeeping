@@ -73,6 +73,7 @@ export function showLoading(delayConditionFunc, delayMills) {
         f7ready((f7) => {
             return f7.preloader.show();
         });
+        return;
     }
 
     f7ready((f7) => {

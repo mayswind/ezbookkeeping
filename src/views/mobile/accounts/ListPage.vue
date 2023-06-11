@@ -20,7 +20,7 @@
                     <span class="net-assets" v-if="loading">0.00 USD</span>
                     <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
                     <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
-                        <f7-icon :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
+                        <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
                 <p class="no-margin">
@@ -463,8 +463,8 @@ export default {
 }
 
 .account-list {
-    --f7-list-group-title-height: 36px;
-    --f7-list-item-footer-font-size: 13px;
+    --f7-list-group-title-height: var(--ebk-account-list-group-title-height);
+    --f7-list-item-footer-font-size: var(--ebk-large-footer-font-size);
 }
 
 .account-list .item-footer {

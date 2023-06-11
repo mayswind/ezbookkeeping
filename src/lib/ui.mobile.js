@@ -129,3 +129,19 @@ export function autoChangeTextareaSize(el) {
         el.style.height = el.scrollHeight + 'px';
     });
 }
+
+export function setAppFontSize(value) {
+    let fontSizeClass = 'font-default';
+
+    if (value === 'extraLarge') {
+        fontSizeClass = 'font-extra-large';
+    } else if (value === 'large') {
+        fontSizeClass = 'font-large';
+    }
+
+    elements('html')
+        .removeClass('font-default')
+        .removeClass('font-large')
+        .removeClass('font-extra-large')
+        .addClass(fontSizeClass);
+}

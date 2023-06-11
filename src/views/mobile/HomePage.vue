@@ -22,7 +22,7 @@
                     <span class="month-expense" v-if="loading">0.00 USD</span>
                     <span class="month-expense" v-else-if="!loading">{{ transactionOverview.thisMonth.expenseAmount }}</span>
                     <f7-link class="margin-left-half" @click="toggleShowAmountInHomePage()">
-                        <f7-icon :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'" size="18px"></f7-icon>
+                        <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
                 <p class="no-margin">
@@ -432,7 +432,7 @@ export default {
 
 .overview-transaction-list .overview-transaction-footer {
     padding-top: 6px;
-    font-size: 13px;
+    font-size: var(--ebk-large-footer-font-size);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -453,13 +453,13 @@ export default {
 }
 
 .tabbar.main-tabbar .link i + span.tabbar-label {
-    margin-top: 2px;
+    margin-top: var(--ebk-icon-text-margin);
 }
 
 .tabbar.main-tabbar .link i.ebk-tarbar-big-icon {
-    font-size: 42px;
-    width: 42px;
-    height: 42px;
-    line-height: 42px;
+    font-size: var(--ebk-big-icon-button-size);
+    width: var(--ebk-big-icon-button-size);
+    height: var(--ebk-big-icon-button-size);
+    line-height: var(--ebk-big-icon-button-size);
 }
 </style>

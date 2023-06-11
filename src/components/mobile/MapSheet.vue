@@ -13,7 +13,7 @@
         </f7-page-content>
         <f7-page-content class="no-margin-top no-padding-top" v-else-if="!knownMapProvider">
             <div class="display-flex padding justify-content-space-between align-items-center">
-                <div style="font-size: 18px"><b>{{ $t('Unsupported Map Provider') }}</b></div>
+                <div class="ebk-sheet-title"><b>{{ $t('Unsupported Map Provider') }}</b></div>
             </div>
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin">{{ $t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.') }}</p>

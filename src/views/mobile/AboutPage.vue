@@ -79,6 +79,6 @@ export default {
 }
 
 .license-popup .subnavbar-title {
-    --f7-subnavbar-title-font-size: 30px;
+    --f7-subnavbar-title-font-size: var(--ebk-license-popup-title-font-size);
 }
 </style>

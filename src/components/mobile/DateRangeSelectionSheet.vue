@@ -4,7 +4,7 @@
         <div class="swipe-handler" style="z-index: 10"></div>
         <f7-page-content>
             <div class="display-flex padding justify-content-space-between align-items-center">
-                <div style="font-size: 18px" v-if="title"><b>{{ title }}</b></div>
+                <div class="ebk-sheet-title" v-if="title"><b>{{ title }}</b></div>
             </div>
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top" v-if="hint">{{ hint }}</p>

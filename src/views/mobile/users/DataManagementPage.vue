@@ -30,7 +30,7 @@
             <div class="swipe-handler" style="z-index: 10"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div style="font-size: 18px"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
+                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('It may take a long time, please wait for a few minutes.') }}</p>

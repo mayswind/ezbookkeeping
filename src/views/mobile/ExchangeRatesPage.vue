@@ -29,7 +29,7 @@
             <f7-list-item
                 class="currency-base-amount"
                 link="#" no-chevron
-                :style="{ fontSize: baseAmountFontSize + 'px' }"
+                :class="baseAmountFontSizeClass"
                 :header="$t('Base Amount')"
                 :title="displayBaseAmount"
                 @click="showBaseAmountSheet = true"
@@ -145,8 +145,14 @@ export default {
         displayBaseAmount() {
             return this.$locale.getDisplayCurrency(this.baseAmount);
         },
-        baseAmountFontSize() {
-            return this.getFontSizeByAmount(this.baseAmount);
+        baseAmountFontSizeClass() {
+            if (this.baseAmount >= 100000000 || this.baseAmount <= -100000000) {
+                return 'ebk-small-amount';
+            } else if (this.baseAmount >= 1000000 || this.baseAmount <= -1000000) {
+                return 'ebk-normal-amount';
+            } else {
+                return 'ebk-large-amount';
+            }
         },
         allowedMinAmount() {
             return transactionConstants.minAmount;
@@ -247,15 +253,6 @@ export default {
 
             this.baseCurrency = currency;
             this.baseAmount = stringCurrencyToNumeric(amount.toString());
-        },
-        getFontSizeByAmount(amount) {
-            if (amount >= 100000000 || amount <= -100000000) {
-                return 32;
-            } else if (amount >= 1000000 || amount <= -1000000) {
-                return 36;
-            } else {
-                return 40;
-            }
         }
     }
 }

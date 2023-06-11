@@ -13,7 +13,7 @@ import { mapStores } from 'pinia';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { isModalShowing } from '@/lib/ui.mobile.js';
+import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
 
 export default {
     data() {
@@ -110,6 +110,8 @@ export default {
         }
     },
     mounted() {
+        setAppFontSize(this.$settings.getFontSize());
+
         f7ready((f7) => {
             this.isDarkMode = f7.darkMode;
             this.setThemeColorMeta(f7.darkMode);
@@ -215,7 +217,7 @@ body {
 }
 
 .smaller {
-    font-size: 10px;
+    font-size: var(--ebk-smaller-font-size);
 }
 
 .readonly {
@@ -258,11 +260,202 @@ body {
 }
 
 i.icon.la, i.icon.las, i.icon.lab {
-    font-size: 28px;
+    font-size: var(--ebk-icon-font-size);
+}
+
+.ios .searchbar-disable-button {
+    font-size: var(--f7-searchbar-disable-button-font-size);
 }
 
 .chip.chip-placeholder {
     border: 0;
+}
+
+/** multiple font size **/
+:root {
+    --ebk-icon-font-size: 28px;
+    --ebk-icon-text-margin: 2px;
+    --ebk-hide-icon-font-size: 18px;
+    --ebk-big-icon-button-size: 42px;
+    --ebk-right-bottom-icon-font-size: 13px;
+    --ebk-list-item-checked-icon-font-size: 20px;
+    --ebk-smaller-font-size: 10px;
+    --ebk-large-footer-font-size: 13px;
+    --ebk-sheet-title-font-size: 18px;
+    --ebk-numpad-value-height: 50px;
+    --ebk-numpad-value-small-font-size: 20px;
+    --ebk-numpad-value-normal-font-size: 22px;
+    --ebk-numpad-value-large-font-size: 24px;
+    --ebk-numpad-normal-button-font-size: 28px;
+    --ebk-numpad-confirm-button-font-size: 20px;
+    --ebk-amount-small-font-size: 32px;
+    --ebk-amount-normal-font-size: 36px;
+    --ebk-amount-large-font-size: 40px;
+    --ebk-pie-chart-toolbox-percentage-height: 30px;
+    --ebk-pie-chart-toolbox-percentage-font-size: 18px;
+    --ebk-pie-chart-toolbox-text-font-size: 16px;
+    --ebk-account-list-group-title-height: 36px;
+    --ebk-transaction-date-width: 25px;
+    --ebk-transaction-day-font-size: 16px;
+    --ebk-transaction-day-of-week-font-size: 12px;
+    --ebk-license-popup-title-font-size: 30px;
+}
+
+:root.font-large {
+    font-size: 17px;
+    --f7-font-size: 17px;
+    --f7-navbar-font-size: 20px;
+    --f7-searchbar-input-font-size: 20px;
+    --f7-searchbar-disable-button-font-size: 20px;
+    --f7-toolbar-font-size: 20px;
+    --f7-tabbar-icon-size: 30px;
+    --f7-toolbar-height: 60px;
+    --f7-tabbar-icons-height: 60px;
+    --f7-tabbar-label-font-size: 17px;
+    --f7-label-font-size: 16px;
+    --f7-input-font-size: 20px;
+    --f7-button-font-size: 18px;
+    --f7-button-small-font-size: 15px;
+    --f7-button-large-font-size: 20px;
+    --f7-chip-font-size: 16px;
+    --f7-block-title-font-size: 20px;
+    --f7-block-font-size: 20px;
+    --f7-block-footer-font-size: 15px;
+    --f7-card-header-font-size: 20px;
+    --f7-list-group-title-font-size: 22px;
+    --f7-list-item-header-font-size: 16px;
+    --f7-list-item-title-font-size: 20px;
+    --f7-list-item-text-font-size: 17px;
+    --f7-list-font-size: 20px;
+    --f7-list-item-after-font-size: 20px;
+    --f7-list-item-footer-font-size: 15px;
+    --f7-list-button-font-size: 20px;
+    --f7-treeview-label-font-size: 20px;
+    --f7-swipeout-button-font-size: 20px;
+    --f7-dialog-title-font-size: 20px;
+    --f7-dialog-font-size: 17px;
+    --f7-dialog-button-font-size: 20px;
+    --f7-actions-button-font-size: 22px;
+    --ebk-icon-font-size: 32px;
+    --ebk-icon-text-margin: 4px;
+    --ebk-hide-icon-font-size: 24px;
+    --ebk-big-icon-button-size: 52px;
+    --ebk-right-bottom-icon-font-size: 15px;
+    --ebk-list-item-checked-icon-font-size: 24px;
+    --ebk-smaller-font-size: 14px;
+    --ebk-large-footer-font-size: 16px;
+    --ebk-sheet-title-font-size: 22px;
+    --ebk-numpad-value-height: 60px;
+    --ebk-numpad-value-small-font-size: 22px;
+    --ebk-numpad-value-normal-font-size: 26px;
+    --ebk-numpad-value-large-font-size: 30px;
+    --ebk-numpad-normal-button-font-size: 32px;
+    --ebk-numpad-confirm-button-font-size: 22px;
+    --ebk-amount-small-font-size: 32px;
+    --ebk-amount-normal-font-size: 36px;
+    --ebk-amount-large-font-size: 40px;
+    --ebk-pie-chart-toolbox-percentage-height: 30px;
+    --ebk-pie-chart-toolbox-percentage-font-size: 22px;
+    --ebk-pie-chart-toolbox-text-font-size: 20px;
+    --ebk-account-list-group-title-height: 40px;
+    --ebk-transaction-date-width: 32px;
+    --ebk-transaction-day-font-size: 20px;
+    --ebk-transaction-day-of-week-font-size: 15px;
+    --ebk-license-popup-title-font-size: 36px;
+}
+
+:root.font-extra-large {
+    font-size: 21px;
+    --f7-font-size: 21px;
+    --f7-navbar-font-size: 24px;
+    --f7-searchbar-input-font-size: 24px;
+    --f7-searchbar-disable-button-font-size: 24px;
+    --f7-toolbar-font-size: 24px;
+    --f7-tabbar-icon-size: 30px;
+    --f7-toolbar-height: 66px;
+    --f7-tabbar-icons-height: 66px;
+    --f7-tabbar-label-font-size: 21px;
+    --f7-label-font-size: 20px;
+    --f7-label-height: 22px;
+    --f7-input-font-size: 24px;
+    --f7-input-height: 60px;
+    --f7-button-font-size: 22px;
+    --f7-button-small-font-size: 19px;
+    --f7-button-large-font-size: 24px;
+    --f7-button-height: 32px;
+    --f7-chip-font-size: 20px;
+    --f7-block-title-font-size: 24px;
+    --f7-block-title-line-height: 26px;
+    --f7-block-font-size: 24px;
+    --f7-block-footer-font-size: 19px;
+    --f7-card-header-font-size: 24px;
+    --f7-list-group-title-font-size: 26px;
+    --f7-list-group-title-height: 48px;
+    --f7-list-item-header-font-size: 20px;
+    --f7-list-item-title-font-size: 24px;
+    --f7-list-item-text-font-size: 21px;
+    --f7-list-font-size: 24px;
+    --f7-list-item-after-font-size: 24px;
+    --f7-list-item-footer-font-size: 19px;
+    --f7-list-button-font-size: 24px;
+    --f7-list-item-min-height: 54px;
+    --f7-treeview-label-font-size: 24px;
+    --f7-swipeout-button-font-size: 24px;
+    --f7-dialog-title-font-size: 24px;
+    --f7-dialog-font-size: 21px;
+    --f7-dialog-button-font-size: 24px;
+    --f7-actions-button-font-size: 26px;
+    --ebk-icon-font-size: 36px;
+    --ebk-icon-text-margin: 4px;
+    --ebk-hide-icon-font-size: 28px;
+    --ebk-big-icon-button-size: 58px;
+    --ebk-right-bottom-icon-font-size: 19px;
+    --ebk-list-item-checked-icon-font-size: 28px;
+    --ebk-smaller-font-size: 18px;
+    --ebk-large-footer-font-size: 20px;
+    --ebk-sheet-title-font-size: 26px;
+    --ebk-numpad-value-height: 60px;
+    --ebk-numpad-value-small-font-size: 26px;
+    --ebk-numpad-value-normal-font-size: 26px;
+    --ebk-numpad-value-large-font-size: 30px;
+    --ebk-numpad-normal-button-font-size: 32px;
+    --ebk-numpad-confirm-button-font-size: 26px;
+    --ebk-amount-small-font-size: 34px;
+    --ebk-amount-normal-font-size: 40px;
+    --ebk-amount-large-font-size: 44px;
+    --ebk-pie-chart-toolbox-percentage-height: 30px;
+    --ebk-pie-chart-toolbox-percentage-font-size: 26px;
+    --ebk-pie-chart-toolbox-text-font-size: 24px;
+    --ebk-account-list-group-title-height: 44px;
+    --ebk-transaction-date-width: 40px;
+    --ebk-transaction-day-font-size: 24px;
+    --ebk-transaction-day-of-week-font-size: 19px;
+    --ebk-license-popup-title-font-size: 40px;
+}
+
+/** custom class **/
+.ebk-small-amount {
+    --f7-list-item-title-font-size: var(--ebk-amount-small-font-size) !important;
+}
+
+.ebk-normal-amount {
+    --f7-list-item-title-font-size: var(--ebk-amount-normal-font-size) !important;
+}
+
+.ebk-large-amount {
+    --f7-list-item-title-font-size: var(--ebk-amount-large-font-size) !important;
+}
+
+.ebk-list-item-error-info div.item-footer {
+    color: var(--f7-input-error-text-color)
+}
+
+.ebk-sheet-title {
+    font-size: var(--ebk-sheet-title-font-size);
+}
+
+.ebk-hide-icon {
+    font-size: var(--ebk-hide-icon-font-size);
 }
 
 /** Replacing the default style of @vuepic/vue-datepicker **/
@@ -426,7 +619,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .list .item-content .list-item-checked-icon {
-    font-size: 20px;
+    font-size: var(--ebk-list-item-checked-icon-font-size);
     color: var(--f7-radio-active-color, var(--f7-theme-color));
     margin-right: calc(var(--f7-list-item-media-margin) + var(--f7-checkbox-extra-margin));
 }
@@ -437,10 +630,6 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .list li.no-margin .item-content.item-input {
     margin: 0;
-}
-
-.ebk-list-item-error-info div.item-footer {
-    color: var(--f7-input-error-text-color)
 }
 
 .skeleton-text .list-item-toggle .item-after {
@@ -472,9 +661,9 @@ i.icon.la, i.icon.las, i.icon.lab {
 }
 
 .badge.right-bottom-icon > .icon {
-    font-size: 13px;
-    width: 13px;
-    height: 13px;
+    font-size: var(--ebk-right-bottom-icon-font-size);
+    width: var(--ebk-right-bottom-icon-font-size);
+    height: var(--ebk-right-bottom-icon-font-size);
 }
 
 /** Swipe handler **/

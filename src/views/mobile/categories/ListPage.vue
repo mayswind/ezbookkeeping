@@ -394,7 +394,7 @@ export default {
 
 <style>
 .category-list {
-    --f7-list-item-footer-font-size: 13px;
+    --f7-list-item-footer-font-size: var(--ebk-large-footer-font-size);
 }
 
 .category-list .item-footer {

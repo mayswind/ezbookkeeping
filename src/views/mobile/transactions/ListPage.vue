@@ -906,24 +906,24 @@ export default {
 }
 
 .list.transaction-info-list li.transaction-info .transaction-date {
-    width: 25px;
+    width: var(--ebk-transaction-date-width);
     margin-right: 6px;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-day {
     opacity: 0.6;
-    font-size: 16px;
+    font-size: var(--ebk-transaction-day-font-size);
     font-weight: bold;
     text-align: left;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-day-of-week {
     opacity: 0.6;
-    font-size: 12px;
+    font-size: var(--ebk-transaction-day-of-week-font-size);
 }
 
 .list.transaction-info-list li.transaction-info .transaction-comment {
-    font-size: 13px;
+    font-size: var(--ebk-large-footer-font-size);
     line-height: 20px;
     padding-top: 2px;
     padding-bottom: 2px;

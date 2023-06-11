@@ -43,8 +43,7 @@
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
-                :class="{ 'readonly': mode === 'view', 'color-teal': transaction.type === allTransactionTypes.Expense, 'color-red': transaction.type === allTransactionTypes.Income }"
-                :style="{ fontSize: sourceAmountFontSize + 'px' }"
+                :class="sourceAmountClass"
                 :header="$t(sourceAmountName)"
                 :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount)"
                 @click="showSourceAmountSheet = true"
@@ -59,8 +58,7 @@
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
-                :class="{ 'readonly': mode === 'view' }"
-                :style="{ fontSize: destinationAmountFontSize + 'px' }"
+                :class="destinationAmountClass"
                 :header="$t('Transfer In Amount')"
                 :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
                 @click="showDestinationAmountSheet = true"
@@ -608,11 +606,25 @@ export default {
         transactionDisplayTimezoneName() {
             return getNameByKeyValue(this.allTimezones, this.transaction.timeZone, 'name', 'displayName');
         },
-        sourceAmountFontSize() {
-            return this.getFontSizeByAmount(this.transaction.sourceAmount);
+        sourceAmountClass() {
+            const classes = {
+                'readonly': this.mode === 'view',
+                'color-teal': this.transaction.type === this.allTransactionTypes.Expense,
+                'color-red': this.transaction.type === this.allTransactionTypes.Income,
+            };
+
+            classes[this.getFontClassByAmount(this.transaction.sourceAmount)] = true;
+
+            return classes;
         },
-        destinationAmountFontSize() {
-            return this.getFontSizeByAmount(this.transaction.destinationAmount);
+        destinationAmountClass() {
+            const classes = {
+                'readonly': this.mode === 'view'
+            };
+
+            classes[this.getFontClassByAmount(this.transaction.destinationAmount)] = true;
+
+            return classes;
         },
         geoLocationStatusInfo() {
             if (this.geoLocationStatus === 'success') {
@@ -1006,13 +1018,13 @@ export default {
                 }
             }
         },
-        getFontSizeByAmount(amount) {
+        getFontClassByAmount(amount) {
             if (amount >= 100000000 || amount <= -100000000) {
-                return 32;
+                return 'ebk-small-amount';
             } else if (amount >= 1000000 || amount <= -1000000) {
-                return 36;
+                return 'ebk-normal-amount';
             } else {
-                return 40;
+                return 'ebk-large-amount';
             }
         },
         getDisplayAmount(amount, hideAmount) {

@@ -8,6 +8,7 @@ const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
     theme: 'auto',
+    fontSize: 'default',
     timeZone: '',
     debug: false,
     applicationLock: false,
@@ -126,6 +127,8 @@ export default {
     isProduction: () => process.env.NODE_ENV === 'production',
     getTheme: () => getOption('theme'),
     setTheme: value => setOption('theme', value),
+    getFontSize: () => getOption('fontSize'),
+    setFontSize: value => setOption('fontSize', value),
     getTimezone: () => getOption('timeZone'),
     setTimezone: value => setOption('timeZone', value),
     isEnableDebug: () => getOption('debug'),

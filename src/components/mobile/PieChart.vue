@@ -308,9 +308,9 @@ export default {
 }
 
 .pie-chart-toolbox-info {
-    --f7-chip-height: 30px;
-    --f7-chip-font-size: 18px;
-    font-size: 16px;
+    --f7-chip-height: var(--ebk-pie-chart-toolbox-percentage-height);
+    --f7-chip-font-size: var(--ebk-pie-chart-toolbox-percentage-font-size);
+    font-size: var(--ebk-pie-chart-toolbox-text-font-size);
     align-self: center;
 }
 

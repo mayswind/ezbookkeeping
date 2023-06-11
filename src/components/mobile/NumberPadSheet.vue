@@ -4,7 +4,7 @@
         <div class="swipe-handler" style="z-index: 10"></div>
         <f7-page-content class="margin-top no-padding-top">
             <div class="numpad-values">
-                <span class="numpad-value" :style="{ fontSize: currentDisplayFontSize + 'px' }">{{ currentDisplay }}</span>
+                <span class="numpad-value" :class="currentDisplayNumClass">{{ currentDisplay }}</span>
             </div>
             <div class="numpad-buttons">
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(7)">
@@ -97,15 +97,15 @@ export default {
                 return currentValue;
             }
         },
-        currentDisplayFontSize() {
+        currentDisplayNumClass() {
             const currentDisplay = this.currentDisplay || '';
 
             if (currentDisplay.length >= 24) {
-                return 20;
+                return 'numpad-value-small';
             } else if (currentDisplay.length >= 16) {
-                return 22;
+                return 'numpad-value-normal';
             } else {
-                return 24;
+                return 'numpad-value-large';
             }
         },
         confirmText() {
@@ -333,10 +333,22 @@ export default {
     position: relative;
     padding-left: 16px;
     line-height: 1;
-    height: 50px;
+    height: var(--ebk-numpad-value-height);
     align-items: center;
     box-sizing: border-box;
     user-select: none;
+}
+
+.numpad-value-small {
+    font-size: var(--ebk-numpad-value-small-font-size);
+}
+
+.numpad-value-normal {
+    font-size: var(--ebk-numpad-value-normal-font-size);
+}
+
+.numpad-value-large {
+    font-size: var(--ebk-numpad-value-large-font-size);
 }
 
 .numpad-buttons {
@@ -374,7 +386,7 @@ export default {
 
 .numpad-button-text {
     display: block;
-    font-size: 28px;
+    font-size: var(--ebk-numpad-normal-button-font-size);
     font-weight: normal;
     line-height: 1;
 }
@@ -388,6 +400,6 @@ export default {
 }
 
 .numpad-button-text-confirm {
-    font-size: 20px;
+    font-size: var(--ebk-numpad-confirm-button-font-size);
 }
 </style>

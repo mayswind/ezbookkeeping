@@ -27,6 +27,17 @@
             </f7-list-item>
 
             <f7-list-item
+                :key="currentLocale + '_fontSize'"
+                :title="$t('Font Size')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Font Size'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="fontSize">
+                    <option value="default">{{ $t('Default') }}</option>
+                    <option value="large">{{ $t('Large') }}</option>
+                    <option value="extraLarge">{{ $t('Extra Large') }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
                 :key="currentLocale + '_timezone'"
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
@@ -102,6 +113,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import currencyConstants from '@/consts/currency.js';
+import { setAppFontSize } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -132,6 +144,17 @@ export default {
                 if (value !== this.$settings.getTheme()) {
                     this.$settings.setTheme(value);
                     location.reload();
+                }
+            }
+        },
+        fontSize: {
+            get: function () {
+                return this.$settings.getFontSize();
+            },
+            set: function (value) {
+                if (value !== this.$settings.getFontSize()) {
+                    this.$settings.setFontSize(value);
+                    setAppFontSize(value);
                 }
             }
         },

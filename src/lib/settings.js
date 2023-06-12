@@ -8,7 +8,7 @@ const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
     theme: 'auto',
-    fontSize: 'default',
+    fontSize: 0,
     timeZone: '',
     debug: false,
     applicationLock: false,

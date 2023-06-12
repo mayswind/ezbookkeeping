@@ -1,5 +1,6 @@
 import { f7, f7ready } from 'framework7-vue';
 
+import fontConstants from '@/consts/font.js';
 import settings from './settings.js';
 import {
     getLocalizedError,
@@ -130,18 +131,18 @@ export function autoChangeTextareaSize(el) {
     });
 }
 
-export function setAppFontSize(value) {
-    let fontSizeClass = 'font-default';
+export function setAppFontSize(type) {
+    const htmlElement = elements('html');
 
-    if (value === 'extraLarge') {
-        fontSizeClass = 'font-extra-large';
-    } else if (value === 'large') {
-        fontSizeClass = 'font-large';
+    for (let i = 0; i < fontConstants.allFontSizeArray.length; i++) {
+        const fontSizeType = fontConstants.allFontSizeArray[i];
+
+        if (fontSizeType.type === type) {
+            if (!htmlElement.hasClass(fontSizeType.className)) {
+                htmlElement.addClass(fontSizeType.className);
+            }
+        } else {
+            htmlElement.removeClass(fontSizeType.className);
+        }
     }
-
-    elements('html')
-        .removeClass('font-default')
-        .removeClass('font-large')
-        .removeClass('font-extra-large')
-        .addClass(fontSizeClass);
 }

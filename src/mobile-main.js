@@ -24,6 +24,7 @@ import Framework7Input from 'framework7/components/input';
 import Framework7Checkbox from 'framework7/components/checkbox';
 import Framework7Radio from 'framework7/components/radio';
 import Framework7Toggle from 'framework7/components/toggle';
+import Framework7Range from 'framework7/components/range';
 import Framework7SmartSelect from 'framework7/components/smart-select';
 import Framework7Grid from 'framework7/components/grid';
 import Framework7Picker from 'framework7/components/picker';
@@ -56,6 +57,7 @@ import 'framework7/components/input/css';
 import 'framework7/components/checkbox/css';
 import 'framework7/components/radio/css';
 import 'framework7/components/toggle/css';
+import 'framework7/components/range/css';
 import 'framework7/components/smart-select/css';
 import 'framework7/components/grid/css';
 import 'framework7/components/picker/css';
@@ -151,6 +153,14 @@ import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
+import '@/styles/mobile/font-size-default.css';
+import '@/styles/mobile/font-size-small.css';
+import '@/styles/mobile/font-size-large.css';
+import '@/styles/mobile/font-size-x-large.css';
+import '@/styles/mobile/font-size-xx-large.css';
+import '@/styles/mobile/font-size-xxx-large.css';
+import '@/styles/mobile/font-size-xxxx-large.css';
+
 import App from '@/MobileApp.vue';
 
 Framework7.use([
@@ -173,6 +183,7 @@ Framework7.use([
     Framework7Checkbox,
     Framework7Radio,
     Framework7Toggle,
+    Framework7Range,
     Framework7SmartSelect,
     Framework7Grid,
     Framework7Picker,

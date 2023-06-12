@@ -16,6 +16,8 @@ import StatisticsSettingsPage from '@/views/mobile/statistics/SettingsPage.vue';
 import StatisticsAccountFilterSettingsPage from '@/views/mobile/statistics/AccountFilterSettingsPage.vue';
 import StatisticsCategoryFilterSettingsPage from '@/views/mobile/statistics/CategoryFilterSettingsPage.vue';
 
+import FontSizeSettingsPage from '@/views/mobile/settings/FontSizeSettingsPage.vue';
+
 import SettingsPage from '@/views/mobile/SettingsPage.vue';
 import ApplicationLockPage from '@/views/mobile/ApplicationLockPage.vue';
 import ExchangeRatesPage from '@/views/mobile/ExchangeRatesPage.vue';
@@ -193,6 +195,11 @@ const routes = [
     {
         path: '/statistic/filter/category',
         async: asyncResolve(StatisticsCategoryFilterSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/fontsize',
+        async: asyncResolve(FontSizeSettingsPage),
         beforeEnter: [checkLogin]
     },
     {

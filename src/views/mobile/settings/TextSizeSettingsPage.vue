@@ -96,6 +96,7 @@
                         :scale-sub-steps="1"
                         :format-scale-label="getFontSizeName"
                         v-model:value="fontSize"
+                        @range-change="fontSize = $event"
                     />
                 </div>
             </f7-block>

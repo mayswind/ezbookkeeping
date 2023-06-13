@@ -263,6 +263,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-size: var(--ebk-icon-font-size);
 }
 
+.f7-icons, .framework7-icons {
+    font-size: var(--ebk-icon-font-size);
+}
+
 .ios .searchbar-icon:after {
     font-size: var(--ebk-searchbar-icon-font-size);
 }
@@ -493,6 +497,10 @@ i.icon.la, i.icon.las, i.icon.lab {
 
 .icon-after-text {
     margin-left: 6px;
+}
+
+.icon-after-text i.icon {
+    font-size: var(--ebk-icon-after-text-font-size);
 }
 
 .badge.right-bottom-icon {

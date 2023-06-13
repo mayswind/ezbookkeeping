@@ -40,9 +40,11 @@ const allFontSizeArray = [
 ];
 
 const defaultFontSize = allFontSize.Default;
+const fontSizePreviewClassNamePrefix = 'preview-';
 
 export default {
     allFontSize: allFontSize,
     allFontSizeArray: allFontSizeArray,
-    defaultFontSize: defaultFontSize
+    defaultFontSize: defaultFontSize,
+    fontSizePreviewClassNamePrefix: fontSizePreviewClassNamePrefix
 };

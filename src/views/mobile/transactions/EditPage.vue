@@ -1047,10 +1047,10 @@ export default {
 </script>
 
 <style>
-.category-separate-icon {
+.category-separate-icon.icon {
     margin-left: 5px;
     margin-right: 5px;
-    font-size: 18px;
+    font-size: var(--ebk-category-separate-icon-font-size);
     line-height: 16px;
     color: var(--f7-color-gray-tint);
 }

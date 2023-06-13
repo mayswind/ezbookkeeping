@@ -15,7 +15,7 @@
                     <div class="swipe-handler" style="z-index: 10"></div>
                     <f7-subnavbar :title="$t('License') "></f7-subnavbar>
                 </f7-navbar>
-                <f7-block strong outline>
+                <f7-block strong outline class="license-content">
                     <p>
                         <span :key="num" v-for="(line, num) in licenseLines"
                               :style="{ 'display': line ? 'initial' : 'block', 'padding' : line ? '0' : '0 0 1em 0' }">
@@ -80,5 +80,9 @@ export default {
 
 .license-popup .subnavbar-title {
     --f7-subnavbar-title-font-size: var(--ebk-license-popup-title-font-size);
+}
+
+.license-content {
+    font-size: var(--ebk-license-content-font-size);
 }
 </style>

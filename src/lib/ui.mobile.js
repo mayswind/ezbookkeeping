@@ -146,3 +146,15 @@ export function setAppFontSize(type) {
         }
     }
 }
+
+export function getFontSizePreviewClassName(type) {
+    for (let i = 0; i < fontConstants.allFontSizeArray.length; i++) {
+        const fontSizeType = fontConstants.allFontSizeArray[i];
+
+        if (fontSizeType.type === type) {
+            return fontConstants.fontSizePreviewClassNamePrefix + fontSizeType.className;
+        }
+    }
+
+    return fontConstants.fontSizePreviewClassNamePrefix + fontConstants.defaultFontSize.className;
+}

@@ -11,7 +11,7 @@
                     <span>{{ hint }}</span>
                     <f7-link id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
                              class="icon-after-text"
-                             icon-only icon-f7="doc_on_doc" icon-size="16px"
+                             icon-only icon-f7="doc_on_doc"
                              v-if="enableCopy"
                     ></f7-link>
                 </p>

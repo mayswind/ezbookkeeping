@@ -938,7 +938,7 @@ export default {
     'Theme': '主题',
     'Light': '浅色',
     'Dark': '深色',
-    'Font Size': '字体大小',
+    'Text Size': '文字大小',
     'Timezone': '时区',
     'System Default': '系统默认',
     'Language Default': '语言默认',

@@ -938,7 +938,7 @@ export default {
     'Theme': 'Theme',
     'Light': 'Light',
     'Dark': 'Dark',
-    'Font Size': 'Font Size',
+    'Text Size': 'Text Size',
     'Timezone': 'Timezone',
     'System Default': 'System Default',
     'Language Default': 'Language Default',

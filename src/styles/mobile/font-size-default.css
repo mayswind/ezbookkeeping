@@ -1,8 +1,53 @@
-:root {
+:root,
+:root .preview-font-size-default {
+    font-size: 14px;
+    --f7-font-size: 14px;
+    --f7-navbar-font-size: 17px;
+    --f7-searchbar-input-font-size: 17px;
+    --f7-searchbar-input-height: 32px;
+    --f7-toolbar-font-size: 17px;
+    --f7-tabbar-icon-size: 28px;
+    --f7-tabbar-icons-height: 50px;
+    --f7-tabbar-label-font-size: 12px;
+    --f7-label-font-size: 12px;
+    --f7-label-height: 16px;
+    --f7-input-font-size: 16px;
+    --f7-input-height: 40px;
+    --f7-button-font-size: 14px;
+    --f7-button-small-font-size: 13px;
+    --f7-button-small-height: 26px;
+    --f7-button-large-font-size: 17px;
+    --f7-chip-font-size: 14px;
+    --f7-block-title-font-size: 16px;
+    --f7-block-title-line-height: 20px;
+    --f7-block-font-size: 17px;
+    --f7-block-footer-font-size: 14px;
+    --f7-card-header-font-size: 17px;
+    --f7-list-group-title-font-size: 17px;
+    --f7-list-group-title-height: 31px;
+    --f7-list-item-header-font-size: 12px;
+    --f7-list-item-title-font-size: 17px;
+    --f7-list-item-text-font-size: 15px;
+    --f7-list-font-size: 17px;
+    --f7-list-item-after-font-size: 17px;
+    --f7-list-item-footer-font-size: 12px;
+    --f7-list-button-font-size: 16px;
+    --f7-list-item-min-height: 44px;
+    --f7-list-item-padding-horizontal: 16px;
+    --f7-list-media-item-padding-vertical: 10px;
+    --f7-treeview-label-font-size: 17px;
+    --f7-swipeout-button-font-size: 16px;
+    --f7-dialog-title-font-size: 18px;
+    --f7-dialog-font-size: 14px;
+    --f7-dialog-button-font-size: 17px;
+    --f7-actions-button-font-size: 20px;
+    --dp-font-size: 17px;
+    --dp-time-font-size: 34px;
     --ebk-icon-font-size: 28px;
     --ebk-icon-text-margin: 2px;
     --ebk-hide-icon-font-size: 18px;
     --ebk-big-icon-button-size: 42px;
+    --ebk-icon-after-text-font-size: 16px;
     --ebk-right-bottom-icon-font-size: 13px;
     --ebk-list-item-checked-icon-font-size: 20px;
     --ebk-searchbar-icon-font-size: 20px;
@@ -23,8 +68,10 @@
     --ebk-pie-chart-toolbox-percentage-font-size: 18px;
     --ebk-pie-chart-toolbox-text-font-size: 16px;
     --ebk-account-list-group-title-height: 36px;
+    --ebk-category-separate-icon-font-size: 18px;
     --ebk-transaction-date-width: 25px;
     --ebk-transaction-day-font-size: 16px;
     --ebk-transaction-day-of-week-font-size: 12px;
     --ebk-license-popup-title-font-size: 30px;
+    --ebk-license-content-font-size: 14px;
 }

@@ -26,7 +26,7 @@
                 </select>
             </f7-list-item>
 
-            <f7-list-item :title="$t('Font Size')" link="/settings/fontsize"></f7-list-item>
+            <f7-list-item :title="$t('Text Size')" link="/settings/textsize"></f7-list-item>
 
             <f7-list-item
                 :key="currentLocale + '_timezone'"

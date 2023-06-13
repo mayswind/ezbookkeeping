@@ -63,7 +63,7 @@
                 <f7-accordion-content style="height: auto">
                     <f7-list strong inset dividers media-list accordion-list class="transaction-info-list combination-list-content">
                         <f7-list-item link="#" chevron-center class="transaction-info"
-                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5 ] : [ 1, 2, 3 ])">
+                                      :key="itemIdx" v-for="itemIdx in (blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date">
                                     <span class="transaction-day full-line flex-direction-column">DD</span>
@@ -85,13 +85,18 @@
                                                 </div>
                                             </div>
                                             <div class="item-after">
-                                                <div class="no-padding transaction-amount">
+                                                <div class="transaction-amount">
                                                     <span>0.00 USD</span>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="item-text">
+                                            <div class="transaction-comment">
+                                                <span>Transaction Comment</span>
+                                            </div>
+                                        </div>
                                         <div class="item-footer">
-                                            <div class="no-padding-horizontal transaction-footer">
+                                            <div class="transaction-footer">
                                                 <span>HH:mm</span>
                                                 <span>·</span>
                                                 <span>Source Account</span>

@@ -1,6 +1,6 @@
 <template>
     <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
-              :class="{ 'tree-view-selection-huge-sheet': hugeTreeViewItems }"
+              :class="heightClass"
               :opened="show" @sheet:open="onSheetOpen" @sheet:closed="onSheetClosed">
         <f7-toolbar>
             <div class="swipe-handler"></div>
@@ -74,9 +74,11 @@ export default {
         }
     },
     computed: {
-        hugeTreeViewItems() {
+        heightClass() {
+            let count = 0;
+
             if (isArray(this.items)) {
-                return this.items.length > 10;
+                count = this.items.length;
             } else {
                 let count = 0;
 
@@ -87,8 +89,14 @@ export default {
 
                     count++;
                 }
+            }
 
-                return count > 10;
+            if (count > 6) {
+                return 'tree-view-selection-huge-sheet';
+            } else if (count > 2) {
+                return 'tree-view-selection-large-sheet';
+            } else {
+                return '';
             }
         }
     },
@@ -157,6 +165,10 @@ export default {
 
 <style>
 @media (min-height: 630px) {
+    .tree-view-selection-large-sheet {
+        height: 310px;
+    }
+
     .tree-view-selection-huge-sheet {
         height: 400px;
     }

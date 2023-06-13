@@ -19,15 +19,14 @@
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item
-                class="transaction-edit-amount"
-                style="font-size: 40px;"
+                class="transaction-edit-amount ebk-large-amount"
                 header="Expense Amount" title="0.00">
             </f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
-            <f7-list-input label="Transaction Time" placeholder="YYYY/MM/DD HH:mm"></f7-list-input>
-            <f7-list-item :no-chevron="mode === 'view'" class="list-item-with-header-and-title list-item-title-hide-overflow" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title" header="Transaction Time" title="YYYY/MM/DD HH:mm:ss"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location"></f7-list-item>
             <f7-list-item header="Tags">
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin">

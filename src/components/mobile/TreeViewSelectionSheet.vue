@@ -80,8 +80,6 @@ export default {
             if (isArray(this.items)) {
                 count = this.items.length;
             } else {
-                let count = 0;
-
                 for (let field in this.items) {
                     if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
                         continue;

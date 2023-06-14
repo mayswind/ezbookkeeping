@@ -233,6 +233,7 @@
                     <f7-block class="list-item-custom-title no-padding no-margin">
                         <span>{{ `(${transactionDisplayTimezone})` }}</span>
                         <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transactionDisplayTimezoneName }}</span>
+                        <span class="transaction-edit-timezone-name" v-else-if="!transaction.timeZone && transaction.timeZone !== ''">{{ transactionTimezoneTimeDifference }}</span>
                     </f7-block>
                 </template>
             </f7-list-item>
@@ -347,6 +348,7 @@ import {
 } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
+    getTimeDifferenceHoursAndMinutes,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getUtcOffsetByUtcOffsetMinutes,
@@ -604,6 +606,36 @@ export default {
         },
         transactionDisplayTimezoneName() {
             return getNameByKeyValue(this.allTimezones, this.transaction.timeZone, 'name', 'displayName');
+        },
+        transactionTimezoneTimeDifference() {
+            const defaultTimezoneOffset = getTimezoneOffsetMinutes();
+            const offsetTime = getTimeDifferenceHoursAndMinutes(this.transaction.utcOffset - defaultTimezoneOffset);
+
+            if (this.transaction.utcOffset > defaultTimezoneOffset) {
+                if (offsetTime.offsetMinutes) {
+                    return this.$t('format.misc.hoursMinutesAheadOfDefaultTimezone', {
+                        hours: offsetTime.offsetHours,
+                        minutes: offsetTime.offsetMinutes
+                    });
+                } else {
+                    return this.$t('format.misc.hoursAheadOfDefaultTimezone', {
+                        hours: offsetTime.offsetHours
+                    });
+                }
+            } else if (this.transaction.utcOffset < defaultTimezoneOffset) {
+                if (offsetTime.offsetMinutes) {
+                    return this.$t('format.misc.hoursMinutesBehindDefaultTimezone', {
+                        hours: offsetTime.offsetHours,
+                        minutes: offsetTime.offsetMinutes
+                    });
+                } else {
+                    return this.$t('format.misc.hoursBehindDefaultTimezone', {
+                        hours: offsetTime.offsetHours
+                    });
+                }
+            } else {
+                return this.$t('Same time as default timezone');
+            }
         },
         sourceAmountClass() {
             const classes = {

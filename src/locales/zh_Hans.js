@@ -65,6 +65,12 @@ export default {
         },
         'currency': {
             'symbol': '{symbol} {amount}'
+        },
+        'misc': {
+            'hoursBehindDefaultTimezone': '比默认时区晚{hours}小时',
+            'hoursAheadOfDefaultTimezone': '比默认时区早{hours}小时',
+            'hoursMinutesBehindDefaultTimezone': '比默认时区晚{hours}小时{minutes}分',
+            'hoursMinutesAheadOfDefaultTimezone': '比默认时区早{time}小时{minutes}分'
         }
     },
     'dataExport': {
@@ -878,6 +884,7 @@ export default {
     'Destination Account': '目标账户',
     'Transaction Time': '交易时间',
     'Transaction Time Zone': '交易时区',
+    'Same time as default timezone': '与默认时区时间相同',
     'Geographic Location': '地理位置',
     'No Location': '没有位置',
     'Getting Location...': '正在获取位置...',

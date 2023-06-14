@@ -65,6 +65,12 @@ export default {
         },
         'currency': {
             'symbol': '{symbol} {amount}'
+        },
+        'misc': {
+            'hoursBehindDefaultTimezone': '{hours} hour(s) behind default timezone',
+            'hoursAheadOfDefaultTimezone': '{hours} hour(s) ahead of default timezone',
+            'hoursMinutesBehindDefaultTimezone': '{hours} hour(s) and {minutes} minutes behind default timezone',
+            'hoursMinutesAheadOfDefaultTimezone': '{hours} hour(s) and {minutes} minutes ahead of default timezone'
         }
     },
     'dataExport': {
@@ -878,6 +884,7 @@ export default {
     'Destination Account': 'Destination Account',
     'Transaction Time': 'Transaction Time',
     'Transaction Time Zone': 'Transaction Time Zone',
+    'Same time as default timezone': 'Same time as default timezone',
     'Geographic Location': 'Geographic Location',
     'No Location': 'No Location',
     'Getting Location...': 'Getting Location...',

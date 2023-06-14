@@ -149,6 +149,16 @@ export function getUnixTimeAfterUnixTime(unixTime, amount, unit) {
     return moment.unix(unixTime).add(amount, unit).unix();
 }
 
+export function getTimeDifferenceHoursAndMinutes(timeDifferenceInMinutes) {
+    let offsetHours = parseInt(Math.abs(timeDifferenceInMinutes) / 60);
+    let offsetMinutes = Math.abs(timeDifferenceInMinutes) - offsetHours * 60;
+
+    return {
+        offsetHours: offsetHours,
+        offsetMinutes: offsetMinutes,
+    };
+}
+
 export function getMinuteFirstUnixTime(date) {
     const datetime = moment(date);
     return datetime.set({ second: 0, millisecond: 0 }).unix();

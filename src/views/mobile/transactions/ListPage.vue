@@ -424,8 +424,12 @@ import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import {
+    getCurrentUnixTime,
+    getSpecifiedDayFirstUnixTime,
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffsetMinutes,
+    getActualUnixTimeForStore,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
@@ -659,6 +663,11 @@ export default {
         },
         changeDateFilter(dateType) {
             if (dateType === this.allDateRanges.Custom.type) { // Custom
+                if (!this.query.minTime || !this.query.maxTime) {
+                    this.query.maxTime = getActualUnixTimeForStore(getCurrentUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+                    this.query.minTime = getSpecifiedDayFirstUnixTime(this.query.maxTime);
+                }
+
                 this.showCustomDateRangeSheet = true;
                 this.showDatePopover = false;
                 return;

@@ -201,18 +201,19 @@ registerComponents(app);
 app.use(pinia);
 app.use(i18n);
 
-function setLanguage(locale) {
+function setLanguage(locale, force) {
     if (!locale) {
         locale = getDefaultLanguage();
         logger.info(`No specified language, use browser default language ${locale}`);
     }
 
     if (!getLanguageInfo(locale)) {
-        logger.warn(`Not found language ${locale}`);
-        return null;
+        locale = getDefaultLanguage();
+        logger.warn(`Not found language ${locale}, use browser default language ${locale}`);
     }
 
-    if (i18n.global.locale === locale) {
+    if (!force && i18n.global.locale === locale) {
+        logger.info(`Current locale is already ${locale}`);
         return locale;
     }
 
@@ -266,9 +267,9 @@ function initLocale() {
 
     if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
         logger.info(`Last user language is ${lastUserLanguage}`);
-        setLanguage(lastUserLanguage);
+        setLanguage(lastUserLanguage, true);
     } else {
-        setLanguage(null);
+        setLanguage(null, true);
     }
 
     if (settings.getTimezone()) {

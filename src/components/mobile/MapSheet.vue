@@ -8,15 +8,15 @@
                 <f7-link :text="$t('Done')" @click="save"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content class="no-margin-vertical no-padding-vertical" v-if="knownMapProvider">
+        <f7-page-content class="no-margin-vertical no-padding-vertical" v-if="mapHolder && dependencyLoaded">
             <div ref="map" style="height: 400px; width: 100%"></div>
         </f7-page-content>
-        <f7-page-content class="no-margin-top no-padding-top" v-else-if="!knownMapProvider">
+        <f7-page-content class="no-margin-top no-padding-top" v-else-if="!mapHolder || !dependencyLoaded">
             <div class="display-flex padding justify-content-space-between align-items-center">
-                <div class="ebk-sheet-title"><b>{{ $t('Unsupported Map Provider') }}</b></div>
+                <div class="ebk-sheet-title"><b>{{ mapErrorTitle }}</b></div>
             </div>
             <div class="padding-horizontal padding-bottom">
-                <p class="no-margin">{{ $t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.') }}</p>
+                <p class="no-margin">{{ mapErrorContent }}</p>
                 <div class="margin-top text-align-center">
                     <f7-link @click="close" :text="$t('Close')"></f7-link>
                 </div>
@@ -26,6 +26,14 @@
 </template>
 
 <script>
+import {
+    createMapHolder,
+    initMapInstance,
+    setMapCenterTo,
+    setMapCenterMarker,
+    removeMapCenterMarker
+} from '@/lib/map.js';
+
 export default {
     props: [
         'modelValue',
@@ -36,21 +44,32 @@ export default {
         'update:show'
     ],
     data() {
-        let knownMapProvider = false;
-
-        if (this.$settings.getMapProvider() === 'openstreetmap') {
-            knownMapProvider = true;
-        }
-
         return {
-            knownMapProvider: knownMapProvider,
-            leaflet: null,
-            tileLayer: null,
-            zoomControl: null,
-            attribution: null,
-            marker: null,
-            initCenter: [ 0, 0 ],
+            mapHolder: createMapHolder(),
+            initCenter: {
+                latitude: 0,
+                longitude: 0,
+            },
             zoomLevel: 1
+        }
+    },
+    computed: {
+        dependencyLoaded() {
+            return this.mapHolder && this.mapHolder.dependencyLoaded;
+        },
+        mapErrorTitle() {
+            if (!this.mapHolder) {
+                return this.$t('Unsupported Map Provider');
+            }
+
+            if (!this.dependencyLoaded) {
+                return this.$t('Cannot Initialize Map');
+            }
+
+            return '';
+        },
+        mapErrorContent() {
+            return this.$t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.');
         }
     },
     methods: {
@@ -61,85 +80,49 @@ export default {
             let isFirstInit = false;
             let centerChanged = false;
 
+            if (!this.mapHolder || !this.mapHolder.dependencyLoaded) {
+                return;
+            }
+
             if (this.modelValue && (this.modelValue.longitude || this.modelValue.latitude)) {
-                if (this.initCenter[0] !== this.modelValue.latitude || this.initCenter[1] !== this.modelValue.longitude) {
-                    this.initCenter[0] = this.modelValue.latitude;
-                    this.initCenter[1] = this.modelValue.longitude;
-                    this.zoomLevel = 14;
+                if (this.initCenter.latitude !== this.modelValue.latitude || this.initCenter.longitude !== this.modelValue.longitude) {
+                    this.initCenter.latitude = this.modelValue.latitude;
+                    this.initCenter.longitude = this.modelValue.longitude;
+                    this.zoomLevel = this.mapHolder.defaultZoomLevel;
 
                     centerChanged = true;
                 }
             } else if (!this.modelValue || (!this.modelValue.longitude && !this.modelValue.latitude)) {
-                if (this.initCenter[0] || this.initCenter[1]) {
-                    this.initCenter[0] = 0;
-                    this.initCenter[1] = 0;
-                    this.zoomLevel = 1;
+                if (this.initCenter.latitude || this.initCenter.longitude) {
+                    this.initCenter.latitude = 0;
+                    this.initCenter.longitude = 0;
+                    this.zoomLevel = this.mapHolder.minZoomLevel;
 
                     centerChanged = true;
                 }
             }
 
-            if (this.knownMapProvider && this.$settings.getMapProvider() === 'openstreetmap') {
-                if (!this.leaflet) {
-                    const mapContainer = this.$refs.map;
+            if (!this.mapHolder.inited) {
+                initMapInstance(this.mapHolder, this.$refs.map, {
+                    text: {
+                        zoomIn: this.$t('Zoom in'),
+                        zoomOut: this.$t('Zoom out'),
+                    }
+                });
 
-                    this.leaflet = this.$map.leaflet.map(mapContainer, {
-                        attributionControl: false,
-                        zoomControl: false
-                    });
-
-                    const mapTileImageUrl = this.$map.generateOpenStreetMapTileImageUrl();
-
-                    this.tileLayer = this.$map.leaflet.tileLayer(mapTileImageUrl.url, {
-                        subdomains: mapTileImageUrl.subDomains,
-                        maxZoom: 19
-                    });
-                    this.tileLayer.addTo(this.leaflet);
-
-                    this.zoomControl = this.$map.leaflet.control.zoom({
-                        zoomInTitle: this.$t('Zoom in'),
-                        zoomOutTitle: this.$t('Zoom out'),
-                    });
-                    this.zoomControl.addTo(this.leaflet);
-
-                    this.attribution = this.$map.leaflet.control.attribution({
-                        prefix: false
-                    });
-                    this.attribution.addAttribution('&copy; <a href="http://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a>');
-                    this.attribution.addTo(this.leaflet);
-
+                if (this.mapHolder.inited) {
                     isFirstInit = true;
                 }
+            }
 
-                if (isFirstInit || centerChanged) {
-                    this.leaflet.setView(this.initCenter, this.zoomLevel);
-                }
+            if (isFirstInit || centerChanged) {
+                setMapCenterTo(this.mapHolder, this.initCenter, this.zoomLevel);
+            }
 
-                if (centerChanged && this.zoomLevel > 1) {
-                    if (!this.marker) {
-                        const markerIcon = this.$map.leaflet.icon({
-                            iconUrl: 'img/map-marker-icon.png',
-                            iconRetinaUrl: 'img/map-marker-icon-2x.png',
-                            iconSize:    [25, 32],
-                            iconAnchor:  [12, 32],
-                            shadowUrl: 'img/map-marker-shadow.png',
-                            shadowSize: [41, 32]
-                        });
-                        this.marker = this.$map.leaflet.marker(this.initCenter, {
-                            icon: markerIcon
-                        });
-                        this.marker.addTo(this.leaflet);
-                    } else {
-                        this.marker.setLatLng(this.initCenter);
-                    }
-                } else if (centerChanged && this.zoomLevel <= 1) {
-                    if (this.marker) {
-                        this.marker.remove();
-                        this.marker = null;
-                    }
-                }
-            } else {
-                this.knownMapProvider = false;
+            if (centerChanged && this.zoomLevel > this.mapHolder.minZoomLevel) {
+                setMapCenterMarker(this.mapHolder, this.initCenter);
+            } else if (centerChanged && this.zoomLevel <= this.mapHolder.minZoomLevel) {
+                removeMapCenterMarker(this.mapHolder);
             }
         },
         onSheetClosed() {

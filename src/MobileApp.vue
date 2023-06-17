@@ -13,6 +13,7 @@ import { mapStores } from 'pinia';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { loadMapAssets } from '@/lib/map.js';
 import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
 
 export default {
@@ -141,6 +142,10 @@ export default {
                 this.isDarkMode = isDarkMode;
                 this.setThemeColorMeta(isDarkMode);
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMapAssets();
         });
     },
     methods: {

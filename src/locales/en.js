@@ -892,6 +892,7 @@ export default {
     'Update Geographic Location': 'Update Geographic Location',
     'Clear Geographic Location': 'Clear Geographic Location',
     'Unable to get current position': 'Unable to get current position',
+    'Cannot Initialize Map': 'Cannot Initialize Map',
     'Unsupported Map Provider': 'Unsupported Map Provider',
     'Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.': 'Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.',
     'Tags': 'Tags',

@@ -108,7 +108,9 @@ export default defineConfig(async () => {
                     chunkFileNames: 'js/[name]-[hash].js',
                     entryFileNames: 'js/[name]-[hash].js',
                     manualChunks: function (id) {
-                        if (/[\\/]node_modules[\\/]/i.test(id)) {
+                        if (/[\\/]node_modules[\\/]leaflet[\\/]/i.test(id)) {
+                            return 'leaflet';
+                        } else if (/[\\/]node_modules[\\/]/i.test(id)) {
                             return 'vendor';
                         }
                     }

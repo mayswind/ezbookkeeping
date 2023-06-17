@@ -75,9 +75,6 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import * as Leaflet from 'leaflet/dist/leaflet-src.esm.js';
-import 'leaflet/dist/leaflet.css';
-
 import datetimeConstants from '@/consts/datetime.js';
 
 import version from '@/lib/version.js';
@@ -344,10 +341,6 @@ app.config.globalProperties.$locale = {
     getAllCurrencies: () => getAllCurrencies(i18n.global.t),
     getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18n.global.t),
     initLocale: initLocale
-};
-app.config.globalProperties.$map = {
-    leaflet: Leaflet,
-    generateOpenStreetMapTileImageUrl: services.generateOpenStreetMapTileImageUrl
 };
 app.config.globalProperties.$tIf = (text, isTranslate) => transateIf(text, isTranslate, i18n.global.t);
 

@@ -1,18 +1,32 @@
-import services from "./services.js";
-import settings from "./settings.js";
+import services from "@/lib/services.js";
 
 const leafletHolder = {
     leaflet: null
 };
 
-function loadLeafletMapAssets() {
+export function loadLeafletMapAssets() {
     return Promise.all([
         import('leaflet/dist/leaflet.css'),
         import('leaflet/dist/leaflet-src.esm.js').then(leaflet => leafletHolder.leaflet = leaflet)
     ]);
 }
 
-function createLeafletMapInstance(mapHolder, mapContainer, options) {
+export function createLeafletMapHolder() {
+    return {
+        mapProvider: 'openstreetmap',
+        dependencyLoaded: !!leafletHolder.leaflet,
+        inited: false,
+        defaultZoomLevel: 14,
+        minZoomLevel: 1,
+        leafletInstance: null,
+        leafletTileLayer: null,
+        leafletZoomControl: null,
+        leafletAttribution: null,
+        leafletCenterMarker: null
+    };
+}
+
+export function createLeafletMapInstance(mapHolder, mapContainer, options) {
     if (!leafletHolder.leaflet) {
         return null;
     }
@@ -50,7 +64,7 @@ function createLeafletMapInstance(mapHolder, mapContainer, options) {
     mapHolder.inited = true;
 }
 
-function setLeafletMapCenterTo(mapHolder, center, zoomLevel) {
+export function setLeafletMapCenterTo(mapHolder, center, zoomLevel) {
     if (!mapHolder.leafletInstance) {
         return;
     }
@@ -58,7 +72,7 @@ function setLeafletMapCenterTo(mapHolder, center, zoomLevel) {
     mapHolder.leafletInstance.setView([ center.latitude, center.longitude ], zoomLevel);
 }
 
-function setLeafletMapCenterMaker(mapHolder, position) {
+export function setLeafletMapCenterMaker(mapHolder, position) {
     if (!leafletHolder.leaflet || !mapHolder.leafletInstance) {
         return;
     }
@@ -83,74 +97,11 @@ function setLeafletMapCenterMaker(mapHolder, position) {
     }
 }
 
-function removeLeafletMapCenterMaker(mapHolder) {
-    if (!mapHolder.leafletInstance || mapHolder.leafletCenterMarker) {
-        mapHolder.leafletCenterMarker.remove();
-        mapHolder.leafletCenterMarker = null;
-    }
-}
-
-export function loadMapAssets() {
-    if (settings.getMapProvider() === 'openstreetmap') {
-        return loadLeafletMapAssets();
-    }
-}
-
-export function createMapHolder() {
-    if (settings.getMapProvider() === 'openstreetmap') {
-        return {
-            mapProvider: 'openstreetmap',
-            dependencyLoaded: !!leafletHolder.leaflet,
-            inited: false,
-            defaultZoomLevel: 14,
-            minZoomLevel: 1,
-            leafletInstance: null,
-            leafletTileLayer: null,
-            leafletZoomControl: null,
-            leafletAttribution: null,
-            leafletCenterMarker: null
-        }
-    } else {
-        return null;
-    }
-}
-
-export function initMapInstance(mapHolder, mapContainer, options) {
-    if (!mapHolder) {
+export function removeLeafletMapCenterMaker(mapHolder) {
+    if (!mapHolder.leafletInstance || !mapHolder.leafletCenterMarker) {
         return;
     }
 
-    if (mapHolder.mapProvider === 'openstreetmap') {
-        createLeafletMapInstance(mapHolder, mapContainer, options);
-    }
-}
-
-export function setMapCenterTo(mapHolder, center, zoomLevel) {
-    if (!mapHolder) {
-        return;
-    }
-
-    if (mapHolder.mapProvider === 'openstreetmap') {
-        setLeafletMapCenterTo(mapHolder, center, zoomLevel);
-    }
-}
-
-export function setMapCenterMarker(mapHolder, position) {
-    if (!mapHolder) {
-        return;
-    }
-
-    if (mapHolder.mapProvider === 'openstreetmap') {
-        setLeafletMapCenterMaker(mapHolder, position);
-    }
-}
-
-export function removeMapCenterMarker(mapHolder) {
-    if (!mapHolder) {
-        return;
-    }
-
-    if (mapHolder.mapProvider === 'openstreetmap') {
-        removeLeafletMapCenterMaker(mapHolder);
-    }
+    mapHolder.leafletCenterMarker.remove();
+    mapHolder.leafletCenterMarker = null;
 }

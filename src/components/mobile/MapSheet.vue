@@ -32,7 +32,7 @@ import {
     setMapCenterTo,
     setMapCenterMarker,
     removeMapCenterMarker
-} from '@/lib/map.js';
+} from '@/lib/map/index.js';
 
 export default {
     props: [

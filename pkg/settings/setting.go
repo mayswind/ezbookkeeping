@@ -65,6 +65,7 @@ const (
 // Map provider types
 const (
 	OpenStreetMapProvider string = "openstreetmap"
+	BaiduMapProvider      string = "baidumap"
 )
 
 // Exchange rates data source types
@@ -176,6 +177,7 @@ type Config struct {
 
 	// Map
 	MapProvider             string
+	BaiduMapAK              string
 	EnableMapDataFetchProxy bool
 
 	// Exchange Rates
@@ -436,11 +438,14 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = ""
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
 		config.MapProvider = OpenStreetMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {
+		config.MapProvider = BaiduMapProvider
 	} else {
 		return errs.ErrInvalidMapProvider
 	}
 
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
 
 	return nil
 }

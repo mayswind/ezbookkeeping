@@ -2,6 +2,74 @@ import Clipboard from 'clipboard';
 import CryptoJS from 'crypto-js';
 import uaParser from 'ua-parser-js';
 
+export function asyncLoadAssets(type, assetUrl) {
+    return new Promise(function (resolve, reject) {
+        let addElement = false;
+        let el = null;
+
+        if (type === 'js') {
+            el = document.querySelector('script[src="' + assetUrl + '"]');
+        } else if (type === 'css') {
+            el = document.querySelector('link[href="' + assetUrl + '"]');
+        } else {
+            reject({
+                type: type,
+                assetUrl: assetUrl,
+                error: 'notsupport'
+            });
+            return;
+        }
+
+        if (!el) {
+            if (type === 'js') {
+                el = document.createElement('script');
+                el.setAttribute('type', 'text/javascript');
+                el.setAttribute('async', 'true');
+                el.setAttribute('src', assetUrl);
+            } else if (type === 'css') {
+                el = document.createElement('link');
+                el.setAttribute('rel', 'stylesheet');
+                el.setAttribute('type', 'text/css');
+                el.setAttribute('href', assetUrl);
+            }
+
+            addElement = true;
+        } else if (el.hasAttribute('data-loaded')) {
+            resolve({
+                type: type,
+                assetUrl: assetUrl
+            });
+            return;
+        }
+
+        el.addEventListener('load', () => {
+            el.setAttribute('data-loaded', true);
+            resolve({
+                type: type,
+                assetUrl: assetUrl
+            });
+        });
+        el.addEventListener('error', () => {
+            reject({
+                type: type,
+                assetUrl: assetUrl,
+                error: 'error'
+            });
+        });
+        el.addEventListener('abort', () => {
+            reject({
+                type: type,
+                assetUrl: assetUrl,
+                error: 'abort'
+            });
+        });
+
+        if (addElement) {
+            document.head.appendChild(el);
+        }
+    });
+}
+
 export function generateRandomString() {
     const baseString = 'ebk_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
     return CryptoJS.SHA256(baseString).toString();

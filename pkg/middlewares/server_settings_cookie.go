@@ -18,6 +18,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			buildBooleanSetting("e", config.EnableDataExport),
 			buildStringSetting("m", config.MapProvider),
 			buildBooleanSetting("mp", config.EnableMapDataFetchProxy),
+			buildStringSetting("bmak", config.BaiduMapAK),
 		}
 
 		bundledSettings := strings.Join(settingsArr, "_")

@@ -411,4 +411,7 @@ export default {
             };
         }
     },
+    generateBaiduMapJavascriptUrl: (callbackFnName) => {
+        return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;
+    }
 };

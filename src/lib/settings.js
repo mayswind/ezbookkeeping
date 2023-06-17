@@ -169,5 +169,6 @@ export default {
     isDataExportingEnabled: () => getServerSetting('e') === '1',
     getMapProvider: () => getServerSetting('m'),
     isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
+    getBaiduMapAK: () => getServerSetting('bmak'),
     clearSettings: clearSettings
 };

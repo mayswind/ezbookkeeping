@@ -13,7 +13,7 @@ import { mapStores } from 'pinia';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { loadMapAssets } from '@/lib/map.js';
+import { loadMapAssets } from '@/lib/map/index.js';
 import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
 
 export default {

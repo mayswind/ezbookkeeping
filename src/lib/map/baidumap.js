@@ -34,11 +34,12 @@ export function createBaiduMapHolder() {
         baiduMapInstance: null,
         baiduMapConverter: null,
         baiduMapNavigationControl: null,
+        baiduMapCenterPosition: null,
         baiduMapCenterMarker: null
     };
 }
 
-export function createBaiduMapInstance(mapHolder, mapContainer) {
+export function createBaiduMapInstance(mapHolder, mapContainer, options) {
     if (!baiduMapHolder.BMap) {
         return null;
     }
@@ -54,6 +55,7 @@ export function createBaiduMapInstance(mapHolder, mapContainer) {
         anchor: baiduMapHolder.BMAP_ANCHOR_TOP_LEFT
     });
     baiduMapInstance.addControl(baiduMapNavigationControl);
+    baiduMapInstance.centerAndZoom(new BMap.Point(options.initCenter.longitude, options.initCenter.latitude), options.zoomLevel);
 
     mapHolder.baiduMapInstance = baiduMapInstance;
     mapHolder.baiduMapConverter = new BMap.Convertor();
@@ -66,16 +68,39 @@ export function setBaiduMapCenterTo(mapHolder, center, zoomLevel) {
     }
 
     const BMap = baiduMapHolder.BMap;
+
+    if (baiduMapHolder.baiduMapCenterPosition
+        && baiduMapHolder.baiduMapCenterPosition.originalLongitude === center.longitude
+        && baiduMapHolder.baiduMapCenterPosition.originalLatitude === center.latitude
+        && baiduMapHolder.baiduMapCenterPosition.convertedLongitude
+        && baiduMapHolder.baiduMapCenterPosition.convertedLatitude
+    ) {
+        mapHolder.baiduMapInstance.centerAndZoom(new BMap.Point(baiduMapHolder.baiduMapCenterPosition.convertedLongitude, baiduMapHolder.baiduMapCenterPosition.convertedLatitude), zoomLevel);
+        return;
+    }
+
+    baiduMapHolder.baiduMapCenterPosition = {
+        originalLongitude: center.longitude,
+        originalLatitude: center.latitude,
+        convertedLongitude: null,
+        convertedLatitude: null
+    };
+
     const centerPoint = new BMap.Point(center.longitude, center.latitude);
 
     if (mapHolder.baiduMapConverter) {
         mapHolder.baiduMapConverter.translate([ centerPoint ], baiduMapHolder.COORDINATES_WGS84, baiduMapHolder.COORDINATES_BD09, data => {
+            let convertedCenterPoint = centerPoint;
+
             if (data.status !== 0) {
                 logger.warn('baidu map geo position convert failed');
+            } else {
+                convertedCenterPoint = data.points[0];
+                baiduMapHolder.baiduMapCenterPosition.convertedLongitude = convertedCenterPoint.lng;
+                baiduMapHolder.baiduMapCenterPosition.convertedLatitude = convertedCenterPoint.lat;
             }
 
-            const actualPoint = (data.status === 0 ? data.points[0] : centerPoint);
-            mapHolder.baiduMapInstance.centerAndZoom(actualPoint, zoomLevel);
+            mapHolder.baiduMapInstance.centerAndZoom(convertedCenterPoint, zoomLevel);
         });
     } else {
         mapHolder.baiduMapInstance.centerAndZoom(centerPoint, zoomLevel);
@@ -88,22 +113,42 @@ export function setBaiduMapCenterMaker(mapHolder, position) {
     }
 
     const BMap = baiduMapHolder.BMap;
-    const markerPoint = new BMap.Point(position.longitude, position.latitude);
-
-    mapHolder.baiduMapConverter.translate([ markerPoint ], baiduMapHolder.COORDINATES_WGS84, baiduMapHolder.COORDINATES_BD09, data => {
-        if (data.status !== 0) {
-            logger.warn('baidu map geo position convert failed');
-        }
-
-        const actualPoint = (data.status === 0 ? data.points[0] : markerPoint);
-
+    const setMaker = function (point) {
         if (!mapHolder.baiduMapCenterMarker) {
-            mapHolder.baiduMapCenterMarker = new BMap.Marker(actualPoint);
+            mapHolder.baiduMapCenterMarker = new BMap.Marker(point);
             mapHolder.baiduMapInstance.addOverlay(mapHolder.baiduMapCenterMarker);
         } else {
-            mapHolder.baiduMapCenterMarker.setPosition(actualPoint);
+            mapHolder.baiduMapCenterMarker.setPosition(point);
         }
-    });
+    }
+
+    if (baiduMapHolder.baiduMapCenterPosition
+        && baiduMapHolder.baiduMapCenterPosition.originalLongitude === position.longitude
+        && baiduMapHolder.baiduMapCenterPosition.originalLatitude === position.latitude
+        && baiduMapHolder.baiduMapCenterPosition.convertedLongitude
+        && baiduMapHolder.baiduMapCenterPosition.convertedLatitude
+    ) {
+        setMaker(new BMap.Point(baiduMapHolder.baiduMapCenterPosition.convertedLongitude, baiduMapHolder.baiduMapCenterPosition.convertedLatitude));
+        return;
+    }
+
+    const markerPoint = new BMap.Point(position.longitude, position.latitude);
+
+    if (mapHolder.baiduMapConverter) {
+        mapHolder.baiduMapConverter.translate([ markerPoint ], baiduMapHolder.COORDINATES_WGS84, baiduMapHolder.COORDINATES_BD09, data => {
+            let convertedMarkPoint = markerPoint;
+
+            if (data.status !== 0) {
+                logger.warn('baidu map geo position convert failed');
+            } else {
+                convertedMarkPoint = data.points[0];
+            }
+
+            setMaker(convertedMarkPoint);
+        });
+    } else {
+        setMaker(markerPoint);
+    }
 }
 
 export function removeBaiduMapCenterMaker(mapHolder) {

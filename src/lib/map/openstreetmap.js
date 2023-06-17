@@ -33,6 +33,8 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
 
     const leaflet = leafletHolder.leaflet;
     const leafletInstance = leaflet.map(mapContainer, {
+        center: [ options.initCenter.latitude, options.initCenter.longitude ],
+        zoom: options.zoomLevel,
         attributionControl: false,
         zoomControl: false
     });

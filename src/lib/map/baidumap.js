@@ -92,7 +92,7 @@ export function setBaiduMapCenterTo(mapHolder, center, zoomLevel) {
         mapHolder.baiduMapConverter.translate([ centerPoint ], baiduMapHolder.COORDINATES_WGS84, baiduMapHolder.COORDINATES_BD09, data => {
             let convertedCenterPoint = centerPoint;
 
-            if (data.status !== 0) {
+            if (data.status !== 0 || !data.points) {
                 logger.warn('baidu map geo position convert failed');
             } else {
                 convertedCenterPoint = data.points[0];
@@ -138,7 +138,7 @@ export function setBaiduMapCenterMaker(mapHolder, position) {
         mapHolder.baiduMapConverter.translate([ markerPoint ], baiduMapHolder.COORDINATES_WGS84, baiduMapHolder.COORDINATES_BD09, data => {
             let convertedMarkPoint = markerPoint;
 
-            if (data.status !== 0) {
+            if (data.status !== 0 || !data.points) {
                 logger.warn('baidu map geo position convert failed');
             } else {
                 convertedMarkPoint = data.points[0];

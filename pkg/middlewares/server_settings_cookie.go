@@ -17,8 +17,14 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			buildBooleanSetting("r", config.EnableUserRegister),
 			buildBooleanSetting("e", config.EnableDataExport),
 			buildStringSetting("m", config.MapProvider),
-			buildBooleanSetting("mp", config.EnableMapDataFetchProxy),
-			buildStringSetting("bmak", config.BaiduMapAK),
+		}
+
+		if config.EnableMapDataFetchProxy {
+			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
+		}
+
+		if config.BaiduMapAK != "" {
+			settingsArr = append(settingsArr, buildStringSetting("bmak", config.BaiduMapAK))
 		}
 
 		bundledSettings := strings.Join(settingsArr, "_")

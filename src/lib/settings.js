@@ -171,5 +171,8 @@ export default {
     isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
     getGoogleMapAPIKey: () => getServerSetting('gmak'),
     getBaiduMapAK: () => getServerSetting('bmak'),
+    getAmapApplicationKey: () => getServerSetting('amak'),
+    getAmapSecurityVerificationMethod: () => getServerSetting('amsv'),
+    getAmapApplicationSecret: () => getServerSetting('amas'),
     clearSettings: clearSettings
 };

@@ -31,6 +31,18 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			settingsArr = append(settingsArr, buildStringSetting("bmak", config.BaiduMapAK))
 		}
 
+		if config.AMapApplicationKey != "" {
+			settingsArr = append(settingsArr, buildStringSetting("amak", config.AMapApplicationKey))
+		}
+
+		if config.AMapSecurityVerificationMethod != "" {
+			settingsArr = append(settingsArr, buildStringSetting("amsv", config.AMapSecurityVerificationMethod))
+
+			if config.AMapSecurityVerificationMethod == settings.AmapSecurityVerificationPlainMethod {
+				settingsArr = append(settingsArr, buildStringSetting("amas", config.AMapApplicationSecret))
+			}
+		}
+
 		bundledSettings := strings.Join(settingsArr, "_")
 		c.SetCookie(settingsCookieName, bundledSettings, int(config.TokenExpiredTime), "", "", false, false)
 

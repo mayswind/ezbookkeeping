@@ -27,6 +27,15 @@ import {
     removeBaiduMapCenterMaker
 } from './baidumap.js';
 
+import {
+    loadAmapAssets,
+    createAmapHolder,
+    createAmapInstance,
+    setAmapCenterTo,
+    setAmapCenterMaker,
+    removeAmapCenterMaker
+} from './amap.js';
+
 export function loadMapAssets(language) {
     if (settings.getMapProvider() === 'openstreetmap') {
         return loadLeafletMapAssets(language);
@@ -34,6 +43,8 @@ export function loadMapAssets(language) {
         return loadGoogleMapAssets(language);
     } else if (settings.getMapProvider() === 'baidumap') {
         return loadBaiduMapAssets(language);
+    } else if (settings.getMapProvider() === 'amap') {
+        return loadAmapAssets(language);
     }
 }
 
@@ -44,6 +55,8 @@ export function createMapHolder() {
         return createGoogleMapHolder();
     } else if (settings.getMapProvider() === 'baidumap') {
         return createBaiduMapHolder();
+    } else if (settings.getMapProvider() === 'amap') {
+        return createAmapHolder();
     } else {
         return null;
     }
@@ -60,6 +73,8 @@ export function initMapInstance(mapHolder, mapContainer, options) {
         createGoogleMapInstance(mapHolder, mapContainer, options);
     } else if (mapHolder.mapProvider === 'baidumap') {
         createBaiduMapInstance(mapHolder, mapContainer, options);
+    } else if (mapHolder.mapProvider === 'amap') {
+        createAmapInstance(mapHolder, mapContainer, options);
     }
 }
 
@@ -74,6 +89,8 @@ export function setMapCenterTo(mapHolder, center, zoomLevel) {
         setGoogleMapCenterTo(mapHolder, center, zoomLevel);
     } else if (mapHolder.mapProvider === 'baidumap') {
         setBaiduMapCenterTo(mapHolder, center, zoomLevel);
+    } else if (mapHolder.mapProvider === 'amap') {
+        setAmapCenterTo(mapHolder, center, zoomLevel);
     }
 }
 
@@ -88,6 +105,8 @@ export function setMapCenterMarker(mapHolder, position) {
         setGoogleMapCenterMaker(mapHolder, position);
     } else if (mapHolder.mapProvider === 'baidumap') {
         setBaiduMapCenterMaker(mapHolder, position);
+    } else if (mapHolder.mapProvider === 'amap') {
+        setAmapCenterMaker(mapHolder, position);
     }
 }
 
@@ -102,5 +121,7 @@ export function removeMapCenterMarker(mapHolder) {
         removeGoogleMapCenterMaker(mapHolder);
     } else if (mapHolder.mapProvider === 'baidumap') {
         removeBaiduMapCenterMaker(mapHolder);
+    } else if (mapHolder.mapProvider === 'amap') {
+        removeAmapCenterMaker(mapHolder);
     }
 }

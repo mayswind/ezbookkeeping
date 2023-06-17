@@ -67,6 +67,12 @@ const (
 	OpenStreetMapProvider string = "openstreetmap"
 	GoogleMapProvider     string = "googlemap"
 	BaiduMapProvider      string = "baidumap"
+	AmapProvider          string = "amap"
+)
+
+// Amap security verification method
+const (
+	AmapSecurityVerificationPlainMethod string = "plain"
 )
 
 // Exchange rates data source types
@@ -177,10 +183,13 @@ type Config struct {
 	EnableDataExport bool
 
 	// Map
-	MapProvider             string
-	GoogleMapAPIKey         string
-	BaiduMapAK              string
-	EnableMapDataFetchProxy bool
+	MapProvider                    string
+	GoogleMapAPIKey                string
+	BaiduMapAK                     string
+	AMapApplicationKey             string
+	AMapSecurityVerificationMethod string
+	AMapApplicationSecret          string
+	EnableMapDataFetchProxy        bool
 
 	// Exchange Rates
 	ExchangeRatesDataSource     string
@@ -444,6 +453,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = GoogleMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {
 		config.MapProvider = BaiduMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == AmapProvider {
+		config.MapProvider = AmapProvider
 	} else {
 		return errs.ErrInvalidMapProvider
 	}
@@ -451,6 +462,15 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
 	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
+	config.AMapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")
+
+	if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationPlainMethod {
+		config.AMapSecurityVerificationMethod = AmapSecurityVerificationPlainMethod
+	} else {
+		return errs.ErrInvalidAmapSecurityVerificationMethod
+	}
+
+	config.AMapApplicationSecret = getConfigItemStringValue(configFile, sectionName, "amap_application_secret")
 
 	return nil
 }

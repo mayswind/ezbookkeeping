@@ -420,5 +420,8 @@ export default {
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
         return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;
+    },
+    generateAmapJavascriptUrl: (callbackFnName) => {
+        return `${api.amapJavascriptUrl}&key=${settings.getAmapApplicationKey()}&callback=${callbackFnName}`;
     }
 };

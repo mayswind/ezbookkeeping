@@ -10,6 +10,15 @@ import {
 } from './openstreetmap.js';
 
 import {
+    loadGoogleMapAssets,
+    createGoogleMapHolder,
+    createGoogleMapInstance,
+    setGoogleMapCenterTo,
+    setGoogleMapCenterMaker,
+    removeGoogleMapCenterMaker
+} from './googlemap.js';
+
+import {
     loadBaiduMapAssets,
     createBaiduMapHolder,
     createBaiduMapInstance,
@@ -18,17 +27,21 @@ import {
     removeBaiduMapCenterMaker
 } from './baidumap.js';
 
-export function loadMapAssets() {
+export function loadMapAssets(language) {
     if (settings.getMapProvider() === 'openstreetmap') {
-        return loadLeafletMapAssets();
+        return loadLeafletMapAssets(language);
+    } else if (settings.getMapProvider() === 'googlemap') {
+        return loadGoogleMapAssets(language);
     } else if (settings.getMapProvider() === 'baidumap') {
-        return loadBaiduMapAssets();
+        return loadBaiduMapAssets(language);
     }
 }
 
 export function createMapHolder() {
     if (settings.getMapProvider() === 'openstreetmap') {
         return createLeafletMapHolder();
+    } else if (settings.getMapProvider() === 'googlemap') {
+        return createGoogleMapHolder();
     } else if (settings.getMapProvider() === 'baidumap') {
         return createBaiduMapHolder();
     } else {
@@ -43,6 +56,8 @@ export function initMapInstance(mapHolder, mapContainer, options) {
 
     if (mapHolder.mapProvider === 'openstreetmap') {
         createLeafletMapInstance(mapHolder, mapContainer, options);
+    } else if (mapHolder.mapProvider === 'googlemap') {
+        createGoogleMapInstance(mapHolder, mapContainer, options);
     } else if (mapHolder.mapProvider === 'baidumap') {
         createBaiduMapInstance(mapHolder, mapContainer, options);
     }
@@ -55,6 +70,8 @@ export function setMapCenterTo(mapHolder, center, zoomLevel) {
 
     if (mapHolder.mapProvider === 'openstreetmap') {
         setLeafletMapCenterTo(mapHolder, center, zoomLevel);
+    } else if (mapHolder.mapProvider === 'googlemap') {
+        setGoogleMapCenterTo(mapHolder, center, zoomLevel);
     } else if (mapHolder.mapProvider === 'baidumap') {
         setBaiduMapCenterTo(mapHolder, center, zoomLevel);
     }
@@ -67,6 +84,8 @@ export function setMapCenterMarker(mapHolder, position) {
 
     if (mapHolder.mapProvider === 'openstreetmap') {
         setLeafletMapCenterMaker(mapHolder, position);
+    } else if (mapHolder.mapProvider === 'googlemap') {
+        setGoogleMapCenterMaker(mapHolder, position);
     } else if (mapHolder.mapProvider === 'baidumap') {
         setBaiduMapCenterMaker(mapHolder, position);
     }
@@ -79,6 +98,8 @@ export function removeMapCenterMarker(mapHolder) {
 
     if (mapHolder.mapProvider === 'openstreetmap') {
         removeLeafletMapCenterMaker(mapHolder);
+    } else if (mapHolder.mapProvider === 'googlemap') {
+        removeGoogleMapCenterMaker(mapHolder);
     } else if (mapHolder.mapProvider === 'baidumap') {
         removeBaiduMapCenterMaker(mapHolder);
     }

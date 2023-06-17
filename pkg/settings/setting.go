@@ -65,6 +65,7 @@ const (
 // Map provider types
 const (
 	OpenStreetMapProvider string = "openstreetmap"
+	GoogleMapProvider     string = "googlemap"
 	BaiduMapProvider      string = "baidumap"
 )
 
@@ -177,6 +178,7 @@ type Config struct {
 
 	// Map
 	MapProvider             string
+	GoogleMapAPIKey         string
 	BaiduMapAK              string
 	EnableMapDataFetchProxy bool
 
@@ -438,6 +440,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = ""
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
 		config.MapProvider = OpenStreetMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == GoogleMapProvider {
+		config.MapProvider = GoogleMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {
 		config.MapProvider = BaiduMapProvider
 	} else {
@@ -445,6 +449,7 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	}
 
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
 
 	return nil

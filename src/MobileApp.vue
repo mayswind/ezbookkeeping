@@ -145,7 +145,8 @@ export default {
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadMapAssets();
+            const languageInfo = this.$locale.getCurrentLanguageInfo();
+            loadMapAssets(languageInfo ? languageInfo.code : null);
         });
     },
     methods: {

@@ -411,6 +411,13 @@ export default {
             };
         }
     },
+    generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
+        if (language) {
+            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&language=${language}&callback=${callbackFnName}`;
+        } else {
+            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&callback=${callbackFnName}`;
+        }
+    },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
         return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;
     }

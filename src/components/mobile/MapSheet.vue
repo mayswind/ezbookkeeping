@@ -8,10 +8,10 @@
                 <f7-link :text="$t('Done')" @click="save"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content class="no-margin-vertical no-padding-vertical" v-if="mapHolder && dependencyLoaded">
+        <f7-page-content class="no-margin-vertical no-padding-vertical" v-if="mapSupported && mapDependencyLoaded">
             <div ref="map" style="height: 400px; width: 100%"></div>
         </f7-page-content>
-        <f7-page-content class="no-margin-top no-padding-top" v-else-if="!mapHolder || !dependencyLoaded">
+        <f7-page-content class="no-margin-top no-padding-top" v-else-if="!mapSupported || !mapDependencyLoaded">
             <div class="display-flex padding justify-content-space-between align-items-center">
                 <div class="ebk-sheet-title"><b>{{ mapErrorTitle }}</b></div>
             </div>
@@ -44,8 +44,12 @@ export default {
         'update:show'
     ],
     data() {
+        this.mapHolder = createMapHolder();
+
         return {
-            mapHolder: createMapHolder(),
+            mapSupported: !!this.mapHolder,
+            mapDependencyLoaded: this.mapHolder.dependencyLoaded,
+            mapInited: false,
             initCenter: {
                 latitude: 0,
                 longitude: 0,
@@ -54,15 +58,12 @@ export default {
         }
     },
     computed: {
-        dependencyLoaded() {
-            return this.mapHolder && this.mapHolder.dependencyLoaded;
-        },
         mapErrorTitle() {
-            if (!this.mapHolder) {
+            if (!this.mapSupported) {
                 return this.$t('Unsupported Map Provider');
             }
 
-            if (!this.dependencyLoaded) {
+            if (!this.mapDependencyLoaded) {
                 return this.$t('Cannot Initialize Map');
             }
 
@@ -80,7 +81,7 @@ export default {
             let isFirstInit = false;
             let centerChanged = false;
 
-            if (!this.mapHolder || !this.mapHolder.dependencyLoaded) {
+            if (!this.mapSupported || !this.mapDependencyLoaded) {
                 return;
             }
 
@@ -104,6 +105,8 @@ export default {
 
             if (!this.mapHolder.inited) {
                 initMapInstance(this.mapHolder, this.$refs.map, {
+                    initCenter: this.initCenter,
+                    zoomLevel: this.zoomLevel,
                     text: {
                         zoomIn: this.$t('Zoom in'),
                         zoomOut: this.$t('Zoom out'),

@@ -23,6 +23,10 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
 		}
 
+		if config.GoogleMapAPIKey != "" {
+			settingsArr = append(settingsArr, buildStringSetting("gmak", config.GoogleMapAPIKey))
+		}
+
 		if config.BaiduMapAK != "" {
 			settingsArr = append(settingsArr, buildStringSetting("bmak", config.BaiduMapAK))
 		}

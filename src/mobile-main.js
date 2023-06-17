@@ -201,6 +201,16 @@ registerComponents(app);
 app.use(pinia);
 app.use(i18n);
 
+function getCurrentLanguageInfo() {
+    const locale = getLanguageInfo(i18n.global.locale);
+
+    if (locale) {
+        return locale;
+    }
+
+    return getDefaultLanguage();
+}
+
 function setLanguage(locale, force) {
     if (!locale) {
         locale = getDefaultLanguage();
@@ -335,6 +345,7 @@ app.config.globalProperties.$locale = {
     formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18n.global.t, userStore.currentUserShortDateFormat)),
     isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18n.global.t, userStore.currentUserLongTimeFormat),
     isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18n.global.t, userStore.currentUserShortTimeFormat),
+    getCurrentLanguageInfo: getCurrentLanguageInfo,
     setLanguage: setLanguage,
     getTimezone: settings.getTimezone,
     setTimezone: setTimezone,

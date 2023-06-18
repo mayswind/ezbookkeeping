@@ -159,6 +159,14 @@ export function base64encode(arrayBuffer) {
     return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
 }
 
+export function base64decode(str) {
+    if (!str) {
+        return '';
+    }
+
+    return atob(str);
+}
+
 export function arrayBufferToString(arrayBuffer) {
     return String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
 }

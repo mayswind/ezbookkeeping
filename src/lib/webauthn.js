@@ -4,7 +4,8 @@ import {
     isFunction,
     stringToArrayBuffer,
     arrayBufferToString,
-    base64encode
+    base64encode,
+    base64decode
 } from './common.js';
 import {
     generateRandomString
@@ -84,7 +85,7 @@ function registerCredential({ username, secret }, { nickname }) {
         const clientData = rawCredential ? parseClientData(rawCredential) : null;
         const publicKey = rawCredential ? parsePublicKeyFromAttestationData(rawCredential) : null;
 
-        const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
+        const challengeFromClientData = clientData && clientData.challenge ? base64decode(clientData.challenge) : null;
 
         logger.debug('webauthn create raw response', rawCredential);
 
@@ -146,7 +147,7 @@ function verifyCredential({ username }, credentialId) {
         challenge: stringToArrayBuffer(challenge),
         rpId: window.location.hostname
     });
-    publicKeyCredentialRequestOptions.allowCredentials[0].id = stringToArrayBuffer(atob(credentialId));
+    publicKeyCredentialRequestOptions.allowCredentials[0].id = stringToArrayBuffer(base64decode(credentialId));
 
     logger.debug('webauthn get options', publicKeyCredentialRequestOptions);
 
@@ -154,7 +155,7 @@ function verifyCredential({ username }, credentialId) {
         publicKey: publicKeyCredentialRequestOptions
     }).then(rawCredential => {
         const clientData = rawCredential ? parseClientData(rawCredential) : null;
-        const challengeFromClientData = clientData && clientData.challenge ? atob(clientData.challenge) : null;
+        const challengeFromClientData = clientData && clientData.challenge ? base64decode(clientData.challenge) : null;
         const userIdParts = rawCredential && rawCredential.response && rawCredential.response.userHandle ? arrayBufferToString(rawCredential.response.userHandle).split('|') : null;
 
         logger.debug('webauthn get raw response', rawCredential);

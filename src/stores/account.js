@@ -6,7 +6,7 @@ import { useExchangeRatesStore } from './exchangeRates.js';
 import accountConstants from '@/consts/account.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber } from '@/lib/common.js';
+import { isNumber, isEquals } from '@/lib/common.js';
 import { getCategorizedAccounts, getAllFilteredAccountsBalance } from '@/lib/account.js';
 
 function loadAccountList(state, accounts) {
@@ -537,11 +537,16 @@ export const useAccountsStore = defineStore('accounts', {
                         return;
                     }
 
-                    loadAccountList(self, data.result);
-
                     if (self.accountListStateInvalid) {
                         self.updateAccountListInvalidState(false);
                     }
+
+                    if (force && data.result && isEquals(self.allAccounts, data.result)) {
+                        reject({ message: 'Account list is up to date' });
+                        return;
+                    }
+
+                    loadAccountList(self, data.result);
 
                     resolve(data.result);
                 }).catch(error => {

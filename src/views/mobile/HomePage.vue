@@ -353,14 +353,19 @@ export default {
         },
         reload(done) {
             const self = this;
+            const force = !!done;
 
             self.overviewStore.loadTransactionOverview({
                 defaultCurrency: self.defaultCurrency,
                 dateRange: self.dateRange,
-                force: true
+                force: force
             }).then(() => {
                 if (done) {
                     done();
+                }
+
+                if (force) {
+                    self.$toast('Data has been updated');
                 }
             }).catch(error => {
                 if (done) {

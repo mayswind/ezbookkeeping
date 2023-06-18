@@ -242,12 +242,17 @@ export default {
             }
 
             const self = this;
+            const force = !!done;
 
             self.transactionCategoriesStore.loadAllCategories({
-                force: true
+                force: force
             }).then(() => {
                 if (done) {
                     done();
+                }
+
+                if (force) {
+                    self.$toast('Category list has been updated');
                 }
             }).catch(error => {
                 if (done) {

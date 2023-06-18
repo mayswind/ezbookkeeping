@@ -267,12 +267,17 @@ export default {
             }
 
             const self = this;
+            const force = !!done;
 
             self.accountsStore.loadAllAccounts({
-                force: true
+                force: force
             }).then(() => {
                 if (done) {
                     done();
+                }
+
+                if (force) {
+                    self.$toast('Account list has been updated');
                 }
             }).catch(error => {
                 if (done) {

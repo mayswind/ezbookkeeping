@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { isEquals } from '@/lib/common.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 
@@ -85,11 +86,16 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
                         return;
                     }
 
-                    loadTransactionTagList(self, data.result);
-
                     if (self.transactionTagListStateInvalid) {
                         self.updateTransactionTagListInvalidState(false);
                     }
+
+                    if (force && data.result && isEquals(self.allTransactionTags, data.result)) {
+                        reject({ message: 'Tag list is up to date' });
+                        return;
+                    }
+
+                    loadTransactionTagList(self, data.result);
 
                     resolve(data.result);
                 }).catch(error => {

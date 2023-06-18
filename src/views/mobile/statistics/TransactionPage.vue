@@ -496,6 +496,7 @@ export default {
         },
         reload(done) {
             const self = this;
+            const force = !!done;
             let dispatchPromise = null;
 
             if (self.query.chartDataType === self.allChartDataTypes.ExpenseByAccount.type ||
@@ -510,7 +511,7 @@ export default {
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
                 dispatchPromise = self.accountsStore.loadAllAccounts({
-                    force: true
+                    force: force
                 });
             }
 
@@ -518,6 +519,10 @@ export default {
                 dispatchPromise.then(() => {
                     if (done) {
                         done();
+                    }
+
+                    if (force) {
+                        self.$toast('Data has been updated');
                     }
                 }).catch(error => {
                     if (done) {

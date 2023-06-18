@@ -590,6 +590,7 @@ export default {
         },
         reload(done) {
             const self = this;
+            const force = !!done;
 
             if (!done) {
                 self.loading = true;
@@ -601,12 +602,17 @@ export default {
             ]).then(() => {
                 return self.transactionsStore.loadTransactions({
                     reload: true,
+                    force: force,
                     autoExpand: true,
                     defaultCurrency: self.defaultCurrency
                 });
             }).then(() => {
                 if (done) {
                     done();
+                }
+
+                if (force) {
+                    self.$toast('Data has been updated');
                 }
 
                 self.loading = false;

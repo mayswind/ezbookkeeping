@@ -238,12 +238,17 @@ export default {
             }
 
             const self = this;
+            const force = !!done;
 
             self.transactionTagsStore.loadAllTags({
-                force: true
+                force: force
             }).then(() => {
                 if (done) {
                     done();
+                }
+
+                if (force) {
+                    self.$toast('Tag list has been updated');
                 }
             }).catch(error => {
                 if (done) {

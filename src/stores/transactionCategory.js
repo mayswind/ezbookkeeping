@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import categoryConstants from '@/consts/category.js';
+import { isEquals } from '@/lib/common.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 
@@ -179,11 +180,16 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                         }
                     }
 
-                    loadTransactionCategoryList(self, data.result);
-
                     if (self.transactionCategoryListStateInvalid) {
                         self.updateTransactionCategoryListInvalidState(false);
                     }
+
+                    if (force && data.result && isEquals(self.allTransactionCategories, data.result)) {
+                        reject({ message: 'Category list is up to date' });
+                        return;
+                    }
+
+                    loadTransactionCategoryList(self, data.result);
 
                     resolve(data.result);
                 }).catch(error => {

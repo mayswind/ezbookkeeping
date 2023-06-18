@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 
 import { useExchangeRatesStore } from './exchangeRates.js';
 
+import { isNumber, isEquals } from '@/lib/common.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber } from '@/lib/common.js';
 
 export const useOverviewStore = defineStore('overview', {
     state: () => ({
@@ -91,11 +91,16 @@ export const useOverviewStore = defineStore('overview', {
                         item.incompleteExpenseAmount = hasUnCalculatedTotalExpense;
                     }
 
-                    self.transactionOverview = overview;
-
                     if (self.transactionOverviewStateInvalid) {
                         self.updateTransactionOverviewInvalidState(false);
                     }
+
+                    if (force && overview && isEquals(self.transactionOverview, overview)) {
+                        reject({ message: 'Data is up to date' });
+                        return;
+                    }
+
+                    self.transactionOverview = overview;
 
                     resolve(overview);
                 }).catch(error => {

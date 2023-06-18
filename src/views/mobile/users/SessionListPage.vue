@@ -48,6 +48,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
 import iconConstants from '@/consts/icon.js';
+import { isEquals } from '@/lib/common.js';
 import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
 
 import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
@@ -116,6 +117,12 @@ export default {
             self.tokensStore.getAllTokens().then(tokens => {
                 if (done) {
                     done();
+                }
+
+                if (isEquals(self.tokens, tokens)) {
+                    self.$toast('Session list is up to date');
+                } else {
+                    self.$toast('Session list has been updated');
                 }
 
                 self.tokens = tokens;

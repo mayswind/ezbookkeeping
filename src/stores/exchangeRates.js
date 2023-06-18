@@ -81,7 +81,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', {
 
                     const currentData = getExchangeRatesFromLocalStorage();
 
-                    if (currentData && currentData.data && isEquals(currentData.data, data.result)) {
+                    if (force && currentData && currentData.data && isEquals(currentData.data, data.result)) {
                         reject({ message: 'Exchange rates data is up to date' });
                         return;
                     }

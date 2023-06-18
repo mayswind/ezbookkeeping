@@ -413,9 +413,9 @@ export default {
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
         if (language) {
-            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&language=${language}&callback=${callbackFnName}`;
+            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&language=${language}&callback=${callbackFnName}`;
         } else {
-            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&callback=${callbackFnName}`;
+            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
         }
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {

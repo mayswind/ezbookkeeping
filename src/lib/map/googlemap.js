@@ -1,5 +1,5 @@
-import { asyncLoadAssets } from "@/lib/misc.js";
-import services from "@/lib/services.js";
+import { asyncLoadAssets } from '@/lib/misc.js';
+import services from '@/lib/services.js';
 
 const googleMapHolder = {
     googleMap: null,

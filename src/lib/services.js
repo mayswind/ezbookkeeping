@@ -407,11 +407,13 @@ export default {
         return url;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
+        let url = `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
+
         if (language) {
-            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&language=${language}&callback=${callbackFnName}`;
-        } else {
-            return `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
+            url = url + `&language=${language}`;
         }
+
+        return url;
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
         return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;

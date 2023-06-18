@@ -1,5 +1,5 @@
-import { asyncLoadAssets } from "@/lib/misc.js";
-import services from "@/lib/services.js";
+import { asyncLoadAssets } from '@/lib/misc.js';
+import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 
 const baiduMapHolder = {
@@ -59,6 +59,7 @@ export function createBaiduMapInstance(mapHolder, mapContainer, options) {
 
     mapHolder.baiduMapInstance = baiduMapInstance;
     mapHolder.baiduMapConverter = new BMap.Convertor();
+    mapHolder.baiduMapNavigationControl = baiduMapNavigationControl;
     mapHolder.inited = true;
 }
 

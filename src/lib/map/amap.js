@@ -62,17 +62,13 @@ export function createAmapInstance(mapHolder, mapContainer, options) {
         jogEnable: false
     });
 
-    AMap.plugin([
-        'AMap.ToolBar'
-    ], function() {
-        mapHolder.amapToolbar = new AMap.ToolBar({
-            position: 'LT'
-        });
-
-        amapInstance.addControl(mapHolder.amapToolbar);
+    const amapToolbar = new AMap.ToolBar({
+        position: 'LT'
     });
+    amapInstance.addControl(amapToolbar);
 
     mapHolder.amapInstance = amapInstance;
+    mapHolder.amapToolbar = amapToolbar;
     mapHolder.inited = true;
 }
 

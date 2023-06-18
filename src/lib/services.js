@@ -422,7 +422,7 @@ export default {
         return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;
     },
     generateAmapJavascriptUrl: (callbackFnName) => {
-        return `${api.amapJavascriptUrl}&key=${settings.getAmapApplicationKey()}&callback=${callbackFnName}`;
+        return `${api.amapJavascriptUrl}&key=${settings.getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: () => {
         return `${window.location.origin}${api.baseAmapApiProxyUrlPath}`;

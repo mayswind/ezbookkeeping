@@ -152,27 +152,35 @@ func startWebServer(c *cli.Context) error {
 		}
 	}
 
+	if config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
+		amapApiProxyRoute := router.Group("/_AMapService")
+		amapApiProxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByCookie))
+		{
+			amapApiProxyRoute.GET("/*action", bindProxy(api.AmapApis.AmapApiProxyHandler))
+		}
+	}
+
 	apiRoute := router.Group("/api")
 
 	apiRoute.Use(bindMiddleware(middlewares.RequestId(config)))
 	apiRoute.Use(bindMiddleware(middlewares.RequestLog))
 	{
-		apiRoute.POST("/authorize.json", bindApi(api.Authorizations.AuthorizeHandler))
+		apiRoute.POST("/authorize.json", bindApiWithTokenUpdate(api.Authorizations.AuthorizeHandler, config))
 
 		if config.EnableTwoFactor {
 			twoFactorRoute := apiRoute.Group("/2fa")
 			twoFactorRoute.Use(bindMiddleware(middlewares.JWTTwoFactorAuthorization))
 			{
-				twoFactorRoute.POST("/authorize.json", bindApi(api.Authorizations.TwoFactorAuthorizeHandler))
-				twoFactorRoute.POST("/recovery.json", bindApi(api.Authorizations.TwoFactorAuthorizeByRecoveryCodeHandler))
+				twoFactorRoute.POST("/authorize.json", bindApiWithTokenUpdate(api.Authorizations.TwoFactorAuthorizeHandler, config))
+				twoFactorRoute.POST("/recovery.json", bindApiWithTokenUpdate(api.Authorizations.TwoFactorAuthorizeByRecoveryCodeHandler, config))
 			}
 		}
 
 		if config.EnableUserRegister {
-			apiRoute.POST("/register.json", bindApi(api.Users.UserRegisterHandler))
+			apiRoute.POST("/register.json", bindApiWithTokenUpdate(api.Users.UserRegisterHandler, config))
 		}
 
-		apiRoute.GET("/logout.json", bindApi(api.Tokens.TokenRevokeCurrentHandler))
+		apiRoute.GET("/logout.json", bindApiWithTokenUpdate(api.Tokens.TokenRevokeCurrentHandler, config))
 
 		apiV1Route := apiRoute.Group("/v1")
 		apiV1Route.Use(bindMiddleware(middlewares.JWTAuthorization))
@@ -181,17 +189,17 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler))
 			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler))
-			apiV1Route.POST("/tokens/refresh.json", bindApi(api.Tokens.TokenRefreshHandler))
+			apiV1Route.POST("/tokens/refresh.json", bindApiWithTokenUpdate(api.Tokens.TokenRefreshHandler, config))
 
 			// Users
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler))
-			apiV1Route.POST("/users/profile/update.json", bindApi(api.Users.UserUpdateProfileHandler))
+			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))
 
 			// Two Factor Authorization
 			if config.EnableTwoFactor {
 				apiV1Route.GET("/users/2fa/status.json", bindApi(api.TwoFactorAuthorizations.TwoFactorStatusHandler))
 				apiV1Route.POST("/users/2fa/enable/request.json", bindApi(api.TwoFactorAuthorizations.TwoFactorEnableRequestHandler))
-				apiV1Route.POST("/users/2fa/enable/confirm.json", bindApi(api.TwoFactorAuthorizations.TwoFactorEnableConfirmHandler))
+				apiV1Route.POST("/users/2fa/enable/confirm.json", bindApiWithTokenUpdate(api.TwoFactorAuthorizations.TwoFactorEnableConfirmHandler, config))
 				apiV1Route.POST("/users/2fa/disable.json", bindApi(api.TwoFactorAuthorizations.TwoFactorDisableHandler))
 				apiV1Route.POST("/users/2fa/recovery/regenerate.json", bindApi(api.TwoFactorAuthorizations.TwoFactorRecoveryCodeRegenerateHandler))
 			}
@@ -291,6 +299,23 @@ func bindApi(fn core.ApiHandlerFunc) gin.HandlerFunc {
 	}
 }
 
+func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		result, err := fn(c)
+
+		if err == nil && config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
+			middlewares.AmapApiProxyAuthCookie(c, config)
+		}
+
+		if err != nil {
+			utils.PrintJsonErrorResult(c, err)
+		} else {
+			utils.PrintJsonSuccessResult(c, result)
+		}
+	}
+}
+
 func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		c := core.WrapContext(ginCtx)
@@ -307,12 +332,7 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 func bindProxy(fn core.ProxyHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		c := core.WrapContext(ginCtx)
-		proxy, err := fn(c)
-
-		if err != nil {
-			utils.PrintDataErrorResult(c, "text/text", err)
-		} else {
-			proxy.ServeHTTP(c.Writer, c.Request)
-		}
+		proxy := fn(c)
+		proxy.ServeHTTP(c.Writer, c.Request)
 	}
 }

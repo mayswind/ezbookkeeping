@@ -16,4 +16,4 @@ type ApiHandlerFunc func(*Context) (interface{}, *errs.Error)
 type DataHandlerFunc func(*Context) ([]byte, string, *errs.Error)
 
 // ProxyHandlerFunc represents the reverse proxy handler function
-type ProxyHandlerFunc func(*Context) (*httputil.ReverseProxy, *errs.Error)
+type ProxyHandlerFunc func(*Context) *httputil.ReverseProxy

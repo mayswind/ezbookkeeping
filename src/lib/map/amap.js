@@ -1,6 +1,6 @@
-import { asyncLoadAssets } from "@/lib/misc.js";
-import services from "@/lib/services.js";
-import settings from "@/lib/settings.js";
+import { asyncLoadAssets } from '@/lib/misc.js';
+import services from '@/lib/services.js';
+import settings from '@/lib/settings.js';
 import logger from '@/lib/logger.js';
 
 const amapHolder = {
@@ -15,7 +15,11 @@ export function loadAmapAssets() {
     if (!window._AMapSecurityConfig) {
         const amapSecurityConfig = {};
 
-        if (settings.getAmapSecurityVerificationMethod() === 'plain') {
+        if (settings.getAmapSecurityVerificationMethod() === 'internalproxy') {
+            amapSecurityConfig.serviceHost = services.generateAmapApiInternalProxyUrl();
+        } else if (settings.getAmapSecurityVerificationMethod() === 'externalproxy') {
+            amapSecurityConfig.serviceHost = settings.getAmapApiExternalProxyUrl();
+        } else if (settings.getAmapSecurityVerificationMethod() === 'plaintext') {
             amapSecurityConfig.securityJsCode = settings.getAmapApplicationSecret();
         }
 

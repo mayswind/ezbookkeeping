@@ -191,6 +191,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Err
 		CreatedUnixTime: oldTokenClaims.IssuedAt,
 	}
 
+	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[token.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)

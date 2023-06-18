@@ -195,6 +195,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.Conte
 		return confirmResp, nil
 	}
 
+	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)

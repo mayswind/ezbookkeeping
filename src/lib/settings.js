@@ -3,6 +3,8 @@ import Cookies from 'js-cookie';
 import currencyConstants from '@/consts/currency.js';
 import statisticsConstants from '@/consts/statistics.js';
 
+import { base64decode } from '@/lib/common.js';
+
 const settingsLocalStorageKey = 'ebk_app_settings';
 const serverSettingsCookieKey = 'ebk_server_settings';
 
@@ -119,6 +121,16 @@ function getServerSetting(key) {
     return undefined;
 }
 
+function getServerDecodedSetting(key) {
+    const value = getServerSetting(key);
+
+    if (!value) {
+        return value;
+    }
+
+    return decodeURIComponent(base64decode(value));
+}
+
 function clearSettings() {
     localStorage.removeItem(settingsLocalStorageKey);
 }
@@ -169,10 +181,11 @@ export default {
     isDataExportingEnabled: () => getServerSetting('e') === '1',
     getMapProvider: () => getServerSetting('m'),
     isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
-    getGoogleMapAPIKey: () => getServerSetting('gmak'),
-    getBaiduMapAK: () => getServerSetting('bmak'),
-    getAmapApplicationKey: () => getServerSetting('amak'),
+    getGoogleMapAPIKey: () => getServerDecodedSetting('gmak'),
+    getBaiduMapAK: () => getServerDecodedSetting('bmak'),
+    getAmapApplicationKey: () => getServerDecodedSetting('amak'),
     getAmapSecurityVerificationMethod: () => getServerSetting('amsv'),
-    getAmapApplicationSecret: () => getServerSetting('amas'),
+    getAmapApiExternalProxyUrl: () => getServerDecodedSetting('amep'),
+    getAmapApplicationSecret: () => getServerDecodedSetting('amas'),
     clearSettings: clearSettings
 };

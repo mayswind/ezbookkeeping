@@ -74,6 +74,10 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 		return nil, errs.ErrTokenGenerating
 	}
 
+	if !twoFactorEnable {
+		c.SetTextualToken(token)
+	}
+
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logined, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
@@ -126,6 +130,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 		return nil, errs.ErrTokenGenerating
 	}
 
+	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
@@ -184,6 +189,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 		return nil, errs.ErrTokenGenerating
 	}
 
+	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)

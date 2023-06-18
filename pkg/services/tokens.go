@@ -73,6 +73,11 @@ func (s *TokenService) ParseTokenByArgument(c *core.Context, tokenParameterName 
 	return s.parseToken(c, request.ArgumentExtractor{tokenParameterName})
 }
 
+// ParseTokenByCookie returns the token model according to request data
+func (s *TokenService) ParseTokenByCookie(c *core.Context, tokenCookieName string) (*jwt.Token, *core.UserTokenClaims, error) {
+	return s.parseToken(c, utils.CookieExtractor{tokenCookieName})
+}
+
 // CreateToken generates a new normal token and saves to database
 func (s *TokenService) CreateToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
 	return s.createToken(user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(ctx), s.CurrentConfig().TokenExpiredTimeDuration)

@@ -85,6 +85,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	}
 
 	authResp.Token = token
+	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"uid:%d\" has logined, token will be expired at %d", user.Uid, claims.ExpiresAt)
@@ -272,6 +273,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		}
 
 		resp.NewToken = token
+		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
 
 		log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)

@@ -9,6 +9,7 @@ import (
 )
 
 const requestIdFieldKey = "REQUEST_ID"
+const textualTokenFieldKey = "TOKEN_STRING"
 const tokenClaimsFieldKey = "TOKEN_CLAIMS"
 const responseErrorFieldKey = "RESPONSE_ERROR"
 
@@ -37,7 +38,23 @@ func (c *Context) GetRequestId() string {
 	return requestId.(string)
 }
 
-// SetTokenClaims sets the given user token id to context
+// SetTextualToken sets the given user token to context
+func (c *Context) SetTextualToken(token string) {
+	c.Set(textualTokenFieldKey, token)
+}
+
+// GetTextualToken returns the current user textual token
+func (c *Context) GetTextualToken() string {
+	token, exists := c.Get(textualTokenFieldKey)
+
+	if !exists {
+		return ""
+	}
+
+	return token.(string)
+}
+
+// SetTokenClaims sets the given user token to context
 func (c *Context) SetTokenClaims(claims *UserTokenClaims) {
 	c.Set(tokenClaimsFieldKey, claims)
 }

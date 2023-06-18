@@ -7,7 +7,6 @@ import (
 	"net/url"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/%s/%s/%s" // https://tile.openstreetmap.org/{z}/{x}/{y}.png
@@ -22,7 +21,7 @@ var (
 )
 
 // OpenStreetMapTileImageProxyHandler returns open street map tile image
-func (p *MapImageProxy) OpenStreetMapTileImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
+func (p *MapImageProxy) OpenStreetMapTileImageProxyHandler(c *core.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		zoomLevel := c.Param("zoomLevel")
 		coordinateX := c.Param("coordinateX")
@@ -36,5 +35,5 @@ func (p *MapImageProxy) OpenStreetMapTileImageProxyHandler(c *core.Context) (*ht
 		req.Host = imageUrl.Host
 	}
 
-	return &httputil.ReverseProxy{Director: director}, nil
+	return &httputil.ReverseProxy{Director: director}
 }

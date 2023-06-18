@@ -1,7 +1,9 @@
 package middlewares
 
 import (
+	"encoding/base64"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -19,27 +21,31 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			buildStringSetting("m", config.MapProvider),
 		}
 
-		if config.EnableMapDataFetchProxy {
+		if config.MapProvider == settings.OpenStreetMapProvider && config.EnableMapDataFetchProxy {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
 		}
 
-		if config.GoogleMapAPIKey != "" {
-			settingsArr = append(settingsArr, buildStringSetting("gmak", config.GoogleMapAPIKey))
+		if config.MapProvider == settings.GoogleMapProvider && config.GoogleMapAPIKey != "" {
+			settingsArr = append(settingsArr, buildEncodedStringSetting("gmak", config.GoogleMapAPIKey))
 		}
 
-		if config.BaiduMapAK != "" {
-			settingsArr = append(settingsArr, buildStringSetting("bmak", config.BaiduMapAK))
+		if config.MapProvider == settings.BaiduMapProvider && config.BaiduMapAK != "" {
+			settingsArr = append(settingsArr, buildEncodedStringSetting("bmak", config.BaiduMapAK))
 		}
 
-		if config.AMapApplicationKey != "" {
-			settingsArr = append(settingsArr, buildStringSetting("amak", config.AMapApplicationKey))
+		if config.MapProvider == settings.AmapProvider && config.AmapApplicationKey != "" {
+			settingsArr = append(settingsArr, buildEncodedStringSetting("amak", config.AmapApplicationKey))
 		}
 
-		if config.AMapSecurityVerificationMethod != "" {
-			settingsArr = append(settingsArr, buildStringSetting("amsv", config.AMapSecurityVerificationMethod))
+		if config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod != "" {
+			settingsArr = append(settingsArr, buildStringSetting("amsv", strings.Replace(config.AmapSecurityVerificationMethod, "_", "", -1)))
 
-			if config.AMapSecurityVerificationMethod == settings.AmapSecurityVerificationPlainMethod {
-				settingsArr = append(settingsArr, buildStringSetting("amas", config.AMapApplicationSecret))
+			if config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationExternalProxyMethod {
+				settingsArr = append(settingsArr, buildEncodedStringSetting("amep", config.AmapApiExternalProxyUrl))
+			}
+
+			if config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationPlainTextMethod {
+				settingsArr = append(settingsArr, buildEncodedStringSetting("amas", config.AmapApplicationSecret))
 			}
 		}
 
@@ -51,7 +57,13 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 }
 
 func buildStringSetting(key string, value string) string {
-	return fmt.Sprintf("%s.%s", key, strings.Replace(value, ".", "-", -1))
+	return fmt.Sprintf("%s.%s", key, value)
+}
+
+func buildEncodedStringSetting(key string, value string) string {
+	urlEncodedValue := url.QueryEscape(value)
+	base64Value := base64.StdEncoding.EncodeToString([]byte(urlEncodedValue))
+	return fmt.Sprintf("%s.%s", key, base64Value)
 }
 
 func buildBooleanSetting(key string, value bool) string {

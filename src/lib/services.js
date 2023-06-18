@@ -423,5 +423,8 @@ export default {
     },
     generateAmapJavascriptUrl: (callbackFnName) => {
         return `${api.amapJavascriptUrl}&key=${settings.getAmapApplicationKey()}&callback=${callbackFnName}`;
+    },
+    generateAmapApiInternalProxyUrl: () => {
+        return `${window.location.origin}${api.baseAmapApiProxyUrlPath}`;
     }
 };

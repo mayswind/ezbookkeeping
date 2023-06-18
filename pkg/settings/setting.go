@@ -72,7 +72,9 @@ const (
 
 // Amap security verification method
 const (
-	AmapSecurityVerificationPlainMethod string = "plain"
+	AmapSecurityVerificationInternalProxyMethod string = "internal_proxy"
+	AmapSecurityVerificationExternalProxyMethod string = "external_proxy"
+	AmapSecurityVerificationPlainTextMethod     string = "plain_text"
 )
 
 // Exchange rates data source types
@@ -186,9 +188,10 @@ type Config struct {
 	MapProvider                    string
 	GoogleMapAPIKey                string
 	BaiduMapAK                     string
-	AMapApplicationKey             string
-	AMapSecurityVerificationMethod string
-	AMapApplicationSecret          string
+	AmapApplicationKey             string
+	AmapSecurityVerificationMethod string
+	AmapApplicationSecret          string
+	AmapApiExternalProxyUrl        string
 	EnableMapDataFetchProxy        bool
 
 	// Exchange Rates
@@ -462,15 +465,20 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
 	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
-	config.AMapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")
+	config.AmapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")
 
-	if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationPlainMethod {
-		config.AMapSecurityVerificationMethod = AmapSecurityVerificationPlainMethod
+	if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationInternalProxyMethod {
+		config.AmapSecurityVerificationMethod = AmapSecurityVerificationInternalProxyMethod
+	} else if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationExternalProxyMethod {
+		config.AmapSecurityVerificationMethod = AmapSecurityVerificationExternalProxyMethod
+	} else if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationPlainTextMethod {
+		config.AmapSecurityVerificationMethod = AmapSecurityVerificationPlainTextMethod
 	} else {
 		return errs.ErrInvalidAmapSecurityVerificationMethod
 	}
 
-	config.AMapApplicationSecret = getConfigItemStringValue(configFile, sectionName, "amap_application_secret")
+	config.AmapApplicationSecret = getConfigItemStringValue(configFile, sectionName, "amap_application_secret")
+	config.AmapApiExternalProxyUrl = getConfigItemStringValue(configFile, sectionName, "amap_api_external_proxy_url")
 
 	return nil
 }

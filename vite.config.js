@@ -139,6 +139,10 @@ export default defineConfig(async () => {
                 '/proxy': {
                     target: 'http://127.0.0.1:8080/',
                     changeOrigin: true
+                },
+                '/_AMapService': {
+                    target: 'http://127.0.0.1:8080/',
+                    changeOrigin: true
                 }
             }
         },

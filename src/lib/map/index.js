@@ -1,4 +1,5 @@
-import settings from "@/lib/settings.js";
+import mapConstants from '@/consts/map.js';
+import settings from '@/lib/settings.js';
 
 import {
     loadLeafletMapAssets,
@@ -7,7 +8,7 @@ import {
     setLeafletMapCenterTo,
     setLeafletMapCenterMaker,
     removeLeafletMapCenterMaker
-} from './openstreetmap.js';
+} from './leaflet.js';
 
 import {
     loadGoogleMapAssets,
@@ -37,7 +38,7 @@ import {
 } from './amap.js';
 
 export function loadMapAssets(language) {
-    if (settings.getMapProvider() === 'openstreetmap') {
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
         return loadLeafletMapAssets(language);
     } else if (settings.getMapProvider() === 'googlemap') {
         return loadGoogleMapAssets(language);
@@ -49,14 +50,14 @@ export function loadMapAssets(language) {
 }
 
 export function createMapHolder() {
-    if (settings.getMapProvider() === 'openstreetmap') {
-        return createLeafletMapHolder();
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
+        return createLeafletMapHolder(settings.getMapProvider());
     } else if (settings.getMapProvider() === 'googlemap') {
-        return createGoogleMapHolder();
+        return createGoogleMapHolder(settings.getMapProvider());
     } else if (settings.getMapProvider() === 'baidumap') {
-        return createBaiduMapHolder();
+        return createBaiduMapHolder(settings.getMapProvider());
     } else if (settings.getMapProvider() === 'amap') {
-        return createAmapHolder();
+        return createAmapHolder(settings.getMapProvider());
     } else {
         return null;
     }
@@ -67,7 +68,7 @@ export function initMapInstance(mapHolder, mapContainer, options) {
         return;
     }
 
-    if (mapHolder.mapProvider === 'openstreetmap') {
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
         createLeafletMapInstance(mapHolder, mapContainer, options);
     } else if (mapHolder.mapProvider === 'googlemap') {
         createGoogleMapInstance(mapHolder, mapContainer, options);
@@ -83,7 +84,7 @@ export function setMapCenterTo(mapHolder, center, zoomLevel) {
         return;
     }
 
-    if (mapHolder.mapProvider === 'openstreetmap') {
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
         setLeafletMapCenterTo(mapHolder, center, zoomLevel);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterTo(mapHolder, center, zoomLevel);
@@ -99,7 +100,7 @@ export function setMapCenterMarker(mapHolder, position) {
         return;
     }
 
-    if (mapHolder.mapProvider === 'openstreetmap') {
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
         setLeafletMapCenterMaker(mapHolder, position);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterMaker(mapHolder, position);
@@ -115,7 +116,7 @@ export function removeMapCenterMarker(mapHolder) {
         return;
     }
 
-    if (mapHolder.mapProvider === 'openstreetmap') {
+    if (mapConstants.leafletTileSources[settings.getMapProvider()]) {
         removeLeafletMapCenterMaker(mapHolder);
     } else if (mapHolder.mapProvider === 'googlemap') {
         removeGoogleMapCenterMaker(mapHolder);

@@ -396,20 +396,9 @@ export default {
             ignoreError: !!ignoreError
         });
     },
-    generateOpenStreetMapTileImageUrl: () => {
-        if (settings.isMapDataFetchProxyEnabled()) {
-            const token = userState.getToken();
-
-            return {
-                url: api.baseProxyUrlPath + '/openstreetmap/tile/{z}/{x}/{y}.png?token=' + token,
-                subDomains: ''
-            };
-        } else {
-            return {
-                url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subDomains: 'abc'
-            };
-        }
+    generateMapProxyTileImageUrl: (mapProvider) => {
+        const token = userState.getToken();
+        return `${api.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
         if (language) {

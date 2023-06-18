@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -25,7 +26,7 @@ var (
 )
 
 // AmapApiProxyHandler returns amap api response
-func (p *AmapApiProxy) AmapApiProxyHandler(c *core.Context) *httputil.ReverseProxy {
+func (p *AmapApiProxy) AmapApiProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
 	var targetUrl string
 
 	if strings.HasPrefix(c.Request.RequestURI, "/_AMapService/v4/map/styles") {
@@ -56,5 +57,5 @@ func (p *AmapApiProxy) AmapApiProxyHandler(c *core.Context) *httputil.ReversePro
 		req.Host = targetUrl.Host
 	}
 
-	return &httputil.ReverseProxy{Director: director}
+	return &httputil.ReverseProxy{Director: director}, nil
 }

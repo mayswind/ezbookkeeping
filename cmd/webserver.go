@@ -147,7 +147,7 @@ func startWebServer(c *cli.Context) error {
 	{
 		if config.EnableMapDataFetchProxy {
 			if config.MapProvider == settings.OpenStreetMapProvider {
-				proxyRoute.GET("/openstreetmap/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.OpenStreetMapTileImageProxyHandler))
+				proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler))
 			}
 		}
 	}
@@ -332,7 +332,12 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 func bindProxy(fn core.ProxyHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		c := core.WrapContext(ginCtx)
-		proxy := fn(c)
-		proxy.ServeHTTP(c.Writer, c.Request)
+		proxy, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			proxy.ServeHTTP(c.Writer, c.Request)
+		}
 	}
 }

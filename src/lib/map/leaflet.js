@@ -1,4 +1,6 @@
-import services from "@/lib/services.js";
+import mapConstants from '@/consts/map.js';
+import settings from '@/lib/settings.js';
+import services from '@/lib/services.js';
 
 const leafletHolder = {
     leaflet: null
@@ -11,9 +13,9 @@ export function loadLeafletMapAssets() {
     ]);
 }
 
-export function createLeafletMapHolder() {
+export function createLeafletMapHolder(mapProvider) {
     return {
-        mapProvider: 'openstreetmap',
+        mapProvider: mapProvider,
         dependencyLoaded: !!leafletHolder.leaflet,
         inited: false,
         defaultZoomLevel: 14,
@@ -38,11 +40,18 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
         attributionControl: false,
         zoomControl: false
     });
+    let mapTileSource = mapConstants.leafletTileSources[mapHolder.mapProvider];
 
-    const mapTileImageUrl = services.generateOpenStreetMapTileImageUrl();
+    if (settings.isMapDataFetchProxyEnabled()) {
+        const mapProxyTileImageUrl = services.generateMapProxyTileImageUrl(mapHolder.mapProvider);
+        mapTileSource = Object.assign({}, mapTileSource, {
+            tileUrlFormat: mapProxyTileImageUrl,
+            tileUrlSubDomains: ''
+        });
+    }
 
-    const tileLayer = leaflet.tileLayer(mapTileImageUrl.url, {
-        subdomains: mapTileImageUrl.subDomains,
+    const tileLayer = leaflet.tileLayer(mapTileSource.tileUrlFormat, {
+        subdomains: mapTileSource.tileUrlSubDomains,
         maxZoom: 19
     });
     tileLayer.addTo(leafletInstance);
@@ -53,16 +62,18 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
     });
     zoomControl.addTo(leafletInstance);
 
-    const attribution = leaflet.control.attribution({
-        prefix: false
-    });
-    attribution.addAttribution('&copy; <a href="http://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a>');
-    attribution.addTo(leafletInstance);
+    if (mapTileSource.attribution) {
+        const attribution = leaflet.control.attribution({
+            prefix: false
+        });
+        attribution.addAttribution(mapTileSource.attribution);
+        attribution.addTo(leafletInstance);
+        mapHolder.leafletAttribution = attribution;
+    }
 
     mapHolder.leafletInstance = leafletInstance;
     mapHolder.leafletTileLayer = tileLayer;
     mapHolder.leafletZoomControl = zoomControl;
-    mapHolder.leafletAttribution = attribution;
     mapHolder.inited = true;
 }
 

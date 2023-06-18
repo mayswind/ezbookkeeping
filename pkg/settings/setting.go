@@ -64,10 +64,14 @@ const (
 
 // Map provider types
 const (
-	OpenStreetMapProvider string = "openstreetmap"
-	GoogleMapProvider     string = "googlemap"
-	BaiduMapProvider      string = "baidumap"
-	AmapProvider          string = "amap"
+	OpenStreetMapProvider                  string = "openstreetmap"
+	OpenStreetMapHumanitarianStyleProvider string = "openstreetmap_humanitarian"
+	OpenTopoMapProvider                    string = "opentopomap"
+	OPNVKarteMapProvider                   string = "opnvkarte"
+	CyclOSMMapProvider                     string = "cyclosm"
+	GoogleMapProvider                      string = "googlemap"
+	BaiduMapProvider                       string = "baidumap"
+	AmapProvider                           string = "amap"
 )
 
 // Amap security verification method
@@ -452,6 +456,14 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = ""
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
 		config.MapProvider = OpenStreetMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapHumanitarianStyleProvider {
+		config.MapProvider = OpenStreetMapHumanitarianStyleProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenTopoMapProvider {
+		config.MapProvider = OpenTopoMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OPNVKarteMapProvider {
+		config.MapProvider = OPNVKarteMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == CyclOSMMapProvider {
+		config.MapProvider = CyclOSMMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == GoogleMapProvider {
 		config.MapProvider = GoogleMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {

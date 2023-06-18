@@ -18,10 +18,15 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 		settingsArr := []string{
 			buildBooleanSetting("r", config.EnableUserRegister),
 			buildBooleanSetting("e", config.EnableDataExport),
-			buildStringSetting("m", config.MapProvider),
+			buildStringSetting("m", strings.Replace(config.MapProvider, "_", "-", -1)),
 		}
 
-		if config.MapProvider == settings.OpenStreetMapProvider && config.EnableMapDataFetchProxy {
+		if config.EnableMapDataFetchProxy &&
+			(config.MapProvider == settings.OpenStreetMapProvider ||
+				config.MapProvider == settings.OpenStreetMapHumanitarianStyleProvider ||
+				config.MapProvider == settings.OpenTopoMapProvider ||
+				config.MapProvider == settings.OPNVKarteMapProvider ||
+				config.MapProvider == settings.CyclOSMMapProvider) {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
 		}
 

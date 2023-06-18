@@ -14,12 +14,18 @@ export function loadLeafletMapAssets() {
 }
 
 export function createLeafletMapHolder(mapProvider) {
+    const mapTileSource = mapConstants.leafletTileSources[mapProvider];
+
+    if (!mapTileSource) {
+        return null;
+    }
+
     return {
         mapProvider: mapProvider,
         dependencyLoaded: !!leafletHolder.leaflet,
         inited: false,
-        defaultZoomLevel: 14,
-        minZoomLevel: 1,
+        defaultZoomLevel: mapTileSource.defaultZoomLevel,
+        minZoomLevel: mapTileSource.minZoom,
         leafletInstance: null,
         leafletTileLayer: null,
         leafletZoomControl: null,
@@ -52,7 +58,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
 
     const tileLayer = leaflet.tileLayer(mapTileSource.tileUrlFormat, {
         subdomains: mapTileSource.tileUrlSubDomains,
-        maxZoom: 19
+        maxZoom: mapTileSource.maxZoom
     });
     tileLayer.addTo(leafletInstance);
 

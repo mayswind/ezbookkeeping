@@ -150,7 +150,8 @@ func startWebServer(c *cli.Context) error {
 				config.MapProvider == settings.OpenStreetMapHumanitarianStyleProvider ||
 				config.MapProvider == settings.OpenTopoMapProvider ||
 				config.MapProvider == settings.OPNVKarteMapProvider ||
-				config.MapProvider == settings.CyclOSMMapProvider {
+				config.MapProvider == settings.CyclOSMMapProvider ||
+				config.MapProvider == settings.TomTomMapProvider {
 				proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler))
 			}
 		}

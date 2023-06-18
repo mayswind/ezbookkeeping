@@ -181,6 +181,7 @@ export default {
     isDataExportingEnabled: () => getServerSetting('e') === '1',
     getMapProvider: () => getServerSetting('m'),
     isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
+    getTomTomMapAPIKey: () => getServerDecodedSetting('tmak'),
     getGoogleMapAPIKey: () => getServerDecodedSetting('gmak'),
     getBaiduMapAK: () => getServerDecodedSetting('bmak'),
     getAmapApplicationKey: () => getServerDecodedSetting('amak'),

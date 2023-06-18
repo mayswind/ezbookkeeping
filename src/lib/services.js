@@ -396,9 +396,15 @@ export default {
             ignoreError: !!ignoreError
         });
     },
-    generateMapProxyTileImageUrl: (mapProvider) => {
+    generateMapProxyTileImageUrl: (mapProvider, language) => {
         const token = userState.getToken();
-        return `${api.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${api.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+
+        if (language) {
+            url = url + `&language=${language}`;
+        }
+
+        return url;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
         if (language) {

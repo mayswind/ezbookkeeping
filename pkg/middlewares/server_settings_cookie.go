@@ -26,8 +26,13 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 				config.MapProvider == settings.OpenStreetMapHumanitarianStyleProvider ||
 				config.MapProvider == settings.OpenTopoMapProvider ||
 				config.MapProvider == settings.OPNVKarteMapProvider ||
-				config.MapProvider == settings.CyclOSMMapProvider) {
+				config.MapProvider == settings.CyclOSMMapProvider ||
+				config.MapProvider == settings.TomTomMapProvider) {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
+		}
+
+		if config.MapProvider == settings.TomTomMapProvider && config.TomTomMapAPIKey != "" && !config.EnableMapDataFetchProxy {
+			settingsArr = append(settingsArr, buildEncodedStringSetting("tmak", config.TomTomMapAPIKey))
 		}
 
 		if config.MapProvider == settings.GoogleMapProvider && config.GoogleMapAPIKey != "" {

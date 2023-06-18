@@ -46,14 +46,27 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
         attributionControl: false,
         zoomControl: false
     });
-    let mapTileSource = mapConstants.leafletTileSources[mapHolder.mapProvider];
+    let mapTileSource = Object.assign({}, mapConstants.leafletTileSources[mapHolder.mapProvider]);
 
     if (settings.isMapDataFetchProxyEnabled()) {
-        const mapProxyTileImageUrl = services.generateMapProxyTileImageUrl(mapHolder.mapProvider);
-        mapTileSource = Object.assign({}, mapTileSource, {
-            tileUrlFormat: mapProxyTileImageUrl,
-            tileUrlSubDomains: ''
-        });
+        mapTileSource.tileUrlFormat = services.generateMapProxyTileImageUrl(mapHolder.mapProvider, options.language);
+        mapTileSource.tileUrlSubDomains = '';
+    } else if (mapTileSource.tileUrlExtraParams) {
+        const params = [];
+
+        for (let i = 0; i < mapTileSource.tileUrlExtraParams.length; i++) {
+            const param = mapTileSource.tileUrlExtraParams[i];
+
+            if (param.paramValueType === 'tomtom_key') {
+                params.push('key=' + settings.getTomTomMapAPIKey());
+            } else if (param.paramValueType === 'language' && options.language) {
+                params.push('language=' + options.language);
+            }
+        }
+
+        if (params.length) {
+            mapTileSource.tileUrlFormat = mapTileSource.tileUrlFormat + '?' + params.join('&');
+        }
     }
 
     const tileLayer = leaflet.tileLayer(mapTileSource.tileUrlFormat, {

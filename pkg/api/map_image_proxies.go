@@ -17,6 +17,7 @@ const openStreetMapHumanitarianStyleTileImageUrlFormat = "https://a.tile.openstr
 const openTopoMapTileImageUrlFormat = "https://tile.opentopomap.org/%s/%s/%s"                           // https://tile.opentopomap.org/{z}/{x}/{y}.png
 const opnvKarteMapTileImageUrlFormat = "https://tileserver.memomaps.de/tilegen/%s/%s/%s"                // https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png
 const cyclOSMMapTileImageUrlFormat = "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/%s/%s/%s"         // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png
+const tomtomMapTileImageUrlFormat = "https://api.tomtom.com/map/1/tile/basic/main/%s/%s/%s"             // https://api.tomtom.com/map/{versionNumber}/tile/{layer}/{style}/{z}/{x}/{y}.png?key={key}&language={language}
 
 // MapImageProxy represents map image proxy
 type MapImageProxy struct {
@@ -42,6 +43,13 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		targetUrl = opnvKarteMapTileImageUrlFormat
 	} else if mapProvider == settings.CyclOSMMapProvider {
 		targetUrl = cyclOSMMapTileImageUrlFormat
+	} else if mapProvider == settings.TomTomMapProvider {
+		targetUrl = tomtomMapTileImageUrlFormat + "?key=" + settings.Container.Current.TomTomMapAPIKey
+		language := c.Query("language")
+
+		if language != "" {
+			targetUrl = targetUrl + "&language=" + language
+		}
 	} else {
 		return nil, errs.ErrParameterInvalid
 	}

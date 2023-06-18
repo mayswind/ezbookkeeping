@@ -104,7 +104,10 @@ export default {
             }
 
             if (!this.mapHolder.inited) {
+                const languageInfo = this.$locale.getCurrentLanguageInfo();
+                
                 initMapInstance(this.mapHolder, this.$refs.map, {
+                    language: languageInfo ? languageInfo.code : null,
                     initCenter: this.initCenter,
                     zoomLevel: this.zoomLevel,
                     text: {

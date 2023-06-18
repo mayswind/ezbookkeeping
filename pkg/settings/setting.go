@@ -70,6 +70,7 @@ const (
 	OPNVKarteMapProvider                   string = "opnvkarte"
 	CyclOSMMapProvider                     string = "cyclosm"
 	GoogleMapProvider                      string = "googlemap"
+	TomTomMapProvider                      string = "tomtom"
 	BaiduMapProvider                       string = "baidumap"
 	AmapProvider                           string = "amap"
 )
@@ -190,6 +191,7 @@ type Config struct {
 
 	// Map
 	MapProvider                    string
+	TomTomMapAPIKey                string
 	GoogleMapAPIKey                string
 	BaiduMapAK                     string
 	AmapApplicationKey             string
@@ -466,6 +468,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = CyclOSMMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == GoogleMapProvider {
 		config.MapProvider = GoogleMapProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == TomTomMapProvider {
+		config.MapProvider = TomTomMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {
 		config.MapProvider = BaiduMapProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == AmapProvider {
@@ -475,6 +479,7 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	}
 
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+	config.TomTomMapAPIKey = getConfigItemStringValue(configFile, sectionName, "tomtom_map_api_key")
 	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
 	config.AmapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")

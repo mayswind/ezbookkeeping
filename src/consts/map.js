@@ -38,6 +38,24 @@ const leafletTileSources = {
         maxZoom: 19,
         defaultZoomLevel: 14,
         attribution : '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render" class="external" target="_blank">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a> contributors'
+    },
+    'tomtom': {
+        tileUrlFormat: 'https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png',
+        tileUrlSubDomains: 'abcd',
+        tileUrlExtraParams: [
+            {
+                paramName: 'key',
+                paramValueType: 'tomtom_key'
+            },
+            {
+                paramName: 'language',
+                paramValueType: 'language'
+            }
+        ],
+        minZoom: 1,
+        maxZoom: 19,
+        defaultZoomLevel: 14,
+        attribution : '<a href="https://tomtom.com" class="external" target="_blank">&copy;  1992 - 2023 TomTom.</a>'
     }
 }
 

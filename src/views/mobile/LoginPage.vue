@@ -111,6 +111,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { isModalShowing } from '@/lib/ui.mobile.js';
@@ -133,7 +134,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useRootStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -208,7 +209,8 @@ export default {
                 }
 
                 if (authResponse.user && authResponse.user.language) {
-                    self.$locale.setLanguage(authResponse.user.language);
+                    const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
+                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
@@ -260,7 +262,8 @@ export default {
                 self.$hideLoading();
 
                 if (authResponse.user && authResponse.user.language) {
-                    self.$locale.setLanguage(authResponse.user.language);
+                    const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
+                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {
@@ -286,7 +289,8 @@ export default {
             }
         },
         changeLanguage(locale) {
-            this.$locale.setLanguage(locale);
+            const localeDefaultSettings = this.$locale.setLanguage(locale);
+            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
         }
     }
 };

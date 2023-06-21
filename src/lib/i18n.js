@@ -1,22 +1,31 @@
+import moment from 'moment-timezone';
+
 import { defaultLanguage, allLanguages } from '@/locales/index.js';
 import datetime from '@/consts/datetime.js';
 import timezone from '@/consts/timezone.js';
 import currency from '@/consts/currency.js';
-import settings from './settings.js';
+
 import {
     isString,
     isNumber
 } from './common.js';
+
 import {
+    formatUnixTime,
     formatTime,
     getCurrentDateTime,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getDateTimeFormatType
 } from './datetime.js';
+
 import {
     numericCurrencyToString
 } from './currency.js';
+
+import logger from './logger.js';
+import settings from './settings.js';
+import services from './services.js';
 
 const apiNotFoundErrorCode = 100001;
 const specifiedApiNotFoundErrors = {
@@ -139,15 +148,15 @@ const parameterizedErrors = [
     }
 ];
 
-export function getAllLanguageInfos() {
+function getAllLanguageInfos() {
     return allLanguages;
 }
 
-export function getLanguageInfo(locale) {
+function getLanguageInfo(locale) {
     return allLanguages[locale];
 }
 
-export function getDefaultLanguage() {
+function getDefaultLanguage() {
     if (!window || !window.navigator) {
         return defaultLanguage;
     }
@@ -195,15 +204,44 @@ export function getDefaultLanguage() {
     return browserLocale;
 }
 
-export function transateIf(text, isTranslate, translateFn) {
-    if (isTranslate) {
-        return translateFn(text);
+function getLocaleFromLanguageAlias(alias) {
+    for (let locale in allLanguages) {
+        if (!Object.prototype.hasOwnProperty.call(allLanguages, locale)) {
+            continue;
+        }
+
+        if (locale.toLowerCase() === alias.toLowerCase()) {
+            return locale;
+        }
+
+        const lang = allLanguages[locale];
+        const aliases = lang.aliases;
+
+        if (!aliases || aliases.length < 1) {
+            continue;
+        }
+
+        for (let i = 0; i < aliases.length; i++) {
+            if (aliases[i].toLowerCase() === alias.toLowerCase()) {
+                return locale;
+            }
+        }
     }
 
-    return text;
+    return null;
 }
 
-export function getAllLongMonthNames(translateFn) {
+function getCurrentLanguageInfo(i18nGlobal) {
+    const locale = getLanguageInfo(i18nGlobal.locale);
+
+    if (locale) {
+        return locale;
+    }
+
+    return getDefaultLanguage();
+}
+
+function getAllLongMonthNames(translateFn) {
     return [
         translateFn('datetime.January.long'),
         translateFn('datetime.February.long'),
@@ -220,7 +258,7 @@ export function getAllLongMonthNames(translateFn) {
     ];
 }
 
-export function getAllShortMonthNames(translateFn) {
+function getAllShortMonthNames(translateFn) {
     return [
         translateFn('datetime.January.short'),
         translateFn('datetime.February.short'),
@@ -237,7 +275,7 @@ export function getAllShortMonthNames(translateFn) {
     ];
 }
 
-export function getAllLongWeekdayNames(translateFn) {
+function getAllLongWeekdayNames(translateFn) {
     return [
         translateFn('datetime.Sunday.long'),
         translateFn('datetime.Monday.long'),
@@ -249,7 +287,7 @@ export function getAllLongWeekdayNames(translateFn) {
     ];
 }
 
-export function getAllShortWeekdayNames(translateFn) {
+function getAllShortWeekdayNames(translateFn) {
     return [
         translateFn('datetime.Sunday.short'),
         translateFn('datetime.Monday.short'),
@@ -261,7 +299,7 @@ export function getAllShortWeekdayNames(translateFn) {
     ];
 }
 
-export function getAllMinWeekdayNames(translateFn) {
+function getAllMinWeekdayNames(translateFn) {
     return [
         translateFn('datetime.Sunday.min'),
         translateFn('datetime.Monday.min'),
@@ -273,89 +311,120 @@ export function getAllMinWeekdayNames(translateFn) {
     ];
 }
 
-export function getAllLongDateFormats(translateFn) {
+function getAllLongDateFormats(translateFn) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormats(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longDate', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat);
 }
 
-export function getAllShortDateFormats(translateFn) {
+function getAllShortDateFormats(translateFn) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
     return getDateTimeFormats(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortDate', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat);
 }
 
-export function getAllLongTimeFormats(translateFn) {
+function getAllLongTimeFormats(translateFn) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     return getDateTimeFormats(translateFn, datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, 'format.longTime', defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat);
 }
 
-export function getAllShortTimeFormats(translateFn) {
+function getAllShortTimeFormats(translateFn) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
     return getDateTimeFormats(translateFn, datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, 'format.shortTime', defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat);
 }
 
-export function getI18nLongDateFormat(translateFn, formatTypeValue) {
+function getI18nLongDateFormat(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormat(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longDate', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
 }
 
-export function getI18nShortDateFormat(translateFn, formatTypeValue) {
+function getI18nShortDateFormat(translateFn, formatTypeValue) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
     return getDateTimeFormat(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortDate', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
 }
 
-export function getI18nLongYearFormat(translateFn, formatTypeValue) {
+function getI18nLongYearFormat(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormat(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longYear', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
 }
 
-export function getI18nShortYearFormat(translateFn, formatTypeValue) {
+function getI18nShortYearFormat(translateFn, formatTypeValue) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
     return getDateTimeFormat(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortYear', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
 }
 
-export function getI18nLongYearMonthFormat(translateFn, formatTypeValue) {
+function getI18nLongYearMonthFormat(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormat(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longYearMonth', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
 }
 
-export function getI18nShortYearMonthFormat(translateFn, formatTypeValue) {
+function getI18nShortYearMonthFormat(translateFn, formatTypeValue) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
     return getDateTimeFormat(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortYearMonth', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
 }
 
-export function getI18nLongMonthDayFormat(translateFn, formatTypeValue) {
+function getI18nLongMonthDayFormat(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormat(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longMonthDay', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
 }
 
-export function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
+function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
     const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
     return getDateTimeFormat(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortMonthDay', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
 }
 
-export function getI18nLongTimeFormat(translateFn, formatTypeValue) {
+function getI18nLongTimeFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     return getDateTimeFormat(translateFn, datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, 'format.longTime', defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
 }
 
-export function getI18nShortTimeFormat(translateFn, formatTypeValue) {
+function getI18nShortTimeFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
     return getDateTimeFormat(translateFn, datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, 'format.shortTime', defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
 }
 
-export function isLongTime24HourFormat(translateFn, formatTypeValue) {
+function isLongTime24HourFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     const type = getDateTimeFormatType(datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
     return type.is24HourFormat;
 }
 
-export function isShortTime24HourFormat(translateFn, formatTypeValue) {
+function isShortTime24HourFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
     const type = getDateTimeFormatType(datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
     return type.is24HourFormat;
 }
 
-export function getAllTimezones(includeSystemDefault, translateFn) {
+function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType) {
+    const defaultFormat = getDateTimeFormat(translateFn, allFormatMap, allFormatArray,
+        localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, datetime.defaultDateTimeFormatValue);
+    const ret = [];
+
+    ret.push({
+        type: datetime.defaultDateTimeFormatValue,
+        format: defaultFormat,
+        displayName: `${translateFn('Language Default')} (${formatTime(getCurrentDateTime(), defaultFormat)})`
+    });
+
+    for (let i = 0; i < allFormatArray.length; i++) {
+        const formatType = allFormatArray[i];
+        const format = translateFn(`${localeFormatPathPrefix}.${formatType.key}`);
+
+        ret.push({
+            type: formatType.type,
+            format: format,
+            displayName: formatTime(getCurrentDateTime(), format)
+        });
+    }
+
+    return ret;
+}
+
+function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
+    const type = getDateTimeFormatType(allFormatMap, allFormatArray,
+        localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue);
+    return translateFn(`${localeFormatPathPrefix}.${type.key}`);
+}
+
+function getAllTimezones(includeSystemDefault, translateFn) {
     const defaultTimezoneOffset = getTimezoneOffset();
     const defaultTimezoneOffsetMinutes = getTimezoneOffsetMinutes();
     const allTimezones = timezone.all;
@@ -393,7 +462,7 @@ export function getAllTimezones(includeSystemDefault, translateFn) {
     return allTimezoneInfos;
 }
 
-export function getAllCurrencies(translateFn) {
+function getAllCurrencies(translateFn) {
     const allCurrencyCodes = currency.all;
     const allCurrencies = [];
 
@@ -415,7 +484,7 @@ export function getAllCurrencies(translateFn) {
     return allCurrencies;
 }
 
-export function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
+function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
     }
@@ -464,6 +533,86 @@ export function getDisplayCurrency(value, currencyCode, notConvertValue, transla
     }
 }
 
+function setLanguage(i18nGlobal, locale, force) {
+    if (!locale) {
+        locale = getDefaultLanguage();
+        logger.info(`No specified language, use browser default language ${locale}`);
+    }
+
+    if (!getLanguageInfo(locale)) {
+        locale = getDefaultLanguage();
+        logger.warn(`Not found language ${locale}, use browser default language ${locale}`);
+    }
+
+    if (!force && i18nGlobal.locale === locale) {
+        logger.info(`Current locale is already ${locale}`);
+        return null;
+    }
+
+    logger.info(`Apply current language to ${locale}`);
+
+    i18nGlobal.locale = locale;
+    moment.updateLocale(locale, {
+        months : getAllLongMonthNames(i18nGlobal.t),
+        monthsShort : getAllShortMonthNames(i18nGlobal.t),
+        weekdays : getAllLongWeekdayNames(i18nGlobal.t),
+        weekdaysShort : getAllShortWeekdayNames(i18nGlobal.t),
+        weekdaysMin : getAllMinWeekdayNames(i18nGlobal.t),
+        meridiem: function (hours) {
+            if (hours > 11) {
+                return i18nGlobal.t('datetime.PM.upperCase');
+            } else {
+                return i18nGlobal.t('datetime.AM.upperCase');
+            }
+        }
+    });
+    services.setLocale(locale);
+    document.querySelector('html').setAttribute('lang', locale);
+
+    const defaultCurrency = i18nGlobal.t('default.currency');
+    const defaultFirstDayOfWeekName = i18nGlobal.t('default.firstDayOfWeek');
+    let defaultFirstDayOfWeek = datetime.defaultFirstDayOfWeek;
+
+    if (datetime.allWeekDays[defaultFirstDayOfWeekName]) {
+        defaultFirstDayOfWeek = datetime.allWeekDays[defaultFirstDayOfWeekName].type;
+    }
+
+    return {
+        defaultCurrency: defaultCurrency,
+        defaultFirstDayOfWeek: defaultFirstDayOfWeek
+    };
+}
+
+function setTimezone(timezone) {
+    if (timezone) {
+        settings.setTimezone(timezone);
+        moment.tz.setDefault(timezone);
+    } else {
+        settings.setTimezone('');
+        moment.tz.setDefault();
+    }
+}
+
+function initLocale(i18nGlobal, lastUserLanguage) {
+    let localeDefaultSettings = null;
+
+    if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
+        logger.info(`Last user language is ${lastUserLanguage}`);
+        localeDefaultSettings = setLanguage(i18nGlobal, lastUserLanguage, true);
+    } else {
+        localeDefaultSettings = setLanguage(i18nGlobal, null, true);
+    }
+
+    if (settings.getTimezone()) {
+        logger.info(`Current timezone is ${settings.getTimezone()}`);
+        setTimezone(settings.getTimezone());
+    } else {
+        logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
+    }
+
+    return localeDefaultSettings;
+}
+
 export function getI18nOptions() {
     return {
         legacy: true,
@@ -485,6 +634,14 @@ export function getI18nOptions() {
             return messages;
         })()
     };
+}
+
+export function transateIf(text, isTranslate, translateFn) {
+    if (isTranslate) {
+        return translateFn(text);
+    }
+
+    return text;
 }
 
 export function getLocalizedError(error) {
@@ -541,60 +698,43 @@ export function getLocalizedErrorParameters(parameters, i18nFunc) {
     return localizedParameters;
 }
 
-function getLocaleFromLanguageAlias(alias) {
-    for (let locale in allLanguages) {
-        if (!Object.prototype.hasOwnProperty.call(allLanguages, locale)) {
-            continue;
-        }
-
-        if (locale.toLowerCase() === alias.toLowerCase()) {
-            return locale;
-        }
-
-        const lang = allLanguages[locale];
-        const aliases = lang.aliases;
-
-        if (!aliases || aliases.length < 1) {
-            continue;
-        }
-
-        for (let i = 0; i < aliases.length; i++) {
-            if (aliases[i].toLowerCase() === alias.toLowerCase()) {
-                return locale;
-            }
-        }
-    }
-
-    return null;
-}
-
-function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType) {
-    const defaultFormat = getDateTimeFormat(translateFn, allFormatMap, allFormatArray,
-        localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, datetime.defaultDateTimeFormatValue);
-    const ret = [];
-
-    ret.push({
-        type: datetime.defaultDateTimeFormatValue,
-        format: defaultFormat,
-        displayName: `${translateFn('Language Default')} (${formatTime(getCurrentDateTime(), defaultFormat)})`
-    });
-
-    for (let i = 0; i < allFormatArray.length; i++) {
-        const formatType = allFormatArray[i];
-        const format = translateFn(`${localeFormatPathPrefix}.${formatType.key}`);
-
-        ret.push({
-            type: formatType.type,
-            format: format,
-            displayName: formatTime(getCurrentDateTime(), format)
-        });
-    }
-
-    return ret;
-}
-
-function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
-    const type = getDateTimeFormatType(allFormatMap, allFormatArray,
-        localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue);
-    return translateFn(`${localeFormatPathPrefix}.${type.key}`);
+export function i18nFunctions(i18nGlobal) {
+    return {
+        getAllLanguageInfos: getAllLanguageInfos,
+        getLanguageInfo: getLanguageInfo,
+        getDefaultLanguage: getDefaultLanguage,
+        getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
+        getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
+        getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
+        getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),
+        getAllShortWeekdayNames: () => getAllShortWeekdayNames(i18nGlobal.t),
+        getAllMinWeekdayNames: () => getAllMinWeekdayNames(i18nGlobal.t),
+        getAllLongDateFormats: () => getAllLongDateFormats(i18nGlobal.t),
+        getAllShortDateFormats: () => getAllShortDateFormats(i18nGlobal.t),
+        getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
+        getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
+        formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearMonthFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongMonthDayFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortMonthDayFormat(i18nGlobal.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
+        formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
+        formatTimeToLongYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat)),
+        formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18nGlobal.t, userStore.currentUserShortDateFormat)),
+        isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
+        isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),
+        getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
+        getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
+        getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18nGlobal.t),
+        setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
+        getTimezone: settings.getTimezone,
+        setTimezone: setTimezone,
+        initLocale: (lastUserLanguage) => initLocale(i18nGlobal, lastUserLanguage)
+    };
 }

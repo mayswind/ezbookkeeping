@@ -2,8 +2,6 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { createI18n } from 'vue-i18n';
 
-import moment from 'moment-timezone';
-
 import Framework7 from 'framework7/lite';
 import Framework7Dialog from 'framework7/components/dialog';
 import Framework7Popup from 'framework7/components/popup';
@@ -75,48 +73,13 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import datetimeConstants from '@/consts/datetime.js';
-
 import version from '@/lib/version.js';
-import logger from '@/lib/logger.js';
 import settings from '@/lib/settings.js';
-import services from '@/lib/services.js';
 import userstate from '@/lib/userstate.js';
 import {
-    formatUnixTime,
-    formatTime,
-    getTimezoneOffset
-} from '@/lib/datetime.js';
-import {
-    getAllLanguageInfos,
-    getLanguageInfo,
-    getDefaultLanguage,
-    transateIf,
-    getAllLongMonthNames,
-    getAllShortMonthNames,
-    getAllLongWeekdayNames,
-    getAllShortWeekdayNames,
-    getAllMinWeekdayNames,
-    getAllLongDateFormats,
-    getAllShortDateFormats,
-    getAllLongTimeFormats,
-    getAllShortTimeFormats,
-    getI18nLongDateFormat,
-    getI18nShortDateFormat,
-    getI18nLongTimeFormat,
-    getI18nShortTimeFormat,
-    getI18nLongYearFormat,
-    getI18nShortYearFormat,
-    getI18nLongYearMonthFormat,
-    getI18nShortYearMonthFormat,
-    getI18nLongMonthDayFormat,
-    getI18nShortMonthDayFormat,
-    isLongTime24HourFormat,
-    isShortTime24HourFormat,
-    getAllTimezones,
-    getAllCurrencies,
-    getDisplayCurrency,
     getI18nOptions,
+    transateIf,
+    i18nFunctions
 } from '@/lib/i18n.js';
 import {
     showAlert,
@@ -146,9 +109,6 @@ import MapSheet from '@/components/mobile/MapSheet.vue';
 import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSelectionSheet.vue';
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
-
-import { useSettingsStore } from '@/stores/setting.js';
-import { useUserStore } from '@/stores/user.js';
 
 import '@/styles/mobile/font-size-default.css';
 import '@/styles/mobile/font-size-small.css';
@@ -201,95 +161,6 @@ registerComponents(app);
 app.use(pinia);
 app.use(i18n);
 
-function getCurrentLanguageInfo() {
-    const locale = getLanguageInfo(i18n.global.locale);
-
-    if (locale) {
-        return locale;
-    }
-
-    return getDefaultLanguage();
-}
-
-function setLanguage(locale, force) {
-    if (!locale) {
-        locale = getDefaultLanguage();
-        logger.info(`No specified language, use browser default language ${locale}`);
-    }
-
-    if (!getLanguageInfo(locale)) {
-        locale = getDefaultLanguage();
-        logger.warn(`Not found language ${locale}, use browser default language ${locale}`);
-    }
-
-    if (!force && i18n.global.locale === locale) {
-        logger.info(`Current locale is already ${locale}`);
-        return locale;
-    }
-
-    logger.info(`Apply current language to ${locale}`);
-
-    i18n.global.locale = locale;
-    moment.updateLocale(locale, {
-        months : app.config.globalProperties.$locale.getAllLongMonthNames(),
-        monthsShort : app.config.globalProperties.$locale.getAllShortMonthNames(),
-        weekdays : app.config.globalProperties.$locale.getAllLongWeekdayNames(),
-        weekdaysShort : app.config.globalProperties.$locale.getAllShortWeekdayNames(),
-        weekdaysMin : app.config.globalProperties.$locale.getAllMinWeekdayNames(),
-        meridiem: function (hours) {
-            if (hours > 11) {
-                return i18n.global.t('datetime.PM.upperCase');
-            } else {
-                return i18n.global.t('datetime.AM.upperCase');
-            }
-        }
-    });
-    services.setLocale(locale);
-    document.querySelector('html').setAttribute('lang', locale);
-
-    const defaultCurrency = i18n.global.t('default.currency');
-    const defaultFirstDayOfWeekName = i18n.global.t('default.firstDayOfWeek');
-    let defaultFirstDayOfWeek = datetimeConstants.defaultFirstDayOfWeek;
-
-    if (datetimeConstants.allWeekDays[defaultFirstDayOfWeekName]) {
-        defaultFirstDayOfWeek = datetimeConstants.allWeekDays[defaultFirstDayOfWeekName].type;
-    }
-
-    const settingsStore = useSettingsStore();
-    settingsStore.updateLocalizedDefaultSettings({ defaultCurrency, defaultFirstDayOfWeek });
-
-    return locale;
-}
-
-function setTimezone(timezone) {
-    if (timezone) {
-        settings.setTimezone(timezone);
-        moment.tz.setDefault(timezone);
-    } else {
-        settings.setTimezone('');
-        moment.tz.setDefault();
-    }
-}
-
-function initLocale() {
-    const userStore = useUserStore();
-    const lastUserLanguage = userStore.currentUserLanguage;
-
-    if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
-        logger.info(`Last user language is ${lastUserLanguage}`);
-        setLanguage(lastUserLanguage, true);
-    } else {
-        setLanguage(null, true);
-    }
-
-    if (settings.getTimezone()) {
-        logger.info(`Current timezone is ${settings.getTimezone()}`);
-        setTimezone(settings.getTimezone());
-    } else {
-        logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
-    }
-}
-
 app.component('VueDatePicker', VueDatePicker);
 
 app.component('ItemIcon', ItemIcon);
@@ -316,44 +187,7 @@ app.config.globalProperties.$version = version.getVersion();
 app.config.globalProperties.$buildTime = version.getBuildTime();
 
 app.config.globalProperties.$settings = settings;
-app.config.globalProperties.$locale = {
-    getDefaultLanguage: getDefaultLanguage,
-    getAllLanguageInfos: getAllLanguageInfos,
-    getLanguageInfo: getLanguageInfo,
-    getAllLongMonthNames: () => getAllLongMonthNames(i18n.global.t),
-    getAllShortMonthNames: () => getAllShortMonthNames(i18n.global.t),
-    getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18n.global.t),
-    getAllShortWeekdayNames: () => getAllShortWeekdayNames(i18n.global.t),
-    getAllMinWeekdayNames: () => getAllMinWeekdayNames(i18n.global.t),
-    getAllLongDateFormats: () => getAllLongDateFormats(i18n.global.t),
-    getAllShortDateFormats: () => getAllShortDateFormats(i18n.global.t),
-    getAllLongTimeFormats: () => getAllLongTimeFormats(i18n.global.t),
-    getAllShortTimeFormats: () => getAllShortTimeFormats(i18n.global.t),
-    formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18n.global.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18n.global.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18n.global.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18n.global.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToLongYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortYear: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToLongYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongYearMonthFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortYearMonth: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortYearMonthFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToLongMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongMonthDayFormat(i18n.global.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortMonthDay: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortMonthDayFormat(i18n.global.t, userStore.currentUserShortDateFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToLongTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongTimeFormat(i18n.global.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
-    formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18n.global.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
-    formatTimeToLongYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nLongYearMonthFormat(i18n.global.t, userStore.currentUserLongDateFormat)),
-    formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18n.global.t, userStore.currentUserShortDateFormat)),
-    isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18n.global.t, userStore.currentUserLongTimeFormat),
-    isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18n.global.t, userStore.currentUserShortTimeFormat),
-    getCurrentLanguageInfo: getCurrentLanguageInfo,
-    setLanguage: setLanguage,
-    getTimezone: settings.getTimezone,
-    setTimezone: setTimezone,
-    getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18n.global.t),
-    getAllCurrencies: () => getAllCurrencies(i18n.global.t),
-    getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18n.global.t),
-    initLocale: initLocale
-};
+app.config.globalProperties.$locale = i18nFunctions(i18n.global);
 app.config.globalProperties.$tIf = (text, isTranslate) => transateIf(text, isTranslate, i18n.global.t);
 
 app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);
@@ -364,7 +198,5 @@ app.config.globalProperties.$hideLoading = hideLoading;
 app.config.globalProperties.$routeBackOnError = routeBackOnError;
 
 app.config.globalProperties.$user = userstate;
-
-app.config.globalProperties.$locale.initLocale();
 
 app.mount('#app');

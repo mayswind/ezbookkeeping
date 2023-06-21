@@ -16,9 +16,13 @@ export const useSettingsStore = defineStore('settings', {
         }
     }),
     actions: {
-        updateLocalizedDefaultSettings({ defaultCurrency, defaultFirstDayOfWeek }) {
-            this.defaultSetting.currency = defaultCurrency;
-            this.defaultSetting.firstDayOfWeek = defaultFirstDayOfWeek;
+        updateLocalizedDefaultSettings(localeDefaultSettings) {
+            if (!localeDefaultSettings) {
+                return;
+            }
+
+            this.defaultSetting.currency = localeDefaultSettings.defaultCurrency;
+            this.defaultSetting.firstDayOfWeek = localeDefaultSettings.defaultFirstDayOfWeek;
         }
     }
 });

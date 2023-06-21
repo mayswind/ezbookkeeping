@@ -100,6 +100,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
@@ -119,7 +120,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useRootStore, useUserStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -241,7 +242,9 @@ export default {
                     self.$hideLoading();
 
                     self.$settings.clearSettings();
-                    self.$locale.initLocale();
+
+                    const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                     router.navigate('/');
                 }).catch(error => {

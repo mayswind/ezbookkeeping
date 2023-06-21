@@ -235,7 +235,9 @@ export default {
                 const isFirstWeekDayDefault = this.user.firstDayOfWeek === (datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
 
                 this.user.language = value;
-                this.$locale.setLanguage(value);
+
+                const localeDefaultSettings = this.$locale.setLanguage(value);
+                this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                 if (isCurrencyDefault) {
                     this.user.defaultCurrency = this.settingsStore.defaultSetting.currency;
@@ -354,7 +356,8 @@ export default {
                 }
 
                 if (response.user && response.user.language) {
-                    self.$locale.setLanguage(response.user.language);
+                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
+                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
                 if (self.$settings.isAutoUpdateExchangeRatesData()) {

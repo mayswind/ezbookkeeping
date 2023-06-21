@@ -10,6 +10,8 @@ import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
@@ -89,17 +91,21 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useTokensStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
     },
     created() {
         const self = this;
+
+        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
         if (self.$user.isUserLogined()) {
             if (!self.$settings.isEnableApplicationLock()) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
-                        self.$locale.setLanguage(response.user.language);
+                        localeDefaultSettings = self.$locale.setLanguage(response.user.language);
+                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }
                 });
 

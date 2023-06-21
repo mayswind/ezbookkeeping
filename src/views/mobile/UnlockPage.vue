@@ -59,6 +59,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
@@ -77,7 +78,7 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useRootStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -126,7 +127,8 @@ export default {
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
-                        self.$locale.setLanguage(response.user.language);
+                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
+                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }
                 });
 
@@ -173,7 +175,8 @@ export default {
                 self.$user.unlockTokenByPinCode(user.username, pinCode);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
-                        self.$locale.setLanguage(response.user.language);
+                        const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
+                        self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }
                 });
 
@@ -194,7 +197,9 @@ export default {
             self.$confirm('Are you sure you want to re-login?', () => {
                 self.rootStore.forceLogout();
                 self.$settings.clearSettings();
-                self.$locale.initLocale();
+
+                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+                self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                 router.navigate('/login', {
                     clearPreviousHistory: true
@@ -205,7 +210,8 @@ export default {
             return pinCode && pinCode.length === 6;
         },
         changeLanguage(locale) {
-            this.$locale.setLanguage(locale);
+            const localeDefaultSettings = this.$locale.setLanguage(locale);
+            this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
         }
     }
 }

@@ -222,6 +222,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
@@ -272,7 +273,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useRootStore, useUserStore, useAccountsStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore),
         allLanguages() {
             const ret = [];
             const allLanguageInfo = this.$locale.getAllLanguageInfos();
@@ -480,7 +481,9 @@ export default {
 
                 if (response.user) {
                     self.setCurrentUserProfile(response.user);
-                    self.$locale.setLanguage(response.user.language);
+
+                    const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
+                    self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
                 self.$toast('Your profile has been successfully updated');

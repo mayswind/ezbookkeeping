@@ -31,7 +31,7 @@
     --f7-list-font-size: 17px;
     --f7-list-item-after-font-size: 17px;
     --f7-list-item-footer-font-size: 12px;
-    --f7-list-button-font-size: 16px;
+    --f7-list-button-font-size: 17px;
     --f7-list-item-min-height: 44px;
     --f7-list-item-padding-horizontal: 16px;
     --f7-list-media-item-padding-vertical: 10px;
@@ -72,6 +72,7 @@
     --ebk-transaction-date-width: 25px;
     --ebk-transaction-day-font-size: 16px;
     --ebk-transaction-day-of-week-font-size: 12px;
+    --ebk-login-page-title-font-size: 28px;
     --ebk-license-popup-title-font-size: 30px;
     --ebk-license-content-font-size: 14px;
 }

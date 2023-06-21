@@ -2,7 +2,7 @@
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
             <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
-            <f7-block class="margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
+            <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
         <f7-list form dividers>
@@ -296,6 +296,10 @@ export default {
 .login-page-logo {
     width: 80px;
     height: 80px;
+}
+
+.login-page-tile {
+    font-size: var(--ebk-login-page-title-font-size);
 }
 
 .lang-popover-menu .popover-inner {

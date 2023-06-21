@@ -43,6 +43,11 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 		return nil, errs.ErrLoginNameOrPasswordWrong
 	}
 
+	if user.Disabled {
+		log.WarnfWithRequestId(c, "[authorizations.AuthorizeHandler] login failed for user \"%s\", because user is disabled", credential.LoginName)
+		return nil, errs.ErrUserIsDisabled
+	}
+
 	err = a.users.UpdateUserLastLoginTime(user.Uid)
 
 	if err != nil {

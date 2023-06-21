@@ -161,6 +161,40 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 	return nil
 }
 
+// EnableUser sets user enabled according to the specified user name
+func (l *UserDataCli) EnableUser(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.EnableUser] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.EnableUser(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.EnableUser] failed to set user enabled by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// DisableUser sets user disabled according to the specified user name
+func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.DisableUser] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.DisableUser(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.DisableUser] failed to set user disabled by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // DeleteUser deletes user according to the specified user name
 func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 	if username == "" {

@@ -577,6 +577,7 @@ export default {
         'login name is invalid': '登录名无效',
         'login name or password is invalid': '登录名或密码无效',
         'login name or password is wrong': '登录名或密码错误',
+        'user is disabled': '用户已禁用',
         'unauthorized access': '未授权的登录',
         'current token is invalid': '当前认证令牌无效',
         'current token is expired': '当前认证令牌已过期',

@@ -63,6 +63,7 @@ type User struct {
 	ShortDateFormat      ShortDateFormat      `xorm:"TINYINT"`
 	LongTimeFormat       LongTimeFormat       `xorm:"TINYINT"`
 	ShortTimeFormat      ShortTimeFormat      `xorm:"TINYINT"`
+	Disabled             bool                 `xorm:"NOT NULL"`
 	Deleted              bool                 `xorm:"NOT NULL"`
 	EmailVerified        bool                 `xorm:"NOT NULL"`
 	CreatedUnixTime      int64

@@ -256,6 +256,52 @@ func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
 	})
 }
 
+// EnableUser sets user enabled
+func (s *UserService) EnableUser(username string) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		Disabled:        false,
+		UpdatedUnixTime: now,
+	}
+
+	updatedRows, err := s.UserDB().Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
+// DisableUser sets user disabled
+func (s *UserService) DisableUser(username string) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		Disabled:        true,
+		UpdatedUnixTime: now,
+	}
+
+	updatedRows, err := s.UserDB().Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
 // DeleteUser deletes an existed user from database
 func (s *UserService) DeleteUser(username string) error {
 	if username == "" {

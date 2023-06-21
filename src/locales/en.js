@@ -577,6 +577,7 @@ export default {
         'login name is invalid': 'Login name is invalid',
         'login name or password is invalid': 'Login name or password is invalid',
         'login name or password is wrong': 'Login name or password is wrong',
+        'user is disabled': 'User is disabled',
         'unauthorized access': 'Unauthorized access',
         'current token is invalid': 'Current token is invalid',
         'current token is expired': 'Current token is expired',

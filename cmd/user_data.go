@@ -87,6 +87,32 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-enable",
+			Usage:  "Enable specified user",
+			Action: enableUser,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
+			Name:   "user-disable",
+			Usage:  "Disable specified user",
+			Action: disableUser,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "user-delete",
 			Usage:  "Delete specified user",
 			Action: deleteUser,
@@ -235,6 +261,46 @@ func modifyUserPassword(c *cli.Context) error {
 	}
 
 	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
+
+	return nil
+}
+
+func enableUser(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	err = clis.UserData.EnableUser(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.enableUser] error occurs when setting user enabled")
+		return err
+	}
+
+	log.BootInfof("[user_data.enableUser] user \"%s\" has been set enabled", username)
+
+	return nil
+}
+
+func disableUser(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	err = clis.UserData.DisableUser(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.disableUser] error occurs when setting user disabled")
+		return err
+	}
+
+	log.BootInfof("[user_data.disableUser] user \"%s\" has been set disabled", username)
 
 	return nil
 }

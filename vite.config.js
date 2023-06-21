@@ -110,6 +110,8 @@ export default defineConfig(async () => {
                     manualChunks: function (id) {
                         if (/[\\/]node_modules[\\/]leaflet[\\/]/i.test(id)) {
                             return 'leaflet';
+                        } else if (/[\\/]node_modules[\\/](dom7|framework7.*|skeleton-elements|swiper)[\\/]/i.test(id)) {
+                            return 'vendor-mobile';
                         } else if (/[\\/]node_modules[\\/]/i.test(id)) {
                             return 'vendor';
                         }

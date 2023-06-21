@@ -81,6 +81,7 @@
                             outline
                             floating-label
                             clear-button
+                            class="no-margin no-padding-bottom"
                             v-if="twoFAVerifyType === 'passcode'"
                             :label="$t('Passcode')"
                             :placeholder="$t('Passcode')"
@@ -91,6 +92,7 @@
                             outline
                             floating-label
                             clear-button
+                            class="no-margin no-padding-bottom"
                             v-if="twoFAVerifyType === 'backupcode'"
                             :label="$t('Backup Code')"
                             :placeholder="$t('Backup Code')"

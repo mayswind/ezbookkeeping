@@ -85,7 +85,7 @@
             <div class="layout-navbar navbar-blur">
                 <div class="navbar-content-container">
                     <div class="d-flex h-100 align-center">
-                        <v-btn class="ms-n3 d-lg-none" color="default" variant="text"
+                        <v-btn class="ms-n3 mr-2 d-lg-none" color="default" variant="text"
                                :icon="true" @click="showVerticalOverlayMenu = true">
                             <v-icon :icon="icons.menu" size="24" />
                         </v-btn>

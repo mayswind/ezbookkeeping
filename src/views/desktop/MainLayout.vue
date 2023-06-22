@@ -151,7 +151,7 @@
             <v-progress-circular indeterminate></v-progress-circular>
         </v-overlay>
 
-        <v-snackbar :timeout="2000" v-model="showSnackbar">
+        <v-snackbar v-model="showSnackbar">
             {{ snackbarMessage }}
 
             <template #actions>

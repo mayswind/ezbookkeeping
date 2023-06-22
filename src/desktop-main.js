@@ -169,6 +169,9 @@ const vuetify = createVuetify({
         VProgressCircular: {
             size: 40
         },
+        VSnackbar: {
+            timeout: 3000
+        },
         VTabs: {
             color: 'primary',
             VSlideGroup: {

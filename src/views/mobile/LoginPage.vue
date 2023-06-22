@@ -42,8 +42,7 @@
         <f7-list>
             <f7-block-footer>
                 <span>Powered by </span>
-                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>&nbsp;
-                <span>{{ version }}</span>
+                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>&nbsp;<span>{{ version }}</span>
             </f7-block-footer>
             <f7-block-footer>
             </f7-block-footer>

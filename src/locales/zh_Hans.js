@@ -917,6 +917,8 @@ export default {
     'Transaction Detail': '交易详情',
     'No transaction data': '没有交易数据',
     'Are you sure you want to delete this transaction?': '您确定要删除该交易？',
+    'Amount value is not number': '金额值不是数值',
+    'Amount value exceeds limitation': '金额数值超出限制',
     'Unable to delete this transaction': '无法删除该交易',
     'Transaction Data': '交易数据',
     'Statistics Data': '统计数据',

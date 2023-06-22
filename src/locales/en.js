@@ -917,6 +917,8 @@ export default {
     'Transaction Detail': 'Transaction Detail',
     'No transaction data': 'No transaction data',
     'Are you sure you want to delete this transaction?': 'Are you sure you want to delete this transaction?',
+    'Amount value is not number': 'Amount value is not number',
+    'Amount value exceeds limitation': 'Amount value exceeds limitation',
     'Unable to delete this transaction': 'Unable to delete this transaction',
     'Transaction Data': 'Transaction Data',
     'Statistics Data': 'Statistics Data',

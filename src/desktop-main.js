@@ -50,6 +50,8 @@ import {
     i18nFunctions
 } from '@/lib/i18n.js';
 
+import AmountInput from '@/components/desktop/AmountInput.vue';
+
 import '@/styles/desktop/base.css';
 import '@/styles/desktop/layout.css';
 import '@/styles/desktop/font-size.css';
@@ -305,6 +307,8 @@ app.use(router);
 
 app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
+
+app.component('AmountInput', AmountInput);
 
 app.config.globalProperties.$version = version.getVersion();
 app.config.globalProperties.$buildTime = version.getBuildTime();

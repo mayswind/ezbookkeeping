@@ -2,24 +2,13 @@ import { f7, f7ready } from 'framework7-vue';
 
 import fontConstants from '@/consts/font.js';
 import settings from './settings.js';
-import {
-    getLocalizedError,
-    getLocalizedErrorParameters
-} from './i18n.js';
+import { translateError } from './i18n.js';
 
 export function showAlert(message, confirmCallback, translateFn) {
-    let parameters = {};
-
-    if (message && message.error) {
-        const localizedError = getLocalizedError(message.error);
-        message = localizedError.message;
-        parameters = getLocalizedErrorParameters(localizedError.parameters, s => translateFn(s));
-    }
-
     f7ready((f7) => {
         f7.dialog.create({
             title: translateFn('global.app.title'),
-            text: translateFn(message, parameters),
+            text: translateError(message, translateFn),
             animate: settings.isEnableAnimate(),
             buttons: [
                 {
@@ -52,17 +41,9 @@ export function showConfirm(message, confirmCallback, cancelCallback, translateF
 }
 
 export function showToast(message, timeout, translateFn) {
-    let parameters = {};
-
-    if (message && message.error) {
-        const localizedError = getLocalizedError(message.error);
-        message = localizedError.message;
-        parameters = getLocalizedErrorParameters(localizedError.parameters, s => translateFn(s));
-    }
-
     f7ready((f7) => {
         f7.toast.create({
-            text: translateFn(message, parameters),
+            text: translateError(message, translateFn),
             position: 'center',
             closeTimeout: timeout || 1500
         }).open();

@@ -533,6 +533,60 @@ function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
     }
 }
 
+function getLocalizedError(error) {
+    if (error.errorCode === apiNotFoundErrorCode && specifiedApiNotFoundErrors[error.path]) {
+        return {
+            message: `${specifiedApiNotFoundErrors[error.path].message}`
+        };
+    }
+
+    if (error.errorCode !== validatorErrorCode) {
+        return {
+            message: `error.${error.errorMessage}`
+        };
+    }
+
+    for (let i = 0; i < parameterizedErrors.length; i++) {
+        const errorInfo = parameterizedErrors[i];
+        const matches = error.errorMessage.match(errorInfo.regex);
+
+        if (matches && matches.length === errorInfo.parameters.length + 1) {
+            return {
+                message: `parameterizedError.${errorInfo.localeKey}`,
+                parameters: errorInfo.parameters.map((param, index) => {
+                    return {
+                        key: param.field,
+                        localized: param.localized,
+                        value: matches[index + 1]
+                    }
+                })
+            };
+        }
+    }
+
+    return {
+        message: `error.${error.errorMessage}`
+    };
+}
+
+function getLocalizedErrorParameters(parameters, i18nFunc) {
+    let localizedParameters = {};
+
+    if (parameters) {
+        for (let i = 0; i < parameters.length; i++) {
+            const parameter = parameters[i];
+
+            if (parameter.localized) {
+                localizedParameters[parameter.key] = i18nFunc(`parameter.${parameter.value}`);
+            } else {
+                localizedParameters[parameter.key] = parameter.value;
+            }
+        }
+    }
+
+    return localizedParameters;
+}
+
 function setLanguage(i18nGlobal, locale, force) {
     if (!locale) {
         locale = getDefaultLanguage();
@@ -636,7 +690,7 @@ export function getI18nOptions() {
     };
 }
 
-export function transateIf(text, isTranslate, translateFn) {
+export function translateIf(text, isTranslate, translateFn) {
     if (isTranslate) {
         return translateFn(text);
     }
@@ -644,58 +698,16 @@ export function transateIf(text, isTranslate, translateFn) {
     return text;
 }
 
-export function getLocalizedError(error) {
-    if (error.errorCode === apiNotFoundErrorCode && specifiedApiNotFoundErrors[error.path]) {
-        return {
-            message: `${specifiedApiNotFoundErrors[error.path].message}`
-        };
+export function translateError(message, translateFn) {
+    let parameters = {};
+
+    if (message && message.error) {
+        const localizedError = getLocalizedError(message.error);
+        message = localizedError.message;
+        parameters = getLocalizedErrorParameters(localizedError.parameters, translateFn);
     }
 
-    if (error.errorCode !== validatorErrorCode) {
-        return {
-            message: `error.${error.errorMessage}`
-        };
-    }
-
-    for (let i = 0; i < parameterizedErrors.length; i++) {
-        const errorInfo = parameterizedErrors[i];
-        const matches = error.errorMessage.match(errorInfo.regex);
-
-        if (matches && matches.length === errorInfo.parameters.length + 1) {
-            return {
-                message: `parameterizedError.${errorInfo.localeKey}`,
-                parameters: errorInfo.parameters.map((param, index) => {
-                    return {
-                        key: param.field,
-                        localized: param.localized,
-                        value: matches[index + 1]
-                    }
-                })
-            };
-        }
-    }
-
-    return {
-        message: `error.${error.errorMessage}`
-    };
-}
-
-export function getLocalizedErrorParameters(parameters, i18nFunc) {
-    let localizedParameters = {};
-
-    if (parameters) {
-        for (let i = 0; i < parameters.length; i++) {
-            const parameter = parameters[i];
-
-            if (parameter.localized) {
-                localizedParameters[parameter.key] = i18nFunc(`parameter.${parameter.value}`);
-            } else {
-                localizedParameters[parameter.key] = parameter.value;
-            }
-        }
-    }
-
-    return localizedParameters;
+    return translateFn(message, parameters);
 }
 
 export function i18nFunctions(i18nGlobal) {

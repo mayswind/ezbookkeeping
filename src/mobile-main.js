@@ -78,7 +78,7 @@ import settings from '@/lib/settings.js';
 import userstate from '@/lib/userstate.js';
 import {
     getI18nOptions,
-    transateIf,
+    translateIf,
     i18nFunctions
 } from '@/lib/i18n.js';
 import {
@@ -188,7 +188,7 @@ app.config.globalProperties.$buildTime = version.getBuildTime();
 
 app.config.globalProperties.$settings = settings;
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
-app.config.globalProperties.$tIf = (text, isTranslate) => transateIf(text, isTranslate, i18n.global.t);
+app.config.globalProperties.$tIf = (text, isTranslate) => translateIf(text, isTranslate, i18n.global.t);
 
 app.config.globalProperties.$alert = (message, confirmCallback) => showAlert(message, confirmCallback, i18n.global.t);
 app.config.globalProperties.$confirm = (message, confirmCallback, cancelCallback) => showConfirm(message, confirmCallback, cancelCallback, i18n.global.t);

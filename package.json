@@ -18,6 +18,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@mdi/js": "^7.2.96",
     "@vuepic/vue-datepicker": "^5.1.2",
     "axios": "^1.4.0",
     "cbor-js": "^0.1.0",
@@ -38,7 +39,10 @@
     "swiper": "^9.3.2",
     "ua-parser-js": "^1.0.35",
     "vue": "^3.3.4",
-    "vue-i18n": "^9.2.2"
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.2",
+    "vue3-perfect-scrollbar": "^1.6.1",
+    "vuetify": "^3.3.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.0",

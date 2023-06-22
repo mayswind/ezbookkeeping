@@ -110,10 +110,20 @@ export default defineConfig(async () => {
                     manualChunks: function (id) {
                         if (/[\\/]node_modules[\\/]leaflet[\\/]/i.test(id)) {
                             return 'leaflet';
+                        } else if (/[\\/]node_modules[\\/](moment|moment-timezone)[\\/]/i.test(id)) {
+                            return 'moment';
                         } else if (/[\\/]node_modules[\\/](dom7|framework7.*|skeleton-elements|swiper)[\\/]/i.test(id)) {
                             return 'vendor-mobile';
+                        } else if (/[\\/]node_modules[\\/](vuetify|vue-router|vue3-perfect-scrollbar|@mdi.*)[\\/]/i.test(id)) {
+                            return 'vendor-desktop';
                         } else if (/[\\/]node_modules[\\/]/i.test(id)) {
-                            return 'vendor';
+                            return 'vendor-common';
+                        } else if (/[\\/]src[\\/]locales[\\/]/i.test(id)) {
+                            return 'locales';
+                        } else if (/[\\/]src[\\/](consts|stores)[\\/]/i.test(id)) {
+                            return 'common';
+                        } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|[a-zA-Z0-9-_]+\.js)/i.test(id)) {
+                            return 'common';
                         }
                     }
                 },

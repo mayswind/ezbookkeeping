@@ -94,10 +94,22 @@
         "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.4/LICENSE"
     },
     {
+        "name": "vue-router",
+        "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
+        "url": "https://github.com/vuejs/router",
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.2.2/LICENSE"
+    },
+    {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
         "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.2.2/LICENSE"
+    },
+    {
+        "name": "vuetify",
+        "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
+        "url": "https://vuetifyjs.com",
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.5/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -140,6 +152,12 @@
         "copyright": "Copyright (c) 2020 Vladimir Kharlampidi",
         "url": "https://github.com/nolimits4web/skeleton-elements",
         "licenseUrl": "https://github.com/nolimits4web/skeleton-elements/blob/v4.0.1/LICENSE"
+    },
+    {
+        "name": "vue3-perfect-scrollbar",
+        "copyright": "Copyright (c) 2018 Adam",
+        "url": "https://github.com/mercs600/vue3-perfect-scrollbar",
+        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/1.6.1/LICENSE"
     },
     {
         "name": "@vuepic/vue-datepicker",
@@ -202,8 +220,19 @@
         "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.35/license.md"
     },
     {
+        "name": "Materio - Vuetify VueJS 3 Free Admin Template",
+        "copyright": "Copyright (c) 2022 ThemeSelection",
+        "url": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free",
+        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.1.0/LICENSE"
+    },
+    {
         "name": "Icons8 Line Awesome",
         "url": "https://icons8.com/line-awesome",
         "licenseUrl": "https://github.com/icons8/line-awesome/blob/master/LICENSE.md"
+    },
+    {
+        "name": "Material Design Icons for JS/TypeScript",
+        "url": "https://materialdesignicons.com",
+        "licenseUrl": "https://github.com/Templarian/MaterialDesign-JS/blob/v7.2.96/LICENSE"
     }
 ]

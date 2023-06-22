@@ -15,6 +15,7 @@ import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { loadMapAssets } from '@/lib/map/index.js';
+import { getSystemTheme } from '@/lib/ui.js';
 
 export default {
     data() {
@@ -36,7 +37,19 @@ export default {
             theme.global.name.value = 'light';
         } else if (self.$settings.getTheme() === 'dark') {
             theme.global.name.value = 'dark';
+        } else {
+            theme.global.name.value = getSystemTheme();
         }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            if (self.$settings.getTheme() === 'auto') {
+                if (e.matches) {
+                    theme.global.name.value = 'dark';
+                } else {
+                    theme.global.name.value = 'light';
+                }
+            }
+        });
 
         let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);

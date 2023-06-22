@@ -96,6 +96,10 @@
                             <h1 class="font-weight-medium text-xl">{{ $t('global.app.title') }}</h1>
                         </div>
                         <v-spacer />
+                        <v-btn color="primary" variant="text" class="me-2"
+                               :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
+                            <v-icon :icon="(currentTheme === 'light' ? icons.themeLight : (currentTheme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
+                        </v-btn>
                         <v-avatar class="cursor-pointer" color="primary" variant="tonal">
                             <v-icon :icon="icons.user"/>
                             <v-menu activator="parent" width="230" location="bottom end" offset="14px">
@@ -163,10 +167,14 @@
 
 <script>
 import { useDisplay } from 'vuetify';
+import { useTheme } from 'vuetify';
+
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
+
+import { getSystemTheme } from '@/lib/ui.js';
 
 import {
     mdiMenu,
@@ -179,6 +187,9 @@ import {
     mdiSwapHorizontal,
     mdiCogOutline,
     mdiInformationOutline,
+    mdiThemeLightDark,
+    mdiWeatherSunny,
+    mdiWeatherNight,
     mdiAccount,
     mdiAccountOutline,
     mdiLogout
@@ -186,7 +197,10 @@ import {
 
 export default {
     data() {
+        const self = this;
+
         return {
+            theme: self.$settings.getTheme(),
             logouting: false,
             isVerticalNavScrolled: false,
             showVerticalOverlayMenu: false,
@@ -204,6 +218,9 @@ export default {
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,
                 about: mdiInformationOutline,
+                themeAuto: mdiThemeLightDark,
+                themeLight: mdiWeatherSunny,
+                themeDark: mdiWeatherNight,
                 user: mdiAccount,
                 profile: mdiAccountOutline,
                 logout: mdiLogout
@@ -218,10 +235,31 @@ export default {
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
+        },
+        currentTheme: {
+            get: function () {
+                return this.theme;
+            },
+            set: function (value) {
+                if (value !== this.$settings.getTheme()) {
+                    this.theme = value;
+                    this.$settings.setTheme(value);
+
+                    if (value === 'light' || value === 'dark') {
+                        this.globalTheme.global.name.value = value;
+                    } else {
+                        this.globalTheme.global.name.value = getSystemTheme();
+                    }
+                }
+            }
         }
     },
-    created() {
+    setup () {
+        const theme = useTheme();
 
+        return {
+            globalTheme: theme
+        };
     },
     methods: {
         handleNavScroll(e) {

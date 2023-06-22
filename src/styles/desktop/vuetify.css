@@ -209,3 +209,18 @@ textarea.v-field__input::placeholder {
     background: rgb(var(--v-theme-surface));
     color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
 }
+
+.v-btn--icon.v-btn--density-default {
+    width: calc(var(--v-btn-height) + 2px);
+    height: calc(var(--v-btn-height) + 2px)
+}
+
+.v-btn--icon.v-btn--density-comfortable {
+    width: calc(var(--v-btn-height) + -8px);
+    height: calc(var(--v-btn-height) + -8px)
+}
+
+.v-btn--icon.v-btn--density-compact {
+    width: calc(var(--v-btn-height) + -12px);
+    height: calc(var(--v-btn-height) + -12px)
+}

@@ -93,7 +93,6 @@
                                     :placeholder="$t('Default Currency')"
                                     :items="allCurrencies"
                                     v-model="newProfile.defaultCurrency"
-
                                 >
                                     <template v-slot:no-data>
                                         <div class="px-4">{{ $t('No results') }}</div>

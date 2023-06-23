@@ -1,20 +1,21 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card>
+            <v-card :class="{ 'disabled': loading }">
                 <template #title>
                     <span>{{ $t('Exchange Rates Data') }}</span>
                     <v-btn density="compact" color="default" variant="text"
-                           class="ml-2" :class="{ 'disabled': updating }"
-                           :icon="true" @click="update">
+                           class="ml-2" :icon="true"
+                           v-if="!loading" @click="update">
                         <v-icon :icon="icons.refresh" size="24" />
                     </v-btn>
+                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text>
                     <span class="text-sm">
                         {{ $t('Data source') }}
-                        <a target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
+                        <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                         <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
                         <span v-if="exchangeRatesDataUpdateTime">&nbsp;,&nbsp;{{ $t('Last Updated') }}&nbsp;{{ exchangeRatesDataUpdateTime }}</span>
                     </span>
@@ -33,6 +34,7 @@
                                 single-line
                                 item-title="currencyDisplayName"
                                 item-value="currencyCode"
+                                :disabled="loading"
                                 :items="availableExchangeRates"
                                 v-model="baseCurrency"
                             ></v-select>
@@ -43,7 +45,7 @@
                             <span class="text-subtitle-1">{{ $t('Base Amount') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <amount-input density="compact" v-model="baseAmount"/>
+                            <amount-input density="compact" :disabled="loading" v-model="baseAmount"/>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -76,10 +78,6 @@
             <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
         </template>
     </v-snackbar>
-
-    <v-overlay class="justify-center align-center" :persistent="true" v-model="updating">
-        <v-progress-circular indeterminate></v-progress-circular>
-    </v-overlay>
 </template>
 
 <script>
@@ -101,7 +99,7 @@ export default {
         return {
             baseCurrency: userStore.currentUserDefaultCurrency,
             baseAmount: '1',
-            updating: false,
+            loading: false,
             showSnackbar: false,
             snackbarMessage: '',
             icons: {
@@ -160,19 +158,19 @@ export default {
         update() {
             const self = this;
 
-            if (self.updating) {
+            if (self.loading) {
                 return;
             }
 
-            self.updating = true;
+            self.loading = true;
             self.exchangeRatesStore.getLatestExchangeRates({
                 silent: false,
                 force: true
             }).then(() => {
-                self.updating = false;
+                self.loading = false;
                 self.showSnackbarMessage(self.$t('Exchange rates data has been updated'));
             }).catch(error => {
-                self.updating = false;
+                self.loading = false;
 
                 if (!error.processed) {
                     self.showSnackbarMessage(self.$tError(error.message || error));

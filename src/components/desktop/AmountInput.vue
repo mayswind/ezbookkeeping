@@ -1,5 +1,5 @@
 <template>
-    <v-text-field type="number" :density="density"
+    <v-text-field type="number" :density="density" :disabled="disabled"
                   :rules="rules" v-model="value"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown"
     ></v-text-field>
@@ -11,6 +11,7 @@ import transactionConstants from '@/consts/transaction.js';
 export default {
     props: [
         'density',
+        'disabled',
         'modelValue'
     ],
     emits: [

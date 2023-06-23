@@ -1,6 +1,9 @@
 .disabled {
     opacity: 0.55 !important;
     pointer-events: none !important;
+    -webkit-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
 }
 
 .readonly {

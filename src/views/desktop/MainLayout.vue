@@ -121,7 +121,7 @@
                                         <template #prepend>
                                             <v-icon class="me-2" :icon="icons.profile" size="22"/>
                                         </template>
-                                        <v-list-item-title>{{ $t('User Profile') }}</v-list-item-title>
+                                        <v-list-item-title>{{ $t('User Settings') }}</v-list-item-title>
                                     </v-list-item>
                                     <v-list-item to="/app/settings">
                                         <template #prepend>
@@ -191,7 +191,7 @@ import {
     mdiWeatherSunny,
     mdiWeatherNight,
     mdiAccount,
-    mdiAccountOutline,
+    mdiAccountCogOutline,
     mdiLogout
 } from '@mdi/js';
 
@@ -222,7 +222,7 @@ export default {
                 themeLight: mdiWeatherSunny,
                 themeDark: mdiWeatherNight,
                 user: mdiAccount,
-                profile: mdiAccountOutline,
+                profile: mdiAccountCogOutline,
                 logout: mdiLogout
             }
         }

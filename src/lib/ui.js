@@ -5,3 +5,16 @@ export function getSystemTheme() {
         return 'light';
     }
 }
+
+export function startDownloadFile(fileName, fileData) {
+    const dataObjectUrl = URL.createObjectURL(fileData);
+    const dataLink = document.createElement('a');
+
+    dataLink.style.display = 'none';
+    dataLink.href = dataObjectUrl;
+    dataLink.setAttribute('download', fileName);
+
+    document.body.appendChild(dataLink);
+
+    dataLink.click();
+}

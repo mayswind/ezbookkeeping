@@ -5,6 +5,7 @@ import { createI18n } from 'vue-i18n';
 import { createVuetify } from 'vuetify';
 import { VApp } from 'vuetify/components/VApp';
 import { VAvatar } from 'vuetify/components/VAvatar';
+import { VAutocomplete } from 'vuetify/components/VAutocomplete';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCard, VCardActions, VCardItem, VCardSubtitle, VCardText, VCardTitle } from 'vuetify/components/VCard';
 import { VChip } from 'vuetify/components/VChip';
@@ -15,6 +16,7 @@ import { VContainer, VCol, VRow, VSpacer } from 'vuetify/components/VGrid';
 import { VIcon } from 'vuetify/components/VIcon';
 import { VImg } from 'vuetify/components/VImg';
 import { VInput } from 'vuetify/components/VInput';
+import { VLabel } from 'vuetify/components/VLabel';
 import { VList, VListGroup, VListImg, VListItem, VListItemAction, VListItemMedia, VListItemSubtitle, VListItemTitle, VListSubheader } from 'vuetify/components/VList';
 import { VMenu } from 'vuetify/components/VMenu';
 import { VOverlay } from 'vuetify/components/VOverlay';
@@ -27,6 +29,8 @@ import { VSnackbar } from 'vuetify/components/VSnackbar';
 import { VTabs, VTab } from 'vuetify/components/VTabs';
 import { VTable } from 'vuetify/components/VTable';
 import { VTextField } from 'vuetify/components/VTextField';
+import { VToolbar } from 'vuetify/components/VToolbar';
+import { VTooltip } from 'vuetify/components/VTooltip';
 import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
@@ -51,6 +55,7 @@ import {
 } from '@/lib/i18n.js';
 
 import AmountInput from '@/components/desktop/AmountInput.vue';
+import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 
 import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
 import '@/styles/desktop/template/template/index.scss';
@@ -68,6 +73,7 @@ const vuetify = createVuetify({
     components: {
         VApp,
         VAvatar,
+        VAutocomplete,
         VBtn,
         VCard,
         VCardActions,
@@ -86,6 +92,7 @@ const vuetify = createVuetify({
         VIcon,
         VImg,
         VInput,
+        VLabel,
         VList,
         VListGroup,
         VListImg,
@@ -107,6 +114,8 @@ const vuetify = createVuetify({
         VTab,
         VTable,
         VTextField,
+        VToolbar,
+        VTooltip,
         VWindow,
         VWindowItem
     },
@@ -192,6 +201,9 @@ const vuetify = createVuetify({
             variant: 'outlined',
             color: 'primary',
             hideDetails: 'auto'
+        },
+        VToolbar: {
+            color: 'primary'
         },
         VTooltip: {
             location: 'top'
@@ -310,6 +322,7 @@ app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
 
 app.component('AmountInput', AmountInput);
+app.component('ConfirmDialog', ConfirmDialog);
 
 app.config.globalProperties.$version = version.getVersion();
 app.config.globalProperties.$buildTime = version.getBuildTime();

@@ -8,6 +8,7 @@
                            class="ml-2" :icon="true"
                            v-if="!loading" @click="update">
                         <v-icon :icon="icons.refresh" size="24" />
+                        <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                     </v-btn>
                     <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
                 </template>

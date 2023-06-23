@@ -47,7 +47,6 @@ import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 
-import iconConstants from '@/consts/icon.js';
 import { isEquals } from '@/lib/common.js';
 import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
 

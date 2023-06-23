@@ -196,19 +196,19 @@ export default {
             const ua = parseUserAgent(token.userAgent);
 
             if (!ua || !ua.device) {
-                return iconConstants.deviceIcons.desktop.f7Icon;
+                return 'device_desktop';
             }
 
             if (ua.device.type === 'mobile') {
-                return iconConstants.deviceIcons.mobile.f7Icon;
+                return 'device_phone_portrait';
             } else if (ua.device.type === 'wearable') {
-                return iconConstants.deviceIcons.wearable.f7Icon;
+                return 'device_phone_portrait';
             } else if (ua.device.type === 'tablet') {
-                return iconConstants.deviceIcons.tablet.f7Icon;
+                return 'device_tablet_portrait';
             } else if (ua.device.type === 'smarttv') {
-                return iconConstants.deviceIcons.tv.f7Icon;
+                return 'tv';
             } else {
-                return iconConstants.deviceIcons.desktop.f7Icon;
+                return 'device_desktop';
             }
         },
         getTokenDomId(tokenId) {

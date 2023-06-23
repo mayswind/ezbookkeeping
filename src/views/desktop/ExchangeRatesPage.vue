@@ -50,7 +50,7 @@
                 <v-table v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                     <thead>
                     <tr>
-                        <th style="width: 50%">{{ $t('Currency') }}</th>
+                        <th class="text-uppercase" style="width: 50%">{{ $t('Currency') }}</th>
                         <th class="text-uppercase">{{ $t('Amount') }}</th>
                     </tr>
                     </thead>

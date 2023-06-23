@@ -44,7 +44,7 @@
                                     {{ line }}
                                 </span>
                             </p>
-                            <hr/><br/>
+                            <v-divider/><br/>
                             <p>
                                 <span>ezBookkeeping also contains additional third party software.</span><br/>
                                 <span>All the third party software included or linked is redistributed under the terms and conditions of their original licenses.</span>

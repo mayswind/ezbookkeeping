@@ -12,6 +12,7 @@
         </f7-toolbar>
         <f7-page-content>
             <vue-date-picker inline enable-seconds auto-apply
+                             ref="datetimepicker"
                              month-name-format="long"
                              six-weeks="center"
                              class="justify-content-center"
@@ -91,6 +92,8 @@ export default {
             if (this.modelValue) {
                 this.dateTime = getLocalDatetimeFromUnixTime(this.modelValue)
             }
+
+            this.$refs.datetimepicker.switchView('calendar');
         },
         onSheetClosed() {
             this.$emit('update:show', false);

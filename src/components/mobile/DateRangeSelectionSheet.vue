@@ -15,6 +15,7 @@
                 </p>
                 <slot></slot>
                 <vue-date-picker range inline enable-seconds auto-apply
+                                 ref="datetimepicker"
                                  month-name-format="long"
                                  six-weeks="center"
                                  class="justify-content-center margin-bottom"
@@ -159,6 +160,8 @@ export default {
             if (this.maxTime) {
                 this.dateRange[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(this.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
             }
+
+            this.$refs.datetimepicker.switchView('calendar');
         },
         onSheetClosed() {
             this.$emit('update:show', false);

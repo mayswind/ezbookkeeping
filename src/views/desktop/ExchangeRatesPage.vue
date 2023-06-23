@@ -30,7 +30,7 @@
                             <span class="text-subtitle-1">{{ $t('Base Currency') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <v-select
+                            <v-autocomplete
                                 density="compact"
                                 single-line
                                 item-title="currencyDisplayName"
@@ -38,7 +38,11 @@
                                 :disabled="loading"
                                 :items="availableExchangeRates"
                                 v-model="baseCurrency"
-                            ></v-select>
+                            >
+                                <template v-slot:no-data>
+                                    <div class="px-4">{{ $t('No results') }}</div>
+                                </template>
+                            </v-autocomplete>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
@@ -179,6 +183,10 @@ export default {
             });
         },
         getConvertedAmount(toExchangeRate) {
+            if (!this.baseCurrency) {
+                return 0;
+            }
+
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
 
             if (!fromExchangeRate) {

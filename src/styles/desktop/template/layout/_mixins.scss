@@ -1,0 +1,31 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "./placeholders";
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+@mixin rtl {
+    @if variables.$enable-rtl-styles {
+        [dir="rtl"] & {
+            @content;
+        }
+    }
+}
+
+@mixin boxed-content($nest-selector: false) {
+    & {
+        @extend %boxed-content-spacing;
+
+        @at-root {
+            @if $nest-selector == false {
+                .layout-content-width-boxed#{&} {
+                    @extend %boxed-content;
+                }
+            } @else {
+                .layout-content-width-boxed & {
+                    @extend %boxed-content;
+                }
+            }
+        }
+    }
+}

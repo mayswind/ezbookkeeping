@@ -1,0 +1,44 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:string";
+
+/*
+  ℹ️ This function is helpful when we have multi dimensional value
+
+  Assume we have padding variable `$nav-padding-horizontal: 10px;`
+  With above variable let's say we use it in some style:
+  ```scss
+  .selector {
+    margin-left: $nav-padding-horizontal;
+  }
+  ```
+
+  Now, problem is we can also have value as `$nav-padding-horizontal: 10px 15px;`
+  In this case above style will be invalid.
+
+  This function will extract the left most value from the variable value.
+
+  $nav-padding-horizontal: 10px; => 10px;
+  $nav-padding-horizontal: 10px 15px; => 10px;
+
+  This is safe:
+  ```scss
+  .selector {
+    margin-left: get-first-value($nav-padding-horizontal);
+  }
+  ```
+*/
+@function get-first-value($var) {
+    $start-at: string.index(#{$var}, " ");
+
+    @if $start-at {
+        @return string.slice(
+                #{$var},
+                0,
+                $start-at
+        );
+    } @else {
+        @return $var;
+    }
+}

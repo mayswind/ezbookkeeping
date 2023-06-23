@@ -1,0 +1,27 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+.bg-var-theme-background {
+    background-color: rgba(var(--v-theme-on-surface), var(--v-hover-opacity)) !important;
+}
+
+// 👉 Pagination small-select dropdown for table
+
+.per-page-select {
+    margin-block: auto;
+
+    .v-field__input {
+        align-items: center;
+        padding: 2px;
+        font-size: 14px;
+    }
+
+    .v-field__append-inner {
+        align-items: center;
+        padding: 0;
+
+        .v-icon {
+            margin-inline-start: 0 !important;
+        }
+    }
+}

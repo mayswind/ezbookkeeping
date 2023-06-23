@@ -1,0 +1,107 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "./placeholders" as *;
+@use "@/styles/desktop/template/template/placeholders" as *;
+@use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
+@use "./misc";
+@use "./mixins";
+
+$header: ".layout-navbar";
+
+@if variables.$layout-vertical-nav-navbar-is-contained {
+    $header: ".layout-navbar .navbar-content-container";
+}
+
+.layout-wrapper.layout-nav-type-vertical {
+    // SECTION  Layout Navbar
+    // 👉 Elevated navbar
+    @if variables.$vertical-nav-navbar-style == "elevated" {
+        // Add transition
+        #{$header} {
+            transition: padding 0.2s ease, background-color 0.18s ease;
+        }
+
+        // If navbar is contained => Add border radius to header
+        @if variables.$layout-vertical-nav-navbar-is-contained {
+            #{$header} {
+                border-radius: 0 0 variables.$default-layout-with-vertical-nav-navbar-footer-roundness variables.$default-layout-with-vertical-nav-navbar-footer-roundness;
+            }
+        }
+
+        // Scrolled styles for sticky navbar
+        @at-root {
+            /* ℹ️ This html selector with not selector is required when:
+              dialog is opened and window don't have any scroll. This removes window-scrolled class from layout and out style broke
+          */
+            html.v-overlay-scroll-blocked:not([style*="--v-body-scroll-y: 0px;"]) .layout-navbar-sticky,
+            &.window-scrolled.layout-navbar-sticky {
+
+                #{$header} {
+                    @extend %default-layout-vertical-nav-scrolled-sticky-elevated-nav;
+                    @extend %default-layout-vertical-nav-floating-navbar-and-sticky-elevated-navbar-scrolled;
+                }
+
+                .navbar-blur#{$header} {
+                    @extend %blurry-bg;
+                }
+            }
+        }
+    }
+
+        // 👉 Floating navbar
+    @else if  variables.$vertical-nav-navbar-style == "floating" {
+        // ℹ️ Regardless of navbar is contained or not => Apply overlay to .layout-navbar
+        .layout-navbar {
+            &.navbar-blur {
+                @extend %default-layout-vertical-nav-floating-navbar-overlay;
+            }
+        }
+
+        &:not(.layout-navbar-sticky) {
+            #{$header} {
+                margin-block-start: variables.$vertical-nav-floating-navbar-top;
+            }
+        }
+
+        #{$header} {
+            @if variables.$layout-vertical-nav-navbar-is-contained {
+                border-radius: variables.$default-layout-with-vertical-nav-navbar-footer-roundness;
+            }
+
+            background-color: rgb(var(--v-theme-surface));
+
+            @extend %default-layout-vertical-nav-floating-navbar-and-sticky-elevated-navbar-scrolled;
+        }
+
+        .navbar-blur#{$header} {
+            @extend %blurry-bg;
+        }
+    }
+
+    // !SECTION
+
+    // 👉 Layout footer
+    .layout-footer {
+        $ele-layout-footer: &;
+
+        .footer-content-container {
+            border-radius: variables.$default-layout-with-vertical-nav-navbar-footer-roundness variables.$default-layout-with-vertical-nav-navbar-footer-roundness 0 0;
+
+            // Sticky footer
+            @at-root {
+                // ℹ️ .layout-footer-sticky#{$ele-layout-footer} => .layout-footer-sticky.layout-wrapper.layout-nav-type-vertical .layout-footer
+                .layout-footer-sticky#{$ele-layout-footer} {
+                    .footer-content-container {
+                        background-color: rgb(var(--v-theme-surface));
+                        padding-block: 0;
+                        padding-inline: 1.2rem;
+
+                        @include mixins.elevation(3);
+                    }
+                }
+            }
+        }
+    }
+}

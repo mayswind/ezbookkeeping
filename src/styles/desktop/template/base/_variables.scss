@@ -1,0 +1,189 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "vuetify/lib/styles/tools/functions" as *;
+
+@forward "../layout/variables" with (
+  // Adjust z-index so vertical nav & overlay stays on top of v-layout in v-main. E.g. Email app
+  $layout-vertical-nav-z-index: 1004,
+  $layout-overlay-z-index: 1003,
+);
+@use "@/styles/desktop/template/layout/variables" as *;
+
+// 👉 Default layout
+
+$navbar-high-emphasis-text: true !default;
+
+// @forward "@layouts/styles/variables" with (
+//   $layout-vertical-nav-width: 350px !default,
+// );
+
+$theme-colors-name: (
+    "primary",
+    "secondary",
+    "error",
+    "info",
+    "success",
+    "warning"
+) !default;
+
+// 👉 Default layout with vertical nav
+
+$default-layout-with-vertical-nav-navbar-footer-roundness: 10px !default;
+
+// 👉 Vertical nav
+$vertical-nav-background-color-rgb: var(--v-theme-background) !default;
+$vertical-nav-background-color: rgb(#{$vertical-nav-background-color-rgb}) !default;
+
+// ℹ️ This is used to keep consistency between nav items and nav header left & right margin
+// This is used by nav items & nav header
+$vertical-nav-horizontal-spacing: 1rem !default;
+$vertical-nav-horizontal-padding: 0.75rem !default;
+
+// Vertical nav header height. Mostly we will align it with navbar height;
+$vertical-nav-header-height: $layout-vertical-nav-navbar-height !default;
+$vertical-nav-navbar-elevation: 3 !default;
+$vertical-nav-navbar-style: "elevated" !default; // options: elevated, floating
+$vertical-nav-floating-navbar-top: 1rem !default;
+
+// Vertical nav header padding
+$vertical-nav-header-padding: 1rem $vertical-nav-horizontal-padding !default;
+$vertical-nav-header-inline-spacing: $vertical-nav-horizontal-spacing !default;
+
+// Move logo when vertical nav is mini (collapsed but not hovered)
+$vertical-nav-header-logo-translate-x-when-vertical-nav-mini: -4px !default;
+
+// Space between logo and title
+$vertical-nav-header-logo-title-spacing: 0.9rem !default;
+
+// Section title margin top (when its not first child)
+$vertical-nav-section-title-mt: 1.5rem !default;
+
+// Section title margin bottom
+$vertical-nav-section-title-mb: 0.5rem !default;
+
+// Vertical nav icons
+$vertical-nav-items-icon-size: 1.5rem !default;
+$vertical-nav-items-nested-icon-size: 0.9rem !default;
+$vertical-nav-items-icon-margin-inline-end: 0.5rem !default;
+
+// Transition duration for nav group arrow
+$vertical-nav-nav-group-arrow-transition-duration: 0.15s !default;
+
+// Timing function for nav group arrow
+$vertical-nav-nav-group-arrow-transition-timing-function: ease-in-out !default;
+
+// 👉 Horizontal nav
+
+/*
+    ❗ Heads up
+    ==================
+    Here we assume we will always use shorthand property which will apply same padding on four side
+    This is because this have been used as value of top property by `.popper-content`
+*/
+$horizontal-nav-padding: 0.6875rem !default;
+
+// Gap between top level horizontal nav items
+$horizontal-nav-top-level-items-gap: 4px !default;
+
+// Horizontal nav icons
+$horizontal-nav-items-icon-size: 1.5rem !default;
+$horizontal-nav-third-level-icon-size: 0.9rem !default;
+$horizontal-nav-items-icon-margin-inline-end: 0.625rem !default;
+
+// ℹ️ We used SCSS variable because we want to allow users to update max height of popper content
+// 120px is combined height of navbar & horizontal nav
+$horizontal-nav-popper-content-max-height: calc((var(--vh, 1vh) * 100) - 120px - 4rem) !default;
+
+// ℹ️ This variable is used for horizontal nav popper content's `margin-top` and "The bridge"'s height. We need to sync both values.
+$horizontal-nav-popper-content-top: calc($horizontal-nav-padding + 0.375rem) !default;
+
+// 👉 Plugins
+
+$plugin-ps-thumb-y-dark: rgba(var(--v-theme-surface-variant), 0.35) !default;
+
+// 👉 Vuetify
+
+// Used in src/@core/scss/base/libs/vuetify/_overrides.scss
+$vuetify-reduce-default-compact-button-icon-size: true !default;
+
+// 👉 Custom variables
+// for utility classes
+$font-sizes: () !default;
+$font-sizes: map-deep-merge(
+        (
+            "xs": 0.75rem,
+            "sm": 0.875rem,
+            "base": 1rem,
+            "lg": 1.125rem,
+            "xl": 1.25rem,
+            "2xl": 1.5rem,
+            "3xl": 1.875rem,
+            "4xl": 2.25rem,
+            "5xl": 3rem,
+            "6xl": 3.75rem,
+            "7xl": 4.5rem,
+            "8xl": 6rem,
+            "9xl": 8rem
+        ),
+        $font-sizes
+);
+
+// line height
+$font-line-height: () !default;
+$font-line-height: map-deep-merge(
+        (
+            "xs": 1rem,
+            "sm": 1.25rem,
+            "base": 1.5rem,
+            "lg": 1.75rem,
+            "xl": 1.75rem,
+            "2xl": 2rem,
+            "3xl": 2.25rem,
+            "4xl": 2.5rem,
+            "5xl": 1,
+            "6xl": 1,
+            "7xl": 1,
+            "8xl": 1,
+            "9xl": 1
+        ),
+        $font-line-height
+);
+
+// gap utility class
+$gap: () !default;
+$gap: map-deep-merge(
+        (
+            "0": 0,
+            "1": 0.25rem,
+            "2": 0.5rem,
+            "3": 0.75rem,
+            "4": 1rem,
+            "5": 1.25rem,
+            "6":1.5rem,
+            "7": 1.75rem,
+            "8": 2rem,
+            "9": 2.25rem,
+            "10": 2.5rem,
+            "11": 2.75rem,
+            "12": 3rem,
+            "14": 3.5rem,
+            "16": 4rem,
+            "20": 5rem,
+            "24": 6rem,
+            "28": 7rem,
+            "32": 8rem,
+            "36": 9rem,
+            "40": 10rem,
+            "44": 11rem,
+            "48": 12rem,
+            "52": 13rem,
+            "56": 14rem,
+            "60": 15rem,
+            "64": 16rem,
+            "72": 18rem,
+            "80": 20rem,
+            "96": 24rem
+        ),
+        $gap
+);

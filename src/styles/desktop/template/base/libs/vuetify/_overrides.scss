@@ -1,0 +1,285 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/utils";
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+// 👉 Application
+// ℹ️ We need accurate vh in mobile devices as well
+.v-application__wrap {
+    /* stylelint-disable-next-line liberty/use-logical-spec */
+    min-height: calc(var(--vh, 1vh) * 100);
+}
+
+// 👉 Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.text-h1,
+.text-h2,
+.text-h3,
+.text-h4,
+.text-h5,
+.text-h6,
+.text-button,
+.text-overline,
+.v-card-title {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.v-application,
+.text-body-1,
+.text-body-2,
+.text-subtitle-1,
+.text-subtitle-2 {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+}
+
+// 👉 Grid
+// Remove margin-bottom of v-input_details inside grid (validation error message)
+.v-row {
+    .v-col,
+    [class^="v-col-*"] {
+        .v-input__details {
+            margin-block-end: 0;
+        }
+    }
+}
+
+// 👉 Button
+@if variables.$vuetify-reduce-default-compact-button-icon-size {
+    .v-btn--density-compact.v-btn--size-default {
+        .v-btn__content > svg {
+            block-size: 22px;
+            font-size: 22px;
+            inline-size: 22px;
+        }
+    }
+}
+
+// 👉 Card
+// Removes padding-top for immediately placed v-card-text after itself
+.v-card-text {
+    & + & {
+        padding-block-start: 0 !important;
+    }
+}
+
+// 👉 Checkbox & Radio Ripple
+.v-checkbox.v-input,
+.v-switch.v-input {
+    --v-input-control-height: auto;
+
+    flex: unset;
+}
+
+.v-selection-control--density-comfortable {
+    &.v-checkbox-btn,
+    &.v-radio,
+    &.v-radio-btn {
+        .v-selection-control__wrapper {
+            margin-inline-start: -0.5625rem;
+        }
+    }
+}
+
+.v-selection-control--density-compact {
+    &.v-radio,
+    &.v-radio-btn,
+    &.v-checkbox-btn {
+        .v-selection-control__wrapper {
+            margin-inline-start: -0.3125rem;
+        }
+    }
+}
+
+.v-selection-control--density-default {
+    &.v-checkbox-btn,
+    &.v-radio,
+    &.v-radio-btn {
+        .v-selection-control__wrapper {
+            margin-inline-start: -0.6875rem;
+        }
+    }
+}
+
+.v-radio-group {
+    .v-selection-control-group {
+        .v-radio:not(:last-child) {
+            margin-inline-end: 0.9rem;
+        }
+    }
+}
+
+/*
+  👉 Tabs
+  Disable tab transition
+
+  This is for tabs where we don't have card wrapper to tabs and have multiple cards as tab content.
+
+  This class will disable transition and adds `overflow: unset` on `VWindow` to allow spreading shadow
+*/
+.disable-tab-transition {
+    overflow: unset !important;
+
+    .v-window__container {
+        block-size: auto !important;
+    }
+
+    .v-window-item:not(.v-window-item--active) {
+        display: none !important;
+    }
+
+    .v-window__container .v-window-item {
+        transform: none !important;
+    }
+}
+
+// 👉 List
+.v-list {
+    // Set icons opacity to .87
+    .v-list-item__prepend > .v-icon,
+    .v-list-item__append > .v-icon {
+        opacity: var(--v-high-emphasis-opacity);
+    }
+}
+
+// 👉 Card list
+
+/*
+  ℹ️ Custom class
+
+  Remove list spacing inside card
+
+  This is because card title gets padding of 20px and list item have padding of 16px. Moreover, list container have padding-bottom as well.
+*/
+.card-list {
+    --v-card-list-gap: 20px;
+
+    &.v-list {
+        padding-block: 0;
+    }
+
+    .v-list-item {
+        min-block-size: unset;
+        min-block-size: auto !important;
+        padding-block: 0 !important;
+        padding-inline: 0 !important;
+
+        > .v-ripple__container {
+            opacity: 0;
+        }
+
+        &:not(:last-child) {
+            padding-block-end: var(--v-card-list-gap) !important;
+        }
+    }
+
+    .v-list-item:hover,
+    .v-list-item:focus,
+    .v-list-item:active,
+    .v-list-item.active {
+        > .v-list-item__overlay {
+            opacity: 0 !important;
+        }
+    }
+}
+
+// 👉 Divider
+.v-divider {
+    color: rgb(var(--v-border-color));
+}
+
+// 👉 DataTable
+// 👉 DataTable
+.v-data-table {
+    /* stylelint-disable-next-line no-descending-specificity */
+    .v-checkbox-btn .v-selection-control__wrapper {
+        margin-inline-start: 0 !important;
+    }
+
+    .v-selection-control {
+        display: flex !important;
+    }
+
+    .v-pagination {
+        color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+    }
+}
+
+.v-data-table-footer {
+    margin-block-start: 1rem;
+}
+
+// 👉 v-field
+.v-field:hover .v-field__outline {
+    --v-field-border-opacity: var(--v-medium-emphasis-opacity);
+}
+
+// 👉 VLabel
+.v-label {
+    opacity: 1 !important;
+
+    &:not(.v-field-label--floating) {
+        color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+    }
+}
+
+// 👉 Overlay
+.v-overlay__scrim,
+.v-navigation-drawer__scrim {
+    background: rgba(var(--v-overlay-scrim-background), var(--v-overlay-scrim-opacity)) !important;
+    opacity: 1 !important;
+}
+
+// 👉 VMessages
+.v-messages {
+    color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+    opacity: 1;
+}
+
+// 👉 Alert close btn
+.v-alert__close {
+    .v-btn--icon .v-icon {
+        --v-icon-size-multiplier: 1.5;
+    }
+}
+
+// 👉 Badge icon alignment
+.v-badge__badge {
+    display: flex;
+    align-items: center;
+}
+
+// 👉 Btn focus outline style removed
+.v-btn:focus-visible::after {
+    opacity: 0 !important;
+}
+
+// .v-select chip spacing for slot
+.v-input:not(.v-select--chips) .v-select__selection {
+    .v-chip {
+        margin-block: 2px var(--select-chips-margin-bottom);
+    }
+}
+
+// 👉 VCard and VList subtitle color
+.v-card-subtitle,
+.v-list-item-subtitle {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+}
+
+// 👉 placeholders
+.v-field__input {
+    @at-root {
+        & input::placeholder,
+        input#{&}::placeholder,
+        textarea#{&}::placeholder {
+            color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity)) !important;
+            opacity: 1 !important;
+        }
+    }
+}

@@ -1,0 +1,43 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:map";
+
+// Layout
+@use "./vertical-nav";
+@use "./default-layout";
+@use "./default-layout-w-vertical-nav";
+
+// Layouts package
+@use "./layouts";
+
+// Components
+@use "./components";
+
+// Utilities
+@use "./utilities";
+
+// Misc
+@use "./misc";
+
+// Dark
+@use "./dark";
+
+// libs
+@use "./libs/perfect-scrollbar";
+
+a {
+    color: rgb(var(--v-theme-primary));
+    text-decoration: none;
+}
+
+// Vuetify 3 don't provide margin bottom style like vuetify 2
+p {
+    margin-block-end: 1rem;
+}
+
+// Iconify icon size
+svg.iconify {
+    block-size: 1em;
+    inline-size: 1em;
+}

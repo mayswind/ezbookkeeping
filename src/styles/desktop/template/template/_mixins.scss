@@ -1,0 +1,15 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "vuetify/lib/styles/settings" as vuetify_settings;
+
+@mixin avatar-font-sizes($map: $avatar-sizes) {
+    @each $sizeName, $multiplier in vuetify_settings.$size-scales {
+        /* stylelint-disable-next-line scss/no-global-function-names */
+        $size: map-get($map, $sizeName);
+
+        &.v-avatar--size-#{$sizeName} {
+            font-size: #{$size}px;
+        }
+    }
+}

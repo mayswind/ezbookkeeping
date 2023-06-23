@@ -1,0 +1,19 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/placeholders";
+@use "./variables";
+
+.layout-vertical-nav,
+.layout-horizontal-nav {
+    ol,
+    ul {
+        list-style: none;
+    }
+}
+
+.layout-navbar {
+    @if variables.$navbar-high-emphasis-text {
+        @extend %layout-navbar;
+    }
+}

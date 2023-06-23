@@ -1,0 +1,160 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "./mixins";
+@use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
+@use "@/styles/desktop/template/layout/placeholders";
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+// 👉 Avatar group
+.v-avatar-group {
+    display: flex;
+    align-items: center;
+
+    > * {
+        &:not(:first-child) {
+            margin-inline-start: -0.8rem;
+        }
+
+        transition: transform 0.25s ease, box-shadow 0.15s ease;
+
+        &:hover {
+            z-index: 2;
+            transform: translateY(-5px) scale(1.05);
+
+            @include mixins.elevation(3);
+        }
+    }
+
+    > .v-avatar {
+        border: 2px solid rgb(var(--v-theme-surface));
+        transition: transform 0.15s ease;
+    }
+}
+
+// 👉 Button outline with default color border color
+.v-alert--variant-outlined,
+.v-avatar--variant-outlined,
+.v-btn.v-btn--variant-outlined,
+.v-card--variant-outlined,
+.v-chip--variant-outlined,
+.v-list-item--variant-outlined {
+    &:not([class*="text-"]) {
+        border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+
+    &.text-default {
+        border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+}
+
+// 👉 Custom Input
+.v-label.custom-input {
+    padding: 1rem;
+    border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    opacity: 1;
+    white-space: normal;
+
+    &:hover {
+        border-color: rgba(var(--v-border-color), 0.25);
+    }
+
+    &.active {
+        border-color: rgb(var(--v-theme-primary));
+
+        .v-icon {
+            color: rgb(var(--v-theme-primary)) !important;
+        }
+    }
+}
+
+// Dialog responsive width
+.v-dialog {
+    // dialog custom close btn
+    .v-dialog-close-btn {
+        position: absolute;
+        z-index: 1;
+        color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity)) !important;
+        inset-block-start: 0.9375rem;
+        inset-inline-end: 0.9375rem;
+
+        .v-btn__overlay {
+            display: none;
+        }
+    }
+
+    .v-card {
+        @extend %style-scroll-bar;
+    }
+}
+
+@media (min-width: 600px) {
+    .v-dialog {
+        &.v-dialog-sm,
+        &.v-dialog-lg,
+        &.v-dialog-xl {
+            .v-overlay__content {
+                inline-size: 565px !important;
+            }
+        }
+    }
+}
+
+@media (min-width: 960px) {
+    .v-dialog {
+        &.v-dialog-lg,
+        &.v-dialog-xl {
+            .v-overlay__content {
+                inline-size: 865px !important;
+            }
+        }
+    }
+}
+
+@media (min-width: 1264px) {
+    .v-dialog.v-dialog-xl {
+        .v-overlay__content {
+            inline-size: 1165px !important;
+        }
+    }
+}
+
+// v-tab with pill support
+
+.v-tabs.v-tabs-pill {
+    .v-tab.v-btn {
+        border-radius: 0.25rem !important;
+        transition: none;
+
+        .v-tab__slider {
+            visibility: hidden;
+        }
+    }
+}
+
+// loop for all colors bg
+@each $color-name in variables.$theme-colors-name {
+    .v-tabs.v-tabs-pill {
+        .v-slide-group-item--active.v-tab--selected.text-#{$color-name} {
+            background-color: rgb(var(--v-theme-#{$color-name}));
+            color: rgb(var(--v-theme-on-#{$color-name})) !important;
+        }
+    }
+}
+
+// ℹ️ We are make even width of all v-timeline body
+.v-timeline--vertical.v-timeline {
+    .v-timeline-item {
+        .v-timeline-item__body {
+            justify-self: stretch !important;
+        }
+    }
+}
+
+// 👉 Textarea
+
+.v-textarea .v-field__input {
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}

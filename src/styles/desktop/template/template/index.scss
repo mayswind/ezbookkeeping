@@ -1,0 +1,11 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:map";
+@use "@/styles/desktop/template/base";
+
+// Components
+@use "./components";
+
+// Utilities
+@use "./utilities";

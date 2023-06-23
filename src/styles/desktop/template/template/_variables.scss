@@ -1,0 +1,36 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:map";
+@use "./utils";
+
+$vertical-nav-horizontal-padding-custom: 1.375rem 1rem;
+
+// ℹ️ We created this SCSS var to extract the start padding
+// Docs: https://sass-lang.com/documentation/modules/string
+// $vertical-nav-horizontal-padding => 0 8px;
+// string.index(#{$vertical-nav-horizontal-padding}, " ") + 1 => 2
+//   string.index(#{$vertical-nav-horizontal-padding}, " ") => 1
+// string.slice(0 8px, 2, -1) => 8px => $card-actions-padding-x
+
+$vertical-nav-horizontal-padding-start: utils.get-first-value($vertical-nav-horizontal-padding-custom) !default;
+$vertical-nav-items-icon-margin-inline-end: 0.625rem !default;
+
+@forward "../base/variables" with (
+  $layout-vertical-nav-collapsed-width: 68px !default,
+  // ℹ️ This is used to keep consistency between nav items and nav header left & right margin
+  // This is used by nav items & nav header
+  $vertical-nav-horizontal-spacing: 0 1.125rem !default,
+  $vertical-nav-horizontal-padding: $vertical-nav-horizontal-padding-custom !default,
+  // Vertical nav header padding
+  $vertical-nav-header-padding: 1rem 0.25rem 1rem $vertical-nav-horizontal-padding-start !default,
+);
+
+// 👉 Custom Variables
+$avatar-font-sizes: (
+    "x-small":12,
+    "small":14,
+    "default":18,
+    "large":20,
+    "x-large":24
+) !default;

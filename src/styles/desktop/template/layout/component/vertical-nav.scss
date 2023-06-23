@@ -1,0 +1,75 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/template/layout/mixins";
+
+// 👉 Vertical Nav
+.layout-vertical-nav {
+    position: fixed;
+    z-index: variables.$layout-vertical-nav-z-index;
+    display: flex;
+    flex-direction: column;
+    block-size: 100%;
+    inline-size: variables.$layout-vertical-nav-width;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    transition: transform 0.25s ease-in-out, inline-size 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+    will-change: transform, inline-size;
+
+    .nav-header {
+        display: flex;
+        align-items: center;
+
+        .header-action {
+            cursor: pointer;
+        }
+    }
+
+    .app-title-wrapper {
+        margin-inline-end: auto;
+    }
+
+    .nav-items {
+        block-size: 100%;
+
+        // ℹ️ We no loner needs this overflow styles as perfect scrollbar applies it
+        // overflow-x: hidden;
+
+        // // ℹ️ We used `overflow-y` instead of `overflow` to mitigate overflow x. Revert back if any issue found.
+        // overflow-y: auto;
+    }
+
+    .nav-item-title {
+        overflow: hidden;
+        margin-inline-end: auto;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // 👉 Collapsed
+    .layout-vertical-nav-collapsed & {
+        &:not(.hovered) {
+            inline-size: variables.$layout-vertical-nav-collapsed-width;
+        }
+    }
+
+    // 👉 Overlay nav
+    &.overlay-nav {
+        &:not(.visible) {
+            transform: translateX(-#{variables.$layout-vertical-nav-width});
+
+            @include mixins.rtl {
+                transform: translateX(variables.$layout-vertical-nav-width);
+            }
+        }
+    }
+}
+
+.layout-vertical-nav {
+    .nav-link a {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+}

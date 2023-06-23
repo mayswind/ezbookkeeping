@@ -1,0 +1,81 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:map";
+@use "@/styles/desktop/template/vuetify/variables.scss" as vuetify;
+
+@mixin elevation($z, $important: false) {
+    box-shadow: map.get(vuetify.$shadow-key-umbra, $z), map.get(vuetify.$shadow-key-penumbra, $z), map.get(vuetify.$shadow-key-ambient, $z) if($important, !important, null);
+}
+
+// ℹ️ This mixin is inspired from vuetify for adding hover styles via before pseudo element
+@mixin before-pseudo() {
+    position: relative;
+
+    &::before {
+        position: absolute;
+        border-radius: inherit;
+        background: currentcolor;
+        block-size: 100%;
+        content: "";
+        inline-size: 100%;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+@mixin bordered-skin($component, $border-property: "border", $important: false) {
+    #{$component} {
+        // background-color: rgb(var(--v-theme-background));
+        box-shadow: none !important;
+        #{$border-property}: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) if($important, !important, null);
+    }
+}
+
+// ℹ️ Inspired from vuetify's active-states mixin
+// focus => 0.12 & selected => 0.08
+@mixin selected-states($selector) {
+    // #{$selector} {
+    //   opacity: calc(#{map.get(vuetify.$states, "selected")} * var(--v-theme-overlay-multiplier));
+    // }
+
+    // &:hover
+    // #{$selector} {
+    //   opacity: calc(#{map.get(vuetify.$states, "selected") + map.get(vuetify.$states, "hover")} * var(--v-theme-overlay-multiplier));
+    // }
+
+    // &:focus-visible
+    // #{$selector} {
+    //   opacity: calc(#{map.get(vuetify.$states, "selected") + map.get(vuetify.$states, "focus")} * var(--v-theme-overlay-multiplier));
+    // }
+
+    // @supports not selector(:focus-visible) {
+    //   &:focus {
+    //     #{$selector} {
+    //       opacity: calc(#{map.get(vuetify.$states, "selected") + map.get(vuetify.$states, "focus")} * var(--v-theme-overlay-multiplier));
+    //     }
+    //   }
+    // }
+    #{$selector} {
+        opacity: calc(var(--v-selected-opacity) * var(--v-theme-overlay-multiplier));
+    }
+
+    &:hover
+    #{$selector} {
+        opacity: calc(var(--v-selected-opacity) + var(--v-hover-opacity) * var(--v-theme-overlay-multiplier));
+    }
+
+    &:focus-visible
+    #{$selector} {
+        opacity: calc(var(--v-selected-opacity) + var(--v-focus-opacity) * var(--v-theme-overlay-multiplier));
+    }
+
+    @supports not selector(:focus-visible) {
+        &:focus {
+            #{$selector} {
+                opacity: calc(var(--v-selected-opacity) + var(--v-focus-opacity) * var(--v-theme-overlay-multiplier));
+            }
+        }
+    }
+}

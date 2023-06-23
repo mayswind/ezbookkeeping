@@ -1,0 +1,38 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+$ps-size: 0.25rem;
+$ps-hover-size: 0.375rem;
+$ps-track-size: 0.5rem;
+
+.ps__thumb-y {
+    inline-size: $ps-size;
+    inset-inline-end: 0.0625rem;
+}
+
+.ps__thumb-x {
+    block-size: $ps-size !important;
+}
+
+.ps__rail-x {
+    background: transparent !important;
+    block-size: $ps-track-size;
+}
+
+.ps__rail-y {
+    background: transparent !important;
+    inline-size: $ps-track-size !important;
+    inset-inline-end: 0.125rem !important;
+    inset-inline-start: unset !important;
+}
+
+.ps__rail-y.ps--clicking .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y:hover > .ps__thumb-y {
+    inline-size: $ps-hover-size;
+}
+
+.ps__thumb-x,
+.ps__thumb-y {
+    background-color: rgb(var(--v-theme-perfect-scrollbar-thumb)) !important;
+}

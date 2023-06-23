@@ -1,0 +1,37 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// These are styles which are both common in layout w/ vertical nav & horizontal nav
+@use "./rtl";
+@use "./placeholders";
+@use "./mixins";
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+html,
+body {
+    min-block-size: 100%;
+}
+
+.layout-page-content {
+    @include mixins.boxed-content(true);
+
+    flex-grow: 1;
+
+    padding-block: 1.5rem;
+}
+
+.layout-footer {
+    .footer-content-container {
+        block-size: variables.$layout-vertical-nav-footer-height;
+    }
+
+    .layout-footer-sticky & {
+        position: sticky;
+        inset-block-end: 0;
+        will-change: transform;
+    }
+
+    .layout-footer-hidden & {
+        display: none;
+    }
+}

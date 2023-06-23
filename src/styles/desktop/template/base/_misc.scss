@@ -1,0 +1,23 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// ℹ️ scrollable-content allows creating fixed header and scrollable content for VNavigationDrawer (Used when perfect scrollbar is used)
+.scrollable-content {
+    &.v-navigation-drawer {
+        .v-navigation-drawer__content {
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+        }
+    }
+}
+
+// ℹ️ adding styling for code tag
+code {
+    border-radius: 3px;
+    color: rgb(var(--v-code-color));
+    font-size: 90%;
+    font-weight: 400;
+    padding-block: 0.2em;
+    padding-inline: 0.4em;
+}

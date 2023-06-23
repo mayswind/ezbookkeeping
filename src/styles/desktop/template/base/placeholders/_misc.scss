@@ -1,0 +1,10 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+%blurry-bg {
+    /* stylelint-disable property-no-vendor-prefix */
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    /* stylelint-enable */
+    background-color: rgb(var(--v-theme-surface), 0.9);
+}

@@ -1,0 +1,10 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "./mixins";
+
+.layout-vertical-nav .nav-group-arrow {
+    @include mixins.rtl {
+        transform: rotate(180deg);
+    }
+}

@@ -1,0 +1,55 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// placeholders
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+%boxed-content {
+    @at-root #{&}-spacing {
+        padding-inline: 1.5rem;
+    }
+
+    inline-size: 100%;
+    margin-inline: auto;
+    max-inline-size: variables.$layout-boxed-content-width;
+}
+
+%layout-navbar-hidden {
+    display: none;
+}
+
+// ℹ️ We created this placeholder even it is being used in just layout w/ vertical nav because in future we might apply style to both navbar & horizontal nav separately
+%layout-navbar-sticky {
+    position: sticky;
+    inset-block-start: 0;
+
+    // will-change: transform;
+    // inline-size: 100%;
+}
+
+%style-scroll-bar {
+    /* width */
+
+    &::-webkit-scrollbar {
+        background: rgb(var(--v-theme-surface));
+        block-size: 8px;
+        border-end-end-radius: 14px;
+        border-start-end-radius: 14px;
+        inline-size: 4px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        border-radius: 0.5rem;
+        background: rgb(var(--v-theme-perfect-scrollbar-thumb));
+    }
+
+    &::-webkit-scrollbar-corner {
+        display: none;
+    }
+}

@@ -24,16 +24,16 @@ import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
 import { VSheet } from 'vuetify/components/VSheet';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
-import { VTabs } from 'vuetify/components/VTabs';
+import { VTabs, VTab } from 'vuetify/components/VTabs';
 import { VTable } from 'vuetify/components/VTable';
 import { VTextField } from 'vuetify/components/VTextField';
+import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
 
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
-import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.min.css';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -52,12 +52,12 @@ import {
 
 import AmountInput from '@/components/desktop/AmountInput.vue';
 
-import '@/styles/desktop/base.css';
-import '@/styles/desktop/layout.css';
-import '@/styles/desktop/font-size-utils.css';
-import '@/styles/desktop/gap-size-utils.css';
-import '@/styles/desktop/vuetify.css';
-import '@/styles/desktop/classess.css';
+import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
+import '@/styles/desktop/template/template/index.scss';
+import '@/styles/desktop/template/layout/index.scss';
+import '@/styles/desktop/template/layout/component/index.scss';
+import '@/styles/desktop/template/layout/_default-layout.scss';
+import '@/styles/desktop/global.scss';
 
 import App from './DesktopApp.vue';
 
@@ -104,8 +104,11 @@ const vuetify = createVuetify({
         VSheet,
         VSnackbar,
         VTabs,
+        VTab,
         VTable,
-        VTextField
+        VTextField,
+        VWindow,
+        VWindowItem
     },
     icons: {
         defaultSet: 'mdi',
@@ -228,9 +231,8 @@ const vuetify = createVuetify({
                     'skin-bordered-surface': '#fff'
                 },
                 variables: {
-                    'btn-height': '38px',
                     'code-color': '#ff8000',
-                    'overlay-scrim-background': '#3a3541',
+                    'overlay-scrim-background': '#413935',
                     'overlay-scrim-opacity': 0.5,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
@@ -278,9 +280,8 @@ const vuetify = createVuetify({
                     'skin-bordered-surface': '#312d4b'
                 },
                 variables: {
-                    'btn-height': '38px',
                     'code-color': '#ff8000',
-                    'overlay-scrim-background': '#2C2942',
+                    'overlay-scrim-background': '#1c1c1d',
                     'overlay-scrim-opacity': 0.6,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
@@ -288,8 +289,8 @@ const vuetify = createVuetify({
                     'activated-opacity': 0.1,
                     'pressed-opacity': 0.14,
                     'dragged-opacity': 0.1,
-                    'border-color': '#E7E3FC',
-                    'table-header-background': '#3D3759',
+                    'border-color': '#e7e3fc',
+                    'table-header-background': '#3d3759',
                     'custom-background': '#373452',
                     'shadow-key-umbra-opacity': 'rgba(20, 18, 33, 0.08)',
                     'shadow-key-penumbra-opacity': 'rgba(20, 18, 33, 0.12)',

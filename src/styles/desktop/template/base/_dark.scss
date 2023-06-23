@@ -1,0 +1,19 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+// ————————————————————————————————————
+// * ——— Perfect Scrollbar
+// ————————————————————————————————————
+
+.v-application.v-theme--dark {
+    .ps__rail-y,
+    .ps__rail-x {
+        background-color: transparent !important;
+    }
+
+    .ps__thumb-y {
+        background-color: variables.$plugin-ps-thumb-y-dark;
+    }
+}

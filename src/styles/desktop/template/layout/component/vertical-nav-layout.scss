@@ -1,0 +1,102 @@
+/** Materio Template layout styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/template/layout/placeholders";
+@use "@/styles/desktop/template/layout/mixins";
+
+.layout-wrapper.layout-nav-type-vertical {
+    block-size: 100%;
+
+    .layout-content-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-block-size: calc(var(--vh, 1vh) * 100);
+        transition: padding-inline-start 0.2s ease-in-out;
+        will-change: padding-inline-start;
+    }
+
+    .layout-navbar {
+        z-index: variables.$layout-vertical-nav-layout-navbar-z-index;
+
+        .navbar-content-container {
+            block-size: variables.$layout-vertical-nav-navbar-height;
+        }
+
+        @at-root {
+            .layout-wrapper.layout-nav-type-vertical {
+                .layout-navbar {
+                    @if variables.$layout-vertical-nav-navbar-is-contained {
+                        @include mixins.boxed-content;
+                    } @else {
+                        .navbar-content-container {
+                            @include mixins.boxed-content;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.layout-navbar-sticky .layout-navbar {
+        @extend %layout-navbar-sticky;
+    }
+
+    &.layout-navbar-hidden .layout-navbar {
+        @extend %layout-navbar-hidden;
+    }
+
+    // 👉 Footer
+    .layout-footer {
+        @include mixins.boxed-content;
+    }
+
+    // 👉 Layout overlay
+    .layout-overlay {
+        position: fixed;
+        z-index: variables.$layout-overlay-z-index;
+        background-color: rgb(0 0 0 / 60%);
+        cursor: pointer;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease-in-out;
+        will-change: transform;
+
+        &.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    &:not(.layout-overlay-nav) .layout-content-wrapper {
+        padding-inline-start: variables.$layout-vertical-nav-width;
+    }
+
+    // Adjust right column pl when vertical nav is collapsed
+    &.layout-vertical-nav-collapsed .layout-content-wrapper {
+        padding-inline-start: variables.$layout-vertical-nav-collapsed-width;
+    }
+
+    // 👉 Content height fixed
+    &.layout-content-height-fixed {
+        .layout-content-wrapper {
+            max-block-size: calc(var(--vh) * 100);
+        }
+
+        .layout-page-content {
+            display: flex;
+            overflow: hidden;
+
+            .page-content-container {
+                inline-size: 100%;
+
+                > :first-child {
+                    max-block-size: 100%;
+                    overflow-y: auto;
+                }
+            }
+        }
+    }
+}

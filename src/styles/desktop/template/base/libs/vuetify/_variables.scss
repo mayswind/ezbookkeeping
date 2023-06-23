@@ -1,0 +1,53 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 Shadow opacities
+$shadow-key-umbra-opacity-custom: var(--v-shadow-key-umbra-opacity);
+$shadow-key-penumbra-opacity-custom: var(--v-shadow-key-penumbra-opacity);
+$shadow-key-ambient-opacity-custom: var(--v-shadow-key-ambient-opacity);
+
+// 👉 Card transition properties
+$card-transition-property-custom: box-shadow, opacity;
+
+@forward "vuetify/settings" with (
+    // 👉 General settings
+    $color-pack: false !default,
+
+    // 👉 Shadow opacity
+    $shadow-key-umbra-opacity: $shadow-key-umbra-opacity-custom !default,
+    $shadow-key-penumbra-opacity: $shadow-key-penumbra-opacity-custom !default,
+    $shadow-key-ambient-opacity: $shadow-key-ambient-opacity-custom !default,
+
+    // 👉 Card
+    $card-color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !default,
+    $card-elevation: 6 !default,
+    $card-title-line-height: 1.6 !default,
+    $card-actions-min-height: unset !default,
+    $card-text-padding: 1.25rem !default,
+    $card-item-padding: 1.25rem !default,
+    $card-actions-padding: 0 12px 12px !default,
+    $card-transition-property: $card-transition-property-custom !default,
+    $card-subtitle-opacity: 1 !default,
+
+    // 👉 Expansion Panel
+    $expansion-panel-active-title-min-height: 48px !default,
+
+    // 👉 List
+    $list-item-icon-margin-end: 16px !default,
+    $list-item-icon-margin-start: 16px !default,
+    $list-item-subtitle-opacity: 1 !default,
+
+    // 👉 Tooltip
+    $tooltip-background-color: rgba(59, 55, 68, 0.9) !default,
+    $tooltip-text-color: rgb(var(--v-theme-on-primary)) !default,
+    $tooltip-font-size: 0.75rem !default,
+
+    $button-icon-density: ("default": 2, "comfortable": 0, "compact": -1) !default,
+
+    // 👉 VTimeline
+    $timeline-dot-size: 34px !default,
+
+    // 👉 VOverlay
+    $overlay-opacity: 1 !default,
+)
+;

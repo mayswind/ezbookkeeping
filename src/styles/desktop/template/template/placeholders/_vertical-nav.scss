@@ -1,0 +1,67 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+
+// ℹ️ Add divider around section title
+%vertical-nav-section-title {
+    /*
+      ℹ️ We will use this to add gap between divider and text.
+      Moreover, we will use this to adjust the `flex-basis` property of left divider
+    */
+    $divider-gap: 0.625rem;
+
+    // Thanks: https://stackoverflow.com/a/62359101/10796681
+    .title-text {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        column-gap: $divider-gap;
+
+        &::before,
+        &::after {
+            border-block-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+            content: "";
+        }
+
+        &::after {
+            flex: 1 1 auto;
+        }
+
+        &::before {
+            flex: 0 1 calc(variables.$vertical-nav-horizontal-padding-start - $divider-gap);
+            margin-inline-start: -#{variables.$vertical-nav-horizontal-padding-start};
+        }
+    }
+
+    // ℹ️ Update the margin-inline-end when vertical nav is in mini state. We done same for link & group.
+    @at-root {
+        .layout-nav-type-vertical.layout-vertical-nav-collapsed .layout-vertical-nav:not(.hovered) .nav-section-title {
+            margin-inline: 4px 0;
+        }
+    }
+}
+
+%vertical-nav-item-interactive {
+    // Add pill shape styles
+    block-size: 2.625rem !important;
+    border-end-end-radius: 3.125rem !important;
+    border-end-start-radius: 0 !important;
+    border-start-end-radius: 3.125rem !important;
+    border-start-start-radius: 0 !important;
+}
+
+%vertical-nav-item-interactive {
+    // ℹ️ Wobble effect
+    // transition: margin-inline 0.4s ease-in-out;
+    // will-change: margin-inline;
+
+    transition: margin-inline 0.15s ease-in-out;
+    will-change: margin-inline;
+
+    // Reduce margin inline end when vertical nav is in collapsed mode and not hovered
+    .layout-nav-type-vertical.layout-vertical-nav-collapsed .layout-vertical-nav:not(.hovered) & {
+        margin-inline: 0 5px;
+    }
+}

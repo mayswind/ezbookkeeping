@@ -2,6 +2,7 @@ import fs from 'fs';
 import { resolve } from 'path';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue';
+import vuetify from 'vite-plugin-vuetify';
 import { VitePWA } from 'vite-plugin-pwa';
 import git from 'git-rev-sync';
 
@@ -33,6 +34,11 @@ export default defineConfig(async () => {
                     compilerOptions: {
                         isCustomElement: (tag) => tag.includes('swiper-')
                     }
+                }
+            }),
+            vuetify({
+                styles: {
+                    configFile: 'styles/desktop/template/configured-variables/_vuetify.scss'
                 }
             }),
             VitePWA({

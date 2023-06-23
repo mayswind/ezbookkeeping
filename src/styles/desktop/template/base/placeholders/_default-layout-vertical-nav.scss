@@ -1,0 +1,49 @@
+/** Materio Template base classes **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "./misc";
+@use "@/styles/desktop/template/base/mixins";
+
+%default-layout-vertical-nav-scrolled-sticky-elevated-nav {
+    background-color: rgb(var(--v-theme-surface));
+}
+
+%default-layout-vertical-nav-floating-navbar-and-sticky-elevated-navbar-scrolled {
+    @include mixins.elevation(variables.$vertical-nav-navbar-elevation);
+
+    // If navbar is contained => Squeeze navbar content on scroll
+    @if variables.$layout-vertical-nav-navbar-is-contained {
+        padding-inline: 1.2rem;
+    }
+}
+
+%default-layout-vertical-nav-floating-navbar-overlay {
+    isolation: isolate;
+
+    &::after {
+        position: absolute;
+        z-index: -1;
+        /* stylelint-disable property-no-vendor-prefix */
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        /* stylelint-enable */
+        background:
+            linear-gradient(
+                    180deg,
+                    rgba(var(--v-theme-background), 70%) 44%,
+                    rgba(var(--v-theme-background), 43%) 73%,
+                    rgba(var(--v-theme-background), 0%)
+            );
+        background-repeat: repeat;
+        block-size: calc(variables.$layout-vertical-nav-navbar-height + variables.$vertical-nav-floating-navbar-top + 0.5rem);
+        content: "";
+        inset-block-start: -(variables.$vertical-nav-floating-navbar-top);
+        inset-inline-end: 0;
+        inset-inline-start: 0;
+        /* stylelint-disable property-no-vendor-prefix */
+        -webkit-mask: linear-gradient(black, black 18%, transparent 100%);
+        mask: linear-gradient(black, black 18%, transparent 100%);
+        /* stylelint-enable */
+    }
+}

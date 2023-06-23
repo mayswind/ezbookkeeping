@@ -1,0 +1,201 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
+@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "./mixins";
+@use "@/styles/desktop/template/base/mixins" as mixins_base;
+
+// 👉 Alert
+.v-alert {
+    .v-alert__close {
+        .v-icon {
+            block-size: 20px !important;
+            font-size: 20px !important;
+            inline-size: 20px !important;
+        }
+    }
+
+    &:not(.v-alert--prominent) .v-alert__prepend {
+        .v-icon {
+            block-size: 1.375rem !important;
+            font-size: 1.375rem !important;
+            inline-size: 1.375rem !important;
+        }
+    }
+
+    .v-alert-title {
+        line-height: 1.5rem;
+        margin-block-end: 0.25rem;
+    }
+}
+
+// 👉 Avatar font-size
+.v-avatar {
+    @include mixins.avatar-font-sizes($map: variables.$avatar-font-sizes);
+}
+
+// 👉 Button
+.v-btn {
+    /* stylelint-disable-next-line no-descending-specificity */
+    &:not(.v-btn--icon) .v-icon {
+        --v-icon-size-multiplier: 0.9525 !important;
+    }
+}
+
+// 👉 Chip
+.v-chip.v-chip--size-default .v-avatar {
+    --v-avatar-height: 24px;
+}
+
+.v-chip.v-chip--density-comfortable {
+    line-height: 1;
+}
+
+// 👉 Expansion Panel
+.v-expansion-panel {
+    .v-expansion-panel-text {
+        font-size: 1rem;
+    }
+}
+
+// 👉 Tooltip
+.v-tooltip > .v-overlay__content {
+    font-weight: 500;
+    line-height: 0.875rem;
+}
+
+// 👉 List
+
+//  👉 Tab with pill support
+.v-tabs.v-tabs-pill {
+    .v-tab.v-btn {
+        border-radius: 6px !important;
+    }
+}
+
+// 👉 Timeline added box shadow
+.v-timeline-item {
+    .v-timeline-divider__dot {
+        .v-timeline-divider__inner-dot {
+            box-shadow: 0 0 0 0.1875rem rgb(var(--v-theme-on-surface-variant));
+
+            @each $color-name in variables.$theme-colors-name {
+
+                &.bg-#{$color-name} {
+                    box-shadow: 0 0 0 0.1875rem rgba(var(--v-theme-#{$color-name}), 0.12);
+                }
+            }
+        }
+    }
+}
+
+// 👉 Timeline Outlined style
+.v-timeline-variant-outlined.v-timeline {
+    .v-timeline-divider__dot {
+        .v-timeline-divider__inner-dot {
+            box-shadow: inset 0 0 0 0.125rem rgb(var(--v-theme-on-surface-variant));
+
+            @each $color-name in variables.$theme-colors-name {
+                background-color: rgb(var(--v-theme-surface)) !important;
+
+                &.bg-#{$color-name} {
+                    box-shadow: inset 0 0 0 0.125rem rgb(var(--v-theme-#{$color-name}));
+                }
+            }
+        }
+    }
+}
+
+// 👉 Expansion panels
+.v-expansion-panel-title,
+.v-expansion-panel-title--active,
+.v-expansion-panel-title:hover,
+.v-expansion-panel-title:focus,
+.v-expansion-panel-title:focus-visible,
+.v-expansion-panel-title--active:focus,
+.v-expansion-panel-title--active:hover {
+    .v-expansion-panel-title__overlay {
+        opacity: 0 !important;
+    }
+}
+
+// 👉 Set Elevation when panel open
+
+.v-expansion-panels:not(.v-expansion-panels--variant-accordion) {
+    .v-expansion-panel.v-expansion-panel--active {
+        .v-expansion-panel__shadow {
+            @include mixins_elevation.elevation(3);
+        }
+    }
+}
+
+// 👉 Slider
+.v-slider-thumb {
+    .v-slider-thumb__label {
+        background: rgb(117, 117, 117);
+        color: rgb(var(--v-theme-on-primary));
+
+        &::before {
+            color: rgb(117, 117, 117);
+        }
+    }
+}
+
+// 👉 Switch
+.v-switch {
+    .v-selection-control:not(.v-selection-control--dirty) .v-switch__thumb {
+        color: #fff;
+    }
+}
+
+// 👉 Table
+.v-table--density-default > .v-table__wrapper > table > tbody > tr > td,
+.v-table--density-default > .v-table__wrapper > table > thead > tr > td,
+.v-table--density-default > .v-table__wrapper > table > tfoot > tr > td {
+    block-size: 50px !important;
+}
+
+.v-table {
+    --v-table-header-height: 54px !important;
+
+    th {
+        color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !important;
+        font-size: 0.75rem;
+
+        .v-data-table-header__content {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    .v-selection-control {
+        color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !important;
+        font-size: 1rem;
+    }
+}
+
+.v-data-table {
+    th {
+        background: rgb(var(--v-table-header-background)) !important;
+    }
+
+    .v-data-table-footer {
+        margin-block-start: 1rem;
+    }
+}
+
+// 👉 Pagination
+.v-pagination {
+    .v-btn {
+        border-radius: 4px;
+        color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+        font-size: 14px;
+        font-weight: 400;
+    }
+}
+
+// 👉 SnackBar
+.v-snackbar--variant-elevated {
+    @include mixins_base.elevation(6);
+}

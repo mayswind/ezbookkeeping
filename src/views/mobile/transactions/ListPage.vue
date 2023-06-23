@@ -978,6 +978,6 @@ export default {
 
 .date-popover-menu .popover-inner, .category-popover-menu .popover-inner, .account-popover-menu .popover-inner {
     max-height: 400px;
-    overflow-Y: auto;
+    overflow-y: auto;
 }
 </style>

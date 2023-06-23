@@ -309,6 +309,6 @@ export default {
 
 .lang-popover-menu .popover-inner {
     max-height: 300px;
-    overflow-Y: auto;
+    overflow-y: auto;
 }
 </style>

@@ -16,7 +16,7 @@ $vertical-nav-horizontal-padding-custom: 1.375rem 1rem;
 $vertical-nav-horizontal-padding-start: utils.get-first-value($vertical-nav-horizontal-padding-custom) !default;
 $vertical-nav-items-icon-margin-inline-end: 0.625rem !default;
 
-@forward "../base/variables" with (
+@forward "@/styles/desktop/template/base/variables" with (
   $layout-vertical-nav-collapsed-width: 68px !default,
   // ℹ️ This is used to keep consistency between nav items and nav header left & right margin
   // This is used by nav items & nav header

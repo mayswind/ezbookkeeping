@@ -2,7 +2,7 @@
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
 @use "./placeholders";
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 
 @mixin rtl {
     @if variables.$enable-rtl-styles {

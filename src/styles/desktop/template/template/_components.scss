@@ -2,7 +2,7 @@
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
 @use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 @use "./mixins";
 @use "@/styles/desktop/template/base/mixins" as mixins_base;
 

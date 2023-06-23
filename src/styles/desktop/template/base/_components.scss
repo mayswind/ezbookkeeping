@@ -4,7 +4,7 @@
 @use "./mixins";
 @use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
 @use "@/styles/desktop/template/layout/placeholders";
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 
 // 👉 Avatar group
 .v-avatar-group {

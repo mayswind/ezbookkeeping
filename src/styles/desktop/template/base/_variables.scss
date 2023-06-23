@@ -3,7 +3,7 @@
 
 @use "vuetify/lib/styles/tools/functions" as *;
 
-@forward "../layout/variables" with (
+@forward "@/styles/desktop/template/layout/variables" with (
   // Adjust z-index so vertical nav & overlay stays on top of v-layout in v-main. E.g. Email app
   $layout-vertical-nav-z-index: 1004,
   $layout-overlay-z-index: 1003,

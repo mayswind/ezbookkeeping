@@ -38,7 +38,7 @@ export default defineConfig(async () => {
             }),
             vuetify({
                 styles: {
-                    configFile: 'styles/desktop/template/configured-variables/_vuetify.scss'
+                    configFile: 'styles/desktop/configured-variables/_vuetify.scss'
                 }
             }),
             VitePWA({

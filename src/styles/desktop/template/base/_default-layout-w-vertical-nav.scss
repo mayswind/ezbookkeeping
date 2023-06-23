@@ -1,7 +1,7 @@
 /** Materio Template base classes **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 @use "./placeholders" as *;
 @use "@/styles/desktop/template/template/placeholders" as *;
 @use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;

@@ -4,7 +4,7 @@
 @use "./placeholders" as *;
 @use "@/styles/desktop/template/template/placeholders" as *;
 @use "@/styles/desktop/template/layout/mixins" as layoutsMixins;
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 @use "./mixins" as mixins;
 @use "vuetify/lib/styles/tools/states" as vuetifyStates;
 

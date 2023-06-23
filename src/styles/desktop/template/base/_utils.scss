@@ -3,7 +3,7 @@
 
 @use "sass:map";
 @use "sass:list";
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 
 // Thanks: https://css-tricks.com/snippets/sass/deep-getset-maps/
 @function map-deep-get($map, $keys...) {

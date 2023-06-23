@@ -5,7 +5,7 @@
 @use "./rtl";
 @use "./placeholders";
 @use "./mixins";
-@use "@/styles/desktop/template/configured-variables/template" as variables;
+@use "@/styles/desktop/configured-variables/template" as variables;
 
 html,
 body {

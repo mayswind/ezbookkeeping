@@ -105,7 +105,7 @@
                         </v-col>
 
                         <v-col cols="12" class="d-flex align-center">
-                            <VDivider />
+                            <v-divider />
                         </v-col>
 
                         <v-col cols="12" class="text-center text-sm">

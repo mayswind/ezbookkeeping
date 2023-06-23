@@ -54,8 +54,8 @@ import AmountInput from '@/components/desktop/AmountInput.vue';
 
 import '@/styles/desktop/base.css';
 import '@/styles/desktop/layout.css';
-import '@/styles/desktop/font-size.css';
-import '@/styles/desktop/gap-size.css';
+import '@/styles/desktop/font-size-utils.css';
+import '@/styles/desktop/gap-size-utils.css';
 import '@/styles/desktop/vuetify.css';
 import '@/styles/desktop/classess.css';
 

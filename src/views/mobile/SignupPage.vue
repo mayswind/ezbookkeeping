@@ -95,13 +95,13 @@
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :key="currentLocale + '_firstDayOfWeek'"
                 :header="$t('First Day of Week')"
-                :title="getDayOfWeekName(user.firstDayOfWeek)"
+                :title="currentDayOfWeekName"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('First Day of Week'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="user.firstDayOfWeek">
                     <option :value="weekDay.type"
                             :key="weekDay.type"
-                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                            v-for="weekDay in allWeekDays">{{ weekDay.displayName }}</option>
                 </select>
             </f7-list-item>
         </f7-list>
@@ -180,7 +180,6 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import datetimeConstants from '@/consts/datetime.js';
 import categoryConstants from '@/consts/category.js';
 import { getNameByKeyValue, copyArrayTo } from '@/lib/common.js';
 
@@ -201,7 +200,7 @@ export default {
                 nickname: '',
                 language: self.$i18n.locale,
                 defaultCurrency: settingsStore.defaultSetting.currency,
-                firstDayOfWeek: datetimeConstants.allWeekDays[self.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[self.$t('default.firstDayOfWeek')].type : 0
+                firstDayOfWeek: settingsStore.defaultSetting.firstDayOfWeek,
             },
             submitting: false,
             presetCategories: {
@@ -224,7 +223,7 @@ export default {
             return this.$locale.getAllCurrencies();
         },
         allWeekDays() {
-            return datetimeConstants.allWeekDays;
+            return this.$locale.getAllWeekDays();
         },
         currentLocale: {
             get: function () {
@@ -232,7 +231,7 @@ export default {
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.defaultSetting.currency;
-                const isFirstWeekDayDefault = this.user.firstDayOfWeek === (datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0);
+                const isFirstWeekDayDefault = this.user.firstDayOfWeek === this.settingsStore.defaultSetting.firstDayOfWeek;
 
                 this.user.language = value;
 
@@ -244,7 +243,7 @@ export default {
                 }
 
                 if (isFirstWeekDayDefault) {
-                    this.user.firstDayOfWeek = datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')] ? datetimeConstants.allWeekDays[this.$t('default.firstDayOfWeek')].type : 0;
+                    this.user.firstDayOfWeek = this.settingsStore.defaultSetting.firstDayOfWeek;
                 }
             }
         },
@@ -256,6 +255,9 @@ export default {
             }
 
             return languageInfo.displayName;
+        },
+        currentDayOfWeekName() {
+            return getNameByKeyValue(this.allWeekDays, this.user.firstDayOfWeek, 'type', 'displayName');
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
@@ -396,11 +398,6 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        },
-        getDayOfWeekName(dayOfWeek) {
-            const weekName = getNameByKeyValue(datetimeConstants.allWeekDays, dayOfWeek, 'type', 'name');
-            const i18nWeekNameKey = `datetime.${weekName}.long`;
-            return this.$t(i18nWeekNameKey);
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {

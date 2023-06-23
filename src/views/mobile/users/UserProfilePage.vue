@@ -149,7 +149,7 @@
                 <select v-model="newProfile.firstDayOfWeek">
                     <option :value="weekDay.type"
                             :key="weekDay.type"
-                            v-for="weekDay in allWeekDays">{{ $t(`datetime.${weekDay.name}.long`) }}</option>
+                            v-for="weekDay in allWeekDays">{{ weekDay.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -226,7 +226,6 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
-import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
 
@@ -311,7 +310,7 @@ export default {
             return getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {
-            return datetimeConstants.allWeekDays;
+            return this.$locale.getAllWeekDays();
         },
         allLongDateFormats() {
             return this.$locale.getAllLongDateFormats();
@@ -359,9 +358,7 @@ export default {
             return this.$t('Unknown');
         },
         currentDayOfWeekName() {
-            const weekName = getNameByKeyValue(datetimeConstants.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'name');
-            const i18nWeekNameKey = `datetime.${weekName}.long`;
-            return this.$t(i18nWeekNameKey);
+            return getNameByKeyValue(this.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'displayName');
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;

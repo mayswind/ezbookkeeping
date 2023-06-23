@@ -241,6 +241,14 @@ function getCurrentLanguageInfo(i18nGlobal) {
     return getDefaultLanguage();
 }
 
+function getDefaultCurrency(translateFn) {
+    return translateFn('default.currency');
+}
+
+function getDefaultFirstDayOfWeek(translateFn) {
+    return translateFn('default.firstDayOfWeek');
+}
+
 function getAllLongMonthNames(translateFn) {
     return [
         translateFn('datetime.January.long'),
@@ -484,6 +492,21 @@ function getAllCurrencies(translateFn) {
     return allCurrencies;
 }
 
+function getAllWeekDays(translateFn) {
+    const allWeekDays = [];
+
+    for (let i = 0; i < datetime.allWeekDaysArray.length; i++) {
+        const weekDay = datetime.allWeekDaysArray[i];
+
+        allWeekDays.push({
+            type: weekDay.type,
+            displayName: translateFn(`datetime.${weekDay.name}.long`)
+        });
+    }
+
+    return allWeekDays;
+}
+
 function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
@@ -623,8 +646,8 @@ function setLanguage(i18nGlobal, locale, force) {
     services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
 
-    const defaultCurrency = i18nGlobal.t('default.currency');
-    const defaultFirstDayOfWeekName = i18nGlobal.t('default.firstDayOfWeek');
+    const defaultCurrency = getDefaultCurrency(i18nGlobal.t);
+    const defaultFirstDayOfWeekName = getDefaultFirstDayOfWeek(i18nGlobal.t);
     let defaultFirstDayOfWeek = datetime.defaultFirstDayOfWeek;
 
     if (datetime.allWeekDays[defaultFirstDayOfWeekName]) {
@@ -716,6 +739,8 @@ export function i18nFunctions(i18nGlobal) {
         getLanguageInfo: getLanguageInfo,
         getDefaultLanguage: getDefaultLanguage,
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
+        getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
+        getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
         getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
         getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),
@@ -743,6 +768,7 @@ export function i18nFunctions(i18nGlobal) {
         isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
+        getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         getTimezone: settings.getTimezone,

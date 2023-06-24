@@ -73,8 +73,14 @@
                     </router-link>
                 </li>
                 <li class="nav-link">
-                    <a :href="mobileVersionPath">
+                    <a href="javascript:void(0);" @click="showMobileQrCode = true">
                         <v-icon class="nav-item-icon" :icon="icons.mobile"/>
+                        <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a :href="mobileVersionPath">
+                        <v-icon class="nav-item-icon" :icon="icons.switchToMobile"/>
                         <span class="nav-item-title">{{ $t('Switch to Mobile Version') }}</span>
                     </a>
                 </li>
@@ -157,6 +163,24 @@
 
         <div class="layout-overlay" :class="{ 'visible': showVerticalOverlayMenu }" @click="showVerticalOverlayMenu = false"></div>
 
+        <v-dialog width="400" v-model="showMobileQrCode">
+            <v-card>
+                <v-toolbar color="primary">
+                    <v-toolbar-title>{{ $t('global.app.title') }}</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text class="pa-4">
+                    <p>{{ $t('You can scan the below QR code on your mobile device.') }}</p>
+                </v-card-text>
+                <v-card-text class="pa-4 w-100 d-flex">
+                    <v-img alt="qrcode" class="text-center img-url-qrcode" src="/qrcode/mobile_url.png" />
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="showMobileQrCode = false">{{ $t('Close') }}</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
         <v-overlay class="justify-center align-center" :persistent="true" v-model="showLoading">
             <v-progress-circular indeterminate></v-progress-circular>
         </v-overlay>
@@ -194,6 +218,7 @@ import {
     mdiSwapHorizontal,
     mdiCogOutline,
     mdiCellphone,
+    mdiMonitorCellphone,
     mdiInformationOutline,
     mdiThemeLightDark,
     mdiWeatherSunny,
@@ -210,6 +235,7 @@ export default {
             isVerticalNavScrolled: false,
             showVerticalOverlayMenu: false,
             showLoading: false,
+            showMobileQrCode: false,
             showSnackbar: false,
             snackbarMessage: '',
             icons: {
@@ -223,6 +249,7 @@ export default {
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,
                 mobile: mdiCellphone,
+                switchToMobile: mdiMonitorCellphone,
                 about: mdiInformationOutline,
                 themeAuto: mdiThemeLightDark,
                 themeLight: mdiWeatherSunny,
@@ -307,6 +334,11 @@ export default {
 </script>
 
 <style>
+.img-url-qrcode {
+    width: 320px;
+    height: 320px
+}
+
 .main-logo {
     width: 1.8em;
     height: 1.8em;

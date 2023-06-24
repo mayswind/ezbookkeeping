@@ -6,6 +6,12 @@
         "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.9.0/LICENSE"
     },
     {
+        "name": "Cache gin's middleware",
+        "copyright": "Copyright (c) 2016 Gin-Gonic",
+        "url": "https://github.com/gin-contrib/cache",
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.2.0/LICENSE"
+    },
+    {
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
@@ -74,6 +80,12 @@
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
         "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.9.0:LICENSE"
+    },
+    {
+        "name": "barcode",
+        "copyright": "Copyright (c) 2014 Florian Sundermann",
+        "url": "https://github.com/boombuler/barcode",
+        "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.1/LICENSE"
     },
     {
         "name": "Testify",

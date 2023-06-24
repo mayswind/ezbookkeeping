@@ -1135,6 +1135,8 @@ export default {
     'Exchange rates data has been updated': 'Exchange rates data has been updated',
     'Exchange rates data is up to date': 'Exchange rates data is up to date',
     'Unable to get exchange rates data': 'Unable to get exchange rates data',
+    'Use on Mobile Device': 'Use on Mobile Device',
+    'You can scan the below QR code on your mobile device.': 'You can scan the below QR code on your mobile device.',
     'Switch to Mobile Version': 'Switch to Mobile Version',
     'Switch to Desktop Version': 'Switch to Desktop Version',
     'About': 'About',

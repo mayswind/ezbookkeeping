@@ -1135,6 +1135,8 @@ export default {
     'Exchange rates data has been updated': '汇率数据已更新',
     'Exchange rates data is up to date': '汇率数据已是最新',
     'Unable to get exchange rates data': '无法获取汇率数据',
+    'Use on Mobile Device': '在移动设备使用',
+    'You can scan the below QR code on your mobile device.': '您可以在您的移动设备上扫描下方二维码。',
     'Switch to Mobile Version': '切换到移动版',
     'Switch to Desktop Version': '切换到桌面版',
     'About': '关于',

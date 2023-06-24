@@ -3,7 +3,10 @@ package cmd
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -163,6 +166,13 @@ func startWebServer(c *cli.Context) error {
 		{
 			amapApiProxyRoute.GET("/*action", bindProxy(api.AmapApis.AmapApiProxyHandler))
 		}
+	}
+
+	qrCodeRoute := router.Group("/qrcode")
+	qrCodeRoute.Use(bindMiddleware(middlewares.RequestId(config)))
+	{
+		qrCodeCacheStore := persistence.NewInMemoryStore(time.Minute)
+		qrCodeRoute.GET("/mobile_url.png", bindCachedPngImage(api.QrCodes.MobileUrlQrCodeHandler, qrCodeCacheStore))
 	}
 
 	apiRoute := router.Group("/api")
@@ -332,6 +342,19 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 			utils.PrintDataSuccessResult(c, "text/csv", fileName, result)
 		}
 	}
+}
+
+func bindCachedPngImage(fn core.DataHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
+	return cache.CachePage(store, time.Minute, func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		result, _, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			utils.PrintDataSuccessResult(c, "img/png", "", result)
+		}
+	})
 }
 
 func bindProxy(fn core.ProxyHandlerFunc) gin.HandlerFunc {

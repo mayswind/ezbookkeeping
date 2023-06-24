@@ -225,9 +225,8 @@
                 :header="$t('Transaction Time Zone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Time Zone'), popupCloseLinkText: $t('Done') }">
                 <select v-model="transaction.timeZone">
-                    <option :value="timezone.name"
-                            :key="timezone.name"
-                            v-for="timezone in allTimezones">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                    <option :value="timezone.name" :key="timezone.name"
+                            v-for="timezone in allTimezones">{{ timezone.displayNameWithUtcOffset }}</option>
                 </select>
                 <template #title>
                     <f7-block class="list-item-custom-title no-padding no-margin">

@@ -441,20 +441,27 @@ function getAllTimezones(includeSystemDefault, translateFn) {
     const allTimezoneInfos = [];
 
     for (let i = 0; i < allTimezones.length; i++) {
+        const utcOffset = (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? getTimezoneOffset(allTimezones[i].timezoneName) : '');
+        const displayName = translateFn(`timezone.${allTimezones[i].displayName}`);
+
         allTimezoneInfos.push({
             name: allTimezones[i].timezoneName,
-            utcOffset: (allTimezones[i].timezoneName !== timezone.utcTimezoneName ? getTimezoneOffset(allTimezones[i].timezoneName) : ''),
+            utcOffset: utcOffset,
             utcOffsetMinutes: getTimezoneOffsetMinutes(allTimezones[i].timezoneName),
-            displayName: translateFn(`timezone.${allTimezones[i].displayName}`)
+            displayName: displayName,
+            displayNameWithUtcOffset: `(UTC${utcOffset}) ${displayName}`
         });
     }
 
     if (includeSystemDefault) {
+        const defaultDisplayName = translateFn('System Default');
+
         allTimezoneInfos.push({
             name: '',
             utcOffset: defaultTimezoneOffset,
             utcOffsetMinutes: defaultTimezoneOffsetMinutes,
-            displayName: translateFn('System Default')
+            displayName: defaultDisplayName,
+            displayNameWithUtcOffset: `(UTC${defaultTimezoneOffset}) ${defaultDisplayName}`
         });
     }
 

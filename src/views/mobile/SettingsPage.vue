@@ -33,9 +33,8 @@
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="timeZone">
-                    <option :value="tz.name"
-                            :key="tz.name"
-                            v-for="tz in allTimezones">{{ `(UTC${tz.utcOffset}) ${tz.displayName}` }}</option>
+                    <option :value="tz.name" :key="tz.name"
+                            v-for="tz in allTimezones">{{ tz.displayNameWithUtcOffset }}</option>
                 </select>
             </f7-list-item>
 

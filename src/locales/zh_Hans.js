@@ -821,6 +821,7 @@ export default {
     'PIN code is wrong': 'PIN码错误',
     'Sign Up': '注册',
     'Overview': '总览',
+    'View Details': '查看详情',
     'Transaction List': '交易列表',
     'Account List': '账户列表',
     'This Week': '本周',

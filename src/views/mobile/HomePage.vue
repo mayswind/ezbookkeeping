@@ -208,8 +208,6 @@ import {
 
 export default {
     data() {
-        const self = this;
-
         return {
             loading: true,
             todayFirstUnixTime: getTodayFirstUnixTime(),

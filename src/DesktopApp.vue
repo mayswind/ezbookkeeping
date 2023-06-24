@@ -20,8 +20,6 @@ import { getSystemTheme } from '@/lib/ui.js';
 
 export default {
     data() {
-        const self = this;
-
         return {
             isProduction: isProduction(),
             devCookiePath: isProduction() ? '' : '/dev/cookies'

@@ -56,11 +56,11 @@
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
-                            <v-btn :disabled="loading || disabling " v-if="status === true" @click="disable">
+                            <v-btn :disabled="!currentPassword || loading || disabling " v-if="status === true" @click="disable">
                                 {{ $t('Disable two-factor authentication') }}
                                 <v-progress-circular indeterminate size="24" class="ml-2" v-if="disabling"></v-progress-circular>
                             </v-btn>
-                            <v-btn :disabled="loading || regenerating" v-if="status === true" @click="regenerateBackupCode()">
+                            <v-btn :disabled="!currentPassword || loading || regenerating" v-if="status === true" @click="regenerateBackupCode()">
                                 {{ $t('Regenerate Backup Codes') }}
                                 <v-progress-circular indeterminate size="24" class="ml-2" v-if="regenerating"></v-progress-circular>
                             </v-btn>
@@ -68,7 +68,7 @@
                                 {{ $t('Enable two-factor authentication') }}
                                 <v-progress-circular indeterminate size="24" class="ml-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
-                            <v-btn :disabled="loading || enableConfirming" v-if="status === false && new2FAQRCode" @click="enableConfirm">
+                            <v-btn :disabled="!currentPasscode || loading || enableConfirming" v-if="status === false && new2FAQRCode" @click="enableConfirm">
                                 {{ $t('Continue') }}
                                 <v-progress-circular indeterminate size="24" class="ml-2" v-if="enableConfirming"></v-progress-circular>
                             </v-btn>

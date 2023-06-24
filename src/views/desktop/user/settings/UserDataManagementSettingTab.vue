@@ -126,7 +126,7 @@
                     </v-card-text>
 
                     <v-card-text class="d-flex flex-wrap gap-4">
-                        <v-btn color="error" :disabled="clearingData" @click="clearData">
+                        <v-btn color="error" :disabled="!currentPasswordForClearData || clearingData" @click="clearData">
                             {{ $t('Clear User Data') }}
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="clearingData"></v-progress-circular>
                         </v-btn>

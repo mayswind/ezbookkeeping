@@ -137,7 +137,7 @@
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-    <snackbar ref="snackbar" />
+    <snack-bar ref="snackbar" />
 </template>
 
 <script>

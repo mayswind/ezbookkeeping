@@ -185,7 +185,7 @@
             <v-progress-circular indeterminate></v-progress-circular>
         </v-overlay>
 
-        <snackbar ref="snackbar" />
+        <snack-bar ref="snackbar" />
     </div>
 </template>
 

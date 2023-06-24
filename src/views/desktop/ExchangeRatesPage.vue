@@ -76,7 +76,7 @@
         </v-col>
     </v-row>
 
-    <snackbar ref="snackbar" />
+    <snack-bar ref="snackbar" />
 </template>
 
 <script>

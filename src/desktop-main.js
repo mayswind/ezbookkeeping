@@ -55,7 +55,7 @@ import {
 
 import AmountInput from '@/components/desktop/AmountInput.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import Snackbar from '@/components/desktop/Snackbar.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
 import '@/styles/desktop/template/template/index.scss';
@@ -327,7 +327,7 @@ app.component('VueDatePicker', VueDatePicker);
 
 app.component('AmountInput', AmountInput);
 app.component('ConfirmDialog', ConfirmDialog);
-app.component('Snackbar', Snackbar);
+app.component('SnackBar', SnackBar);
 
 app.config.globalProperties.$version = getVersion();
 app.config.globalProperties.$buildTime = getBuildTime();

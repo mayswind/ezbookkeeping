@@ -117,7 +117,7 @@
             </v-card-text>
         </v-card>
 
-        <snackbar ref="snackbar" />
+        <snack-bar ref="snackbar" />
 
         <v-overlay class="justify-center align-center" :persistent="true" v-model="logining">
             <v-progress-circular indeterminate></v-progress-circular>

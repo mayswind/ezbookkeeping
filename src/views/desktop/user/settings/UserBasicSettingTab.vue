@@ -42,14 +42,11 @@
                                     :label="$t('Default Account')"
                                     :placeholder="$t('Default Account')"
                                     :items="allVisibleAccounts"
+                                    :no-data-text="$t('No results')"
                                     v-model="newProfile.defaultAccountId"
                                 >
                                     <template v-slot:selection="{ item }">
                                         <v-label>{{ !item || item.value === 0 || item.value === '0' ? $t('Not Specified') : item.title }}</v-label>
-                                    </template>
-
-                                    <template v-slot:no-data>
-                                        <div class="px-4">{{ $t('No results') }}</div>
                                     </template>
                                 </v-select>
                             </v-col>
@@ -92,12 +89,9 @@
                                     :label="$t('Default Currency')"
                                     :placeholder="$t('Default Currency')"
                                     :items="allCurrencies"
+                                    :no-data-text="$t('No results')"
                                     v-model="newProfile.defaultCurrency"
-                                >
-                                    <template v-slot:no-data>
-                                        <div class="px-4">{{ $t('No results') }}</div>
-                                    </template>
-                                </v-autocomplete>
+                                />
                             </v-col>
 
                             <v-col cols="12" md="6">

@@ -44,13 +44,8 @@
             <f7-list-item :title="$t('Exchange Rates Data')" :after="exchangeRatesLastUpdateDate" link="/exchange_rates"></f7-list-item>
 
             <f7-list-item>
-                <span>{{ $t('Auto Update Exchange Rates Data') }}</span>
+                <span>{{ $t('Auto-update Exchange Rates Data') }}</span>
                 <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
-            </f7-list-item>
-
-            <f7-list-item>
-                <span>{{ $t('Auto Get Current Geographic Location') }}</span>
-                <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
             </f7-list-item>
 
             <f7-list-item>
@@ -71,24 +66,16 @@
             </f7-list-item>
 
             <f7-list-item>
-                <span>{{ $t('Show Amount In Home Page') }}</span>
-                <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
-            </f7-list-item>
-
-            <f7-list-item>
                 <span>{{ $t('Show Account Balance') }}</span>
                 <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item>
-                <span>{{ $t('Show Total Amount In Transaction List Page') }}</span>
-                <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
-            </f7-list-item>
+            <f7-list-item :title="$t('Page Settings')" link="/settings/page"></f7-list-item>
 
             <f7-list-item :title="$t('Statistics Settings')" link="/statistic/settings"></f7-list-item>
 
             <f7-list-item>
-                <span>{{ $t('Enable Animate') }}</span>
+                <span>{{ $t('Enable Animation') }}</span>
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
 
@@ -172,14 +159,6 @@ export default {
         isEnableApplicationLock() {
             return this.settingsStore.appSettings.applicationLock;
         },
-        isAutoGetCurrentGeoLocation: {
-            get: function () {
-                return this.settingsStore.appSettings.autoGetCurrentGeoLocation;
-            },
-            set: function (value) {
-                this.settingsStore.setAutoGetCurrentGeoLocation(value);
-            }
-        },
         isEnableThousandsSeparator: {
             get: function () {
                 return this.settingsStore.appSettings.thousandsSeparator;
@@ -196,28 +175,12 @@ export default {
                 this.settingsStore.setCurrencyDisplayMode(value);
             }
         },
-        showAmountInHomePage: {
-            get: function () {
-                return this.settingsStore.appSettings.showAmountInHomePage;
-            },
-            set: function (value) {
-                this.settingsStore.setShowAmountInHomePage(value);
-            }
-        },
         showAccountBalance: {
             get: function () {
                 return this.settingsStore.appSettings.showAccountBalance;
             },
             set: function (value) {
                 this.settingsStore.setShowAccountBalance(value);
-            }
-        },
-        showTotalAmountInTransactionListPage: {
-            get: function () {
-                return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
-            },
-            set: function (value) {
-                this.settingsStore.setShowTotalAmountInTransactionListPage(value);
             }
         },
         isEnableAnimate: {

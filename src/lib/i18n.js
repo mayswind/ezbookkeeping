@@ -16,6 +16,8 @@ import {
     getCurrentDateTime,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffset,
+    getBrowserTimezoneOffsetMinutes,
     getDateTimeFormatType
 } from './datetime.js';
 
@@ -433,8 +435,8 @@ function getDateTimeFormat(translateFn, allFormatMap, allFormatArray, localeForm
 }
 
 function getAllTimezones(includeSystemDefault, translateFn) {
-    const defaultTimezoneOffset = getTimezoneOffset();
-    const defaultTimezoneOffsetMinutes = getTimezoneOffsetMinutes();
+    const defaultTimezoneOffset = getBrowserTimezoneOffset();
+    const defaultTimezoneOffsetMinutes = getBrowserTimezoneOffsetMinutes();
     const allTimezones = timezone.all;
     const allTimezoneInfos = [];
 

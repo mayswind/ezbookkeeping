@@ -49,6 +49,10 @@ export function getTimezoneOffsetMinutes(timezone) {
     return getUtcOffsetMinutesByUtcOffset(utcOffset);
 }
 
+export function getBrowserTimezoneOffset() {
+    return getUtcOffsetByUtcOffsetMinutes(getBrowserTimezoneOffsetMinutes());
+}
+
 export function getBrowserTimezoneOffsetMinutes() {
     return -new Date().getTimezoneOffset();
 }

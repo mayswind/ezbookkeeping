@@ -40,10 +40,10 @@
 </template>
 
 <script>
-import UserBasicSettingTab from "./settings/UserBasicSettingTab.vue";
-import UserSecuritySettingTab from "./settings/UserSecuritySettingTab.vue";
-import UserTwoFactorAuthSettingTab from "./settings/UserTwoFactorAuthSettingTab.vue";
-import UserDataManagementSettingTab from "./settings/UserDataManagementSettingTab.vue";
+import UserBasicSettingTab from './settings/UserBasicSettingTab.vue';
+import UserSecuritySettingTab from './settings/UserSecuritySettingTab.vue';
+import UserTwoFactorAuthSettingTab from './settings/UserTwoFactorAuthSettingTab.vue';
+import UserDataManagementSettingTab from './settings/UserDataManagementSettingTab.vue';
 
 import {
     mdiAccountOutline,

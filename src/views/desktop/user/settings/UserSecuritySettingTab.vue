@@ -148,7 +148,7 @@ import {
     mdiWatch,
     mdiTelevision,
     mdiDevices
-} from "@mdi/js";
+} from '@mdi/js';
 
 export default {
     data() {

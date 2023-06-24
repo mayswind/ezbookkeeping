@@ -37,6 +37,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import logger from '@/lib/logger.js';
@@ -46,8 +47,6 @@ export default {
     data() {
         return {
             isSupportedWebAuthn: false,
-            isEnableApplicationLock: this.$settings.isEnableApplicationLock(),
-            isEnableApplicationLockWebAuthn: this.$settings.isEnableApplicationLockWebAuthn(),
             currentPinCodeForEnable: '',
             currentPinCodeForDisable: '',
             showInputPinCodeSheetForEnable: false,
@@ -55,7 +54,23 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore)
+        ...mapStores(useSettingsStore, useUserStore),
+        isEnableApplicationLock: {
+            get: function () {
+                return this.settingsStore.appSettings.applicationLock;
+            },
+            set: function (value) {
+                this.settingsStore.setEnableApplicationLock(value);
+            }
+        },
+        isEnableApplicationLockWebAuthn: {
+            get: function () {
+                return this.settingsStore.appSettings.applicationLockWebAuthn;
+            },
+            set: function (value) {
+                this.settingsStore.setEnableApplicationLockWebAuthn(value);
+            }
+        }
     },
     watch: {
         isEnableApplicationLockWebAuthn: function (newValue) {
@@ -71,7 +86,7 @@ export default {
                     self.$hideLoading();
 
                     self.$user.saveWebAuthnConfig(id);
-                    self.$settings.setEnableApplicationLockWebAuthn(true);
+                    self.settingsStore.setEnableApplicationLockWebAuthn(true);
                     self.$toast('You have enabled WebAuthn successfully');
                 }).catch(error => {
                     logger.error('failed to enable WebAuthn', error);
@@ -89,11 +104,11 @@ export default {
                     }
 
                     self.isEnableApplicationLockWebAuthn = false;
-                    self.$settings.setEnableApplicationLockWebAuthn(false);
+                    self.settingsStore.setEnableApplicationLockWebAuthn(false);
                     self.$user.clearWebAuthnConfig();
                 });
             } else {
-                self.$settings.setEnableApplicationLockWebAuthn(false);
+                self.settingsStore.setEnableApplicationLockWebAuthn(false);
                 self.$user.clearWebAuthnConfig();
             }
         }
@@ -106,7 +121,7 @@ export default {
     },
     methods: {
         enable(pinCode) {
-            if (this.$settings.isEnableApplicationLock()) {
+            if (this.settingsStore.appSettings.applicationLock) {
                 this.$alert('Application lock has been enabled');
                 return;
             }
@@ -129,17 +144,15 @@ export default {
             }
 
             this.$user.encryptToken(user.username, pinCode);
-            this.$settings.setEnableApplicationLock(true);
-            this.isEnableApplicationLock = true;
+            this.settingsStore.setEnableApplicationLock(true);
 
-            this.$settings.setEnableApplicationLockWebAuthn(false);
+            this.settingsStore.setEnableApplicationLockWebAuthn(false);
             this.$user.clearWebAuthnConfig();
-            this.isEnableApplicationLockWebAuthn = false;
 
             this.showInputPinCodeSheetForEnable = false;
         },
         disable(pinCode) {
-            if (!this.$settings.isEnableApplicationLock()) {
+            if (!this.settingsStore.appSettings.applicationLock) {
                 this.$alert('Application lock is not enabled');
                 return;
             }
@@ -155,12 +168,10 @@ export default {
             }
 
             this.$user.decryptToken();
-            this.$settings.setEnableApplicationLock(false);
-            this.isEnableApplicationLock = false;
+            this.settingsStore.setEnableApplicationLock(false);
 
-            this.$settings.setEnableApplicationLockWebAuthn(false);
+            this.settingsStore.setEnableApplicationLockWebAuthn(false);
             this.$user.clearWebAuthnConfig();
-            this.isEnableApplicationLockWebAuthn = false;
 
             this.showInputPinCodeSheetForDisable = false;
         }

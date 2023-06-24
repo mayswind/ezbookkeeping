@@ -73,8 +73,7 @@ import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import version from '@/lib/version.js';
-import settings from '@/lib/settings.js';
+import { getVersion, getBuildTime } from '@/lib/version.js';
 import userstate from '@/lib/userstate.js';
 import {
     getI18nOptions,
@@ -183,10 +182,9 @@ app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
 
-app.config.globalProperties.$version = version.getVersion();
-app.config.globalProperties.$buildTime = version.getBuildTime();
+app.config.globalProperties.$version = getVersion();
+app.config.globalProperties.$buildTime = getBuildTime();
 
-app.config.globalProperties.$settings = settings;
 app.config.globalProperties.$locale = i18nFunctions(i18n.global);
 app.config.globalProperties.$tIf = (text, isTranslate) => translateIf(text, isTranslate, i18n.global.t);
 

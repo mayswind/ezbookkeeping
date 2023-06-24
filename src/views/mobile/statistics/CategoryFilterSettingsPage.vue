@@ -124,6 +124,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
@@ -149,7 +150,7 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useTransactionCategoriesStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useTransactionCategoriesStore, useStatisticsStore),
 
         title() {
             if (this.modifyDefault) {
@@ -221,7 +222,7 @@ export default {
             }
 
             if (self.modifyDefault) {
-                self.filterCategoryIds = copyObjectTo(self.$settings.getStatisticsDefaultTransactionCategoryFilter(), allCategoryIds);
+                self.filterCategoryIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter, allCategoryIds);
             } else {
                 self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
             }
@@ -255,7 +256,7 @@ export default {
             }
 
             if (self.modifyDefault) {
-                self.$settings.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
+                self.settingsStore.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
             } else {
                 self.statisticsStore.updateTransactionStatisticsFilter({
                     filterCategoryIds: filteredCategoryIds

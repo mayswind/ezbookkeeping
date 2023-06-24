@@ -76,7 +76,7 @@
             </v-card>
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="12" v-if="isDataExportingEnabled">
             <v-card :class="{ 'disabled': exportingData }" :title="$t('Export Data')">
                 <v-card-text>
                     <span class="text-subtitle-1">{{ $t('Export all data to csv file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
@@ -153,6 +153,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { appendThousandsSeparator } from '@/lib/common.js';
+import { isDataExportingEnabled } from '@/lib/server_settings.js';
 import { startDownloadFile } from '@/lib/ui.js';
 
 import {
@@ -206,7 +207,7 @@ export default {
             };
         },
         isDataExportingEnabled() {
-            return this.$settings.isDataExportingEnabled();
+            return isDataExportingEnabled();
         },
         exportFileName() {
             const nickname = this.userStore.currentUserNickname;

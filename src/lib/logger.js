@@ -1,7 +1,7 @@
-import settings from './settings.js';
+import { isEnableDebug } from './settings.js';
 
 function logDebug(msg, obj) {
-    if (settings.isEnableDebug()) {
+    if (isEnableDebug()) {
         if (obj) {
             console.debug('[ezBookkeeping Debug] ' + msg, obj);
         } else {

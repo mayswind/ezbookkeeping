@@ -97,8 +97,8 @@
                         </div>
                         <v-spacer />
                         <v-btn color="primary" variant="text" class="me-2"
-                               :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
-                            <v-icon :icon="(currentTheme === 'light' ? icons.themeLight : (currentTheme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
+                               :icon="true" @click="(theme === 'light' ? theme = 'dark' : (theme === 'dark' ? theme = 'auto' : theme = 'light'))">
+                            <v-icon :icon="(theme === 'light' ? icons.themeLight : (theme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer" color="primary" variant="tonal">
                             <v-icon :icon="icons.user"/>
@@ -197,10 +197,7 @@ import {
 
 export default {
     data() {
-        const self = this;
-
         return {
-            theme: self.$settings.getTheme(),
             logouting: false,
             isVerticalNavScrolled: false,
             showVerticalOverlayMenu: false,
@@ -236,14 +233,13 @@ export default {
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
         },
-        currentTheme: {
+        theme: {
             get: function () {
-                return this.theme;
+                return this.settingsStore.appSettings.theme;
             },
             set: function (value) {
-                if (value !== this.$settings.getTheme()) {
-                    this.theme = value;
-                    this.$settings.setTheme(value);
+                if (value !== this.settingsStore.appSettings.theme) {
+                    this.settingsStore.setTheme(value);
 
                     if (value === 'light' || value === 'dark') {
                         this.globalTheme.global.name.value = value;
@@ -275,9 +271,9 @@ export default {
                 self.logouting = false;
                 self.showLoading = false;
 
-                self.$settings.clearSettings();
+                self.settingsStore.clearAppSettings();
 
-                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                 self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                 this.$router.replace('/login');

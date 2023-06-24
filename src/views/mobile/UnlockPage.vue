@@ -86,7 +86,7 @@ export default {
             return this.$locale.getAllLanguageInfos();
         },
         isWebAuthnAvailable() {
-            return this.$settings.isEnableApplicationLockWebAuthn()
+            return this.settingsStore.appSettings.applicationLockWebAuthn
                 && this.$user.getWebAuthnCredentialId()
                 && webauthn.isSupported();
         },
@@ -106,7 +106,7 @@ export default {
             const self = this;
             const router = self.f7router;
 
-            if (!self.$settings.isEnableApplicationLockWebAuthn() || !self.$user.getWebAuthnCredentialId()) {
+            if (!self.settingsStore.appSettings.applicationLockWebAuthn || !self.$user.getWebAuthnCredentialId()) {
                 self.$toast('WebAuthn is not enabled');
                 return;
             }
@@ -132,7 +132,7 @@ export default {
                     }
                 });
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
@@ -180,7 +180,7 @@ export default {
                     }
                 });
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
@@ -196,9 +196,9 @@ export default {
 
             self.$confirm('Are you sure you want to re-login?', () => {
                 self.rootStore.forceLogout();
-                self.$settings.clearSettings();
+                self.settingsStore.clearAppSettings();
 
-                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+                const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                 self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                 router.navigate('/login', {

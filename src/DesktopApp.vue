@@ -14,6 +14,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { isProduction } from '@/lib/version.js';
 import { loadMapAssets } from '@/lib/map/index.js';
 import { getSystemTheme } from '@/lib/ui.js';
 
@@ -22,8 +23,8 @@ export default {
         const self = this;
 
         return {
-            isProduction: self.$settings.isProduction(),
-            devCookiePath: self.$settings.isProduction() ? '' : '/dev/cookies'
+            isProduction: isProduction(),
+            devCookiePath: isProduction() ? '' : '/dev/cookies'
         }
     },
     computed: {
@@ -33,16 +34,16 @@ export default {
         const self = this;
         const theme = useTheme();
 
-        if (self.$settings.getTheme() === 'light') {
+        if (self.settingsStore.appSettings.theme === 'light') {
             theme.global.name.value = 'light';
-        } else if (self.$settings.getTheme() === 'dark') {
+        } else if (self.settingsStore.appSettings.theme === 'dark') {
             theme.global.name.value = 'dark';
         } else {
             theme.global.name.value = getSystemTheme();
         }
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
-            if (self.$settings.getTheme() === 'auto') {
+            if (self.settingsStore.appSettings.theme === 'auto') {
                 if (e.matches) {
                     theme.global.name.value = 'dark';
                 } else {
@@ -51,11 +52,11 @@ export default {
             }
         });
 
-        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
         if (self.$user.isUserLogined()) {
-            if (!self.$settings.isEnableApplicationLock()) {
+            if (!self.settingsStore.appSettings.applicationLock) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
@@ -65,7 +66,7 @@ export default {
                 });
 
                 // auto refresh exchange rates data
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
             }

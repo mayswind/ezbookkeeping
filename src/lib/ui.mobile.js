@@ -1,7 +1,7 @@
 import { f7, f7ready } from 'framework7-vue';
 
 import fontConstants from '@/consts/font.js';
-import settings from './settings.js';
+import { isEnableAnimate } from './settings.js';
 import { translateError } from './i18n.js';
 
 export function showAlert(message, confirmCallback, translateFn) {
@@ -9,7 +9,7 @@ export function showAlert(message, confirmCallback, translateFn) {
         f7.dialog.create({
             title: translateFn('global.app.title'),
             text: translateError(message, translateFn),
-            animate: settings.isEnableAnimate(),
+            animate: isEnableAnimate(),
             buttons: [
                 {
                     text: translateFn('OK'),
@@ -25,7 +25,7 @@ export function showConfirm(message, confirmCallback, cancelCallback, translateF
         f7.dialog.create({
             title: translateFn('global.app.title'),
             text: translateFn(message),
-            animate: settings.isEnableAnimate(),
+            animate: isEnableAnimate(),
             buttons: [
                 {
                     text: translateFn('Cancel'),

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.js';
 import { useUserStore } from './user.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
@@ -11,7 +12,6 @@ import { useExchangeRatesStore } from './exchangeRates.js';
 
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
-import settings from '@/lib/settings.js';
 import logger from '@/lib/logger.js';
 import { isObject, isString } from '@/lib/common.js';
 
@@ -43,6 +43,8 @@ export const useRootStore = defineStore('root', {
             userStore.resetUserInfo();
         },
         authorize({ loginName, password }) {
+            const settingsStore = useSettingsStore();
+
             return new Promise((resolve, reject) => {
                 services.authorize({
                     loginName: loginName,
@@ -60,13 +62,13 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    if (settings.isEnableApplicationLock() || userState.getUserAppLockState()) {
+                    if (settingsStore.appSettings.applicationLock || userState.getUserAppLockState()) {
                         const appLockState = userState.getUserAppLockState();
 
                         if (!appLockState || appLockState.username !== data.result.user.username) {
                             userState.clearTokenAndUserInfo(true);
-                            settings.setEnableApplicationLock(false);
-                            settings.setEnableApplicationLockWebAuthn(false);
+                            settingsStore.setEnableApplicationLock(false);
+                            settingsStore.setEnableApplicationLockWebAuthn(false);
                             userState.clearWebAuthnConfig();
                         }
                     }
@@ -93,6 +95,8 @@ export const useRootStore = defineStore('root', {
             });
         },
         authorize2FA({ token, passcode, recoveryCode }) {
+            const settingsStore = useSettingsStore();
+
             return new Promise((resolve, reject) => {
                 let promise = null;
 
@@ -119,13 +123,13 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    if (settings.isEnableApplicationLock() || userState.getUserAppLockState()) {
+                    if (settingsStore.appSettings.applicationLock || userState.getUserAppLockState()) {
                         const appLockState = userState.getUserAppLockState();
 
                         if (!appLockState || appLockState.username !== data.result.user.username) {
                             userState.clearTokenAndUserInfo(true);
-                            settings.setEnableApplicationLock(false);
-                            settings.setEnableApplicationLockWebAuthn(false);
+                            settingsStore.setEnableApplicationLock(false);
+                            settingsStore.setEnableApplicationLockWebAuthn(false);
                             userState.clearWebAuthnConfig();
                         }
                     }
@@ -152,6 +156,8 @@ export const useRootStore = defineStore('root', {
             });
         },
         register({ user }) {
+            const settingsStore = useSettingsStore();
+
             return new Promise((resolve, reject) => {
                 services.register({
                     username: user.username,
@@ -169,9 +175,9 @@ export const useRootStore = defineStore('root', {
                         return;
                     }
 
-                    if (settings.isEnableApplicationLock()) {
-                        settings.setEnableApplicationLock(false);
-                        settings.setEnableApplicationLockWebAuthn(false);
+                    if (settingsStore.appSettings.applicationLock) {
+                        settingsStore.setEnableApplicationLock(false);
+                        settingsStore.setEnableApplicationLockWebAuthn(false);
                         userState.clearWebAuthnConfig();
                     }
 

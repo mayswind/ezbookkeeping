@@ -413,6 +413,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
@@ -441,14 +442,11 @@ export default {
         'f7router'
     ],
     data() {
-        const self = this;
-
         return {
             loading: true,
             loadingError: null,
             loadingMore: false,
             transactionToDelete: null,
-            showTotalAmountInTransactionListPage: self.$settings.isShowTotalAmountInTransactionListPage(),
             showDatePopover: false,
             showTypePopover: false,
             showCategoryPopover: false,
@@ -458,7 +456,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
         defaultCurrency() {
             if (this.query.accountId && this.query.accountId !== '0') {
                 const account = this.allAccounts[this.query.accountId];
@@ -551,6 +549,9 @@ export default {
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
+        },
+        showTotalAmountInTransactionListPage() {
+            return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
         }
     },
     created() {

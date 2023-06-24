@@ -106,6 +106,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import fontConstants from '@/consts/font.js';
@@ -117,15 +118,15 @@ export default {
         'f7router'
     ],
     data() {
-        const self = this;
+        const settingsStore = useSettingsStore();
 
         return {
             currentTime: getCurrentUnixTime(),
-            fontSize: self.$settings.getFontSize()
+            fontSize: settingsStore.appSettings.fontSize
         }
     },
     computed: {
-        ...mapStores(useUserStore),
+        ...mapStores(useSettingsStore, useUserStore),
         minFontSizeType() {
             return 0;
         },
@@ -152,8 +153,8 @@ export default {
         setFontSize() {
             const router = this.f7router;
 
-            if (this.fontSize !== this.$settings.getFontSize()) {
-                this.$settings.setFontSize(this.fontSize);
+            if (this.fontSize !== this.settingsStore.appSettings.fontSize) {
+                this.settingsStore.setFontSize(this.fontSize);
                 setAppFontSize(this.fontSize);
             }
 

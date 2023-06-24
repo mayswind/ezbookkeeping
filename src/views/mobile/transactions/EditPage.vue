@@ -303,7 +303,7 @@
                 <f7-actions-button v-if="mode !== 'view'" @click="updateGeoLocation(true)">{{ $t('Update Geographic Location') }}</f7-actions-button>
                 <f7-actions-button v-if="mode !== 'view'" @click="clearGeoLocation">{{ $t('Clear Geographic Location') }}</f7-actions-button>
             </f7-actions-group>
-            <f7-actions-group v-if="$settings.getMapProvider()">
+            <f7-actions-group v-if="mapProvider">
                 <f7-actions-button :class="{ 'disabled': !transaction.geoLocation }" @click="showGeoLocationMapSheet = true">{{ $t('Show on the map') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -331,6 +331,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
@@ -367,6 +368,7 @@ import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
 } from '@/lib/category.js';
+import { getMapProvider } from '@/lib/server_settings.js';
 
 export default {
     props: [
@@ -375,9 +377,10 @@ export default {
     ],
     data() {
         const self = this;
+        const settingsStore = useSettingsStore();
         const query = self.f7route.query;
         const now = getCurrentUnixTime();
-        const currentTimezone = self.$locale.getTimezone();
+        const currentTimezone = settingsStore.appSettings.timeZone;
 
         let defaultType = transactionConstants.allTransactionTypes.Expense;
 
@@ -412,7 +415,6 @@ export default {
             geoLocationStatus: null,
             submitting: false,
             isSupportGeoLocation: !!navigator.geolocation,
-            showAccountBalance: self.$settings.isShowAccountBalance(),
             showGeoLocationActionSheet: false,
             showMoreActionSheet: false,
             showSourceAmountSheet: false,
@@ -426,7 +428,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useExchangeRatesStore),
         title() {
             if (this.mode === 'add') {
                 return 'Add Transaction';
@@ -672,6 +674,12 @@ export default {
         allowedMaxAmount() {
             return transactionConstants.maxAmount;
         },
+        showAccountBalance() {
+            return this.settingsStore.appSettings.showAccountBalance;
+        },
+        mapProvider() {
+            return getMapProvider();
+        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -898,7 +906,7 @@ export default {
         onPageAfterIn() {
             this.$routeBackOnError(this.f7router, 'loadingError');
 
-            if (this.$settings.isAutoGetCurrentGeoLocation() && this.mode === 'add'
+            if (this.settingsStore.appSettings.autoGetCurrentGeoLocation && this.mode === 'add'
                 && !this.geoLocationStatus && !this.transaction.geoLocation) {
                 this.updateGeoLocation(false);
             }

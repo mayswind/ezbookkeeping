@@ -115,6 +115,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { isUserRegistrationEnabled } from '@/lib/server_settings.js';
 import { isModalShowing } from '@/lib/ui.mobile.js';
 
 export default {
@@ -143,7 +144,7 @@ export default {
             return this.$locale.getAllLanguageInfos();
         },
         isUserRegistrationEnabled() {
-            return this.$settings.isUserRegistrationEnabled();
+            return isUserRegistrationEnabled();
         },
         inputIsEmpty() {
             return !this.username || !this.password;
@@ -214,7 +215,7 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
@@ -267,7 +268,7 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 

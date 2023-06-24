@@ -19,7 +19,7 @@
                 <p class="no-margin">
                     <span class="net-assets" v-if="loading">0.00 USD</span>
                     <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                    <f7-link class="margin-left-half" @click="toggleShowAccountBalance()">
+                    <f7-link class="margin-left-half" @click="showAccountBalance = !showAccountBalance">
                         <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
@@ -166,6 +166,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
@@ -184,7 +185,6 @@ export default {
             showHidden: false,
             sortable: false,
             accountToDelete: null,
-            showAccountBalance: this.$settings.isShowAccountBalance(),
             showMoreActionSheet: false,
             showDeleteActionSheet: false,
             displayOrderModified: false,
@@ -192,7 +192,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useAccountsStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useExchangeRatesStore),
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
@@ -232,6 +232,14 @@ export default {
         totalLiabilities() {
             const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAccountBalance);
             return this.$locale.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
+        },
+        showAccountBalance: {
+            get: function () {
+                return this.settingsStore.appSettings.showAccountBalance;
+            },
+            set: function (value) {
+                this.settingsStore.setShowAccountBalance(value);
+            }
         }
     },
     created() {
@@ -294,10 +302,6 @@ export default {
         },
         hasVisibleSubAccount(account) {
             return this.accountsStore.hasVisibleSubAccount(this.showHidden, account);
-        },
-        toggleShowAccountBalance() {
-            this.showAccountBalance = !this.showAccountBalance;
-            this.$settings.setShowAccountBalance(this.showAccountBalance);
         },
         accountBalance(account) {
             const balance = this.accountsStore.getAccountBalance(this.showAccountBalance, account);

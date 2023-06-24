@@ -199,8 +199,8 @@ export default {
                 email: '',
                 nickname: '',
                 language: self.$i18n.locale,
-                defaultCurrency: settingsStore.defaultSetting.currency,
-                firstDayOfWeek: settingsStore.defaultSetting.firstDayOfWeek,
+                defaultCurrency: settingsStore.localeDefaultSettings.currency,
+                firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
             },
             submitting: false,
             presetCategories: {
@@ -230,8 +230,8 @@ export default {
                 return this.$i18n.locale;
             },
             set: function (value) {
-                const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.defaultSetting.currency;
-                const isFirstWeekDayDefault = this.user.firstDayOfWeek === this.settingsStore.defaultSetting.firstDayOfWeek;
+                const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;
+                const isFirstWeekDayDefault = this.user.firstDayOfWeek === this.settingsStore.localeDefaultSettings.firstDayOfWeek;
 
                 this.user.language = value;
 
@@ -239,11 +239,11 @@ export default {
                 this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                 if (isCurrencyDefault) {
-                    this.user.defaultCurrency = this.settingsStore.defaultSetting.currency;
+                    this.user.defaultCurrency = this.settingsStore.localeDefaultSettings.currency;
                 }
 
                 if (isFirstWeekDayDefault) {
-                    this.user.firstDayOfWeek = this.settingsStore.defaultSetting.firstDayOfWeek;
+                    this.user.firstDayOfWeek = this.settingsStore.localeDefaultSettings.firstDayOfWeek;
                 }
             }
         },
@@ -362,7 +362,7 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 

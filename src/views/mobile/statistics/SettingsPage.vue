@@ -50,11 +50,15 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 
 export default {
     computed: {
+        ...mapStores(useSettingsStore),
         allChartTypes() {
             return statisticsConstants.allChartTypes;
         },
@@ -83,34 +87,34 @@ export default {
         },
         defaultChartType: {
             get: function () {
-                return this.$settings.getStatisticsDefaultChartType();
+                return this.settingsStore.appSettings.statistics.defaultChartType;
             },
             set: function (value) {
-                this.$settings.setStatisticsDefaultChartType(value);
+                this.settingsStore.setStatisticsDefaultChartType(value);
             }
         },
         defaultChartDataType: {
             get: function () {
-                return this.$settings.getStatisticsDefaultChartDataType();
+                return this.settingsStore.appSettings.statistics.defaultChartDataType;
             },
             set: function (value) {
-                this.$settings.setStatisticsDefaultChartDataType(value);
+                this.settingsStore.setStatisticsDefaultChartDataType(value);
             }
         },
         defaultDateRange: {
             get: function () {
-                return this.$settings.getStatisticsDefaultDateRange();
+                return this.settingsStore.appSettings.statistics.defaultDataRangeType;
             },
             set: function (value) {
-                this.$settings.setStatisticsDefaultDateRange(value);
+                this.settingsStore.setStatisticsDefaultDateRange(value);
             }
         },
         defaultSortingType: {
             get: function () {
-                return this.$settings.getStatisticsSortingType();
+                return this.settingsStore.appSettings.statistics.defaultSortingType;
             },
             set: function (value) {
-                this.$settings.setStatisticsSortingType(value);
+                this.settingsStore.setStatisticsSortingType(value);
             }
         }
     }

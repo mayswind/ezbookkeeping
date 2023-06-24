@@ -251,6 +251,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
@@ -273,12 +274,9 @@ export default {
         'f7router'
     ],
     data() {
-        const self = this;
-
         return {
             loading: true,
             loadingError: null,
-            showAccountBalance: self.$settings.isShowAccountBalance(),
             showChartDataTypePopover: false,
             showSortingTypePopover: false,
             showDatePopover: false,
@@ -287,7 +285,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
@@ -322,6 +320,9 @@ export default {
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
+        },
+        showAccountBalance() {
+            return this.settingsStore.appSettings.showAccountBalance;
         },
         totalAmountName() {
             if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
@@ -431,25 +432,25 @@ export default {
     created() {
         const self = this;
 
-        let defaultChartType = self.$settings.getStatisticsDefaultChartType();
+        let defaultChartType = self.settingsStore.appSettings.statistics.defaultChartType;
 
         if (defaultChartType !== self.allChartTypes.Pie && defaultChartType !== self.allChartTypes.Bar) {
             defaultChartType = statisticsConstants.defaultChartType;
         }
 
-        let defaultChartDataType = self.$settings.getStatisticsDefaultChartDataType();
+        let defaultChartDataType = self.settingsStore.appSettings.statistics.defaultChartDataType;
 
         if (defaultChartDataType < self.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.allChartDataTypes.AccountTotalLiabilities.type) {
             defaultChartDataType = statisticsConstants.defaultChartDataType;
         }
 
-        let defaultDateRange = self.$settings.getStatisticsDefaultDateRange();
+        let defaultDateRange = self.settingsStore.appSettings.statistics.defaultDataRangeType;
 
         if (defaultDateRange < self.allDateRanges.All.type || defaultDateRange >= self.allDateRanges.Custom.type) {
             defaultDateRange = statisticsConstants.defaultDataRangeType;
         }
 
-        let defaultSortType = self.$settings.getStatisticsSortingType();
+        let defaultSortType = self.settingsStore.appSettings.statistics.defaultSortingType;
 
         if (defaultSortType < self.allSortingTypes.Amount.type || defaultSortType > self.allSortingTypes.Name.type) {
             defaultSortType = statisticsConstants.defaultSortingType;
@@ -463,8 +464,8 @@ export default {
             endTime: dateRange ? dateRange.maxTime : undefined,
             chartType: defaultChartType,
             chartDataType: defaultChartDataType,
-            filterAccountIds: self.$settings.getStatisticsDefaultAccountFilter() || {},
-            filterCategoryIds: self.$settings.getStatisticsDefaultTransactionCategoryFilter() || {},
+            filterAccountIds: self.settingsStore.appSettings.statistics.defaultAccountFilter || {},
+            filterCategoryIds: self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
             sortingType: defaultSortType,
         });
 

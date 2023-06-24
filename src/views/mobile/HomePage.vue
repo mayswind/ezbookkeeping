@@ -21,7 +21,7 @@
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
                     <span class="month-expense" v-else-if="!loading">{{ transactionOverview.thisMonth.expenseAmount }}</span>
-                    <f7-link class="margin-left-half" @click="toggleShowAmountInHomePage()">
+                    <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
                         <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
                 </p>
@@ -189,6 +189,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
@@ -212,14 +213,25 @@ export default {
         return {
             loading: true,
             todayFirstUnixTime: getTodayFirstUnixTime(),
-            todayLastUnixTime: getTodayLastUnixTime(),
-            showAmountInHomePage: self.$settings.isShowAmountInHomePage(),
-            isEnableThousandsSeparator: self.$settings.isEnableThousandsSeparator(),
-            currencyDisplayMode: self.$settings.getCurrencyDisplayMode()
+            todayLastUnixTime: getTodayLastUnixTime()
         };
     },
     computed: {
-        ...mapStores(useUserStore, useOverviewStore),
+        ...mapStores(useSettingsStore, useUserStore, useOverviewStore),
+        showAmountInHomePage: {
+            get: function() {
+                return this.settingsStore.appSettings.showAmountInHomePage;
+            },
+            set: function(value) {
+                this.settingsStore.setShowAmountInHomePage(value);
+            }
+        },
+        isEnableThousandsSeparator() {
+            return this.settingsStore.appSettings.thousandsSeparator;
+        },
+        currencyDisplayMode() {
+            return this.settingsStore.appSettings.currencyDisplayMode;
+        },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
@@ -330,14 +342,6 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.showAmountInHomePage = this.$settings.isShowAmountInHomePage();
-
-            if (this.isEnableThousandsSeparator !== this.$settings.isEnableThousandsSeparator() || this.currencyDisplayMode !== this.$settings.getCurrencyDisplayMode()) {
-                this.isEnableThousandsSeparator = this.$settings.isEnableThousandsSeparator();
-                this.currencyDisplayMode = this.$settings.getCurrencyDisplayMode();
-                this.$forceUpdate();
-            }
-
             let dateChanged = false;
 
             if (this.todayFirstUnixTime !== getTodayFirstUnixTime()) {
@@ -376,10 +380,6 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        },
-        toggleShowAmountInHomePage() {
-            this.showAmountInHomePage = !this.showAmountInHomePage;
-            this.$settings.setShowAmountInHomePage(this.showAmountInHomePage);
         },
         getDisplayAmount(amount, incomplete) {
             if (!this.showAmountInHomePage) {

@@ -1,12 +1,7 @@
-import Cookies from 'js-cookie';
-
 import currencyConstants from '@/consts/currency.js';
 import statisticsConstants from '@/consts/statistics.js';
 
-import { base64decode } from '@/lib/common.js';
-
 const settingsLocalStorageKey = 'ebk_app_settings';
-const serverSettingsCookieKey = 'ebk_server_settings';
 
 const defaultSettings = {
     theme: 'auto',
@@ -106,87 +101,162 @@ function setSubOption(key, subKey, value) {
     return setSettings(settings);
 }
 
-function getServerSetting(key) {
-    const settings = Cookies.get(serverSettingsCookieKey) || '';
-    const settingsArr = settings.split('_');
-
-    for (let i = 0; i < settingsArr.length; i++) {
-        const pairs = settingsArr[i].split('.');
-
-        if (pairs[0] === key) {
-            return pairs[1];
-        }
-    }
-
-    return undefined;
+export function isEnableDebug() {
+    return getOption('debug');
 }
 
-function getServerDecodedSetting(key) {
-    const value = getServerSetting(key);
-
-    if (!value) {
-        return value;
-    }
-
-    return decodeURIComponent(base64decode(value));
+export function getTheme() {
+    return getOption('theme');
 }
 
-function clearSettings() {
+export function setTheme(value) {
+    return setOption('theme', value);
+}
+
+export function getFontSize() {
+    return getOption('fontSize');
+}
+
+export function setFontSize(value) {
+    return setOption('fontSize', value);
+}
+
+export function getTimeZone() {
+    return getOption('timeZone');
+}
+
+export function setTimeZone(value) {
+    return setOption('timeZone', value);
+}
+
+export function isEnableApplicationLock() {
+    return getOption('applicationLock');
+}
+
+export function setEnableApplicationLock(value) {
+    return setOption('applicationLock', value);
+}
+
+export function isEnableApplicationLockWebAuthn() {
+    return getOption('applicationLockWebAuthn');
+}
+
+export function setEnableApplicationLockWebAuthn(value) {
+    return setOption('applicationLockWebAuthn', value);
+}
+
+export function isAutoUpdateExchangeRatesData() {
+    return getOption('autoUpdateExchangeRatesData');
+}
+
+export function setAutoUpdateExchangeRatesData(value) {
+    setOption('autoUpdateExchangeRatesData', value);
+}
+
+export function isAutoGetCurrentGeoLocation() {
+    return getOption('autoGetCurrentGeoLocation');
+}
+
+export function setAutoGetCurrentGeoLocation(value) {
+    setOption('autoGetCurrentGeoLocation', value);
+}
+
+export function isEnableThousandsSeparator() {
+    return getOption('thousandsSeparator');
+}
+
+export function setEnableThousandsSeparator(value) {
+    setOption('thousandsSeparator', value);
+}
+
+export function getCurrencyDisplayMode() {
+    return getOption('currencyDisplayMode');
+}
+
+export function setCurrencyDisplayMode(value) {
+    setOption('currencyDisplayMode', value);
+}
+
+export function isShowAmountInHomePage() {
+    return getOption('showAmountInHomePage');
+}
+
+export function setShowAmountInHomePage(value) {
+    setOption('showAmountInHomePage', value);
+}
+
+export function isShowTotalAmountInTransactionListPage() {
+    return getOption('showTotalAmountInTransactionListPage');
+}
+
+export function setShowTotalAmountInTransactionListPage(value) {
+    setOption('showTotalAmountInTransactionListPage', value);
+}
+
+export function isShowAccountBalance() {
+    return getOption('showAccountBalance');
+}
+
+export function setShowAccountBalance(value) {
+    setOption('showAccountBalance', value);
+}
+
+export function getStatisticsDefaultChartType() {
+    return getSubOption('statistics', 'defaultChartType');
+}
+
+export function setStatisticsDefaultChartType(value) {
+    setSubOption('statistics', 'defaultChartType', value);
+}
+
+export function getStatisticsDefaultChartDataType() {
+    return getSubOption('statistics', 'defaultChartDataType');
+}
+
+export function setStatisticsDefaultChartDataType(value) {
+    setSubOption('statistics', 'defaultChartDataType', value);
+}
+
+export function getStatisticsDefaultDateRange() {
+    return getSubOption('statistics', 'defaultDataRangeType');
+}
+
+export function setStatisticsDefaultDateRange(value) {
+    setSubOption('statistics', 'defaultDataRangeType', value);
+}
+
+export function getStatisticsDefaultAccountFilter() {
+    return getSubOption('statistics', 'defaultAccountFilter');
+}
+
+export function setStatisticsDefaultAccountFilter(value) {
+    setSubOption('statistics', 'defaultAccountFilter', value);
+}
+
+export function getStatisticsDefaultTransactionCategoryFilter() {
+    return getSubOption('statistics', 'defaultTransactionCategoryFilter');
+}
+
+export function setStatisticsDefaultTransactionCategoryFilter(value) {
+    setSubOption('statistics', 'defaultTransactionCategoryFilter', value);
+}
+
+export function getStatisticsSortingType() {
+    return getSubOption('statistics', 'defaultSortingType');
+}
+
+export function setStatisticsSortingType(value) {
+    setSubOption('statistics', 'defaultSortingType', value);
+}
+
+export function isEnableAnimate() {
+    return getOption('animate');
+}
+
+export function setEnableAnimate(value) {
+    return setOption('animate', value);
+}
+
+export function clearSettings() {
     localStorage.removeItem(settingsLocalStorageKey);
 }
-
-export default {
-    isProduction: () => process.env.NODE_ENV === 'production',
-    getTheme: () => getOption('theme'),
-    setTheme: value => setOption('theme', value),
-    getFontSize: () => getOption('fontSize'),
-    setFontSize: value => setOption('fontSize', value),
-    getTimezone: () => getOption('timeZone'),
-    setTimezone: value => setOption('timeZone', value),
-    isEnableDebug: () => getOption('debug'),
-    setEnableDebug: value => setOption('debug', value),
-    isEnableApplicationLock: () => getOption('applicationLock'),
-    setEnableApplicationLock: value => setOption('applicationLock', value),
-    isEnableApplicationLockWebAuthn: () => getOption('applicationLockWebAuthn'),
-    setEnableApplicationLockWebAuthn: value => setOption('applicationLockWebAuthn', value),
-    isAutoUpdateExchangeRatesData: () => getOption('autoUpdateExchangeRatesData'),
-    setAutoUpdateExchangeRatesData: value => setOption('autoUpdateExchangeRatesData', value),
-    isAutoGetCurrentGeoLocation: () => getOption('autoGetCurrentGeoLocation'),
-    setAutoGetCurrentGeoLocation: value => setOption('autoGetCurrentGeoLocation', value),
-    isEnableThousandsSeparator: () => getOption('thousandsSeparator'),
-    setEnableThousandsSeparator: value => setOption('thousandsSeparator', value),
-    getCurrencyDisplayMode: () => getOption('currencyDisplayMode'),
-    setCurrencyDisplayMode: value => setOption('currencyDisplayMode', value),
-    isShowAmountInHomePage: () => getOption('showAmountInHomePage'),
-    setShowAmountInHomePage: value => setOption('showAmountInHomePage', value),
-    isShowTotalAmountInTransactionListPage: () => getOption('showTotalAmountInTransactionListPage'),
-    setShowTotalAmountInTransactionListPage: value => setOption('showTotalAmountInTransactionListPage', value),
-    isShowAccountBalance: () => getOption('showAccountBalance'),
-    setShowAccountBalance: value => setOption('showAccountBalance', value),
-    getStatisticsDefaultChartType: () => getSubOption('statistics', 'defaultChartType'),
-    setStatisticsDefaultChartType: value => setSubOption('statistics', 'defaultChartType', value),
-    getStatisticsDefaultChartDataType: () => getSubOption('statistics', 'defaultChartDataType'),
-    setStatisticsDefaultChartDataType: value => setSubOption('statistics', 'defaultChartDataType', value),
-    getStatisticsDefaultDateRange: () => getSubOption('statistics', 'defaultDataRangeType'),
-    setStatisticsDefaultDateRange: value => setSubOption('statistics', 'defaultDataRangeType', value),
-    getStatisticsDefaultAccountFilter: () => getSubOption('statistics', 'defaultAccountFilter'),
-    setStatisticsDefaultAccountFilter: value => setSubOption('statistics', 'defaultAccountFilter', value),
-    getStatisticsDefaultTransactionCategoryFilter: () => getSubOption('statistics', 'defaultTransactionCategoryFilter'),
-    setStatisticsDefaultTransactionCategoryFilter: value => setSubOption('statistics', 'defaultTransactionCategoryFilter', value),
-    getStatisticsSortingType: () => getSubOption('statistics', 'defaultSortingType'),
-    setStatisticsSortingType: value => setSubOption('statistics', 'defaultSortingType', value),
-    isEnableAnimate: () => getOption('animate'),
-    setEnableAnimate: value => setOption('animate', value),
-    isUserRegistrationEnabled: () => getServerSetting('r') === '1',
-    isDataExportingEnabled: () => getServerSetting('e') === '1',
-    getMapProvider: () => getServerSetting('m'),
-    isMapDataFetchProxyEnabled: () => getServerSetting('mp') === '1',
-    getTomTomMapAPIKey: () => getServerDecodedSetting('tmak'),
-    getGoogleMapAPIKey: () => getServerDecodedSetting('gmak'),
-    getBaiduMapAK: () => getServerDecodedSetting('bmak'),
-    getAmapApplicationKey: () => getServerDecodedSetting('amak'),
-    getAmapSecurityVerificationMethod: () => getServerSetting('amsv'),
-    getAmapApiExternalProxyUrl: () => getServerDecodedSetting('amep'),
-    getAmapApplicationSecret: () => getServerDecodedSetting('amas'),
-    clearSettings: clearSettings
-};

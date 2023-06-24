@@ -61,6 +61,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { appendThousandsSeparator } from '@/lib/common.js';
+import { isDataExportingEnabled } from '@/lib/server_settings.js';
 
 export default {
     props: [
@@ -96,7 +97,7 @@ export default {
             };
         },
         isDataExportingEnabled() {
-            return this.$settings.isDataExportingEnabled();
+            return isDataExportingEnabled();
         },
         exportFileName() {
             const nickname = this.userStore.currentUserNickname;

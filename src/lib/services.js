@@ -2,7 +2,11 @@ import axios from 'axios';
 
 import api from '@/consts/api.js';
 import userState from './userstate.js';
-import settings from './settings.js';
+import {
+    getGoogleMapAPIKey,
+    getBaiduMapAK,
+    getAmapApplicationKey
+} from './server_settings.js';
 import { getTimezoneOffsetMinutes } from './datetime.js';
 
 let needBlockRequest = false;
@@ -407,7 +411,7 @@ export default {
         return url;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
-        let url = `${api.googleMapJavascriptUrl}?key=${settings.getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
+        let url = `${api.googleMapJavascriptUrl}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -416,10 +420,10 @@ export default {
         return url;
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
-        return `${api.baiduMapJavascriptUrl}&ak=${settings.getBaiduMapAK()}&callback=${callbackFnName}`;
+        return `${api.baiduMapJavascriptUrl}&ak=${getBaiduMapAK()}&callback=${callbackFnName}`;
     },
     generateAmapJavascriptUrl: (callbackFnName) => {
-        return `${api.amapJavascriptUrl}&key=${settings.getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
+        return `${api.amapJavascriptUrl}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: () => {
         return `${window.location.origin}${api.baseAmapApiProxyUrlPath}`;

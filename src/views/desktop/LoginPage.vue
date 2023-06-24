@@ -80,7 +80,7 @@
                             </v-btn>
                         </v-col>
 
-                        <v-col cols="12" class="text-center text-base">
+                        <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled">
                             <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
                             <router-link class="text-primary ms-2" to="/signup">
                                 {{ $t('Create an account') }}
@@ -141,6 +141,8 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { isUserRegistrationEnabled } from '@/lib/server_settings.js';
+
 import {
     mdiEyeOutline,
     mdiEyeOffOutline,
@@ -181,7 +183,7 @@ export default {
             return this.$locale.getAllLanguageInfos();
         },
         isUserRegistrationEnabled() {
-            return this.$settings.isUserRegistrationEnabled();
+            return isUserRegistrationEnabled();
         },
         inputIsEmpty() {
             return !this.username || !this.password;
@@ -255,8 +257,8 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
-                    self.exchangeRatesStore.getLatestExchangeRates({silent: true, force: false});
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
+                    self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
                 this.$router.replace('/');
@@ -297,7 +299,7 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 

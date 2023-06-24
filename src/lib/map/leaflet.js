@@ -1,5 +1,5 @@
 import mapConstants from '@/consts/map.js';
-import settings from '@/lib/settings.js';
+import { isMapDataFetchProxyEnabled, getTomTomMapAPIKey } from '@/lib/server_settings.js';
 import services from '@/lib/services.js';
 
 const leafletHolder = {
@@ -48,7 +48,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
     });
     let mapTileSource = Object.assign({}, mapConstants.leafletTileSources[mapHolder.mapProvider]);
 
-    if (settings.isMapDataFetchProxyEnabled()) {
+    if (isMapDataFetchProxyEnabled()) {
         mapTileSource.tileUrlFormat = services.generateMapProxyTileImageUrl(mapHolder.mapProvider, options.language);
         mapTileSource.tileUrlSubDomains = '';
     } else if (mapTileSource.tileUrlExtraParams) {
@@ -58,7 +58,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
             const param = mapTileSource.tileUrlExtraParams[i];
 
             if (param.paramValueType === 'tomtom_key') {
-                params.push('key=' + settings.getTomTomMapAPIKey());
+                params.push('key=' + getTomTomMapAPIKey());
             } else if (param.paramValueType === 'language' && options.language) {
                 params.push('language=' + options.language);
             }

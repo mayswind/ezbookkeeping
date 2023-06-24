@@ -24,7 +24,7 @@ import {
 } from './currency.js';
 
 import logger from './logger.js';
-import settings from './settings.js';
+import { getCurrencyDisplayMode } from './settings.js';
 import services from './services.js';
 
 const apiNotFoundErrorCode = 100001;
@@ -530,7 +530,7 @@ function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
         }
     }
 
-    const currencyDisplayMode = settings.getCurrencyDisplayMode();
+    const currencyDisplayMode = getCurrencyDisplayMode();
 
     if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
         const currencyInfo = currency.all[currencyCode];
@@ -660,17 +660,15 @@ function setLanguage(i18nGlobal, locale, force) {
     };
 }
 
-function setTimezone(timezone) {
+function setTimeZone(timezone) {
     if (timezone) {
-        settings.setTimezone(timezone);
         moment.tz.setDefault(timezone);
     } else {
-        settings.setTimezone('');
         moment.tz.setDefault();
     }
 }
 
-function initLocale(i18nGlobal, lastUserLanguage) {
+function initLocale(i18nGlobal, lastUserLanguage, timezone) {
     let localeDefaultSettings = null;
 
     if (lastUserLanguage && getLanguageInfo(lastUserLanguage)) {
@@ -680,9 +678,9 @@ function initLocale(i18nGlobal, lastUserLanguage) {
         localeDefaultSettings = setLanguage(i18nGlobal, null, true);
     }
 
-    if (settings.getTimezone()) {
-        logger.info(`Current timezone is ${settings.getTimezone()}`);
-        setTimezone(settings.getTimezone());
+    if (timezone) {
+        logger.info(`Current timezone is ${timezone}`);
+        setTimeZone(timezone);
     } else {
         logger.info(`No timezone is set, use browser default ${getTimezoneOffset()} (maybe ${moment.tz.guess(true)})`);
     }
@@ -771,8 +769,6 @@ export function i18nFunctions(i18nGlobal) {
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
-        getTimezone: settings.getTimezone,
-        setTimezone: setTimezone,
-        initLocale: (lastUserLanguage) => initLocale(i18nGlobal, lastUserLanguage)
+        initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };
 }

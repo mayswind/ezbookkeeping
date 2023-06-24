@@ -115,6 +115,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
@@ -140,7 +141,7 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useAccountsStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useAccountsStore, useStatisticsStore),
         title() {
             if (this.modifyDefault) {
                 return 'Default Account Filter';
@@ -188,7 +189,7 @@ export default {
             }
 
             if (self.modifyDefault) {
-                self.filterAccountIds = copyObjectTo(self.$settings.getStatisticsDefaultAccountFilter(), allAccountIds);
+                self.filterAccountIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds);
             } else {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
             }
@@ -222,7 +223,7 @@ export default {
             }
 
             if (self.modifyDefault) {
-                self.$settings.setStatisticsDefaultAccountFilter(filteredAccountIds);
+                self.settingsStore.setStatisticsDefaultAccountFilter(filteredAccountIds);
             } else {
                 self.statisticsStore.updateTransactionStatisticsFilter({
                     filterAccountIds: filteredAccountIds

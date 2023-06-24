@@ -15,6 +15,8 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { isProduction } from '@/lib/version.js';
+import { getTheme, isEnableAnimate } from '@/lib/settings.js';
 import { loadMapAssets } from '@/lib/map/index.js';
 import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
 
@@ -23,15 +25,15 @@ export default {
         const self = this;
         let darkMode = 'auto';
 
-        if (self.$settings.getTheme() === 'light') {
+        if (getTheme() === 'light') {
             darkMode = false;
-        } else if (self.$settings.getTheme() === 'dark') {
+        } else if (getTheme() === 'dark') {
             darkMode = true;
         }
 
         return {
-            isProduction: self.$settings.isProduction(),
-            devCookiePath: self.$settings.isProduction() ? '' : '/dev/cookies',
+            isProduction: isProduction(),
+            devCookiePath: isProduction() ? '' : '/dev/cookies',
             f7params: {
                 name: 'ezBookkeeping',
                 theme: 'ios',
@@ -45,31 +47,31 @@ export default {
                     tapHold: true
                 },
                 serviceWorker: {
-                    path: self.$settings.isProduction() ? './sw.js' : undefined,
+                    path: isProduction() ? './sw.js' : undefined,
                     scope: './',
                 },
                 actions: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
                 },
                 dialog: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     backdrop: true
                 },
                 popover: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
                 },
                 popup: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true,
                     swipeToClose: true
                 },
                 sheet: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     backdrop: true,
                     closeOnEscape: true
                 },
@@ -77,7 +79,7 @@ export default {
                     routableModals: false
                 },
                 view: {
-                    animate: self.$settings.isEnableAnimate(),
+                    animate: isEnableAnimate(),
                     browserHistory: !self.isiOSHomeScreenMode(),
                     browserHistoryInitialMatch: true,
                     browserHistoryAnimate: false,
@@ -96,11 +98,11 @@ export default {
     created() {
         const self = this;
 
-        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+        let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
         if (self.$user.isUserLogined()) {
-            if (!self.$settings.isEnableApplicationLock()) {
+            if (!self.settingsStore.appSettings.applicationLock) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user && response.user.language) {
@@ -110,14 +112,14 @@ export default {
                 });
 
                 // auto refresh exchange rates data
-                if (self.$settings.isAutoUpdateExchangeRatesData()) {
+                if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
             }
         }
     },
     mounted() {
-        setAppFontSize(this.$settings.getFontSize());
+        setAppFontSize(this.settingsStore.appSettings.fontSize);
 
         f7ready((f7) => {
             this.isDarkMode = f7.darkMode;

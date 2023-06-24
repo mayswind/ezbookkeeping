@@ -32,10 +32,10 @@
                 :key="currentLocale + '_timezone'"
                 :title="$t('Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                <select v-model="currentTimezone">
-                    <option :value="timezone.name"
-                            :key="timezone.name"
-                            v-for="timezone in allTimezones">{{ `(UTC${timezone.utcOffset}) ${timezone.displayName}` }}</option>
+                <select v-model="timeZone">
+                    <option :value="tz.name"
+                            :key="tz.name"
+                            v-for="tz in allTimezones">{{ `(UTC${tz.utcOffset}) ${tz.displayName}` }}</option>
                 </select>
             </f7-list-item>
 
@@ -114,8 +114,7 @@ export default {
         const self = this;
 
         return {
-            currentLocale: this.$i18n.locale,
-            isEnableApplicationLock: self.$settings.isEnableApplicationLock(),
+            currentLocale: self.$i18n.locale,
             logouting: false
         };
     },
@@ -127,98 +126,101 @@ export default {
         allTimezones() {
             return this.$locale.getAllTimezones(true);
         },
+        allCurrencyDisplayModes() {
+            return currencyConstants.allCurrencyDisplayModes;
+        },
+        currentNickName() {
+            return this.userStore.currentUserNickname || this.$t('User');
+        },
         theme: {
             get: function () {
-                return this.$settings.getTheme();
+                return this.settingsStore.appSettings.theme;
             },
             set: function (value) {
-                if (value !== this.$settings.getTheme()) {
-                    this.$settings.setTheme(value);
+                if (value !== this.settingsStore.appSettings.theme) {
+                    this.settingsStore.setTheme(value);
                     location.reload();
                 }
             }
         },
-        currentTimezone: {
+        timeZone: {
             get: function () {
-                return this.$locale.getTimezone();
+                return this.settingsStore.appSettings.timeZone;
             },
             set: function (value) {
-                this.$locale.setTimezone(value);
+                this.settingsStore.setTimeZone(value);
             }
-        },
-        currentNickName() {
-            return this.userStore.currentUserNickname || this.$t('User');
         },
         exchangeRatesLastUpdateDate() {
             const exchangeRatesLastUpdateTime = this.exchangeRatesStore.exchangeRatesLastUpdateTime;
             return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
         },
-        allCurrencyDisplayModes() {
-            return currencyConstants.allCurrencyDisplayModes;
-        },
         isAutoUpdateExchangeRatesData: {
             get: function () {
-                return this.$settings.isAutoUpdateExchangeRatesData();
+                return this.settingsStore.appSettings.autoUpdateExchangeRatesData;
             },
             set: function (value) {
-                this.$settings.setAutoUpdateExchangeRatesData(value);
+                this.settingsStore.setAutoUpdateExchangeRatesData(value);
             }
+        },
+        isEnableApplicationLock() {
+            return this.settingsStore.appSettings.applicationLock;
         },
         isAutoGetCurrentGeoLocation: {
             get: function () {
-                return this.$settings.isAutoGetCurrentGeoLocation();
+                return this.settingsStore.appSettings.autoGetCurrentGeoLocation;
             },
             set: function (value) {
-                this.$settings.setAutoGetCurrentGeoLocation(value);
+                this.settingsStore.setAutoGetCurrentGeoLocation(value);
             }
         },
         isEnableThousandsSeparator: {
             get: function () {
-                return this.$settings.isEnableThousandsSeparator();
+                return this.settingsStore.appSettings.thousandsSeparator;
             },
             set: function (value) {
-                this.$settings.setEnableThousandsSeparator(value);
+                this.settingsStore.setEnableThousandsSeparator(value);
             }
         },
         currencyDisplayMode: {
             get: function () {
-                return this.$settings.getCurrencyDisplayMode();
+                return this.settingsStore.appSettings.currencyDisplayMode;
             },
             set: function (value) {
-                this.$settings.setCurrencyDisplayMode(value);
+                this.settingsStore.setCurrencyDisplayMode(value);
             }
         },
         showAmountInHomePage: {
             get: function () {
-                return this.$settings.isShowAmountInHomePage();
+                return this.settingsStore.appSettings.showAmountInHomePage;
             },
             set: function (value) {
-                this.$settings.setShowAmountInHomePage(value);
+                this.settingsStore.setShowAmountInHomePage(value);
             }
         },
         showAccountBalance: {
             get: function () {
-                return this.$settings.isShowAccountBalance();
+                return this.settingsStore.appSettings.showAccountBalance;
             },
             set: function (value) {
-                this.$settings.setShowAccountBalance(value);
+                this.settingsStore.setShowAccountBalance(value);
             }
         },
         showTotalAmountInTransactionListPage: {
             get: function () {
-                return this.$settings.isShowTotalAmountInTransactionListPage();
+                return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
             },
             set: function (value) {
-                this.$settings.setShowTotalAmountInTransactionListPage(value);
+                this.settingsStore.setShowTotalAmountInTransactionListPage(value);
             }
         },
         isEnableAnimate: {
             get: function () {
-                return this.$settings.isEnableAnimate();
+                return this.settingsStore.appSettings.animate;
             },
             set: function (value) {
-                if (value !== this.$settings.isEnableAnimate()) {
-                    this.$settings.setEnableAnimate(value);
+                if (value !== this.settingsStore.appSettings.animate) {
+                    this.settingsStore.setEnableAnimate(value);
                     location.reload();
                 }
             }
@@ -227,7 +229,6 @@ export default {
     methods: {
         onPageAfterIn() {
             this.currentLocale = this.$i18n.locale;
-            this.isEnableApplicationLock = this.$settings.isEnableApplicationLock();
         },
         logout() {
             const self = this;
@@ -241,9 +242,9 @@ export default {
                     self.logouting = false;
                     self.$hideLoading();
 
-                    self.$settings.clearSettings();
+                    self.settingsStore.clearAppSettings();
 
-                    const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage);
+                    const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                     router.navigate('/');

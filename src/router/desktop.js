@@ -123,8 +123,8 @@ const router = createRouter({
         },
         {
             path: '/signup',
-            component: LoginPage,
-            beforeEnter: SignUpPage
+            component: SignUpPage,
+            beforeEnter: checkNotLogin
         },
         {
             path: '/unlock',

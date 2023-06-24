@@ -16,10 +16,10 @@
                 @ps-scroll-y="handleNavScroll"
             >
                 <li class="nav-link">
-                    <RouterLink to="/">
+                    <router-link to="/">
                         <v-icon class="nav-item-icon" :icon="icons.overview"/>
                         <span class="nav-item-title">{{ $t('Overview') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
@@ -27,16 +27,16 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/transactions">
+                    <router-link to="/transactions">
                         <v-icon class="nav-item-icon" :icon="icons.transactions"/>
                         <span class="nav-item-title">{{ $t('Transaction List') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/statistics/transaction">
+                    <router-link to="/statistics/transaction">
                         <v-icon class="nav-item-icon" :icon="icons.statistics"/>
                         <span class="nav-item-title">{{ $t('Statistics Data') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
@@ -44,22 +44,22 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/accounts">
+                    <router-link to="/accounts">
                         <v-icon class="nav-item-icon" :icon="icons.accounts"/>
                         <span class="nav-item-title">{{ $t('Account List') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/categories">
+                    <router-link to="/categories">
                         <v-icon class="nav-item-icon" :icon="icons.categories"/>
                         <span class="nav-item-title">{{ $t('Transaction Categories') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/tags">
+                    <router-link to="/tags">
                         <v-icon class="nav-item-icon" :icon="icons.tags"/>
                         <span class="nav-item-title">{{ $t('Transaction Tags') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
@@ -67,16 +67,22 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/exchange_rates">
+                    <router-link to="/exchange_rates">
                         <v-icon class="nav-item-icon" :icon="icons.exchangeRates"/>
                         <span class="nav-item-title">{{ $t('Exchange Rates Data') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
                 <li class="nav-link">
-                    <RouterLink to="/about">
+                    <a :href="mobileVersionPath">
+                        <v-icon class="nav-item-icon" :icon="icons.mobile"/>
+                        <span class="nav-item-title">{{ $t('Switch to Mobile Version') }}</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <router-link to="/about">
                         <v-icon class="nav-item-icon" :icon="icons.about"/>
                         <span class="nav-item-title">{{ $t('About') }}</span>
-                    </RouterLink>
+                    </router-link>
                 </li>
             </perfect-scrollbar>
         </div>
@@ -175,6 +181,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { getSystemTheme } from '@/lib/ui.js';
+import { getMobileVersionPath } from '@/lib/version.js';
 
 import {
     mdiMenu,
@@ -186,6 +193,7 @@ import {
     mdiChartPieOutline,
     mdiSwapHorizontal,
     mdiCogOutline,
+    mdiCellphone,
     mdiInformationOutline,
     mdiThemeLightDark,
     mdiWeatherSunny,
@@ -214,6 +222,7 @@ export default {
                 statistics: mdiChartPieOutline,
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,
+                mobile: mdiCellphone,
                 about: mdiInformationOutline,
                 themeAuto: mdiThemeLightDark,
                 themeLight: mdiWeatherSunny,
@@ -229,6 +238,9 @@ export default {
         mdAndDown() {
             const { mdAndDown } = useDisplay();
             return mdAndDown.value;
+        },
+        mobileVersionPath() {
+            return getMobileVersionPath();
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');

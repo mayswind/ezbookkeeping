@@ -92,6 +92,8 @@
                 <f7-toggle :checked="isEnableAnimate" @toggle:change="isEnableAnimate = $event"></f7-toggle>
             </f7-list-item>
 
+            <f7-list-item external :title="$t('Switch to Desktop Version')" :link="desktopVersionPath"></f7-list-item>
+
             <f7-list-item :title="$t('About')" link="/about" :after="version"></f7-list-item>
         </f7-list>
     </f7-page>
@@ -105,6 +107,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import currencyConstants from '@/consts/currency.js';
+import { getDesktopVersionPath } from '@/lib/version.js';
 
 export default {
     props: [
@@ -122,6 +125,9 @@ export default {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
+        },
+        desktopVersionPath() {
+            return getDesktopVersionPath();
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);

@@ -1132,6 +1132,8 @@ export default {
     'Exchange rates data has been updated': 'Exchange rates data has been updated',
     'Exchange rates data is up to date': 'Exchange rates data is up to date',
     'Unable to get exchange rates data': 'Unable to get exchange rates data',
+    'Switch to Mobile Version': 'Switch to Mobile Version',
+    'Switch to Desktop Version': 'Switch to Desktop Version',
     'About': 'About',
     'Build Time': 'Build Time',
     'Official Website': 'Official Website',

@@ -1132,6 +1132,8 @@ export default {
     'Exchange rates data has been updated': '汇率数据已更新',
     'Exchange rates data is up to date': '汇率数据已是最新',
     'Unable to get exchange rates data': '无法获取汇率数据',
+    'Switch to Mobile Version': '切换到移动版',
+    'Switch to Desktop Version': '切换到桌面版',
     'About': '关于',
     'Build Time': '编译时间',
     'Official Website': '官方网站',

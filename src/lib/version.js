@@ -16,3 +16,18 @@ export function getVersion() {
 export function getBuildTime() {
     return __EZBOOKKEEPING_BUILD_UNIX_TIME__; // eslint-disable-line
 }
+
+export function getMobileVersionPath() {
+    if (isProduction()) {
+        return '../mobile';
+    } else {
+        return 'mobile.html';
+    }
+}
+export function getDesktopVersionPath() {
+    if (isProduction()) {
+        return '../desktop';
+    } else {
+        return 'desktop.html';
+    }
+}

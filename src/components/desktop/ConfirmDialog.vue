@@ -43,7 +43,7 @@ export default {
         }
     },
     watch: {
-        'show': function (newValue) {
+        'showState': function (newValue) {
             this.$emit('update:show', newValue);
         }
     },
@@ -67,7 +67,7 @@ export default {
             return new Promise((resolve, reject) => {
                 this.resolve = resolve;
                 this.reject = reject;
-            })
+            });
         },
         confirm() {
             if (this.resolve) {

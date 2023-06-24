@@ -185,13 +185,7 @@
             <v-progress-circular indeterminate></v-progress-circular>
         </v-overlay>
 
-        <v-snackbar v-model="showSnackbar">
-            {{ snackbarMessage }}
-
-            <template #actions>
-                <v-btn color="red" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-            </template>
-        </v-snackbar>
+        <snackbar ref="snackbar" />
     </div>
 </template>
 
@@ -236,8 +230,6 @@ export default {
             showVerticalOverlayMenu: false,
             showLoading: false,
             showMobileQrCode: false,
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 menu: mdiMenu,
                 overview: mdiHomeOutline,
@@ -321,13 +313,9 @@ export default {
                 self.showLoading = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 }

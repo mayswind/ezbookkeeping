@@ -137,14 +137,7 @@
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -176,8 +169,6 @@ export default {
             currentPasswordForClearData: '',
             isCurrentPasswordVisible: false,
             clearingData: false,
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 refresh: mdiRefresh,
                 transactions: mdiListBoxOutline,
@@ -237,7 +228,7 @@ export default {
                 self.loadingDataStatistics = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -257,7 +248,7 @@ export default {
                 self.exportingData = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -265,7 +256,7 @@ export default {
             const self = this;
 
             if (!self.currentPasswordForClearData) {
-                self.showSnackbarMessage(self.$t('Current password cannot be empty'));
+                self.$refs.snackbar.showMessage('Current password cannot be empty');
                 return;
             }
 
@@ -282,20 +273,16 @@ export default {
                 }).then(() => {
                     self.clearingData = false;
 
-                    self.showSnackbarMessage(self.$t('All user data has been cleared'));
+                    self.$refs.snackbar.showMessage('All user data has been cleared');
                     self.reloadUserDataStatistics();
                 }).catch(error => {
                     self.clearingData = false;
 
                     if (!error.processed) {
-                        self.showSnackbarMessage(self.$tError(error.message || error));
+                        self.$refs.snackbar.showError(error);
                     }
                 });
             });
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 }

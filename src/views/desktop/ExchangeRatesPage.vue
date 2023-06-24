@@ -76,13 +76,7 @@
         </v-col>
     </v-row>
 
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -105,8 +99,6 @@ export default {
             baseCurrency: userStore.currentUserDefaultCurrency,
             baseAmount: '1',
             loading: false,
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 refresh: mdiRefresh
             }
@@ -157,7 +149,7 @@ export default {
             }
         }
 
-        this.showSnackbarMessage(this.$t('There is no exchange rates data for your default currency'));
+        this.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
     },
     methods: {
         update() {
@@ -173,12 +165,12 @@ export default {
                 force: true
             }).then(() => {
                 self.loading = false;
-                self.showSnackbarMessage(self.$t('Exchange rates data has been updated'));
+                self.$refs.snackbar.showMessage('Exchange rates data has been updated');
             }).catch(error => {
                 self.loading = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -221,10 +213,6 @@ export default {
                 const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
                 return appendThousandsSeparator(trimmedRateStr);
             }
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 }

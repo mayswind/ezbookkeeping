@@ -119,14 +119,7 @@
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -162,8 +155,6 @@ export default {
             isConfirmPasswordVisible: false,
             updatingPassword: false,
             loadingSession: true,
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 refresh: mdiRefresh,
                 eye: mdiEyeOutline,
@@ -223,7 +214,7 @@ export default {
             self.loadingSession = false;
 
             if (!error.processed) {
-                self.showSnackbarMessage(self.$tError(error.message || error));
+                self.$refs.snackbar.showError(error);
             }
         });
     },
@@ -234,7 +225,7 @@ export default {
             const problemMessage = self.inputProblemMessage;
 
             if (problemMessage) {
-                self.showSnackbarMessage(self.$t(problemMessage));
+                self.$refs.snackbar.showMessage(problemMessage);
                 return;
             }
 
@@ -260,13 +251,13 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                self.showSnackbarMessage(self.$t('Your profile has been successfully updated'));
+                self.$refs.snackbar.showMessage('Your profile has been successfully updated');
             }).catch(error => {
                 self.updatingPassword = false;
                 self.currentPassword = '';
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -277,9 +268,9 @@ export default {
 
             self.tokensStore.getAllTokens().then(tokens => {
                 if (isEquals(self.tokens, tokens)) {
-                    self.showSnackbarMessage(this.$t('Session list is up to date'));
+                    self.$refs.snackbar.showMessage('Session list is up to date');
                 } else {
-                    self.showSnackbarMessage(this.$t('Session list has been updated'));
+                    self.$refs.snackbar.showMessage('Session list has been updated');
                 }
 
                 self.tokens = tokens;
@@ -288,7 +279,7 @@ export default {
                 self.loadingSession = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -312,7 +303,7 @@ export default {
                     self.loadingSession = false;
 
                     if (!error.processed) {
-                        self.showSnackbarMessage(self.$tError(error.message || error));
+                        self.$refs.snackbar.showError(error);
                     }
                 });
             });
@@ -336,12 +327,12 @@ export default {
                         }
                     }
 
-                    self.showSnackbarMessage(this.$t('You have logged out all other sessions'));
+                    self.$refs.snackbar.showMessage('You have logged out all other sessions');
                 }).catch(error => {
                     self.loadingSession = false
 
                     if (!error.processed) {
-                        self.showSnackbarMessage(self.$tError(error.message || error));
+                        self.$refs.snackbar.showError(error);
                     }
                 });
             });
@@ -364,10 +355,6 @@ export default {
             } else {
                 return mdiDevices;
             }
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 };

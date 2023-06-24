@@ -97,13 +97,7 @@
         </v-col>
     </v-row>
 
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -147,8 +141,6 @@ export default {
             loadingOverview: true,
             todayFirstUnixTime: getTodayFirstUnixTime(),
             todayLastUnixTime: getTodayLastUnixTime(),
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 refresh: mdiRefresh,
                 eye: mdiEyeOutline,
@@ -279,13 +271,13 @@ export default {
                 self.loadingOverview = false;
 
                 if (force) {
-                    self.showSnackbarMessage(self.$t('Data has been updated'));
+                    self.$refs.snackbar.showMessage('Data has been updated');
                 }
             }).catch(error => {
                 self.loadingOverview = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -295,10 +287,6 @@ export default {
             }
 
             return this.$locale.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 }

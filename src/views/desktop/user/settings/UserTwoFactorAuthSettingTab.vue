@@ -100,13 +100,7 @@
         </v-col>
     </v-row>
 
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -137,8 +131,6 @@ export default {
             disabling: false,
             regenerating: false,
             clipboardHolder: null,
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
@@ -161,7 +153,7 @@ export default {
             self.loading = false;
 
             if (!error.processed) {
-                self.showSnackbarMessage(self.$tError(error.message || error));
+                self.$refs.snackbar.showError(error);
             }
         });
     },
@@ -191,7 +183,7 @@ export default {
                 self.enabling = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -199,7 +191,7 @@ export default {
             const self = this;
 
             if (!self.currentPasscode) {
-                self.showSnackbarMessage(self.$t('Passcode cannot be empty'));
+                self.$refs.snackbar.showMessage('Passcode cannot be empty');
                 return;
             }
 
@@ -236,7 +228,7 @@ export default {
                 self.enableConfirming = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -244,7 +236,7 @@ export default {
             const self = this;
 
             if (!self.currentPassword) {
-                self.showSnackbarMessage(self.$t('Current password cannot be empty'));
+                self.$refs.snackbar.showMessage('Current password cannot be empty');
                 return;
             }
 
@@ -265,12 +257,12 @@ export default {
                 self.disabling = false;
 
                 self.status = false;
-                self.showSnackbarMessage(self.$t('Two factor authentication has been disabled'));
+                self.$refs.snackbar.showMessage('Two factor authentication has been disabled');
             }).catch(error => {
                 self.disabling = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -278,7 +270,7 @@ export default {
             const self = this;
 
             if (!self.currentPassword) {
-                self.showSnackbarMessage(self.$t('Current password cannot be empty'));
+                self.$refs.snackbar.showMessage('Current password cannot be empty');
                 return;
             }
 
@@ -307,7 +299,7 @@ export default {
                 self.regenerating = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -323,14 +315,10 @@ export default {
                     el: '#copy-to-clipboard-icon',
                     text: self.currentBackupCode,
                     successCallback: function () {
-                        self.showSnackbarMessage(self.$t('Backup codes copied'));
+                        self.$refs.snackbar.showMessage('Backup codes copied');
                     }
                 });
             }
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 };

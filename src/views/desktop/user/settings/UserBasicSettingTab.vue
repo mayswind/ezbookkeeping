@@ -170,14 +170,7 @@
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-
-    <v-snackbar v-model="showSnackbar">
-        {{ snackbarMessage }}
-
-        <template #actions>
-            <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-        </template>
-    </v-snackbar>
+    <snackbar ref="snackbar" />
 </template>
 
 <script>
@@ -224,9 +217,7 @@ export default {
                 shortTimeFormat: 0
             },
             loading: true,
-            saving: false,
-            showSnackbar: false,
-            snackbarMessage: ''
+            saving: false
         };
     },
     computed: {
@@ -380,7 +371,7 @@ export default {
             self.loading = false;
 
             if (!error.processed) {
-                self.showSnackbarMessage(self.$tError(error.message || error));
+                self.$refs.snackbar.showError(error);
             }
         });
     },
@@ -391,7 +382,7 @@ export default {
             const problemMessage = self.inputIsNotChangedProblemMessage || self.inputInvalidProblemMessage || self.extendInputInvalidProblemMessage || self.langAndRegionInputInvalidProblemMessage;
 
             if (problemMessage) {
-                self.showSnackbarMessage(self.$t(problemMessage));
+                self.$refs.snackbar.showMessage(problemMessage);
                 return;
             }
 
@@ -409,12 +400,12 @@ export default {
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
 
-                self.showSnackbarMessage(self.$t('Your profile has been successfully updated'));
+                self.$refs.snackbar.showMessage('Your profile has been successfully updated');
             }).catch(error => {
                 self.saving = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -445,10 +436,6 @@ export default {
             this.newProfile.shortDateFormat = this.oldProfile.shortDateFormat;
             this.newProfile.longTimeFormat = this.oldProfile.longTimeFormat;
             this.newProfile.shortTimeFormat = this.oldProfile.shortTimeFormat;
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 };

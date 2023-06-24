@@ -117,13 +117,7 @@
             </v-card-text>
         </v-card>
 
-        <v-snackbar v-model="showSnackbar">
-            {{ snackbarMessage }}
-
-            <template #actions>
-                <v-btn color="primary" variant="text" @click="showSnackbar = false">{{ $t('Close') }}</v-btn>
-            </template>
-        </v-snackbar>
+        <snackbar ref="snackbar" />
 
         <v-overlay class="justify-center align-center" :persistent="true" v-model="logining">
             <v-progress-circular indeterminate></v-progress-circular>
@@ -163,8 +157,6 @@ export default {
             verifying: false,
             show2faInput: false,
             twoFAVerifyType: 'passcode',
-            showSnackbar: false,
-            snackbarMessage: '',
             icons: {
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
@@ -211,12 +203,12 @@ export default {
             const self = this;
 
             if (!self.username) {
-                self.showSnackbarMessage(self.$t('Username cannot be empty'));
+                self.$refs.snackbar.showMessage('Username cannot be empty');
                 return;
             }
 
             if (!self.password) {
-                self.showSnackbarMessage(self.$t('Password cannot be empty'));
+                self.$refs.snackbar.showMessage('Password cannot be empty');
                 return;
             }
 
@@ -266,7 +258,7 @@ export default {
                 self.logining = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -278,10 +270,10 @@ export default {
             }
 
             if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
-                self.showSnackbarMessage(self.$t('Passcode cannot be empty'));
+                self.$refs.snackbar.showMessage('Passcode cannot be empty');
                 return;
             } else if (this.twoFAVerifyType === 'backupcode' && !this.backupCode) {
-                self.showSnackbarMessage(self.$t('Backup code cannot be empty'));
+                self.$refs.snackbar.showMessage('Backup code cannot be empty');
                 return;
             }
 
@@ -308,7 +300,7 @@ export default {
                 self.verifying = false;
 
                 if (!error.processed) {
-                    self.showSnackbarMessage(self.$tError(error.message || error));
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },
@@ -322,10 +314,6 @@ export default {
         changeLanguage(locale) {
             const localeDefaultSettings = this.$locale.setLanguage(locale);
             this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        },
-        showSnackbarMessage(message) {
-            this.showSnackbar = true;
-            this.snackbarMessage = message;
         }
     }
 }

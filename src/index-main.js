@@ -13,7 +13,7 @@ function isMobileDevice() {
 
     const device = uaParseRet.device;
 
-    if (device.type === 'mobile' || device.type === 'tablet' || device.type === 'wearable' || device.type === 'embedded') {
+    if (device.type === 'mobile' || device.type === 'wearable' || device.type === 'embedded') {
         return true;
     }
 

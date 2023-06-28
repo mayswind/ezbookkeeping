@@ -6,7 +6,7 @@
                     <span>{{ $t('Data Management') }}</span>
                     <v-btn density="compact" color="default" variant="text"
                            class="ml-2" :icon="true"
-                           v-if="!loadingDataStatistics" @click="reloadUserDataStatistics">
+                           v-if="!loadingDataStatistics" @click="reloadUserDataStatistics(true)">
                         <v-icon :icon="icons.refresh" size="24" />
                         <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                     </v-btn>
@@ -145,7 +145,7 @@ import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useUserStore } from '@/stores/user.js';
 
-import { appendThousandsSeparator } from '@/lib/common.js';
+import {appendThousandsSeparator, isEquals} from '@/lib/common.js';
 import { isDataExportingEnabled } from '@/lib/server_settings.js';
 import { startDownloadFile } from '@/lib/ui.js';
 
@@ -213,15 +213,23 @@ export default {
         }
     },
     created() {
-        this.reloadUserDataStatistics();
+        this.reloadUserDataStatistics(false);
     },
     methods: {
-        reloadUserDataStatistics() {
+        reloadUserDataStatistics(force) {
             const self = this;
 
             self.loadingDataStatistics = true;
 
             self.userStore.getUserDataStatistics().then(dataStatistics => {
+                if (force) {
+                    if (isEquals(self.dataStatistics, dataStatistics)) {
+                        self.$refs.snackbar.showMessage('Data is up to date');
+                    } else {
+                        self.$refs.snackbar.showMessage('Data has been updated');
+                    }
+                }
+
                 self.dataStatistics = dataStatistics;
                 self.loadingDataStatistics = false;
             }).catch(error => {

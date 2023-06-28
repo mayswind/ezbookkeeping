@@ -451,3 +451,21 @@ func (s TransactionMonthAmountsResponseItemSlice) Less(i, j int) bool {
 
 	return s[i].Month > s[j].Month
 }
+
+// TransactionAmountsResponseItemAmountInfoSlice represents the slice data structure of TransactionAmountsResponseItemAmountInfo
+type TransactionAmountsResponseItemAmountInfoSlice []*TransactionAmountsResponseItemAmountInfo
+
+// Len returns the count of items
+func (s TransactionAmountsResponseItemAmountInfoSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionAmountsResponseItemAmountInfoSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s TransactionAmountsResponseItemAmountInfoSlice) Less(i, j int) bool {
+	return strings.Compare(s[i].Currency, s[j].Currency) < 0
+}

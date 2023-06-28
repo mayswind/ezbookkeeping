@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strings"
 
+	orderedmap "github.com/wk8/go-ordered-map/v2"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -295,7 +297,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	amountsResp := make(map[string]*models.TransactionAmountsResponseItem)
+	amountsResp := orderedmap.New[string, *models.TransactionAmountsResponseItem]()
 
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
@@ -353,17 +355,19 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 			amountsMap[account.Currency] = totalAmounts
 		}
 
-		allTotalAmounts := make([]*models.TransactionAmountsResponseItemAmountInfo, 0)
+		allTotalAmounts := make(models.TransactionAmountsResponseItemAmountInfoSlice, 0)
 
 		for _, totalAmounts := range amountsMap {
 			allTotalAmounts = append(allTotalAmounts, totalAmounts)
 		}
 
-		amountsResp[requestItem.Name] = &models.TransactionAmountsResponseItem{
+		sort.Sort(allTotalAmounts)
+
+		amountsResp.Set(requestItem.Name, &models.TransactionAmountsResponseItem{
 			StartTime: requestItem.StartTime,
 			EndTime:   requestItem.EndTime,
 			Amounts:   allTotalAmounts,
-		}
+		})
 	}
 
 	return amountsResp, nil
@@ -463,11 +467,13 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 			continue
 		}
 
-		amounts := make([]*models.TransactionAmountsResponseItemAmountInfo, 0, len(monthTotalAmounts))
+		amounts := make(models.TransactionAmountsResponseItemAmountInfoSlice, 0, len(monthTotalAmounts))
 
 		for _, monthTotalAmount := range monthTotalAmounts {
 			amounts = append(amounts, monthTotalAmount)
 		}
+
+		sort.Sort(amounts)
 
 		amountsResp = append(amountsResp, &models.TransactionMonthAmountsResponseItem{
 			Year:    year,

@@ -15,6 +15,7 @@
                                     type="text"
                                     autocomplete="nickname"
                                     clearable
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Nickname')"
                                     :placeholder="$t('Your nickname')"
@@ -27,6 +28,7 @@
                                     type="email"
                                     autocomplete="email"
                                     clearable
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('E-mail')"
                                     :placeholder="$t('Your email address')"
@@ -38,6 +40,7 @@
                                 <v-select
                                     item-title="name"
                                     item-value="id"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Default Account')"
                                     :placeholder="$t('Default Account')"
@@ -55,6 +58,7 @@
                                 <v-select
                                     item-title="name"
                                     item-value="value"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Editable Transaction Scope')"
                                     :placeholder="$t('Editable Transaction Scope')"
@@ -73,6 +77,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="code"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Language')"
                                     :placeholder="$t('Language')"
@@ -85,6 +90,7 @@
                                 <v-autocomplete
                                     item-title="displayName"
                                     item-value="code"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Default Currency')"
                                     :placeholder="$t('Default Currency')"
@@ -98,6 +104,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="type"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('First Day of Week')"
                                     :placeholder="$t('First Day of Week')"
@@ -112,6 +119,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="type"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Long Date Format')"
                                     :placeholder="$t('Long Date Format')"
@@ -124,6 +132,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="type"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Short Date Format')"
                                     :placeholder="$t('Short Date Format')"
@@ -136,6 +145,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="type"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Long Time Format')"
                                     :placeholder="$t('Long Time Format')"
@@ -148,6 +158,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="type"
+                                    persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Short Time Format')"
                                     :placeholder="$t('Short Time Format')"
@@ -191,8 +202,8 @@ export default {
 
         return {
             newProfile: {
-                email: ' ',
-                nickname: self.$t('Your nickname'),
+                email: '',
+                nickname: '',
                 defaultAccountId: 0,
                 transactionEditScope: 1,
                 language: '',
@@ -205,7 +216,7 @@ export default {
             },
             oldProfile: {
                 email: '',
-                nickname: self.$t('Your nickname'),
+                nickname: '',
                 defaultAccountId: 0,
                 transactionEditScope: 1,
                 language: '',

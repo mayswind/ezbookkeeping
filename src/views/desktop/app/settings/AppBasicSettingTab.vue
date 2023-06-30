@@ -9,6 +9,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Theme')"
                                     :placeholder="$t('Theme')"
                                     :items="[
@@ -24,6 +25,7 @@
                                 <v-autocomplete
                                     item-title="displayNameWithUtcOffset"
                                     item-value="name"
+                                    persistent-placeholder
                                     :label="$t('Timezone')"
                                     :placeholder="$t('Timezone')"
                                     :items="allTimezones"
@@ -36,6 +38,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Auto-update Exchange Rates Data')"
                                     :placeholder="$t('Auto-update Exchange Rates Data')"
                                     :items="enableDisableOptions"
@@ -47,6 +50,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Enable Thousands Separator')"
                                     :placeholder="$t('Enable Thousands Separator')"
                                     :items="enableDisableOptions"
@@ -58,6 +62,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Currency Display Mode')"
                                     :placeholder="$t('Currency Display Mode')"
                                     :items="[
@@ -74,6 +79,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Show Account Balance')"
                                     :placeholder="$t('Show Account Balance')"
                                     :items="enableDisableOptions"
@@ -95,6 +101,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Show Amount')"
                                     :placeholder="$t('Show Amount')"
                                     :items="enableDisableOptions"
@@ -116,6 +123,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Show Monthly Total Amount')"
                                     :placeholder="$t('Show Monthly Total Amount')"
                                     :items="enableDisableOptions"
@@ -137,6 +145,7 @@
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Automatically Add Geolocation')"
                                     :placeholder="$t('Automatically Add Geolocation')"
                                     :items="enableDisableOptions"

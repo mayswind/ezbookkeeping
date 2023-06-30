@@ -113,14 +113,16 @@
                             <v-icon :icon="(theme === 'light' ? icons.themeLight : (theme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer" color="primary" variant="tonal">
-                            <v-icon :icon="icons.user"/>
+                            <v-img :src="currentUserAvatar" v-if="currentUserAvatar"/>
+                            <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
                             <v-menu activator="parent" width="230" location="bottom end" offset="14px">
                                 <v-list>
                                     <v-list-item>
                                         <template #prepend>
                                             <v-list-item-action start>
                                                 <v-avatar color="primary" variant="tonal">
-                                                    <v-icon :icon="icons.user"/>
+                                                    <v-img :src="currentUserAvatar" v-if="currentUserAvatar"/>
+                                                    <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
@@ -263,6 +265,9 @@ export default {
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
+        },
+        currentUserAvatar() {
+            return this.userStore.currentUserAvatar;
         },
         theme: {
             get: function () {

@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"strings"
 	"unicode"
 
@@ -131,6 +132,12 @@ func MD5Encode(data []byte) []byte {
 	m := md5.New()
 	m.Write(data)
 	return m.Sum(nil)
+}
+
+// MD5EncodeToString returns a hashed string by md5
+func MD5EncodeToString(data []byte) string {
+	hash := MD5Encode(data)
+	return hex.EncodeToString(hash)
 }
 
 // AESGCMEncrypt returns a encrypted string by aes-gcm

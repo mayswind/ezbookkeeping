@@ -62,6 +62,11 @@ const (
 	InternalUuidGeneratorType string = "internal"
 )
 
+// User avatar provider types
+const (
+	GravatarProvider string = "gravatar"
+)
+
 // Map provider types
 const (
 	OpenStreetMapProvider                  string = "openstreetmap"
@@ -185,6 +190,7 @@ type Config struct {
 
 	// User
 	EnableUserRegister bool
+	AvatarProvider     string
 
 	// Data
 	EnableDataExport bool
@@ -443,6 +449,12 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 
 func loadUserConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableUserRegister = getConfigItemBoolValue(configFile, sectionName, "enable_register", false)
+
+	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == "" {
+		config.AvatarProvider = ""
+	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == GravatarProvider {
+		config.AvatarProvider = GravatarProvider
+	}
 
 	return nil
 }

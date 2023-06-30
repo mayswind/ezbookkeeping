@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -77,6 +78,7 @@ type UserBasicInfo struct {
 	Username             string               `json:"username"`
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
+	AvatarUrl            string               `json:"avatar"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 	Language             string               `json:"language"`
@@ -133,6 +135,7 @@ type UserProfileResponse struct {
 	Username             string               `json:"username"`
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
+	AvatarUrl            string               `json:"avatar"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 	Language             string               `json:"language"`
@@ -193,6 +196,7 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
+		AvatarUrl:            u.getAvatarUrl(),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
 		Language:             u.Language,
@@ -211,6 +215,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
+		AvatarUrl:            u.getAvatarUrl(),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
 		Language:             u.Language,
@@ -222,4 +227,14 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		ShortTimeFormat:      u.ShortTimeFormat,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}
+}
+
+func (u *User) getAvatarUrl() string {
+	avatarProvider := settings.Container.Current.AvatarProvider
+
+	if avatarProvider == settings.GravatarProvider {
+		return utils.GetGravatarUrl(u.Email)
+	}
+
+	return ""
 }

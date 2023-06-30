@@ -16,6 +16,10 @@ export const useUserStore = defineStore('user', {
             const userInfo = state.currentUserInfo || {};
             return userInfo.nickname || userInfo.username || null;
         },
+        currentUserAvatar(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.avatar || null;
+        },
         currentUserDefaultAccountId(state) {
             const userInfo = state.currentUserInfo || {};
             return userInfo.defaultAccountId || '';

@@ -42,7 +42,7 @@
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.2",
     "vue3-perfect-scrollbar": "^1.6.1",
-    "vuetify": "^3.3.5"
+    "vuetify": "^3.3.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.0",

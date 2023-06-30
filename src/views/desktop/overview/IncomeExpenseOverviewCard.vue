@@ -6,7 +6,7 @@
             </v-avatar>
             <span class="text-base font-weight-bold ml-3">{{ title }}</span>
             <v-spacer/>
-            <v-btn density="compact" color="default" variant="text" class="ml-2" :icon="true">
+            <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true">
                 <v-icon :icon="icons.more" />
                 <v-menu activator="parent">
                     <v-list>

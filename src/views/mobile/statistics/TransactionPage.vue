@@ -474,7 +474,7 @@ export default {
             self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
             return self.statisticsStore.loadTransactionStatistics({
-                defaultCurrency: self.defaultCurrency
+                force: false
             });
         }).then(() => {
             self.loading = false;
@@ -507,7 +507,7 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
                 dispatchPromise = self.statisticsStore.loadTransactionStatistics({
-                    defaultCurrency: self.defaultCurrency
+                    force: force
                 });
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {

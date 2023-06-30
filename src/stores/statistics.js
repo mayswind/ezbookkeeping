@@ -11,53 +11,11 @@ import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber, isObject } from '@/lib/common.js';
-
-function loadTransactionStatistics(state, { statistics, defaultCurrency }) {
-    if (statistics && statistics.items && statistics.items.length) {
-        const accountsStore = useAccountsStore();
-        const transactionCategoriesStore = useTransactionCategoriesStore();
-        const exchangeRatesStore = useExchangeRatesStore();
-
-        for (let i = 0; i < statistics.items.length; i++) {
-            const item = statistics.items[i];
-
-            if (item.accountId) {
-                item.account = accountsStore.allAccountsMap[item.accountId];
-            }
-
-            if (item.account && item.account.parentId !== '0') {
-                item.primaryAccount = accountsStore.allAccountsMap[item.account.parentId];
-            } else {
-                item.primaryAccount = item.account;
-            }
-
-            if (item.categoryId) {
-                item.category = transactionCategoriesStore.allTransactionCategoriesMap[item.categoryId];
-            }
-
-            if (item.category && item.category.parentId !== '0') {
-                item.primaryCategory = transactionCategoriesStore.allTransactionCategoriesMap[item.category.parentId];
-            } else {
-                item.primaryCategory = item.category;
-            }
-
-            if (item.account && item.account.currency !== defaultCurrency) {
-                const amount = exchangeRatesStore.getExchangedAmount(item.amount, item.account.currency, defaultCurrency);
-
-                if (isNumber(amount)) {
-                    item.amountInDefaultCurrency = Math.floor(amount);
-                }
-            } else if (item.account && item.account.currency === defaultCurrency) {
-                item.amountInDefaultCurrency = item.amount;
-            } else {
-                item.amountInDefaultCurrency = null;
-            }
-        }
-    }
-
-    state.transactionStatistics = statistics;
-}
+import {
+    isEquals,
+    isNumber,
+    isObject
+} from '@/lib/common.js';
 
 export const useStatisticsStore = defineStore('statistics', {
     state: () => ({
@@ -70,10 +28,72 @@ export const useStatisticsStore = defineStore('statistics', {
             filterAccountIds: {},
             filterCategoryIds: {}
         },
-        transactionStatistics: [],
+        transactionStatisticsData: {},
         transactionStatisticsStateInvalid: true
     }),
     getters: {
+        transactionStatistics(state) {
+            const statistics = state.transactionStatisticsData;
+            const finalStatistics = {
+                startTime: statistics.startTime,
+                endTime: statistics.endTime,
+                items: []
+            };
+
+            if (statistics && statistics.items && statistics.items.length) {
+                const userStore = useUserStore();
+                const accountsStore = useAccountsStore();
+                const transactionCategoriesStore = useTransactionCategoriesStore();
+                const exchangeRatesStore = useExchangeRatesStore();
+
+                const defaultCurrency = userStore.currentUserDefaultCurrency;
+
+                for (let i = 0; i < statistics.items.length; i++) {
+                    const dataItem = statistics.items[i];
+                    const item = {
+                        categoryId: dataItem.categoryId,
+                        accountId: dataItem.accountId,
+                        amount: dataItem.amount
+                    };
+
+                    if (item.accountId) {
+                        item.account = accountsStore.allAccountsMap[item.accountId];
+                    }
+
+                    if (item.account && item.account.parentId !== '0') {
+                        item.primaryAccount = accountsStore.allAccountsMap[item.account.parentId];
+                    } else {
+                        item.primaryAccount = item.account;
+                    }
+
+                    if (item.categoryId) {
+                        item.category = transactionCategoriesStore.allTransactionCategoriesMap[item.categoryId];
+                    }
+
+                    if (item.category && item.category.parentId !== '0') {
+                        item.primaryCategory = transactionCategoriesStore.allTransactionCategoriesMap[item.category.parentId];
+                    } else {
+                        item.primaryCategory = item.category;
+                    }
+
+                    if (item.account && item.account.currency !== defaultCurrency) {
+                        const amount = exchangeRatesStore.getExchangedAmount(item.amount, item.account.currency, defaultCurrency);
+
+                        if (isNumber(amount)) {
+                            item.amountInDefaultCurrency = Math.floor(amount);
+                        }
+                    } else if (item.account && item.account.currency === defaultCurrency) {
+                        item.amountInDefaultCurrency = item.amount;
+                    } else {
+                        item.amountInDefaultCurrency = null;
+                    }
+
+                    finalStatistics.items.push(item);
+                }
+            }
+
+            return finalStatistics;
+        },
         statisticsItemsByTransactionStatisticsData(state) {
             if (!state.transactionStatistics || !state.transactionStatistics.items) {
                 return null;
@@ -381,7 +401,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
             }
         },
-        loadTransactionStatistics({ defaultCurrency }) {
+        loadTransactionStatistics({ force }) {
             const self = this;
 
             return new Promise((resolve, reject) => {
@@ -396,14 +416,16 @@ export const useStatisticsStore = defineStore('statistics', {
                         return;
                     }
 
-                    loadTransactionStatistics(self,  {
-                        statistics: data.result,
-                        defaultCurrency: defaultCurrency
-                    });
-
                     if (self.transactionStatisticsStateInvalid) {
                         self.updateTransactionStatisticsInvalidState(false);
                     }
+
+                    if (force && data.result && isEquals(self.transactionStatisticsData, data.result)) {
+                        reject({ message: 'Data is up to date' });
+                        return;
+                    }
+
+                    self.transactionStatisticsData = data.result;
 
                     resolve(data.result);
                 }).catch(error => {

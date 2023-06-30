@@ -9,3 +9,9 @@
 .readonly {
     pointer-events: none !important;
 }
+
+.v-table {
+    th {
+        background: rgb(var(--v-table-header-background)) !important;
+    }
+}

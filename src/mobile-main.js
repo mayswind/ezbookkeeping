@@ -109,6 +109,7 @@ import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSele
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
 
+import '@/styles/mobile/global.css';
 import '@/styles/mobile/font-size-default.css';
 import '@/styles/mobile/font-size-small.css';
 import '@/styles/mobile/font-size-large.css';

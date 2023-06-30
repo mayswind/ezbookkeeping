@@ -297,19 +297,3 @@ export default {
     }
 };
 </script>
-
-<style>
-.login-page-logo {
-    width: 80px;
-    height: 80px;
-}
-
-.login-page-tile {
-    font-size: var(--ebk-login-page-title-font-size);
-}
-
-.lang-popover-menu .popover-inner {
-    max-height: 300px;
-    overflow-y: auto;
-}
-</style>

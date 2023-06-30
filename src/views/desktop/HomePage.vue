@@ -17,7 +17,7 @@
 
                 <v-card-text>
                     <h5 class="text-2xl font-weight-medium text-primary">
-                        {{ transactionOverview && transactionOverview.thisMonth ? transactionOverview.thisMonth.expenseAmount : '-' }}
+                        {{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}
                         <v-btn density="compact" color="default" variant="text"
                                :icon="true" @click="showAmountInHomePage = !showAmountInHomePage">
                             <v-icon :icon="showAmountInHomePage ? icons.eyeSlash : icons.eye" size="20" />
@@ -25,7 +25,7 @@
                     </h5>
                     <p>
                         <span class="mr-2">{{ $t('Monthly income') }}</span>
-                        <span>{{ transactionOverview && transactionOverview.thisMonth ? transactionOverview.thisMonth.incomeAmount : '-' }}</span>
+                        <span>{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                     </p>
                     <v-btn size="small" to="/transactions">{{ $t('View Details') }}</v-btn>
                 </v-card-text>
@@ -36,8 +36,8 @@
             <income-expense-overview-card
                 :disabled="loadingOverview" :icon="icons.calendarToday"
                 :title="$t('Today')"
-                :expense-amount="transactionOverview.today && transactionOverview.today.valid ? transactionOverview.today.expenseAmount : '-'"
-                :income-amount="transactionOverview.today && transactionOverview.today.valid ? transactionOverview.today.incomeAmount : '-'"
+                :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : '-'"
+                :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : '-'"
                 :datetime="displayDateRange.today.displayTime"
             >
                 <template #menus>
@@ -52,8 +52,8 @@
             <income-expense-overview-card
                 :disabled="loadingOverview" :icon="icons.calendarWeek"
                 :title="$t('This Week')"
-                :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? transactionOverview.thisWeek.expenseAmount : '-'"
-                :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? transactionOverview.thisWeek.incomeAmount : '-'"
+                :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : '-'"
+                :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : '-'"
                 :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
             >
                 <template #menus>
@@ -68,8 +68,8 @@
             <income-expense-overview-card
                 :disabled="loadingOverview" :icon="icons.calendarMonth"
                 :title="$t('This Month')"
-                :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? transactionOverview.thisMonth.expenseAmount : '-'"
-                :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? transactionOverview.thisMonth.incomeAmount : '-'"
+                :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-'"
+                :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-'"
                 :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
             >
                 <template #menus>
@@ -84,8 +84,8 @@
             <income-expense-overview-card
                 :disabled="loadingOverview" :icon="icons.calendarYear"
                 :title="$t('This Year')"
-                :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? transactionOverview.thisYear.expenseAmount : '-'"
-                :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? transactionOverview.thisYear.incomeAmount : '-'"
+                :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : '-'"
+                :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : '-'"
                 :datetime="displayDateRange.thisYear.displayTime"
             >
                 <template #menus>
@@ -109,17 +109,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import {
-    formatUnixTime,
-    getTodayFirstUnixTime,
-    getTodayLastUnixTime,
-    getThisWeekFirstUnixTime,
-    getThisWeekLastUnixTime,
-    getThisMonthFirstUnixTime,
-    getThisMonthLastUnixTime,
-    getThisYearFirstUnixTime,
-    getThisYearLastUnixTime
-} from '@/lib/datetime.js';
+import { formatUnixTime } from '@/lib/datetime.js';
 
 import {
     mdiRefresh,
@@ -139,8 +129,6 @@ export default {
     data() {
         return {
             loadingOverview: true,
-            todayFirstUnixTime: getTodayFirstUnixTime(),
-            todayLastUnixTime: getTodayLastUnixTime(),
             icons: {
                 refresh: mdiRefresh,
                 eye: mdiEyeOutline,
@@ -178,78 +166,29 @@ export default {
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
-        dateRange() {
-            const self = this;
-
-            return {
-                today: {
-                    startTime: self.todayFirstUnixTime,
-                    endTime: self.todayLastUnixTime
-                },
-                thisWeek: {
-                    startTime: getThisWeekFirstUnixTime(self.firstDayOfWeek),
-                    endTime: getThisWeekLastUnixTime(self.firstDayOfWeek)
-                },
-                thisMonth: {
-                    startTime: getThisMonthFirstUnixTime(),
-                    endTime: getThisMonthLastUnixTime()
-                },
-                thisYear: {
-                    startTime: getThisYearFirstUnixTime(),
-                    endTime: getThisYearLastUnixTime()
-                }
-            };
-        },
         displayDateRange() {
             const self = this;
 
             return {
                 today: {
-                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.dateRange.today.startTime),
+                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.overviewStore.transactionDataRange.today.startTime),
                 },
                 thisWeek: {
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.endTime)
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.endTime)
                 },
                 thisMonth: {
-                    displayTime: formatUnixTime(self.dateRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.endTime)
+                    displayTime: formatUnixTime(self.overviewStore.transactionDataRange.thisMonth.startTime, 'MMMM'),
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.endTime)
                 },
                 thisYear: {
-                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.dateRange.thisYear.startTime)
+                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.overviewStore.transactionDataRange.thisYear.startTime)
                 }
             };
         },
         transactionOverview() {
-            if (!this.overviewStore.transactionOverview || !this.overviewStore.transactionOverview.thisMonth) {
-                return {
-                    thisMonth: {
-                        valid: false,
-                        incomeAmount: this.getDisplayAmount(0, false),
-                        expenseAmount: this.getDisplayAmount(0, false)
-                    }
-                };
-            }
-
-            const originalOverview = this.overviewStore.transactionOverview;
-            const displayOverview = {};
-
-            [ 'today', 'thisWeek', 'thisMonth', 'thisYear' ].forEach(key => {
-                if (!originalOverview[key]) {
-                    return;
-                }
-
-                const item = originalOverview[key];
-
-                displayOverview[key] = {
-                    valid: true,
-                    incomeAmount: this.getDisplayAmount(item.incomeAmount, item.incompleteIncomeAmount),
-                    expenseAmount: this.getDisplayAmount(item.expenseAmount, item.incompleteExpenseAmount)
-                };
-            });
-
-            return displayOverview;
+            return this.overviewStore.transactionOverview;
         }
     },
     created() {
@@ -264,8 +203,6 @@ export default {
             self.loadingOverview = true;
 
             self.overviewStore.loadTransactionOverview({
-                defaultCurrency: self.defaultCurrency,
-                dateRange: self.dateRange,
                 force: force
             }).then(() => {
                 self.loadingOverview = false;
@@ -287,6 +224,12 @@ export default {
             }
 
             return this.$locale.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
+        },
+        getDisplayIncomeAmount(category) {
+            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
+        },
+        getDisplayExpenseAmount(category) {
+            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
         }
     }
 }

@@ -20,7 +20,7 @@
                 </p>
                 <p class="no-margin">
                     <span class="month-expense" v-if="loading">0.00 USD</span>
-                    <span class="month-expense" v-else-if="!loading">{{ transactionOverview.thisMonth.expenseAmount }}</span>
+                    <span class="month-expense" v-else-if="!loading">{{ getDisplayExpenseAmount(transactionOverview.thisMonth) }}</span>
                     <f7-link class="margin-left-half" @click="showAmountInHomePage = !showAmountInHomePage">
                         <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                     </f7-link>
@@ -29,7 +29,7 @@
                     <small class="home-summary-misc" v-if="loading">Monthly income 0.00 USD</small>
                     <small class="home-summary-misc" v-else-if="!loading">
                         <span>{{ $t('Monthly income') }}</span>
-                        <span>{{ transactionOverview.thisMonth.incomeAmount }}</span>
+                        <span>{{ getDisplayIncomeAmount(transactionOverview.thisMonth) }}</span>
                     </small>
                 </p>
             </f7-card-header>
@@ -56,11 +56,11 @@
                     <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.incomeAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ getDisplayIncomeAmount(transactionOverview.today) }}</small>
                         </div>
                         <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ transactionOverview.today.expenseAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.today && transactionOverview.today.valid">{{ getDisplayExpenseAmount(transactionOverview.today) }}</small>
                         </div>
                     </div>
                 </template>
@@ -89,11 +89,11 @@
                     <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.incomeAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ getDisplayIncomeAmount(transactionOverview.thisWeek) }}</small>
                         </div>
                         <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ transactionOverview.thisWeek.expenseAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisWeek && transactionOverview.thisWeek.valid">{{ getDisplayExpenseAmount(transactionOverview.thisWeek) }}</small>
                         </div>
                     </div>
                 </template>
@@ -122,11 +122,11 @@
                     <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.incomeAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ getDisplayIncomeAmount(transactionOverview.thisMonth) }}</small>
                         </div>
                         <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ transactionOverview.thisMonth.expenseAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisMonth && transactionOverview.thisMonth.valid">{{ getDisplayExpenseAmount(transactionOverview.thisMonth) }}</small>
                         </div>
                     </div>
                 </template>
@@ -152,11 +152,11 @@
                     <div class="overview-transaction-amount">
                         <div class="text-color-red text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.incomeAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ getDisplayIncomeAmount(transactionOverview.thisYear) }}</small>
                         </div>
                         <div class="text-color-teal text-align-right">
                             <small v-if="loading">0.00 USD</small>
-                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ transactionOverview.thisYear.expenseAmount }}</small>
+                            <small v-else-if="!loading && transactionOverview.thisYear && transactionOverview.thisYear.valid">{{ getDisplayExpenseAmount(transactionOverview.thisYear) }}</small>
                         </div>
                     </div>
                 </template>
@@ -194,24 +194,12 @@ import { useUserStore } from '@/stores/user.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import {
-    formatUnixTime,
-    getTodayFirstUnixTime,
-    getTodayLastUnixTime,
-    getThisWeekFirstUnixTime,
-    getThisWeekLastUnixTime,
-    getThisMonthFirstUnixTime,
-    getThisMonthLastUnixTime,
-    getThisYearFirstUnixTime,
-    getThisYearLastUnixTime
-} from '@/lib/datetime.js';
+import { formatUnixTime } from '@/lib/datetime.js';
 
 export default {
     data() {
         return {
-            loading: true,
-            todayFirstUnixTime: getTodayFirstUnixTime(),
-            todayLastUnixTime: getTodayLastUnixTime()
+            loading: true
         };
     },
     computed: {
@@ -239,82 +227,29 @@ export default {
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
-        dateRange() {
-            const self = this;
-
-            return {
-                today: {
-                    startTime: self.todayFirstUnixTime,
-                    endTime: self.todayLastUnixTime
-                },
-                thisWeek: {
-                    startTime: getThisWeekFirstUnixTime(self.firstDayOfWeek),
-                    endTime: getThisWeekLastUnixTime(self.firstDayOfWeek)
-                },
-                thisMonth: {
-                    startTime: getThisMonthFirstUnixTime(),
-                    endTime: getThisMonthLastUnixTime()
-                },
-                thisYear: {
-                    startTime: getThisYearFirstUnixTime(),
-                    endTime: getThisYearLastUnixTime()
-                }
-            };
-        },
         displayDateRange() {
             const self = this;
 
             return {
                 today: {
-                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.dateRange.today.startTime),
+                    displayTime: self.$locale.formatUnixTimeToLongDate(self.userStore, self.overviewStore.transactionDataRange.today.startTime),
                 },
                 thisWeek: {
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisWeek.endTime)
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisWeek.endTime)
                 },
                 thisMonth: {
-                    displayTime: formatUnixTime(self.dateRange.thisMonth.startTime, 'MMMM'),
-                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.startTime),
-                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.dateRange.thisMonth.endTime)
+                    displayTime: formatUnixTime(self.overviewStore.transactionDataRange.thisMonth.startTime, 'MMMM'),
+                    startTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.startTime),
+                    endTime: self.$locale.formatUnixTimeToLongMonthDay(self.userStore, self.overviewStore.transactionDataRange.thisMonth.endTime)
                 },
                 thisYear: {
-                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.dateRange.thisYear.startTime)
+                    displayTime: self.$locale.formatUnixTimeToLongYear(self.userStore, self.overviewStore.transactionDataRange.thisYear.startTime)
                 }
             };
         },
         transactionOverview() {
-            // make sure this computed property refers these property, so these property can trigger this computed property to update
-            const isEnableThousandsSeparator = this.isEnableThousandsSeparator; // eslint-disable-line
-            const currencyDisplayMode = this.currencyDisplayMode; // eslint-disable-line
-
-            if (!this.overviewStore.transactionOverview || !this.overviewStore.transactionOverview.thisMonth) {
-                return {
-                    thisMonth: {
-                        valid: false,
-                        incomeAmount: this.getDisplayAmount(0, false),
-                        expenseAmount: this.getDisplayAmount(0, false)
-                    }
-                };
-            }
-
-            const originalOverview = this.overviewStore.transactionOverview;
-            const displayOverview = {};
-
-            [ 'today', 'thisWeek', 'thisMonth', 'thisYear' ].forEach(key => {
-                if (!originalOverview[key]) {
-                    return;
-                }
-
-                const item = originalOverview[key];
-
-                displayOverview[key] = {
-                    valid: true,
-                    incomeAmount: this.getDisplayAmount(item.incomeAmount, item.incompleteIncomeAmount),
-                    expenseAmount: this.getDisplayAmount(item.expenseAmount, item.incompleteExpenseAmount)
-                };
-            });
-
-            return displayOverview;
+            return this.overviewStore.transactionOverview;
         }
     },
     created() {
@@ -324,8 +259,6 @@ export default {
             self.loading = true;
 
             self.overviewStore.loadTransactionOverview({
-                defaultCurrency: self.defaultCurrency,
-                dateRange: self.dateRange,
                 force: false
             }).then(() => {
                 self.loading = false;
@@ -340,16 +273,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            let dateChanged = false;
-
-            if (this.todayFirstUnixTime !== getTodayFirstUnixTime()) {
-                dateChanged = true;
-
-                this.todayFirstUnixTime = getTodayFirstUnixTime();
-                this.todayLastUnixTime = getTodayLastUnixTime();
-            }
-
-            if ((dateChanged || this.overviewStore.transactionOverviewStateInvalid) && !this.loading) {
+            if (!this.loading) {
                 this.reload(null);
             }
         },
@@ -358,8 +282,6 @@ export default {
             const force = !!done;
 
             self.overviewStore.loadTransactionOverview({
-                defaultCurrency: self.defaultCurrency,
-                dateRange: self.dateRange,
                 force: force
             }).then(() => {
                 if (done) {
@@ -385,6 +307,12 @@ export default {
             }
 
             return this.$locale.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
+        },
+        getDisplayIncomeAmount(category) {
+            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
+        },
+        getDisplayExpenseAmount(category) {
+            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
         }
     }
 }

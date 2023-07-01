@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import { createI18n } from 'vue-i18n';
 
 import { createVuetify } from 'vuetify';
+import { VAlert } from 'vuetify/components/VAlert';
 import { VApp } from 'vuetify/components/VApp';
 import { VAvatar } from 'vuetify/components/VAvatar';
 import { VAutocomplete } from 'vuetify/components/VAutocomplete';
@@ -71,6 +72,7 @@ const pinia = createPinia();
 const i18n = createI18n(getI18nOptions());
 const vuetify = createVuetify({
     components: {
+        VAlert,
         VApp,
         VAvatar,
         VAutocomplete,

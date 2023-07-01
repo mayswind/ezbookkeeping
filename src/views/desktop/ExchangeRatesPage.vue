@@ -14,7 +14,7 @@
                 </template>
 
                 <v-card-text>
-                    <span class="text-sm">
+                    <span class="text-sm" v-if="exchangeRatesData">
                         {{ $t('Data source') }}
                         <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                         <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
@@ -37,12 +37,9 @@
                                 item-value="currencyCode"
                                 :disabled="loading"
                                 :items="availableExchangeRates"
+                                :no-data-text="$t('No results')"
                                 v-model="baseCurrency"
-                            >
-                                <template v-slot:no-data>
-                                    <div class="px-4">{{ $t('No results') }}</div>
-                                </template>
-                            </v-autocomplete>
+                            />
                         </v-col>
                     </v-row>
                     <v-row no-gutters>

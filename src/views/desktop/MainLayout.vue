@@ -79,12 +79,6 @@
                     </a>
                 </li>
                 <li class="nav-link">
-                    <a :href="mobileVersionPath">
-                        <v-icon class="nav-item-icon" :icon="icons.switchToMobile"/>
-                        <span class="nav-item-title">{{ $t('Switch to Mobile Version') }}</span>
-                    </a>
-                </li>
-                <li class="nav-link">
                     <router-link to="/about">
                         <v-icon class="nav-item-icon" :icon="icons.about"/>
                         <span class="nav-item-title">{{ $t('About') }}</span>
@@ -177,6 +171,7 @@
                     <v-img alt="qrcode" class="text-center img-url-qrcode" src="/qrcode/mobile_url.png" />
                 </v-card-text>
                 <v-card-actions>
+                    <v-btn :href="mobileVersionPath">{{$t('Switch to Mobile Version') }}</v-btn>
                     <v-spacer></v-spacer>
                     <v-btn @click="showMobileQrCode = false">{{ $t('Close') }}</v-btn>
                 </v-card-actions>
@@ -214,7 +209,6 @@ import {
     mdiSwapHorizontal,
     mdiCogOutline,
     mdiCellphone,
-    mdiMonitorCellphone,
     mdiInformationOutline,
     mdiThemeLightDark,
     mdiWeatherSunny,
@@ -243,7 +237,6 @@ export default {
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,
                 mobile: mdiCellphone,
-                switchToMobile: mdiMonitorCellphone,
                 about: mdiInformationOutline,
                 themeAuto: mdiThemeLightDark,
                 themeLight: mdiWeatherSunny,

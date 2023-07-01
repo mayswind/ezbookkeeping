@@ -1003,6 +1003,8 @@ export default {
     'Basic Settings': 'Basic Settings',
     'Security Settings': 'Security Settings',
     'Two-Factor Authentication Settings': 'Two-Factor Authentication Settings',
+    'Username:': 'Username:',
+    'Avatar Provider:': 'Avatar Provider:',
     'Current Password': 'Current Password',
     'New Password': 'New Password',
     'Modify Password': 'Modify Password',

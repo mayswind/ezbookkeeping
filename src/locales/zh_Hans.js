@@ -1003,6 +1003,8 @@ export default {
     'Basic Settings': '基本设置',
     'Security Settings': '安全设置',
     'Two-Factor Authentication Settings': '两步验证设置',
+    'Username:': '用户名：',
+    'Avatar Provider:': '头像提供方：',
     'Current Password': '当前密码',
     'New Password': '新密码',
     'Modify Password': '修改密码',

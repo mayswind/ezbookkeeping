@@ -7,7 +7,26 @@
                     <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
                 </template>
 
-                <v-form>
+                <v-card-text class="d-flex">
+                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-6">
+                        <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar"/>
+                        <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
+                    </v-avatar>
+                    <div class="d-flex flex-column justify-center gap-5">
+                        <p class="text-body-1 mb-0">
+                            <span class="mr-2">{{ $t('Username:') }}</span>
+                            <span>{{ oldProfile.username }}</span>
+                        </p>
+                        <p class="text-body-1 mb-0">
+                            <span class="mr-2">{{ $t('Avatar Provider:') }}</span>
+                            <span>{{ currentUserAvatarProvider }}</span>
+                        </p>
+                    </div>
+                </v-card-text>
+
+                <v-divider />
+
+                <v-form class="mt-6">
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
@@ -198,6 +217,10 @@ import { useAccountsStore } from '@/stores/account.js';
 import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 
+import {
+    mdiAccount
+} from '@mdi/js';
+
 export default {
     data() {
         const self = this;
@@ -232,7 +255,10 @@ export default {
                 shortTimeFormat: 0
             },
             loading: true,
-            saving: false
+            saving: false,
+            icons: {
+                user: mdiAccount
+            }
         };
     },
     computed: {
@@ -310,6 +336,13 @@ export default {
                 value: 6,
                 name: self.$t('This year or later')
             }];
+        },
+        currentUserAvatarProvider() {
+            if (this.oldProfile.avatarProvider === 'gravatar') {
+                return 'Gravatar';
+            } else {
+                return this.$t('None');
+            }
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
@@ -431,8 +464,11 @@ export default {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);
         },
         setCurrentUserProfile(profile) {
+            this.oldProfile.username = profile.username;
             this.oldProfile.email = profile.email;
             this.oldProfile.nickname = profile.nickname;
+            this.oldProfile.avatar = profile.avatar;
+            this.oldProfile.avatarProvider = profile.avatarProvider;
             this.oldProfile.defaultAccountId = profile.defaultAccountId;
             this.oldProfile.transactionEditScope = profile.transactionEditScope;
             this.oldProfile.language = profile.language;

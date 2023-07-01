@@ -79,6 +79,7 @@ type UserBasicInfo struct {
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
 	AvatarUrl            string               `json:"avatar"`
+	AvatarProvider       string               `json:"avatarProvider,omitempty"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 	Language             string               `json:"language"`
@@ -136,6 +137,7 @@ type UserProfileResponse struct {
 	Email                string               `json:"email"`
 	Nickname             string               `json:"nickname"`
 	AvatarUrl            string               `json:"avatar"`
+	AvatarProvider       string               `json:"avatarProvider,omitempty"`
 	DefaultAccountId     int64                `json:"defaultAccountId,string"`
 	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
 	Language             string               `json:"language"`
@@ -197,6 +199,7 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		Email:                u.Email,
 		Nickname:             u.Nickname,
 		AvatarUrl:            u.getAvatarUrl(),
+		AvatarProvider:       u.getAvatarProvider(),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
 		Language:             u.Language,
@@ -216,6 +219,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		Email:                u.Email,
 		Nickname:             u.Nickname,
 		AvatarUrl:            u.getAvatarUrl(),
+		AvatarProvider:       u.getAvatarProvider(),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
 		Language:             u.Language,
@@ -227,6 +231,10 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		ShortTimeFormat:      u.ShortTimeFormat,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}
+}
+
+func (u *User) getAvatarProvider() string {
+	return settings.Container.Current.AvatarProvider
 }
 
 func (u *User) getAvatarUrl() string {

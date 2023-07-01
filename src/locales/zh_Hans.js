@@ -985,7 +985,7 @@ export default {
     'Currency Symbol': '货币符号',
     'Show Account Balance': '显示账户余额',
     'Page Settings': '页面设置',
-    'Overview Page': '概览页面',
+    'Overview Page': '总览页面',
     'Transaction List Page': '交易列表页面',
     'Show Monthly Total Amount': '显示月度总金额',
     'Transaction Edit Page': '交易编辑页面',

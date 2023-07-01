@@ -63,6 +63,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+
 import { isString, appendThousandsSeparator } from '@/lib/common.js';
 import { numericCurrencyToString, stringCurrencyToNumeric } from '@/lib/currency.js';
 
@@ -87,9 +90,13 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useSettingsStore),
+        isEnableThousandsSeparator() {
+            return this.settingsStore.appSettings.thousandsSeparator;
+        },
         currentDisplay() {
-            const previousValue = appendThousandsSeparator(this.previousValue);
-            const currentValue = appendThousandsSeparator(this.currentValue);
+            const previousValue = appendThousandsSeparator(this.previousValue, this.isEnableThousandsSeparator);
+            const currentValue = appendThousandsSeparator(this.currentValue, this.isEnableThousandsSeparator);
 
             if (this.currentSymbol) {
                 return `${previousValue} ${this.currentSymbol} ${currentValue}`;
@@ -118,7 +125,7 @@ export default {
     },
     methods: {
         getStringValue(value) {
-            let str = numericCurrencyToString(value);
+            let str = numericCurrencyToString(value, this.isEnableThousandsSeparator);
 
             if (str.indexOf(',')) {
                 str = str.replaceAll(/,/g, '');

@@ -164,7 +164,10 @@ export default {
             return '';
         },
         getDisplayAmount(value) {
-            return this.$locale.getDisplayCurrency(value, this.userStore.currentUserDefaultCurrency);
+            return this.$locale.getDisplayCurrency(value, this.userStore.currentUserDefaultCurrency, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         }
     }
 }

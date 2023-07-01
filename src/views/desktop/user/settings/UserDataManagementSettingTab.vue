@@ -143,6 +143,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import {appendThousandsSeparator, isEquals} from '@/lib/common.js';
@@ -182,7 +183,10 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useRootStore, useUserStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore),
+        isEnableThousandsSeparator() {
+            return this.settingsStore.appSettings.thousandsSeparator;
+        },
         displayDataStatistics() {
             const self = this;
 
@@ -191,10 +195,10 @@ export default {
             }
 
             return {
-                totalAccountCount: appendThousandsSeparator(self.dataStatistics.totalAccountCount),
-                totalTransactionCategoryCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCategoryCount),
-                totalTransactionTagCount: appendThousandsSeparator(self.dataStatistics.totalTransactionTagCount),
-                totalTransactionCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCount)
+                totalAccountCount: appendThousandsSeparator(self.dataStatistics.totalAccountCount, self.isEnableThousandsSeparator),
+                totalTransactionCategoryCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCategoryCount, self.isEnableThousandsSeparator),
+                totalTransactionTagCount: appendThousandsSeparator(self.dataStatistics.totalTransactionTagCount, self.isEnableThousandsSeparator),
+                totalTransactionCount: appendThousandsSeparator(self.dataStatistics.totalTransactionCount, self.isEnableThousandsSeparator)
             };
         },
         isDataExportingEnabled() {

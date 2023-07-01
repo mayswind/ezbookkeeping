@@ -842,14 +842,20 @@ export default {
         },
         getDisplayAmount(amount, currency, hideAmount) {
             if (hideAmount) {
-                return this.$locale.getDisplayCurrency('***', currency);
+                return this.getDisplayCurrency('***', currency);
             }
 
-            return this.$locale.getDisplayCurrency(amount, currency);
+            return this.getDisplayCurrency(amount, currency);
         },
         getDisplayMonthTotalAmount(amount, currency, symbol, incomplete) {
-            const displayAmount = this.$locale.getDisplayCurrency(amount, currency);
+            const displayAmount = this.getDisplayCurrency(amount, currency);
             return symbol + displayAmount + (incomplete ? '+' : '');
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         },
         getTransactionTypeName(type, defaultName) {
             switch (type){

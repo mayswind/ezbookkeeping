@@ -212,12 +212,6 @@ export default {
                 this.settingsStore.setShowAmountInHomePage(value);
             }
         },
-        isEnableThousandsSeparator() {
-            return this.settingsStore.appSettings.thousandsSeparator;
-        },
-        currencyDisplayMode() {
-            return this.settingsStore.appSettings.currencyDisplayMode;
-        },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
@@ -301,12 +295,18 @@ export default {
                 }
             });
         },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
+        },
         getDisplayAmount(amount, incomplete) {
             if (!this.showAmountInHomePage) {
-                return this.$locale.getDisplayCurrency('***', this.defaultCurrency);
+                return this.getDisplayCurrency('***', this.defaultCurrency);
             }
 
-            return this.$locale.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
+            return this.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
         },
         getDisplayIncomeAmount(category) {
             return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);

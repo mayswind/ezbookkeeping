@@ -223,15 +223,15 @@ export default {
         },
         netAssets() {
             const netAssets = this.accountsStore.getNetAssets(this.showAccountBalance);
-            return this.$locale.getDisplayCurrency(netAssets, this.defaultCurrency);
+            return this.getDisplayCurrency(netAssets, this.defaultCurrency);
         },
         totalAssets() {
             const totalAssets = this.accountsStore.getTotalAssets(this.showAccountBalance);
-            return this.$locale.getDisplayCurrency(totalAssets, this.defaultCurrency);
+            return this.getDisplayCurrency(totalAssets, this.defaultCurrency);
         },
         totalLiabilities() {
             const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAccountBalance);
-            return this.$locale.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
+            return this.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
         },
         showAccountBalance: {
             get: function () {
@@ -305,11 +305,11 @@ export default {
         },
         accountBalance(account) {
             const balance = this.accountsStore.getAccountBalance(this.showAccountBalance, account);
-            return this.$locale.getDisplayCurrency(balance, account.currency);
+            return this.getDisplayCurrency(balance, account.currency);
         },
         accountCategoryTotalBalance(accountCategory) {
             const totalBalance = this.accountsStore.getAccountCategoryTotalBalance(this.showAccountBalance, accountCategory);
-            return this.$locale.getDisplayCurrency(totalBalance, this.defaultCurrency);
+            return this.getDisplayCurrency(totalBalance, this.defaultCurrency);
         },
         setSortable() {
             if (this.sortable) {
@@ -425,6 +425,12 @@ export default {
                 if (!error.processed) {
                     self.$toast(error.message || error);
                 }
+            });
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
             });
         },
         getAccountDomId(account) {

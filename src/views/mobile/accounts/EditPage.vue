@@ -421,6 +421,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
@@ -467,7 +468,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useAccountsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore),
         title() {
             if (!this.editAccountId) {
                 return 'Add Account';
@@ -720,7 +721,13 @@ export default {
             return this.$t(categoryName);
         },
         getAccountBalance(account) {
-            return this.$locale.getDisplayCurrency(account.balance, account.currency)
+            return this.getDisplayCurrency(account.balance, account.currency);
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             for (let i = 0; i < this.allAccountCategories.length; i++) {

@@ -91,12 +91,17 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import transactionConstants from '@/consts/transaction.js';
 import { isNumber, appendThousandsSeparator } from '@/lib/common.js';
-import { stringCurrencyToNumeric, getExchangedAmount } from '@/lib/currency.js';
+import {
+    numericCurrencyToString,
+    stringCurrencyToNumeric,
+    getExchangedAmount,
+} from '@/lib/currency.js';
 
 export default {
     data() {
@@ -111,7 +116,10 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
+        isEnableThousandsSeparator() {
+            return this.settingsStore.appSettings.thousandsSeparator;
+        },
         exchangeRatesData() {
             return this.exchangeRatesStore.latestExchangeRates.data;
         },
@@ -143,7 +151,7 @@ export default {
             return availableExchangeRates;
         },
         displayBaseAmount() {
-            return this.$locale.getDisplayCurrency(this.baseAmount);
+            return numericCurrencyToString(this.baseAmount, this.isEnableThousandsSeparator);
         },
         baseAmountFontSizeClass() {
             if (this.baseAmount >= 100000000 || this.baseAmount <= -100000000) {
@@ -231,7 +239,7 @@ export default {
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
 
             if (rateStr.indexOf('.') < 0) {
-                return appendThousandsSeparator(rateStr);
+                return appendThousandsSeparator(rateStr, this.isEnableThousandsSeparator);
             } else {
                 let firstNonZeroPos = 0;
 
@@ -243,7 +251,7 @@ export default {
                 }
 
                 const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
-                return appendThousandsSeparator(trimmedRateStr);
+                return appendThousandsSeparator(trimmedRateStr, this.isEnableThousandsSeparator);
             }
         },
         setAsBaseline(currency, amount) {

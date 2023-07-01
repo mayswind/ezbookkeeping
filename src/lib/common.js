@@ -1,5 +1,3 @@
-import { isEnableThousandsSeparator } from './settings.js';
-
 export function isFunction(val) {
     return typeof(val) === 'function';
 }
@@ -79,8 +77,8 @@ export function isEquals(obj1, obj2) {
     }
 }
 
-export function appendThousandsSeparator(value) {
-    if (!isEnableThousandsSeparator() || value.length <= 3) {
+export function appendThousandsSeparator(value, enable) {
+    if (!enable || value.length <= 3) {
         return value;
     }
 

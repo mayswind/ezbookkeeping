@@ -78,6 +78,7 @@
 
 <script>
 import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
@@ -102,7 +103,10 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useUserStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
+        isEnableThousandsSeparator() {
+            return this.settingsStore.appSettings.thousandsSeparator;
+        },
         exchangeRatesData() {
             return this.exchangeRatesStore.latestExchangeRates.data;
         },
@@ -196,7 +200,7 @@ export default {
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
 
             if (rateStr.indexOf('.') < 0) {
-                return appendThousandsSeparator(rateStr);
+                return appendThousandsSeparator(rateStr, this.isEnableThousandsSeparator);
             } else {
                 let firstNonZeroPos = 0;
 
@@ -208,7 +212,7 @@ export default {
                 }
 
                 const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
-                return appendThousandsSeparator(trimmedRateStr);
+                return appendThousandsSeparator(trimmedRateStr, this.isEnableThousandsSeparator);
             }
         }
     }

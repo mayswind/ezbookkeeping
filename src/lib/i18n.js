@@ -26,7 +26,6 @@ import {
 } from './currency.js';
 
 import logger from './logger.js';
-import { getCurrencyDisplayMode } from './settings.js';
 import services from './services.js';
 
 const apiNotFoundErrorCode = 100001;
@@ -516,7 +515,7 @@ function getAllWeekDays(translateFn) {
     return allWeekDays;
 }
 
-function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
+function getDisplayCurrency(value, currencyCode, options, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
     }
@@ -525,21 +524,25 @@ function getDisplayCurrency(value, currencyCode, notConvertValue, translateFn) {
         value = value.toString();
     }
 
-    if (!notConvertValue) {
+    if (!options) {
+        options = {};
+    }
+
+    if (!options.notConvertValue) {
         const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
 
         if (hasIncompleteFlag) {
             value = value.substring(0, value.length - 1);
         }
 
-        value = numericCurrencyToString(value);
+        value = numericCurrencyToString(value, options.enableThousandsSeparator);
 
         if (hasIncompleteFlag) {
             value = value + '+';
         }
     }
 
-    const currencyDisplayMode = getCurrencyDisplayMode();
+    const currencyDisplayMode = options.currencyDisplayMode;
 
     if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
         const currencyInfo = currency.all[currencyCode];
@@ -776,7 +779,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
-        getDisplayCurrency: (value, currencyCode, notConvertValue) => getDisplayCurrency(value, currencyCode, notConvertValue, i18nGlobal.t),
+        getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };

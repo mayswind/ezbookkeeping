@@ -714,7 +714,7 @@ export default {
             container.scrollTop(targetPos);
         },
         getDisplayAmount(amount, currency, textLimit) {
-            amount = this.$locale.getDisplayCurrency(amount, currency);
+            amount = this.getDisplayCurrency(amount, currency);
 
             if (!this.showAccountBalance
                 && (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type
@@ -728,6 +728,12 @@ export default {
             }
 
             return amount;
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         },
         getDisplayPercent(value, precision, lowPrecisionValue) {
             return formatPercent(value, precision, lowPrecisionValue);

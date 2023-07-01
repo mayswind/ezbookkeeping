@@ -77,6 +77,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+
 import colorConstants from '@/consts/color.js';
 import { formatPercent } from '@/lib/common.js';
 
@@ -124,6 +127,7 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useSettingsStore),
         validItems: function () {
             let totalValidValue = 0;
 
@@ -154,7 +158,7 @@ export default {
                     };
 
                     finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-                    finalItem.displayValue = this.$locale.getDisplayCurrency(finalItem.value, (finalItem.currency || this.defaultCurrency));
+                    finalItem.displayValue = this.getDisplayCurrency(finalItem.value, (finalItem.currency || this.defaultCurrency));
 
                     validItems.push(finalItem);
                 }
@@ -281,6 +285,12 @@ export default {
 
             const allPreviousLength = allPreviousPercent * this.circumference;
             return this.circumference - allPreviousLength + offset;
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         }
     }
 }

@@ -503,9 +503,9 @@ export default {
                         const account = accountCategory.accounts[i];
 
                         if (this.showAccountBalance && account.isAsset) {
-                            account.displayBalance = this.$locale.getDisplayCurrency(account.balance, account.currency);
+                            account.displayBalance = this.getDisplayCurrency(account.balance, account.currency);
                         } else if (this.showAccountBalance && account.isLiability) {
-                            account.displayBalance = this.$locale.getDisplayCurrency(-account.balance, account.currency);
+                            account.displayBalance = this.getDisplayCurrency(-account.balance, account.currency);
                         } else {
                             account.displayBalance = '***';
                         }
@@ -544,7 +544,7 @@ export default {
                         totalBalance = totalBalance + '+';
                     }
 
-                    accountCategory.displayBalance = this.$locale.getDisplayCurrency(totalBalance, this.defaultCurrency);
+                    accountCategory.displayBalance = this.getDisplayCurrency(totalBalance, this.defaultCurrency);
                 } else {
                     accountCategory.displayBalance = '***';
                 }
@@ -1067,10 +1067,16 @@ export default {
         },
         getDisplayAmount(amount, hideAmount) {
             if (hideAmount) {
-                return this.$locale.getDisplayCurrency('***');
+                return this.getDisplayCurrency('***');
             }
 
-            return this.$locale.getDisplayCurrency(amount);
+            return this.getDisplayCurrency(amount);
+        },
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         },
         getPrimaryCategoryName(categoryId, allCategories) {
             return getTransactionPrimaryCategoryName(categoryId, allCategories);

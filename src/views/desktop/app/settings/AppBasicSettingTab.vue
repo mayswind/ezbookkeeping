@@ -271,7 +271,7 @@ export default {
             }
         }
     },
-    setup () {
+    setup() {
         const theme = useTheme();
 
         return {

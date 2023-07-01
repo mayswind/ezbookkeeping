@@ -116,6 +116,9 @@ import {
 } from '@mdi/js';
 
 export default {
+    expose: [
+        'reset'
+    ],
     data() {
         return {
             status: null,
@@ -165,6 +168,18 @@ export default {
         }
     },
     methods: {
+        reset() {
+            this.new2FASecret = '';
+            this.new2FAQRCode = '';
+            this.currentPassword = '';
+            this.isCurrentPasswordVisible = false;
+            this.currentPasscode = '';
+            this.currentBackupCode = '';
+            this.enabling = false;
+            this.enableConfirming = false;
+            this.disabling = false;
+            this.regenerating = false;
+        },
         enable() {
             const self = this;
 

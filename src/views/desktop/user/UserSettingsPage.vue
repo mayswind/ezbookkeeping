@@ -29,7 +29,7 @@
             </v-window-item>
 
             <v-window-item value="twoFactorSetting">
-                <user-two-factor-auth-setting-tab/>
+                <user-two-factor-auth-setting-tab ref="twoFactorSettingTab"/>
             </v-window-item>
 
             <v-window-item value="dataManagementSetting">
@@ -69,6 +69,13 @@ export default {
                 dataManagementSetting: mdiDatabaseCogOutline
             }
         };
+    },
+    watch: {
+        'activeTab': function (newValue, oldValue) {
+            if (oldValue === 'twoFactorSetting' && newValue !== 'twoFactorSetting') {
+                this.$refs.twoFactorSettingTab.reset();
+            }
+        }
     }
 }
 </script>

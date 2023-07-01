@@ -174,6 +174,10 @@
                             {{ $t('Save changes') }}
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="saving"></v-progress-circular>
                         </v-btn>
+
+                        <v-btn color="secondary" variant="tonal" @click="reset">
+                            {{ $t('Reset') }}
+                        </v-btn>
                     </v-card-text>
                 </v-form>
             </v-card>
@@ -419,6 +423,9 @@ export default {
                     self.$refs.snackbar.showError(error);
                 }
             });
+        },
+        reset() {
+            this.setCurrentUserProfile(this.oldProfile);
         },
         getNameByKeyValue(src, value, keyField, nameField, defaultName) {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);

@@ -699,6 +699,7 @@ export default {
     'Apply': '应用',
     'Save': '保存',
     'Save changes': '保存修改',
+    'Reset': '重置',
     'Update': '更新',
     'Refresh': '刷新',
     'Clear': '清除',

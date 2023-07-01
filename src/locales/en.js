@@ -699,6 +699,7 @@ export default {
     'Apply': 'Apply',
     'Save': 'Save',
     'Save changes': 'Save changes',
+    'Reset': 'Reset',
     'Update': 'Update',
     'Refresh': 'Refresh',
     'Clear': 'Clear',

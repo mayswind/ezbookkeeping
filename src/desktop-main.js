@@ -27,12 +27,14 @@ import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
 import { VSheet } from 'vuetify/components/VSheet';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
+import { VSwitch } from 'vuetify/components/VSwitch';
 import { VTabs, VTab } from 'vuetify/components/VTabs';
 import { VTable } from 'vuetify/components/VTable';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VToolbar } from 'vuetify/components/VToolbar';
 import { VTooltip } from 'vuetify/components/VTooltip';
 import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
+
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
 
@@ -114,6 +116,7 @@ const vuetify = createVuetify({
         VSelect,
         VSheet,
         VSnackbar,
+        VSwitch,
         VTabs,
         VTab,
         VTable,

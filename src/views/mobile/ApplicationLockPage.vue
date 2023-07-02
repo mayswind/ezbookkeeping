@@ -27,7 +27,7 @@
         </pin-code-input-sheet>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
-                              :hint="$t('Please enter your current PIN code when disable application lock')"
+                              :hint="$t('Please enter your current PIN code when disable application lock.')"
                               v-model:show="showInputPinCodeSheetForDisable"
                               v-model="currentPinCodeForDisable"
                               @pincode:confirm="disable">

@@ -768,7 +768,7 @@ export default {
     'Welcome to ezBookkeeping': '欢迎使用 ezBookkeeping',
     'Please log in with your ezBookkeeping account': '请使用您的 ezBookkeeping 账号登录',
     'Unlock Application': '解锁应用',
-    'Re-login': '重新登陆',
+    'Re-login': '重新登录',
     'Username': '用户名',
     'Your username': '你的用户名',
     'Your username or email': '你的用户名或注册邮箱',

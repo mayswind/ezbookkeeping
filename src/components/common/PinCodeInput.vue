@@ -1,11 +1,14 @@
 <template>
-    <div class="pin-code-input grid grid-gap" :class="'grid-cols-' + length">
-        <div class="input input-outline input-with-value"
-             :key="index" v-for="(code, index) in codes">
+    <div class="pin-codes-input" :style="`grid-template-columns: repeat(${length}, minmax(0, 1fr))`">
+        <div class="pin-code-input pin-code-input-outline"
+             :class="{ 'pin-code-input-focued': codes[index].focused }" :key="index"
+             v-for="(code, index) in codes">
             <input min="0" maxlength="1" pattern="[0-9]*"
                    :ref="`pin-code-input-${index}`"
                    :value="codes[index].value"
                    :type="codes[index].inputType"
+                   @focus="codes[index].focused = true"
+                   @blur="codes[index].focused = false"
                    @keydown="onKeydown(index, $event)"
                    @paste="onPaste(index, $event)"
                    @change="onInput(index, $event)"
@@ -74,7 +77,8 @@ export default {
                 const code = {
                     value: '',
                     inputType: 'tel',
-                    inputTimer: null
+                    inputTimer: null,
+                    focused: false
                 };
 
                 if (value && value[i]) {
@@ -235,14 +239,48 @@ export default {
 </script>
 
 <style>
+.pin-codes-input {
+    --ebk-pin-code-border-color: #bbb;
+    --ebk-pin-code-focued-color: #c67e48;
+    --ebk-pin-code-border-radius: 8px;
+    --ebk-pin-code-input-height: 46px;
+    --ebk-pin-code-transition-duration: 200ms;
+    display: grid;
+    gap: 8px;
+}
+
+.pin-code-input {
+    position: relative;
+}
+
 .pin-code-input input {
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
-    height: 60px !important;
+    width: 100%;
+    height: var(--ebk-pin-code-input-height) !important;
 }
 
-.pin-code-input.grid.grid-gap {
-    --f7-grid-gap: 4px;
+.pin-code-input input:focus {
+    outline: none;
+}
+
+.pin-code-input-outline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border: 1px solid var(--ebk-pin-code-border-color);
+    border-radius: var(--ebk-pin-code-border-radius);
+    pointer-events: none;
+    box-sizing: border-box;
+    transition-duration: var(--ebk-pin-code-transition-duration);
+}
+
+.pin-code-input-outline.pin-code-input-focued::after {
+    border-width: 2px;
+    border-color: var(--ebk-pin-code-focued-color);
 }
 </style>

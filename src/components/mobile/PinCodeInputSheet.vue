@@ -9,7 +9,7 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin">{{ hint }}</p>
                 <f7-list class="no-margin">
-                    <f7-list-item class="list-item-pincode-input">
+                    <f7-list-item class="list-item-pincode-input padding-vertical-half">
                         <pin-code-input :secure="true" :length="6" v-model="currentPinCode"/>
                     </f7-list-item>
                 </f7-list>
@@ -74,7 +74,14 @@ export default {
 </script>
 
 <style>
-.list-item-pincode-input .item-inner {
+.list-item-pincode-input .item-content {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.list-item-pincode-input .item-content .item-inner {
+    padding-left: 0;
+    padding-right: 0;
     justify-content: center;
 }
 </style>

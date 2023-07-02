@@ -130,6 +130,8 @@ export default defineConfig(async () => {
                             return 'common';
                         } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|[a-zA-Z0-9-_]+\.js)/i.test(id)) {
                             return 'common';
+                        } else if (/[\\/]src[\\/]components[\\/]common[\\/]/i.test(id)) {
+                            return 'common';
                         }
                     }
                 },

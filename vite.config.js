@@ -78,7 +78,9 @@ export default defineConfig(async () => {
                         'mobile.html',
                         'desktop.html',
                         'robots.txt',
+                        'css/vendor-desktop-*.js',
                         'css/desktop-*.js',
+                        'js/vendor-desktop-*.js',
                         'js/desktop-*.js'
                     ],
                     navigateFallback: '',

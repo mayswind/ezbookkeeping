@@ -89,9 +89,10 @@ import {
     routeBackOnError
 } from '@/lib/ui.mobile.js';
 
+import PinCodeInput from '@/components/common/PinCodeInput.vue';
+
 import ItemIcon from '@/components/mobile/ItemIcon.vue';
 import PieChart from '@/components/mobile/PieChart.vue';
-import PinCodeInput from '@/components/mobile/PinCodeInput.vue';
 import PinCodeInputSheet from '@/components/mobile/PinCodeInputSheet.vue';
 import PasswordInputSheet from '@/components/mobile/PasswordInputSheet.vue';
 import PasscodeInputSheet from '@/components/mobile/PasscodeInputSheet.vue';
@@ -163,9 +164,10 @@ app.use(i18n);
 
 app.component('VueDatePicker', VueDatePicker);
 
+app.component('PinCodeInput', PinCodeInput);
+
 app.component('ItemIcon', ItemIcon);
 app.component('PieChart', PieChart);
-app.component('PinCodeInput', PinCodeInput);
 app.component('PinCodeInputSheet', PinCodeInputSheet);
 app.component('PasswordInputSheet', PasswordInputSheet);
 app.component('PasscodeInputSheet', PasscodeInputSheet);

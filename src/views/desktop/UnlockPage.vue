@@ -19,7 +19,8 @@
                         <v-form>
                             <v-row>
                                 <v-col cols="12">
-                                    <pin-code-input :secure="true" :length="6" v-model="pinCode" @pincode:confirm="unlockByPin" />
+                                    <pin-code-input :autofocus="true" :secure="true" :length="6"
+                                                    v-model="pinCode" @pincode:confirm="unlockByPin" />
                                 </v-col>
 
                                 <v-col cols="12">

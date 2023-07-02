@@ -316,7 +316,7 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
-            this.transactionStatistics = {};
+            this.transactionStatisticsData = {};
             this.transactionStatisticsStateInvalid = true;
         },
         initTransactionStatisticsFilter(filter) {

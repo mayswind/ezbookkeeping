@@ -138,6 +138,7 @@ export const useOverviewStore = defineStore('overview', {
             this.transactionOverviewStateInvalid = invalidState;
         },
         resetTransactionOverview() {
+            updateTransactionDateRange(this);
             this.transactionOverviewData = {};
             this.transactionOverviewStateInvalid = true;
         },

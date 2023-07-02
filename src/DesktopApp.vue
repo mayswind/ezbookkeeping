@@ -57,7 +57,7 @@ export default {
             if (!self.settingsStore.appSettings.applicationLock) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user && response.user.language) {
+                    if (response.user) {
                         localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }

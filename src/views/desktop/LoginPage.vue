@@ -254,7 +254,7 @@ export default {
                     return;
                 }
 
-                if (authResponse.user && authResponse.user.language) {
+                if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
@@ -296,7 +296,7 @@ export default {
             }).then(authResponse => {
                 self.verifying = false;
 
-                if (authResponse.user && authResponse.user.language) {
+                if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }

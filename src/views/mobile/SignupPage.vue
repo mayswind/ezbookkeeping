@@ -357,7 +357,7 @@ export default {
                     return;
                 }
 
-                if (response.user && response.user.language) {
+                if (response.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }

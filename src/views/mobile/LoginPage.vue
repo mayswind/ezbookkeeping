@@ -210,7 +210,7 @@ export default {
                     return;
                 }
 
-                if (authResponse.user && authResponse.user.language) {
+                if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
@@ -263,7 +263,7 @@ export default {
                 self.verifying = false;
                 self.$hideLoading();
 
-                if (authResponse.user && authResponse.user.language) {
+                if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }

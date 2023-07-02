@@ -126,7 +126,7 @@ export default {
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user && response.user.language) {
+                    if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }
@@ -174,7 +174,7 @@ export default {
             try {
                 self.$user.unlockTokenByPinCode(user.username, pinCode);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-                    if (response.user && response.user.language) {
+                    if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                     }

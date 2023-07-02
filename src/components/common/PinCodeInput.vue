@@ -244,9 +244,10 @@ export default {
     --ebk-pin-code-focued-color: #c67e48;
     --ebk-pin-code-border-radius: 8px;
     --ebk-pin-code-input-height: 46px;
+    --ebk-pin-code-input-gap: 8px;
     --ebk-pin-code-transition-duration: 200ms;
     display: grid;
-    gap: 8px;
+    gap: var(--ebk-pin-code-input-gap);
 }
 
 .pin-code-input {

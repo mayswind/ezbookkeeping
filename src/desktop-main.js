@@ -54,6 +54,8 @@ import {
     i18nFunctions
 } from '@/lib/i18n.js';
 
+import PinCodeInput from '@/components/common/PinCodeInput.vue';
+
 import AmountInput from '@/components/desktop/AmountInput.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
@@ -326,6 +328,8 @@ app.use(router);
 
 app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
+
+app.component('PinCodeInput', PinCodeInput);
 
 app.component('AmountInput', AmountInput);
 app.component('ConfirmDialog', ConfirmDialog);

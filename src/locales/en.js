@@ -768,6 +768,8 @@ export default {
     'Welcome to ezBookkeeping': 'Welcome to ezBookkeeping',
     'Please log in with your ezBookkeeping account': 'Please log in with your ezBookkeeping account',
     'Unlock Application': 'Unlock Application',
+    'Please input your PIN code or use Webauth to unlock application': 'Please input your PIN code or use Webauth to unlock application',
+    'Can\'t Unlock?': 'Can\'t Unlock?',
     'Re-login': 'Re-login',
     'Username': 'Username',
     'Your username': 'Your username',

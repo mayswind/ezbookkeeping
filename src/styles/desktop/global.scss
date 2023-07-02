@@ -12,6 +12,16 @@
 }
 
 /** custom class **/
+.pin-codes-input {
+    --ebk-pin-code-input-height: 56px;
+    --ebk-pin-code-input-gap: 20px;
+    --ebk-pin-code-transition-duration: 0ms;
+}
+
+.pin-code-input input {
+    font-size: 1.25rem;
+}
+
 .auth-logo {
     position: absolute;
     z-index: 1;

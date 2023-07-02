@@ -768,6 +768,8 @@ export default {
     'Welcome to ezBookkeeping': '欢迎使用 ezBookkeeping',
     'Please log in with your ezBookkeeping account': '请使用您的 ezBookkeeping 账号登录',
     'Unlock Application': '解锁应用',
+    'Please input your PIN code or use Webauth to unlock application': '请输入您的 PIN 码，或使用 Webauth 解锁应用',
+    'Can\'t Unlock?': '无法登录？',
     'Re-login': '重新登录',
     'Username': '用户名',
     'Your username': '你的用户名',

@@ -314,13 +314,6 @@ export default {
                 }
             });
         },
-        switch2FAVerifyType() {
-            if (this.twoFAVerifyType === 'passcode') {
-                this.twoFAVerifyType = 'backupcode';
-            } else {
-                this.twoFAVerifyType = 'passcode';
-            }
-        },
         changeLanguage(locale) {
             const localeDefaultSettings = this.$locale.setLanguage(locale);
             this.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);

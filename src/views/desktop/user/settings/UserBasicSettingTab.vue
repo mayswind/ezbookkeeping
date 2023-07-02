@@ -8,17 +8,17 @@
                 </template>
 
                 <v-card-text class="d-flex">
-                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-6">
+                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4">
                         <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar"/>
                         <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
                     </v-avatar>
                     <div class="d-flex flex-column justify-center gap-5">
                         <p class="text-body-1 mb-0">
-                            <span class="mr-2">{{ $t('Username:') }}</span>
+                            <span class="me-1">{{ $t('Username:') }}</span>
                             <span>{{ oldProfile.username }}</span>
                         </p>
                         <p class="text-body-1 mb-0">
-                            <span class="mr-2">{{ $t('Avatar Provider:') }}</span>
+                            <span class="me-1">{{ $t('Avatar Provider:') }}</span>
                             <span>{{ currentUserAvatarProvider }}</span>
                         </p>
                     </div>

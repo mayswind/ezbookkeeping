@@ -107,7 +107,13 @@
                             <v-icon :icon="(theme === 'light' ? icons.themeLight : (theme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer" color="primary" variant="tonal">
-                            <v-img :src="currentUserAvatar" v-if="currentUserAvatar"/>
+                            <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
+                                <template v-slot:placeholder>
+                                    <div class="d-flex align-center justify-center fill-height">
+                                        <v-icon :icon="icons.user"/>
+                                    </div>
+                                </template>
+                            </v-img>
                             <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
                             <v-menu activator="parent" width="230" location="bottom end" offset="14px">
                                 <v-list>
@@ -115,7 +121,13 @@
                                         <template #prepend>
                                             <v-list-item-action start>
                                                 <v-avatar color="primary" variant="tonal">
-                                                    <v-img :src="currentUserAvatar" v-if="currentUserAvatar"/>
+                                                    <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
+                                                        <template v-slot:placeholder>
+                                                            <div class="d-flex align-center justify-center fill-height">
+                                                                <v-icon :icon="icons.user"/>
+                                                            </div>
+                                                        </template>
+                                                    </v-img>
                                                     <v-icon :icon="icons.user" v-else-if="!currentUserAvatar"/>
                                                 </v-avatar>
                                             </v-list-item-action>

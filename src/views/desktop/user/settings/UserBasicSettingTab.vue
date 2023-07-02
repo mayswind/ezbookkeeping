@@ -9,7 +9,13 @@
 
                 <v-card-text class="d-flex">
                     <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4">
-                        <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar"/>
+                        <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar">
+                            <template v-slot:placeholder>
+                                <div class="d-flex align-center justify-center fill-height">
+                                    <v-icon size="48" :icon="icons.user"/>
+                                </div>
+                            </template>
+                        </v-img>
                         <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
                     </v-avatar>
                     <div class="d-flex flex-column justify-center gap-5">

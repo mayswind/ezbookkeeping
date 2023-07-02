@@ -89,8 +89,8 @@
                                 </v-col>
 
                                 <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled">
-                                    <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
-                                    <router-link class="text-primary ms-2" to="/signup">
+                                    <span class="me-1">{{ $t('Don\'t have an account?') }}</span>
+                                    <router-link class="text-primary" to="/signup">
                                         {{ $t('Create an account') }}
                                     </router-link>
                                 </v-col>

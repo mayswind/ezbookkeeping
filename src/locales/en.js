@@ -765,6 +765,8 @@ export default {
     'Zoom out': 'Zoom out',
     'Change Language': 'Change Language',
     'Date is too early': 'Date is too early',
+    'Welcome to ezBookkeeping': 'Welcome to ezBookkeeping',
+    'Please log in with your ezBookkeeping account': 'Please log in with your ezBookkeeping account',
     'Unlock Application': 'Unlock Application',
     'Re-login': 'Re-login',
     'Username': 'Username',

@@ -1,3 +1,4 @@
+/** Common class **/
 .disabled {
     opacity: 0.55 !important;
     pointer-events: none !important;
@@ -10,6 +11,28 @@
     pointer-events: none !important;
 }
 
+/** custom class **/
+.auth-logo {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: 2rem;
+    inset-inline-start: 2.3rem;
+}
+
+.auth-logo img {
+    width: 2em;
+    height: 2em;
+}
+
+.auth-wrapper {
+    min-block-size: calc(var(--vh, 1vh) * 100);
+}
+
+.auth-card {
+    background-color: rgb(var(--v-theme-surface));
+}
+
+/** Common class for replacing the default style of vuetify **/
 .v-table {
     th {
         background: rgb(var(--v-table-header-background)) !important;

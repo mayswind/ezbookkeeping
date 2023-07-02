@@ -1,121 +1,131 @@
 <template>
-    <div class="auth-wrapper d-flex align-center justify-center pa-4">
-        <v-card class="auth-card pa-4 pt-7" max-width="448">
-            <v-card-item class="justify-center">
-                <v-card-title class="d-grid font-weight-semibold text-2xl">
-                    <v-img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" :width="96" />
-                    <p class="mt-4 font-weight-bold">{{ $t('global.app.title') }}</p>
-                </v-card-title>
-            </v-card-item>
+    <div class="layout-wrapper">
+        <div class="auth-logo d-flex align-start gap-x-3">
+            <v-img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+            <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+        </div>
+        <v-row no-gutters class="auth-wrapper">
+            <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
 
-            <v-card-text>
-                <v-form>
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field
-                                type="text"
-                                autocomplete="username"
-                                clearable
-                                :disabled="show2faInput"
-                                :label="$t('Username')"
-                                :placeholder="$t('Your username or email')"
-                                v-model="username"
-                                @input="tempToken = ''"
-                                @keyup.enter="$refs.passwordInput.focus()"
-                            />
-                        </v-col>
+            </v-col>
+            <v-col cols="12" md="4" class="auth-card d-flex align-center justify-center">
+                <v-card variant="flat" class="mt-12 mt-sm-0 pa-4" max-width="500">
+                    <v-card-text>
+                        <h5 class="text-h5 mb-1">{{ $t('Welcome to ezBookkeeping') }}</h5>
+                        <p class="mb-0">{{ $t('Please log in with your ezBookkeeping account') }}</p>
+                    </v-card-text>
 
-                        <v-col cols="12">
-                            <v-text-field
-                                autocomplete="current-password"
-                                clearable
-                                ref="passwordInput"
-                                :type="isPasswordVisible ? 'text' : 'password'"
-                                :disabled="show2faInput"
-                                :label="$t('Password')"
-                                :placeholder="$t('Your password')"
-                                :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
-                                v-model="password"
-                                @input="tempToken = ''"
-                                @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                                @keyup.enter="login"
-                            />
-                        </v-col>
+                    <v-card-text>
+                        <v-form>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        type="text"
+                                        autocomplete="username"
+                                        autofocus="autofocus"
+                                        clearable
+                                        :disabled="show2faInput"
+                                        :label="$t('Username')"
+                                        :placeholder="$t('Your username or email')"
+                                        v-model="username"
+                                        @input="tempToken = ''"
+                                        @keyup.enter="$refs.passwordInput.focus()"
+                                    />
+                                </v-col>
 
-                        <v-col cols="12" v-show="show2faInput">
-                            <v-text-field
-                                type="number"
-                                autocomplete="one-time-code"
-                                clearable
-                                ref="passcodeInput"
-                                :label="$t('Passcode')"
-                                :placeholder="$t('Passcode')"
-                                :append-inner-icon="icons.backupCode"
-                                v-model="passcode"
-                                @click:append-inner="twoFAVerifyType = 'backupcode'"
-                                @keyup.enter="verify"
-                                v-if="twoFAVerifyType === 'passcode'"
-                            />
-                            <v-text-field
-                                type="text"
-                                clearable
-                                :label="$t('Backup Code')"
-                                :placeholder="$t('Backup Code')"
-                                :append-inner-icon="icons.passcode"
-                                v-model="backupCode"
-                                @click:append-inner="twoFAVerifyType = 'passcode'"
-                                @keyup.enter="verify"
-                                v-if="twoFAVerifyType === 'backupcode'"
-                            />
-                        </v-col>
+                                <v-col cols="12">
+                                    <v-text-field
+                                        autocomplete="current-password"
+                                        clearable
+                                        ref="passwordInput"
+                                        :type="isPasswordVisible ? 'text' : 'password'"
+                                        :disabled="show2faInput"
+                                        :label="$t('Password')"
+                                        :placeholder="$t('Your password')"
+                                        :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
+                                        v-model="password"
+                                        @input="tempToken = ''"
+                                        @click:append-inner="isPasswordVisible = !isPasswordVisible"
+                                        @keyup.enter="login"
+                                    />
+                                </v-col>
 
-                        <v-col cols="12">
-                            <v-btn block :class="{ 'disabled': inputIsEmpty || logining }"
-                                   @click="login" v-if="!show2faInput">
-                                {{ $t('Log In') }}
-                            </v-btn>
-                            <v-btn block :class="{ 'disabled': twoFAInputIsEmpty || verifying }"
-                                   @click="verify" v-else-if="show2faInput">
-                                {{ $t('Continue') }}
-                            </v-btn>
-                        </v-col>
+                                <v-col cols="12" v-show="show2faInput">
+                                    <v-text-field
+                                        type="number"
+                                        autocomplete="one-time-code"
+                                        clearable
+                                        ref="passcodeInput"
+                                        :label="$t('Passcode')"
+                                        :placeholder="$t('Passcode')"
+                                        :append-inner-icon="icons.backupCode"
+                                        v-model="passcode"
+                                        @click:append-inner="twoFAVerifyType = 'backupcode'"
+                                        @keyup.enter="verify"
+                                        v-if="twoFAVerifyType === 'passcode'"
+                                    />
+                                    <v-text-field
+                                        type="text"
+                                        clearable
+                                        :label="$t('Backup Code')"
+                                        :placeholder="$t('Backup Code')"
+                                        :append-inner-icon="icons.passcode"
+                                        v-model="backupCode"
+                                        @click:append-inner="twoFAVerifyType = 'passcode'"
+                                        @keyup.enter="verify"
+                                        v-if="twoFAVerifyType === 'backupcode'"
+                                    />
+                                </v-col>
 
-                        <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled">
-                            <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
-                            <router-link class="text-primary ms-2" to="/signup">
-                                {{ $t('Create an account') }}
-                            </router-link>
-                        </v-col>
+                                <v-col cols="12">
+                                    <v-btn block :class="{ 'disabled': inputIsEmpty || logining }"
+                                           @click="login" v-if="!show2faInput">
+                                        {{ $t('Log In') }}
+                                    </v-btn>
+                                    <v-btn block :class="{ 'disabled': twoFAInputIsEmpty || verifying }"
+                                           @click="verify" v-else-if="show2faInput">
+                                        {{ $t('Continue') }}
+                                    </v-btn>
+                                </v-col>
 
-                        <v-col cols="12" class="text-center">
-                            <v-menu location="bottom">
-                                <template #activator="{ props }">
-                                    <v-btn variant="text" v-bind="props">{{ currentLanguageName }}</v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item v-for="(lang, locale) in allLanguages" :key="locale">
-                                        <v-list-item-title
-                                            class="cursor-pointer"
-                                            @click="changeLanguage(locale)">
-                                            {{ lang.displayName }}
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </v-col>
+                                <v-col cols="12" class="text-center text-base" v-if="isUserRegistrationEnabled">
+                                    <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
+                                    <router-link class="text-primary ms-2" to="/signup">
+                                        {{ $t('Create an account') }}
+                                    </router-link>
+                                </v-col>
 
-                        <v-col cols="12" class="d-flex align-center">
-                            <v-divider />
-                        </v-col>
+                                <v-col cols="12" class="text-center">
+                                    <v-menu location="bottom">
+                                        <template #activator="{ props }">
+                                            <v-btn variant="text" v-bind="props">{{ currentLanguageName }}</v-btn>
+                                        </template>
+                                        <v-list>
+                                            <v-list-item v-for="(lang, locale) in allLanguages" :key="locale">
+                                                <v-list-item-title
+                                                    class="cursor-pointer"
+                                                    @click="changeLanguage(locale)">
+                                                    {{ lang.displayName }}
+                                                </v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-col>
 
-                        <v-col cols="12" class="text-center text-sm">
-                            <span>Powered by </span>
-                            <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
-                        </v-col>
-                    </v-row>
-                </v-form>
-            </v-card-text>
-        </v-card>
+                                <v-col cols="12" class="d-flex align-center">
+                                    <v-divider />
+                                </v-col>
+
+                                <v-col cols="12" class="text-center text-sm">
+                                    <span>Powered by </span>
+                                    <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
 
         <snack-bar ref="snackbar" />
 
@@ -318,17 +328,3 @@ export default {
     }
 }
 </script>
-
-<style>
-.auth-wrapper {
-    min-block-size: calc(var(--vh, 1vh) * 100);
-}
-
-.auth-card {
-    z-index: 1 !important
-}
-
-.login-page-logo {
-    margin: auto;
-}
-</style>

@@ -27,11 +27,11 @@ jobs:
         run: |
           cat >> docker/custom-backend-pre-setup.sh <<EOF
           #!/bin/sh
-          ${{ secrets.CUSTOM_BACKEND_PRE_SETUP }}
+          ${{ vars.CUSTOM_BACKEND_PRE_SETUP }}
           EOF
           cat >> docker/custom-frontend-pre-setup.sh <<EOF
           #!/bin/sh
-          ${{ secrets.CUSTOM_FRONTEND_PRE_SETUP }}
+          ${{ vars.CUSTOM_FRONTEND_PRE_SETUP }}
           EOF
           chmod +x docker/custom-backend-pre-setup.sh
           chmod +x docker/custom-frontend-pre-setup.sh

@@ -12,7 +12,8 @@
                 <v-card variant="flat" class="mt-12 mt-sm-0 pa-4" max-width="500">
                     <v-card-text>
                         <h5 class="text-h5 mb-1">{{ $t('Unlock Application') }}</h5>
-                        <p class="mb-0">{{ $t('Please input your PIN code or use Webauth to unlock application') }}</p>
+                        <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please input your PIN code or use WebAuthn to unlock application') }}</p>
+                        <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please input your PIN code to unlock application') }}</p>
                     </v-card-text>
 
                     <v-card-text>

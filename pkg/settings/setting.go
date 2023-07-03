@@ -466,25 +466,27 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadMapConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	if getConfigItemStringValue(configFile, sectionName, "map_provider") == "" {
+	mapProvider := getConfigItemStringValue(configFile, sectionName, "map_provider")
+
+	if mapProvider == "" {
 		config.MapProvider = ""
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapProvider {
+	} else if mapProvider == OpenStreetMapProvider {
 		config.MapProvider = OpenStreetMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenStreetMapHumanitarianStyleProvider {
+	} else if mapProvider == OpenStreetMapHumanitarianStyleProvider {
 		config.MapProvider = OpenStreetMapHumanitarianStyleProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OpenTopoMapProvider {
+	} else if mapProvider == OpenTopoMapProvider {
 		config.MapProvider = OpenTopoMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == OPNVKarteMapProvider {
+	} else if mapProvider == OPNVKarteMapProvider {
 		config.MapProvider = OPNVKarteMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == CyclOSMMapProvider {
+	} else if mapProvider == CyclOSMMapProvider {
 		config.MapProvider = CyclOSMMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == GoogleMapProvider {
+	} else if mapProvider == GoogleMapProvider {
 		config.MapProvider = GoogleMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == TomTomMapProvider {
+	} else if mapProvider == TomTomMapProvider {
 		config.MapProvider = TomTomMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == BaiduMapProvider {
+	} else if mapProvider == BaiduMapProvider {
 		config.MapProvider = BaiduMapProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "map_provider") == AmapProvider {
+	} else if mapProvider == AmapProvider {
 		config.MapProvider = AmapProvider
 	} else {
 		return errs.ErrInvalidMapProvider
@@ -496,11 +498,13 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
 	config.AmapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")
 
-	if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationInternalProxyMethod {
+	amapSecurityVerificationMethod := getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method")
+
+	if amapSecurityVerificationMethod == AmapSecurityVerificationInternalProxyMethod {
 		config.AmapSecurityVerificationMethod = AmapSecurityVerificationInternalProxyMethod
-	} else if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationExternalProxyMethod {
+	} else if amapSecurityVerificationMethod == AmapSecurityVerificationExternalProxyMethod {
 		config.AmapSecurityVerificationMethod = AmapSecurityVerificationExternalProxyMethod
-	} else if getConfigItemStringValue(configFile, sectionName, "amap_security_verification_method") == AmapSecurityVerificationPlainTextMethod {
+	} else if amapSecurityVerificationMethod == AmapSecurityVerificationPlainTextMethod {
 		config.AmapSecurityVerificationMethod = AmapSecurityVerificationPlainTextMethod
 	} else {
 		return errs.ErrInvalidAmapSecurityVerificationMethod
@@ -512,17 +516,19 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	return nil
 }
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	if getConfigItemStringValue(configFile, sectionName, "data_source") == EuroCentralBankDataSource {
+	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
+
+	if dataSource == EuroCentralBankDataSource {
 		config.ExchangeRatesDataSource = EuroCentralBankDataSource
-	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == BankOfCanadaDataSource {
+	} else if dataSource == BankOfCanadaDataSource {
 		config.ExchangeRatesDataSource = BankOfCanadaDataSource
-	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == ReserveBankOfAustraliaDataSource {
+	} else if dataSource == ReserveBankOfAustraliaDataSource {
 		config.ExchangeRatesDataSource = ReserveBankOfAustraliaDataSource
-	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == CzechNationalBankDataSource {
+	} else if dataSource == CzechNationalBankDataSource {
 		config.ExchangeRatesDataSource = CzechNationalBankDataSource
-	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == NationalBankOfPolandDataSource {
+	} else if dataSource == NationalBankOfPolandDataSource {
 		config.ExchangeRatesDataSource = NationalBankOfPolandDataSource
-	} else if getConfigItemStringValue(configFile, sectionName, "data_source") == MonetaryAuthorityOfSingaporeDataSource {
+	} else if dataSource == MonetaryAuthorityOfSingaporeDataSource {
 		config.ExchangeRatesDataSource = MonetaryAuthorityOfSingaporeDataSource
 	} else {
 		return errs.ErrInvalidExchangeRatesDataSource

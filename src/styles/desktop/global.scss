@@ -14,8 +14,14 @@
 /** custom class **/
 .pin-codes-input {
     --ebk-pin-code-input-height: 56px;
-    --ebk-pin-code-input-gap: 20px;
+    --ebk-pin-code-input-gap: 12px;
     --ebk-pin-code-transition-duration: 0ms;
+}
+
+@media (min-width: 1280px) {
+    .pin-codes-input {
+        --ebk-pin-code-input-gap: 20px;
+    }
 }
 
 .pin-code-input input {

@@ -24,8 +24,8 @@
                     </p>
                     <hr/>
                     <p>
-                        <span>ezBookkeeping also contains additional third party software.</span><br/>
-                        <span>All the third party software included or linked is redistributed under the terms and conditions of their original licenses.</span>
+                        <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
+                        <span>All the third party software/illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
                     </p>
                     <p></p>
                     <p :key="license.name" v-for="license in thirdPartyLicenses">

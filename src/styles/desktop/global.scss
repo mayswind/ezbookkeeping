@@ -48,6 +48,12 @@
     background-color: rgb(var(--v-theme-surface));
 }
 
+.auth-img-footer {
+    position: absolute;
+    inset-block-end: 0;
+    min-inline-size: 100%;
+}
+
 /** Common class for replacing the default style of vuetify **/
 .v-table {
     th {

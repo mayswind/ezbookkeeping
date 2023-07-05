@@ -78,10 +78,30 @@ export default defineConfig(async () => {
                         'mobile.html',
                         'desktop.html',
                         'robots.txt',
-                        'css/vendor-desktop-*.js',
-                        'css/desktop-*.js',
+                        'img/desktop/*',
+                        'img/splash_screens/*',
+                        'fonts/*.eot',
+                        'fonts/*.ttf',
+                        'fonts/*.svg',
+                        'fonts/*.woff',
+                        'css/vendor-desktop-*.css',
+                        'css/desktop-*.css',
                         'js/vendor-desktop-*.js',
                         'js/desktop-*.js'
+                    ],
+                    runtimeCaching: [
+                        {
+                            urlPattern: /.*\/(mobile\/|desktop\/|index\.html|mobile\.html|desktop\.html)/,
+                            handler: 'NetworkFirst'
+                        },
+                        {
+                            urlPattern: /.*\/(js|css|fonts)\/.*\.(js|css|ttf|woff|woff2|svg|eot)/,
+                            handler: 'CacheFirst'
+                        },
+                        {
+                            urlPattern: /.*\/img\/(splash_screens|desktop)\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
+                            handler: 'StaleWhileRevalidate'
+                        }
                     ],
                     navigateFallback: '',
                     skipWaiting: true,

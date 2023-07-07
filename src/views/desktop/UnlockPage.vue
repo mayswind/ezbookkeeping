@@ -1,9 +1,11 @@
 <template>
     <div class="layout-wrapper">
-        <div class="auth-logo d-flex align-start gap-x-3">
-            <v-img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
-            <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
-        </div>
+        <router-link to="/">
+            <div class="auth-logo d-flex align-start gap-x-3">
+                <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+                <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
+            </div>
+        </router-link>
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
                 <div class="d-flex auth-img-footer" v-if="currentTheme !== 'dark'">

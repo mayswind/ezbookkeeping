@@ -1,6 +1,6 @@
 <template>
     <div class="layout-wrapper">
-        <router-link class="d-inline" to="/">
+        <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
                 <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
                 <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>

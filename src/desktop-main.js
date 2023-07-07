@@ -12,6 +12,7 @@ import { VCard, VCardActions, VCardItem, VCardSubtitle, VCardText, VCardTitle } 
 import { VChip } from 'vuetify/components/VChip';
 import { VDialog } from 'vuetify/components/VDialog';
 import { VDivider } from 'vuetify/components/VDivider';
+import { VExpansionPanel, VExpansionPanelText, VExpansionPanelTitle, VExpansionPanels } from 'vuetify/components/VExpansionPanel';
 import { VForm } from 'vuetify/components/VForm';
 import { VContainer, VCol, VRow, VSpacer } from 'vuetify/components/VGrid';
 import { VIcon } from 'vuetify/components/VIcon';
@@ -26,6 +27,7 @@ import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
 import { VSheet } from 'vuetify/components/VSheet';
+import { VSlideGroup, VSlideGroupItem } from 'vuetify/components/VSlideGroup';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
 import { VSwitch } from 'vuetify/components/VSwitch';
 import { VTabs, VTab } from 'vuetify/components/VTabs';
@@ -58,7 +60,9 @@ import {
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 
+import ItemIcon from '@/components/desktop/ItemIcon.vue';
 import AmountInput from '@/components/desktop/AmountInput.vue';
+import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
@@ -68,6 +72,7 @@ import '@/styles/desktop/template/layout/index.scss';
 import '@/styles/desktop/template/layout/component/index.scss';
 import '@/styles/desktop/template/layout/_default-layout.scss';
 import '@/styles/desktop/global.scss';
+import '@/styles/desktop/font-size.scss';
 
 import App from './DesktopApp.vue';
 
@@ -90,6 +95,10 @@ const vuetify = createVuetify({
         VChip,
         VDialog,
         VDivider,
+        VExpansionPanel,
+        VExpansionPanelText,
+        VExpansionPanelTitle,
+        VExpansionPanels,
         VForm,
         VContainer,
         VCol,
@@ -115,6 +124,8 @@ const vuetify = createVuetify({
         VProgressLinear,
         VSelect,
         VSheet,
+        VSlideGroup,
+        VSlideGroupItem,
         VSnackbar,
         VSwitch,
         VTabs,
@@ -334,7 +345,9 @@ app.component('VueDatePicker', VueDatePicker);
 
 app.component('PinCodeInput', PinCodeInput);
 
+app.component('ItemIcon', ItemIcon);
 app.component('AmountInput', AmountInput);
+app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);
 

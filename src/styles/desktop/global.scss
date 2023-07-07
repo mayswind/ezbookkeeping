@@ -11,6 +11,12 @@
     pointer-events: none !important;
 }
 
+@media (min-width: 600px) {
+    .text-right-sm {
+        text-align: right !important;
+    }
+}
+
 /** custom class **/
 .pin-codes-input {
     --ebk-pin-code-input-height: 56px;

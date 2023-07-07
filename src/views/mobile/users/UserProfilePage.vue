@@ -274,28 +274,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore),
         allLanguages() {
-            const ret = [];
-            const allLanguageInfo = this.$locale.getAllLanguageInfos();
-
-            ret.push({
-                code: '',
-                displayName: this.$t('System Default')
-            });
-
-            for (let code in allLanguageInfo) {
-                if (!Object.prototype.hasOwnProperty.call(allLanguageInfo, code)) {
-                    continue;
-                }
-
-                const languageInfo = allLanguageInfo[code];
-
-                ret.push({
-                    code: code,
-                    displayName: languageInfo.displayName
-                });
-            }
-
-            return ret;
+            return this.$locale.getAllLanguageInfoArray(true);
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();

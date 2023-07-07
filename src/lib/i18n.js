@@ -153,6 +153,32 @@ function getAllLanguageInfos() {
     return allLanguages;
 }
 
+function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
+    const ret = [];
+
+    if (includeSystemDefault) {
+        ret.push({
+            code: '',
+            displayName: translateFn('System Default')
+        });
+    }
+
+    for (const code in allLanguages) {
+        if (!Object.prototype.hasOwnProperty.call(allLanguages, code)) {
+            continue;
+        }
+
+        const languageInfo = allLanguages[code];
+
+        ret.push({
+            code: code,
+            displayName: languageInfo.displayName
+        });
+    }
+
+    return ret;
+}
+
 function getLanguageInfo(locale) {
     return allLanguages[locale];
 }
@@ -746,6 +772,7 @@ export function translateError(message, translateFn) {
 export function i18nFunctions(i18nGlobal) {
     return {
         getAllLanguageInfos: getAllLanguageInfos,
+        getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getLanguageInfo: getLanguageInfo,
         getDefaultLanguage: getDefaultLanguage,
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),

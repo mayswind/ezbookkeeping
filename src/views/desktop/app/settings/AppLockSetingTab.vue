@@ -43,11 +43,11 @@
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
-                            <v-btn :class="{ 'disabled': !pinCodeValid }"
+                            <v-btn :disabled="!pinCodeValid"
                                    v-if="!isEnableApplicationLock" @click="enable">
                                 {{ $t('Enable Application Lock') }}
                             </v-btn>
-                            <v-btn :class="{ 'disabled': !pinCodeValid }"
+                            <v-btn :disabled="!pinCodeValid"
                                    v-if="isEnableApplicationLock" @click="disable">
                                 {{ $t('Disable Application Lock') }}
                             </v-btn>

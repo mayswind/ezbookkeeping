@@ -43,7 +43,7 @@
                 :datetime="displayDateRange.today.displayTime"
             >
                 <template #menus>
-                    <v-list-item :to="'/transactions?dateType=' + allDateRanges.Today.type">
+                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.Today.type">
                         <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                     </v-list-item>
                 </template>
@@ -59,7 +59,7 @@
                 :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
             >
                 <template #menus>
-                    <v-list-item :to="'/transactions?dateType=' + allDateRanges.ThisWeek.type">
+                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisWeek.type">
                         <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                     </v-list-item>
                 </template>
@@ -75,7 +75,7 @@
                 :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
             >
                 <template #menus>
-                    <v-list-item :to="'/transactions?dateType=' + allDateRanges.ThisMonth.type">
+                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisMonth.type">
                         <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                     </v-list-item>
                 </template>
@@ -91,7 +91,7 @@
                 :datetime="displayDateRange.thisYear.displayTime"
             >
                 <template #menus>
-                    <v-list-item :to="'/transactions?dateType=' + allDateRanges.ThisYear.type">
+                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisYear.type">
                         <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                     </v-list-item>
                 </template>
@@ -121,6 +121,7 @@ import {
     mdiCalendarWeekOutline,
     mdiCalendarMonthOutline,
     mdiLayersTripleOutline,
+    mdiListBoxOutline,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -139,6 +140,7 @@ export default {
                 calendarWeek: mdiCalendarWeekOutline,
                 calendarMonth: mdiCalendarMonthOutline,
                 calendarYear: mdiLayersTripleOutline,
+                viewDetails: mdiListBoxOutline,
                 more: mdiDotsVertical
             }
         };

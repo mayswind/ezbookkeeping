@@ -137,25 +137,17 @@
                                         </v-list-item-title>
                                     </v-list-item>
                                     <v-divider class="my-2"/>
-                                    <v-list-item to="/user/settings">
-                                        <template #prepend>
-                                            <v-icon class="me-2" :icon="icons.profile" size="22"/>
-                                        </template>
-                                        <v-list-item-title>{{ $t('User Settings') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item to="/app/settings">
-                                        <template #prepend>
-                                            <v-icon class="me-2" :icon="icons.settings" size="22"/>
-                                        </template>
-                                        <v-list-item-title>{{ $t('Application Settings') }}</v-list-item-title>
-                                    </v-list-item>
+                                    <v-list-item :prepend-icon="icons.profile"
+                                                 :title="$t('User Settings')"
+                                                 to="/user/settings"></v-list-item>
+                                    <v-list-item :prepend-icon="icons.settings"
+                                                 :title="$t('Application Settings')"
+                                                 to="/app/settings"></v-list-item>
                                     <v-divider class="my-2"/>
-                                    <v-list-item :class="{ 'disabled': logouting }" @click="logout">
-                                        <template #prepend>
-                                            <v-icon class="me-2" :icon="icons.logout" size="22"/>
-                                        </template>
-                                        <v-list-item-title>{{ $t('Log Out') }}</v-list-item-title>
-                                    </v-list-item>
+                                    <v-list-item :disabled="logouting"
+                                                 :prepend-icon="icons.logout"
+                                                 :title="$t('Log Out')"
+                                                 @click="logout"></v-list-item>
                                 </v-list>
                             </v-menu>
                         </v-avatar>

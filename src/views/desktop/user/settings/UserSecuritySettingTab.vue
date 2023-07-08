@@ -99,7 +99,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="session.tokenId" v-for="session in sessions">
+                    <tr v-for="idx in (loadingSession && (!sessions || sessions.length < 1) ? [1, 2, 3] : [])">
+                        <td class="px-0" colspan="4">
+                            <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
+                        </td>
+                    </tr>
+
+                    <tr :key="session.tokenId"
+                        v-for="session in sessions">
                         <td>
                             <v-icon start :icon="session.icon"/>
                             {{ session.deviceType }}

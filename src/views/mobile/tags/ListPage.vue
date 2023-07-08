@@ -342,10 +342,10 @@ export default {
                 self.$hideLoading();
 
                 if (tag.id) {
-                    this.editingTag.id = '';
-                    this.editingTag.name = '';
+                    self.editingTag.id = '';
+                    self.editingTag.name = '';
                 } else {
-                    this.newTag = null;
+                    self.newTag = null;
                 }
             }).catch(error => {
                 self.$hideLoading();

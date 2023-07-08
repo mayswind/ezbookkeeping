@@ -467,7 +467,7 @@ export default {
                         self.$refs.snackbar.showMessage('You have been successfully registered');
                     }
 
-                    this.$router.replace('/');
+                    self.$router.replace('/');
                     return;
                 }
 
@@ -484,7 +484,7 @@ export default {
                     self.submitting = false;
 
                     self.$refs.snackbar.showMessage('You have been successfully registered');
-                    this.$router.replace('/');
+                    self.$router.replace('/');
                     return;
                 }
 
@@ -494,12 +494,12 @@ export default {
                     self.submitting = false;
 
                     self.$refs.snackbar.showMessage('You have been successfully registered');
-                    router.navigate('/');
+                    self.$router.replace('/');
                 }).catch(() => {
                     self.submitting = false;
 
                     self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
-                    this.$router.replace('/');
+                    self.$router.replace('/');
                 });
             }).catch(error => {
                 self.submitting = false;

@@ -30,21 +30,23 @@
                         <v-form>
                             <v-row>
                                 <v-col cols="12">
-                                    <pin-code-input :autofocus="true" :secure="true" :length="6"
+                                    <pin-code-input :disabled="verifyingByWebAuthn" :autofocus="true"
+                                                    :secure="true" :length="6"
                                                     v-model="pinCode" @pincode:confirm="unlockByPin" />
                                 </v-col>
 
                                 <v-col cols="12">
-                                    <v-btn block :class="{ 'disabled': !isPinCodeValid(pinCode) }"
+                                    <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
                                            @click="unlockByPin(pinCode)">
                                         {{ $t('Unlock By PIN Code') }}
                                     </v-btn>
                                 </v-col>
 
                                 <v-col cols="12" v-if="isWebAuthnAvailable">
-                                    <v-btn block variant="tonal"
+                                    <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
                                            @click="unlockByWebAuthn">
                                         {{ $t('Unlock By WebAuthn') }}
+                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
                                     </v-btn>
                                 </v-col>
 
@@ -58,7 +60,9 @@
                                 <v-col cols="12" class="text-center">
                                     <v-menu location="bottom">
                                         <template #activator="{ props }">
-                                            <v-btn variant="text" v-bind="props">{{ currentLanguageName }}</v-btn>
+                                            <v-btn variant="text"
+                                                   :disabled="verifyingByWebAuthn"
+                                                   v-bind="props">{{ currentLanguageName }}</v-btn>
                                         </template>
                                         <v-list>
                                             <v-list-item v-for="(lang, locale) in allLanguages" :key="locale">
@@ -89,10 +93,6 @@
 
         <confirm-dialog ref="confirmDialog"/>
         <snack-bar ref="snackbar" />
-
-        <v-overlay class="justify-center align-center" :persistent="true" v-model="verifying">
-            <v-progress-circular indeterminate></v-progress-circular>
-        </v-overlay>
     </div>
 </template>
 
@@ -113,7 +113,7 @@ export default {
     data() {
         return {
             pinCode: '',
-            verifying: false
+            verifyingByWebAuthn: false
         };
     },
     computed: {
@@ -166,13 +166,13 @@ export default {
                 return;
             }
 
-            this.verifying = true;
+            this.verifyingByWebAuthn = true;
 
             webauthn.verifyCredential(
                 self.userStore.currentUserInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
-                this.verifying = false;
+                this.verifyingByWebAuthn = false;
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
@@ -188,7 +188,7 @@ export default {
 
                 self.$router.replace('/');
             }).catch(error => {
-                this.verifying = false;
+                this.verifyingByWebAuthn = false;
                 logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {

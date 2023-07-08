@@ -34,7 +34,7 @@
                                         autocomplete="username"
                                         autofocus="autofocus"
                                         clearable
-                                        :disabled="show2faInput"
+                                        :disabled="show2faInput || logining || verifying"
                                         :label="$t('Username')"
                                         :placeholder="$t('Your username or email')"
                                         v-model="username"
@@ -49,7 +49,7 @@
                                         clearable
                                         ref="passwordInput"
                                         :type="isPasswordVisible ? 'text' : 'password'"
-                                        :disabled="show2faInput"
+                                        :disabled="show2faInput || logining || verifying"
                                         :label="$t('Password')"
                                         :placeholder="$t('Your password')"
                                         :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
@@ -66,6 +66,7 @@
                                         autocomplete="one-time-code"
                                         clearable
                                         ref="passcodeInput"
+                                        :disabled="logining || verifying"
                                         :label="$t('Passcode')"
                                         :placeholder="$t('Passcode')"
                                         :append-inner-icon="icons.backupCode"
@@ -77,6 +78,7 @@
                                     <v-text-field
                                         type="text"
                                         clearable
+                                        :disabled="logining || verifying"
                                         :label="$t('Backup Code')"
                                         :placeholder="$t('Backup Code')"
                                         :append-inner-icon="icons.passcode"
@@ -88,13 +90,15 @@
                                 </v-col>
 
                                 <v-col cols="12">
-                                    <v-btn block :class="{ 'disabled': inputIsEmpty || logining }"
+                                    <v-btn block :disabled="inputIsEmpty || logining || verifying"
                                            @click="login" v-if="!show2faInput">
                                         {{ $t('Log In') }}
+                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="logining"></v-progress-circular>
                                     </v-btn>
-                                    <v-btn block :class="{ 'disabled': twoFAInputIsEmpty || verifying }"
+                                    <v-btn block :disabled="twoFAInputIsEmpty || logining || verifying"
                                            @click="verify" v-else-if="show2faInput">
                                         {{ $t('Continue') }}
+                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifying"></v-progress-circular>
                                     </v-btn>
                                 </v-col>
 
@@ -108,7 +112,9 @@
                                 <v-col cols="12" class="text-center">
                                     <v-menu location="bottom">
                                         <template #activator="{ props }">
-                                            <v-btn variant="text" v-bind="props">{{ currentLanguageName }}</v-btn>
+                                            <v-btn variant="text"
+                                                   :disabled="logining || verifying"
+                                                   v-bind="props">{{ currentLanguageName }}</v-btn>
                                         </template>
                                         <v-list>
                                             <v-list-item v-for="(lang, locale) in allLanguages" :key="locale">
@@ -138,14 +144,6 @@
         </v-row>
 
         <snack-bar ref="snackbar" />
-
-        <v-overlay class="justify-center align-center" :persistent="true" v-model="logining">
-            <v-progress-circular indeterminate></v-progress-circular>
-        </v-overlay>
-
-        <v-overlay class="justify-center align-center" :persistent="true" v-model="verifying">
-            <v-progress-circular indeterminate></v-progress-circular>
-        </v-overlay>
     </div>
 </template>
 

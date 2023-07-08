@@ -7,6 +7,7 @@
                    :ref="`pin-code-input-${index}`"
                    :value="codes[index].value"
                    :type="codes[index].inputType"
+                   :disabled="disabled ? 'disabled' : undefined"
                    :autofocus="autofocus && index === 0 ? 'autofocus' : undefined"
                    @focus="codes[index].focused = true"
                    @blur="codes[index].focused = false"
@@ -22,6 +23,7 @@
 export default {
     props: [
         'modelValue',
+        'disabled',
         'autofocus',
         'secure',
         'length'

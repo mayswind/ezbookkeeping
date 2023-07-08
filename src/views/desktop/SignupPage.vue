@@ -153,13 +153,17 @@
 
                                 <v-row class="mb-5">
                                     <v-col cols="12" sm="6">
-                                        <v-switch inset :label="$t('Use Preset Transaction Categories')"
+                                        <v-switch inset
+                                                  :disabled="submitting"
+                                                  :label="$t('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="text-right-sm">
                                         <v-menu location="bottom">
                                             <template #activator="{ props }">
-                                                <v-btn variant="text" v-bind="props">{{ currentLanguageName }}</v-btn>
+                                                <v-btn variant="text"
+                                                       :disabled="submitting"
+                                                       v-bind="props">{{ currentLanguageName }}</v-btn>
                                             </template>
                                             <v-list>
                                                 <v-list-item v-for="lang in allLanguages" :key="lang.code">
@@ -174,7 +178,7 @@
                                     </v-col>
                                 </v-row>
 
-                                <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories }" style="max-height: 323px">
+                                <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting }" style="max-height: 323px">
                                     <v-row :key="categoryType" v-for="(categories, categoryType) in presetCategories">
                                         <v-col cols="12" md="12">
                                             <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
@@ -210,29 +214,28 @@
 
                     <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
                         <v-btn :color="currentStep === 'basicSetting' ? 'default' : 'primary'"
-                               :disabled="currentStep === 'basicSetting'"
+                               :disabled="currentStep === 'basicSetting' || submitting"
                                :prepend-icon="icons.previous"
                                @click="switchToPreviousTab">{{ $t('Previous') }}</v-btn>
                         <v-btn :color="currentStep === 'presetCategories' ? 'secondary' : 'primary'"
-                               :disabled="currentStep === 'presetCategories'"
+                               :disabled="currentStep === 'presetCategories' || submitting"
                                :append-icon="icons.next"
                                @click="switchToNextTab"
                                v-if="currentStep !== 'presetCategories'">{{ $t('Next') }}</v-btn>
                         <v-btn color="expense"
                                :disabled="submitting"
-                               :append-icon="icons.submit"
+                               :append-icon="!submitting ? icons.submit : null"
                                @click="submit"
-                               v-if="currentStep === 'presetCategories'">{{ $t('Submit') }}</v-btn>
+                               v-if="currentStep === 'presetCategories'">
+                            {{ $t('Submit') }}
+                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                        </v-btn>
                     </div>
                 </v-card>
             </v-col>
         </v-row>
 
         <snack-bar ref="snackbar" />
-
-        <v-overlay class="justify-center align-center" :persistent="true" v-model="submitting">
-            <v-progress-circular indeterminate></v-progress-circular>
-        </v-overlay>
     </div>
 </template>
 
@@ -381,6 +384,10 @@ export default {
     },
     methods: {
         switchToTab(tabName) {
+            if (this.submitting) {
+                return;
+            }
+
             if (tabName === 'basicSetting') {
                 this.currentStep = 'basicSetting';
             } else if (tabName === 'presetCategories') {

@@ -206,7 +206,7 @@ export default {
             return true;
         },
         hasEditingTag() {
-            return this.newTag || (this.editingTag.id && this.editingTag.id !== '');
+            return !!(this.newTag || (this.editingTag.id && this.editingTag.id !== ''));
         }
     },
     created() {

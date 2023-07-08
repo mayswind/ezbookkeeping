@@ -71,14 +71,16 @@
         <v-col cols="12">
             <v-card :class="{ 'disabled': loadingSession }">
                 <template #title>
-                    <span>{{ $t('Device & Sessions') }}</span>
-                    <v-btn density="compact" color="default" variant="text"
-                           class="ml-2" :icon="true"
-                           v-if="!loadingSession" @click="reloadSessions">
-                        <v-icon :icon="icons.refresh" size="24" />
-                        <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                    </v-btn>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingSession"></v-progress-circular>
+                    <div class="d-flex align-center">
+                        <span>{{ $t('Device & Sessions') }}</span>
+                        <v-btn density="compact" color="default" variant="text"
+                               class="ml-2" :icon="true"
+                               v-if="!loadingSession" @click="reloadSessions">
+                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                        </v-btn>
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingSession"></v-progress-circular>
+                    </div>
                 </template>
 
                 <v-table class="text-no-wrap">

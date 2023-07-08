@@ -3,16 +3,18 @@
         <v-col cols="12" lg="4" md="12">
             <v-card :class="{ 'disabled': loadingOverview }">
                 <template #title>
-                    <span class="text-2xl font-weight-bold">{{ displayDateRange.thisMonth.displayTime }}</span>
-                    <span>·</span>
-                    <small>{{ $t('Expense') }}</small>
-                    <v-btn density="compact" color="default" variant="text"
-                           class="ml-2" :icon="true"
-                           v-if="!loadingOverview" @click="reload(true)">
-                        <v-icon :icon="icons.refresh" size="24" />
-                        <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                    </v-btn>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingOverview"></v-progress-circular>
+                    <div class="d-flex align-center">
+                        <span class="text-2xl font-weight-bold">{{ displayDateRange.thisMonth.displayTime }}</span>
+                        <span>·</span>
+                        <small>{{ $t('Expense') }}</small>
+                        <v-btn density="compact" color="default" variant="text"
+                               class="ml-2" :icon="true"
+                               v-if="!loadingOverview" @click="reload(true)">
+                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                        </v-btn>
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingOverview"></v-progress-circular>
+                    </div>
                 </template>
 
                 <v-card-text>

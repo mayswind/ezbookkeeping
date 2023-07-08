@@ -3,14 +3,16 @@
         <v-col cols="12">
             <v-card :class="{ 'disabled': loadingDataStatistics }">
                 <template #title>
-                    <span>{{ $t('Data Management') }}</span>
-                    <v-btn density="compact" color="default" variant="text"
-                           class="ml-2" :icon="true"
-                           v-if="!loadingDataStatistics" @click="reloadUserDataStatistics(true)">
-                        <v-icon :icon="icons.refresh" size="24" />
-                        <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                    </v-btn>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingDataStatistics"></v-progress-circular>
+                    <div class="d-flex align-center">
+                        <span>{{ $t('Data Management') }}</span>
+                        <v-btn density="compact" color="default" variant="text"
+                               class="ml-2" :icon="true"
+                               v-if="!loadingDataStatistics" @click="reloadUserDataStatistics(true)">
+                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                        </v-btn>
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingDataStatistics"></v-progress-circular>
+                    </div>
                 </template>
 
                 <v-card-text>

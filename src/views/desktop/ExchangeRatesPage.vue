@@ -3,14 +3,16 @@
         <v-col cols="12">
             <v-card :class="{ 'disabled': loading }">
                 <template #title>
-                    <span>{{ $t('Exchange Rates Data') }}</span>
-                    <v-btn density="compact" color="default" variant="text"
-                           class="ml-2" :icon="true"
-                           v-if="!loading" @click="update">
-                        <v-icon :icon="icons.refresh" size="24" />
-                        <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                    </v-btn>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                    <div class="d-flex align-center">
+                        <span>{{ $t('Exchange Rates Data') }}</span>
+                        <v-btn density="compact" color="default" variant="text"
+                               class="ml-2" :icon="true"
+                               v-if="!loading" @click="update">
+                            <v-icon :icon="icons.refresh" size="24" />
+                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                        </v-btn>
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                    </div>
                 </template>
 
                 <v-card-text>

@@ -45,7 +45,7 @@
                     </thead>
 
                     <tbody>
-                    <tr v-for="idx in (loading && noAvailableTag ? [1, 2, 3] : [])">
+                    <tr :key="itemIdx" v-for="itemIdx in (loading && noAvailableTag ? [ 1, 2, 3 ] : [])">
                         <td class="px-0" colspan="2">
                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                         </td>

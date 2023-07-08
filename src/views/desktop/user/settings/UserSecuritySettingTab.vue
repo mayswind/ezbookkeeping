@@ -99,7 +99,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="idx in (loadingSession && (!sessions || sessions.length < 1) ? [1, 2, 3] : [])">
+                    <tr :key="itemIdx"
+                        v-for="itemIdx in (loadingSession && (!sessions || sessions.length < 1) ? [ 1, 2, 3 ] : [])">
                         <td class="px-0" colspan="4">
                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                         </td>

@@ -409,7 +409,6 @@ export default {
         },
         submit() {
             const self = this;
-            const router = self.f7router;
 
             const problemMessage = self.inputEmptyProblemMessage || self.inputInvalidProblemMessage;
 

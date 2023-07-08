@@ -5,7 +5,7 @@
             <div class="nav-header">
                 <router-link to="/" class="app-logo d-flex align-center gap-x-3 app-title-wrapper">
                     <div class="d-flex">
-                        <v-img alt="logo" class="main-logo" src="/img/ezbookkeeping-192.png" />
+                        <img alt="logo" class="main-logo" src="/img/ezbookkeeping-192.png" />
                     </div>
                     <h1 class="font-weight-medium text-xl">{{ $t('global.app.title') }}</h1>
                 </router-link>
@@ -97,7 +97,7 @@
                         </v-btn>
                         <div class="app-logo d-flex align-center gap-x-3 app-title-wrapper" v-if="mdAndDown">
                             <div class="d-flex">
-                                <v-img alt="logo" class="main-logo" src="/img/ezbookkeeping-192.png" />
+                                <img alt="logo" class="main-logo" src="/img/ezbookkeeping-192.png" />
                             </div>
                             <h1 class="font-weight-medium text-xl">{{ $t('global.app.title') }}</h1>
                         </div>
@@ -171,8 +171,8 @@
                 <v-card-text class="pa-4">
                     <p>{{ $t('You can scan the below QR code on your mobile device.') }}</p>
                 </v-card-text>
-                <v-card-text class="pa-4 w-100 d-flex">
-                    <v-img alt="qrcode" class="text-center img-url-qrcode" src="/qrcode/mobile_url.png" />
+                <v-card-text class="pa-4 w-100 d-flex justify-center">
+                    <img alt="qrcode" class="img-url-qrcode" src="/qrcode/mobile_url.png" />
                 </v-card-text>
                 <v-card-actions>
                     <v-btn :href="mobileVersionPath">{{$t('Switch to Mobile Version') }}</v-btn>

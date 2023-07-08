@@ -1,7 +1,14 @@
 <template>
-    <i class="item-icon" :class="icon" :style="style">
+    <i class="item-icon" :class="icon" :style="style" v-if="!hiddenStatus">
         <slot></slot>
     </i>
+    <v-badge class="right-bottom-icon" color="secondary"
+             location="bottom right" offset-y="2" :icon="icons.hide"
+             v-if="hiddenStatus">
+        <i class="item-icon" :class="icon" :style="style">
+            <slot></slot>
+        </i>
+    </v-badge>
 </template>
 
 <script>
@@ -9,14 +16,26 @@ import iconConstatns from '@/consts/icon.js';
 import colorConstatns from '@/consts/color.js';
 import { isNumber } from '@/lib/common.js';
 
+import {
+    mdiEyeOffOutline
+} from '@mdi/js';
+
 export default {
     props: [
         'iconType',
         'iconId',
         'color',
         'defaultColor',
-        'additionalColorAttr'
+        'additionalColorAttr',
+        'hiddenStatus'
     ],
+    data() {
+        return {
+            icons: {
+                hide: mdiEyeOffOutline
+            }
+        }
+    },
     computed: {
         icon() {
             if (this.iconType === 'account') {

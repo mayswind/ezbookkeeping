@@ -27,6 +27,7 @@ import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
 import { VSheet } from 'vuetify/components/VSheet';
+import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader';
 import { VSlideGroup, VSlideGroupItem } from 'vuetify/components/VSlideGroup';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
 import { VSwitch } from 'vuetify/components/VSwitch';
@@ -124,6 +125,7 @@ const vuetify = createVuetify({
         VProgressLinear,
         VSelect,
         VSheet,
+        VSkeletonLoader,
         VSlideGroup,
         VSlideGroupItem,
         VSnackbar,

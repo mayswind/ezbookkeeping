@@ -77,3 +77,9 @@ input[type=number] {
         background: rgb(var(--v-table-header-background)) !important;
     }
 }
+
+.right-bottom-icon .v-badge__badge {
+    padding: 0;
+    min-width: 16px;
+    height: 1rem;
+}

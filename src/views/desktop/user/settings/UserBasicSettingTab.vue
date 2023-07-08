@@ -200,7 +200,7 @@
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="saving"></v-progress-circular>
                         </v-btn>
 
-                        <v-btn color="secondary" variant="tonal" @click="reset">
+                        <v-btn color="default" variant="tonal" @click="reset">
                             {{ $t('Reset') }}
                         </v-btn>
                     </v-card-text>

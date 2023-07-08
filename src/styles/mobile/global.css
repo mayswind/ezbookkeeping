@@ -10,6 +10,16 @@ body {
     user-select: none;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 /** Common class **/
 .no-right-border {
     border-right: 0;

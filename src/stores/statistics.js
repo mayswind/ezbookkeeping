@@ -302,6 +302,84 @@ export const useStatisticsStore = defineStore('statistics', {
                 totalNonNegativeAmount: totalNonNegativeAmount,
                 items: allDataItems
             }
+        },
+        statisticsData(state) {
+            let combinedData = {
+                items: [],
+                totalAmount: 0
+            };
+
+            if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                combinedData = state.statisticsItemsByTransactionStatisticsData;
+            } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type ||
+                state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+                combinedData = state.statisticsItemsByAccountsData;
+            }
+
+            const allStatisticsItems = [];
+
+            for (let id in combinedData.items) {
+                if (!Object.prototype.hasOwnProperty.call(combinedData.items, id)) {
+                    continue;
+                }
+
+                const data = combinedData.items[id];
+
+                if (data.totalAmount > 0) {
+                    data.percent = data.totalAmount * 100 / combinedData.totalNonNegativeAmount;
+                } else {
+                    data.percent = 0;
+                }
+
+                if (data.percent < 0) {
+                    data.percent = 0;
+                }
+
+                allStatisticsItems.push(data);
+            }
+
+            if (state.transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.DisplayOrder.type) {
+                allStatisticsItems.sort(function (data1, data2) {
+                    for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
+                        if (data1.displayOrders[i] !== data2.displayOrders[i]) {
+                            return data1.displayOrders[i] - data2.displayOrders[i]; // asc
+                        }
+                    }
+
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            } else if (state.transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.Name.type) {
+                allStatisticsItems.sort(function (data1, data2) {
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            } else {
+                allStatisticsItems.sort(function (data1, data2) {
+                    if (data1.totalAmount !== data2.totalAmount) {
+                        return data2.totalAmount - data1.totalAmount; // desc
+                    }
+
+                    return data1.name.localeCompare(data2.name, undefined, { // asc
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+            }
+
+            return {
+                totalAmount: combinedData.totalAmount,
+                items: allStatisticsItems
+            };
         }
     },
     actions: {
@@ -400,6 +478,40 @@ export const useStatisticsStore = defineStore('statistics', {
             if (filter && isNumber(filter.sortingType)) {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
             }
+        },
+        getTransactionListPageParams(item) {
+            const querys = [];
+
+            if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                querys.push('type=2');
+            } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                querys.push('type=3');
+            }
+
+            if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+                querys.push('accountId=' + item.id);
+            } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                querys.push('categoryId=' + item.id);
+            }
+
+            if (this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
+                && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+                querys.push('dateType=' + this.transactionStatisticsFilter.dateType);
+                querys.push('minTime=' + this.transactionStatisticsFilter.startTime);
+                querys.push('maxTime=' + this.transactionStatisticsFilter.endTime);
+            }
+
+            return querys.join('&');
         },
         loadTransactionStatistics({ force }) {
             const self = this;

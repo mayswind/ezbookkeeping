@@ -342,83 +342,7 @@ export default {
             return this.$t('Total Amount');
         },
         statisticsData() {
-            const self = this;
-            let combinedData = {
-                items: [],
-                totalAmount: 0
-            };
-
-            if (self.query.chartDataType === self.allChartDataTypes.ExpenseByAccount.type ||
-                self.query.chartDataType === self.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
-                self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
-                self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                combinedData = this.statisticsStore.statisticsItemsByTransactionStatisticsData;
-            } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
-                self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
-                combinedData = this.statisticsStore.statisticsItemsByAccountsData;
-            }
-
-            const allStatisticsItems = [];
-
-            for (let id in combinedData.items) {
-                if (!Object.prototype.hasOwnProperty.call(combinedData.items, id)) {
-                    continue;
-                }
-
-                const data = combinedData.items[id];
-
-                if (data.totalAmount > 0) {
-                    data.percent = data.totalAmount * 100 / combinedData.totalNonNegativeAmount;
-                } else {
-                    data.percent = 0;
-                }
-
-                if (data.percent < 0) {
-                    data.percent = 0;
-                }
-
-                allStatisticsItems.push(data);
-            }
-
-            if (self.query.sortingType === this.allSortingTypes.DisplayOrder.type) {
-                allStatisticsItems.sort(function (data1, data2) {
-                    for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
-                        if (data1.displayOrders[i] !== data2.displayOrders[i]) {
-                            return data1.displayOrders[i] - data2.displayOrders[i]; // asc
-                        }
-                    }
-
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            } else if (self.query.sortingType === this.allSortingTypes.Name.type) {
-                allStatisticsItems.sort(function (data1, data2) {
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            } else {
-                allStatisticsItems.sort(function (data1, data2) {
-                    if (data1.totalAmount !== data2.totalAmount) {
-                        return data2.totalAmount - data1.totalAmount; // desc
-                    }
-
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            }
-
-            return {
-                totalAmount: combinedData.totalAmount,
-                items: allStatisticsItems
-            };
+            return this.statisticsStore.statisticsData;
         },
         showAmountInChart() {
             if (!this.showAccountBalance
@@ -739,38 +663,7 @@ export default {
             return formatPercent(value, precision, lowPrecisionValue);
         },
         getItemLinkUrl(item) {
-            const querys = [];
-
-            if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
-                || this.query.chartDataType === this.allChartDataTypes.IncomeByPrimaryCategory.type
-                || this.query.chartDataType === this.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                querys.push('type=2');
-            } else if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type
-                || this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type
-                || this.query.chartDataType === this.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                querys.push('type=3');
-            }
-
-            if (this.query.chartDataType === this.allChartDataTypes.IncomeByAccount.type
-                || this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type
-                || this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type
-                || this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('accountId=' + item.id);
-            } else if (this.query.chartDataType === this.allChartDataTypes.IncomeByPrimaryCategory.type
-                || this.query.chartDataType === this.allChartDataTypes.IncomeBySecondaryCategory.type
-                || this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type
-                || this.query.chartDataType === this.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                querys.push('categoryId=' + item.id);
-            }
-
-            if (this.query.chartDataType !== this.allChartDataTypes.AccountTotalAssets.type
-                && this.query.chartDataType !== this.allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('dateType=' + this.query.dateType);
-                querys.push('minTime=' + this.query.startTime);
-                querys.push('maxTime=' + this.query.endTime);
-            }
-
-            return '/transaction/list?' + querys.join('&');
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(item)}`;
         }
     }
 };

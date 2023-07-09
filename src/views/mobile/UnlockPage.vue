@@ -1,7 +1,7 @@
 <template>
     <f7-page no-toolbar no-navbar no-swipeback login-screen>
         <f7-login-screen-title>
-            <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+            <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
             <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
@@ -76,6 +76,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import assetConstants from '@/consts/asset.js';
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
 import { getDesktopVersionPath } from '@/lib/version.js';
@@ -92,6 +93,9 @@ export default {
     },
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ezBookkeepingLogoPath() {
+            return assetConstants.ezBookkeepingLogoPath;
+        },
         version() {
             return 'v' + this.$version;
         },

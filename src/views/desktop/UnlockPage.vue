@@ -2,7 +2,7 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
                 <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
             </div>
         </router-link>
@@ -115,6 +115,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import assetConstants from '@/consts/asset.js';
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
 
@@ -128,6 +129,9 @@ export default {
     },
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ezBookkeepingLogoPath() {
+            return assetConstants.ezBookkeepingLogoPath;
+        },
         version() {
             return 'v' + this.$version;
         },

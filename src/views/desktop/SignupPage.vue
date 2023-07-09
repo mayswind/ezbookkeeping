@@ -2,7 +2,7 @@
     <div class="layout-wrapper">
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
-                <img alt="logo" class="login-page-logo" src="/img/ezbookkeeping-192.png" />
+                <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
                 <h1 class="font-weight-medium leading-normal text-2xl">{{ $t('global.app.title') }}</h1>
             </div>
         </router-link>
@@ -248,6 +248,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import assetConstants from '@/consts/asset.js';
 import categoryConstants from '@/consts/category.js';
 import { getNameByKeyValue, copyArrayTo } from '@/lib/common.js';
 
@@ -296,6 +297,9 @@ export default {
     },
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
+        ezBookkeepingLogoPath() {
+            return assetConstants.ezBookkeepingLogoPath;
+        },
         allLanguages() {
             return this.$locale.getAllLanguageInfoArray(false);
         },

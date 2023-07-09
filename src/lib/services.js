@@ -400,6 +400,9 @@ export default {
             ignoreError: !!ignoreError
         });
     },
+    generateQrCodeUrl: (qrCodeName) => {
+        return `${api.baseQrcodePath}/${qrCodeName}.png`;
+    },
     generateMapProxyTileImageUrl: (mapProvider, language) => {
         const token = userState.getToken();
         let url = `${api.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;

@@ -1,4 +1,5 @@
 const baseApiUrlPath = '/api';
+const baseQrcodePath = '/qrcode';
 const baseProxyUrlPath = '/proxy';
 const baseAmapApiProxyUrlPath = '/_AMapService';
 const googleMapJavascriptUrl = 'https://maps.googleapis.com/maps/api/js';
@@ -7,6 +8,7 @@ const amapJavascriptUrl = 'https://webapi.amap.com/maps?v=2.0';
 
 export default {
     baseApiUrlPath: baseApiUrlPath,
+    baseQrcodePath: baseQrcodePath,
     baseProxyUrlPath: baseProxyUrlPath,
     baseAmapApiProxyUrlPath: baseAmapApiProxyUrlPath,
     googleMapJavascriptUrl: googleMapJavascriptUrl,

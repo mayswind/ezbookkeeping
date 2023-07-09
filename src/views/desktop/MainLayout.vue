@@ -172,7 +172,7 @@
                     <p>{{ $t('You can scan the below QR code on your mobile device.') }}</p>
                 </v-card-text>
                 <v-card-text class="pa-4 w-100 d-flex justify-center">
-                    <img alt="qrcode" class="img-url-qrcode" src="/qrcode/mobile_url.png" />
+                    <img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath" />
                 </v-card-text>
                 <v-card-actions>
                     <v-btn :href="mobileVersionPath">{{$t('Switch to Mobile Version') }}</v-btn>
@@ -200,6 +200,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { getSystemTheme } from '@/lib/ui.js';
+import { getMobileUrlQrCodePath } from '@/lib/qrcode.js';
 import { getMobileVersionPath } from '@/lib/version.js';
 
 import {
@@ -256,6 +257,9 @@ export default {
         mdAndDown() {
             const { mdAndDown } = useDisplay();
             return mdAndDown.value;
+        },
+        mobileUrlQrCodePath() {
+            return getMobileUrlQrCodePath();
         },
         mobileVersionPath() {
             return getMobileVersionPath();

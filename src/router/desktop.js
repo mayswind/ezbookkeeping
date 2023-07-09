@@ -104,11 +104,17 @@ const router = createRouter({
                 },
                 {
                     path: '/user/settings',
-                    component: UserSettingsPage
+                    component: UserSettingsPage,
+                    props: route => ({
+                        tab: route.query.tab
+                    })
                 },
                 {
                     path: '/app/settings',
-                    component: AppSettingsPage
+                    component: AppSettingsPage,
+                    props: route => ({
+                        tab: route.query.tab
+                    })
                 },
                 {
                     path: '/about',

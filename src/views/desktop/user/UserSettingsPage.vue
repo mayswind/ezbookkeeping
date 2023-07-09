@@ -59,9 +59,23 @@ export default {
         UserTwoFactorAuthSettingTab,
         UserDataManagementSettingTab
     },
+    props: [
+        'tab'
+    ],
     data() {
+        let queryActiveTab = this.tab || 'basicSetting';
+
+        if ([
+            'basicSetting',
+            'securitySetting',
+            'twoFactorSetting',
+            'dataManagementSetting'
+        ].indexOf(queryActiveTab) === -1) {
+            queryActiveTab = 'basicSetting';
+        }
+
         return {
-            activeTab: 'basicSetting',
+            activeTab: queryActiveTab,
             icons: {
                 basicSetting: mdiAccountOutline,
                 securitySetting: mdiLockOpenOutline,

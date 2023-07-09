@@ -21,7 +21,7 @@
             </v-window-item>
 
             <v-window-item value="applicationLockSetting">
-                <app-lock-seting-tab/>
+                <app-lock-setting-tab/>
             </v-window-item>
 
             <v-window-item value="statisticsSetting">
@@ -33,7 +33,7 @@
 
 <script>
 import AppBasicSettingTab from './settings/AppBasicSettingTab.vue';
-import AppLockSetingTab from './settings/AppLockSetingTab.vue';
+import AppLockSettingTab from './settings/AppLockSettingTab.vue';
 import AppStatisticsSettingTab from './settings/AppStatisticsSettingTab.vue';
 
 import {
@@ -45,12 +45,25 @@ import {
 export default {
     components: {
         AppBasicSettingTab,
-        AppLockSetingTab,
+        AppLockSettingTab,
         AppStatisticsSettingTab
     },
+    props: [
+        'tab'
+    ],
     data() {
+        let queryActiveTab = this.tab || 'basicSetting';
+
+        if ([
+            'basicSetting',
+            'applicationLockSetting',
+            'statisticsSetting'
+        ].indexOf(queryActiveTab) === -1) {
+            queryActiveTab = 'basicSetting';
+        }
+
         return {
-            activeTab: 'basicSetting',
+            activeTab: queryActiveTab,
             icons: {
                 basicSetting: mdiCogOutline,
                 applicationLockSetting: mdiLockOpenOutline,

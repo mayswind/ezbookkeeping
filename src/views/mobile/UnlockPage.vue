@@ -5,7 +5,7 @@
             <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
-        <f7-list form>
+        <f7-list form class="margin-bottom-half">
             <f7-list-item class="no-padding no-margin">
                 <template #inner>
                     <div class="display-flex justify-content-center full-line">{{ $t('Unlock Application') }}</div>
@@ -16,7 +16,19 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list>
+        <f7-list class="no-margin-vertical">
+            <f7-list-item>
+                <template #title>
+                    <small>
+                        <f7-link external :href="desktopVersionPath">{{ $t('Switch to Desktop Version') }}</f7-link>
+                    </small>
+                </template>
+                <template #after>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-list class="margin-top-half">
             <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="$t('Unlock By PIN Code')" @click="unlockByPin"></f7-list-button>
             <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock By WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
             <f7-block-footer>
@@ -66,6 +78,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
+import { getDesktopVersionPath } from '@/lib/version.js';
 import { isModalShowing } from '@/lib/ui.mobile.js';
 
 export default {
@@ -81,6 +94,9 @@ export default {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
+        },
+        desktopVersionPath() {
+            return getDesktopVersionPath();
         },
         allLanguages() {
             return this.$locale.getAllLanguageInfos();

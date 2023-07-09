@@ -89,6 +89,14 @@
                                     />
                                 </v-col>
 
+                                <v-col cols="12" class="py-0 mt-1 mb-4">
+                                    <div class="d-flex align-center justify-space-between flex-wrap">
+                                        <a href="javascript:void(0);" @click="showMobileQrCode = true">
+                                            <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
+                                        </a>
+                                    </div>
+                                </v-col>
+
                                 <v-col cols="12">
                                     <v-btn block :disabled="inputIsEmpty || logining || verifying"
                                            @click="login" v-if="!show2faInput">
@@ -143,6 +151,7 @@
             </v-col>
         </v-row>
 
+        <switch-to-mobile-dialog v-model:show="showMobileQrCode" />
         <snack-bar ref="snackbar" />
     </div>
 </template>
@@ -177,6 +186,7 @@ export default {
             verifying: false,
             show2faInput: false,
             twoFAVerifyType: 'passcode',
+            showMobileQrCode: false,
             icons: {
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,

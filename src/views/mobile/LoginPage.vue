@@ -5,7 +5,7 @@
             <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
         </f7-login-screen-title>
 
-        <f7-list form dividers>
+        <f7-list form dividers class="margin-bottom-half">
             <f7-list-input
                 type="text"
                 autocomplete="username"
@@ -27,7 +27,19 @@
             ></f7-list-input>
         </f7-list>
 
-        <f7-list>
+        <f7-list class="no-margin-vertical">
+            <f7-list-item>
+                <template #title>
+                    <small>
+                        <f7-link external :href="desktopVersionPath">{{ $t('Switch to Desktop Version') }}</f7-link>
+                    </small>
+                </template>
+                <template #after>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-list class="margin-top-half">
             <f7-list-button :class="{ 'disabled': inputIsEmpty || logining }" :text="$t('Log In')" @click="login"></f7-list-button>
             <f7-block-footer>
                 <span>{{ $t('Don\'t have an account?') }}</span>&nbsp;
@@ -116,6 +128,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { isUserRegistrationEnabled } from '@/lib/server_settings.js';
+import { getDesktopVersionPath } from '@/lib/version.js';
 import { isModalShowing } from '@/lib/ui.mobile.js';
 
 export default {
@@ -139,6 +152,9 @@ export default {
         ...mapStores(useRootStore, useSettingsStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
+        },
+        desktopVersionPath() {
+            return getDesktopVersionPath();
         },
         allLanguages() {
             return this.$locale.getAllLanguageInfos();

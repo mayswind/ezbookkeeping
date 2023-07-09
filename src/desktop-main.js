@@ -66,6 +66,7 @@ import AmountInput from '@/components/desktop/AmountInput.vue';
 import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
 import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
 import '@/styles/desktop/template/template/index.scss';
@@ -352,6 +353,7 @@ app.component('AmountInput', AmountInput);
 app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);
+app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
 app.config.globalProperties.$version = getVersion();
 app.config.globalProperties.$buildTime = getBuildTime();

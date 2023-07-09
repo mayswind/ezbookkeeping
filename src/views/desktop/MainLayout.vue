@@ -161,26 +161,9 @@
             </div>
         </div>
 
-        <div class="layout-overlay" :class="{ 'visible': showVerticalOverlayMenu }" @click="showVerticalOverlayMenu = false"></div>
+        <switch-to-mobile-dialog v-model:show="showMobileQrCode" />
 
-        <v-dialog width="400" v-model="showMobileQrCode">
-            <v-card>
-                <v-toolbar color="primary">
-                    <v-toolbar-title>{{ $t('global.app.title') }}</v-toolbar-title>
-                </v-toolbar>
-                <v-card-text class="pa-4">
-                    <p>{{ $t('You can scan the below QR code on your mobile device.') }}</p>
-                </v-card-text>
-                <v-card-text class="pa-4 w-100 d-flex justify-center">
-                    <img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath" />
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn :href="mobileVersionPath">{{$t('Switch to Mobile Version') }}</v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="showMobileQrCode = false">{{ $t('Close') }}</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        <div class="layout-overlay" :class="{ 'visible': showVerticalOverlayMenu }" @click="showVerticalOverlayMenu = false"></div>
 
         <v-overlay class="justify-center align-center" :persistent="true" v-model="showLoading">
             <v-progress-circular indeterminate></v-progress-circular>
@@ -200,8 +183,6 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import { getSystemTheme } from '@/lib/ui.js';
-import { getMobileUrlQrCodePath } from '@/lib/qrcode.js';
-import { getMobileVersionPath } from '@/lib/version.js';
 
 import {
     mdiMenu,
@@ -257,12 +238,6 @@ export default {
         mdAndDown() {
             const { mdAndDown } = useDisplay();
             return mdAndDown.value;
-        },
-        mobileUrlQrCodePath() {
-            return getMobileUrlQrCodePath();
-        },
-        mobileVersionPath() {
-            return getMobileVersionPath();
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');

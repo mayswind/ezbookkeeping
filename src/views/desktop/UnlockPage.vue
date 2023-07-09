@@ -35,14 +35,6 @@
                                                     v-model="pinCode" @pincode:confirm="unlockByPin" />
                                 </v-col>
 
-                                <v-col cols="12" class="py-0 mt-4 mb-4">
-                                    <div class="d-flex align-center justify-space-between flex-wrap">
-                                        <a href="javascript:void(0);" @click="showMobileQrCode = true">
-                                            <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
-                                        </a>
-                                    </div>
-                                </v-col>
-
                                 <v-col cols="12">
                                     <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
                                            @click="unlockByPin(pinCode)">
@@ -99,7 +91,6 @@
             </v-col>
         </v-row>
 
-        <switch-to-mobile-dialog v-model:show="showMobileQrCode" />
         <confirm-dialog ref="confirmDialog"/>
         <snack-bar ref="snackbar" />
     </div>
@@ -123,8 +114,7 @@ export default {
     data() {
         return {
             pinCode: '',
-            verifyingByWebAuthn: false,
-            showMobileQrCode: false
+            verifyingByWebAuthn: false
         };
     },
     computed: {

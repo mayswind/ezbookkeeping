@@ -27,6 +27,7 @@ export default {
         'color',
         'defaultColor',
         'additionalColorAttr',
+        'size',
         'hiddenStatus'
     ],
     data() {
@@ -102,6 +103,10 @@ export default {
                 ret[additionalColorAttr] = color;
             }
 
+            if (this.size) {
+                ret['font-size'] = this.size;
+            }
+
             return ret;
         },
         getCategoryIconStyle(color, defaultColor, additionalColorAttr) {
@@ -119,6 +124,10 @@ export default {
                 ret[additionalColorAttr] = color;
             }
 
+            if (this.size) {
+                ret['font-size'] = this.size;
+            }
+
             return ret;
         },
         getDefaultIconStyle(color, defaultColor, additionalColorAttr) {
@@ -134,6 +143,10 @@ export default {
 
             if (additionalColorAttr) {
                 ret[additionalColorAttr] = color;
+            }
+
+            if (this.size) {
+                ret['font-size'] = this.size;
             }
 
             return ret;

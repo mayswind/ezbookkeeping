@@ -8,6 +8,8 @@ import { VApp } from 'vuetify/components/VApp';
 import { VAvatar } from 'vuetify/components/VAvatar';
 import { VAutocomplete } from 'vuetify/components/VAutocomplete';
 import { VBtn } from 'vuetify/components/VBtn';
+import { VBtnGroup } from 'vuetify/components/VBtnGroup';
+import { VBtnToggle } from 'vuetify/components/VBtnToggle';
 import { VCard, VCardActions, VCardItem, VCardSubtitle, VCardText, VCardTitle } from 'vuetify/components/VCard';
 import { VChip } from 'vuetify/components/VChip';
 import { VDialog } from 'vuetify/components/VDialog';
@@ -41,6 +43,15 @@ import { VWindow, VWindowItem } from 'vuetify/components/VWindow';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
 
+import * as echarts from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { PieChart } from 'echarts/charts';
+import {
+    TooltipComponent,
+    LegendComponent,
+} from 'echarts/components';
+import VChart from 'vue-echarts';
+
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
@@ -66,6 +77,8 @@ import AmountInput from '@/components/desktop/AmountInput.vue';
 import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import PieChartComponent from '@/components/desktop/PieChart.vue';
+import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
 import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
@@ -88,6 +101,8 @@ const vuetify = createVuetify({
         VAvatar,
         VAutocomplete,
         VBtn,
+        VBtnGroup,
+        VBtnToggle,
         VCard,
         VCardActions,
         VCardItem,
@@ -338,11 +353,19 @@ const vuetify = createVuetify({
     }
 });
 
+echarts.use([
+    CanvasRenderer,
+    PieChart,
+    TooltipComponent,
+    LegendComponent
+]);
+
 app.use(pinia);
 app.use(i18n);
 app.use(vuetify);
 app.use(router);
 
+app.component('VChart', VChart);
 app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
 
@@ -353,6 +376,8 @@ app.component('AmountInput', AmountInput);
 app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);
+app.component('PieChart', PieChartComponent);
+app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
 app.config.globalProperties.$version = getVersion();

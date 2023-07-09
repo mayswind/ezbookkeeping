@@ -171,6 +171,18 @@
         "licenseUrl": "https://github.com/nolimits4web/skeleton-elements/blob/v4.0.1/LICENSE"
     },
     {
+        "name": "Apache ECharts",
+        "copyright": "Copyright © 2017-2023, The Apache Software Foundation Apache ECharts, ECharts, Apache, the Apache feather, and the Apache ECharts project logo are either registered trademarks or trademarks of the Apache Software Foundation.",
+        "url": "https://echarts.apache.org/",
+        "licenseUrl": "https://github.com/apache/echarts/blob/5.4.2/LICENSE"
+    },
+    {
+        "name": "vue-echarts",
+        "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
+        "url": "https://github.com/ecomfe/vue-echarts",
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.0/LICENSE"
+    },
+    {
         "name": "vue3-perfect-scrollbar",
         "copyright": "Copyright (c) 2018 Adam",
         "url": "https://github.com/mercs600/vue3-perfect-scrollbar",

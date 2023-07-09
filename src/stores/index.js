@@ -17,9 +17,11 @@ import { isObject, isString } from '@/lib/common.js';
 
 export const useRootStore = defineStore('root', {
     actions: {
-        resetAllStates() {
-            const exchangeRatesStore = useExchangeRatesStore();
-            exchangeRatesStore.resetLatestExchangeRates();
+        resetAllStates(resetUserInfoAndSettings) {
+            if (resetUserInfoAndSettings) {
+                const exchangeRatesStore = useExchangeRatesStore();
+                exchangeRatesStore.resetLatestExchangeRates();
+            }
 
             const statisticsStore = useStatisticsStore();
             statisticsStore.resetTransactionStatistics();
@@ -39,8 +41,10 @@ export const useRootStore = defineStore('root', {
             const accountsStore = useAccountsStore();
             accountsStore.resetAccounts();
 
-            const userStore = useUserStore();
-            userStore.resetUserInfo();
+            if (resetUserInfoAndSettings) {
+                const userStore = useUserStore();
+                userStore.resetUserInfo();
+            }
         },
         authorize({ loginName, password }) {
             const settingsStore = useSettingsStore();
@@ -204,6 +208,10 @@ export const useRootStore = defineStore('root', {
                 });
             });
         },
+        lock() {
+            userState.clearSessionToken();
+            this.resetAllStates(false);
+        },
         logout() {
             const self = this;
 
@@ -218,7 +226,7 @@ export const useRootStore = defineStore('root', {
 
                     userState.clearTokenAndUserInfo(true);
                     userState.clearWebAuthnConfig();
-                    self.resetAllStates();
+                    self.resetAllStates(true);
 
                     resolve(data.result);
                 }).catch(error => {
@@ -237,7 +245,7 @@ export const useRootStore = defineStore('root', {
         forceLogout() {
             userState.clearTokenAndUserInfo(true);
             userState.clearWebAuthnConfig();
-            this.resetAllStates();
+            this.resetAllStates(true);
         },
         updateUserProfile({ profile, currentPassword }) {
             return new Promise((resolve, reject) => {

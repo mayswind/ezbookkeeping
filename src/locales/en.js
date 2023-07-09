@@ -1124,6 +1124,7 @@ export default {
     'Unable to get current two factor authentication status': 'Unable to get current two factor authentication status',
     'Unable to enable two factor authentication': 'Unable to enable two factor authentication',
     'Unable to disable two factor authentication': 'Unable to disable two factor authentication',
+    'Lock Application': 'Lock Application',
     'Log Out': 'Log Out',
     'Are you sure you want to log out?': 'Are you sure you want to log out?',
     'Unable to logout': 'Unable to logout',

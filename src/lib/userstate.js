@@ -164,6 +164,11 @@ function clearUserInfo() {
     localStorage.removeItem(userInfoLocalStorageKey);
 }
 
+function clearSessionToken() {
+    sessionStorage.removeItem(tokenSessionStorageKey);
+    sessionStorage.removeItem(appLockStateSessionStorageKey);
+}
+
 function clearTokenAndUserInfo(clearAppLockState) {
     if (clearAppLockState) {
         sessionStorage.removeItem(appLockStateSessionStorageKey);
@@ -191,5 +196,6 @@ export default {
     updateToken,
     updateUserInfo,
     clearUserInfo,
+    clearSessionToken,
     clearTokenAndUserInfo
 };

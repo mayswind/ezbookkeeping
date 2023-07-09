@@ -144,6 +144,10 @@
                                                  :title="$t('Application Settings')"
                                                  to="/app/settings"></v-list-item>
                                     <v-divider class="my-2"/>
+                                    <v-list-item :prepend-icon="icons.lock"
+                                                 :title="$t('Lock Application')"
+                                                 v-if="isEnableApplicationLock"
+                                                 @click="lock"></v-list-item>
                                     <v-list-item :disabled="logouting"
                                                  :prepend-icon="icons.logout"
                                                  :title="$t('Log Out')"
@@ -201,6 +205,7 @@ import {
     mdiWeatherNight,
     mdiAccount,
     mdiAccountCogOutline,
+    mdiLockOutline,
     mdiLogout
 } from '@mdi/js';
 
@@ -229,6 +234,7 @@ export default {
                 themeDark: mdiWeatherNight,
                 user: mdiAccount,
                 profile: mdiAccountCogOutline,
+                lock: mdiLockOutline,
                 logout: mdiLogout
             }
         }
@@ -260,6 +266,9 @@ export default {
                     }
                 }
             }
+        },
+        isEnableApplicationLock() {
+            return this.settingsStore.appSettings.applicationLock;
         }
     },
     setup() {
@@ -272,6 +281,10 @@ export default {
     methods: {
         handleNavScroll(e) {
             this.isVerticalNavScrolled = e.target.scrollTop > 0;
+        },
+        lock() {
+            this.rootStore.lock();
+            this.$router.replace('/unlock');
         },
         logout() {
             const self = this;

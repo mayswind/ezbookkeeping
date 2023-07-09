@@ -1124,6 +1124,7 @@ export default {
     'Unable to get current two factor authentication status': '无法获取当前两步验证状态',
     'Unable to enable two factor authentication': '无法启用两步验证',
     'Unable to disable two factor authentication': '无法禁用两步验证',
+    'Lock Application': '锁定应用',
     'Log Out': '退出登录',
     'Are you sure you want to log out?': '您确定要退出登录？',
     'Unable to logout': '无法退出登录',

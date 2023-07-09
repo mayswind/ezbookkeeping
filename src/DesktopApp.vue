@@ -7,6 +7,7 @@
 
 <script>
 import { useTheme } from 'vuetify';
+import { register } from 'register-service-worker';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
@@ -68,6 +69,14 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
             }
+        }
+
+        if (isProduction()) {
+            register('./sw.js', {
+                registrationOptions: {
+                    scope: './'
+                }
+            });
         }
     },
     mounted() {

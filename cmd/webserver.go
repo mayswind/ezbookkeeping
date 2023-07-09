@@ -74,6 +74,8 @@ func startWebServer(c *cli.Context) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	workboxFileNames := utils.ListFileNamesWithPrefixAndSuffix(config.StaticRootPath, "workbox-", ".js")
+
 	router := gin.New()
 	router.Use(bindMiddleware(middlewares.Recovery))
 
@@ -119,7 +121,6 @@ func startWebServer(c *cli.Context) error {
 	router.StaticFile("/mobile/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
 	router.StaticFile("/mobile/sw.js", filepath.Join(config.StaticRootPath, "sw.js"))
 
-	workboxFileNames := utils.ListFileNamesWithPrefixAndSuffix(config.StaticRootPath, "workbox-", ".js")
 	for i := 0; i < len(workboxFileNames); i++ {
 		router.StaticFile("/mobile/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
 	}
@@ -137,6 +138,11 @@ func startWebServer(c *cli.Context) error {
 	router.StaticFile("/desktop/favicon.png", filepath.Join(config.StaticRootPath, "favicon.png"))
 	router.StaticFile("/desktop/touchicon.png", filepath.Join(config.StaticRootPath, "touchicon.png"))
 	router.StaticFile("/desktop/manifest.json", filepath.Join(config.StaticRootPath, "manifest.json"))
+	router.StaticFile("/desktop/sw.js", filepath.Join(config.StaticRootPath, "sw.js"))
+
+	for i := 0; i < len(workboxFileNames); i++ {
+		router.StaticFile("/desktop/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
+	}
 
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
 

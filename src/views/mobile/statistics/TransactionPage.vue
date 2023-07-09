@@ -141,7 +141,7 @@
                         <template #media>
                             <div class="display-flex no-padding-horizontal">
                                 <div class="display-flex align-items-center statistics-icon">
-                                    <ItemIcon icon-type="category" :icon-id="item.icon" :color="item.color" v-if="item.icon"></ItemIcon>
+                                    <ItemIcon :icon-type="queryChartDataCategory" :icon-id="item.icon" :color="item.color" v-if="item.icon"></ItemIcon>
                                     <f7-icon f7="pencil_ellipsis_rectangle" v-else-if="!item.icon"></f7-icon>
                                 </div>
                             </div>
@@ -294,6 +294,9 @@ export default {
         },
         query() {
             return this.statisticsStore.transactionStatisticsFilter;
+        },
+        queryChartDataCategory() {
+            return this.statisticsStore.transactionStatisticsChartDataCategory;
         },
         queryChartDataTypeName() {
             const queryChartDataTypeName = getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');

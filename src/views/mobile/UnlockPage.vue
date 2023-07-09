@@ -17,7 +17,7 @@
         </f7-list>
 
         <f7-list class="no-margin-vertical">
-            <f7-list-item>
+            <f7-list-item class="margin-horizontal">
                 <template #title>
                     <small>
                         <f7-link external :href="desktopVersionPath">{{ $t('Switch to Desktop Version') }}</f7-link>

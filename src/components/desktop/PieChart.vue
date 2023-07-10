@@ -227,9 +227,19 @@ export default {
     },
     methods: {
         clickItem: function (e) {
-            if (this.enableClickItem && e.componentType === 'series' && e.seriesType ==='pie' && e.data && e.data.sourceItem) {
-                this.$emit('click', e.data.sourceItem);
+            if (!this.enableClickItem || e.componentType !== 'series' || e.seriesType !=='pie') {
+                return;
             }
+
+            if (e.event && e.event.target && e.event.target.constructor && e.event.target.constructor.name === 'PiePiece2') {
+                return;
+            }
+
+            if (!e.data || !e.data.sourceItem) {
+                return;
+            }
+
+            this.$emit('click', e.data.sourceItem);
         },
         onLegendSelectChanged: function (e) {
             this.selectedLegends = e.selected;

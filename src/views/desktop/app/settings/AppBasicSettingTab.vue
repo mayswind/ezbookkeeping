@@ -176,13 +176,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useExchangeRatesStore),
         enableDisableOptions() {
-            return [{
-                value: true,
-                displayName: this.$t('Enable')
-            },{
-                value: false,
-                displayName: this.$t('Disable')
-            }];
+            return this.$locale.getEnableDisableOptions();
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);

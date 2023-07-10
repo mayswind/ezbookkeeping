@@ -627,6 +627,16 @@ function getAllTransactionEditScopeTypes(translateFn) {
     }];
 }
 
+function getEnableDisableOptions(translateFn) {
+    return [{
+        value: true,
+        displayName: translateFn('Enable')
+    },{
+        value: false,
+        displayName: translateFn('Disable')
+    }];
+}
+
 function getDisplayCurrency(value, currencyCode, options, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
@@ -896,6 +906,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
+        getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)

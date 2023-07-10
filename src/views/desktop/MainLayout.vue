@@ -320,11 +320,6 @@ export default {
 </script>
 
 <style>
-.img-url-qrcode {
-    width: 320px;
-    height: 320px
-}
-
 .main-logo {
     width: 1.8em;
     height: 1.8em;

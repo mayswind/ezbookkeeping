@@ -48,3 +48,10 @@ export default {
     }
 }
 </script>
+
+<style>
+.img-url-qrcode {
+    width: 320px;
+    height: 320px
+}
+</style>

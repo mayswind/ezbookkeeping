@@ -96,13 +96,13 @@
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Editable Transaction Scope')"
-                :title="$t(getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'value', 'name'))"
+                :title="getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'type', 'displayName')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Scope'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.transactionEditScope">
-                    <option :value="option.value"
-                            :key="option.value"
-                            v-for="option in allTransactionEditScopeTypes">{{ $t(option.name) }}</option>
+                    <option :value="option.type"
+                            :key="option.type"
+                            v-for="option in allTransactionEditScopeTypes">{{ option.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -304,28 +304,7 @@ export default {
             return this.$locale.getAllShortTimeFormats();
         },
         allTransactionEditScopeTypes() {
-            return [{
-                value: 0,
-                name: 'None'
-            }, {
-                value: 1,
-                name: 'All'
-            }, {
-                value: 2,
-                name: 'Today or later'
-            }, {
-                value: 3,
-                name: 'Recent 24 hours or later'
-            }, {
-                value: 4,
-                name: 'This week or later'
-            }, {
-                value: 5,
-                name: 'This month or later'
-            }, {
-                value: 6,
-                name: 'This year or later'
-            }];
+            return this.$locale.getAllTransactionEditScopeTypes();
         },
         currentLanguageName() {
             for (let i = 0; i < this.allLanguages.length; i++) {

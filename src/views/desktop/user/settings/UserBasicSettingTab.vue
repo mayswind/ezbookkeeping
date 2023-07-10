@@ -81,8 +81,8 @@
 
                             <v-col cols="12" md="6">
                                 <v-select
-                                    item-title="name"
-                                    item-value="value"
+                                    item-title="displayName"
+                                    item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Editable Transaction Scope')"
@@ -297,30 +297,7 @@ export default {
             return this.$locale.getAllShortTimeFormats();
         },
         allTransactionEditScopeTypes() {
-            const self = this;
-
-            return [{
-                value: 0,
-                name: self.$t('None')
-            }, {
-                value: 1,
-                name: self.$t('All')
-            }, {
-                value: 2,
-                name: self.$t('Today or later')
-            }, {
-                value: 3,
-                name: self.$t('Recent 24 hours or later')
-            }, {
-                value: 4,
-                name: self.$t('This week or later')
-            }, {
-                value: 5,
-                name: self.$t('This month or later')
-            }, {
-                value: 6,
-                name: self.$t('This year or later')
-            }];
+            return this.$locale.getAllTransactionEditScopeTypes();
         },
         currentUserAvatarProvider() {
             if (this.oldProfile.avatarProvider === 'gravatar') {

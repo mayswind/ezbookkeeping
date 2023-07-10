@@ -602,6 +602,31 @@ function getAllStatisticsSortingTypes(translateFn) {
     return allSortingTypes;
 }
 
+function getAllTransactionEditScopeTypes(translateFn) {
+    return [{
+        type: 0,
+        displayName: translateFn('None')
+    }, {
+        type: 1,
+        displayName: translateFn('All')
+    }, {
+        type: 2,
+        displayName: translateFn('Today or later')
+    }, {
+        type: 3,
+        displayName: translateFn('Recent 24 hours or later')
+    }, {
+        type: 4,
+        displayName: translateFn('This week or later')
+    }, {
+        type: 5,
+        displayName: translateFn('This month or later')
+    }, {
+        type: 6,
+        displayName: translateFn('This year or later')
+    }];
+}
+
 function getDisplayCurrency(value, currencyCode, options, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
@@ -870,6 +895,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
+        getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)

@@ -231,7 +231,7 @@ export default {
                 return;
             }
 
-            if (e.event && e.event.target && e.event.target.constructor && e.event.target.constructor.name === 'PiePiece2') {
+            if (e.event && e.event.target && e.event.target.currentStates && e.event.target.currentStates[0] && e.event.target.currentStates[0] === 'emphasis') {
                 return;
             }
 

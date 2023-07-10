@@ -96,11 +96,12 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import transactionConstants from '@/consts/transaction.js';
-import { isNumber, appendThousandsSeparator } from '@/lib/common.js';
+import { isNumber } from '@/lib/common.js';
 import {
     numericCurrencyToString,
     stringCurrencyToNumeric,
-    getExchangedAmount,
+    getConvertedAmount,
+    getDisplayExchangeRateAmount
 } from '@/lib/currency.js';
 
 export default {
@@ -128,27 +129,7 @@ export default {
             return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
         },
         availableExchangeRates() {
-            if (!this.exchangeRatesData || !this.exchangeRatesData.exchangeRates) {
-                return [];
-            }
-
-            const availableExchangeRates = [];
-
-            for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
-                const exchangeRate = this.exchangeRatesData.exchangeRates[i];
-
-                availableExchangeRates.push({
-                    currencyCode: exchangeRate.currency,
-                    currencyDisplayName: this.$t(`currency.${exchangeRate.currency}`),
-                    rate: exchangeRate.rate
-                });
-            }
-
-            availableExchangeRates.sort(function(c1, c2) {
-                return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
-            })
-
-            return availableExchangeRates;
+            return this.$locale.getAllDisplayExchangeRates(this.exchangeRatesData);
         },
         displayBaseAmount() {
             return numericCurrencyToString(this.baseAmount, this.isEnableThousandsSeparator);
@@ -228,31 +209,11 @@ export default {
         },
         getConvertedAmount(toExchangeRate) {
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
-
-            if (!fromExchangeRate) {
-                return '';
-            }
-
-            return getExchangedAmount(this.baseAmount / 100, fromExchangeRate.rate, toExchangeRate.rate);
+            return getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
         },
         getDisplayConvertedAmount(toExchangeRate) {
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
-
-            if (rateStr.indexOf('.') < 0) {
-                return appendThousandsSeparator(rateStr, this.isEnableThousandsSeparator);
-            } else {
-                let firstNonZeroPos = 0;
-
-                for (let i = 0; i < rateStr.length; i++) {
-                    if (rateStr.charAt(i) !== '.' && rateStr.charAt(i) !== '0') {
-                        firstNonZeroPos = Math.min(i + 4, rateStr.length);
-                        break;
-                    }
-                }
-
-                const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
-                return appendThousandsSeparator(trimmedRateStr, this.isEnableThousandsSeparator);
-            }
+            return getDisplayExchangeRateAmount(rateStr, this.isEnableThousandsSeparator);
         },
         setAsBaseline(currency, amount) {
             if (!isNumber(amount)) {

@@ -83,3 +83,33 @@ export function getExchangedAmount(amount, fromRate, toRate) {
 
     return amount * exchangeRate;
 }
+
+export function getConvertedAmount(baseAmount, fromExchangeRate, toExchangeRate) {
+    if (!fromExchangeRate || !toExchangeRate) {
+        return '';
+    }
+
+    if (baseAmount === '') {
+        return 0;
+    }
+
+    return getExchangedAmount(baseAmount, fromExchangeRate.rate, toExchangeRate.rate);
+}
+
+export function getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator) {
+    if (rateStr.indexOf('.') < 0) {
+        return appendThousandsSeparator(rateStr, isEnableThousandsSeparator);
+    } else {
+        let firstNonZeroPos = 0;
+
+        for (let i = 0; i < rateStr.length; i++) {
+            if (rateStr.charAt(i) !== '.' && rateStr.charAt(i) !== '0') {
+                firstNonZeroPos = Math.min(i + 4, rateStr.length);
+                break;
+            }
+        }
+
+        const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
+        return appendThousandsSeparator(trimmedRateStr, isEnableThousandsSeparator);
+    }
+}

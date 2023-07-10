@@ -627,6 +627,30 @@ function getAllTransactionEditScopeTypes(translateFn) {
     }];
 }
 
+function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
+    if (!exchangeRatesData || !exchangeRatesData.exchangeRates) {
+        return [];
+    }
+
+    const availableExchangeRates = [];
+
+    for (let i = 0; i < exchangeRatesData.exchangeRates.length; i++) {
+        const exchangeRate = exchangeRatesData.exchangeRates[i];
+
+        availableExchangeRates.push({
+            currencyCode: exchangeRate.currency,
+            currencyDisplayName: translateFn(`currency.${exchangeRate.currency}`),
+            rate: exchangeRate.rate
+        });
+    }
+
+    availableExchangeRates.sort(function(c1, c2) {
+        return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
+    })
+
+    return availableExchangeRates;
+}
+
 function getEnableDisableOptions(translateFn) {
     return [{
         value: true,
@@ -906,6 +930,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
+        getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),

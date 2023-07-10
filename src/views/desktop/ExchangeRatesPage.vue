@@ -84,8 +84,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { appendThousandsSeparator } from '@/lib/common.js';
-import { getExchangedAmount } from '@/lib/currency.js';
+import { getConvertedAmount, getDisplayExchangeRateAmount } from '@/lib/currency.js';
 
 import {
     mdiRefresh
@@ -117,27 +116,7 @@ export default {
             return exchangeRatesLastUpdateTime ? this.$locale.formatUnixTimeToLongDate(this.userStore, exchangeRatesLastUpdateTime) : '';
         },
         availableExchangeRates() {
-            if (!this.exchangeRatesData || !this.exchangeRatesData.exchangeRates) {
-                return [];
-            }
-
-            const availableExchangeRates = [];
-
-            for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
-                const exchangeRate = this.exchangeRatesData.exchangeRates[i];
-
-                availableExchangeRates.push({
-                    currencyCode: exchangeRate.currency,
-                    currencyDisplayName: this.$t(`currency.${exchangeRate.currency}`),
-                    rate: exchangeRate.rate
-                });
-            }
-
-            availableExchangeRates.sort(function(c1, c2) {
-                return c1.currencyDisplayName.localeCompare(c2.currencyDisplayName);
-            })
-
-            return availableExchangeRates;
+            return this.$locale.getAllDisplayExchangeRates(this.exchangeRatesData);
         }
     },
     created() {
@@ -184,38 +163,15 @@ export default {
 
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
 
-            if (!fromExchangeRate) {
-                return '';
-            }
-
-            if (this.baseAmount === '') {
-                return 0;
-            }
-
             try {
-                return getExchangedAmount(parseFloat(this.baseAmount), fromExchangeRate.rate, toExchangeRate.rate);
+                return getConvertedAmount(parseFloat(this.baseAmount), fromExchangeRate, toExchangeRate);
             } catch (e) {
                 return 0;
             }
         },
         getDisplayConvertedAmount(toExchangeRate) {
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
-
-            if (rateStr.indexOf('.') < 0) {
-                return appendThousandsSeparator(rateStr, this.isEnableThousandsSeparator);
-            } else {
-                let firstNonZeroPos = 0;
-
-                for (let i = 0; i < rateStr.length; i++) {
-                    if (rateStr.charAt(i) !== '.' && rateStr.charAt(i) !== '0') {
-                        firstNonZeroPos = Math.min(i + 4, rateStr.length);
-                        break;
-                    }
-                }
-
-                const trimmedRateStr = rateStr.substring(0, Math.max(6, Math.max(firstNonZeroPos, rateStr.indexOf('.') + 2)));
-                return appendThousandsSeparator(trimmedRateStr, this.isEnableThousandsSeparator);
-            }
+            return getDisplayExchangeRateAmount(rateStr, this.isEnableThousandsSeparator);
         }
     }
 }

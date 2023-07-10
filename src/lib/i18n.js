@@ -4,6 +4,7 @@ import { defaultLanguage, allLanguages } from '@/locales/index.js';
 import datetime from '@/consts/datetime.js';
 import timezone from '@/consts/timezone.js';
 import currency from '@/consts/currency.js';
+import statistics from '@/consts/statistics.js';
 
 import {
     isString,
@@ -541,6 +542,66 @@ function getAllWeekDays(translateFn) {
     return allWeekDays;
 }
 
+function getAllDateRanges(includeCustom, translateFn) {
+    const allDateRanges = [];
+
+    for (let dateRangeField in datetime.allDateRanges) {
+        if (!Object.prototype.hasOwnProperty.call(datetime.allDateRanges, dateRangeField)) {
+            continue;
+        }
+
+        const dateRangeType = datetime.allDateRanges[dateRangeField];
+
+        if (includeCustom || dateRangeType.type !== datetime.allDateRanges.Custom.type) {
+            allDateRanges.push({
+                type: dateRangeType.type,
+                displayName: translateFn(dateRangeType.name)
+            });
+        }
+    }
+
+    return allDateRanges;
+}
+
+function getAllStatisticsChartDataTypes(translateFn) {
+    const allChartDataTypes = [];
+
+    for (const dataTypeField in statistics.allChartDataTypes) {
+        if (!Object.prototype.hasOwnProperty.call(statistics.allChartDataTypes, dataTypeField)) {
+            return;
+        }
+
+        const chartDataType = statistics.allChartDataTypes[dataTypeField];
+
+        allChartDataTypes.push({
+            type: chartDataType.type,
+            displayName: translateFn(chartDataType.name)
+        });
+    }
+
+    return allChartDataTypes;
+}
+
+function getAllStatisticsSortingTypes(translateFn) {
+    const allSortingTypes = [];
+
+    for (const sortingTypeField in statistics.allSortingTypes) {
+        if (!Object.prototype.hasOwnProperty.call(statistics.allSortingTypes, sortingTypeField)) {
+            return;
+        }
+
+        const sortingType = statistics.allSortingTypes[sortingTypeField];
+
+        allSortingTypes.push({
+            type: sortingType.type,
+            displayName: translateFn(sortingType.name),
+            displayFullName: translateFn(sortingType.fullName)
+        });
+    }
+
+    return allSortingTypes;
+}
+
 function getDisplayCurrency(value, currencyCode, options, translateFn) {
     if (!isNumber(value) && !isString(value)) {
         return value;
@@ -806,6 +867,9 @@ export function i18nFunctions(i18nGlobal) {
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
+        getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
+        getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
+        getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)

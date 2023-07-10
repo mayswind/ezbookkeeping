@@ -18,7 +18,7 @@
                 <select v-model="defaultChartDataType">
                     <option :value="chartDataType.type"
                             :key="chartDataType.type"
-                            v-for="chartDataType in allChartDataTypes">{{ $t(chartDataType.name) }}</option>
+                            v-for="chartDataType in allChartDataTypes">{{ chartDataType.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -28,7 +28,7 @@
                 <select v-model="defaultDateRange">
                     <option :value="dateRange.type"
                             :key="dateRange.type"
-                            v-for="dateRange in allDateRanges">{{ $t(dateRange.name) }}</option>
+                            v-for="dateRange in allDateRanges">{{ dateRange.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -42,7 +42,7 @@
                 <select v-model="defaultSortingType">
                     <option :value="sortingType.type"
                             :key="sortingType.type"
-                            v-for="sortingType in allSortingTypes">{{ $t(sortingType.name) }}</option>
+                            v-for="sortingType in allSortingTypes">{{ sortingType.displayName }}</option>
                 </select>
             </f7-list-item>
         </f7-list>
@@ -53,7 +53,6 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 
 export default {
@@ -63,27 +62,13 @@ export default {
             return statisticsConstants.allChartTypes;
         },
         allChartDataTypes() {
-            return statisticsConstants.allChartDataTypes;
+            return this.$locale.getAllStatisticsChartDataTypes();
         },
         allSortingTypes() {
-            return statisticsConstants.allSortingTypes;
+            return this.$locale.getAllStatisticsSortingTypes();
         },
         allDateRanges() {
-            const allDateRanges = [];
-
-            for (let dateRangeField in datetimeConstants.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(datetimeConstants.allDateRanges, dateRangeField)) {
-                    continue;
-                }
-
-                const dateRangeType = datetimeConstants.allDateRanges[dateRangeField];
-
-                if (dateRangeType.type !== datetimeConstants.allDateRanges.Custom.type) {
-                    allDateRanges.push(dateRangeType);
-                }
-            }
-
-            return allDateRanges;
+            return this.$locale.getAllDateRanges(false);
         },
         defaultChartType: {
             get: function () {

@@ -78,8 +78,8 @@ export default defineConfig(async () => {
                         'mobile.html',
                         'desktop.html',
                         'robots.txt',
-                        'img/desktop/*',
                         'img/splash_screens/*',
+                        'img/desktop/*',
                         'fonts/*.eot',
                         'fonts/*.ttf',
                         'fonts/*.svg',
@@ -95,12 +95,20 @@ export default defineConfig(async () => {
                             handler: 'NetworkFirst'
                         },
                         {
-                            urlPattern: /.*\/(js|css|fonts)\/.*\.(js|css|ttf|woff|woff2|svg|eot)/,
+                            urlPattern: /.*\/img\/(splash_screens|desktop)\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
+                            handler: 'StaleWhileRevalidate'
+                        },
+                        {
+                            urlPattern: /.*\/fonts\/.*\.(eot|ttf|svg|woff)/,
                             handler: 'CacheFirst'
                         },
                         {
-                            urlPattern: /.*\/img\/(splash_screens|desktop)\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
-                            handler: 'StaleWhileRevalidate'
+                            urlPattern: /.*\/css\/(vendor-desktop-\.*|desktop-\.*)\.css/,
+                            handler: 'CacheFirst'
+                        },
+                        {
+                            urlPattern: /.*\/js\/(vendor-desktop-\.*|desktop-\.*)\.js/,
+                            handler: 'CacheFirst'
                         }
                     ],
                     navigateFallback: '',

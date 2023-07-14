@@ -183,7 +183,7 @@
                                         <v-col cols="12" md="12">
                                             <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
 
-                                            <v-expansion-panels variant="accordion" multiple>
+                                            <v-expansion-panels class="border rounded" variant="accordion" multiple>
                                                 <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                                                     <v-expansion-panel-title class="py-0">
                                                         <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>

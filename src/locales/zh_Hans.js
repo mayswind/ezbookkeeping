@@ -1030,6 +1030,7 @@ export default {
     'Nothing has been modified': '没有修改的项目',
     'Your profile has been successfully updated': '您的用户信息更新成功',
     'Unable to update user profile': '无法更新用户信息',
+    'After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.': '密码修改后，其他设备将会退出登录，请使用新密码在其他设备上重新登录。',
     'Data Management': '数据管理',
     'Unable to get user statistics data': '无法获取用户统计数据',
     'Export Data': '导出数据',

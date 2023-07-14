@@ -1030,6 +1030,7 @@ export default {
     'Nothing has been modified': 'Nothing has been modified',
     'Your profile has been successfully updated': 'Your profile has been successfully updated',
     'Unable to update user profile': 'Unable to update user profile',
+    'After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.': 'After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.',
     'Data Management': 'Data Management',
     'Unable to get user statistics data': 'Unable to get user statistics data',
     'Export Data': 'Export Data',

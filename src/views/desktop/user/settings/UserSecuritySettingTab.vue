@@ -3,6 +3,10 @@
         <v-col cols="12">
             <v-card :class="{ 'disabled': updatingPassword }" :title="$t('Modify Password')">
                 <v-form>
+                    <v-card-text class="pt-0">
+                        <span class="text-subtitle-1">{{ $t('After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.') }}</span>
+                    </v-card-text>
+
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
@@ -260,6 +264,8 @@ export default {
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
                 }
+
+                self.reloadSessions();
 
                 self.$refs.snackbar.showMessage('Your profile has been successfully updated');
             }).catch(error => {

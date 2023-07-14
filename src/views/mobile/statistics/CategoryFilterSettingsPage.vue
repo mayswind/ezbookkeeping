@@ -151,7 +151,6 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore, useTransactionCategoriesStore, useStatisticsStore),
-
         title() {
             if (this.modifyDefault) {
                 return 'Default Transaction Category Filter';

@@ -38,8 +38,6 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v4
-        env:
-          ACTIONS_RUNTIME_TOKEN: '' # See https://gitea.com/gitea/act_runner/issues/119
         with:
           file: Dockerfile
           context: .

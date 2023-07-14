@@ -1,19 +1,19 @@
 <template>
-    <i class="item-icon" :class="icon" :style="style" v-if="!hiddenStatus">
+    <i class="item-icon" :class="classes" :style="style" v-if="!hiddenStatus">
         <slot></slot>
     </i>
     <v-badge class="right-bottom-icon" color="secondary"
              location="bottom right" offset-y="2" :icon="icons.hide"
              v-if="hiddenStatus">
-        <i class="item-icon" :class="icon" :style="style">
+        <i class="item-icon" :class="classes" :style="style">
             <slot></slot>
         </i>
     </v-badge>
 </template>
 
 <script>
-import iconConstatns from '@/consts/icon.js';
-import colorConstatns from '@/consts/color.js';
+import iconConstants from '@/consts/icon.js';
+import colorConstants from '@/consts/color.js';
 import { isNumber } from '@/lib/common.js';
 
 import {
@@ -22,6 +22,7 @@ import {
 
 export default {
     props: [
+        'class',
         'iconType',
         'iconId',
         'color',
@@ -38,16 +39,18 @@ export default {
         }
     },
     computed: {
-        icon() {
+        classes() {
+            let allClasses = this.class ? (this.class + ' ') : '';
+
             if (this.iconType === 'account') {
-                return this.getAccountIcon(this.iconId);
+                allClasses += this.getAccountIcon(this.iconId);
             } else if (this.iconType === 'category') {
-                return this.getCategoryIcon(this.iconId);
+                allClasses += this.getCategoryIcon(this.iconId);
             } else if (this.iconType === 'fixed') {
-                return this.iconId;
-            } else {
-                return '';
+                allClasses += this.iconId;
             }
+
+            return allClasses;
         },
         style() {
             let defaultColor = 'var(--default-icon-color)';
@@ -71,25 +74,25 @@ export default {
                 iconId = iconId.toString();
             }
 
-            if (!iconConstatns.allAccountIcons[iconId]) {
-                return iconConstatns.defaultAccountIcon.icon;
+            if (!iconConstants.allAccountIcons[iconId]) {
+                return iconConstants.defaultAccountIcon.icon;
             }
 
-            return iconConstatns.allAccountIcons[iconId].icon;
+            return iconConstants.allAccountIcons[iconId].icon;
         },
         getCategoryIcon(iconId) {
             if (isNumber(iconId)) {
                 iconId = iconId.toString();
             }
 
-            if (!iconConstatns.allCategoryIcons[iconId]) {
-                return iconConstatns.defaultCategoryIcon.icon;
+            if (!iconConstants.allCategoryIcons[iconId]) {
+                return iconConstants.defaultCategoryIcon.icon;
             }
 
-            return iconConstatns.allCategoryIcons[iconId].icon;
+            return iconConstants.allCategoryIcons[iconId].icon;
         },
         getAccountIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstatns.defaultAccountColor) {
+            if (color && color !== colorConstants.defaultAccountColor) {
                 color = '#' + color;
             } else {
                 color = defaultColor;
@@ -110,7 +113,7 @@ export default {
             return ret;
         },
         getCategoryIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstatns.defaultCategoryColor) {
+            if (color && color !== colorConstants.defaultCategoryColor) {
                 color = '#' + color;
             } else {
                 color = defaultColor;
@@ -131,7 +134,7 @@ export default {
             return ret;
         },
         getDefaultIconStyle(color, defaultColor, additionalColorAttr) {
-            if (color && color !== colorConstatns.defaultColor) {
+            if (color && color !== colorConstants.defaultColor) {
                 color = '#' + color;
             } else {
                 color = defaultColor;

@@ -121,6 +121,9 @@ set_build_parameters() {
 }
 
 build_backend() {
+    echo "Pulling backend dependencies..."
+    go get .
+
     if [ "$NO_LINT" = "0" ]; then
         echo "Executing backend lint checking..."
         go vet -v ./...

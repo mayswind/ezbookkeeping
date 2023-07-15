@@ -3,7 +3,7 @@
         "name": "Gin",
         "copyright": "Copyright (c) 2014 Manuel Martínez-Almeida",
         "url": "https://github.com/gin-gonic/gin",
-        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.9.0/LICENSE"
+        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.9.1/LICENSE"
     },
     {
         "name": "Cache gin's middleware",
@@ -27,13 +27,13 @@
         "name": "Logrus",
         "copyright": "Copyright (c) 2014 Simon Eskildsen",
         "url": "https://github.com/sirupsen/logrus",
-        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.0/LICENSE"
+        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.3/LICENSE"
     },
     {
         "name": "cli",
         "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.25.4/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.25.7/LICENSE"
     },
     {
         "name": "INI",
@@ -45,7 +45,7 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.14.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.14.1/LICENSE"
     },
     {
         "name": "jwt-go",
@@ -90,13 +90,13 @@
     {
         "name": "go-ordered-map",
         "url": "https://github.com/wk8/go-ordered-map",
-        "licenseUrl": "https://github.com/wk8/go-ordered-map/blob/v2.1.7/LICENSE"
+        "licenseUrl": "https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE"
     },
     {
         "name": "Testify",
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",
-        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.8.2/LICENSE"
+        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.8.4/LICENSE"
     },
     {
         "name": "vuejs/core",
@@ -114,7 +114,7 @@
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.2.2/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.2.4/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -126,7 +126,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.6/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.8/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -138,13 +138,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.1.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.2.0/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.1.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.2.0/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -162,7 +162,7 @@
         "name": "Swiper",
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v9.3.2/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v10.0.4/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -192,7 +192,7 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v5.3.0/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v5.4.0/LICENSE"
     },
     {
         "name": "axios",

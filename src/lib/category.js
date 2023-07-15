@@ -54,18 +54,18 @@ export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
 export function allVisibleTransactionCategories(allTransactionCategories) {
     const ret = {};
 
-    for (let key in transactionConstants.allTransactionTypes) {
-        if (!Object.prototype.hasOwnProperty.call(transactionConstants.allTransactionTypes, key)) {
+    for (let key in categoryConstants.allCategoryTypes) {
+        if (!Object.prototype.hasOwnProperty.call(categoryConstants.allCategoryTypes, key)) {
             continue;
         }
 
-        const transactionType = transactionConstants.allTransactionTypes[key];
+        const categoryType = categoryConstants.allCategoryTypes[key];
 
-        if (!allTransactionCategories[transactionType]) {
+        if (!allTransactionCategories[categoryType]) {
             continue;
         }
 
-        const allCategories = allTransactionCategories[transactionType];
+        const allCategories = allTransactionCategories[categoryType];
         const visibleCategories = [];
         const allVisibleSubCategories = {};
 
@@ -95,8 +95,8 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
             }
         }
 
-        ret[transactionType.toString()] = {
-            type: transactionType.toString(),
+        ret[categoryType.toString()] = {
+            type: categoryType.toString(),
             visibleCategories: visibleCategories,
             visibleSubCategories: allVisibleSubCategories
         };

@@ -28,13 +28,15 @@ input[type=number] {
     }
 }
 
-/** custom class **/
+/** Custom class **/
 :root {
     --default-icon-color: var(--v-theme-on-surface);
+    --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
 :root .v-theme--dark {
     --default-icon-color: var(--v-theme-on-surface);
+    --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
 .pin-codes-input {
@@ -51,6 +53,10 @@ input[type=number] {
 
 .pin-code-input input {
     font-size: 1.25rem;
+}
+
+.expand-panel-title-with-bg {
+    background-color: var(--v-expand-panel-title-bg);
 }
 
 .auth-logo {
@@ -90,6 +96,44 @@ input[type=number] {
     padding: 0;
     min-width: 16px;
     height: 1rem;
+}
+
+/** Common class for replacing the default style of Materio **/
+.v-application,
+.text-body-1,
+.text-body-2,
+.text-subtitle-1,
+.text-subtitle-2 {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.v-label {
+    &:not(.v-field-label--floating) {
+        color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+    }
+}
+
+.v-card-subtitle,
+.v-list-item-subtitle {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.v-table {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.v-text-field {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+
+    .v-label {
+        color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+    }
+
+    .v-select__selection {
+        .v-label {
+            color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+        }
+    }
 }
 
 /** Replacing the default style of @vuepic/vue-datepicker **/

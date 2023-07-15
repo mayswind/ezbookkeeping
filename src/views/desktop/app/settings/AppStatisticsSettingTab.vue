@@ -62,15 +62,11 @@
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="$t('Default Account Filter')">
-
-            </v-card>
+            <account-filter-settings-card :auto-save="true" :modify-default="true" />
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="$t('Default Transaction Category Filter')">
-
-            </v-card>
+            <category-filter-settings-card :auto-save="true" :modify-default="true" />
         </v-col>
     </v-row>
 </template>
@@ -81,7 +77,14 @@ import { useSettingsStore } from '@/stores/setting.js';
 
 import statisticsConstants from '@/consts/statistics.js';
 
+import AccountFilterSettingsCard from '@/views/desktop/statistics/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/statistics/CategoryFilterSettingsCard.vue';
+
 export default {
+    components: {
+        AccountFilterSettingsCard,
+        CategoryFilterSettingsCard
+    },
     computed: {
         ...mapStores(useSettingsStore),
         allChartTypes() {

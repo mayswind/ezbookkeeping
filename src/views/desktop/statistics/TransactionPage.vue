@@ -105,10 +105,10 @@
                                                 <v-list>
                                                     <v-list-item :prepend-icon="icons.filter"
                                                                  :title="$t('Filter Accounts')"
-                                                                 @click="filterAccounts"></v-list-item>
+                                                                 @click="showFilterAccountDialog = true"></v-list-item>
                                                     <v-list-item :prepend-icon="icons.filter"
                                                                  :title="$t('Filter Transaction Categories')"
-                                                                 @click="filterCategories"></v-list-item>
+                                                                 @click="showFilterCategoryDialog = true"></v-list-item>
                                                     <v-divider class="my-2"/>
                                                     <v-list-item :prepend-icon="icons.filterSettings"
                                                                  :title="$t('Settings')"
@@ -199,6 +199,19 @@
                                   :max-time="query.endTime"
                                   v-model:show="showCustomDateRangeDialog"
                                   @dateRange:change="setCustomDateFilter" />
+
+    <v-dialog scrollable max-width="600" max-height="600" v-model="showFilterAccountDialog">
+        <account-filter-settings-card
+            :dialog-mode="true" :modify-default="false"
+            @settings:change="showFilterAccountDialog = false" />
+    </v-dialog>
+
+    <v-dialog scrollable max-width="600" max-height="600" v-model="showFilterCategoryDialog">
+        <category-filter-settings-card
+            :dialog-mode="true" :modify-default="false"
+            @settings:change="showFilterCategoryDialog = false" />
+    </v-dialog>
+
     <snack-bar ref="snackbar" />
 </template>
 
@@ -234,13 +247,22 @@ import {
     mdiDotsVertical,
 } from '@mdi/js';
 
+import AccountFilterSettingsCard from '@/views/desktop/statistics/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/statistics/CategoryFilterSettingsCard.vue';
+
 export default {
+    components: {
+        AccountFilterSettingsCard,
+        CategoryFilterSettingsCard
+    },
     data() {
         return {
             activeTab: 'statisticsPage',
             initing: true,
             loading: true,
             showCustomDateRangeDialog: false,
+            showFilterAccountDialog: false,
+            showFilterCategoryDialog: false,
             icons: {
                 check: mdiCheck,
                 left: mdiArrowLeft,
@@ -576,12 +598,6 @@ export default {
         },
         clickPieChartItem(item) {
             this.$router.push(this.getItemLinkUrl(item));
-        },
-        filterAccounts() {
-
-        },
-        filterCategories() {
-
         },
         settings() {
             this.$router.push('/app/settings?tab=statisticsSetting');

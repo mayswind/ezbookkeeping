@@ -7,6 +7,7 @@ import { VAlert } from 'vuetify/components/VAlert';
 import { VApp } from 'vuetify/components/VApp';
 import { VAvatar } from 'vuetify/components/VAvatar';
 import { VAutocomplete } from 'vuetify/components/VAutocomplete';
+import { VBadge } from 'vuetify/components/VBadge';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VBtnGroup } from 'vuetify/components/VBtnGroup';
 import { VBtnToggle } from 'vuetify/components/VBtnToggle';
@@ -29,7 +30,6 @@ import { VPagination } from 'vuetify/components/VPagination';
 import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
-import { VSheet } from 'vuetify/components/VSheet';
 import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader';
 import { VSlideGroup, VSlideGroupItem } from 'vuetify/components/VSlideGroup';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
@@ -101,6 +101,7 @@ const vuetify = createVuetify({
         VApp,
         VAvatar,
         VAutocomplete,
+        VBadge,
         VBtn,
         VBtnGroup,
         VBtnToggle,
@@ -143,7 +144,6 @@ const vuetify = createVuetify({
         VProgressCircular,
         VProgressLinear,
         VSelect,
-        VSheet,
         VSkeletonLoader,
         VSlideGroup,
         VSlideGroupItem,

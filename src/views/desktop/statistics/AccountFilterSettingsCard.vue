@@ -4,7 +4,7 @@
             <v-toolbar-title>{{ $t('Default Account Filter') }}</v-toolbar-title>
             <v-spacer/>
             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
-                   :disabled="loading" :icon="true">
+                   :disabled="loading || !hasAnyAvailableAccount" :icon="true">
                 <v-icon :icon="icons.more" />
                 <v-menu activator="parent">
                     <v-list>
@@ -115,7 +115,7 @@
         <v-card-actions class="mt-3" v-if="dialogMode">
             <v-spacer></v-spacer>
             <v-btn color="gray" @click="cancel">{{ $t('Cancel') }}</v-btn>
-            <v-btn color="primary" @click="save">{{ $t('OK') }}</v-btn>
+            <v-btn color="primary" :disabled="!hasAnyAvailableAccount" @click="save">{{ $t('OK') }}</v-btn>
         </v-card-actions>
     </v-card>
 </template>

@@ -577,6 +577,10 @@ export const useAccountsStore = defineStore('accounts', {
                 return null;
             }
 
+            if (hasUnCalculatedAmount) {
+                totalBalance += '+';
+            }
+
             return {
                 balance: showAccountBalance ? totalBalance : '***',
                 currency: resultCurrency

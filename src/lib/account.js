@@ -10,6 +10,82 @@ export function getAccountCategoryInfo(categoryId) {
     return null;
 }
 
+export function getAccountOrSubAccountId(account, subAccountId) {
+    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+        return account.id;
+    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && !subAccountId) {
+        return account.id;
+    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && subAccountId) {
+        if (!account.subAccounts || !account.subAccounts.length) {
+            return null;
+        }
+
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
+
+            if (subAccountId && subAccountId === subAccount.id) {
+                return subAccount.id;
+            }
+        }
+
+        return null;
+    } else {
+        return null;
+    }
+}
+
+export function getAccountOrSubAccountComment(account, subAccountId) {
+    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+        return account.comment;
+    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && !subAccountId) {
+        return account.comment;
+    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && subAccountId) {
+        if (!account.subAccounts || !account.subAccounts.length) {
+            return null;
+        }
+
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
+
+            if (subAccountId && subAccountId === subAccount.id) {
+                return subAccount.comment;
+            }
+        }
+
+        return null;
+    } else {
+        return null;
+    }
+}
+
+export function getSubAccountCurrencies(account, showHidden, subAccountId) {
+    if (!account.subAccounts || !account.subAccounts.length) {
+        return [];
+    }
+
+    const subAccountCurrenciesMap = {};
+    const subAccountCurrencies = [];
+
+    for (let i = 0; i < account.subAccounts.length; i++) {
+        const subAccount = account.subAccounts[i];
+
+        if (!showHidden && subAccount.hidden) {
+            continue;
+        }
+
+        if (subAccountId && subAccountId === subAccount.id) {
+            return [subAccount.currency];
+        } else {
+            if (!subAccountCurrenciesMap[subAccount.currency]) {
+                subAccountCurrenciesMap[subAccount.currency] = true;
+                subAccountCurrencies.push(subAccount.currency);
+            }
+        }
+    }
+
+    return subAccountCurrencies;
+}
+
 export function getCategorizedAccounts(allAccounts) {
     const ret = {};
 

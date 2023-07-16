@@ -67,6 +67,7 @@ export default {
             'symbol': '{symbol} {amount}'
         },
         'misc': {
+            'multiTextJoinSeparator': ', ',
             'hoursBehindDefaultTimezone': '{hours} hour(s) behind default timezone',
             'hoursAheadOfDefaultTimezone': '{hours} hour(s) ahead of default timezone',
             'hoursMinutesBehindDefaultTimezone': '{hours} hour(s) and {minutes} minutes behind default timezone',
@@ -855,6 +856,8 @@ export default {
     'Debt Account': 'Debt Account',
     'Receivables': 'Receivables',
     'Investment Account': 'Investment Account',
+    'Balance': 'Balance',
+    'View Transactions': 'View Transactions',
     'Unable to get account list': 'Unable to get account list',
     'Account list is up to date': 'Account list is up to date',
     'Account list has been updated': 'Account list has been updated',
@@ -997,6 +1000,7 @@ export default {
     'Currency Name': 'Currency Name',
     'Currency Symbol': 'Currency Symbol',
     'Show Account Balance': 'Show Account Balance',
+    'Hide Account Balance': 'Hide Account Balance',
     'Page Settings': 'Page Settings',
     'Overview Page': 'Overview Page',
     'Transaction List Page': 'Transaction List Page',

@@ -67,6 +67,7 @@ export default {
             'symbol': '{symbol} {amount}'
         },
         'misc': {
+            'multiTextJoinSeparator': '、',
             'hoursBehindDefaultTimezone': '比默认时区晚{hours}小时',
             'hoursAheadOfDefaultTimezone': '比默认时区早{hours}小时',
             'hoursMinutesBehindDefaultTimezone': '比默认时区晚{hours}小时{minutes}分',
@@ -855,6 +856,8 @@ export default {
     'Debt Account': '负债账户',
     'Receivables': '应收款项',
     'Investment Account': '投资账户',
+    'Balance': '余额',
+    'View Transactions': '查看交易',
     'Unable to get account list': '无法获取账户列表',
     'Account list is up to date': '账户列表已是最新',
     'Account list has been updated': '账户列表已更新',
@@ -997,6 +1000,7 @@ export default {
     'Currency Name': '货币名称',
     'Currency Symbol': '货币符号',
     'Show Account Balance': '显示账户余额',
+    'Hide Account Balance': '隐藏账户余额',
     'Page Settings': '页面设置',
     'Overview Page': '总览页面',
     'Transaction List Page': '交易列表页面',

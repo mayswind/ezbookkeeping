@@ -726,6 +726,16 @@ function getDisplayCurrency(value, currencyCode, options, translateFn) {
     }
 }
 
+function joinMultiText(textArray, translateFn) {
+    if (!textArray || !textArray.length) {
+        return '';
+    }
+
+    const separator = translateFn('format.misc.multiTextJoinSeparator');
+
+    return textArray.join(separator);
+}
+
 function getLocalizedError(error) {
     if (error.errorCode === apiNotFoundErrorCode && specifiedApiNotFoundErrors[error.path]) {
         return {
@@ -948,6 +958,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
+        joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };

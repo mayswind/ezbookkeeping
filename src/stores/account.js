@@ -485,6 +485,103 @@ export const useAccountsStore = defineStore('accounts', {
                 return '***';
             }
         },
+        getAccountSubAccountBalance(showAccountBalance, showHidden, account, subAccountId) {
+            if (account.type !== accountConstants.allAccountTypes.MultiSubAccounts) {
+                return null;
+            }
+
+            const userStore = useUserStore();
+            const exchangeRatesStore = useExchangeRatesStore();
+            let resultCurrency = userStore.currentUserDefaultCurrency;
+
+            if (!account.subAccounts || !account.subAccounts.length) {
+                return {
+                    balance: showAccountBalance ? 0 : '***',
+                    currency: resultCurrency
+                };
+            }
+
+            const allSubAccountCurrenciesMap = {};
+            const allSubAccountCurrencies = [];
+            let totalBalance = 0;
+
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
+
+                if (!showHidden && subAccount.hidden) {
+                    continue;
+                }
+
+                if (!allSubAccountCurrenciesMap[subAccount.currency]) {
+                    allSubAccountCurrenciesMap[subAccount.currency] = true;
+                    allSubAccountCurrencies.push(subAccount.currency);
+                }
+            }
+
+            if (allSubAccountCurrencies.length === 0) {
+                return {
+                    balance: showAccountBalance ? 0 : '***',
+                    currency: resultCurrency
+                };
+            }
+
+            if (allSubAccountCurrencies.length === 1) {
+                resultCurrency = allSubAccountCurrencies[0];
+            }
+
+            let hasUnCalculatedAmount = false;
+
+            for (let i = 0; i < account.subAccounts.length; i++) {
+                const subAccount = account.subAccounts[i];
+
+                if (!showHidden && subAccount.hidden) {
+                    continue;
+                }
+
+                if (subAccountId) {
+                    if (subAccountId === subAccount.id) {
+                        return {
+                            balance: showAccountBalance ? this.getAccountBalance(showAccountBalance, subAccount) : '***',
+                            currency: subAccount.currency
+                        };
+                    }
+                }
+
+                if (subAccount === resultCurrency) {
+                    if (subAccount.isAsset) {
+                        totalBalance += subAccount.balance;
+                    } else if (subAccount.isLiability) {
+                        totalBalance -= subAccount.balance;
+                    } else {
+                        totalBalance += subAccount.balance;
+                    }
+                } else {
+                    const balance = exchangeRatesStore.getExchangedAmount(subAccount.balance, subAccount.currency, resultCurrency);
+
+                    if (!isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    if (subAccount.isAsset) {
+                        totalBalance += Math.floor(balance);
+                    } else if (subAccount.isLiability) {
+                        totalBalance -= Math.floor(balance);
+                    } else {
+                        totalBalance += Math.floor(balance);
+                    }
+                }
+            }
+
+            if (subAccountId) { // not found specified id in sub accounts
+                return null;
+            }
+
+            return {
+                balance: showAccountBalance ? totalBalance : '***',
+                currency: resultCurrency
+            };
+        },
         hasAccount(accountCategory, visibleOnly) {
             if (!this.allCategorizedAccounts[accountCategory.id] ||
                 !this.allCategorizedAccounts[accountCategory.id].accounts ||

@@ -28,10 +28,10 @@
                                  :preset-ranges="presetRanges"
                                  v-model="dateRange">
                     <template #month="{ text }">
-                        {{ $t(`datetime.${text}.short`) }}
+                        {{ getMonthShortName(text) }}
                     </template>
                     <template #month-overlay-value="{ text }">
-                        {{ $t(`datetime.${text}.short`) }}
+                        {{ getMonthShortName(text) }}
                     </template>
                 </vue-date-picker>
             </v-card-text>
@@ -188,6 +188,9 @@ export default {
         },
         cancel() {
             this.$emit('update:show', false);
+        },
+        getMonthShortName(month) {
+            return this.$locale.getMonthShortName(month);
         }
     }
 }

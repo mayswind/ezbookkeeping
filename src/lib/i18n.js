@@ -371,6 +371,14 @@ function getAllShortTimeFormats(translateFn) {
     return getDateTimeFormats(translateFn, datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, 'format.shortTime', defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat);
 }
 
+function getMonthShortName(month, translateFn) {
+    return translateFn(`datetime.${month}.short`);
+}
+
+function getWeekdayShortName(weekDay, translateFn) {
+    return translateFn(`datetime.${weekDay}.short`);
+}
+
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
     const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
     return getDateTimeFormat(translateFn, datetime.allLongDateFormat, datetime.allLongDateFormatArray, 'format.longDate', defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
@@ -912,6 +920,8 @@ export function i18nFunctions(i18nGlobal) {
         getAllShortDateFormats: () => getAllShortDateFormats(i18nGlobal.t),
         getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
         getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
+        getMonthShortName: (month) => getMonthShortName(month, i18nGlobal.t),
+        getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),

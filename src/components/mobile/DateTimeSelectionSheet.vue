@@ -24,10 +24,10 @@
                              :is24="is24Hour"
                              v-model="dateTime">
                 <template #month="{ text }">
-                    {{ $t(`datetime.${text}.short`) }}
+                    {{ getMonthShortName(text) }}
                 </template>
                 <template #month-overlay-value="{ text }">
-                    {{ $t(`datetime.${text}.short`) }}
+                    {{ getMonthShortName(text) }}
                 </template>
             </vue-date-picker>
         </f7-page-content>
@@ -115,6 +115,9 @@ export default {
 
             this.$emit('update:modelValue', unixTime);
             this.$emit('update:show', false);
+        },
+        getMonthShortName(month) {
+            return this.$locale.getMonthShortName(month);
         }
     }
 }

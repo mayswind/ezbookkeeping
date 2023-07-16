@@ -143,7 +143,7 @@ export default {
             return getDay(this.currentTime);
         },
         currentDayOfWeek() {
-            return this.$t(`datetime.${getDayOfWeekName(this.currentTime)}.short`);
+            return this.$locale.getWeekdayShortName(getDayOfWeekName(this.currentTime));
         },
         currentShortTime() {
             return this.$locale.formatUnixTimeToShortTime(this.userStore, this.currentTime);

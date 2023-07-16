@@ -159,7 +159,7 @@
                                         {{ transaction.day }}
                                     </span>
                                     <span class="transaction-day-of-week full-line flex-direction-column">
-                                        {{ $t(`datetime.${transaction.dayOfWeek}.short`) }}
+                                        {{ getWeekdayShortName(transaction) }}
                                     </span>
                                 </div>
                             </template>
@@ -856,6 +856,9 @@ export default {
                 currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
                 enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
             });
+        },
+        getWeekdayShortName(transaction) {
+            return this.$locale.getWeekdayShortName(transaction.dayOfWeek);
         },
         getTransactionTypeName(type, defaultName) {
             switch (type){

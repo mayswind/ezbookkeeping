@@ -4,8 +4,26 @@
             <v-card>
                 <div class="d-flex flex-column flex-md-row">
                     <div>
-                        <v-tabs show-arrows direction="vertical"
-                                class="text-uppercase my-4" v-model="query.chartDataType">
+                        <div class="mx-6 my-4">
+                            <v-btn-toggle
+                                variant="outlined"
+                                color="primary"
+                                density="comfortable"
+                                mandatory="force"
+                                divided
+                                :disabled="loading"
+                                v-model="query.chartType"
+                            >
+                                <v-btn :value="allChartTypes.Pie" @click="setChartType(allChartTypes.Pie)">
+                                    {{ $t('Pie Chart') }}
+                                </v-btn>
+                                <v-btn :value="allChartTypes.Bar" @click="setChartType(allChartTypes.Bar)">
+                                    {{ $t('Bar Chart') }}
+                                </v-btn>
+                            </v-btn-toggle>
+                        </div>
+                        <v-divider />
+                        <v-tabs show-arrows class="my-4" direction="vertical" v-model="query.chartDataType">
                             <v-tab :key="dataType.type" :value="dataType.type"
                                    v-for="dataType in allChartDataTypes">
                                 {{ $t(dataType.name) }}
@@ -18,26 +36,7 @@
                                 <template #title>
                                     <div class="d-flex align-center">
                                         <div class="statistics-toolbar">
-                                            <v-btn-toggle
-                                                variant="outlined"
-                                                color="primary"
-                                                density="comfortable"
-                                                mandatory="force"
-                                                divided
-                                                :disabled="loading"
-                                                v-model="query.chartType"
-                                            >
-                                                <v-btn :value="allChartTypes.Pie" @click="setChartType(allChartTypes.Pie)">
-                                                    {{ $t('Pie Chart') }}
-                                                </v-btn>
-                                                <v-btn :value="allChartTypes.Bar" @click="setChartType(allChartTypes.Bar)">
-                                                    {{ $t('Bar Chart') }}
-                                                </v-btn>
-                                            </v-btn-toggle>
-
-                                            <v-btn-group class="ml-3" color="default"
-                                                         density="comfortable" variant="outlined"
-                                                         divided>
+                                            <v-btn-group color="default" density="comfortable" variant="outlined" divided>
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
                                                        @click="shiftDateRange(query.startTime, query.endTime, -1)"/>

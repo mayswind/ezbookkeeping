@@ -23,7 +23,8 @@
                             </v-btn-toggle>
                         </div>
                         <v-divider />
-                        <v-tabs show-arrows class="my-4" direction="vertical" v-model="query.chartDataType">
+                        <v-tabs show-arrows class="my-4" direction="vertical"
+                                :disabled="loading" v-model="query.chartDataType">
                             <v-tab :key="dataType.type" :value="dataType.type"
                                    v-for="dataType in allChartDataTypes">
                                 {{ $t(dataType.name) }}
@@ -119,12 +120,13 @@
                                     </div>
                                 </template>
 
-                                <v-card-text v-if="initing">
+                                <div v-if="initing">
                                     <v-skeleton-loader type="paragraph" :loading="initing"
                                                        :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
-                                </v-card-text>
+                                </div>
 
-                                <v-card-text class="statistics-overview-title pt-0" v-if="!initing">
+                                <v-card-text class="statistics-overview-title pt-0"
+                                             :class="{ 'disabled': loading }" v-if="!initing">
                                     <span class="text-subtitle-1">{{ totalAmountName }}</span>
                                     <span class="statistics-overview-amount ml-3" :class="statisticsTextColor"
                                           v-if="statisticsData && statisticsData.items && statisticsData.items.length">
@@ -136,7 +138,7 @@
                                     </span>
                                 </v-card-text>
 
-                                <v-card-text v-if="!initing && query.chartType === allChartTypes.Pie">
+                                <v-card-text :class="{ 'disabled': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
                                     <pie-chart
                                         :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
                                         :min-valid-percent="0.0001"
@@ -153,7 +155,7 @@
                                     />
                                 </v-card-text>
 
-                                <v-card-text v-if="!initing && query.chartType === allChartTypes.Bar">
+                                <v-card-text :class="{ 'disabled': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
                                     <v-list rounded lines="two"
                                             v-if="statisticsData && statisticsData.items && statisticsData.items.length">
                                         <template :key="idx"

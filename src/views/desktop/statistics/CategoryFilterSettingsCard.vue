@@ -46,10 +46,10 @@
             </div>
         </template>
 
-        <v-card-text v-if="loading">
+        <div v-if="loading">
             <v-skeleton-loader type="paragraph" :loading="loading"
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
-        </v-card-text>
+        </div>
 
         <v-card-text v-else-if="!loading">
             <v-expansion-panels class="category-types" multiple v-model="expandCategoryTypes">

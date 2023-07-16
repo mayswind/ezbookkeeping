@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-tabs show-arrows class="text-uppercase" v-model="activeTab">
+        <v-tabs show-arrows class="v-tabs-pill text-uppercase" v-model="activeTab">
             <v-tab value="basicSetting">
                 <v-icon size="20" start :icon="icons.basicSetting"/>
                 {{ $t('Basic') }}
@@ -14,8 +14,8 @@
                 {{ $t('Statistics') }}
             </v-tab>
         </v-tabs>
-        <v-divider />
-        <v-window class="mt-5 disable-tab-transition" v-model="activeTab">
+
+        <v-window class="mt-4 disable-tab-transition" v-model="activeTab">
             <v-window-item value="basicSetting">
                 <app-basic-setting-tab/>
             </v-window-item>

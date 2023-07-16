@@ -30,7 +30,7 @@
                             </v-tab>
                         </v-tabs>
                     </div>
-                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition statistics-container" v-model="activeTab">
+                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition w-100-window-container" v-model="activeTab">
                         <v-window-item value="statisticsPage">
                             <v-card variant="flat">
                                 <template #title>
@@ -635,10 +635,6 @@ export default {
 </script>
 
 <style>
-.statistics-container.v-window > .v-window__container {
-    width: 100%;
-}
-
 .statistics-toolbar {
     overflow-x: auto;
     white-space: nowrap;

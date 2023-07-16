@@ -85,6 +85,10 @@ input[type=number] {
     min-inline-size: 100%;
 }
 
+.w-100-window-container.v-window > .v-window__container {
+    width: 100%;
+}
+
 /** Common class for replacing the default style of vuetify **/
 .v-table {
     th {

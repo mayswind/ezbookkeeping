@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition exchange-rates-container" v-model="activeTab">
+                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition w-100-window-container" v-model="activeTab">
                         <v-window-item value="exchangeRatesPage">
                             <v-card variant="flat">
                                 <template #title>
@@ -212,10 +212,6 @@ export default {
 </script>
 
 <style>
-.exchange-rates-container.v-window > .v-window__container {
-    width: 100%;
-}
-
 .exchange-rates-summary-skeleton .v-skeleton-loader__text {
     margin: 0;
 }

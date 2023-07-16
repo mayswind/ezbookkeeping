@@ -138,7 +138,7 @@
                                                         <v-btn :value="undefined">
                                                             <span>{{ $t('All') }}</span>
                                                         </v-btn>
-                                                        <v-btn :value="subAccount.id"
+                                                        <v-btn :key="subAccount.id" :value="subAccount.id"
                                                                v-for="subAccount in account.subAccounts"
                                                                v-show="showHidden || !subAccount.hidden">
                                                             <ItemIcon icon-type="account" :icon-id="subAccount.icon"
@@ -370,7 +370,7 @@ export default {
         add() {
 
         },
-        edit(account) {
+        edit() {
 
         },
         hide(account, hidden) {

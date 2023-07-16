@@ -32,11 +32,13 @@ input[type=number] {
 :root {
     --default-icon-color: var(--v-theme-on-surface);
     --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
+    --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
 :root .v-theme--dark {
     --default-icon-color: var(--v-theme-on-surface);
     --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
+    --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
 .pin-codes-input {
@@ -57,6 +59,10 @@ input[type=number] {
 
 .expand-panel-title-with-bg {
     background-color: var(--v-expand-panel-title-bg);
+}
+
+.card-title-with-bg > .v-card-item {
+    background-color: var(--v-card-title-bg);
 }
 
 .auth-logo {

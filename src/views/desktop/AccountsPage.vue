@@ -99,7 +99,7 @@
 
                                 <v-row class="pl-4 pr-8" v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length">
                                     <v-col cols="12">
-                                        <v-card border class="mb-8 h-auto" :key="account.id"
+                                        <v-card border class="card-title-with-bg mb-8 h-auto" :key="account.id"
                                                 v-for="account in categorizedAccounts[activeAccountCategory.id].accounts"
                                                 v-show="showHidden || !account.hidden">
                                             <template #title>

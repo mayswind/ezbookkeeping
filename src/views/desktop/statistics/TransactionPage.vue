@@ -111,9 +111,9 @@
                                                                  :title="$t('Filter Transaction Categories')"
                                                                  @click="showFilterCategoryDialog = true"></v-list-item>
                                                     <v-divider class="my-2"/>
-                                                    <v-list-item :prepend-icon="icons.filterSettings"
-                                                                 :title="$t('Settings')"
-                                                                 @click="settings"></v-list-item>
+                                                    <v-list-item to="/app/settings?tab=statisticsSetting"
+                                                                 :prepend-icon="icons.filterSettings"
+                                                                 :title="$t('Settings')"></v-list-item>
                                                 </v-list>
                                             </v-menu>
                                         </v-btn>
@@ -600,9 +600,6 @@ export default {
         },
         clickPieChartItem(item) {
             this.$router.push(this.getItemLinkUrl(item));
-        },
-        settings() {
-            this.$router.push('/app/settings?tab=statisticsSetting');
         },
         getDisplayAmount(amount, currency, textLimit) {
             amount = this.getDisplayCurrency(amount, currency);

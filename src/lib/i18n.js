@@ -277,6 +277,10 @@ function getDefaultFirstDayOfWeek(translateFn) {
     return translateFn('default.firstDayOfWeek');
 }
 
+function getCurrencyName(currencyCode, translateFn) {
+    return translateFn(`currency.${currencyCode}`);
+}
+
 function getAllLongMonthNames(translateFn) {
     return [
         translateFn('datetime.January.long'),
@@ -516,7 +520,7 @@ function getAllCurrencies(translateFn) {
 
         allCurrencies.push({
             code: currencyCode,
-            displayName: translateFn(`currency.${currencyCode}`)
+            displayName: getCurrencyName(currencyCode, translateFn)
         });
     }
 
@@ -639,7 +643,7 @@ function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
 
         availableExchangeRates.push({
             currencyCode: exchangeRate.currency,
-            currencyDisplayName: translateFn(`currency.${exchangeRate.currency}`),
+            currencyDisplayName: getCurrencyName(exchangeRate.currency, translateFn),
             rate: exchangeRate.rate
         });
     }
@@ -707,7 +711,7 @@ function getDisplayCurrency(value, currencyCode, options, translateFn) {
     } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Code) {
         return `${value} ${currencyCode}`;
     } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Name) {
-        const currencyName = translateFn(`currency.${currencyCode}`);
+        const currencyName = getCurrencyName(currencyCode, translateFn);
         return `${value} ${currencyName}`;
     } else {
         return value;
@@ -898,6 +902,7 @@ export function i18nFunctions(i18nGlobal) {
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
+        getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
         getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
         getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
         getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),

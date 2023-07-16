@@ -80,7 +80,7 @@
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
-                        <span>{{ $t(`currency.${user.defaultCurrency}`) }}&nbsp;</span>
+                        <span>{{ getCurrencyName(user.defaultCurrency) }}&nbsp;</span>
                         <small class="smaller">{{ user.defaultCurrency }}</small>
                     </f7-block>
                 </template>
@@ -398,6 +398,9 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getCurrencyName(currencyCode) {
+            return this.$locale.getCurrencyName(currencyCode);
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {

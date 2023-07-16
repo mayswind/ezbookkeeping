@@ -16,7 +16,7 @@
             >
                 <template #title>
                     <div class="no-padding no-margin">
-                        <span>{{ $t(`currency.${baseCurrency}`) }}&nbsp;</span>
+                        <span>{{ getCurrencyName(baseCurrency) }}&nbsp;</span>
                         <small class="smaller">{{ baseCurrency }}</small>
                     </div>
                 </template>
@@ -206,6 +206,9 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getCurrencyName(currencyCode) {
+            return this.$locale.getCurrencyName(currencyCode);
         },
         getConvertedAmount(toExchangeRate) {
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];

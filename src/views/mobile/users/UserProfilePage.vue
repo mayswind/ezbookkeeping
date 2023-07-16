@@ -129,7 +129,7 @@
             >
                 <template #title>
                     <f7-block class="no-padding no-margin">
-                        <span>{{ $t(`currency.${newProfile.defaultCurrency}`) }}&nbsp;</span>
+                        <span>{{ getCurrencyName(newProfile.defaultCurrency) }}&nbsp;</span>
                         <small class="smaller">{{ newProfile.defaultCurrency }}</small>
                     </f7-block>
                 </template>
@@ -455,6 +455,9 @@ export default {
         },
         getNameByKeyValue(src, value, keyField, nameField, defaultName) {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);
+        },
+        getCurrencyName(currencyCode) {
+            return this.$locale.getCurrencyName(currencyCode);
         },
         setCurrentUserProfile(profile) {
             this.oldProfile.email = profile.email;

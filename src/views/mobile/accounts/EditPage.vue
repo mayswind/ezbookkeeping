@@ -164,7 +164,7 @@
             >
                 <template #title>
                     <div class="no-padding no-margin">
-                        <span>{{ $t(`currency.${account.currency}`) }}&nbsp;</span>
+                        <span>{{ getCurrencyName(account.currency) }}&nbsp;</span>
                         <small class="smaller">{{ account.currency }}</small>
                     </div>
                 </template>
@@ -357,7 +357,7 @@
                 >
                     <template #title>
                         <div class="no-padding no-margin">
-                            <span>{{ $t(`currency.${subAccount.currency}`) }}&nbsp;</span>
+                            <span>{{ getCurrencyName(subAccount.currency) }}&nbsp;</span>
                             <small class="smaller">{{ subAccount.currency }}</small>
                         </div>
                     </template>
@@ -711,6 +711,9 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getCurrencyName(currencyCode) {
+            return this.$locale.getCurrencyName(currencyCode);
         },
         getAccountTypeName(accountType) {
             const typeName = getNameByKeyValue(this.allAccountTypesArray, accountType, 'id', 'name');

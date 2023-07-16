@@ -40,7 +40,7 @@
                     <thead>
                     <tr>
                         <th class="text-uppercase" style="width: 50%">{{ $t('Tag Title') }}</th>
-                        <th class="text-uppercase text-center">{{ $t('Operation') }}</th>
+                        <th class="text-uppercase text-right">{{ $t('Operation') }}</th>
                     </tr>
                     </thead>
 
@@ -88,57 +88,48 @@
                                     </template>
                                 </v-text-field>
                             </td>
-                            <td class="text-uppercase text-center">
-                                <v-btn color="default"
-                                       density="comfortable"
-                                       variant="text"
-                                       :icon="true"
+                            <td class="text-uppercase text-right">
+                                <v-btn class="px-2" color="default"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="icons.edit"
                                        :loading="tagUpdating[tag.id]"
                                        :disabled="updating"
                                        v-if="editingTag.id !== tag.id"
                                        @click="edit(tag)">
-                                    <v-icon size="24" :icon="icons.edit"/>
-                                    <v-tooltip activator="parent">{{ $t('Edit') }}</v-tooltip>
+                                    {{ $t('Edit') }}
                                 </v-btn>
-                                <v-btn color="default"
-                                       density="comfortable"
-                                       variant="text"
-                                       :icon="true"
+                                <v-btn class="px-2 ml-2" color="default"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="tag.hidden ? icons.show : icons.hide"
+                                       :loading="tagHiding[tag.id]"
                                        :disabled="updating"
-                                       v-if="editingTag.id !== tag.id">
-                                    <v-icon size="24" :icon="icons.more"/>
-                                    <v-tooltip activator="parent">{{ $t('More') }}</v-tooltip>
-                                    <v-menu activator="parent">
-                                        <v-list>
-                                            <v-list-item :prepend-icon="tag.hidden ? icons.show : icons.hide"
-                                                         :title="tag.hidden ? $t('Show') : $t('Hide')"
-                                                         @click="hide(tag, !tag.hidden)">
-                                            </v-list-item>
-                                            <v-list-item :prepend-icon="icons.remove"
-                                                         :title="$t('Delete')" @click="remove(tag)">
-                                            </v-list-item>
-                                        </v-list>
-                                    </v-menu>
+                                       v-if="editingTag.id !== tag.id"
+                                       @click="hide(tag, !tag.hidden)">
+                                    {{ tag.hidden ? $t('Show') : $t('Hide') }}
                                 </v-btn>
-                                <v-btn density="comfortable"
-                                       variant="text"
-                                       :icon="true"
+                                <v-btn class="px-2 ml-2" color="default"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="icons.remove"
+                                       :loading="tagRemoving[tag.id]"
+                                       :disabled="updating"
+                                       v-if="editingTag.id !== tag.id"
+                                       @click="remove(tag)">
+                                    {{ $t('Delete') }}
+                                </v-btn>
+                                <v-btn class="px-2"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="icons.confirm"
                                        :loading="tagUpdating[tag.id]"
                                        :disabled="updating || !isTagModified(tag)"
-                                       v-if="editingTag.id === tag.id"
-                                       @click="save(editingTag)">
-                                    <v-icon size="24" :icon="icons.confirm"/>
-                                    <v-tooltip activator="parent">{{ $t('Save') }}</v-tooltip>
+                                       v-if="editingTag.id === tag.id" @click="save(editingTag)">
+                                    {{ $t('Save') }}
                                 </v-btn>
-                                <v-btn class="ml-2" color="default"
-                                       density="comfortable"
-                                       variant="text"
-                                       :icon="true"
+                                <v-btn class="px-2 ml-2" color="default"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="icons.cancel"
                                        :disabled="updating"
-                                       v-if="editingTag.id === tag.id"
-                                       @click="cancelSave(editingTag)">
-                                    <v-icon size="24" :icon="icons.cancel"/>
-                                    <v-tooltip activator="parent">{{ $t('Cancel') }}</v-tooltip>
+                                       v-if="editingTag.id === tag.id" @click="cancelSave(editingTag)">
+                                    {{ $t('Cancel') }}
                                 </v-btn>
                             </td>
                         </tr>
@@ -146,40 +137,29 @@
 
                     <tr v-if="newTag">
                         <td>
-                            <v-text-field
-                                type="text"
-                                color="primary"
-                                clearable
-                                density="compact"
-                                variant="underlined"
-                                :disabled="updating"
-                                :placeholder="$t('Tag Title')"
-                                v-model="newTag.name"
-                                @keyup.enter="save(newTag)"
-                            >
+                            <v-text-field type="text" color="primary" clearable
+                                          density="compact" variant="underlined"
+                                          :disabled="updating" :placeholder="$t('Tag Title')"
+                                          v-model="newTag.name" @keyup.enter="save(newTag)">
                                 <template #prepend>
                                     <v-icon size="24" start :icon="icons.tag"/>
                                 </template>
                             </v-text-field>
                         </td>
-                        <td class="text-uppercase text-center">
-                            <v-btn density="comfortable"
-                                   variant="text"
-                                   :icon="true"
+                        <td class="text-uppercase text-right">
+                            <v-btn class="px-2" density="comfortable" variant="text"
+                                   :prepend-icon="icons.confirm"
                                    :loading="tagUpdating[null]"
                                    :disabled="updating || !isTagModified(newTag)"
                                    @click="save(newTag)">
-                                <v-icon size="24" :icon="icons.confirm"/>
-                                <v-tooltip activator="parent">{{ $t('Save') }}</v-tooltip>
+                                {{ $t('Save') }}
                             </v-btn>
-                            <v-btn class="ml-2" color="default"
-                                   density="comfortable"
-                                   variant="text"
-                                   :icon="true"
+                            <v-btn class="px-2 ml-2" color="default"
+                                   density="comfortable" variant="text"
+                                   :prepend-icon="icons.cancel"
                                    :disabled="updating"
                                    @click="cancelSave(newTag)">
-                                <v-icon size="24" :icon="icons.cancel"/>
-                                <v-tooltip activator="parent">{{ $t('Cancel') }}</v-tooltip>
+                                {{ $t('Cancel') }}
                             </v-btn>
                         </td>
                     </tr>
@@ -221,6 +201,8 @@ export default {
             loading: true,
             updating: false,
             tagUpdating: {},
+            tagHiding: {},
+            tagRemoving: {},
             showHidden: false,
             icons: {
                 refresh: mdiRefresh,
@@ -363,17 +345,17 @@ export default {
             const self = this;
 
             self.updating = true;
-            self.tagUpdating[tag.id] = true;
+            self.tagHiding[tag.id] = true;
 
             self.transactionTagsStore.hideTag({
                 tag: tag,
                 hidden: hidden
             }).then(() => {
                 self.updating = false;
-                self.tagUpdating[tag.id] = false;
+                self.tagHiding[tag.id] = false;
             }).catch(error => {
                 self.updating = false;
-                self.tagUpdating[tag.id] = false;
+                self.tagHiding[tag.id] = false;
 
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
@@ -385,16 +367,16 @@ export default {
 
             self.$refs.confirmDialog.open('Are you sure you want to delete this tag?').then(() => {
                 self.updating = true;
-                self.tagUpdating[tag.id] = true;
+                self.tagRemoving[tag.id] = true;
 
                 self.transactionTagsStore.deleteTag({
                     tag: tag
                 }).then(() => {
                     self.updating = false;
-                    self.tagUpdating[tag.id] = false;
+                    self.tagRemoving[tag.id] = false;
                 }).catch(error => {
                     self.updating = false;
-                    self.tagUpdating[tag.id] = false;
+                    self.tagRemoving[tag.id] = false;
 
                     if (!error.processed) {
                         self.$refs.snackbar.showError(error);

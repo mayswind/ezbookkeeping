@@ -67,8 +67,8 @@
                                 <v-table>
                                     <thead>
                                     <tr>
-                                        <th class="text-uppercase" style="width: 50%">{{ $t('Currency') }}</th>
-                                        <th class="text-uppercase">{{ $t('Amount') }}</th>
+                                        <th class="text-uppercase">{{ $t('Currency') }}</th>
+                                        <th class="text-uppercase text-right">{{ $t('Amount') }}</th>
                                     </tr>
                                     </thead>
 
@@ -89,7 +89,7 @@
                                             <span>{{ exchangeRate.currencyDisplayName }}</span>
                                             <small class="smaller ml-1">{{ exchangeRate.currencyCode }}</small>
                                         </td>
-                                        <td>{{ getDisplayConvertedAmount(exchangeRate) }}</td>
+                                        <td class="text-right">{{ getDisplayConvertedAmount(exchangeRate) }}</td>
                                     </tr>
                                     </tbody>
                                 </v-table>

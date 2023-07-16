@@ -59,12 +59,12 @@ export const useExchangeRatesStore = defineStore('exchangeRates', {
             if (!force) {
                 if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
                     formatUnixTime(currentExchangeRateData.data.updateTime, 'YYYY-MM-DD') === formatUnixTime(now, 'YYYY-MM-DD')) {
-                    return currentExchangeRateData.data;
+                    return Promise.resolve(currentExchangeRateData.data);
                 }
 
                 if (currentExchangeRateData && currentExchangeRateData.time && currentExchangeRateData.data &&
                     formatUnixTime(currentExchangeRateData.time, 'YYYY-MM-DD HH') === formatUnixTime(now, 'YYYY-MM-DD HH')) {
-                    return currentExchangeRateData.data;
+                    return Promise.resolve(currentExchangeRateData.data);
                 }
             }
 

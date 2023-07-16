@@ -1,76 +1,102 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card :class="{ 'disabled': loading }">
-                <template #title>
-                    <div class="d-flex align-center">
-                        <span>{{ $t('Exchange Rates Data') }}</span>
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ml-2" :icon="true"
-                               v-if="!loading" @click="update">
-                            <v-icon :icon="icons.refresh" size="24" />
-                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                        </v-btn>
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+            <v-card>
+                <div class="d-flex flex-column flex-md-row">
+                    <div>
+                        <div class="mx-6 my-4">
+                            <small>{{ $t('Data source') }}</small>
+                            <p class="text-subtitle-1 mb-2">
+                                <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
+                                <span v-else-if="!loading && exchangeRatesData && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                                <span v-else-if="!loading && !exchangeRatesData">{{ $t('None') }}</span>
+                                <span v-else-if="loading">
+                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-2 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                </span>
+                            </p>
+                            <small v-if="exchangeRatesDataUpdateTime">{{ $t('Last Updated') }}</small>
+                            <p class="text-subtitle-1" v-if="exchangeRatesDataUpdateTime">
+                                <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
+                                <span v-if="loading">
+                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-2 mb-6" type="text" :loading="true"></v-skeleton-loader>
+                                </span>
+                            </p>
+                        </div>
+                        <v-divider />
+                        <div class="mx-6 mt-4">
+                            <small>{{ $t('Base Amount') }}</small>
+                            <amount-input class="mt-2" density="compact"
+                                          :disabled="loading || !exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length"
+                                          v-model="baseAmount"/>
+                        </div>
+                        <div class="mx-6 mt-4">
+                            <small>{{ $t('Base Currency') }}</small>
+                        </div>
+                        <v-tabs show-arrows class="mb-4" direction="vertical"
+                                :disabled="loading" v-model="baseCurrency"
+                                v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+                            <v-tab :key="exchangeRate.currencyCode" :value="exchangeRate.currencyCode"
+                                   v-for="exchangeRate in availableExchangeRates">
+                                {{ exchangeRate.currencyDisplayName }}
+                                <small class="smaller ml-1">{{ exchangeRate.currencyCode }}</small>
+                            </v-tab>
+                        </v-tabs>
+                        <div class="mx-6 mt-2 mb-4"
+                             v-else-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+                            <span v-if="!loading">{{ $t('None') }}</span>
+                            <v-skeleton-loader type="paragraph" :loading="loading" v-else-if="loading"></v-skeleton-loader>
+                        </div>
                     </div>
-                </template>
 
-                <v-card-text>
-                    <span class="text-sm" v-if="exchangeRatesData">
-                        {{ $t('Data source') }}
-                        <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
-                        <span v-else-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
-                        <span v-if="exchangeRatesDataUpdateTime">&nbsp;,&nbsp;{{ $t('Last Updated') }}&nbsp;{{ exchangeRatesDataUpdateTime }}</span>
-                    </span>
-                </v-card-text>
-                <v-card-text v-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-                    <span class="text-subtitle-1">{{ $t('No exchange rates data') }}</span>
-                </v-card-text>
-                <v-card-text v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                    <v-row no-gutters>
-                        <v-col cols="12" md="2">
-                            <span class="text-subtitle-1">{{ $t('Base Currency') }}</span>
-                        </v-col>
-                        <v-col cols="12" md="10" class="mb-6">
-                            <v-autocomplete
-                                density="compact"
-                                single-line
-                                item-title="currencyDisplayName"
-                                item-value="currencyCode"
-                                :disabled="loading"
-                                :items="availableExchangeRates"
-                                :no-data-text="$t('No results')"
-                                v-model="baseCurrency"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col cols="12" md="2">
-                            <span class="text-subtitle-1">{{ $t('Base Amount') }}</span>
-                        </v-col>
-                        <v-col cols="12" md="10" class="mb-6">
-                            <amount-input density="compact" :disabled="loading" v-model="baseAmount"/>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-table v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                    <thead>
-                    <tr>
-                        <th class="text-uppercase" style="width: 50%">{{ $t('Currency') }}</th>
-                        <th class="text-uppercase">{{ $t('Amount') }}</th>
-                    </tr>
-                    </thead>
+                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition exchange-rates-container" v-model="activeTab">
+                        <v-window-item value="exchangeRatesPage">
+                            <v-card variant="flat">
+                                <template #title>
+                                    <div class="d-flex align-center">
+                                        <span>{{ $t('Exchange Rates Data') }}</span>
+                                        <v-btn density="compact" color="default" variant="text"
+                                               class="ml-2" :icon="true"
+                                               v-if="!loading" @click="reload">
+                                            <v-icon :icon="icons.refresh" size="24" />
+                                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                        </v-btn>
+                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                                    </div>
+                                </template>
 
-                    <tbody>
-                    <tr :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
-                        <td>
-                            <span style="margin-right: 5px">{{ exchangeRate.currencyDisplayName }}</span>
-                            <small class="smaller">{{ exchangeRate.currencyCode }}</small>
-                        </td>
-                        <td>{{ getDisplayConvertedAmount(exchangeRate) }}</td>
-                    </tr>
-                    </tbody>
-                </v-table>
+                                <v-table>
+                                    <thead>
+                                    <tr>
+                                        <th class="text-uppercase" style="width: 50%">{{ $t('Currency') }}</th>
+                                        <th class="text-uppercase">{{ $t('Amount') }}</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    <tr :key="itemIdx"
+                                        v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3 ] : [])">
+                                        <td class="px-0" colspan="2">
+                                            <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
+                                        </td>
+                                    </tr>
+
+                                    <tr v-if="!loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length)">
+                                        <td colspan="2">{{ $t('No exchange rates data') }}</td>
+                                    </tr>
+
+                                    <tr :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
+                                        <td>
+                                            <span>{{ exchangeRate.currencyDisplayName }}</span>
+                                            <small class="smaller ml-1">{{ exchangeRate.currencyCode }}</small>
+                                        </td>
+                                        <td>{{ getDisplayConvertedAmount(exchangeRate) }}</td>
+                                    </tr>
+                                    </tbody>
+                                </v-table>
+                            </v-card>
+                        </v-window-item>
+                    </v-window>
+                </div>
             </v-card>
         </v-col>
     </v-row>
@@ -95,9 +121,10 @@ export default {
         const userStore = useUserStore();
 
         return {
+            activeTab: 'exchangeRatesPage',
             baseCurrency: userStore.currentUserDefaultCurrency,
             baseAmount: '1',
-            loading: false,
+            loading: true,
             icons: {
                 refresh: mdiRefresh
             }
@@ -120,34 +147,37 @@ export default {
         }
     },
     created() {
-        if (!this.exchangeRatesData || !this.exchangeRatesData.exchangeRates) {
-            return;
-        }
-
-        for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
-            const exchangeRate = this.exchangeRatesData.exchangeRates[i];
-            if (exchangeRate.currency === this.baseCurrency) {
-                return;
-            }
-        }
-
-        this.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
+        this.reload(false);
     },
     methods: {
-        update() {
+        reload(force) {
             const self = this;
 
-            if (self.loading) {
-                return;
-            }
-
             self.loading = true;
+
             self.exchangeRatesStore.getLatestExchangeRates({
                 silent: false,
-                force: true
+                force: force
             }).then(() => {
                 self.loading = false;
-                self.$refs.snackbar.showMessage('Exchange rates data has been updated');
+
+                if (this.exchangeRatesData && this.exchangeRatesData.exchangeRates) {
+                    let foundDefaultCurrency = false;
+
+                    for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
+                        const exchangeRate = this.exchangeRatesData.exchangeRates[i];
+                        if (exchangeRate.currency === this.baseCurrency) {
+                            foundDefaultCurrency = true;
+                            break;
+                        }
+                    }
+
+                    if (force) {
+                        self.$refs.snackbar.showMessage('Exchange rates data has been updated');
+                    } else if (!foundDefaultCurrency) {
+                        this.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
+                    }
+                }
             }).catch(error => {
                 self.loading = false;
 
@@ -170,9 +200,23 @@ export default {
             }
         },
         getDisplayConvertedAmount(toExchangeRate) {
+            if (this.baseAmount === '') {
+                return '';
+            }
+
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
             return getDisplayExchangeRateAmount(rateStr, this.isEnableThousandsSeparator);
         }
     }
 }
 </script>
+
+<style>
+.exchange-rates-container.v-window > .v-window__container {
+    width: 100%;
+}
+
+.exchange-rates-summary-skeleton .v-skeleton-loader__text {
+    margin: 0;
+}
+</style>

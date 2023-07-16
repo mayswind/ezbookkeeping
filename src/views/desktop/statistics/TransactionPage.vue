@@ -125,17 +125,17 @@
                                                        :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
                                 </div>
 
-                                <v-card-text class="statistics-overview-title pt-0"
-                                             :class="{ 'disabled': loading }" v-if="!initing">
+                                <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
+                                             v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
                                     <span class="text-subtitle-1">{{ totalAmountName }}</span>
-                                    <span class="statistics-overview-amount ml-3" :class="statisticsTextColor"
-                                          v-if="statisticsData && statisticsData.items && statisticsData.items.length">
+                                    <span class="statistics-overview-amount ml-3" :class="statisticsTextColor">
                                         {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
                                     </span>
-                                    <span class="text-subtitle-1 ml-3"
-                                          v-else-if="!statisticsData || !statisticsData.items || !statisticsData.items.length">
-                                        {{ $t('No transaction data') }}
-                                    </span>
+                                </v-card-text>
+
+                                <v-card-text class="statistics-overview-title pt-0"
+                                             v-else-if="!initing && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
+                                    <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                 </v-card-text>
 
                                 <v-card-text :class="{ 'disabled': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
@@ -650,6 +650,10 @@ export default {
     font-size: 1.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.statistics-overview-empty-tip {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
 }
 
 .statistics-list-item {

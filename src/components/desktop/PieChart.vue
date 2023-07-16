@@ -33,7 +33,8 @@ export default {
     ],
     data() {
         return {
-            selectedLegends: null
+            selectedLegends: null,
+            selectedIndex: 0
         };
     },
     computed: {
@@ -113,9 +114,10 @@ export default {
 
             return false;
         },
-        currentFirstItemPercent: function () {
+        firstItemAndHalfCurrentItemTotalPercent: function () {
             let totalValue = 0;
             let firstValue = null;
+            let firstToCurrentTotalValue = 0;
 
             for (let i = 0; i < this.validItems.length; i++) {
                 const item = this.validItems[i];
@@ -128,11 +130,19 @@ export default {
                     firstValue = item.value;
                 }
 
+                if (firstValue !== null) {
+                    if (i < this.selectedIndex) {
+                        firstToCurrentTotalValue += item.value;
+                    } else if (i === this.selectedIndex) {
+                        firstToCurrentTotalValue += item.value / 2;
+                    }
+                }
+
                 totalValue += item.value;
             }
 
-            if (firstValue && totalValue > 0) {
-                return firstValue / totalValue;
+            if (firstToCurrentTotalValue && totalValue > 0) {
+                return firstToCurrentTotalValue / totalValue;
             } else {
                 return 0;
             }
@@ -180,7 +190,7 @@ export default {
                         type: 'pie',
                         data: self.validItems,
                         top: 50,
-                        startAngle: -90 + self.currentFirstItemPercent / 2 * 360,
+                        startAngle: -90 + self.firstItemAndHalfCurrentItemTotalPercent * 360,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
@@ -218,6 +228,11 @@ export default {
             }
         }
     },
+    watch: {
+        'items': function () {
+            this.selectedIndex = 0;
+        }
+    },
     setup() {
         const theme = useTheme();
 
@@ -232,6 +247,7 @@ export default {
             }
 
             if (e.event && e.event.target && e.event.target.currentStates && e.event.target.currentStates[0] && e.event.target.currentStates[0] === 'emphasis') {
+                this.selectedIndex = e.dataIndex;
                 return;
             }
 
@@ -243,6 +259,22 @@ export default {
         },
         onLegendSelectChanged: function (e) {
             this.selectedLegends = e.selected;
+            const selectedItem = this.validItems[this.selectedIndex];
+
+            if (!selectedItem || !this.selectedLegends[selectedItem.id]) {
+                let newSelectedIndex = 0;
+
+                for (let i = 0; i < this.validItems.length; i++) {
+                    const item = this.validItems[i];
+
+                    if (this.selectedLegends[item.id]) {
+                        newSelectedIndex = i;
+                        break;
+                    }
+                }
+
+                this.selectedIndex = newSelectedIndex;
+            }
         },
         getColor: function (color) {
             if (color && color !== colorConstants.defaultColor) {

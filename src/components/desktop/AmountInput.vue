@@ -1,5 +1,5 @@
 <template>
-    <v-text-field type="number" :class="class" :density="density" :disabled="disabled"
+    <v-text-field type="number" :class="extraClass" :density="density" :disabled="disabled"
                   :rules="enableRules ? rules : []" v-model="value"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown"
     ></v-text-field>
@@ -47,6 +47,9 @@ export default {
             set: function (value) {
                 this.$emit('update:modelValue', value);
             }
+        },
+        extraClass() {
+            return this.class;
         }
     },
     methods: {

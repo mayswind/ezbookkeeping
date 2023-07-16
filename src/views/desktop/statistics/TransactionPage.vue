@@ -35,7 +35,8 @@
                             <v-card variant="flat">
                                 <template #title>
                                     <div class="d-flex align-center">
-                                        <div class="statistics-toolbar">
+                                        <span>{{ $t('Statistics Data') }}</span>
+                                        <div class="statistics-toolbar ml-4">
                                             <v-btn-group color="default" density="comfortable" variant="outlined" divided>
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
@@ -123,17 +124,17 @@
                                                        :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
                                 </v-card-text>
 
-                                <v-card-title class="statistics-overview-title pt-0" v-if="!initing">
-                                    <div>{{ totalAmountName }}</div>
-                                    <div class="statistics-overview-amount ml-3" :class="statisticsTextColor"
+                                <v-card-text class="statistics-overview-title pt-0" v-if="!initing">
+                                    <span class="text-subtitle-1">{{ totalAmountName }}</span>
+                                    <span class="statistics-overview-amount ml-3" :class="statisticsTextColor"
                                           v-if="statisticsData && statisticsData.items && statisticsData.items.length">
                                         {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
-                                    </div>
-                                    <div class="text-subtitle-1 ml-3"
+                                    </span>
+                                    <span class="text-subtitle-1 ml-3"
                                           v-else-if="!statisticsData || !statisticsData.items || !statisticsData.items.length">
                                         {{ $t('No transaction data') }}
-                                    </div>
-                                </v-card-title>
+                                    </span>
+                                </v-card-text>
 
                                 <v-card-text v-if="!initing && query.chartType === allChartTypes.Pie">
                                     <pie-chart
@@ -645,6 +646,7 @@ export default {
 
 .statistics-overview-title {
     line-height: 2rem !important;
+    height: 46px;
     display: flex;
     align-items: flex-end;
 }

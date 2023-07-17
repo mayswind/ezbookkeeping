@@ -81,7 +81,6 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
 import colorConstants from '@/consts/color.js';
-import statisticsConstants from '@/consts/statistics.js';
 import { formatPercent } from '@/lib/common.js';
 
 export default {
@@ -141,7 +140,7 @@ export default {
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
                         currency: item[this.currencyField],
-                        color: item[this.colorField] ? item[this.colorField] : statisticsConstants.defaultChartColors[validItems.length % statisticsConstants.defaultChartColors.length],
+                        color: item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[validItems.length % colorConstants.defaultChartColors.length],
                         sourceItem: item
                     };
 

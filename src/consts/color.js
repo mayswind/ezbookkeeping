@@ -16,10 +16,24 @@ const allAvailableColors = [
     '9c27b0', // purple
 ];
 
+const defaultChartColors = [
+    'cc4a66',
+    'e3564a',
+    'fc892c',
+    'ffc349',
+    '4dd291',
+    '24ceb3',
+    '2ab4d0',
+    '065786',
+    '713670',
+    '8e1d51'
+];
+
 export default {
     defaultColor: defaultColor,
     allAccountColors: allAvailableColors,
     defaultAccountColor: defaultColor,
     allCategoryColors: allAvailableColors,
     defaultCategoryColor: defaultColor,
+    defaultChartColors: defaultChartColors,
 };

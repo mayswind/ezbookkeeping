@@ -64,19 +64,6 @@ const allSortingTypes = {
 
 const defaultSortingType = allSortingTypes.Amount.type;
 
-const defaultChartColors = [
-    'cc4a66',
-    'e3564a',
-    'fc892c',
-    'ffc349',
-    '4dd291',
-    '24ceb3',
-    '2ab4d0',
-    '065786',
-    '713670',
-    '8e1d51'
-];
-
 export default {
     allChartTypes: allChartTypes,
     defaultChartType: defaultChartType,
@@ -85,5 +72,4 @@ export default {
     defaultDataRangeType: datetime.allDateRanges.ThisMonth.type,
     allSortingTypes: allSortingTypes,
     defaultSortingType: defaultSortingType,
-    defaultChartColors: defaultChartColors,
 };

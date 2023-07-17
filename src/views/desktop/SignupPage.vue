@@ -250,7 +250,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
 import categoryConstants from '@/consts/category.js';
-import { getNameByKeyValue, copyArrayTo } from '@/lib/common.js';
+import { copyArrayTo } from '@/lib/common.js';
 
 import {
     mdiArrowLeft,

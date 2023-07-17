@@ -198,7 +198,7 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                language: self.$i18n.locale,
+                language: self.$locale.getCurrentLanguageCode(),
                 defaultCurrency: settingsStore.localeDefaultSettings.currency,
                 firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
             },
@@ -227,7 +227,7 @@ export default {
         },
         currentLocale: {
             get: function () {
-                return this.$i18n.locale;
+                return this.$locale.getCurrentLanguageCode();
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;

@@ -259,6 +259,10 @@ function getLocaleFromLanguageAlias(alias) {
     return null;
 }
 
+function getCurrentLanguageCode(i18nGlobal) {
+    return i18nGlobal.locale;
+}
+
 function getCurrentLanguageInfo(i18nGlobal) {
     const locale = getLanguageInfo(i18nGlobal.locale);
 
@@ -266,7 +270,12 @@ function getCurrentLanguageInfo(i18nGlobal) {
         return locale;
     }
 
-    return getDefaultLanguage();
+    return getLanguageInfo(getDefaultLanguage());
+}
+
+function getCurrentLanguageDisplayName(i18nGlobal) {
+    const currentLanguageInfo = getCurrentLanguageInfo(i18nGlobal);
+    return currentLanguageInfo.displayName;
 }
 
 function getDefaultCurrency(translateFn) {
@@ -917,7 +926,9 @@ export function i18nFunctions(i18nGlobal) {
         getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getLanguageInfo: getLanguageInfo,
         getDefaultLanguage: getDefaultLanguage,
+        getCurrentLanguageCode: () => getCurrentLanguageCode(i18nGlobal),
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
+        getCurrentLanguageDisplayName: () => getCurrentLanguageDisplayName(i18nGlobal),
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),

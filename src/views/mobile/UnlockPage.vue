@@ -48,7 +48,7 @@
                     @click="changeLanguage(locale)"
                 >
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="$i18n.locale === locale"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="currentLanguageCode === locale"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -94,15 +94,11 @@ export default {
                 && this.$user.getWebAuthnCredentialId()
                 && webauthn.isSupported();
         },
+        currentLanguageCode() {
+            return this.$locale.getCurrentLanguageCode();
+        },
         currentLanguageName() {
-            const currentLocale = this.$i18n.locale;
-            let lang = this.$locale.getLanguageInfo(currentLocale);
-
-            if (!lang) {
-                lang = this.$locale.getLanguageInfo(this.$locale.getDefaultLanguage());
-            }
-
-            return lang.displayName;
+            return this.$locale.getCurrentLanguageDisplayName();
         }
     },
     methods: {

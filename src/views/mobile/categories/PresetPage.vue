@@ -71,7 +71,7 @@ export default {
 
         return {
             loadingError: null,
-            currentLocale: self.$i18n.locale,
+            currentLocale: self.$locale.getCurrentLanguageCode(),
             categoryType: 0,
             allCategories: [],
             submitting: false,

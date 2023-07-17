@@ -103,7 +103,7 @@ export default {
         const self = this;
 
         return {
-            currentLocale: self.$i18n.locale,
+            currentLocale: self.$locale.getCurrentLanguageCode(),
             logouting: false
         };
     },
@@ -196,7 +196,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.currentLocale = this.$i18n.locale;
+            this.currentLocale = this.$locale.getCurrentLanguageCode();
         },
         logout() {
             const self = this;

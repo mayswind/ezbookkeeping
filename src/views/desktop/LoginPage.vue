@@ -8,10 +8,10 @@
         </router-link>
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="8" class="d-none d-md-flex align-center justify-center position-relative">
-                <div class="d-flex auth-img-footer" v-if="currentTheme !== 'dark'">
+                <div class="d-flex auth-img-footer" v-if="!isDarkMode">
                     <v-img src="img/desktop/background.svg"/>
                 </div>
-                <div class="d-flex auth-img-footer" v-if="currentTheme === 'dark'">
+                <div class="d-flex auth-img-footer" v-if="isDarkMode">
                     <v-img src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
@@ -221,20 +221,11 @@ export default {
                 return !this.passcode;
             }
         },
-        currentTheme: {
-            get: function () {
-                return this.globalTheme.global.name.value;
-            }
+        isDarkMode() {
+            return this.globalTheme.global.name.value === 'dark';
         },
         currentLanguageName() {
-            const currentLocale = this.$i18n.locale;
-            let lang = this.$locale.getLanguageInfo(currentLocale);
-
-            if (!lang) {
-                lang = this.$locale.getLanguageInfo(this.$locale.getDefaultLanguage());
-            }
-
-            return lang.displayName;
+            return this.$locale.getCurrentLanguageDisplayName();
         }
     },
     setup() {

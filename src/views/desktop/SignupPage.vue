@@ -8,10 +8,10 @@
         </router-link>
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="4" class="d-none d-md-flex align-center justify-center position-relative">
-                <div class="d-flex auth-img-footer" v-if="currentTheme !== 'dark'">
+                <div class="d-flex auth-img-footer" v-if="!isDarkMode">
                     <v-img src="img/desktop/background.svg"/>
                 </div>
-                <div class="d-flex auth-img-footer" v-if="currentTheme === 'dark'">
+                <div class="d-flex auth-img-footer" v-if="isDarkMode">
                     <v-img src="img/desktop/background-dark.svg"/>
                 </div>
                 <div class="d-flex align-center justify-center w-100 pt-10">
@@ -272,7 +272,7 @@ export default {
                 confirmPassword: '',
                 email: '',
                 nickname: '',
-                language: self.$i18n.locale,
+                language: self.$locale.getCurrentLanguageCode(),
                 defaultCurrency: settingsStore.localeDefaultSettings.currency,
                 firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
             },
@@ -311,7 +311,7 @@ export default {
         },
         currentLocale: {
             get: function () {
-                return this.$i18n.locale;
+                return this.$locale.getCurrentLanguageCode();
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;
@@ -331,10 +331,8 @@ export default {
                 }
             }
         },
-        currentTheme: {
-            get: function () {
-                return this.globalTheme.global.name.value;
-            }
+        isDarkMode() {
+            return this.globalTheme.global.name.value === 'dark';
         },
         currentLanguageName() {
             const languageInfo = this.$locale.getLanguageInfo(this.currentLocale);
@@ -344,9 +342,6 @@ export default {
             }
 
             return languageInfo.displayName;
-        },
-        currentDayOfWeekName() {
-            return getNameByKeyValue(this.allWeekDays, this.user.firstDayOfWeek, 'type', 'displayName');
         },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;

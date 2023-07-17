@@ -12,14 +12,18 @@ import {
 } from './common.js';
 
 import {
+    parseDateFromUnixTime,
     formatUnixTime,
     formatTime,
     getCurrentDateTime,
+    getYear,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
-    getDateTimeFormatType
+    getDateTimeFormatType,
+    isDateRangeMatchFullYears,
+    isDateRangeMatchFullMonths
 } from './datetime.js';
 
 import {
@@ -584,6 +588,53 @@ function getAllDateRanges(includeCustom, translateFn) {
     return allDateRanges;
 }
 
+function getDateRangeDisplayName(userStore, dateType, startTime, endTime, translateFn) {
+    if (dateType === datetime.allDateRanges.All.type) {
+        return translateFn(datetime.allDateRanges.All.name);
+    }
+
+    for (let dateRangeField in datetime.allDateRanges) {
+        if (!Object.prototype.hasOwnProperty.call(datetime.allDateRanges, dateRangeField)) {
+            continue;
+        }
+
+        const dateRange = datetime.allDateRanges[dateRangeField];
+
+        if (dateRange && dateRange.type !== datetime.allDateRanges.Custom.type && dateRange.type === dateType && dateRange.name) {
+            return translateFn(dateRange.name);
+        }
+    }
+
+    if (isDateRangeMatchFullYears(startTime, endTime)) {
+        const displayStartTime = formatUnixTime(startTime, getI18nShortYearFormat(translateFn, userStore.currentUserShortDateFormat));
+        const displayEndTime = formatUnixTime(endTime, getI18nShortYearFormat(translateFn, userStore.currentUserShortDateFormat));
+
+        return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+    }
+
+    if (isDateRangeMatchFullMonths(startTime, endTime)) {
+        const displayStartTime = formatUnixTime(startTime, getI18nShortYearMonthFormat(translateFn, userStore.currentUserShortDateFormat));
+        const displayEndTime = formatUnixTime(endTime, getI18nShortYearMonthFormat(translateFn, userStore.currentUserShortDateFormat));
+
+        return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+    }
+
+    const startTimeYear = getYear(parseDateFromUnixTime(startTime));
+    const endTimeYear = getYear(parseDateFromUnixTime(endTime));
+
+    const displayStartTime = formatUnixTime(startTime, getI18nShortDateFormat(translateFn, userStore.currentUserShortDateFormat));
+    const displayEndTime = formatUnixTime(endTime, getI18nShortDateFormat(translateFn, userStore.currentUserShortDateFormat));
+
+    if (displayStartTime === displayEndTime) {
+        return displayStartTime;
+    } else if (startTimeYear === endTimeYear) {
+        const displayShortEndTime = formatUnixTime(endTime, getI18nShortMonthDayFormat(translateFn, userStore.currentUserShortDateFormat));
+        return `${displayStartTime} ~ ${displayShortEndTime}`;
+    }
+
+    return `${displayStartTime} ~ ${displayEndTime}`;
+}
+
 function getAllStatisticsChartDataTypes(translateFn) {
     const allChartDataTypes = [];
 
@@ -963,6 +1014,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
+        getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),

@@ -229,12 +229,8 @@ import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 import { getNameByKeyValue, limitText, formatPercent } from '@/lib/common.js'
 import {
-    parseDateFromUnixTime,
-    getYear,
     getShiftedDateRange,
-    getDateRangeByDateType,
-    isDateRangeMatchFullYears,
-    isDateRangeMatchFullMonths
+    getDateRangeByDateType
 } from '@/lib/datetime.js';
 
 import {
@@ -553,50 +549,7 @@ export default {
                 return this.$t(this.allDateRanges.All.name);
             }
 
-            if (query.dateType === this.allDateRanges.All.type) {
-                return this.$t(this.allDateRanges.All.name);
-            }
-
-            for (let dateRangeField in this.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(this.allDateRanges, dateRangeField)) {
-                    continue;
-                }
-
-                const dateRange = this.allDateRanges[dateRangeField];
-
-                if (dateRange && dateRange.type !== this.allDateRanges.Custom.type && dateRange.type === query.dateType && dateRange.name) {
-                    return this.$t(dateRange.name);
-                }
-            }
-
-            if (isDateRangeMatchFullYears(query.startTime, query.endTime)) {
-                const displayStartTime = this.$locale.formatUnixTimeToShortYear(this.userStore, query.startTime);
-                const displayEndTime = this.$locale.formatUnixTimeToShortYear(this.userStore, query.endTime);
-
-                return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
-            }
-
-            if (isDateRangeMatchFullMonths(query.startTime, query.endTime)) {
-                const displayStartTime = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, query.startTime);
-                const displayEndTime = this.$locale.formatUnixTimeToShortYearMonth(this.userStore, query.endTime);
-
-                return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
-            }
-
-            const startTimeYear = getYear(parseDateFromUnixTime(query.startTime));
-            const endTimeYear = getYear(parseDateFromUnixTime(query.endTime));
-
-            const displayStartTime = this.$locale.formatUnixTimeToShortDate(this.userStore, query.startTime);
-            const displayEndTime = this.$locale.formatUnixTimeToShortDate(this.userStore, query.endTime);
-
-            if (displayStartTime === displayEndTime) {
-                return displayStartTime;
-            } else if (startTimeYear === endTimeYear) {
-                const displayShortEndTime = this.$locale.formatUnixTimeToShortMonthDay(this.userStore, query.endTime);
-                return `${displayStartTime} ~ ${displayShortEndTime}`;
-            }
-
-            return `${displayStartTime} ~ ${displayEndTime}`;
+            return this.$locale.getDateRangeDisplayName(this.userStore, query.dateType, query.startTime, query.endTime);
         },
         clickPieChartItem(item) {
             this.$router.push(this.getItemLinkUrl(item));

@@ -156,7 +156,7 @@
                                             </v-card-text>
 
                                             <v-card-text>
-                                                <div class="d-flex align-center">
+                                                <div class="d-flex account-toolbar align-center">
                                                     <v-btn class="px-2" density="comfortable" color="default" variant="text"
                                                            :disabled="loading" :prepend-icon="icons.edit"
                                                            @click="edit(account)">
@@ -443,6 +443,11 @@ export default {
 }
 
 .account-subaccounts {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.account-toolbar {
     overflow-x: auto;
     white-space: nowrap;
 }

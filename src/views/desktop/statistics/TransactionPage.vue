@@ -365,42 +365,7 @@ export default {
     created() {
         const self = this;
 
-        let defaultChartType = self.settingsStore.appSettings.statistics.defaultChartType;
-
-        if (defaultChartType !== self.allChartTypes.Pie && defaultChartType !== self.allChartTypes.Bar) {
-            defaultChartType = statisticsConstants.defaultChartType;
-        }
-
-        let defaultChartDataType = self.settingsStore.appSettings.statistics.defaultChartDataType;
-
-        if (defaultChartDataType < self.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > self.allChartDataTypes.AccountTotalLiabilities.type) {
-            defaultChartDataType = statisticsConstants.defaultChartDataType;
-        }
-
-        let defaultDateRange = self.settingsStore.appSettings.statistics.defaultDataRangeType;
-
-        if (defaultDateRange < self.allDateRanges.All.type || defaultDateRange >= self.allDateRanges.Custom.type) {
-            defaultDateRange = statisticsConstants.defaultDataRangeType;
-        }
-
-        let defaultSortType = self.settingsStore.appSettings.statistics.defaultSortingType;
-
-        if (defaultSortType < self.allSortingTypes.Amount.type || defaultSortType > self.allSortingTypes.Name.type) {
-            defaultSortType = statisticsConstants.defaultSortingType;
-        }
-
-        const dateRange = getDateRangeByDateType(defaultDateRange, self.firstDayOfWeek);
-
-        self.statisticsStore.initTransactionStatisticsFilter({
-            dateType: dateRange ? dateRange.dateType : undefined,
-            startTime: dateRange ? dateRange.minTime : undefined,
-            endTime: dateRange ? dateRange.maxTime : undefined,
-            chartType: defaultChartType,
-            chartDataType: defaultChartDataType,
-            filterAccountIds: self.settingsStore.appSettings.statistics.defaultAccountFilter || {},
-            filterCategoryIds: self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
-            sortingType: defaultSortType,
-        });
+        self.statisticsStore.initTransactionStatisticsFilter();
 
         Promise.all([
             self.accountsStore.loadAllAccounts({ force: false }),

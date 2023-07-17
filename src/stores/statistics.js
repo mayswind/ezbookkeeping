@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.js';
 import { useUserStore } from './user.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
+import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
@@ -16,6 +18,9 @@ import {
     isNumber,
     isObject
 } from '@/lib/common.js';
+import {
+    getDateRangeByDateType
+} from '@/lib/datetime.js';
 
 export const useStatisticsStore = defineStore('statistics', {
     state: () => ({
@@ -413,6 +418,48 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsStateInvalid = true;
         },
         initTransactionStatisticsFilter(filter) {
+            if (!filter) {
+                const settingsStore = useSettingsStore();
+                const userStore = useUserStore();
+
+                let defaultChartType = settingsStore.appSettings.statistics.defaultChartType;
+
+                if (defaultChartType !== statisticsConstants.allChartTypes.Pie && defaultChartType !== statisticsConstants.allChartTypes.Bar) {
+                    defaultChartType = statisticsConstants.defaultChartType;
+                }
+
+                let defaultChartDataType = settingsStore.appSettings.statistics.defaultChartDataType;
+
+                if (defaultChartDataType < statisticsConstants.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
+                    defaultChartDataType = statisticsConstants.defaultChartDataType;
+                }
+
+                let defaultDateRange = settingsStore.appSettings.statistics.defaultDataRangeType;
+
+                if (defaultDateRange < datetimeConstants.allDateRanges.All.type || defaultDateRange >= datetimeConstants.allDateRanges.Custom.type) {
+                    defaultDateRange = statisticsConstants.defaultDataRangeType;
+                }
+
+                let defaultSortType = settingsStore.appSettings.statistics.defaultSortingType;
+
+                if (defaultSortType < statisticsConstants.allSortingTypes.Amount.type || defaultSortType > statisticsConstants.allSortingTypes.Name.type) {
+                    defaultSortType = statisticsConstants.defaultSortingType;
+                }
+
+                const dateRange = getDateRangeByDateType(defaultDateRange, userStore.currentUserFirstDayOfWeek);
+
+                filter = {
+                    dateType: dateRange ? dateRange.dateType : undefined,
+                    startTime: dateRange ? dateRange.minTime : undefined,
+                    endTime: dateRange ? dateRange.maxTime : undefined,
+                    chartType: defaultChartType,
+                    chartDataType: defaultChartDataType,
+                    filterAccountIds: settingsStore.appSettings.statistics.defaultAccountFilter || {},
+                    filterCategoryIds: settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
+                    sortingType: defaultSortType,
+                };
+            }
+
             if (filter && isNumber(filter.dateType)) {
                 this.transactionStatisticsFilter.dateType = filter.dateType;
             } else {

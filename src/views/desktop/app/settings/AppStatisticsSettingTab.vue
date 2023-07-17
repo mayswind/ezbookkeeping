@@ -10,8 +10,8 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
-                                    :label="$t('Chart Type')"
-                                    :placeholder="$t('Chart Type')"
+                                    :label="$t('Default Chart Type')"
+                                    :placeholder="$t('Default Chart Type')"
                                     :items="[
                                         { type: allChartTypes.Pie, displayName: $t('Pie Chart') },
                                         { type: allChartTypes.Bar, displayName: $t('Bar Chart') }

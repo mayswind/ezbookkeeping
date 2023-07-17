@@ -258,6 +258,31 @@ export function getShiftedDateRange(minTime, maxTime, scale) {
     };
 }
 
+export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek) {
+    const newDateRange = getShiftedDateRange(minTime, maxTime, scale);
+    let newDateType = dateTimeConstants.allDateRanges.Custom.type;
+
+    for (let dateRangeField in dateTimeConstants.allDateRanges) {
+        if (!Object.prototype.hasOwnProperty.call(dateTimeConstants.allDateRanges, dateRangeField)) {
+            continue;
+        }
+
+        const dateRangeType = dateTimeConstants.allDateRanges[dateRangeField];
+        const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek);
+
+        if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
+            newDateType = dateRangeType.type;
+            break;
+        }
+    }
+
+    return {
+        dateType: newDateType,
+        minTime: newDateRange.minTime,
+        maxTime: newDateRange.maxTime
+    };
+}
+
 export function getDateRangeByDateType(dateType, firstDayOfWeek) {
     let maxTime = 0;
     let minTime = 0;

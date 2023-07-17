@@ -229,7 +229,7 @@ import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
 import { getNameByKeyValue, limitText, formatPercent } from '@/lib/common.js'
 import {
-    getShiftedDateRange,
+    getShiftedDateRangeAndDateType,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 
@@ -518,25 +518,10 @@ export default {
                 return;
             }
 
-            const newDateRange = getShiftedDateRange(startTime, endTime, scale);
-            let newDateType = this.allDateRanges.Custom.type;
-
-            for (let dateRangeField in this.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(this.allDateRanges, dateRangeField)) {
-                    continue;
-                }
-
-                const dateRangeType = this.allDateRanges[dateRangeField];
-                const dateRange = getDateRangeByDateType(dateRangeType.type, this.firstDayOfWeek);
-
-                if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
-                    newDateType = dateRangeType.type;
-                    break;
-                }
-            }
+            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek);
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: newDateType,
+                dateType: newDateRange.dateType,
                 startTime: newDateRange.minTime,
                 endTime: newDateRange.maxTime
             });

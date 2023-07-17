@@ -99,7 +99,7 @@
 
                                 <v-row class="pl-4 pr-8" v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length">
                                     <v-col cols="12">
-                                        <v-card border class="card-title-with-bg mb-8 h-auto" :key="account.id"
+                                        <v-card border class="card-title-with-bg account-card mb-8 h-auto" :key="account.id"
                                                 v-for="account in categorizedAccounts[activeAccountCategory.id].accounts"
                                                 v-show="showHidden || !account.hidden">
                                             <template #title>
@@ -433,26 +433,26 @@ export default {
     text-overflow: ellipsis;
 }
 
-.account-title {
+.account-card .account-title {
     line-height: 1.5rem !important;
 }
 
-.account-currency {
+.account-card .account-currency {
     font-size: 0.8rem;
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
 
-.account-subaccounts {
+.account-card .account-subaccounts {
     overflow-x: auto;
     white-space: nowrap;
 }
 
-.account-toolbar {
+.account-card .account-toolbar {
     overflow-x: auto;
     white-space: nowrap;
 }
 
-.account-balance {
+.account-card .account-balance {
     font-size: 1.5rem;
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
 }

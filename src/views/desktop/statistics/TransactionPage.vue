@@ -138,7 +138,7 @@
                                     <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                 </v-card-text>
 
-                                <v-card-text :class="{ 'disabled': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
+                                <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
                                     <pie-chart
                                         :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
                                         :min-valid-percent="0.0001"
@@ -155,7 +155,7 @@
                                     />
                                 </v-card-text>
 
-                                <v-card-text :class="{ 'disabled': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
+                                <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
                                     <v-list rounded lines="two"
                                             v-if="statisticsData && statisticsData.items && statisticsData.items.length">
                                         <template :key="idx"

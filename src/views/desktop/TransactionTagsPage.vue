@@ -275,21 +275,6 @@ export default {
                 }
             });
         },
-        saveSortResult() {
-            const self = this;
-
-            self.updating = true;
-
-            self.transactionTagsStore.updateTagDisplayOrders().then(() => {
-                self.updating = false;
-            }).catch(error => {
-                self.updating = false;
-
-                if (!error.processed) {
-                    self.$refs.snackbar.showError(error);
-                }
-            });
-        },
         add() {
             this.newTag = {
                 name: ''

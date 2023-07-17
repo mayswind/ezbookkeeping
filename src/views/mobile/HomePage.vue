@@ -215,9 +215,6 @@ export default {
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
-        firstDayOfWeek() {
-            return this.userStore.currentUserFirstDayOfWeek;
-        },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },

@@ -259,16 +259,6 @@ export default {
         categorizedAccounts() {
             return this.accountsStore.allCategorizedAccounts;
         },
-        allAccountCount() {
-            return this.accountsStore.allAvailableAccountsCount;
-        },
-        noAvailableAccount() {
-            if (this.showHidden) {
-                return this.accountsStore.allAvailableAccountsCount < 1;
-            } else {
-                return this.accountsStore.allVisibleAccountsCount < 1;
-            }
-        },
         netAssets() {
             const netAssets = this.accountsStore.getNetAssets(this.showAccountBalance);
             return this.getDisplayCurrency(netAssets, this.defaultCurrency);

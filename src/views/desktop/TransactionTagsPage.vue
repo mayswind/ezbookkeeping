@@ -1,12 +1,12 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card :class="{ 'disabled': loading }">
+            <v-card>
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ $t('Transaction Tags') }}</span>
                         <v-btn density="compact" color="default" variant="text"
-                               class="ml-2" :icon="true" :disabled="updating"
+                               class="ml-2" :icon="true" :disabled="loading || updating || hasEditingTag"
                                v-if="!loading" @click="reload">
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
@@ -72,7 +72,7 @@
                                     clearable
                                     density="compact"
                                     variant="underlined"
-                                    :disabled="updating"
+                                    :disabled="loading || updating"
                                     :placeholder="$t('Tag Title')"
                                     v-model="editingTag.name"
                                     v-else-if="editingTag.id === tag.id"
@@ -93,7 +93,7 @@
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.edit"
                                        :loading="tagUpdating[tag.id]"
-                                       :disabled="updating"
+                                       :disabled="loading || updating"
                                        v-if="editingTag.id !== tag.id"
                                        @click="edit(tag)">
                                     {{ $t('Edit') }}
@@ -102,7 +102,7 @@
                                        density="comfortable" variant="text"
                                        :prepend-icon="tag.hidden ? icons.show : icons.hide"
                                        :loading="tagHiding[tag.id]"
-                                       :disabled="updating"
+                                       :disabled="loading || updating"
                                        v-if="editingTag.id !== tag.id"
                                        @click="hide(tag, !tag.hidden)">
                                     {{ tag.hidden ? $t('Show') : $t('Hide') }}
@@ -111,7 +111,7 @@
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.remove"
                                        :loading="tagRemoving[tag.id]"
-                                       :disabled="updating"
+                                       :disabled="loading || updating"
                                        v-if="editingTag.id !== tag.id"
                                        @click="remove(tag)">
                                     {{ $t('Delete') }}
@@ -120,14 +120,14 @@
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.confirm"
                                        :loading="tagUpdating[tag.id]"
-                                       :disabled="updating || !isTagModified(tag)"
+                                       :disabled="loading || updating || !isTagModified(tag)"
                                        v-if="editingTag.id === tag.id" @click="save(editingTag)">
                                     {{ $t('Save') }}
                                 </v-btn>
                                 <v-btn class="px-2 ml-2" color="default"
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.cancel"
-                                       :disabled="updating"
+                                       :disabled="loading || updating"
                                        v-if="editingTag.id === tag.id" @click="cancelSave(editingTag)">
                                     {{ $t('Cancel') }}
                                 </v-btn>
@@ -139,7 +139,7 @@
                         <td>
                             <v-text-field type="text" color="primary" clearable
                                           density="compact" variant="underlined"
-                                          :disabled="updating" :placeholder="$t('Tag Title')"
+                                          :disabled="loading || updating" :placeholder="$t('Tag Title')"
                                           v-model="newTag.name" @keyup.enter="save(newTag)">
                                 <template #prepend>
                                     <v-icon size="24" start :icon="icons.tag"/>
@@ -150,14 +150,14 @@
                             <v-btn class="px-2" density="comfortable" variant="text"
                                    :prepend-icon="icons.confirm"
                                    :loading="tagUpdating[null]"
-                                   :disabled="updating || !isTagModified(newTag)"
+                                   :disabled="loading || updating || !isTagModified(newTag)"
                                    @click="save(newTag)">
                                 {{ $t('Save') }}
                             </v-btn>
                             <v-btn class="px-2 ml-2" color="default"
                                    density="comfortable" variant="text"
                                    :prepend-icon="icons.cancel"
-                                   :disabled="updating"
+                                   :disabled="loading || updating"
                                    @click="cancelSave(newTag)">
                                 {{ $t('Cancel') }}
                             </v-btn>

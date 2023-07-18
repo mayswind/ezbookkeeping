@@ -30,13 +30,13 @@ input[type=number] {
 
 /** Custom class **/
 :root {
-    --default-icon-color: var(--v-theme-on-surface);
+    --default-icon-color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
     --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
     --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }
 
 :root .v-theme--dark {
-    --default-icon-color: var(--v-theme-on-surface);
+    --default-icon-color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
     --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
     --v-card-title-bg: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
 }

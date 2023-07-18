@@ -22,6 +22,15 @@ input[type=number] {
     pointer-events: none !important;
 }
 
+.drag-handle {
+    cursor: grab;
+}
+
+.dragging-item {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+
 @media (min-width: 600px) {
     .text-right-sm {
         text-align: right !important;

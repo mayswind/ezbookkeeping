@@ -86,16 +86,26 @@ function updateAccountToAccountList(state, account) {
     }
 }
 
-function updateAccountDisplayOrderInAccountList(state, { account, from, to }) {
+function updateAccountDisplayOrderInAccountList(state, { account, from, to, onlyUpdateGlobalList }) {
     let fromAccount = null;
     let toAccount = null;
 
     if (state.allCategorizedAccounts[account.category]) {
         const accountList = state.allCategorizedAccounts[account.category].accounts;
-        fromAccount = accountList[from];
-        toAccount = accountList[to];
 
-        accountList.splice(to, 0, accountList.splice(from, 1)[0]);
+        if (!onlyUpdateGlobalList) {
+            fromAccount = accountList[from];
+            toAccount = accountList[to];
+            accountList.splice(to, 0, accountList.splice(from, 1)[0]);
+        } else {
+            fromAccount = accountList[to];
+
+            if (from < to) {
+                toAccount = accountList[to - 1];
+            } else if (from > to) {
+                toAccount = accountList[to + 1];
+            }
+        }
     }
 
     if (fromAccount && toAccount) {
@@ -746,7 +756,7 @@ export const useAccountsStore = defineStore('accounts', {
                 });
             });
         },
-        changeAccountDisplayOrder({ accountId, from, to }) {
+        changeAccountDisplayOrder({ accountId, from, to, onlyUpdateGlobalList }) {
             const self = this;
             const account = self.allAccountsMap[accountId];
 
@@ -766,7 +776,8 @@ export const useAccountsStore = defineStore('accounts', {
                 updateAccountDisplayOrderInAccountList(self, {
                     account: account,
                     from: from,
-                    to: to
+                    to: to,
+                    onlyUpdateGlobalList: onlyUpdateGlobalList
                 });
 
                 resolve();

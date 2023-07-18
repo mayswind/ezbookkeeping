@@ -60,6 +60,8 @@ import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
+import draggable from 'vuedraggable';
+
 import router from '@/router/desktop.js';
 
 import { getVersion, getBuildTime } from '@/lib/version.js';
@@ -371,6 +373,7 @@ app.use(router);
 app.component('VChart', VChart);
 app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
+app.component('draggable', draggable);
 
 app.component('PinCodeInput', PinCodeInput);
 

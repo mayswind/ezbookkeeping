@@ -225,6 +225,12 @@
         "licenseUrl": "https://github.com/brix/crypto-js/blob/4.1.1/LICENSE"
     },
     {
+        "name": "vuedraggable",
+        "copyright": "Copyright (c) 2016-2019 David Desmaisons",
+        "url": "https://github.com/SortableJS/vue.draggable.next",
+        "licenseUrl": "https://github.com/SortableJS/vue.draggable.next/blob/fae4944e7227f8f0ca06e19be01b14b584cfa973/LICENSE"
+    },
+    {
         "name": "cbor-js",
         "copyright": "Copyright (c) 2014 Patrick Gansterer <paroga@paroga.com>",
         "url": "https://github.com/paroga/cbor-js",

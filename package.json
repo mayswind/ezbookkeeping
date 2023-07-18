@@ -44,6 +44,7 @@
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.4",
     "vue3-perfect-scrollbar": "^1.6.1",
+    "vuedraggable": "^4.1.0",
     "vuetify": "^3.3.8"
   },
   "devDependencies": {

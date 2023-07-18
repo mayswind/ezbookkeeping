@@ -150,7 +150,11 @@ export default defineConfig(async () => {
                             return 'moment';
                         } else if (/[\\/]node_modules[\\/](dom7|framework7.*|skeleton-elements|swiper)[\\/]/i.test(id)) {
                             return 'vendor-mobile';
-                        } else if (/[\\/]node_modules[\\/](vuetify|vue-router|vue3-perfect-scrollbar|@mdi.*|echarts|vue-echarts)[\\/]/i.test(id)) {
+                        } else if (/[\\/]node_modules[\\/](vuetify|vue-router|vue3-perfect-scrollbar|perfect-scrollbar|@mdi.*)[\\/]/i.test(id)) {
+                            return 'vendor-desktop';
+                        } else if (/[\\/]node_modules[\\/](echarts|zrender|tslib|resize-detector|vue-echarts)[\\/]/i.test(id)) {
+                            return 'vendor-desktop';
+                        } else if (/plugin-vuetify:/i.test(id)) {
                             return 'vendor-desktop';
                         } else if (/[\\/]node_modules[\\/]/i.test(id)) {
                             return 'vendor-common';

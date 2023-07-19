@@ -338,7 +338,9 @@ export default {
             self.accountsStore.changeAccountDisplayOrder({
                 accountId: id,
                 from: event.from - 1, // first item in the list is title, so the index need minus one
-                to: event.to - 1
+                to: event.to - 1,
+                updateListOrder: true,
+                updateGlobalListOrder: true
             }).then(() => {
                 self.displayOrderModified = true;
             }).catch(error => {

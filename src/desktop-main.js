@@ -373,7 +373,7 @@ app.use(router);
 app.component('VChart', VChart);
 app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
-app.component('draggable', draggable);
+app.component('DraggableList', draggable);
 
 app.component('PinCodeInput', PinCodeInput);
 

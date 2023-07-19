@@ -102,7 +102,7 @@
 
                                 <v-row class="pl-4 pr-8" v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length">
                                     <v-col cols="12">
-                                        <draggable
+                                        <draggable-list
                                             class="list-group"
                                             item-key="id"
                                             handle=".drag-handle"
@@ -197,7 +197,7 @@
                                                     </v-card>
                                                 </div>
                                             </template>
-                                        </draggable>
+                                        </draggable-list>
                                     </v-col>
                                 </v-row>
                             </v-card>
@@ -417,7 +417,8 @@ export default {
                 accountId: moveEvent.element.id,
                 from: moveEvent.oldIndex,
                 to: moveEvent.newIndex,
-                onlyUpdateGlobalList: true
+                updateListOrder: false,
+                updateGlobalListOrder: true
             }).then(() => {
                 self.displayOrderModified = true;
             }).catch(error => {
@@ -440,7 +441,7 @@ export default {
                 self.loading = false;
 
                 if (!error.processed) {
-                    self.$toast(error.message || error);
+                    self.$refs.snackbar.showError(error);
                 }
             });
         },

@@ -3,7 +3,7 @@
         <slot></slot>
     </i>
     <v-badge class="right-bottom-icon" color="secondary"
-             location="bottom right" offset-y="2" :icon="icons.hide"
+             location="bottom right" offset-y="4" :icon="icons.hide"
              v-if="hiddenStatus">
         <i class="item-icon" :class="classes" :style="style">
             <slot></slot>

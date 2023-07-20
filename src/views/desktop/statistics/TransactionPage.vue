@@ -55,7 +55,7 @@
                                                                 class="cursor-pointer"
                                                                 @click="setDateFilter(dateRange.type)">
                                                                 {{ $t(dateRange.name) }}
-                                                                <div class="text-body-2" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
+                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
                                                                     <small>
                                                                         <span>{{ queryStartTime }}</span>
                                                                         <span>&nbsp;-&nbsp;</span>
@@ -540,6 +540,11 @@ export default {
 .statistics-toolbar {
     overflow-x: auto;
     white-space: nowrap;
+}
+
+.statistics-custom-datetime-range {
+    font-size: 0.7rem;
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
 }
 
 .statistics-overview-title {

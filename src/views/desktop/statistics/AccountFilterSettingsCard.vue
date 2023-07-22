@@ -52,7 +52,7 @@
         </div>
 
         <v-card-text v-if="!loading && !hasAnyAvailableAccount">
-            <span class="text-subtitle-1">{{ $t('No available account') }}</span>
+            <span class="text-body-1">{{ $t('No available account') }}</span>
         </v-card-text>
 
         <v-card-text v-else-if="!loading && hasAnyAvailableAccount">

@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': updatingPassword }" :title="$t('Modify Password')">
                 <v-form>
                     <v-card-text class="pt-0">
-                        <span class="text-subtitle-1">{{ $t('After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.') }}</span>
+                        <span class="text-body-1">{{ $t('After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.') }}</span>
                     </v-card-text>
 
                     <v-card-text>

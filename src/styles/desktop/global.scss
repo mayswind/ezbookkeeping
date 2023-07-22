@@ -109,6 +109,30 @@ input[type=number] {
     th {
         background: rgb(var(--v-table-header-background)) !important;
     }
+
+    tr:nth-child(even) {
+        background: #fcfcfc;
+    }
+
+    tr.even-row {
+        background: #fcfcfc;
+    }
+
+    tbody.has-bottom-border > tr:last-child > td {
+        border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+}
+
+.v-theme--dark {
+    .v-table {
+        tr:nth-child(even) {
+            background: #161616;
+        }
+
+        tr.even-row {
+            background: #161616;
+        }
+    }
 }
 
 .right-bottom-icon .v-badge__badge {
@@ -124,6 +148,10 @@ input[type=number] {
 .text-subtitle-1,
 .text-subtitle-2 {
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.text-caption {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
 
 .v-label {

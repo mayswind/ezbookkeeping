@@ -6,19 +6,19 @@
                     <div>
                         <div class="mx-6 my-4">
                             <small>{{ $t('Data source') }}</small>
-                            <p class="text-subtitle-1 mb-2">
+                            <p class="text-body-1 mt-1 mb-3">
                                 <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                                 <span v-else-if="!loading && exchangeRatesData && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
                                 <span v-else-if="!loading && !exchangeRatesData">{{ $t('None') }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-2 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small v-if="exchangeRatesDataUpdateTime">{{ $t('Last Updated') }}</small>
-                            <p class="text-subtitle-1" v-if="exchangeRatesDataUpdateTime">
+                            <p class="text-body-1 mt-1" v-if="exchangeRatesDataUpdateTime">
                                 <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
                                 <span v-if="loading">
-                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-2 mb-6" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="exchange-rates-summary-skeleton mt-3 mb-5" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                         </div>
@@ -86,10 +86,10 @@
 
                                     <tr :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
                                         <td>
-                                            <span>{{ exchangeRate.currencyDisplayName }}</span>
-                                            <small class="smaller ml-1">{{ exchangeRate.currencyCode }}</small>
+                                            <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
+                                            <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
                                         </td>
-                                        <td class="text-right">{{ getDisplayConvertedAmount(exchangeRate) }}</td>
+                                        <td class="text-sm text-right">{{ getDisplayConvertedAmount(exchangeRate) }}</td>
                                     </tr>
                                     </tbody>
                                 </v-table>

@@ -8,7 +8,7 @@
                         <v-btn class="ml-3" color="default" variant="outlined"
                                :disabled="loading || updating || hasEditingTag" @click="add">{{ $t('Add') }}</v-btn>
                         <v-btn class="ml-3" color="primary" variant="tonal"
-                               :disabled="loading" @click="saveSortResult"
+                               :disabled="loading || updating || hasEditingTag" @click="saveSortResult"
                                v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text"
                                class="ml-2" :icon="true" :disabled="loading || updating || hasEditingTag"
@@ -61,19 +61,20 @@
                                     item-key="id"
                                     handle=".drag-handle"
                                     ghost-class="dragging-item"
+                                    :class="{ 'has-bottom-border': newTag }"
                                     :disabled="noAvailableTag"
                                     v-model="tags"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr v-show="showHidden || !element.hidden">
+                            <tr class="text-sm" v-if="showHidden || !element.hidden">
                                 <td>
                                     <div class="d-flex align-center" v-if="editingTag.id !== element.id">
                                         <v-badge class="right-bottom-icon" color="secondary"
                                                  location="bottom right" offset-x="8" :icon="icons.hide"
                                                  v-if="element.hidden">
-                                            <v-icon size="24" start :icon="icons.tag"/>
+                                            <v-icon size="20" start :icon="icons.tag"/>
                                         </v-badge>
-                                        <v-icon size="24" start :icon="icons.tag" v-else-if="!element.hidden"/>
+                                        <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
                                         {{ element.name }}
                                     </div>
                                     <v-text-field
@@ -91,9 +92,9 @@
                                             <v-badge class="right-bottom-icon" color="secondary"
                                                      location="bottom right" offset-x="8" :icon="icons.hide"
                                                      v-if="element.hidden">
-                                                <v-icon size="24" start :icon="icons.tag"/>
+                                                <v-icon size="20" start :icon="icons.tag"/>
                                             </v-badge>
-                                            <v-icon size="24" start :icon="icons.tag" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
                                         </template>
                                     </v-text-field>
                                 </td>
@@ -151,14 +152,14 @@
                     </draggable-list>
 
                     <tbody v-if="newTag">
-                    <tr>
+                    <tr class="text-sm" :class="{ 'even-row': availableTagCount & 1 === 1}">
                         <td>
                             <v-text-field type="text" color="primary" clearable
                                           density="compact" variant="underlined"
                                           :disabled="loading || updating" :placeholder="$t('Tag Title')"
                                           v-model="newTag.name" @keyup.enter="save(newTag)">
                                 <template #prepend>
-                                    <v-icon size="24" start :icon="icons.tag"/>
+                                    <v-icon size="20" start :icon="icons.tag"/>
                                 </template>
                             </v-text-field>
                         </td>
@@ -462,15 +463,16 @@ export default {
 }
 
 .transaction-tags-table .v-text-field.v-text-field--plain-underlined .v-input__prepend {
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
 .transaction-tags-table tr:last-child .v-text-field.v-text-field--plain-underlined .v-input__prepend {
-    padding-top: 9px;
+    padding-top: 11px;
 }
 
 .transaction-tags-table .v-text-field .v-field__input {
-    padding-top: 2px;
+    font-size: 0.875rem;
+    padding-top: 1px;
     color: rgba(var(--v-theme-on-surface));
 }
 </style>

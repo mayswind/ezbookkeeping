@@ -5,26 +5,26 @@
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-subtitle-1">{{ $t('Version') }}</span>
+                            <span class="text-body-1">{{ $t('Version') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-subtitle-1">{{ version }}</span>
+                            <span class="text-body-1">{{ version }}</span>
                         </v-col>
                     </v-row>
                     <v-row no-gutters v-if="buildTime">
                         <v-col cols="12" md="2">
-                            <span class="text-subtitle-1">{{ $t('Build Time') }}</span>
+                            <span class="text-body-1">{{ $t('Build Time') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-subtitle-1">{{ buildTime }}</span>
+                            <span class="text-body-1">{{ buildTime }}</span>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-subtitle-1">{{ $t('Official Website') }}</span>
+                            <span class="text-body-1">{{ $t('Official Website') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <a class="text-subtitle-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
+                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
                                 https://github.com/mayswind/ezbookkeeping
                             </a>
                         </v-col>

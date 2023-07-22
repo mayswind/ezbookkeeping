@@ -81,7 +81,7 @@
         <v-col cols="12" v-if="isDataExportingEnabled">
             <v-card :class="{ 'disabled': exportingData }" :title="$t('Export Data')">
                 <v-card-text>
-                    <span class="text-subtitle-1">{{ $t('Export all data to csv file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
+                    <span class="text-body-1">{{ $t('Export all data to csv file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">
@@ -101,7 +101,7 @@
 
                 <v-form>
                     <v-card-text class="py-0">
-                    <span class="text-subtitle-1 text-error">
+                    <span class="text-body-1 text-error">
                         <v-icon :icon="icons.alert"/>
                         {{ $t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.') }}
                     </span>

@@ -227,6 +227,9 @@ const vuetify = createVuetify({
         VSnackbar: {
             timeout: 3000
         },
+        VTable: {
+            hover: true
+        },
         VTabs: {
             color: 'primary',
             VSlideGroup: {

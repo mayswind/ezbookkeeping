@@ -6,24 +6,24 @@
                     <div>
                         <div class="mx-6 my-4">
                             <small>{{ $t('Net assets') }}</small>
-                            <p class="text-subtitle-1 text-income mb-2">
+                            <p class="text-body-1 text-income mt-1 mb-3">
                                 <span v-if="!loading">{{ netAssets }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-2 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total liabilities') }}</small>
-                            <p class="text-subtitle-1 text-expense mb-2">
+                            <p class="text-body-1 text-expense mt-1 mb-3">
                                 <span v-if="!loading">{{ totalLiabilities }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-2 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total assets') }}</small>
-                            <p class="text-subtitle-1">
+                            <p class="text-body-1 mt-1">
                                 <span v-if="!loading">{{ totalAssets }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-2 mb-6" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-5" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                         </div>
@@ -116,10 +116,10 @@
                                                     <v-card border class="card-title-with-bg account-card mb-8 h-auto" v-if="showHidden || !element.hidden">
                                                         <template #title>
                                                             <div class="account-title d-flex align-baseline">
-                                                                <ItemIcon icon-type="account" :icon-id="element.icon"
+                                                                <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
                                                                           :color="element.color" :hidden-status="element.hidden" />
-                                                                <span class="account-name ml-3">{{ element.name }}</span>
-                                                                <small class="account-currency ml-3">
+                                                                <span class="account-name ml-2">{{ element.name }}</span>
+                                                                <small class="account-currency ml-2">
                                                                     {{ accountCurrency(element) }}
                                                                 </small>
                                                                 <v-spacer/>
@@ -147,9 +147,9 @@
                                                                     <v-btn :key="subAccount.id" :value="subAccount.id"
                                                                            v-for="subAccount in element.subAccounts"
                                                                            v-show="showHidden || !subAccount.hidden">
-                                                                        <ItemIcon icon-type="account" :icon-id="subAccount.icon"
+                                                                        <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
                                                                                   :color="subAccount.color" :hidden-status="subAccount.hidden" />
-                                                                        <span class="ml-3">{{ subAccount.name }}</span>
+                                                                        <span class="ml-2">{{ subAccount.name }}</span>
                                                                     </v-btn>
                                                                 </v-btn-toggle>
                                                             </div>
@@ -521,7 +521,13 @@ export default {
     text-overflow: ellipsis;
 }
 
+.account-card > .v-card-item {
+    padding-top: 0.875rem;
+    padding-bottom: 0.875rem;
+}
+
 .account-card .account-title {
+    font-size: 1rem;
     line-height: 1.5rem !important;
 }
 
@@ -545,7 +551,7 @@ export default {
 }
 
 .account-card .account-balance {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
 }
 </style>

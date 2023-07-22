@@ -3,10 +3,10 @@
         <v-col cols="12">
             <v-card :title="$t('Application Lock')">
                 <v-card-text class="pb-0">
-                    <p class="text-subtitle-1 font-weight-semibold" v-if="!isEnableApplicationLock">
+                    <p class="text-body-1 font-weight-semibold" v-if="!isEnableApplicationLock">
                         {{ $t('Application lock is not enabled') }}
                     </p>
-                    <p class="text-subtitle-1" v-if="isEnableApplicationLock">
+                    <p class="text-body-1" v-if="isEnableApplicationLock">
                         {{ $t('Application lock has been enabled') }}
                     </p>
                 </v-card-text>
@@ -22,10 +22,10 @@
                 </v-card-text>
 
                 <v-card-text class="pb-0">
-                    <p class="text-subtitle-1 font-weight-semibold" v-if="!isEnableApplicationLock">
+                    <p class="text-body-1 font-weight-semibold" v-if="!isEnableApplicationLock">
                         {{ $t('Please input a new 6-digit PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.') }}
                     </p>
-                    <p class="text-subtitle-1 font-weight-semibold" v-if="isEnableApplicationLock">
+                    <p class="text-body-1 font-weight-semibold" v-if="isEnableApplicationLock">
                         {{ $t('Please enter your current PIN code when disable application lock.') }}
                     </p>
                 </v-card-text>

@@ -87,7 +87,7 @@
                     </div>
                 </template>
 
-                <v-table class="text-no-wrap">
+                <v-table class="table-striped text-no-wrap">
                     <thead>
                     <tr>
                         <th class="text-uppercase">{{ $t('Type') }}</th>

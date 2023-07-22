@@ -110,11 +110,13 @@ input[type=number] {
         background: rgb(var(--v-table-header-background)) !important;
     }
 
-    tr:nth-child(even) {
+    tr.even-row {
         background: #fcfcfc;
     }
+}
 
-    tr.even-row {
+.v-table.table-striped {
+    tr:nth-child(even) {
         background: #fcfcfc;
     }
 
@@ -125,11 +127,15 @@ input[type=number] {
 
 .v-theme--dark {
     .v-table {
-        tr:nth-child(even) {
+        tr.even-row {
             background: #161616;
         }
+    }
+}
 
-        tr.even-row {
+.v-theme--dark {
+    .v-table.table-striped {
+        tr:nth-child(even) {
             background: #161616;
         }
     }

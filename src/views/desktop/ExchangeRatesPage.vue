@@ -64,7 +64,7 @@
                                     </div>
                                 </template>
 
-                                <v-table>
+                                <v-table class="table-striped">
                                     <thead>
                                     <tr>
                                         <th class="text-uppercase">{{ $t('Currency') }}</th>

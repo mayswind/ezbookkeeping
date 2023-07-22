@@ -18,7 +18,7 @@
                 <f7-searchbar
                     custom-searchs
                     :value="query.keyword"
-                    :placeholder="$t('Search transaction comment')"
+                    :placeholder="$t('Search transaction description')"
                     :disable-button-text="$t('Cancel')"
                     @change="changeKeywordFilter($event.target.value)"
                 ></f7-searchbar>
@@ -91,8 +91,8 @@
                                             </div>
                                         </div>
                                         <div class="item-text">
-                                            <div class="transaction-comment">
-                                                <span>Transaction Comment</span>
+                                            <div class="transaction-description">
+                                                <span>Transaction Description</span>
                                             </div>
                                         </div>
                                         <div class="item-footer">
@@ -201,7 +201,7 @@
                                             </div>
                                         </div>
                                         <div class="item-text">
-                                            <div class="transaction-comment" v-if="transaction.comment">
+                                            <div class="transaction-description" v-if="transaction.comment">
                                                 <span>{{ transaction.comment }}</span>
                                             </div>
                                         </div>
@@ -952,7 +952,7 @@ export default {
     font-size: var(--ebk-transaction-day-of-week-font-size);
 }
 
-.list.transaction-info-list li.transaction-info .transaction-comment {
+.list.transaction-info-list li.transaction-info .transaction-description {
     font-size: var(--ebk-large-footer-font-size);
     line-height: 20px;
     padding-top: 2px;

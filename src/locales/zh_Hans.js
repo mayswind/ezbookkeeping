@@ -939,7 +939,7 @@ export default {
     'Unable to save transaction': '无法保存交易',
     'You have added a new transaction': '您已经添加新交易',
     'You have saved this transaction': '您已经保存该交易',
-    'Search transaction comment': '搜索交易描述',
+    'Search transaction description': '搜索交易描述',
     'Unable to get transaction list': '无法获取交易列表',
     'Custom Date Range': '自定义日期范围',
     'Transaction Detail': '交易详情',

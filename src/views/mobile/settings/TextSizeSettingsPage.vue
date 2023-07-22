@@ -58,7 +58,7 @@
                                                 </div>
                                             </div>
                                             <div class="item-text">
-                                                <div class="transaction-comment">
+                                                <div class="transaction-description">
                                                     <span>{{ $t('Description') }}</span>
                                                 </div>
                                             </div>

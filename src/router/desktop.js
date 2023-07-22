@@ -76,35 +76,43 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    component: HomePage
+                    component: HomePage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/transactions',
-                    component: TransactionsPage
+                    component: TransactionsPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/statistics/transaction',
-                    component: StatisticsTransactionPage
+                    component: StatisticsTransactionPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/accounts',
-                    component: AccountsPage
+                    component: AccountsPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/categories',
-                    component: TransactionCategoriesPage
+                    component: TransactionCategoriesPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/tags',
-                    component: TransactionTagsPage
+                    component: TransactionTagsPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/exchange_rates',
-                    component: ExchangeRatesPage
+                    component: ExchangeRatesPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/user/settings',
                     component: UserSettingsPage,
+                    beforeEnter: checkLogin,
                     props: route => ({
                         tab: route.query.tab
                     })
@@ -112,13 +120,15 @@ const router = createRouter({
                 {
                     path: '/app/settings',
                     component: AppSettingsPage,
+                    beforeEnter: checkLogin,
                     props: route => ({
                         tab: route.query.tab
                     })
                 },
                 {
                     path: '/about',
-                    component: AboutPage
+                    component: AboutPage,
+                    beforeEnter: checkLogin
                 }
             ]
         },

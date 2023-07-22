@@ -35,7 +35,7 @@
                     </div>
                 </template>
 
-                <v-table class="transaction-tags-table table-striped">
+                <v-table class="transaction-tags-table table-striped" :hover="!loading">
                     <thead>
                     <tr>
                         <th class="text-uppercase" style="width: 50%">{{ $t('Tag Title') }}</th>

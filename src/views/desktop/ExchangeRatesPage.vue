@@ -64,7 +64,7 @@
                                     </div>
                                 </template>
 
-                                <v-table class="table-striped">
+                                <v-table class="table-striped" :hover="!loading">
                                     <thead>
                                     <tr>
                                         <th class="text-uppercase">{{ $t('Currency') }}</th>
@@ -74,7 +74,7 @@
 
                                     <tbody>
                                     <tr :key="itemIdx"
-                                        v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3 ] : [])">
+                                        v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] : [])">
                                         <td class="px-0" colspan="2">
                                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                         </td>

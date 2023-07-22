@@ -72,6 +72,8 @@
     --ebk-transaction-date-width: 40px;
     --ebk-transaction-day-font-size: 24px;
     --ebk-transaction-day-of-week-font-size: 19px;
+    --ebk-transaction-account-arrow-font-size: 19px;
+    --ebk-transaction-account-arrow-margin-bottom: 3px;
     --ebk-login-page-title-font-size: 28px;
     --ebk-license-popup-title-font-size: 40px;
     --ebk-license-content-font-size: 21px;

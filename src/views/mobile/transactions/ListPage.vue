@@ -211,7 +211,7 @@
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
                                                 <span v-if="transaction.sourceAccount">·</span>
                                                 <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">→</span>
+                                                <f7-icon f7="arrow_right" class="transaction-account-arrow" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></f7-icon>
                                                 <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                             </div>
                                         </div>
@@ -969,6 +969,12 @@ export default {
 
 .list.transaction-info-list li.transaction-info .transaction-footer > span {
     margin-right: 4px;
+}
+
+.list.transaction-info-list li.transaction-info .transaction-footer .transaction-account-arrow {
+    font-size: var(--ebk-transaction-account-arrow-font-size);
+    margin-right: 4px;
+    margin-bottom: var(--ebk-transaction-account-arrow-margin-bottom);
 }
 
 .list.transaction-info-list li.transaction-info .transaction-amount {

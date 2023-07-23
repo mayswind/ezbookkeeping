@@ -377,7 +377,31 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.keyword = filter.keyword;
             }
         },
-        loadTransactions({ reload, autoExpand, defaultCurrency }) {
+        getTransactionListPageParams() {
+            const querys = [];
+
+            if (this.transactionsFilter.type) {
+                querys.push('type=' + this.transactionsFilter.type);
+            }
+
+            if (this.transactionsFilter.accountId && this.transactionsFilter.accountId !== '0') {
+                querys.push('accountId=' + this.transactionsFilter.accountId);
+            }
+
+            if (this.transactionsFilter.categoryId && this.transactionsFilter.categoryId !== '0') {
+                querys.push('categoryId=' + this.transactionsFilter.categoryId);
+            }
+
+            querys.push('dateType=' + this.transactionsFilter.dateType);
+
+            if (this.transactionsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
+                querys.push('maxTime=' + this.transactionsFilter.maxTime);
+                querys.push('minTime=' + this.transactionsFilter.minTime);
+            }
+
+            return querys.join('&');
+        },
+        loadTransactions({ reload, yearMonth, autoExpand, defaultCurrency }) {
             const self = this;
             const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
@@ -390,14 +414,29 @@ export const useTransactionsStore = defineStore('transactions', {
             }
 
             return new Promise((resolve, reject) => {
-                services.getTransactions({
+                let promise = null;
+
+                if (yearMonth) {
+                    promise = services.getAllTransactionsByMonth({
+                        year: yearMonth.year,
+                        month: yearMonth.month,
+                        type: self.transactionsFilter.type,
+                        categoryId: self.transactionsFilter.categoryId,
+                        accountId: self.transactionsFilter.accountId,
+                        keyword: self.transactionsFilter.keyword
+                    });
+                } else {
+                    promise = services.getTransactions({
                         maxTime: actualMaxTime,
                         minTime: self.transactionsFilter.minTime * 1000,
                         type: self.transactionsFilter.type,
                         categoryId: self.transactionsFilter.categoryId,
                         accountId: self.transactionsFilter.accountId,
                         keyword: self.transactionsFilter.keyword
-                }).then(response => {
+                    });
+                }
+
+                promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {

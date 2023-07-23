@@ -331,6 +331,70 @@ export function getDateRangeByDateType(dateType, firstDayOfWeek) {
     };
 }
 
+export function getRecentMonthDateRanges(monthCount) {
+    const recentDateRanges = [];
+    const thisMonthFirstUnixTime = getThisMonthFirstUnixTime();
+
+    for (let i = 0; i < monthCount; i++) {
+        let minTime = thisMonthFirstUnixTime;
+
+        if (i > 0) {
+            minTime = getUnixTimeBeforeUnixTime(thisMonthFirstUnixTime, i, 'months');
+        }
+
+        let maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
+        let dateType = dateTimeConstants.allDateRanges.Custom.type;
+        let year = getYear(parseDateFromUnixTime(minTime));
+        let month = getMonth(parseDateFromUnixTime(minTime));
+
+        if (i === 0) {
+            dateType = dateTimeConstants.allDateRanges.ThisMonth.type;
+        } else if (i === 1) {
+            dateType = dateTimeConstants.allDateRanges.LastMonth.type;
+        }
+
+        recentDateRanges.push({
+            dateType: dateType,
+            minTime: minTime,
+            maxTime: maxTime,
+            year: year,
+            month: month
+        });
+    }
+
+    return recentDateRanges;
+}
+
+export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTime, maxTime, firstDayOfWeek) {
+    let dateRange = getDateRangeByDateType(dateType, firstDayOfWeek);
+
+    if (dateRange && dateRange.dateType === dateTimeConstants.allDateRanges.All.type) {
+        return allRecentMonthDateRanges.length - 1; // Custom
+    }
+
+    if (!dateRange && (!maxTime || !minTime)) {
+        return allRecentMonthDateRanges.length - 1; // Custom
+    }
+
+    if (!dateRange) {
+        dateRange = {
+            dateType: dateTimeConstants.allDateRanges.Custom.type,
+            maxTime: maxTime,
+            minTime: minTime
+        };
+    }
+
+    for (let i = 0; i < allRecentMonthDateRanges.length - 1; i++) {
+        const recentDateRange = allRecentMonthDateRanges[i];
+
+        if (recentDateRange.minTime === dateRange.minTime && recentDateRange.maxTime === dateRange.maxTime) {
+            return i;
+        }
+    }
+
+    return allRecentMonthDateRanges.length - 1; // Custom
+}
+
 export function isDateRangeMatchFullYears(minTime, maxTime) {
     const minDateTime = parseDateFromUnixTime(minTime).set({ second: 0, millisecond: 0 });
     const maxDateTime = parseDateFromUnixTime(maxTime).set({ second: 59, millisecond: 999 });

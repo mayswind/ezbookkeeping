@@ -113,15 +113,21 @@ input[type=number] {
     tr.even-row {
         background: #fcfcfc;
     }
+
+    tbody.has-bottom-border > tr:last-child > td {
+        border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+}
+
+.v-table.v-table--hover {
+    tbody > tr.no-hover:hover td {
+        background: inherit !important;
+    }
 }
 
 .v-table.table-striped {
     tr:nth-child(even) {
         background: #fcfcfc;
-    }
-
-    tbody.has-bottom-border > tr:last-child > td {
-        border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
     }
 }
 

@@ -82,7 +82,15 @@ const router = createRouter({
                 {
                     path: '/transactions',
                     component: TransactionsPage,
-                    beforeEnter: checkLogin
+                    beforeEnter: checkLogin,
+                    props: route => ({
+                        initDateType: route.query.dateType,
+                        initMaxTime: route.query.maxTime,
+                        initMinTime: route.query.minTime,
+                        initType: route.query.type,
+                        initCategoryId: route.query.categoryId,
+                        initAccountId: route.query.accountId
+                    })
                 },
                 {
                     path: '/statistics/transaction',

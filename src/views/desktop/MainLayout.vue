@@ -27,7 +27,7 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/transactions">
+                    <router-link to="/transactions?dateType=7">
                         <v-icon class="nav-item-icon" :icon="icons.transactions"/>
                         <span class="nav-item-title">{{ $t('Transaction List') }}</span>
                     </router-link>

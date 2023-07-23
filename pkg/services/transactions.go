@@ -98,11 +98,11 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32,
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	if page < 1 {
+	if page < 0 || (count > 0 && page < 1) {
 		return nil, errs.ErrPageIndexInvalid
 	}
 
-	if count < 1 {
+	if count < 0 {
 		return nil, errs.ErrPageCountInvalid
 	}
 
@@ -120,7 +120,13 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32,
 	var transactions []*models.Transaction
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(count), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
+	sess := s.UserDataDB(uid).Where(condition, conditionParams...)
+
+	if count > 0 {
+		sess = sess.Limit(int(count), int(count*(page-1)))
+	}
+
+	err = sess.OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }

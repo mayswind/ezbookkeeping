@@ -22,6 +22,7 @@ import {
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
     getDateTimeFormatType,
+    getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
     isDateRangeMatchFullMonths
 } from './datetime.js';
@@ -388,8 +389,16 @@ function getMonthShortName(month, translateFn) {
     return translateFn(`datetime.${month}.short`);
 }
 
+function getMonthLongName(month, translateFn) {
+    return translateFn(`datetime.${month}.long`);
+}
+
 function getWeekdayShortName(weekDay, translateFn) {
     return translateFn(`datetime.${weekDay}.short`);
+}
+
+function getWeekdayLongName(weekDay, translateFn) {
+    return translateFn(`datetime.${weekDay}.long`);
 }
 
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
@@ -586,6 +595,35 @@ function getAllDateRanges(includeCustom, translateFn) {
     }
 
     return allDateRanges;
+}
+
+function getAllRecentMonthDateRanges(userStore, includeCustom, translateFn) {
+    const allRecentMonthDateRanges = [];
+    const recentDateRanges = getRecentMonthDateRanges(12);
+
+    for (let i = 0; i < recentDateRanges.length; i++) {
+        const recentDateRange = recentDateRanges[i];
+
+        allRecentMonthDateRanges.push({
+            dateType: recentDateRange.dateType,
+            minTime: recentDateRange.minTime,
+            maxTime: recentDateRange.maxTime,
+            year: recentDateRange.year,
+            month: recentDateRange.month,
+            displayName: formatUnixTime(recentDateRange.minTime, getI18nLongYearMonthFormat(translateFn, userStore.currentUserLongDateFormat))
+        });
+    }
+
+    if (includeCustom) {
+        allRecentMonthDateRanges.push({
+            dateType: datetime.allDateRanges.Custom.type,
+            minTime: 0,
+            maxTime: 0,
+            displayName: translateFn('Custom Date')
+        });
+    }
+
+    return allRecentMonthDateRanges;
 }
 
 function getDateRangeDisplayName(userStore, dateType, startTime, endTime, translateFn) {
@@ -993,7 +1031,9 @@ export function i18nFunctions(i18nGlobal) {
         getAllLongTimeFormats: () => getAllLongTimeFormats(i18nGlobal.t),
         getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
         getMonthShortName: (month) => getMonthShortName(month, i18nGlobal.t),
+        getMonthLongName: (month) => getMonthLongName(month, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
+        getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
@@ -1014,6 +1054,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
+        getAllRecentMonthDateRanges: (userStore, includeCustom) => getAllRecentMonthDateRanges(userStore, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),

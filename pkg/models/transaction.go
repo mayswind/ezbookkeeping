@@ -126,8 +126,8 @@ type TransactionListInMonthByPageRequest struct {
 	CategoryId   int64             `form:"category_id" binding:"min=0"`
 	AccountId    int64             `form:"account_id" binding:"min=0"`
 	Keyword      string            `form:"keyword"`
-	Page         int32             `form:"page" binding:"required,min=1"`
-	Count        int32             `form:"count" binding:"required,min=1,max=50"`
+	Page         int32             `form:"page" binding:"min=0"`
+	Count        int32             `form:"count" binding:"min=0,max=50"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`

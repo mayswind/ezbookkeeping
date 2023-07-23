@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="460" v-model="showState">
+    <v-dialog width="460" :persistent="!!persistent" v-model="showState">
         <v-card>
             <v-toolbar color="primary">
                 <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -72,6 +72,7 @@ export default {
         'maxTime',
         'title',
         'hint',
+        'persistent',
         'show'
     ],
     emits: [

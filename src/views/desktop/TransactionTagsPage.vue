@@ -38,14 +38,19 @@
                 <v-table class="transaction-tags-table table-striped" :hover="!loading">
                     <thead>
                     <tr>
-                        <th class="text-uppercase" style="width: 50%">{{ $t('Tag Title') }}</th>
-                        <th class="text-uppercase text-right">{{ $t('Operation') }}</th>
+                        <th class="text-uppercase">
+                            <div class="d-flex align-center">
+                                <span>{{ $t('Tag Title') }}</span>
+                                <v-spacer/>
+                                <span>{{ $t('Operation') }}</span>
+                            </div>
+                        </th>
                     </tr>
                     </thead>
 
                     <tbody v-if="loading && noAvailableTag && !newTag">
                     <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
-                        <td class="px-0" colspan="2">
+                        <td class="px-0">
                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                         </td>
                     </tr>
@@ -53,7 +58,7 @@
 
                     <tbody v-if="!loading && noAvailableTag && !newTag">
                     <tr>
-                        <td colspan="2">{{ $t('No available tag') }}</td>
+                        <td>{{ $t('No available tag') }}</td>
                     </tr>
                     </tbody>
 
@@ -66,86 +71,87 @@
                                     v-model="tags"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr class="text-sm" v-if="showHidden || !element.hidden">
+                            <tr class="transaction-tags-table-row-tag text-sm" v-if="showHidden || !element.hidden">
                                 <td>
-                                    <div class="d-flex align-center" v-if="editingTag.id !== element.id">
-                                        <v-badge class="right-bottom-icon" color="secondary"
-                                                 location="bottom right" offset-x="8" :icon="icons.hide"
-                                                 v-if="element.hidden">
-                                            <v-icon size="20" start :icon="icons.tag"/>
-                                        </v-badge>
-                                        <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
-                                        {{ element.name }}
-                                    </div>
-                                    <v-text-field
-                                        type="text"
-                                        clearable
-                                        density="compact"
-                                        variant="underlined"
-                                        :disabled="loading || updating"
-                                        :placeholder="$t('Tag Title')"
-                                        v-model="editingTag.name"
-                                        v-else-if="editingTag.id === element.id"
-                                        @keyup.enter="save(editingTag)"
-                                    >
-                                        <template #prepend>
+                                    <div class="d-flex align-center">
+                                        <div class="d-flex align-center" v-if="editingTag.id !== element.id">
                                             <v-badge class="right-bottom-icon" color="secondary"
                                                      location="bottom right" offset-x="8" :icon="icons.hide"
                                                      v-if="element.hidden">
                                                 <v-icon size="20" start :icon="icons.tag"/>
                                             </v-badge>
                                             <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
-                                        </template>
-                                    </v-text-field>
-                                </td>
-                                <td class="text-uppercase text-right">
-                                    <v-btn class="px-2" color="default"
-                                           density="comfortable" variant="text"
-                                           :prepend-icon="icons.edit"
-                                           :loading="tagUpdating[element.id]"
-                                           :disabled="loading || updating"
-                                           v-if="editingTag.id !== element.id"
-                                           @click="edit(element)">
-                                        {{ $t('Edit') }}
-                                    </v-btn>
-                                    <v-btn class="px-2 ml-2" color="default"
-                                           density="comfortable" variant="text"
-                                           :prepend-icon="element.hidden ? icons.show : icons.hide"
-                                           :loading="tagHiding[element.id]"
-                                           :disabled="loading || updating"
-                                           v-if="editingTag.id !== element.id"
-                                           @click="hide(element, !element.hidden)">
-                                        {{ element.hidden ? $t('Show') : $t('Hide') }}
-                                    </v-btn>
-                                    <v-btn class="px-2 ml-2" color="default"
-                                           density="comfortable" variant="text"
-                                           :prepend-icon="icons.remove"
-                                           :loading="tagRemoving[element.id]"
-                                           :disabled="loading || updating"
-                                           v-if="editingTag.id !== element.id"
-                                           @click="remove(element)">
-                                        {{ $t('Delete') }}
-                                    </v-btn>
-                                    <v-btn class="px-2"
-                                           density="comfortable" variant="text"
-                                           :prepend-icon="icons.confirm"
-                                           :loading="tagUpdating[element.id]"
-                                           :disabled="loading || updating || !isTagModified(element)"
-                                           v-if="editingTag.id === element.id" @click="save(editingTag)">
-                                        {{ $t('Save') }}
-                                    </v-btn>
-                                    <v-btn class="px-2 ml-2" color="default"
-                                           density="comfortable" variant="text"
-                                           :prepend-icon="icons.cancel"
-                                           :disabled="loading || updating"
-                                           v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
-                                        {{ $t('Cancel') }}
-                                    </v-btn>
-                                    <span>
-                                        <v-icon :class="availableTagCount > 1 ? 'drag-handle' : 'disabled'"
-                                                :icon="icons.drag"/>
-                                        <v-tooltip activator="parent" v-if="availableTagCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
-                                    </span>
+                                            <span>{{ element.name }}</span>
+                                        </div>
+
+                                        <v-text-field class="w-100 mr-2" type="text"
+                                            clearable density="compact" variant="underlined"
+                                            :disabled="loading || updating"
+                                            :placeholder="$t('Tag Title')"
+                                            v-model="editingTag.name"
+                                            v-else-if="editingTag.id === element.id"
+                                            @keyup.enter="save(editingTag)"
+                                        >
+                                            <template #prepend>
+                                                <v-badge class="right-bottom-icon" color="secondary"
+                                                         location="bottom right" offset-x="8" :icon="icons.hide"
+                                                         v-if="element.hidden">
+                                                    <v-icon size="20" start :icon="icons.tag"/>
+                                                </v-badge>
+                                                <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
+                                            </template>
+                                        </v-text-field>
+
+                                        <v-spacer/>
+
+                                        <v-btn class="hover-display px-2" color="default"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="icons.edit"
+                                               :loading="tagUpdating[element.id]"
+                                               :disabled="loading || updating"
+                                               v-if="editingTag.id !== element.id"
+                                               @click="edit(element)">
+                                            {{ $t('Edit') }}
+                                        </v-btn>
+                                        <v-btn class="hover-display px-2 ml-2" color="default"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                               :loading="tagHiding[element.id]"
+                                               :disabled="loading || updating"
+                                               v-if="editingTag.id !== element.id"
+                                               @click="hide(element, !element.hidden)">
+                                            {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                        </v-btn>
+                                        <v-btn class="hover-display px-2 ml-2" color="default"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="icons.remove"
+                                               :loading="tagRemoving[element.id]"
+                                               :disabled="loading || updating"
+                                               v-if="editingTag.id !== element.id"
+                                               @click="remove(element)">
+                                            {{ $t('Delete') }}
+                                        </v-btn>
+                                        <v-btn class="px-2"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="icons.confirm"
+                                               :loading="tagUpdating[element.id]"
+                                               :disabled="loading || updating || !isTagModified(element)"
+                                               v-if="editingTag.id === element.id" @click="save(editingTag)">
+                                            {{ $t('Save') }}
+                                        </v-btn>
+                                        <v-btn class="px-2 ml-2" color="default"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="icons.cancel"
+                                               :disabled="loading || updating"
+                                               v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
+                                            {{ $t('Cancel') }}
+                                        </v-btn>
+                                        <span>
+                                            <v-icon :class="availableTagCount > 1 ? 'drag-handle' : 'disabled'"
+                                                    :icon="icons.drag"/>
+                                            <v-tooltip activator="parent" v-if="availableTagCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                        </span>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
@@ -154,33 +160,36 @@
                     <tbody v-if="newTag">
                     <tr class="text-sm" :class="{ 'even-row': availableTagCount & 1 === 1}">
                         <td>
-                            <v-text-field type="text" color="primary" clearable
-                                          density="compact" variant="underlined"
-                                          :disabled="loading || updating" :placeholder="$t('Tag Title')"
-                                          v-model="newTag.name" @keyup.enter="save(newTag)">
-                                <template #prepend>
-                                    <v-icon size="20" start :icon="icons.tag"/>
-                                </template>
-                            </v-text-field>
-                        </td>
-                        <td class="text-uppercase text-right">
-                            <v-btn class="px-2" density="comfortable" variant="text"
-                                   :prepend-icon="icons.confirm"
-                                   :loading="tagUpdating[null]"
-                                   :disabled="loading || updating || !isTagModified(newTag)"
-                                   @click="save(newTag)">
-                                {{ $t('Save') }}
-                            </v-btn>
-                            <v-btn class="px-2 ml-2" color="default"
-                                   density="comfortable" variant="text"
-                                   :prepend-icon="icons.cancel"
-                                   :disabled="loading || updating"
-                                   @click="cancelSave(newTag)">
-                                {{ $t('Cancel') }}
-                            </v-btn>
-                            <span>
-                                <v-icon class="disabled" :icon="icons.drag"/>
-                            </span>
+                            <div class="d-flex align-center">
+                                <v-text-field class="w-100 mr-2" type="text" color="primary" clearable
+                                              density="compact" variant="underlined"
+                                              :disabled="loading || updating" :placeholder="$t('Tag Title')"
+                                              v-model="newTag.name" @keyup.enter="save(newTag)">
+                                    <template #prepend>
+                                        <v-icon size="20" start :icon="icons.tag"/>
+                                    </template>
+                                </v-text-field>
+
+                                <v-spacer/>
+
+                                <v-btn class="px-2" density="comfortable" variant="text"
+                                       :prepend-icon="icons.confirm"
+                                       :loading="tagUpdating[null]"
+                                       :disabled="loading || updating || !isTagModified(newTag)"
+                                       @click="save(newTag)">
+                                    {{ $t('Save') }}
+                                </v-btn>
+                                <v-btn class="px-2 ml-2" color="default"
+                                       density="comfortable" variant="text"
+                                       :prepend-icon="icons.cancel"
+                                       :disabled="loading || updating"
+                                       @click="cancelSave(newTag)">
+                                    {{ $t('Cancel') }}
+                                </v-btn>
+                                <span>
+                                    <v-icon class="disabled" :icon="icons.drag"/>
+                                </span>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -453,6 +462,14 @@ export default {
 </script>
 
 <style>
+.transaction-tags-table tr.transaction-tags-table-row-tag .hover-display {
+    display: none;
+}
+
+.transaction-tags-table tr.transaction-tags-table-row-tag:hover .hover-display {
+    display: grid;
+}
+
 .transaction-tags-table .v-text-field .v-input__prepend {
     margin-right: 0;
     color: rgba(var(--v-theme-on-surface));

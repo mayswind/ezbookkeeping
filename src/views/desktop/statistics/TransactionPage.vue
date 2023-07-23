@@ -35,9 +35,9 @@
                         <v-window-item value="statisticsPage">
                             <v-card variant="flat">
                                 <template #title>
-                                    <div class="d-flex align-center">
+                                    <div class="statistics-title d-flex align-center">
                                         <span>{{ $t('Statistics Data') }}</span>
-                                        <div class="statistics-toolbar ml-4">
+                                        <div class="ml-4">
                                             <v-btn-group color="default" density="comfortable" variant="outlined" divided>
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
@@ -537,7 +537,7 @@ export default {
 </script>
 
 <style>
-.statistics-toolbar {
+.statistics-title {
     overflow-x: auto;
     white-space: nowrap;
 }

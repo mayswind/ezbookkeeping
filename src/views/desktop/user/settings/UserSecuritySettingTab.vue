@@ -93,8 +93,8 @@
                         <th class="text-uppercase">{{ $t('Type') }}</th>
                         <th class="text-uppercase">{{ $t('Device Info') }}</th>
                         <th class="text-uppercase">{{ $t('Last Activity Time') }}</th>
-                        <th class="text-uppercase text-center">
-                            <v-btn density="comfortable"
+                        <th class="text-uppercase text-right">
+                            <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="sessions.length < 2 || loadingSession"
                                    @click="revokeAllSessions">
                                 {{ $t('Logout All') }}
@@ -112,14 +112,14 @@
 
                     <tr :key="session.tokenId"
                         v-for="session in sessions">
-                        <td>
+                        <td class="text-sm">
                             <v-icon start :icon="session.icon"/>
                             {{ session.deviceType }}
                         </td>
-                        <td>{{ session.deviceInfo }}</td>
-                        <td>{{ session.createdAt }}</td>
-                        <td class="text-center">
-                            <v-btn density="comfortable"
+                        <td class="text-sm">{{ session.deviceInfo }}</td>
+                        <td class="text-sm">{{ session.createdAt }}</td>
+                        <td class="text-sm text-right">
+                            <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="session.isCurrent || loadingSession"
                                    @click="revokeSession(session)">
                                 {{ $t('Log Out') }}

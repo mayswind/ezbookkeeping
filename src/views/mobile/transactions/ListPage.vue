@@ -480,7 +480,7 @@ export default {
             return true;
         },
         currentTimezoneOffsetMinutes() {
-            return getTimezoneOffsetMinutes();
+            return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
         },
         firstDayOfWeek() {
             return this.userStore.currentUserFirstDayOfWeek;
@@ -671,7 +671,7 @@ export default {
         changeDateFilter(dateType) {
             if (dateType === this.allDateRanges.Custom.type) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
-                    this.query.maxTime = getActualUnixTimeForStore(getCurrentUnixTime(), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes());
+                    this.query.maxTime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
                     this.query.minTime = getSpecifiedDayFirstUnixTime(this.query.maxTime);
                 }
 

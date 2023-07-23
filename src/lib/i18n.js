@@ -1023,6 +1023,7 @@ export function i18nFunctions(i18nGlobal) {
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
+        setTimeZone: (timezone) => setTimeZone(timezone),
         initLocale: (lastUserLanguage, timezone) => initLocale(i18nGlobal, lastUserLanguage, timezone)
     };
 }

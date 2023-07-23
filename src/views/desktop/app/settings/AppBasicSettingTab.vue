@@ -167,6 +167,9 @@ import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
+import { useOverviewStore } from '@/stores/overview.js';
+import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import currencyConstants from '@/consts/currency.js';
@@ -174,7 +177,7 @@ import { getSystemTheme } from '@/lib/ui.js';
 
 export default {
     computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTransactionsStore, useOverviewStore, useStatisticsStore, useExchangeRatesStore),
         enableDisableOptions() {
             return this.$locale.getEnableDisableOptions();
         },
@@ -206,6 +209,10 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setTimeZone(value);
+                this.$locale.setTimeZone(value);
+                this.transactionsStore.updateTransactionListInvalidState(true);
+                this.overviewStore.updateTransactionOverviewInvalidState(true);
+                this.statisticsStore.updateTransactionStatisticsInvalidState(true);
             }
         },
         isAutoUpdateExchangeRatesData: {

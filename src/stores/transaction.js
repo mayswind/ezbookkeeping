@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from './setting.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useOverviewStore } from './overview.js';
@@ -26,13 +27,13 @@ const emptyTransactionResult = {
     transactionsNextTimeId: 0
 };
 
-function loadTransactionList(state, exchangeRatesStore, { transactions, reload, autoExpand, defaultCurrency }) {
+function loadTransactionList(state, settingsStore, exchangeRatesStore, { transactions, reload, autoExpand, defaultCurrency }) {
     if (reload) {
         state.transactions = [];
     }
 
     if (transactions.items && transactions.items.length) {
-        const currentUtcOffset = getTimezoneOffsetMinutes();
+        const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
         let currentMonthListIndex = -1;
         let currentMonthList = null;
 
@@ -86,8 +87,8 @@ function loadTransactionList(state, exchangeRatesStore, { transactions, reload, 
     }
 }
 
-function updateTransactionInTransactionList(state, exchangeRatesStore, { transaction, defaultCurrency }) {
-    const currentUtcOffset = getTimezoneOffsetMinutes();
+function updateTransactionInTransactionList(state, settingsStore, exchangeRatesStore, { transaction, defaultCurrency }) {
+    const currentUtcOffset = getTimezoneOffsetMinutes(settingsStore.appSettings.timeZone);
     const transactionTime = parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
     const transactionYear = getYear(transactionTime);
     const transactionMonth = getMonth(transactionTime);
@@ -378,6 +379,7 @@ export const useTransactionsStore = defineStore('transactions', {
         },
         loadTransactions({ reload, autoExpand, defaultCurrency }) {
             const self = this;
+            const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
             let actualMaxTime = self.transactionsNextTimeId;
 
@@ -389,18 +391,18 @@ export const useTransactionsStore = defineStore('transactions', {
 
             return new Promise((resolve, reject) => {
                 services.getTransactions({
-                    maxTime: actualMaxTime,
-                    minTime: self.transactionsFilter.minTime * 1000,
-                    type: self.transactionsFilter.type,
-                    categoryId: self.transactionsFilter.categoryId,
-                    accountId: self.transactionsFilter.accountId,
-                    keyword: self.transactionsFilter.keyword
+                        maxTime: actualMaxTime,
+                        minTime: self.transactionsFilter.minTime * 1000,
+                        type: self.transactionsFilter.type,
+                        categoryId: self.transactionsFilter.categoryId,
+                        accountId: self.transactionsFilter.accountId,
+                        keyword: self.transactionsFilter.keyword
                 }).then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
                         if (reload) {
-                            loadTransactionList(self, exchangeRatesStore, {
+                            loadTransactionList(self, settingsStore, exchangeRatesStore, {
                                 transactions: emptyTransactionResult,
                                 reload: reload,
                                 autoExpand: autoExpand,
@@ -416,7 +418,7 @@ export const useTransactionsStore = defineStore('transactions', {
                         return;
                     }
 
-                    loadTransactionList(self, exchangeRatesStore, {
+                    loadTransactionList(self, settingsStore, exchangeRatesStore, {
                         transactions: data.result,
                         reload: reload,
                         autoExpand: autoExpand,
@@ -434,7 +436,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     logger.error('failed to load transaction list', error);
 
                     if (reload) {
-                        loadTransactionList(self, exchangeRatesStore, {
+                        loadTransactionList(self, settingsStore, exchangeRatesStore, {
                             transactions: emptyTransactionResult,
                             reload: reload,
                             autoExpand: autoExpand,
@@ -484,6 +486,7 @@ export const useTransactionsStore = defineStore('transactions', {
         },
         saveTransaction({ transaction, defaultCurrency }) {
             const self = this;
+            const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
             return new Promise((resolve, reject) => {
@@ -512,7 +515,7 @@ export const useTransactionsStore = defineStore('transactions', {
                             self.updateTransactionListInvalidState(true);
                         }
                     } else {
-                        updateTransactionInTransactionList(self, exchangeRatesStore, {
+                        updateTransactionInTransactionList(self, settingsStore, exchangeRatesStore, {
                             transaction: data.result,
                             defaultCurrency: defaultCurrency
                         });

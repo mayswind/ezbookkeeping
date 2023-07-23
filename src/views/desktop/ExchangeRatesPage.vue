@@ -64,32 +64,46 @@
                                     </div>
                                 </template>
 
-                                <v-table class="table-striped" :hover="!loading">
+                                <v-table class="exchange-rates-table table-striped" :hover="!loading">
                                     <thead>
                                     <tr>
-                                        <th class="text-uppercase">{{ $t('Currency') }}</th>
-                                        <th class="text-uppercase text-right">{{ $t('Amount') }}</th>
+                                        <th class="text-uppercase">
+                                            <div class="d-flex align-center">
+                                                <span>{{ $t('Currency') }}</span>
+                                                <v-spacer/>
+                                                <span>{{ $t('Amount') }}</span>
+                                            </div>
+                                        </th>
                                     </tr>
                                     </thead>
 
                                     <tbody>
                                     <tr :key="itemIdx"
                                         v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] : [])">
-                                        <td class="px-0" colspan="2">
+                                        <td class="px-0">
                                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                         </td>
                                     </tr>
 
                                     <tr v-if="!loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length)">
-                                        <td colspan="2">{{ $t('No exchange rates data') }}</td>
+                                        <td>{{ $t('No exchange rates data') }}</td>
                                     </tr>
 
-                                    <tr :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
+                                    <tr class="exchange-rates-table-row-data" :key="exchangeRate.currencyCode"
+                                        v-for="exchangeRate in availableExchangeRates">
                                         <td>
-                                            <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
-                                            <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
+                                            <div class="d-flex align-center">
+                                                <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
+                                                <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
+                                                <v-spacer/>
+                                                <v-btn class="hover-display px-2 ml-2 mr-3" color="default"
+                                                       density="comfortable" variant="text"
+                                                       @click="setAsBaseline(exchangeRate.currencyCode, exchangeRate)">
+                                                    {{ $t('Set As Baseline') }}
+                                                </v-btn>
+                                                <span>{{ getDisplayConvertedAmount(exchangeRate, isEnableThousandsSeparator) }}</span>
+                                            </div>
                                         </td>
-                                        <td class="text-sm text-right">{{ getDisplayConvertedAmount(exchangeRate) }}</td>
                                     </tr>
                                     </tbody>
                                 </v-table>
@@ -110,7 +124,12 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { getConvertedAmount, getDisplayExchangeRateAmount } from '@/lib/currency.js';
+import { isNumber } from '@/lib/common.js';
+import {
+    getConvertedAmount,
+    stringCurrencyToNumeric,
+    getDisplayExchangeRateAmount
+} from '@/lib/currency.js';
 
 import {
     mdiRefresh
@@ -199,13 +218,18 @@ export default {
                 return 0;
             }
         },
-        getDisplayConvertedAmount(toExchangeRate) {
+        getDisplayConvertedAmount(toExchangeRate, isEnableThousandsSeparator) {
             if (this.baseAmount === '') {
                 return '';
             }
 
             const rateStr = this.getConvertedAmount(toExchangeRate).toString();
-            return getDisplayExchangeRateAmount(rateStr, this.isEnableThousandsSeparator);
+            return getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator);
+        },
+        setAsBaseline(currency, toExchangeRate) {
+            const rateStr = this.getConvertedAmount(toExchangeRate).toString();
+            this.baseCurrency = currency;
+            this.baseAmount = getDisplayExchangeRateAmount(rateStr, false)
         }
     }
 }
@@ -215,4 +239,13 @@ export default {
 .exchange-rates-summary-skeleton .v-skeleton-loader__text {
     margin: 0;
 }
+
+.exchange-rates-table tr.exchange-rates-table-row-data .hover-display {
+    display: none;
+}
+
+.exchange-rates-table tr.exchange-rates-table-row-data:hover .hover-display {
+    display: grid;
+}
+
 </style>

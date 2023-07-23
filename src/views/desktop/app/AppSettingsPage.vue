@@ -1,15 +1,15 @@
 <template>
     <div>
         <v-tabs show-arrows class="v-tabs-pill text-uppercase" v-model="activeTab">
-            <v-tab value="basicSetting">
+            <v-tab value="basicSetting" @click="pushRouter('basicSetting')">
                 <v-icon size="20" start :icon="icons.basicSetting"/>
                 {{ $t('Basic') }}
             </v-tab>
-            <v-tab value="applicationLockSetting">
+            <v-tab value="applicationLockSetting" @click="pushRouter('applicationLockSetting')">
                 <v-icon size="20" start :icon="icons.applicationLockSetting"/>
                 {{ $t('Application Lock') }}
             </v-tab>
-            <v-tab value="statisticsSetting">
+            <v-tab value="statisticsSetting" @click="pushRouter('statisticsSetting')">
                 <v-icon size="20" start :icon="icons.statisticsSetting"/>
                 {{ $t('Statistics') }}
             </v-tab>
@@ -49,10 +49,10 @@ export default {
         AppStatisticsSettingTab
     },
     props: [
-        'tab'
+        'initTab'
     ],
     data() {
-        let queryActiveTab = this.tab || 'basicSetting';
+        let queryActiveTab = this.initTab || 'basicSetting';
 
         if ([
             'basicSetting',
@@ -70,6 +70,22 @@ export default {
                 statisticsSetting: mdiChartPieOutline
             }
         };
+    },
+    beforeRouteUpdate(to) {
+        if (to.query && to.query.tab && [
+            'basicSetting',
+            'applicationLockSetting',
+            'statisticsSetting'
+        ].indexOf(to.query.tab) >= 0) {
+            this.activeTab = to.query.tab;
+        } else {
+            this.activeTab = 'basicSetting';
+        }
+    },
+    methods: {
+        pushRouter(tab) {
+            this.$router.push(`/app/settings?tab=${tab}`);
+        }
     }
 }
 </script>

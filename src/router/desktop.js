@@ -114,7 +114,7 @@ const router = createRouter({
                     component: UserSettingsPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        tab: route.query.tab
+                        initTab: route.query.tab
                     })
                 },
                 {
@@ -122,7 +122,7 @@ const router = createRouter({
                     component: AppSettingsPage,
                     beforeEnter: checkLogin,
                     props: route => ({
-                        tab: route.query.tab
+                        initTab: route.query.tab
                     })
                 },
                 {

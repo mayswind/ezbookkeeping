@@ -124,10 +124,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { isNumber } from '@/lib/common.js';
 import {
     getConvertedAmount,
-    stringCurrencyToNumeric,
     getDisplayExchangeRateAmount
 } from '@/lib/currency.js';
 

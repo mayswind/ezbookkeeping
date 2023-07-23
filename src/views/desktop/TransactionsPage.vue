@@ -131,7 +131,7 @@
 
                                                     <template :key="categoryType"
                                                               v-for="(categories, categoryType) in allPrimaryCategories"
-                                                              v-show="!query.type || getTransactionTypeFromCategoryType(categoryType) === query.type">
+                                                              v-if="!query.type || getTransactionTypeFromCategoryType(categoryType) === query.type">
                                                         <v-list-item density="compact">
                                                             <v-list-item-title>
                                                                 <span class="text-sm">{{ getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type') }}</span>
@@ -250,9 +250,9 @@
                                     </tr>
                                     </tbody>
 
-                                    <template :key="transactionMonthList.yearMonth" :class="{ 'has-bottom-border': monthIdx < transactions.length - 1 }"
+                                    <template :key="transactionMonthList.yearMonth"
                                               v-for="(transactionMonthList, monthIdx) in transactions">
-                                        <tbody v-if="shouldShowMonthlyData(transactionMonthList)">
+                                        <tbody :class="{ 'has-bottom-border': monthIdx < transactions.length - 1 }" v-if="shouldShowMonthlyData(transactionMonthList)">
                                         <template :key="transaction.id" v-for="(transaction, idx) in transactionMonthList.items">
                                             <template v-if="monthlyDatePageFirstIndex <= idx && idx < monthlyDatePageLastIndex">
                                                 <tr class="transaction-list-row-date no-hover text-sm"

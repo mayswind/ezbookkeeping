@@ -569,8 +569,11 @@ export const useStatisticsStore = defineStore('statistics', {
             if (this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('dateType=' + this.transactionStatisticsFilter.dateType);
-                querys.push('minTime=' + this.transactionStatisticsFilter.startTime);
-                querys.push('maxTime=' + this.transactionStatisticsFilter.endTime);
+
+                if (this.transactionStatisticsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
+                    querys.push('minTime=' + this.transactionStatisticsFilter.startTime);
+                    querys.push('maxTime=' + this.transactionStatisticsFilter.endTime);
+                }
             }
 
             return querys.join('&');

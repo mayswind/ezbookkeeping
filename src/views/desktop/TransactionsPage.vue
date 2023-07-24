@@ -49,7 +49,7 @@
                                     <div class="transaction-list-title d-flex align-center text-no-wrap">
                                         <span>{{ $t('Transaction List') }}</span>
                                         <v-btn class="ml-3" color="default" variant="outlined"
-                                               :disabled="loading" @click="add">{{ $t('Add') }}</v-btn>
+                                               :disabled="loading || !canAddTransaction" @click="add">{{ $t('Add') }}</v-btn>
                                         <v-btn density="compact" color="default" variant="text"
                                                class="ml-2" :icon="true" :disabled="loading"
                                                v-if="!loading" @click="reload">
@@ -76,25 +76,23 @@
                                         <span class="text-body-1">{{ $t('Date Range') }}</span>
                                         <span class="text-body-1 transaction-list-datetime-range-text ml-2">
                                             <span v-if="!this.query.minTime && !this.query.maxTime">{{ $t('All') }}</span>
-                                            <span v-if="this.query.minTime || this.query.maxTime">{{ queryMinTime }}</span>
-                                            <span v-if="this.query.minTime || this.query.maxTime">&nbsp;-&nbsp;</span>
-                                            <span v-if="this.query.minTime || this.query.maxTime">{{ queryMaxTime }}</span>
+                                            <span v-else-if="this.query.minTime || this.query.maxTime">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
                                         </span>
                                         <v-spacer/>
-                                        <div class="transaction-list-total-amount-text d-flex align-center" v-if="isShowMonthlyData">
+                                        <div class="transaction-list-total-amount-text d-flex align-center" v-if="showTotalAmountInTransactionListPage && monthlyDataTotalAmount">
                                             <span class="ml-2 text-subtitle-1">{{ $t('Total Income') }}</span>
                                             <span class="text-income ml-2" v-if="loading">
                                                 <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                             </span>
                                             <span class="text-income ml-2" v-else-if="!loading">
-                                                {{ monthlyDataTotalIncome }}
+                                                {{ monthlyDataTotalAmount.income }}
                                             </span>
-                                            <span class="text-subtitle-1 ml-2">{{ $t('Total Expense') }}</span>
+                                            <span class="text-subtitle-1 ml-3">{{ $t('Total Expense') }}</span>
                                             <span class="text-income ml-2" v-if="loading">
                                                 <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                             </span>
                                             <span class="text-expense ml-2" v-else-if="!loading">
-                                                {{ monthlyDataTotalExpense }}
+                                                {{ monthlyDataTotalAmount.expense }}
                                             </span>
                                         </div>
                                     </div>
@@ -304,10 +302,8 @@
                                                         <v-icon :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
                                                         <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                                     </td>
-                                                    <td class="transaction-table-column-description">
-                                                        <div class="d-flex align-center">
-                                                            <span>{{ transaction.comment }}</span>
-                                                        </div>
+                                                    <td class="transaction-table-column-description text-truncate">
+                                                        {{ transaction.comment }}
                                                     </td>
                                                 </tr>
                                             </template>
@@ -525,45 +521,28 @@ export default {
                 return Number.MAX_SAFE_INTEGER;
             }
         },
-        monthlyDataTotalIncome() {
+        monthlyDataTotalAmount() {
             const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
 
             if (!recentDateRange || !recentDateRange.year || !recentDateRange.month) {
-                return '-';
+                return null;
             }
 
             if (!this.transactions || !this.transactions.length) {
-                return '-';
+                return null;
             }
 
             for (let i = 0; i < this.transactions.length; i++) {
                 if (this.transactions[i].year === recentDateRange.year &&
                     this.transactions[i].month === recentDateRange.month) {
-                    return this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.income, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteIncome)
+                    return {
+                        income: this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.income, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteIncome),
+                        expense: this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.expense, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteExpense)
+                    };
                 }
             }
 
-            return '-';
-        },
-        monthlyDataTotalExpense() {
-            const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
-
-            if (!recentDateRange || !recentDateRange.year || !recentDateRange.month) {
-                return '-';
-            }
-
-            if (!this.transactions || !this.transactions.length) {
-                return '-';
-            }
-
-            for (let i = 0; i < this.transactions.length; i++) {
-                if (this.transactions[i].year === recentDateRange.year &&
-                    this.transactions[i].month === recentDateRange.month) {
-                    return this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.expense, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteExpense)
-                }
-            }
-
-            return '-';
+            return null;
         },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
@@ -922,6 +901,7 @@ export default {
 }
 
 .transaction-list-datetime-range {
+    height: 28px;
     overflow-x: auto;
     white-space: nowrap;
 }
@@ -966,10 +946,8 @@ export default {
     white-space: nowrap;
 }
 
-.transaction-table .transaction-table-column-description {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.transaction-table-column-description {
+    max-width: 300px;
 }
 
 .transaction-table .transaction-table-column-category .v-btn,

@@ -331,6 +331,7 @@
                               :class="getCategoryListItemCheckedClass(category, query.categoryId)"
                               :key="category.id"
                               v-for="category in categories"
+                              v-show="!category.hidden"
                 >
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -349,6 +350,7 @@
                                           :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
+                                          v-show="!subCategory.hidden"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
                                 <template #media>

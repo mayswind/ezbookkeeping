@@ -974,7 +974,7 @@ export default {
 .list.transaction-info-list li.transaction-info .transaction-footer .transaction-account-arrow {
     font-size: var(--ebk-transaction-account-arrow-font-size);
     margin-right: 4px;
-    margin-bottom: var(--ebk-transaction-account-arrow-margin-bottom);
+    margin-top: var(--ebk-transaction-account-arrow-margin-top);
 }
 
 .list.transaction-info-list li.transaction-info .transaction-amount {

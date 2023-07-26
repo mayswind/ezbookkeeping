@@ -91,7 +91,11 @@ export default defineConfig(async () => {
                     ],
                     runtimeCaching: [
                         {
-                            urlPattern: /.*\/(mobile\/|desktop\/|index\.html|mobile\.html|desktop\.html)/,
+                            urlPattern: /.*\/(mobile|mobile\/|desktop|desktop\/)$/,
+                            handler: 'NetworkFirst'
+                        },
+                        {
+                            urlPattern: /.*\/(index\.html|mobile\.html|desktop\.html)/,
                             handler: 'NetworkFirst'
                         },
                         {

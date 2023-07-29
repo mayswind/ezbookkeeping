@@ -95,6 +95,14 @@ export default defineConfig(async () => {
                             handler: 'NetworkFirst'
                         },
                         {
+                            urlPattern: /.*\/(mobile|mobile\/)#!\//,
+                            handler: 'NetworkFirst'
+                        },
+                        {
+                            urlPattern: /.*\/(desktop|desktop\/)#\//,
+                            handler: 'NetworkFirst'
+                        },
+                        {
                             urlPattern: /.*\/(index\.html|mobile\.html|desktop\.html)/,
                             handler: 'NetworkFirst'
                         },

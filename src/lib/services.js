@@ -237,9 +237,9 @@ export default {
             id
         });
     },
-    getTransactions: ({ maxTime, minTime, type, categoryId, accountId, keyword }) => {
+    getTransactions: ({ maxTime, minTime, count, page, withCount, type, categoryId, accountId, keyword }) => {
         keyword = encodeURIComponent(keyword);
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=50&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=${count}&page=${page}&with_count=${withCount}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     getAllTransactionsByMonth: ({ year, month, type, categoryId, accountId, keyword }) => {
         keyword = encodeURIComponent(keyword);

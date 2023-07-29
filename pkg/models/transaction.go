@@ -112,7 +112,9 @@ type TransactionListByMaxTimeRequest struct {
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
 	MinTime      int64             `form:"min_time" binding:"min=0"`
+	Page         int32             `form:"page" binding:"min=0"`
 	Count        int32             `form:"count" binding:"required,min=1,max=50"`
+	WithCount    bool              `form:"with_count"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -126,8 +128,6 @@ type TransactionListInMonthByPageRequest struct {
 	CategoryId   int64             `form:"category_id" binding:"min=0"`
 	AccountId    int64             `form:"account_id" binding:"min=0"`
 	Keyword      string            `form:"keyword"`
-	Page         int32             `form:"page" binding:"min=0"`
-	Count        int32             `form:"count" binding:"min=0,max=50"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -218,6 +218,7 @@ type TransactionCountResponse struct {
 type TransactionInfoPageWrapperResponse struct {
 	Items              TransactionInfoResponseSlice `json:"items"`
 	NextTimeSequenceId *int64                       `json:"nextTimeSequenceId,string"`
+	TotalCount         *int64                       `json:"totalCount,omitempty"`
 }
 
 // TransactionInfoPageWrapperResponse2 represents a response of transaction which contains items and count

@@ -70,13 +70,19 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int32, noDu
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, nil, "", count, noDuplicated)
+	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, nil, "", 1, count, false, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, count int32, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
+	}
+
+	if page < 0 {
+		return nil, errs.ErrPageIndexInvalid
+	} else if page == 0 {
+		page = 1
 	}
 
 	if count < 1 {
@@ -86,49 +92,54 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionT
 	var transactions []*models.Transaction
 	var err error
 
+	actualCount := count
+
+	if needOneMoreItem {
+		actualCount++
+	}
+
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, noDuplicated)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(count), 0).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(actualCount), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
 
-// GetTransactionsInMonthByPage returns transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, utcOffset int16) ([]*models.Transaction, error) {
+// GetTransactionsInMonthByPage returns all transactions in given year and month
+func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	if page < 0 || (count > 0 && page < 1) {
-		return nil, errs.ErrPageIndexInvalid
-	}
-
-	if count < 0 {
-		return nil, errs.ErrPageCountInvalid
-	}
-
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month), utcOffset)
+	startMinUnixTime, err := utils.ParseFromLongDateTimeToMinUnixTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month))
+	startMaxUnixTime, err := utils.ParseFromLongDateTimeToMaxUnixTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month))
 
 	if err != nil {
 		return nil, errs.ErrSystemError
 	}
 
-	endTime := startTime.AddDate(0, 1, 0)
+	endMaxUnixTime := startMaxUnixTime.AddDate(0, 1, 0)
 
-	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
-	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
+	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startMinUnixTime.Unix())
+	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endMaxUnixTime.Unix()) - 1
 
 	var transactions []*models.Transaction
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
-	sess := s.UserDataDB(uid).Where(condition, conditionParams...)
+	err = s.UserDataDB(uid).Where(condition, conditionParams...).OrderBy("transaction_time desc").Find(&transactions)
 
-	if count > 0 {
-		sess = sess.Limit(int(count), int(count*(page-1)))
+	transactionsInMonth := make([]*models.Transaction, 0, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+		transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
+		transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
+
+		if utils.IsUnixTimeEqualsYearAndMonth(transactionUnixTime, transactionTimeZone, year, month) {
+			transactionsInMonth = append(transactionsInMonth, transaction)
+		}
 	}
 
-	err = sess.OrderBy("transaction_time desc").Find(&transactions)
-
-	return transactions, err
+	return transactionsInMonth, err
 }
 
 // GetTransactionByTransactionId returns a transaction model according to transaction id

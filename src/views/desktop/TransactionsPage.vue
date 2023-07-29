@@ -79,20 +79,20 @@
                                             <span v-else-if="this.query.minTime || this.query.maxTime">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
                                         </span>
                                         <v-spacer/>
-                                        <div class="transaction-list-total-amount-text d-flex align-center" v-if="showTotalAmountInTransactionListPage && monthlyDataTotalAmount">
+                                        <div class="transaction-list-total-amount-text d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
                                             <span class="ml-2 text-subtitle-1">{{ $t('Total Income') }}</span>
                                             <span class="text-income ml-2" v-if="loading">
                                                 <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                             </span>
                                             <span class="text-income ml-2" v-else-if="!loading">
-                                                {{ monthlyDataTotalAmount.income }}
+                                                {{ currentMonthTotalAmount.income }}
                                             </span>
                                             <span class="text-subtitle-1 ml-3">{{ $t('Total Expense') }}</span>
                                             <span class="text-income ml-2" v-if="loading">
                                                 <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                             </span>
                                             <span class="text-expense ml-2" v-else-if="!loading">
-                                                {{ monthlyDataTotalAmount.expense }}
+                                                {{ currentMonthTotalAmount.expense }}
                                             </span>
                                         </div>
                                     </div>
@@ -234,7 +234,7 @@
                                     </tr>
                                     </thead>
 
-                                    <tbody v-if="loading">
+                                    <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
                                     <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]">
                                         <td class="px-0" colspan="5">
                                             <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
@@ -242,79 +242,76 @@
                                     </tr>
                                     </tbody>
 
-                                    <tbody v-if="!loading && noTransaction">
+                                    <tbody v-if="!loading && (!transactions || !transactions.length || transactions.length < 1)">
                                     <tr>
                                         <td colspan="5">{{ $t('No transaction data') }}</td>
                                     </tr>
                                     </tbody>
 
-                                    <template :key="transactionMonthList.yearMonth"
-                                              v-for="(transactionMonthList, monthIdx) in transactions">
-                                        <tbody :class="{ 'has-bottom-border': monthIdx < transactions.length - 1 }" v-if="shouldShowMonthlyData(transactionMonthList)">
-                                        <template :key="transaction.id" v-for="(transaction, idx) in transactionMonthList.items">
-                                            <template v-if="monthlyDatePageFirstIndex <= idx && idx < monthlyDatePageLastIndex">
-                                                <tr class="transaction-list-row-date no-hover text-sm"
-                                                    v-if="idx === 0 || monthlyDatePageFirstIndex === idx || (idx > 0 && (transaction.day !== transactionMonthList.items[idx - 1].day))">
-                                                    <td colspan="5" class="font-weight-bold">
-                                                        <div class="d-flex align-center">
-                                                            <span>{{ getLongDate(transaction) }}</span>
-                                                            <v-chip class="ml-1" color="default" size="x-small">
-                                                                {{ getWeekdayLongName(transaction) }}
-                                                            </v-chip>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="transaction-table-row-data text-sm cursor-pointer"
-                                                    @click="show(transaction)">
-                                                    <td class="transaction-table-column-time">
-                                                        <div class="d-flex flex-column">
-                                                            <span>{{ getDisplayTime(transaction) }}</span>
-                                                            <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="transaction-table-column-category">
-                                                        <div class="d-flex align-center">
-                                                            <ItemIcon size="24px" icon-type="category"
-                                                                      :icon-id="transaction.category.icon"
-                                                                      :color="transaction.category.color"
-                                                                      v-if="transaction.category && transaction.category.color"></ItemIcon>
-                                                            <v-icon size="24" :icon="icons.modifyBalance" v-else-if="!transaction.category || !transaction.category.color" />
-                                                            <span class="ml-2" v-if="transaction.type === allTransactionTypes.ModifyBalance">
-                                                                {{ $t('Modify Balance') }}
-                                                            </span>
-                                                            <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
-                                                                {{ transaction.category.name }}
-                                                            </span>
-                                                            <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
-                                                                {{ getTransactionTypeName(transaction.type, 'Transaction') }}
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
-                                                        <div v-if="transaction.sourceAccount">
-                                                            <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                            <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
-                                                            <span v-else></span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="transaction-table-column-account">
-                                                        <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                        <v-icon :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
-                                                        <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
-                                                    </td>
-                                                    <td class="transaction-table-column-description text-truncate">
-                                                        {{ transaction.comment }}
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </template>
-                                        </tbody>
-                                    </template>
+                                    <tbody :key="transaction.id"
+                                           :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
+                                           v-for="(transaction, idx) in transactions">
+                                        <tr class="transaction-list-row-date no-hover text-sm"
+                                            v-if="idx === 0 || (idx > 0 && (transaction.day !== transactions[idx - 1].day))">
+                                            <td colspan="5" class="font-weight-bold">
+                                                <div class="d-flex align-center">
+                                                    <span>{{ getLongDate(transaction) }}</span>
+                                                    <v-chip class="ml-1" color="default" size="x-small">
+                                                        {{ getWeekdayLongName(transaction) }}
+                                                    </v-chip>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="transaction-table-row-data text-sm cursor-pointer"
+                                            @click="show(transaction)">
+                                            <td class="transaction-table-column-time">
+                                                <div class="d-flex flex-column">
+                                                    <span>{{ getDisplayTime(transaction) }}</span>
+                                                    <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="transaction-table-column-category">
+                                                <div class="d-flex align-center">
+                                                    <ItemIcon size="24px" icon-type="category"
+                                                              :icon-id="transaction.category.icon"
+                                                              :color="transaction.category.color"
+                                                              v-if="transaction.category && transaction.category.color"></ItemIcon>
+                                                    <v-icon size="24" :icon="icons.modifyBalance" v-else-if="!transaction.category || !transaction.category.color" />
+                                                    <span class="ml-2" v-if="transaction.type === allTransactionTypes.ModifyBalance">
+                                                        {{ $t('Modify Balance') }}
+                                                    </span>
+                                                    <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
+                                                        {{ transaction.category.name }}
+                                                    </span>
+                                                    <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
+                                                        {{ getTransactionTypeName(transaction.type, 'Transaction') }}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
+                                                <div v-if="transaction.sourceAccount">
+                                                    <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
+                                                    <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
+                                                    <span v-else></span>
+                                                </div>
+                                            </td>
+                                            <td class="transaction-table-column-account">
+                                                <div class="d-flex align-center">
+                                                    <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
+                                                    <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
+                                                    <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="transaction-table-column-description text-truncate">
+                                                {{ transaction.comment }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </v-table>
 
-                                <div class="mt-2 mb-4" v-if="isShowMonthlyData">
-                                    <v-pagination :total-visible="5" :length="monthlyDatePageCount"
-                                                  v-model="currentPage"></v-pagination>
+                                <div class="mt-2 mb-4">
+                                    <v-pagination :total-visible="6" :length="totalPageCount"
+                                                  v-model="paginationCurrentPage"></v-pagination>
                                 </div>
                             </v-card>
                         </v-window-item>
@@ -324,7 +321,7 @@
         </v-col>
     </v-row>
 
-    <date-range-selection-dialog :title="$t('Custom Date Range')" :persistent="true"
+    <date-range-selection-dialog :title="$t('Custom Date Range')"
                                  :min-time="query.minTime"
                                  :max-time="query.maxTime"
                                  v-model:show="showCustomDateRangeDialog"
@@ -350,6 +347,8 @@ import { getNameByKeyValue } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
     parseDateFromUnixTime,
+    getYear,
+    getMonth,
     getUnixTime,
     getSpecifiedDayFirstUnixTime,
     getUtcOffsetByUtcOffsetMinutes,
@@ -357,7 +356,8 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
     getDateRangeByDateType,
-    getRecentDateRangeType
+    getRecentDateRangeType,
+    isDateRangeMatchOneMonth
 } from '@/lib/datetime.js';
 import {
     categoryTypeToTransactionType,
@@ -372,7 +372,7 @@ import {
     mdiRefresh,
     mdiMenuDown,
     mdiPencilBoxOutline,
-    mdiArrowRightThin,
+    mdiArrowRight,
     mdiDeleteOutline,
     mdiDotsVertical
 } from '@mdi/js';
@@ -394,6 +394,8 @@ export default {
             currentPage: 1,
             countPerPage: 15,
             searchKeyword: '',
+            currentPageTransactions: [],
+            totalPageCount: 1,
             showCustomDateRangeDialog: false,
             transactionRemoving: {},
             icons: {
@@ -403,7 +405,7 @@ export default {
                 refresh: mdiRefresh,
                 dropdownMenu: mdiMenuDown,
                 modifyBalance: mdiPencilBoxOutline,
-                arrowRight: mdiArrowRightThin,
+                arrowRight: mdiArrowRight,
                 remove: mdiDeleteOutline,
                 more: mdiDotsVertical
             }
@@ -466,83 +468,71 @@ export default {
         queryAccountName() {
             return getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
         },
-        transactions() {
-            if (this.loading) {
-                return [];
-            }
-
-            return this.transactionsStore.transactions;
+        queryMonthlyData() {
+            return isDateRangeMatchOneMonth(this.query.minTime, this.query.maxTime);
         },
-        noTransaction() {
-            return this.transactionsStore.noTransaction;
-        },
-        hasMoreTransaction() {
-            return this.transactionsStore.hasMoreTransaction;
-        },
-        isShowMonthlyData() {
-            const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
-            return recentDateRange.year && recentDateRange.month;
-        },
-        monthlyDatePageCount() {
-            const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
+        paginationCurrentPage: {
+            get: function () {
+                return this.currentPage;
+            },
+            set: function (value) {
+                this.currentPage = value;
 
-            if (!recentDateRange || !recentDateRange.year || !recentDateRange.month) {
-                return 1;
-            }
-
-            if (!this.transactions || !this.transactions.length) {
-                return 1;
-            }
-
-            for (let i = 0; i < this.transactions.length; i++) {
-                if (this.transactions[i].year === recentDateRange.year &&
-                    this.transactions[i].month === recentDateRange.month) {
-                    return Math.ceil(this.transactions[i].items.length / this.countPerPage);
+                if (!this.queryMonthlyData) {
+                    this.reload(false);
                 }
             }
-
-            return 1;
         },
-        monthlyDatePageFirstIndex() {
-            const currentPage = this.currentPage >= 1 ? this.currentPage : 1;
+        currentMonthTransactionData() {
+            const allTransactions = this.transactionsStore.transactions;
 
-            if (this.isShowMonthlyData) {
-                return (currentPage - 1) * this.countPerPage;
-            } else {
-                return 0;
-            }
-        },
-        monthlyDatePageLastIndex() {
-            const currentPage = this.currentPage >= 1 ? this.currentPage : 1;
-
-            if (this.isShowMonthlyData) {
-                return currentPage * this.countPerPage;
-            } else {
-                return Number.MAX_SAFE_INTEGER;
-            }
-        },
-        monthlyDataTotalAmount() {
-            const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
-
-            if (!recentDateRange || !recentDateRange.year || !recentDateRange.month) {
+            if (!allTransactions || !allTransactions.length) {
                 return null;
             }
 
-            if (!this.transactions || !this.transactions.length) {
-                return null;
-            }
+            const currentMonthMinDate = parseDateFromUnixTime(this.query.minTime);
+            const currentYear = getYear(currentMonthMinDate);
+            const currentMonth = getMonth(currentMonthMinDate);
 
-            for (let i = 0; i < this.transactions.length; i++) {
-                if (this.transactions[i].year === recentDateRange.year &&
-                    this.transactions[i].month === recentDateRange.month) {
-                    return {
-                        income: this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.income, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteIncome),
-                        expense: this.getDisplayMonthTotalAmount(this.transactions[i].totalAmount.expense, this.defaultCurrency, '', this.transactions[i].totalAmount.incompleteExpense)
-                    };
+            for (let i = 0; i < allTransactions.length; i++) {
+                if (allTransactions[i].year === currentYear && allTransactions[i].month === currentMonth) {
+                    return allTransactions[i];
                 }
             }
 
             return null;
+        },
+        transactions() {
+            if (this.queryMonthlyData) {
+                const transactionData = this.currentMonthTransactionData;
+
+                if (!transactionData || !transactionData.items) {
+                    return [];
+                }
+
+                const firstIndex = (this.currentPage - 1) * this.countPerPage;
+                const lastIndex = this.currentPage * this.countPerPage;
+
+                return transactionData.items.slice(firstIndex, lastIndex);
+            } else {
+                return this.currentPageTransactions;
+            }
+        },
+        currentMonthTotalAmount() {
+            if (this.queryMonthlyData) {
+                const transactionData = this.currentMonthTransactionData;
+
+                if (!transactionData) {
+                    return null;
+                }
+
+                return {
+                    income: this.getDisplayMonthTotalAmount(transactionData.totalAmount.income, this.defaultCurrency, '', transactionData.totalAmount.incompleteIncome),
+                    expense: this.getDisplayMonthTotalAmount(transactionData.totalAmount.expense, this.defaultCurrency, '', transactionData.totalAmount.incompleteExpense)
+                };
+            } else {
+                return null;
+            }
         },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
@@ -623,6 +613,7 @@ export default {
                 keyword: this.searchKeyword
             });
 
+            this.currentPage = 1;
             this.reload(false);
         },
         reload(force) {
@@ -630,37 +621,50 @@ export default {
 
             self.loading = true;
 
+            const page = self.currentPage;
+
             Promise.all([
                 self.accountsStore.loadAllAccounts({ force: false }),
                 self.transactionCategoriesStore.loadAllCategories({ force: false })
             ]).then(() => {
-                const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
-                let yearMonth = null;
+                if (this.queryMonthlyData) {
+                    const currentMonthMinDate = parseDateFromUnixTime(this.query.minTime);
+                    const currentYear = getYear(currentMonthMinDate);
+                    const currentMonth = getMonth(currentMonthMinDate);
 
-                if (recentDateRange.year && recentDateRange.month) {
-                    yearMonth = {
-                        year: recentDateRange.year,
-                        month: recentDateRange.month
-                    };
+                    return self.transactionsStore.loadMonthlyAllTransactions({
+                        year: currentYear,
+                        month: currentMonth,
+                        force: force,
+                        autoExpand: true,
+                        defaultCurrency: self.defaultCurrency
+                    });
+                } else {
+                    return self.transactionsStore.loadTransactions({
+                        reload: true,
+                        force: force,
+                        count: self.countPerPage,
+                        page: page,
+                        withCount: page <= 1,
+                        autoExpand: true,
+                        defaultCurrency: self.defaultCurrency
+                    });
                 }
-
-                return self.transactionsStore.loadTransactions({
-                    reload: true,
-                    yearMonth: yearMonth,
-                    force: force,
-                    autoExpand: true,
-                    defaultCurrency: self.defaultCurrency
-                });
-            }).then(() => {
+            }).then(data => {
                 self.loading = false;
-                self.currentPage = 1;
+                self.currentPageTransactions = data && data.items && data.items.length ? data.items : [];
+
+                if (page <= 1) {
+                    self.totalPageCount = data && data.totalCount ? Math.ceil(data.totalCount / this.countPerPage) : 1;
+                }
 
                 if (force) {
                     self.$refs.snackbar.showMessage('Data has been updated');
                 }
             }).catch(error => {
                 self.loading = false;
-                self.currentPage = 1;
+                self.currentPageTransactions = [];
+                self.totalPageCount = 1;
 
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
@@ -756,6 +760,7 @@ export default {
                 keyword: keyword
             });
 
+            this.currentPage = 1;
             this.reload(false);
         },
         add() {
@@ -792,15 +797,6 @@ export default {
                     }
                 });
             });
-        },
-        shouldShowMonthlyData(transactionMonthList) {
-            const recentDateRange = this.recentMonthDateRanges[this.recentDateRangeType];
-
-            if (!recentDateRange || !recentDateRange.year || !recentDateRange.month) {
-                return true;
-            }
-
-            return transactionMonthList.year === recentDateRange.year && transactionMonthList.month === recentDateRange.month;
         },
         scrollCategoryMenuToSelectedItem(opened) {
             if (opened) {

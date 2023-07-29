@@ -414,3 +414,14 @@ export function isDateRangeMatchFullMonths(minTime, maxTime) {
 
     return firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix();
 }
+
+export function isDateRangeMatchOneMonth(minTime, maxTime) {
+    const minDateTime = parseDateFromUnixTime(minTime);
+    const maxDateTime = parseDateFromUnixTime(maxTime);
+
+    if (getYear(minDateTime) !== getYear(maxDateTime) || getMonth(minDateTime) !== getMonth(maxDateTime)) {
+        return false;
+    }
+
+    return isDateRangeMatchFullMonths(minTime, maxTime);
+}

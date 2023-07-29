@@ -118,7 +118,18 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword, transactionListReq.Count+1, true)
+	var totalCount int64
+
+	if transactionListReq.WithCount {
+		totalCount, err = a.transactions.GetTransactionCount(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+	}
+
+	transactions, err := a.transactions.GetTransactionsByMaxTime(uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword, transactionListReq.Page, transactionListReq.Count, true, true)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
@@ -149,10 +160,14 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 		transactionResps.NextTimeSequenceId = nextTimeSequenceId
 	}
 
+	if transactionListReq.WithCount {
+		transactionResps.TotalCount = &totalCount
+	}
+
 	return transactionResps, nil
 }
 
-// TransactionMonthListHandler returns transaction list of current user by month
+// TransactionMonthListHandler returns all transaction list of current user by month
 func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interface{}, *errs.Error) {
 	var transactionListReq models.TransactionListInMonthByPageRequest
 	err := c.ShouldBindQuery(&transactionListReq)
@@ -194,17 +209,10 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword, transactionListReq.Page, transactionListReq.Count, utcOffset)
+	transactions, err := a.transactions.GetTransactionsInMonthByPage(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	totalCount, err := a.transactions.GetMonthTransactionCount(uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, allAccountIds, transactionListReq.Keyword, utcOffset)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transaction count in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -217,7 +225,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 
 	transactionResps := &models.TransactionInfoPageWrapperResponse2{
 		Items:      transactionResult,
-		TotalCount: totalCount,
+		TotalCount: int64(transactionResult.Len()),
 	}
 
 	return transactionResps, nil

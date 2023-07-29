@@ -13,6 +13,8 @@ const (
 	longDateTimeWithoutSecondFormat = "2006-01-02 15:04"
 	shortDateTimeFormat             = "2006-1-2 15:4:5"
 	yearMonthDateTimeFormat         = "2006-01"
+	westernmostTimezoneUtcOffset    = -720 // Etc/GMT+12 (UTC-12:00)
+	easternmostTimezoneUtcOffset    = 840  // Pacific/Kiritimati (UTC+14:00)
 )
 
 // FormatUnixTimeToLongDateTimeInServerTimezone returns a textual representation of the unix time formatted by long date time format
@@ -42,6 +44,18 @@ func FormatUnixTimeToYearMonth(unixTime int64, timezone *time.Location) string {
 	return t.Format(yearMonthDateTimeFormat)
 }
 
+// ParseFromLongDateTimeToMinUnixTime parses a formatted string in long date time format to minimal unix time (the westernmost timezone)
+func ParseFromLongDateTimeToMinUnixTime(t string) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", easternmostTimezoneUtcOffset*60)
+	return time.ParseInLocation(longDateTimeFormat, t, timezone)
+}
+
+// ParseFromLongDateTimeToMaxUnixTime parses a formatted string in long date time format to maximal unix time (the easternmost timezone)
+func ParseFromLongDateTimeToMaxUnixTime(t string) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", westernmostTimezoneUtcOffset*60)
+	return time.ParseInLocation(longDateTimeFormat, t, timezone)
+}
+
 // ParseFromLongDateTime parses a formatted string in long date time format
 func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
@@ -57,6 +71,12 @@ func ParseFromLongDateTimeWithoutSecond(t string, timezone *time.Location) (time
 func ParseFromShortDateTime(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
 	return time.ParseInLocation(shortDateTimeFormat, t, timezone)
+}
+
+// IsUnixTimeEqualsYearAndMonth returns whether year and month of the unix time are equals to the specified year and month
+func IsUnixTimeEqualsYearAndMonth(unixTime int64, timezone *time.Location, year int32, month int32) bool {
+	date := parseFromUnixTime(unixTime).In(timezone)
+	return date.Year() == int(year) && int(date.Month()) == int(month)
 }
 
 // GetTimezoneOffsetMinutes returns offset minutes according specified timezone

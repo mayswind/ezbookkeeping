@@ -401,7 +401,7 @@ export const useTransactionsStore = defineStore('transactions', {
 
             return querys.join('&');
         },
-        loadTransactions({ reload, yearMonth, autoExpand, defaultCurrency }) {
+        loadTransactions({ reload, count, page, withCount, autoExpand, defaultCurrency }) {
             const self = this;
             const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
@@ -414,29 +414,17 @@ export const useTransactionsStore = defineStore('transactions', {
             }
 
             return new Promise((resolve, reject) => {
-                let promise = null;
-
-                if (yearMonth) {
-                    promise = services.getAllTransactionsByMonth({
-                        year: yearMonth.year,
-                        month: yearMonth.month,
-                        type: self.transactionsFilter.type,
-                        categoryId: self.transactionsFilter.categoryId,
-                        accountId: self.transactionsFilter.accountId,
-                        keyword: self.transactionsFilter.keyword
-                    });
-                } else {
-                    promise = services.getTransactions({
-                        maxTime: actualMaxTime,
-                        minTime: self.transactionsFilter.minTime * 1000,
-                        type: self.transactionsFilter.type,
-                        categoryId: self.transactionsFilter.categoryId,
-                        accountId: self.transactionsFilter.accountId,
-                        keyword: self.transactionsFilter.keyword
-                    });
-                }
-
-                promise.then(response => {
+                services.getTransactions({
+                    maxTime: actualMaxTime,
+                    minTime: self.transactionsFilter.minTime * 1000,
+                    count: count || 50,
+                    page: page || 1,
+                    withCount: (!!withCount) || false,
+                    type: self.transactionsFilter.type,
+                    categoryId: self.transactionsFilter.categoryId,
+                    accountId: self.transactionsFilter.accountId,
+                    keyword: self.transactionsFilter.keyword
+                }).then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
@@ -485,6 +473,74 @@ export const useTransactionsStore = defineStore('transactions', {
                         if (!self.transactionListStateInvalid) {
                             self.updateTransactionListInvalidState(true);
                         }
+                    }
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to get transaction list' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        loadMonthlyAllTransactions({ year, month, autoExpand, defaultCurrency }) {
+            const self = this;
+            const settingsStore = useSettingsStore();
+            const exchangeRatesStore = useExchangeRatesStore();
+
+            return new Promise((resolve, reject) => {
+                services.getAllTransactionsByMonth({
+                    year: year,
+                    month: month,
+                    type: self.transactionsFilter.type,
+                    categoryId: self.transactionsFilter.categoryId,
+                    accountId: self.transactionsFilter.accountId,
+                    keyword: self.transactionsFilter.keyword
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        loadTransactionList(self, settingsStore, exchangeRatesStore, {
+                            transactions: emptyTransactionResult,
+                            reload: true,
+                            autoExpand: autoExpand,
+                            defaultCurrency: defaultCurrency
+                        });
+
+                        if (!self.transactionListStateInvalid) {
+                            self.updateTransactionListInvalidState(true);
+                        }
+
+                        reject({ message: 'Unable to get transaction list' });
+                        return;
+                    }
+
+                    loadTransactionList(self, settingsStore, exchangeRatesStore, {
+                        transactions: data.result,
+                        reload: true,
+                        autoExpand: autoExpand,
+                        defaultCurrency: defaultCurrency
+                    });
+
+                    if (self.transactionListStateInvalid) {
+                        self.updateTransactionListInvalidState(false);
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to load monthly all transaction list', error);
+
+                    loadTransactionList(self, settingsStore, exchangeRatesStore, {
+                        transactions: emptyTransactionResult,
+                        reload: true,
+                        autoExpand: autoExpand,
+                        defaultCurrency: defaultCurrency
+                    });
+
+                    if (!self.transactionListStateInvalid) {
+                        self.updateTransactionListInvalidState(true);
                     }
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {

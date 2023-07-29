@@ -85,7 +85,7 @@
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">
-                    <v-btn :disabled="exportingData" @click="exportData">
+                    <v-btn :disabled="exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'" @click="exportData">
                         {{ $t('Export Data') }}
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="exportingData"></v-progress-circular>
                     </v-btn>

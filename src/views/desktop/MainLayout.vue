@@ -108,7 +108,7 @@
                         </v-btn>
                         <v-avatar class="cursor-pointer" color="primary" variant="tonal">
                             <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
-                                <template v-slot:placeholder>
+                                <template #placeholder>
                                     <div class="d-flex align-center justify-center fill-height">
                                         <v-icon :icon="icons.user"/>
                                     </div>
@@ -122,7 +122,7 @@
                                             <v-list-item-action start>
                                                 <v-avatar color="primary" variant="tonal">
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
-                                                        <template v-slot:placeholder>
+                                                        <template #placeholder>
                                                             <div class="d-flex align-center justify-center fill-height">
                                                                 <v-icon :icon="icons.user"/>
                                                             </div>

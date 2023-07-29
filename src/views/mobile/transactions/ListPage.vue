@@ -323,7 +323,6 @@
                      class="no-margin-vertical"
                      :key="categoryType"
                      v-for="(categories, categoryType) in allPrimaryCategories"
-                     v-show="!query.type || getTransactionTypeFromCategoryType(categoryType) === query.type"
             >
                 <f7-list-item divider :title="getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
@@ -547,7 +546,21 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allPrimaryCategories() {
-            return this.transactionCategoriesStore.allTransactionCategories;
+            const primaryCategories = {};
+
+            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
+                    continue;
+                }
+
+                primaryCategories[categoryType] = this.transactionCategoriesStore.allTransactionCategories[categoryType];
+            }
+
+            return primaryCategories;
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;

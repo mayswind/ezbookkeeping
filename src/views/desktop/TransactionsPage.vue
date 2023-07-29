@@ -105,13 +105,14 @@
                                         <th class="transaction-table-column-category text-uppercase">
                                             <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
                                                     eager location="bottom" max-height="500"
+                                                    :disabled="query.type === 1"
                                                     :close-on-content-click="false"
                                                     @update:model-value="scrollCategoryMenuToSelectedItem">
                                                 <template #activator="{ props }">
-                                                    <div class="cursor-pointer"
-                                                         :class="{ 'readonly': loading, 'text-primary': query.categoryId > 0 }" v-bind="props">
+                                                    <div class="d-flex align-center"
+                                                        :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryId > 0 }" v-bind="props">
                                                         <span>{{ queryCategoryName }}</span>
-                                                        <v-icon :icon="icons.dropdownMenu" />
+                                                        <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
                                                     </div>
                                                 </template>
                                                 <v-list :selected="[query.categoryId]">
@@ -128,8 +129,7 @@
                                                     </v-list-item>
 
                                                     <template :key="categoryType"
-                                                              v-for="(categories, categoryType) in allPrimaryCategories"
-                                                              v-if="!query.type || getTransactionTypeFromCategoryType(categoryType) === query.type">
+                                                              v-for="(categories, categoryType) in allPrimaryCategories">
                                                         <v-list-item density="compact">
                                                             <v-list-item-title>
                                                                 <span class="text-sm">{{ getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type') }}</span>
@@ -137,7 +137,7 @@
                                                         </v-list-item>
 
                                                         <v-list-group :key="category.id" v-for="category in categories">
-                                                            <template v-slot:activator="{ props }" v-if="!category.hidden">
+                                                            <template #activator="{ props }" v-if="!category.hidden">
                                                                 <v-divider />
                                                                 <v-list-item class="text-sm" density="compact"
                                                                              :class="getCategoryListItemCheckedClass(category, query.categoryId)"
@@ -192,7 +192,7 @@
                                                     eager location="bottom" max-height="500"
                                                     @update:model-value="scrollAccountMenuToSelectedItem">
                                                 <template #activator="{ props }">
-                                                    <div class="cursor-pointer"
+                                                    <div class="d-flex align-center cursor-pointer"
                                                          :class="{ 'readonly': loading, 'text-primary': query.accountId > 0 }" v-bind="props">
                                                         <span>{{ queryAccountName }}</span>
                                                         <v-icon :icon="icons.dropdownMenu" />
@@ -554,7 +554,21 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allPrimaryCategories() {
-            return this.transactionCategoriesStore.allTransactionCategories;
+            const primaryCategories = {};
+
+            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
+                    continue;
+                }
+
+                primaryCategories[categoryType] = this.transactionCategoriesStore.allTransactionCategories[categoryType];
+            }
+
+            return primaryCategories;
         },
         recentMonthDateRanges() {
             return this.$locale.getAllRecentMonthDateRanges(this.userStore, true);

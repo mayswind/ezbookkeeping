@@ -10,7 +10,7 @@
                 <v-card-text class="d-flex">
                     <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4">
                         <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar">
-                            <template v-slot:placeholder>
+                            <template #placeholder>
                                 <div class="d-flex align-center justify-center fill-height">
                                     <v-icon size="48" :icon="icons.user"/>
                                 </div>
@@ -66,15 +66,37 @@
                                     item-title="name"
                                     item-value="id"
                                     persistent-placeholder
-                                    :disabled="loading || saving"
+                                    :disabled="loading || saving || !allVisibleAccounts.length"
                                     :label="$t('Default Account')"
                                     :placeholder="$t('Default Account')"
                                     :items="allVisibleAccounts"
                                     :no-data-text="$t('No results')"
                                     v-model="newProfile.defaultAccountId"
                                 >
-                                    <template v-slot:selection="{ item }">
-                                        <v-label>{{ !item || item.value === 0 || item.value === '0' ? $t('Not Specified') : item.title }}</v-label>
+                                    <template #selection="{ item }">
+                                        <v-label v-if="item && item.value !== 0 && item.value !== '0'">
+                                            <ItemIcon class="mr-2" icon-type="account" size="23px"
+                                                      :icon-id="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'icon')"
+                                                      :color="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'color')"
+                                                      v-if="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'icon')" />
+                                            <span>{{ getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Not Specified')) }}</span>
+                                        </v-label>
+                                        <v-label v-if="!item || item.value === 0 || item.value === '0'">{{ $t('Not Specified') }}</v-label>
+                                    </template>
+
+                                    <template #item="{ props, item }">
+                                        <v-list-item :value="item.value" v-bind="props">
+                                            <template #title>
+                                                <v-list-item-title>
+                                                    <div class="d-flex align-center">
+                                                        <ItemIcon icon-type="account"
+                                                                  :icon-id="item.raw.icon" :color="item.raw.color"
+                                                                  v-if="item.raw" />
+                                                        <span class="ml-2">{{ item.title }}</span>
+                                                    </div>
+                                                </v-list-item-title>
+                                            </template>
+                                        </v-list-item>
                                     </template>
                                 </v-select>
                             </v-col>
@@ -195,7 +217,7 @@
                     </v-card-text>
 
                     <v-card-text class="d-flex flex-wrap gap-4">
-                        <v-btn :disabled="saving" @click="save">
+                        <v-btn :disabled="inputIsNotChanged || inputIsInvalid || saving" @click="save">
                             {{ $t('Save changes') }}
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="saving"></v-progress-circular>
                         </v-btn>

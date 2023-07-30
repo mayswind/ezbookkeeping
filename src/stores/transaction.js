@@ -198,14 +198,14 @@ function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthLi
                 continue;
             }
 
-            amount = Math.floor(balance);
+            amount = balance;
         }
 
         if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
             totalExpense += amount;
         } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
             totalIncome += amount;
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountId) {
+        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountId && accountId !== '0') {
             if (accountId === transaction.sourceAccountId) {
                 totalExpense += amount;
             } else if (accountId === transaction.destinationAccountId) {
@@ -222,9 +222,9 @@ function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthLi
     }
 
     transactionMonthList.totalAmount = {
-        expense: totalExpense,
+        expense: Math.floor(totalExpense),
         incompleteExpense: incomplete || hasUnCalculatedTotalExpense,
-        income: totalIncome,
+        income: Math.floor(totalIncome),
         incompleteIncome: incomplete || hasUnCalculatedTotalIncome
     };
 }

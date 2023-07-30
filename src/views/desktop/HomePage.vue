@@ -103,8 +103,8 @@
         </v-col>
 
         <v-col cols="12" md="6">
-            <monthly-income-and-expense-card :data="monthlyIncomeAndExpenseData"
-                :disabled="loadingOverview" :is-dark-mode="isDarkMode" />
+            <monthly-income-and-expense-card :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode"
+                                             :loading="loadingOverview" :disabled="loadingOverview" />
         </v-col>
     </v-row>
 
@@ -206,6 +206,10 @@ export default {
         monthlyIncomeAndExpenseData() {
             const self = this;
             const data = [];
+
+            if (!self.transactionOverview || !self.transactionOverview.thisMonth || !self.transactionOverview.thisMonth.valid) {
+                return data;
+            }
 
             [ 'monthBeforeLast4Months', 'monthBeforeLast3Months', 'monthBeforeLast2Months', 'monthBeforeLastMonth', 'lastMonth', 'thisMonth' ].forEach(fieldName => {
                 if (!Object.prototype.hasOwnProperty.call(self.transactionOverview, fieldName)) {

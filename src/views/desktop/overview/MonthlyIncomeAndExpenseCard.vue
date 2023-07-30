@@ -4,7 +4,13 @@
             <span class="text-2xl font-weight-bold">{{ $t('Trend in Income and Expense') }}</span>
         </template>
 
-        <v-chart class="overview-monthly-chart" autoresize :option="chartOptions" />
+        <v-card-text class="overview-monthly-chart overview-monthly-chart-no-data-tips" v-if="!loading && !hasAnyData">
+            <div class="d-flex flex-column align-center justify-center w-100 h-100">
+                <h2 style="margin-top: -40px">{{ $t('No data') }}</h2>
+            </div>
+        </v-card-text>
+
+        <v-chart autoresize class="overview-monthly-chart" :class="{ 'readonly': !hasAnyData }" :option="chartOptions"/>
     </v-card>
 </template>
 
@@ -20,6 +26,7 @@ import {
 
 export default {
     props: [
+        'loading',
         'data',
         'disabled',
         'isDarkMode'
@@ -31,6 +38,21 @@ export default {
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
+        },
+        hasAnyData() {
+            if (!this.data || !this.data.length || this.data.length < 1) {
+                return false;
+            }
+
+            for (let i = 0; i < this.data.length; i++) {
+                const item = this.data[i];
+
+                if (item.incomeAmount > 0 || item.incomeAmount < 0 || item.expenseAmount > 0 || item.expenseAmount < 0) {
+                    return true;
+                }
+            }
+
+            return false;
         },
         chartOptions() {
             const self = this;
@@ -244,6 +266,11 @@ export default {
 </script>
 
 <style>
+.overview-monthly-chart-no-data-tips {
+    position: absolute !important;
+    z-index: 10;
+}
+
 .overview-monthly-chart {
     width: 100%;
     height: 400px;

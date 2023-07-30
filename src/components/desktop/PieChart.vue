@@ -153,6 +153,7 @@ export default {
                 tooltip: {
                     trigger: 'item',
                     backgroundColor: self.isDarkMode ? '#333' : '#fff',
+                    borderColor: self.isDarkMode ? '#333' : '#fff',
                     textStyle: {
                         color: self.isDarkMode ? '#eee' : '#333'
                     },
@@ -174,7 +175,6 @@ export default {
                 },
                 legend: {
                     orient: 'horizontal',
-                    left: 'top',
                     data: self.validItems.map(item => item.name),
                     selected: self.selectedLegends,
                     textStyle: {

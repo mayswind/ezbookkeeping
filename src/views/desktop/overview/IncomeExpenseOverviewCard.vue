@@ -17,9 +17,9 @@
         </v-card-text>
         <v-card-text class="pb-2">
             <div class="d-flex align-center mb-2">
-                <span class="font-weight-semibold text-truncate text-red text-h5 text-expense me-2">{{ expenseAmount }}</span>
+                <span class="font-weight-semibold text-truncate text-red text-h5 text-income me-2">{{ incomeAmount }}</span>
             </div>
-            <span class="text-truncate text-h6 text-income">{{ incomeAmount }}</span>
+            <span class="text-truncate text-h6 text-expense">{{ expenseAmount }}</span>
         </v-card-text>
         <v-card-text>
             <span class="text-caption">{{ datetime }}</span>

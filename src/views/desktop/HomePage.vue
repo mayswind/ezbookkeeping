@@ -21,15 +21,17 @@
 
                 <v-card-text>
                     <h5 class="text-2xl font-weight-medium text-primary">
-                        {{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}
-                        <v-btn density="compact" color="default" variant="text"
+                        <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
+                        <v-skeleton-loader class="d-inline-block overview-card-skeleton mt-4" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
+                        <v-btn class="ml-1" density="compact" color="default" variant="text"
                                :icon="true" @click="showAmountInHomePage = !showAmountInHomePage">
                             <v-icon :icon="showAmountInHomePage ? icons.eyeSlash : icons.eye" size="20" />
                         </v-btn>
                     </h5>
                     <div class="mt-2 mb-3">
                         <span class="mr-2">{{ $t('Monthly income') }}</span>
-                        <span>{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
+                        <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
+                        <v-skeleton-loader class="d-inline-block overview-card-skeleton" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </div>
                     <v-btn size="small" to="/transactions?dateType=7">{{ $t('View Details') }}</v-btn>
                     <v-img class="overview-card-background" src="img/desktop/card-background.png"/>
@@ -40,10 +42,10 @@
 
         <v-col cols="12" lg="2" md="6">
             <income-expense-overview-card
-                :disabled="loadingOverview" :icon="icons.calendarToday"
+                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarToday"
                 :title="$t('Today')"
-                :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : '-'"
-                :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : '-'"
+                :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : ''"
+                :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : ''"
                 :datetime="displayDateRange.today.displayTime"
             >
                 <template #menus>
@@ -56,10 +58,10 @@
 
         <v-col cols="12" lg="2" md="6">
             <income-expense-overview-card
-                :disabled="loadingOverview" :icon="icons.calendarWeek"
+                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarWeek"
                 :title="$t('This Week')"
-                :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : '-'"
-                :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : '-'"
+                :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : ''"
+                :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : ''"
                 :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
             >
                 <template #menus>
@@ -72,10 +74,10 @@
 
         <v-col cols="12" lg="2" md="6">
             <income-expense-overview-card
-                :disabled="loadingOverview" :icon="icons.calendarMonth"
+                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarMonth"
                 :title="$t('This Month')"
-                :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-'"
-                :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-'"
+                :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : ''"
+                :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : ''"
                 :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
             >
                 <template #menus>
@@ -88,10 +90,10 @@
 
         <v-col cols="12" lg="2" md="6">
             <income-expense-overview-card
-                :disabled="loadingOverview" :icon="icons.calendarYear"
+                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarYear"
                 :title="$t('This Year')"
-                :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : '-'"
-                :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : '-'"
+                :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : ''"
+                :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : ''"
                 :datetime="displayDateRange.thisYear.displayTime"
             >
                 <template #menus>
@@ -307,5 +309,9 @@ export default {
     inline-size: 5rem;
     inset-block-end: 0.5rem;
     inset-inline-end: 1rem;
+}
+
+.overview-card-skeleton .v-skeleton-loader__text {
+    margin: 0;
 }
 </style>

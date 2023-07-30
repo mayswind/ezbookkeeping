@@ -4,13 +4,36 @@
             <span class="text-2xl font-weight-bold">{{ $t('Trend in Income and Expense') }}</span>
         </template>
 
-        <v-card-text class="overview-monthly-chart overview-monthly-chart-no-data-tips" v-if="!loading && !hasAnyData">
+        <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
+            <div class="overview-monthly-chart-skeleton-container h-100" style="margin-top: -30px">
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+                <div class="d-flex w-100 h-100 align-center justify-center">
+                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                </div>
+            </div>
+        </v-card-text>
+
+        <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-else-if="!loading && !hasAnyData">
             <div class="d-flex flex-column align-center justify-center w-100 h-100">
                 <h2 style="margin-top: -40px">{{ $t('No data') }}</h2>
             </div>
         </v-card-text>
 
-        <v-chart autoresize class="overview-monthly-chart" :class="{ 'readonly': !hasAnyData }" :option="chartOptions"/>
+        <v-chart autoresize class="overview-monthly-chart-container" :class="{ 'readonly': !hasAnyData }" :option="chartOptions"/>
     </v-card>
 </template>
 
@@ -266,14 +289,19 @@ export default {
 </script>
 
 <style>
-.overview-monthly-chart-no-data-tips {
+.overview-monthly-chart-container {
+    width: 100%;
+    height: 400px;
+}
+
+.overview-monthly-chart-overlay {
     position: absolute !important;
     z-index: 10;
 }
 
-.overview-monthly-chart {
-    width: 100%;
-    height: 400px;
+.overview-monthly-chart-skeleton-container {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .overview-monthly-chart-tooltip-indicator {

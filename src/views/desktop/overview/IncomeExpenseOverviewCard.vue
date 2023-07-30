@@ -16,10 +16,10 @@
             </v-btn>
         </v-card-text>
         <v-card-text class="pb-2">
-            <div class="d-flex align-center mb-2">
-                <span class="font-weight-semibold text-truncate text-red text-h5 text-income me-2">{{ incomeAmount }}</span>
-            </div>
-            <span class="text-truncate text-h6 text-expense">{{ expenseAmount }}</span>
+            <div class="font-weight-semibold text-truncate text-red text-h5 text-income me-2 mb-2" v-if="!loading || incomeAmount">{{ incomeAmount }}</div>
+            <v-skeleton-loader class="income-expense-overview-card-skeleton mt-4 mb-6" type="text" :loading="true" v-else-if="loading && !incomeAmount"></v-skeleton-loader>
+            <div class="text-truncate text-h6 text-expense" v-if="!loading || expenseAmount">{{ expenseAmount }}</div>
+            <v-skeleton-loader class="income-expense-overview-card-skeleton mb-2" type="text" :loading="true" v-else-if="loading && !expenseAmount"></v-skeleton-loader>
         </v-card-text>
         <v-card-text>
             <span class="text-caption">{{ datetime }}</span>
@@ -34,6 +34,7 @@ import {
 
 export default {
     props: [
+        'loading',
         'disabled',
         'icon',
         'title',
@@ -50,3 +51,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.income-expense-overview-card-skeleton .v-skeleton-loader__text {
+    margin: 0;
+}
+</style>

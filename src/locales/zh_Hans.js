@@ -837,6 +837,7 @@ export default {
     'PIN code is wrong': 'PIN码错误',
     'Sign Up': '注册',
     'Overview': '总览',
+    'Trend in Income and Expense': '收入与支出趋势',
     'View Details': '查看详情',
     'Transaction List': '交易列表',
     'Account List': '账户列表',

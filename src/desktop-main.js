@@ -46,8 +46,9 @@ import 'vuetify/styles';
 
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { PieChart } from 'echarts/charts';
+import { BarChart, PieChart } from 'echarts/charts';
 import {
+    GridComponent,
     TooltipComponent,
     LegendComponent,
 } from 'echarts/components';
@@ -363,7 +364,9 @@ const vuetify = createVuetify({
 
 echarts.use([
     CanvasRenderer,
+    BarChart,
     PieChart,
+    GridComponent,
     TooltipComponent,
     LegendComponent
 ]);

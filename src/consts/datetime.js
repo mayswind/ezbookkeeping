@@ -1,3 +1,18 @@
+const allMonthsArray = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+];
+
 const allWeekDays = {
     Sunday: {
         type: 0,
@@ -190,6 +205,7 @@ const defaultDateTimeFormatValue = 0;
 export default {
     allWeekDays: allWeekDays,
     allWeekDaysArray: allWeekDaysArray,
+    allMonthsArray: allMonthsArray,
     allLongDateFormat: allLongDateFormat,
     allLongDateFormatArray: allLongDateFormatArray,
     allShortDateFormat: allShortDateFormat,

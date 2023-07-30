@@ -258,7 +258,7 @@ export default {
 
         return axios.get('v1/transactions/statistics.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
     },
-    getTransactionAmounts: ({ today, thisWeek, thisMonth, thisYear }) => {
+    getTransactionAmounts: ({ today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months }) => {
         const queryParams = [];
 
         if (today) {
@@ -275,6 +275,26 @@ export default {
 
         if (thisYear) {
             queryParams.push(`thisYear_${thisYear.startTime}_${thisYear.endTime}`);
+        }
+
+        if (lastMonth) {
+            queryParams.push(`lastMonth_${lastMonth.startTime}_${lastMonth.endTime}`);
+        }
+
+        if (monthBeforeLastMonth) {
+            queryParams.push(`monthBeforeLastMonth_${monthBeforeLastMonth.startTime}_${monthBeforeLastMonth.endTime}`);
+        }
+
+        if (monthBeforeLast2Months) {
+            queryParams.push(`monthBeforeLast2Months_${monthBeforeLast2Months.startTime}_${monthBeforeLast2Months.endTime}`);
+        }
+
+        if (monthBeforeLast3Months) {
+            queryParams.push(`monthBeforeLast3Months_${monthBeforeLast3Months.startTime}_${monthBeforeLast3Months.endTime}`);
+        }
+
+        if (monthBeforeLast4Months) {
+            queryParams.push(`monthBeforeLast4Months_${monthBeforeLast4Months.startTime}_${monthBeforeLast4Months.endTime}`);
         }
 
         return axios.get('v1/transactions/amounts.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));

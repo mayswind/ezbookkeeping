@@ -1,0 +1,258 @@
+<template>
+    <v-card :class="{ 'disabled': disabled }">
+        <template #title>
+            <span class="text-2xl font-weight-bold">{{ $t('Trend in Income and Expense') }}</span>
+        </template>
+
+        <v-chart class="overview-monthly-chart" autoresize :option="chartOptions" />
+    </v-card>
+</template>
+
+<script>
+import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
+
+import {
+    parseDateFromUnixTime,
+    getMonthName
+} from '@/lib/datetime.js';
+
+export default {
+    props: [
+        'data',
+        'disabled',
+        'isDarkMode'
+    ],
+    computed: {
+        ...mapStores(useSettingsStore, useUserStore),
+        showAmountInHomePage() {
+            return this.settingsStore.appSettings.showAmountInHomePage;
+        },
+        defaultCurrency() {
+            return this.userStore.currentUserDefaultCurrency;
+        },
+        chartOptions() {
+            const self = this;
+            const monthNames = [];
+            const incomeAmounts = [];
+            const expenseAmounts = [];
+            let minAmount = 0;
+            let maxAmount = 0;
+
+            if (self.data) {
+                for (let i = 0; i < self.data.length; i++) {
+                    const item = self.data[i];
+                    const month = getMonthName(parseDateFromUnixTime(item.monthStartTime));
+
+                    monthNames.push(self.$locale.getMonthShortName(month));
+                    incomeAmounts.push(item.incomeAmount);
+                    expenseAmounts.push(-item.expenseAmount);
+
+                    if (item.incomeAmount > maxAmount) {
+                        maxAmount = item.incomeAmount;
+                    }
+
+                    if (-item.expenseAmount > maxAmount) {
+                        maxAmount = -item.expenseAmount;
+                    }
+
+                    if (item.incomeAmount < minAmount) {
+                        minAmount = item.incomeAmount;
+                    }
+
+                    if (-item.expenseAmount < minAmount) {
+                        minAmount = -item.expenseAmount;
+                    }
+                }
+            }
+
+            let amountGap = maxAmount - minAmount;
+
+            return {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    backgroundColor: self.isDarkMode ? '#333' : '#fff',
+                    borderColor: self.isDarkMode ? '#333' : '#fff',
+                    textStyle: {
+                        color: self.isDarkMode ? '#eee' : '#333'
+                    },
+                    formatter: params => {
+                        let incomeAmount = 0;
+                        let incomeColor = '#cc4a66';
+                        let expenseAmount = 0;
+                        let expenseColor = '#4dd291';
+
+                        for (let i = 0; i < params.length; i++) {
+                            const param = params[i];
+                            const dataIndex = param.dataIndex;
+                            const data = self.data[dataIndex];
+
+                            if (param.seriesId === 'seriesIncome') {
+                                incomeAmount = self.getDisplayIncomeAmount(data);
+                                incomeColor = param.color;
+                            } else if (param.seriesId === 'seriesExpense') {
+                                expenseAmount = self.getDisplayExpenseAmount(data);
+                                expenseColor = param.color;
+                            }
+                        }
+
+                        return `<table>` +
+                            `<thead>` +
+                                `<tr>` +
+                                    `<td colspan="2" class="text-left">${params[0].name}</td>` +
+                                `</tr>` +
+                            `</thead>` +
+                            `<tbody>` +
+                                `<tr>` +
+                                    `<td><span class="overview-monthly-chart-tooltip-indicator mr-1" style="background-color: ${incomeColor}"></span><span class="mr-4">${self.$t('Income')}</span></td>` +
+                                    `<td><strong>${incomeAmount}</strong></td>` +
+                                `</tr>` +
+                                `<tr>` +
+                                    `<td><span class="overview-monthly-chart-tooltip-indicator mr-1" style="background-color: ${expenseColor}"></span><span class="mr-4">${self.$t('Expense')}</span></td>` +
+                                    `<td><strong>${expenseAmount}</strong></td>` +
+                                `</tr>` +
+                            `</tbody>` +
+                            `</table>`;
+                    }
+                },
+                legend: {
+                    bottom: 20,
+                    itemWidth: 14,
+                    itemHeight: 14,
+                    textStyle: {
+                        color: self.isDarkMode ? '#eee' : '#333'
+                    },
+                    icon: 'circle',
+                    data: [ self.$t('Income'), self.$t('Expense') ]
+                },
+                grid: {
+                    left: '20px',
+                    right: '20px',
+                    top: '10px',
+                    bottom: '100px'
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: monthNames,
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            padding: [ 20, 0, 0, 0 ]
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        min: minAmount - amountGap / 20,
+                        max: maxAmount,
+                        splitNumber: 10,
+                        axisLabel: {
+                            show: false
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    },
+                    {
+                        type: 'value',
+                        min: minAmount,
+                        max: maxAmount + amountGap / 20,
+                        splitNumber: 10,
+                        axisLabel: {
+                            show: false
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        type: 'bar',
+                        id: 'seriesIncome',
+                        name: self.$t('Income'),
+                        yAxisIndex: 0,
+                        stack: 'Total',
+                        itemStyle: {
+                            color: '#cc4a66',
+                            borderRadius: 16
+                        },
+                        emphasis: {
+                            focus: 'series',
+                            labelLine: {
+                                show: false
+                            }
+                        },
+                        barMaxWidth: 40,
+                        data: incomeAmounts
+                    },
+                    {
+                        type: 'bar',
+                        id: 'seriesExpense',
+                        name: self.$t('Expense'),
+                        yAxisIndex: 1,
+                        stack: 'Total',
+                        itemStyle: {
+                            color: '#4dd291',
+                            borderRadius: 16
+                        },
+                        emphasis: {
+                            focus: 'series',
+                            labelLine: {
+                                show: false
+                            }
+                        },
+                        barMaxWidth: 40,
+                        data: expenseAmounts
+                    }
+                ]
+            };
+        }
+    },
+    methods: {
+        getDisplayCurrency(value, currencyCode) {
+            return this.$locale.getDisplayCurrency(value, currencyCode, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
+        },
+        getDisplayAmount(amount, incomplete) {
+            if (!this.showAmountInHomePage) {
+                return this.getDisplayCurrency('***', this.defaultCurrency);
+            }
+
+            return this.getDisplayCurrency(amount, this.defaultCurrency) + (incomplete ? '+' : '');
+        },
+        getDisplayIncomeAmount(category) {
+            return this.getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
+        },
+        getDisplayExpenseAmount(category) {
+            return this.getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
+        }
+    }
+}
+</script>
+
+<style>
+.overview-monthly-chart {
+    width: 100%;
+    height: 400px;
+}
+
+.overview-monthly-chart-tooltip-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+}
+</style>

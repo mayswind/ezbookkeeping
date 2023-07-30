@@ -4,9 +4,11 @@
             <v-card :class="{ 'disabled': loadingOverview }">
                 <template #title>
                     <div class="d-flex align-center">
-                        <span class="text-2xl font-weight-bold">{{ displayDateRange.thisMonth.displayTime }}</span>
-                        <span>·</span>
-                        <small>{{ $t('Expense') }}</small>
+                        <div class="d-flex align-baseline">
+                            <span class="text-2xl font-weight-bold">{{ displayDateRange.thisMonth.displayTime }}</span>
+                            <span>·</span>
+                            <small>{{ $t('Expense') }}</small>
+                        </div>
                         <v-btn density="compact" color="default" variant="text"
                                class="ml-2" :icon="true"
                                v-if="!loadingOverview" @click="reload(true)">
@@ -25,11 +27,13 @@
                             <v-icon :icon="showAmountInHomePage ? icons.eyeSlash : icons.eye" size="20" />
                         </v-btn>
                     </h5>
-                    <p>
+                    <div class="mt-2 mb-3">
                         <span class="mr-2">{{ $t('Monthly income') }}</span>
                         <span>{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
-                    </p>
-                    <v-btn size="small" to="/transactions">{{ $t('View Details') }}</v-btn>
+                    </div>
+                    <v-btn size="small" to="/transactions?dateType=7">{{ $t('View Details') }}</v-btn>
+                    <v-img class="overview-card-background" src="img/desktop/card-background.png"/>
+                    <v-img class="overview-card-background-image" width="116px" src="img/desktop/document.svg"/>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -97,13 +101,21 @@
                 </template>
             </income-expense-overview-card>
         </v-col>
+
+        <v-col cols="12" md="6">
+            <monthly-income-and-expense-card :data="monthlyIncomeAndExpenseData"
+                :disabled="loadingOverview" :is-dark-mode="isDarkMode" />
+        </v-col>
     </v-row>
 
     <snack-bar ref="snackbar" />
 </template>
 
 <script>
+import { useTheme } from 'vuetify';
+
 import IncomeExpenseOverviewCard from './overview/IncomeExpenseOverviewCard.vue';
+import MonthlyIncomeAndExpenseCard from './overview/MonthlyIncomeAndExpenseCard.vue';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
@@ -117,6 +129,7 @@ import {
     mdiRefresh,
     mdiEyeOutline,
     mdiEyeOffOutline,
+    mdiCartOutline,
     mdiCalendarTodayOutline,
     mdiCalendarWeekOutline,
     mdiCalendarMonthOutline,
@@ -127,7 +140,8 @@ import {
 
 export default {
     components: {
-        IncomeExpenseOverviewCard
+        IncomeExpenseOverviewCard,
+        MonthlyIncomeAndExpenseCard
     },
     data() {
         return {
@@ -136,6 +150,7 @@ export default {
                 refresh: mdiRefresh,
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
+                cart: mdiCartOutline,
                 calendarToday: mdiCalendarTodayOutline,
                 calendarWeek: mdiCalendarWeekOutline,
                 calendarMonth: mdiCalendarMonthOutline,
@@ -147,6 +162,9 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useOverviewStore),
+        isDarkMode() {
+            return this.globalTheme.global.name.value === 'dark';
+        },
         showAmountInHomePage: {
             get: function() {
                 return this.settingsStore.appSettings.showAmountInHomePage;
@@ -184,12 +202,47 @@ export default {
         },
         transactionOverview() {
             return this.overviewStore.transactionOverview;
+        },
+        monthlyIncomeAndExpenseData() {
+            const self = this;
+            const data = [];
+
+            [ 'monthBeforeLast4Months', 'monthBeforeLast3Months', 'monthBeforeLast2Months', 'monthBeforeLastMonth', 'lastMonth', 'thisMonth' ].forEach(fieldName => {
+                if (!Object.prototype.hasOwnProperty.call(self.transactionOverview, fieldName)) {
+                    return;
+                }
+
+                const dateRange = self.overviewStore.transactionDataRange[fieldName];
+
+                if (!dateRange) {
+                    return;
+                }
+
+                const item = self.overviewStore.transactionOverview[fieldName];
+
+                data.push({
+                    monthStartTime: dateRange.startTime,
+                    incomeAmount: item ? item.incomeAmount : 0,
+                    expenseAmount: item ? item.expenseAmount : 0,
+                    incompleteIncomeAmount: item ? item.incompleteIncomeAmount : true,
+                    incompleteExpenseAmount: item ? item.incompleteExpenseAmount : true
+                });
+            });
+
+            return data;
         }
     },
     created() {
         if (this.$user.isUserLogined() && this.$user.isUserUnlocked()) {
             this.reload(false);
         }
+    },
+    setup() {
+        const theme = useTheme();
+
+        return {
+            globalTheme: theme
+        };
     },
     methods: {
         reload(force) {
@@ -198,7 +251,8 @@ export default {
             self.loadingOverview = true;
 
             self.overviewStore.loadTransactionOverview({
-                force: force
+                force: force,
+                loadLast5Months: true
             }).then(() => {
                 self.loadingOverview = false;
 
@@ -235,3 +289,19 @@ export default {
     }
 }
 </script>
+
+<style>
+.overview-card-background {
+    position: absolute;
+    inline-size: 9rem;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+}
+
+.overview-card-background-image {
+    position: absolute;
+    inline-size: 5rem;
+    inset-block-end: 0.5rem;
+    inset-inline-end: 1rem;
+}
+</style>

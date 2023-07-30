@@ -837,6 +837,7 @@ export default {
     'PIN code is wrong': 'PIN code is wrong',
     'Sign Up': 'Sign Up',
     'Overview': 'Overview',
+    'Trend in Income and Expense': 'Trend in Income and Expense',
     'View Details': 'View Details',
     'Transaction List': 'Transaction List',
     'Account List': 'Account List',

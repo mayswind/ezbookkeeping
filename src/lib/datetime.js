@@ -133,6 +133,11 @@ export function getDayOfWeekName(date) {
     return dateTimeConstants.allWeekDaysArray[dayOfWeek].name;
 }
 
+export function getMonthName(date) {
+    const dayOfWeek = moment(date).month();
+    return dateTimeConstants.allMonthsArray[dayOfWeek];
+}
+
 export function getHour(date) {
     return moment(date).hour();
 }

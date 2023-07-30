@@ -1,7 +1,7 @@
 <template>
     <v-card :class="{ 'disabled': disabled }">
         <template #title>
-            <span class="text-2xl font-weight-bold">{{ $t('Trend in Income and Expense') }}</span>
+            <span>{{ $t('Trend in Income and Expense') }}</span>
         </template>
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">

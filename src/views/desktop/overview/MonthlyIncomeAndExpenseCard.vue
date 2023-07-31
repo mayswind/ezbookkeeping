@@ -6,23 +6,9 @@
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
             <div class="overview-monthly-chart-skeleton-container h-100" style="margin-top: -30px">
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
-                </div>
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
-                </div>
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
-                </div>
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
-                </div>
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
-                </div>
-                <div class="d-flex w-100 h-100 align-center justify-center">
-                    <v-skeleton-loader width="40" height="200" :loading="true"></v-skeleton-loader>
+                <div class="d-flex w-100 h-100 align-center justify-center"
+                     :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
+                    <v-skeleton-loader width="16" height="200" :loading="true"></v-skeleton-loader>
                 </div>
             </div>
         </v-card-text>
@@ -238,7 +224,7 @@ export default {
                                 show: false
                             }
                         },
-                        barMaxWidth: 40,
+                        barMaxWidth: 16,
                         data: incomeAmounts
                     },
                     {
@@ -257,7 +243,7 @@ export default {
                                 show: false
                             }
                         },
-                        barMaxWidth: 40,
+                        barMaxWidth: 16,
                         data: expenseAmounts
                     }
                 ]
@@ -301,7 +287,7 @@ export default {
 
 .overview-monthly-chart-skeleton-container {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .overview-monthly-chart-tooltip-indicator {

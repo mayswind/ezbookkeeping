@@ -40,68 +40,136 @@
             </v-card>
         </v-col>
 
-        <v-col cols="12" lg="2" md="6">
-            <income-expense-overview-card
-                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarToday"
-                :title="$t('Today')"
-                :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : ''"
-                :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : ''"
-                :datetime="displayDateRange.today.displayTime"
-            >
-                <template #menus>
-                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.Today.type">
-                        <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
-                    </v-list-item>
+        <v-col cols="12" lg="8" md="12">
+            <v-card :class="{ 'disabled': loadingOverview }">
+                <template #title>
+                    <span>{{ $t('Asset Summary') }}</span>
                 </template>
-            </income-expense-overview-card>
+
+                <v-card-text>
+                    <h6 class="text-sm font-weight-medium mb-6">
+                        <span>{{ $t('format.misc.youHaveAccounts', { count: allAccounts.length }) }}</span>
+                    </h6>
+
+                    <v-row>
+                        <v-col cols="12" md="4">
+                            <div class="d-flex align-center">
+                                <div class="me-3">
+                                    <v-avatar rounded color="secondary" size="42" class="elevation-1">
+                                        <v-icon size="24" :icon="icons.totalAssets"/>
+                                    </v-avatar>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <span class="text-caption">{{ $t('Total assets') }}</span>
+                                    <span class="text-h6" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ totalAssets }}</span>
+                                    <v-skeleton-loader class="overview-card-skeleton mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
+                                </div>
+                            </div>
+                        </v-col>
+
+                        <v-col cols="12" md="4">
+                            <div class="d-flex align-center">
+                                <div class="me-3">
+                                    <v-avatar rounded color="expense" size="42" class="elevation-1">
+                                        <v-icon size="24" :icon="icons.totalLiabilities"/>
+                                    </v-avatar>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <span class="text-caption">{{ $t('Total liabilities') }}</span>
+                                    <span class="text-h6" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ totalLiabilities }}</span>
+                                    <v-skeleton-loader class="overview-card-skeleton mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
+                                </div>
+                            </div>
+                        </v-col>
+
+                        <v-col cols="12" md="4">
+                            <div class="d-flex align-center">
+                                <div class="me-3">
+                                    <v-avatar rounded color="primary" size="42" class="elevation-1">
+                                        <v-icon size="24" :icon="icons.netAssets"/>
+                                    </v-avatar>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <span class="text-caption">{{ $t('Net assets') }}</span>
+                                    <span class="text-h6" v-if="!loadingOverview || (allAccounts && allAccounts.length)">{{ netAssets }}</span>
+                                    <v-skeleton-loader class="overview-card-skeleton mt-3 mb-2" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!allAccounts || !allAccounts.length)"></v-skeleton-loader>
+                                </div>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </v-col>
 
-        <v-col cols="12" lg="2" md="6">
-            <income-expense-overview-card
-                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarWeek"
-                :title="$t('This Week')"
-                :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : ''"
-                :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : ''"
-                :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
-            >
-                <template #menus>
-                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisWeek.type">
-                        <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
-                    </v-list-item>
-                </template>
-            </income-expense-overview-card>
-        </v-col>
+        <v-col cols="12" md="6">
+            <v-row>
+                <v-col cols="12" md="6">
+                    <income-expense-overview-card
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarToday"
+                        :title="$t('Today')"
+                        :expense-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayExpenseAmount(transactionOverview.today) : ''"
+                        :income-amount="transactionOverview.today && transactionOverview.today.valid ? getDisplayIncomeAmount(transactionOverview.today) : ''"
+                        :datetime="displayDateRange.today.displayTime"
+                    >
+                        <template #menus>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.Today.type">
+                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            </v-list-item>
+                        </template>
+                    </income-expense-overview-card>
+                </v-col>
 
-        <v-col cols="12" lg="2" md="6">
-            <income-expense-overview-card
-                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarMonth"
-                :title="$t('This Month')"
-                :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : ''"
-                :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : ''"
-                :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
-            >
-                <template #menus>
-                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisMonth.type">
-                        <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
-                    </v-list-item>
-                </template>
-            </income-expense-overview-card>
-        </v-col>
+                <v-col cols="12" md="6">
+                    <income-expense-overview-card
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarWeek"
+                        :title="$t('This Week')"
+                        :expense-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayExpenseAmount(transactionOverview.thisWeek) : ''"
+                        :income-amount="transactionOverview.thisWeek && transactionOverview.thisWeek.valid ? getDisplayIncomeAmount(transactionOverview.thisWeek) : ''"
+                        :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
+                    >
+                        <template #menus>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisWeek.type">
+                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            </v-list-item>
+                        </template>
+                    </income-expense-overview-card>
+                </v-col>
 
-        <v-col cols="12" lg="2" md="6">
-            <income-expense-overview-card
-                :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarYear"
-                :title="$t('This Year')"
-                :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : ''"
-                :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : ''"
-                :datetime="displayDateRange.thisYear.displayTime"
-            >
-                <template #menus>
-                    <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisYear.type">
-                        <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
-                    </v-list-item>
-                </template>
-            </income-expense-overview-card>
+                <v-col cols="12" md="6">
+                    <income-expense-overview-card
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarMonth"
+                        :title="$t('This Month')"
+                        :expense-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayExpenseAmount(transactionOverview.thisMonth) : ''"
+                        :income-amount="transactionOverview.thisMonth && transactionOverview.thisMonth.valid ? getDisplayIncomeAmount(transactionOverview.thisMonth) : ''"
+                        :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
+                    >
+                        <template #menus>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisMonth.type">
+                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            </v-list-item>
+                        </template>
+                    </income-expense-overview-card>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <income-expense-overview-card
+                        :loading="loadingOverview" :disabled="loadingOverview" :icon="icons.calendarYear"
+                        :title="$t('This Year')"
+                        :expense-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayExpenseAmount(transactionOverview.thisYear) : ''"
+                        :income-amount="transactionOverview.thisYear && transactionOverview.thisYear.valid ? getDisplayIncomeAmount(transactionOverview.thisYear) : ''"
+                        :datetime="displayDateRange.thisYear.displayTime"
+                    >
+                        <template #menus>
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisYear.type">
+                                <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
+                            </v-list-item>
+                        </template>
+                    </income-expense-overview-card>
+                </v-col>
+            </v-row>
         </v-col>
 
         <v-col cols="12" md="6">
@@ -122,6 +190,7 @@ import MonthlyIncomeAndExpenseCard from './overview/MonthlyIncomeAndExpenseCard.
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
+import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
@@ -131,7 +200,9 @@ import {
     mdiRefresh,
     mdiEyeOutline,
     mdiEyeOffOutline,
-    mdiCartOutline,
+    mdiBankOutline,
+    mdiCreditCardOutline,
+    mdiPiggyBankOutline,
     mdiCalendarTodayOutline,
     mdiCalendarWeekOutline,
     mdiCalendarMonthOutline,
@@ -152,7 +223,9 @@ export default {
                 refresh: mdiRefresh,
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
-                cart: mdiCartOutline,
+                totalAssets: mdiBankOutline,
+                totalLiabilities: mdiCreditCardOutline,
+                netAssets: mdiPiggyBankOutline,
                 calendarToday: mdiCalendarTodayOutline,
                 calendarWeek: mdiCalendarWeekOutline,
                 calendarMonth: mdiCalendarMonthOutline,
@@ -163,7 +236,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useOverviewStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
         isDarkMode() {
             return this.globalTheme.global.name.value === 'dark';
         },
@@ -180,6 +253,21 @@ export default {
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
+        },
+        allAccounts() {
+            return this.accountsStore.allAccounts;
+        },
+        netAssets() {
+            const netAssets = this.accountsStore.getNetAssets(this.showAmountInHomePage);
+            return this.getDisplayCurrency(netAssets, this.defaultCurrency);
+        },
+        totalAssets() {
+            const totalAssets = this.accountsStore.getTotalAssets(this.showAmountInHomePage);
+            return this.getDisplayCurrency(totalAssets, this.defaultCurrency);
+        },
+        totalLiabilities() {
+            const totalLiabilities = this.accountsStore.getTotalLiabilities(this.showAmountInHomePage);
+            return this.getDisplayCurrency(totalLiabilities, this.defaultCurrency);
         },
         displayDateRange() {
             const self = this;
@@ -213,7 +301,20 @@ export default {
                 return data;
             }
 
-            [ 'monthBeforeLast4Months', 'monthBeforeLast3Months', 'monthBeforeLast2Months', 'monthBeforeLastMonth', 'lastMonth', 'thisMonth' ].forEach(fieldName => {
+            [
+                'monthBeforeLast10Months',
+                'monthBeforeLast9Months',
+                'monthBeforeLast8Months',
+                'monthBeforeLast7Months',
+                'monthBeforeLast6Months',
+                'monthBeforeLast5Months',
+                'monthBeforeLast4Months',
+                'monthBeforeLast3Months',
+                'monthBeforeLast2Months',
+                'monthBeforeLastMonth',
+                'lastMonth',
+                'thisMonth'
+            ].forEach(fieldName => {
                 if (!Object.prototype.hasOwnProperty.call(self.transactionOverview, fieldName)) {
                     return;
                 }
@@ -256,10 +357,12 @@ export default {
 
             self.loadingOverview = true;
 
-            self.overviewStore.loadTransactionOverview({
-                force: force,
-                loadLast5Months: true
-            }).then(() => {
+            const promises = [
+                self.accountsStore.loadAllAccounts({ force: false }),
+                self.overviewStore.loadTransactionOverview({ force: force, loadLast11Months: true })
+            ];
+
+            Promise.all(promises).then(() => {
                 self.loadingOverview = false;
 
                 if (force) {

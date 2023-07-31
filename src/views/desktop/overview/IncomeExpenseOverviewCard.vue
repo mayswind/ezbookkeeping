@@ -15,13 +15,13 @@
                 </v-menu>
             </v-btn>
         </v-card-text>
-        <v-card-text class="pb-2">
+        <v-card-text class="mt-1 pb-2">
             <div class="font-weight-semibold text-truncate text-red text-h5 text-income me-2 mb-2" v-if="!loading || incomeAmount">{{ incomeAmount }}</div>
-            <v-skeleton-loader class="income-expense-overview-card-skeleton mt-4 mb-6" type="text" :loading="true" v-else-if="loading && !incomeAmount"></v-skeleton-loader>
+            <v-skeleton-loader class="income-expense-overview-card-skeleton mt-4 mb-6" type="text" width="120px" :loading="true" v-else-if="loading && !incomeAmount"></v-skeleton-loader>
             <div class="text-truncate text-h6 text-expense" v-if="!loading || expenseAmount">{{ expenseAmount }}</div>
-            <v-skeleton-loader class="income-expense-overview-card-skeleton mb-2" type="text" :loading="true" v-else-if="loading && !expenseAmount"></v-skeleton-loader>
+            <v-skeleton-loader class="income-expense-overview-card-skeleton mb-2" type="text" width="120px" :loading="true" v-else-if="loading && !expenseAmount"></v-skeleton-loader>
         </v-card-text>
-        <v-card-text>
+        <v-card-text class="mt-6">
             <span class="text-caption">{{ datetime }}</span>
         </v-card-text>
     </v-card>

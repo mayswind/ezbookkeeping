@@ -258,7 +258,7 @@ export default {
 
         return axios.get('v1/transactions/statistics.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
     },
-    getTransactionAmounts: ({ today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months }) => {
+    getTransactionAmounts: ({ today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months, monthBeforeLast5Months, monthBeforeLast6Months, monthBeforeLast7Months, monthBeforeLast8Months, monthBeforeLast9Months, monthBeforeLast10Months }) => {
         const queryParams = [];
 
         if (today) {
@@ -295,6 +295,30 @@ export default {
 
         if (monthBeforeLast4Months) {
             queryParams.push(`monthBeforeLast4Months_${monthBeforeLast4Months.startTime}_${monthBeforeLast4Months.endTime}`);
+        }
+
+        if (monthBeforeLast5Months) {
+            queryParams.push(`monthBeforeLast5Months_${monthBeforeLast5Months.startTime}_${monthBeforeLast5Months.endTime}`);
+        }
+
+        if (monthBeforeLast6Months) {
+            queryParams.push(`monthBeforeLast6Months_${monthBeforeLast6Months.startTime}_${monthBeforeLast6Months.endTime}`);
+        }
+
+        if (monthBeforeLast7Months) {
+            queryParams.push(`monthBeforeLast7Months_${monthBeforeLast7Months.startTime}_${monthBeforeLast7Months.endTime}`);
+        }
+
+        if (monthBeforeLast8Months) {
+            queryParams.push(`monthBeforeLast8Months_${monthBeforeLast8Months.startTime}_${monthBeforeLast8Months.endTime}`);
+        }
+
+        if (monthBeforeLast9Months) {
+            queryParams.push(`monthBeforeLast9Months_${monthBeforeLast9Months.startTime}_${monthBeforeLast9Months.endTime}`);
+        }
+
+        if (monthBeforeLast10Months) {
+            queryParams.push(`monthBeforeLast10Months_${monthBeforeLast10Months.startTime}_${monthBeforeLast10Months.endTime}`);
         }
 
         return axios.get('v1/transactions/amounts.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));

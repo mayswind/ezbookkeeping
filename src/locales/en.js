@@ -71,7 +71,8 @@ export default {
             'hoursBehindDefaultTimezone': '{hours} hour(s) behind default timezone',
             'hoursAheadOfDefaultTimezone': '{hours} hour(s) ahead of default timezone',
             'hoursMinutesBehindDefaultTimezone': '{hours} hour(s) and {minutes} minutes behind default timezone',
-            'hoursMinutesAheadOfDefaultTimezone': '{hours} hour(s) and {minutes} minutes ahead of default timezone'
+            'hoursMinutesAheadOfDefaultTimezone': '{hours} hour(s) and {minutes} minutes ahead of default timezone',
+            'youHaveAccounts': 'You have recorded {count} accounts'
         }
     },
     'dataExport': {
@@ -837,6 +838,7 @@ export default {
     'PIN code is wrong': 'PIN code is wrong',
     'Sign Up': 'Sign Up',
     'Overview': 'Overview',
+    'Asset Summary': 'Asset Summary',
     'Trend in Income and Expense': 'Trend in Income and Expense',
     'View Details': 'View Details',
     'Transaction List': 'Transaction List',

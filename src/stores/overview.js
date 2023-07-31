@@ -39,14 +39,10 @@ function updateTransactionDateRange(state) {
     state.transactionDataRange.monthBeforeLastMonth.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 2, 'months');
     state.transactionDataRange.monthBeforeLastMonth.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 2, 'months');
 
-    state.transactionDataRange.monthBeforeLast2Months.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 3, 'months');
-    state.transactionDataRange.monthBeforeLast2Months.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 3, 'months');
-
-    state.transactionDataRange.monthBeforeLast3Months.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 4, 'months');
-    state.transactionDataRange.monthBeforeLast3Months.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 4, 'months');
-
-    state.transactionDataRange.monthBeforeLast4Months.startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 5, 'months');
-    state.transactionDataRange.monthBeforeLast4Months.endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 5, 'months');
+    for (let i = 2; i <= 10; i++) {
+        state.transactionDataRange[`monthBeforeLast${i}Months`].startTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), i + 1, 'months');
+        state.transactionDataRange[`monthBeforeLast${i}Months`].endTime = getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), i + 1, 'months');
+    }
 }
 
 export const useOverviewStore = defineStore('overview', {
@@ -87,10 +83,34 @@ export const useOverviewStore = defineStore('overview', {
             monthBeforeLast4Months: {
                 startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 5, 'months'),
                 endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 5, 'months')
+            },
+            monthBeforeLast5Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 6, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 6, 'months')
+            },
+            monthBeforeLast6Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 7, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 7, 'months')
+            },
+            monthBeforeLast7Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 8, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 8, 'months')
+            },
+            monthBeforeLast8Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 9, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 9, 'months')
+            },
+            monthBeforeLast9Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 10, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 10, 'months')
+            },
+            monthBeforeLast10Months: {
+                startTime: getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 11, 'months'),
+                endTime: getUnixTimeBeforeUnixTime(getThisMonthLastUnixTime(), 11, 'months')
             }
         },
         transactionOverviewOptions: {
-            loadLast5Months: false
+            loadLast11Months: false
         },
         transactionOverviewData: {},
         transactionOverviewStateInvalid: true
@@ -117,7 +137,23 @@ export const useOverviewStore = defineStore('overview', {
             const finalOverviewData = {};
             const defaultCurrency = userStore.currentUserDefaultCurrency;
 
-            [ 'today', 'thisWeek', 'thisMonth', 'thisYear', 'lastMonth', 'monthBeforeLastMonth', 'monthBeforeLast2Months', 'monthBeforeLast3Months', 'monthBeforeLast4Months' ].forEach(field => {
+            [
+                'today',
+                'thisWeek',
+                'thisMonth',
+                'thisYear',
+                'lastMonth',
+                'monthBeforeLastMonth',
+                'monthBeforeLast2Months',
+                'monthBeforeLast3Months',
+                'monthBeforeLast4Months',
+                'monthBeforeLast5Months',
+                'monthBeforeLast6Months',
+                'monthBeforeLast7Months',
+                'monthBeforeLast8Months',
+                'monthBeforeLast9Months',
+                'monthBeforeLast10Months'
+            ].forEach(field => {
                 if (!Object.prototype.hasOwnProperty.call(overviewData, field)) {
                     return;
                 }
@@ -178,11 +214,11 @@ export const useOverviewStore = defineStore('overview', {
         },
         resetTransactionOverview() {
             updateTransactionDateRange(this);
-            this.transactionOverviewOptions.loadLast5Months = false;
+            this.transactionOverviewOptions.loadLast11Months = false;
             this.transactionOverviewData = {};
             this.transactionOverviewStateInvalid = true;
         },
-        loadTransactionOverview({ force, loadLast5Months }) {
+        loadTransactionOverview({ force, loadLast11Months }) {
             const self = this;
             let dateChanged = false;
             let rangeChanged = false;
@@ -192,7 +228,7 @@ export const useOverviewStore = defineStore('overview', {
                 updateTransactionDateRange(self);
             }
 
-            if (loadLast5Months && !self.transactionOverviewOptions.loadLast5Months) {
+            if (loadLast11Months && !self.transactionOverviewOptions.loadLast11Months) {
                 rangeChanged = true;
             }
 
@@ -209,12 +245,18 @@ export const useOverviewStore = defineStore('overview', {
                 thisYear: self.transactionDataRange.thisYear
             };
 
-            if (loadLast5Months) {
+            if (loadLast11Months) {
                 requestParams.lastMonth = self.transactionDataRange.lastMonth;
                 requestParams.monthBeforeLastMonth = self.transactionDataRange.monthBeforeLastMonth;
                 requestParams.monthBeforeLast2Months = self.transactionDataRange.monthBeforeLast2Months;
                 requestParams.monthBeforeLast3Months = self.transactionDataRange.monthBeforeLast3Months;
                 requestParams.monthBeforeLast4Months = self.transactionDataRange.monthBeforeLast4Months;
+                requestParams.monthBeforeLast5Months = self.transactionDataRange.monthBeforeLast5Months;
+                requestParams.monthBeforeLast6Months = self.transactionDataRange.monthBeforeLast6Months;
+                requestParams.monthBeforeLast7Months = self.transactionDataRange.monthBeforeLast7Months;
+                requestParams.monthBeforeLast8Months = self.transactionDataRange.monthBeforeLast8Months;
+                requestParams.monthBeforeLast9Months = self.transactionDataRange.monthBeforeLast9Months;
+                requestParams.monthBeforeLast10Months = self.transactionDataRange.monthBeforeLast10Months;
             }
 
             return new Promise((resolve, reject) => {
@@ -236,7 +278,7 @@ export const useOverviewStore = defineStore('overview', {
                     }
 
                     self.transactionOverviewData = data.result;
-                    self.transactionOverviewOptions.loadLast5Months = loadLast5Months;
+                    self.transactionOverviewOptions.loadLast11Months = loadLast11Months;
 
                     resolve(data.result);
                 }).catch(error => {

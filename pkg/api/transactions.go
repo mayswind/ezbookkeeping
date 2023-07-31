@@ -290,7 +290,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 		return nil, errs.ErrQueryItemsEmpty
 	}
 
-	if len(requestItems) > 10 {
+	if len(requestItems) > 20 {
 		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are too many items")
 		return nil, errs.ErrQueryItemsTooMuch
 	}

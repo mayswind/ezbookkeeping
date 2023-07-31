@@ -71,7 +71,8 @@ export default {
             'hoursBehindDefaultTimezone': '比默认时区晚{hours}小时',
             'hoursAheadOfDefaultTimezone': '比默认时区早{hours}小时',
             'hoursMinutesBehindDefaultTimezone': '比默认时区晚{hours}小时{minutes}分',
-            'hoursMinutesAheadOfDefaultTimezone': '比默认时区早{time}小时{minutes}分'
+            'hoursMinutesAheadOfDefaultTimezone': '比默认时区早{time}小时{minutes}分',
+            'youHaveAccounts': '您已经记录 {count} 个账户'
         }
     },
     'dataExport': {
@@ -837,6 +838,7 @@ export default {
     'PIN code is wrong': 'PIN码错误',
     'Sign Up': '注册',
     'Overview': '总览',
+    'Asset Summary': '资产概要',
     'Trend in Income and Expense': '收入与支出趋势',
     'View Details': '查看详情',
     'Transaction List': '交易列表',

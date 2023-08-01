@@ -22,7 +22,7 @@
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableCategory">
             <f7-list-item :title="$t('No available category')"></f7-list-item>
-            <f7-list-button v-if="hasSubCategories"
+            <f7-list-button v-if="hasSubCategories && noCategory"
                             :title="$t('Add Default Categories')"
                             :href="'/category/preset?type=' + categoryType"></f7-list-button>
         </f7-list>
@@ -188,6 +188,9 @@ export default {
             }
 
             return true;
+        },
+        noCategory() {
+            return this.categories.length < 1;
         }
     },
     created() {

@@ -15,6 +15,7 @@ import { isNumber, isString } from '@/lib/common.js';
 import {
     getTimezoneOffsetMinutes,
     parseDateFromUnixTime,
+    getShortDate,
     getYear,
     getMonth,
     getYearAndMonth,
@@ -238,6 +239,7 @@ function fillTransactionObject(state, transaction, currentUtcOffset) {
     const transactionCategoriesStore = useTransactionCategoriesStore();
     const transactionTime = parseDateFromUnixTime(transaction.time, transaction.utcOffset, currentUtcOffset);
 
+    transaction.date = getShortDate(transactionTime);
     transaction.day = getDay(transactionTime);
     transaction.dayOfWeek = getDayOfWeekName(transactionTime);
 

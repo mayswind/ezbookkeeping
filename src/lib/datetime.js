@@ -105,6 +105,11 @@ export function getUnixTime(date) {
     return moment(date).unix();
 }
 
+export function getShortDate(date) {
+    date = moment(date);
+    return date.year() + '-' + (date.month() + 1) + '-' + date.date();
+}
+
 export function getYear(date) {
     return moment(date).year();
 }

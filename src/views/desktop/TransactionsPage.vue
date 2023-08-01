@@ -252,7 +252,7 @@
                                            :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
                                            v-for="(transaction, idx) in transactions">
                                         <tr class="transaction-list-row-date no-hover text-sm"
-                                            v-if="idx === 0 || (idx > 0 && (transaction.day !== transactions[idx - 1].day))">
+                                            v-if="idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date))">
                                             <td colspan="5" class="font-weight-bold">
                                                 <div class="d-flex align-center">
                                                     <span>{{ getLongDate(transaction) }}</span>

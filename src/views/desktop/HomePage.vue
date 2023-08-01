@@ -174,7 +174,8 @@
 
         <v-col cols="12" md="6">
             <monthly-income-and-expense-card :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode"
-                                             :loading="loadingOverview" :disabled="loadingOverview" />
+                                             :loading="loadingOverview" :disabled="loadingOverview"
+                                             :enable-click-item="true" @click="clickMonthlyIncomeOrExpense" />
         </v-col>
     </v-row>
 
@@ -194,7 +195,11 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
-import { formatUnixTime } from '@/lib/datetime.js';
+import {
+    formatUnixTime,
+    getUnixTimeBeforeUnixTime,
+    getUnixTimeAfterUnixTime
+} from '@/lib/datetime.js';
 
 import {
     mdiRefresh,
@@ -375,6 +380,13 @@ export default {
                     self.$refs.snackbar.showError(error);
                 }
             });
+        },
+        clickMonthlyIncomeOrExpense(e) {
+            const minTime = e.monthStartTime;
+            const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
+            const type = e.transactionType;
+            
+            this.$router.push(`/transactions?type=${type}&dateType=${datetimeConstants.allDateRanges.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.getDisplayCurrency(value, currencyCode, {

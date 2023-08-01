@@ -19,7 +19,8 @@
             </div>
         </v-card-text>
 
-        <v-chart autoresize class="overview-monthly-chart-container" :class="{ 'readonly': !hasAnyData }" :option="chartOptions"/>
+        <v-chart autoresize class="overview-monthly-chart-container"
+                 :class="{ 'readonly': !hasAnyData }" :option="chartOptions" @click="clickItem"/>
     </v-card>
 </template>
 
@@ -28,6 +29,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
+import transactionConstants from '@/consts/transaction.js';
 import {
     parseDateFromUnixTime,
     getMonthName
@@ -38,7 +40,11 @@ export default {
         'loading',
         'data',
         'disabled',
-        'isDarkMode'
+        'isDarkMode',
+        'enableClickItem'
+    ],
+    emits: [
+        'click'
     ],
     computed: {
         ...mapStores(useSettingsStore, useUserStore),
@@ -251,6 +257,25 @@ export default {
         }
     },
     methods: {
+        clickItem: function (e) {
+            if (!this.enableClickItem  || !this.data || e.componentType !== 'series') {
+                return;
+            }
+
+            const clickData = this.data[e.dataIndex];
+
+            if (clickData && e.seriesId === 'seriesIncome') {
+                this.$emit('click', {
+                    transactionType: transactionConstants.allTransactionTypes.Income,
+                    monthStartTime: clickData.monthStartTime
+                });
+            } else if (clickData && e.seriesId === 'seriesExpense') {
+                this.$emit('click', {
+                    transactionType: transactionConstants.allTransactionTypes.Expense,
+                    monthStartTime: clickData.monthStartTime
+                });
+            }
+        },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.getDisplayCurrency(value, currencyCode, {
                 currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,

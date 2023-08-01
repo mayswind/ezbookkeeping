@@ -147,9 +147,9 @@
                                             {{ $t('Cancel') }}
                                         </v-btn>
                                         <span>
-                                            <v-icon :class="availableTagCount > 1 ? 'drag-handle' : 'disabled'"
+                                            <v-icon :class="!loading && !updating && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="icons.drag"/>
-                                            <v-tooltip activator="parent" v-if="availableTagCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                            <v-tooltip activator="parent" v-if="!loading && !updating && availableTagCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
                                         </span>
                                     </div>
                                 </td>

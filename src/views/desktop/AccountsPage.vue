@@ -125,9 +125,9 @@
                                                                 </small>
                                                                 <v-spacer/>
                                                                 <span class="align-self-center">
-                                                                    <v-icon :class="activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
+                                                                    <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
                                                                             :icon="icons.drag"/>
-                                                                    <v-tooltip activator="parent" v-if="activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                                                    <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
                                                                 </span>
                                                             </div>
 

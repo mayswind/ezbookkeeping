@@ -122,7 +122,7 @@
 
                                 <div v-if="initing">
                                     <v-skeleton-loader type="paragraph" :loading="initing"
-                                                       :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
+                                                       :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4 ]"></v-skeleton-loader>
                                 </div>
 
                                 <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"

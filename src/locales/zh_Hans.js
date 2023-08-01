@@ -1069,6 +1069,7 @@ export default {
     'Expense Categories': '支出分类',
     'Income Categories': '收入分类',
     'Transfer Categories': '转账分类',
+    'Primary Categories': '一级分类',
     'Expense Primary Categories': '支出一级分类',
     'Income Primary Categories': '收入一级分类',
     'Transfer Primary Categories': '转账一级分类',

@@ -1069,6 +1069,7 @@ export default {
     'Expense Categories': 'Expense Categories',
     'Income Categories': 'Income Categories',
     'Transfer Categories': 'Transfer Categories',
+    'Primary Categories': 'Primary Categories',
     'Expense Primary Categories': 'Expense Primary Categories',
     'Income Primary Categories': 'Income Primary Categories',
     'Transfer Primary Categories': 'Transfer Primary Categories',

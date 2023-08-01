@@ -375,15 +375,25 @@ export function getRecentMonthDateRanges(monthCount) {
     return recentDateRanges;
 }
 
+export function getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateType) {
+    for (let i = 0; i < allRecentMonthDateRanges.length; i++) {
+        if (!allRecentMonthDateRanges[i].isPreset && allRecentMonthDateRanges[i].dateType === dateType) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTime, maxTime, firstDayOfWeek) {
     let dateRange = getDateRangeByDateType(dateType, firstDayOfWeek);
 
     if (dateRange && dateRange.dateType === dateTimeConstants.allDateRanges.All.type) {
-        return allRecentMonthDateRanges.length - 1; // Custom
+        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.All.type);
     }
 
     if (!dateRange && (!maxTime || !minTime)) {
-        return allRecentMonthDateRanges.length - 1; // Custom
+        return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.Custom.type);
     }
 
     if (!dateRange) {
@@ -394,15 +404,15 @@ export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTi
         };
     }
 
-    for (let i = 0; i < allRecentMonthDateRanges.length - 1; i++) {
+    for (let i = 0; i < allRecentMonthDateRanges.length; i++) {
         const recentDateRange = allRecentMonthDateRanges[i];
 
-        if (recentDateRange.minTime === dateRange.minTime && recentDateRange.maxTime === dateRange.maxTime) {
+        if (recentDateRange.isPreset && recentDateRange.minTime === dateRange.minTime && recentDateRange.maxTime === dateRange.maxTime) {
             return i;
         }
     }
 
-    return allRecentMonthDateRanges.length - 1; // Custom
+    return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.Custom.type);
 }
 
 export function isDateRangeMatchFullYears(minTime, maxTime) {

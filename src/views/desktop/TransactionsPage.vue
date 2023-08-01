@@ -561,7 +561,7 @@ export default {
             return primaryCategories;
         },
         recentMonthDateRanges() {
-            return this.$locale.getAllRecentMonthDateRanges(this.userStore, true);
+            return this.$locale.getAllRecentMonthDateRanges(this.userStore, true, true);
         },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;

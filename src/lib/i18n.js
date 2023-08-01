@@ -597,7 +597,7 @@ function getAllDateRanges(includeCustom, translateFn) {
     return allDateRanges;
 }
 
-function getAllRecentMonthDateRanges(userStore, includeCustom, translateFn) {
+function getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, translateFn) {
     const allRecentMonthDateRanges = [];
     const recentDateRanges = getRecentMonthDateRanges(12);
 
@@ -610,7 +610,17 @@ function getAllRecentMonthDateRanges(userStore, includeCustom, translateFn) {
             maxTime: recentDateRange.maxTime,
             year: recentDateRange.year,
             month: recentDateRange.month,
+            isPreset: true,
             displayName: formatUnixTime(recentDateRange.minTime, getI18nLongYearMonthFormat(translateFn, userStore.currentUserLongDateFormat))
+        });
+    }
+
+    if (includeAll) {
+        allRecentMonthDateRanges.push({
+            dateType: datetime.allDateRanges.All.type,
+            minTime: 0,
+            maxTime: 0,
+            displayName: translateFn('All')
         });
     }
 
@@ -1054,7 +1064,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
-        getAllRecentMonthDateRanges: (userStore, includeCustom) => getAllRecentMonthDateRanges(userStore, includeCustom, i18nGlobal.t),
+        getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),

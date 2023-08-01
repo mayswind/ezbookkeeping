@@ -5,7 +5,7 @@
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" v-if="!sortable && this.categories.length" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :href="'/category/add?type=' + categoryType + '&parentId=' + categoryId" icon-f7="plus" v-if="!sortable"></f7-link>
+                <f7-link :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId" icon-f7="plus" v-if="!sortable"></f7-link>
                 <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -102,7 +102,7 @@ export default {
         return {
             hasSubCategories: false,
             categoryType: 0,
-            categoryId: '',
+            primaryCategoryId: '',
             loading: true,
             loadingError: null,
             showHidden: false,
@@ -117,18 +117,18 @@ export default {
     computed: {
         ...mapStores(useTransactionCategoriesStore),
         categories() {
-            if (!this.categoryId || this.categoryId === '' || this.categoryId === '0') {
+            if (!this.primaryCategoryId || this.primaryCategoryId === '' || this.primaryCategoryId === '0') {
                 if (!this.transactionCategoriesStore.allTransactionCategories || !this.transactionCategoriesStore.allTransactionCategories[this.categoryType]) {
                     return [];
                 }
 
                 return this.transactionCategoriesStore.allTransactionCategories[this.categoryType];
-            } else if (this.categoryId && this.categoryId !== '' && this.categoryId !== '0') {
-                if (!this.transactionCategoriesStore.allTransactionCategoriesMap || !this.transactionCategoriesStore.allTransactionCategoriesMap[this.categoryId]) {
+            } else if (this.primaryCategoryId && this.primaryCategoryId !== '' && this.primaryCategoryId !== '0') {
+                if (!this.transactionCategoriesStore.allTransactionCategoriesMap || !this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId]) {
                     return [];
                 }
 
-                return this.transactionCategoriesStore.allTransactionCategoriesMap[this.categoryId].subCategories;
+                return this.transactionCategoriesStore.allTransactionCategoriesMap[this.primaryCategoryId].subCategories;
             } else {
                 return [];
             }
@@ -208,10 +208,10 @@ export default {
         }
 
         if (query.id && query.id !== '0') {
-            self.categoryId = query.id;
+            self.primaryCategoryId = query.id;
             self.hasSubCategories = false;
         } else {
-            self.categoryId = '0';
+            self.primaryCategoryId = '0';
             self.hasSubCategories = true;
         }
 
@@ -315,7 +315,7 @@ export default {
 
             self.transactionCategoriesStore.updateCategoryDisplayOrders({
                 type: self.categoryType,
-                parentId: self.categoryId,
+                parentId: self.primaryCategoryId,
             }).then(() => {
                 self.displayOrderSaving = false;
                 self.$hideLoading();

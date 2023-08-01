@@ -13,7 +13,7 @@ let needBlockRequest = false;
 let blockedRequests = [];
 
 axios.defaults.baseURL = api.baseApiUrlPath;
-axios.defaults.timeout = 100000; // 10s
+axios.defaults.timeout = 10000; // 10s
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 

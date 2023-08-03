@@ -106,7 +106,7 @@
                                             <div class="d-flex align-center">
                                                 <span>{{ $t('No available category') }}</span>
                                                 <v-btn class="ml-3" color="default" variant="outlined"
-                                                       @click="showPresetCategories"
+                                                       @click="showPresetDialog = true"
                                                        v-if="hasSubCategories && noCategory">
                                                     {{ $t('Add Default Categories') }}
                                                 </v-btn>
@@ -178,11 +178,16 @@
         </v-col>
     </v-row>
 
+    <preset-category-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
+                            @category:saved="presetCategorySaved" />
+
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script>
+import PresetCategoryDialog from './categories/PresetCategoryDialog.vue';
+
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
@@ -199,6 +204,9 @@ import {
 } from '@mdi/js';
 
 export default {
+    components: {
+        PresetCategoryDialog
+    },
     data() {
         return {
             activeCategoryType: categoryConstants.allCategoryTypes.Expense,
@@ -210,6 +218,7 @@ export default {
             categoryRemoving: {},
             displayOrderModified: false,
             showHidden: false,
+            showPresetDialog: false,
             icons: {
                 refresh: mdiRefresh,
                 edit: mdiPencilOutline,
@@ -395,8 +404,11 @@ export default {
                 });
             });
         },
-        showPresetCategories() {
-
+        presetCategorySaved(e) {
+            if (e && e.message) {
+                this.$refs.snackbar.showMessage(e.message);
+                this.reload(false);
+            }
         },
         switchActiveCategoryType(activeCategoryType) {
             if (this.activeCategoryType === activeCategoryType) {

@@ -72,7 +72,7 @@ export default {
             'hoursAheadOfDefaultTimezone': '比默认时区早{hours}小时',
             'hoursMinutesBehindDefaultTimezone': '比默认时区晚{hours}小时{minutes}分',
             'hoursMinutesAheadOfDefaultTimezone': '比默认时区早{time}小时{minutes}分',
-            'youHaveAccounts': '您已经记录 {count} 个账户'
+            'youHaveAccounts': '您已经记录了 {count} 个账户'
         }
     },
     'dataExport': {

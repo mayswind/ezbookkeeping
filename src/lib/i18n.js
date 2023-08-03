@@ -4,11 +4,13 @@ import { defaultLanguage, allLanguages } from '@/locales/index.js';
 import datetime from '@/consts/datetime.js';
 import timezone from '@/consts/timezone.js';
 import currency from '@/consts/currency.js';
+import category from '@/consts/category.js';
 import statistics from '@/consts/statistics.js';
 
 import {
     isString,
-    isNumber
+    isNumber,
+    copyArrayTo
 } from './common.js';
 
 import {
@@ -747,6 +749,61 @@ function getAllTransactionEditScopeTypes(translateFn) {
     }];
 }
 
+function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
+    const allCategories = {};
+    const categoryTypes = [];
+
+    if (categoryType === 0) {
+        for (let i = category.allCategoryTypes.Income; i <= category.allCategoryTypes.Transfer; i++) {
+            categoryTypes.push(i);
+        }
+    } else {
+        categoryTypes.push(categoryType);
+    }
+
+    for (let i = 0; i < categoryTypes.length; i++) {
+        const categories = [];
+        const categoryType = categoryTypes[i];
+        let defaultCategories = [];
+
+        if (categoryType === category.allCategoryTypes.Income) {
+            defaultCategories = copyArrayTo(category.defaultIncomeCategories, []);
+        } else if (categoryType === category.allCategoryTypes.Expense) {
+            defaultCategories = copyArrayTo(category.defaultExpenseCategories, []);
+        } else if (categoryType === category.allCategoryTypes.Transfer) {
+            defaultCategories = copyArrayTo(category.defaultTransferCategories, []);
+        }
+
+        for (let j = 0; j < defaultCategories.length; j++) {
+            const category = defaultCategories[j];
+
+            const submitCategory = {
+                name: translateFn('category.' + category.name, locale),
+                type: categoryType,
+                icon: category.categoryIconId,
+                color: category.color,
+                subCategories: []
+            }
+
+            for (let k = 0; k < category.subCategories.length; k++) {
+                const subCategory = category.subCategories[k];
+                submitCategory.subCategories.push({
+                    name: translateFn('category.' + subCategory.name, locale),
+                    type: categoryType,
+                    icon: subCategory.categoryIconId,
+                    color: subCategory.color
+                });
+            }
+
+            categories.push(submitCategory);
+        }
+
+        allCategories[categoryType] = categories;
+    }
+
+    return allCategories;
+}
+
 function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
     if (!exchangeRatesData || !exchangeRatesData.exchangeRates) {
         return [];
@@ -1069,6 +1126,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
+        getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),

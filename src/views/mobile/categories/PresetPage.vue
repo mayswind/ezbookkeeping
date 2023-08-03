@@ -4,30 +4,30 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Default Categories')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" v-if="allCategories && allCategories.length" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" v-if="allCategories && allCategories.length" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" v-if="isPresetHasCategories" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link :text="$t('Save')" :class="{ 'disabled': submitting }" v-if="isPresetHasCategories" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="no-padding no-margin" :key="categoryInfo.type" v-for="categoryInfo in allCategories">
-            <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryInfo.type) }}</f7-block-title>
+        <f7-block class="no-padding no-margin" :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
+            <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
 
             <f7-list strong inset dividers class="margin-top">
-                <f7-list-item :title="$t('category.' + category.name, currentLocale)"
+                <f7-list-item :title="category.name"
                               :accordion-item="!!category.subCategories.length"
                               :key="idx"
-                              v-for="(category, idx) in categoryInfo.categories">
+                              v-for="(category, idx) in categories">
                     <template #media>
-                        <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
+                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
                     </template>
 
                     <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                         <f7-list>
-                            <f7-list-item :title="$t('category.' + subCategory.name, currentLocale)"
+                            <f7-list-item :title="subCategory.name"
                                           :key="subIdx"
                                           v-for="(subCategory, subIdx) in category.subCategories">
                                 <template #media>
-                                    <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
@@ -59,7 +59,7 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
-import { copyArrayTo } from '@/lib/common.js';
+import { getObjectOwnFieldCount, categoriedArrayToPlainArray } from '@/lib/common.js';
 
 export default {
     props: [
@@ -73,7 +73,6 @@ export default {
             loadingError: null,
             currentLocale: self.$locale.getCurrentLanguageCode(),
             categoryType: 0,
-            allCategories: [],
             submitting: false,
             showMoreActionSheet: false,
             showChangeLocaleSheet: false
@@ -83,6 +82,12 @@ export default {
         ...mapStores(useTransactionCategoriesStore),
         allLanguages() {
             return this.$locale.getAllLanguageInfos();
+        },
+        allPresetCategories() {
+            return this.$locale.getAllTransactionDefaultCategories(this.categoryType, this.currentLocale);
+        },
+        isPresetHasCategories() {
+            return getObjectOwnFieldCount(this.allPresetCategories);
         }
     },
     created() {
@@ -97,38 +102,11 @@ export default {
             self.categoryType !== categoryConstants.allCategoryTypes.Transfer) {
             self.$toast('Parameter Invalid');
             self.loadingError = 'Parameter Invalid';
-            return;
-        }
-
-        if (self.categoryType === 0) {
-            for (let i = 1; i <= 3; i++) {
-                self.allCategories.push({
-                    type: i,
-                    categories: copyArrayTo(self.getDefaultCategories(i), [])
-                });
-            }
-        } else {
-            self.allCategories.push({
-                type: self.categoryType,
-                categories: copyArrayTo(self.getDefaultCategories(self.categoryType), [])
-            });
         }
     },
     methods: {
         onPageAfterIn() {
             this.$routeBackOnError(this.f7router, 'loadingError');
-        },
-        getDefaultCategories(categoryType) {
-            switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income:
-                    return categoryConstants.defaultIncomeCategories;
-                case categoryConstants.allCategoryTypes.Expense:
-                    return categoryConstants.defaultExpenseCategories;
-                case categoryConstants.allCategoryTypes.Transfer:
-                    return categoryConstants.defaultTransferCategories;
-                default:
-                    return [];
-            }
         },
         save() {
             const self = this;
@@ -137,37 +115,10 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            const categories = [];
-
-            for (let i = 0; i < self.allCategories.length; i++) {
-                const categoryInfo = self.allCategories[i];
-
-                for (let j = 0; j < categoryInfo.categories.length; j++) {
-                    const category = categoryInfo.categories[j];
-                    const submitCategory = {
-                        name: self.$t('category.' + category.name, self.currentLocale),
-                        type: categoryInfo.type,
-                        icon: category.categoryIconId,
-                        color: category.color,
-                        subCategories: []
-                    }
-
-                    for (let k = 0; k < category.subCategories.length; k++) {
-                        const subCategory = category.subCategories[k];
-                        submitCategory.subCategories.push({
-                            name: self.$t('category.' + subCategory.name, self.currentLocale),
-                            type: categoryInfo.type,
-                            icon: subCategory.categoryIconId,
-                            color: subCategory.color
-                        });
-                    }
-
-                    categories.push(submitCategory);
-                }
-            }
+            const submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
 
             self.transactionCategoriesStore.addCategories({
-                categories: categories
+                categories: submitCategories
             }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
@@ -185,11 +136,11 @@ export default {
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
-                case categoryConstants.allCategoryTypes.Income:
+                case categoryConstants.allCategoryTypes.Income.toString():
                     return this.$t('Income Categories');
-                case categoryConstants.allCategoryTypes.Expense:
+                case categoryConstants.allCategoryTypes.Expense.toString():
                     return this.$t('Expense Categories');
-                case categoryConstants.allCategoryTypes.Transfer:
+                case categoryConstants.allCategoryTypes.Transfer.toString():
                     return this.$t('Transfer Categories');
                 default:
                     return this.$t('Transaction Categories');

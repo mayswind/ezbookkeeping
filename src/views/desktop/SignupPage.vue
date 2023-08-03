@@ -179,15 +179,15 @@
                                 </v-row>
 
                                 <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting }" style="max-height: 323px">
-                                    <v-row :key="categoryType" v-for="(categories, categoryType) in presetCategories">
+                                    <v-row :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                                         <v-col cols="12" md="12">
                                             <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
 
                                             <v-expansion-panels class="border rounded" variant="accordion" multiple>
                                                 <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                                                     <v-expansion-panel-title class="py-0">
-                                                        <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
-                                                        <span class="ml-3">{{ $t('category.' + category.name) }}</span>
+                                                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                        <span class="ml-3">{{ category.name }}</span>
                                                     </v-expansion-panel-title>
                                                     <v-expansion-panel-text v-if="category.subCategories.length">
                                                         <v-list rounded density="comfortable" class="pa-0">
@@ -195,9 +195,9 @@
                                                                       v-for="(subCategory, subIdx) in category.subCategories">
                                                                 <v-list-item>
                                                                     <template #prepend>
-                                                                        <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                                                        <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                                                     </template>
-                                                                    <span class="ml-3">{{ $t('category.' + subCategory.name) }}</span>
+                                                                    <span class="ml-3">{{ subCategory.name }}</span>
                                                                 </v-list-item>
                                                                 <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
                                                             </template>
@@ -250,7 +250,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
 import categoryConstants from '@/consts/category.js';
-import { copyArrayTo } from '@/lib/common.js';
+import { categoriedArrayToPlainArray } from '@/lib/common.js';
 
 import {
     mdiArrowLeft,
@@ -280,11 +280,6 @@ export default {
             isPasswordVisible: false,
             isConfirmPasswordVisible: false,
             submitting: false,
-            presetCategories: {
-                [categoryConstants.allCategoryTypes.Income]: copyArrayTo(categoryConstants.defaultIncomeCategories, []),
-                [categoryConstants.allCategoryTypes.Expense]: copyArrayTo(categoryConstants.defaultExpenseCategories, []),
-                [categoryConstants.allCategoryTypes.Transfer]: copyArrayTo(categoryConstants.defaultTransferCategories, [])
-            },
             usePresetCategories: false,
             icons: {
                 previous: mdiArrowLeft,
@@ -308,6 +303,9 @@ export default {
         },
         allWeekDays() {
             return this.$locale.getAllWeekDays();
+        },
+        allPresetCategories() {
+            return this.$locale.getAllTransactionDefaultCategories(0, this.currentLocale);
         },
         currentLocale: {
             get: function () {
@@ -418,39 +416,10 @@ export default {
 
             self.submitting = true;
 
-            const allCategories = [];
+            let submitCategories = [];
 
             if (self.usePresetCategories) {
-                for (let categoryType in self.presetCategories) {
-                    if (!Object.prototype.hasOwnProperty.call(self.presetCategories, categoryType)) {
-                        continue;
-                    }
-
-                    const categories = self.presetCategories[categoryType];
-
-                    for (let j = 0; j < categories.length; j++) {
-                        const category = categories[j];
-                        const submitCategory = {
-                            name: self.$t('category.' + category.name),
-                            type: parseInt(categoryType),
-                            icon: category.categoryIconId,
-                            color: category.color,
-                            subCategories: []
-                        }
-
-                        for (let k = 0; k < category.subCategories.length; k++) {
-                            const subCategory = category.subCategories[k];
-                            submitCategory.subCategories.push({
-                                name: self.$t('category.' + subCategory.name),
-                                type: parseInt(categoryType),
-                                icon: subCategory.categoryIconId,
-                                color: subCategory.color
-                            });
-                        }
-
-                        allCategories.push(submitCategory);
-                    }
-                }
+                submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({
@@ -487,7 +456,7 @@ export default {
                 }
 
                 self.transactionCategoriesStore.addCategories({
-                    categories: allCategories
+                    categories: submitCategories
                 }).then(() => {
                     self.submitting = false;
 

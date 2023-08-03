@@ -77,6 +77,24 @@ export function isEquals(obj1, obj2) {
     }
 }
 
+export function getObjectOwnFieldCount(object) {
+    let count = 0;
+
+    if (!object || !isObject(object)) {
+        return count;
+    }
+
+    for (let field in object) {
+        if (!Object.prototype.hasOwnProperty.call(object, field)) {
+            continue;
+        }
+
+        count++;
+    }
+
+    return count;
+}
+
 export function appendThousandsSeparator(value, enable) {
     if (!enable || value.length <= 3) {
         return value;
@@ -282,6 +300,24 @@ export function copyArrayTo(fromArray, toArray) {
     }
 
     return toArray;
+}
+
+export function categoriedArrayToPlainArray(object) {
+    const ret = [];
+
+    for (let field in object) {
+        if (!Object.prototype.hasOwnProperty.call(object, field)) {
+            continue;
+        }
+
+        const array = object[field];
+
+        for (let i = 0; i < array.length; i++) {
+            ret.push(array[i]);
+        }
+    }
+
+    return ret;
 }
 
 export function arrangeArrayWithNewStartIndex(array, startIndex) {

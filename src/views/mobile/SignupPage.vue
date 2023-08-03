@@ -127,24 +127,24 @@
                     </f7-nav-right>
                 </f7-navbar>
                 <f7-block class="no-padding no-margin"
-                          :key="categoryType" v-for="(categories, categoryType) in presetCategories">
+                          :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                     <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(categoryType) }}</f7-block-title>
                     <f7-list strong inset dividers v-if="showPresetCategories">
-                        <f7-list-item :title="$t('category.' + category.name)"
+                        <f7-list-item :title="category.name"
                                       :accordion-item="!!category.subCategories.length"
                                       :key="idx"
                                       v-for="(category, idx) in categories">
                             <template #media>
-                                <ItemIcon icon-type="category" :icon-id="category.categoryIconId" :color="category.color"></ItemIcon>
+                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
                             </template>
 
                             <f7-accordion-content v-if="category.subCategories.length" class="padding-left">
                                 <f7-list>
-                                    <f7-list-item :title="$t('category.' + subCategory.name)"
+                                    <f7-list-item :title="subCategory.name"
                                                   :key="subIdx"
                                                   v-for="(subCategory, subIdx) in category.subCategories">
                                         <template #media>
-                                            <ItemIcon icon-type="category" :icon-id="subCategory.categoryIconId" :color="subCategory.color"></ItemIcon>
+                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                         </template>
                                     </f7-list-item>
                                 </f7-list>
@@ -181,7 +181,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
-import { getNameByKeyValue, copyArrayTo } from '@/lib/common.js';
+import { getNameByKeyValue, categoriedArrayToPlainArray } from '@/lib/common.js';
 
 export default {
     props: [
@@ -203,11 +203,6 @@ export default {
                 firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
             },
             submitting: false,
-            presetCategories: {
-                [categoryConstants.allCategoryTypes.Income]: copyArrayTo(categoryConstants.defaultIncomeCategories, []),
-                [categoryConstants.allCategoryTypes.Expense]: copyArrayTo(categoryConstants.defaultExpenseCategories, []),
-                [categoryConstants.allCategoryTypes.Transfer]: copyArrayTo(categoryConstants.defaultTransferCategories, [])
-            },
             usePresetCategories: false,
             showPresetCategories: false,
             showPresetCategoriesMoreActionSheet: false,
@@ -224,6 +219,9 @@ export default {
         },
         allWeekDays() {
             return this.$locale.getAllWeekDays();
+        },
+        allPresetCategories() {
+            return this.$locale.getAllTransactionDefaultCategories(0, this.currentLocale);
         },
         currentLocale: {
             get: function () {
@@ -305,39 +303,10 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            const allCategories = [];
+            let submitCategories = [];
 
             if (self.usePresetCategories) {
-                for (let categoryType in self.presetCategories) {
-                    if (!Object.prototype.hasOwnProperty.call(self.presetCategories, categoryType)) {
-                        continue;
-                    }
-
-                    const categories = self.presetCategories[categoryType];
-
-                    for (let j = 0; j < categories.length; j++) {
-                        const category = categories[j];
-                        const submitCategory = {
-                            name: self.$t('category.' + category.name),
-                            type: parseInt(categoryType),
-                            icon: category.categoryIconId,
-                            color: category.color,
-                            subCategories: []
-                        }
-
-                        for (let k = 0; k < category.subCategories.length; k++) {
-                            const subCategory = category.subCategories[k];
-                            submitCategory.subCategories.push({
-                                name: self.$t('category.' + subCategory.name),
-                                type: parseInt(categoryType),
-                                icon: subCategory.categoryIconId,
-                                color: subCategory.color
-                            });
-                        }
-
-                        allCategories.push(submitCategory);
-                    }
-                }
+                submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({
@@ -376,7 +345,7 @@ export default {
                 }
 
                 self.transactionCategoriesStore.addCategories({
-                    categories: allCategories
+                    categories: submitCategories
                 }).then(() => {
                     self.submitting = false;
                     self.$hideLoading();

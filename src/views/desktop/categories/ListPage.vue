@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import PresetCategoryDialog from './categories/PresetCategoryDialog.vue';
+import PresetCategoryDialog from './list/dialogs/PresetCategoryDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';

@@ -880,7 +880,7 @@ export default {
             return [];
         },
         getFilterLinkUrl() {
-            return `/transactions?${this.transactionsStore.getTransactionListPageParams()}`;
+            return `/transaction/list?${this.transactionsStore.getTransactionListPageParams()}`;
         }
     }
 };

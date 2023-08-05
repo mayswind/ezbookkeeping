@@ -33,7 +33,7 @@
                         <span v-if="!loadingOverview || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                         <v-skeleton-loader class="d-inline-block overview-card-skeleton" width="120px" type="text" :loading="true" v-else-if="loadingOverview && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </div>
-                    <v-btn size="small" to="/transactions?dateType=7">{{ $t('View Details') }}</v-btn>
+                    <v-btn size="small" to="/transaction/list?dateType=7">{{ $t('View Details') }}</v-btn>
                     <v-img class="overview-card-background" src="img/desktop/card-background.png"/>
                     <v-img class="overview-card-background-image" width="116px" src="img/desktop/document.svg"/>
                 </v-card-text>
@@ -115,7 +115,7 @@
                         :datetime="displayDateRange.today.displayTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.Today.type">
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.Today.type">
                                 <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -131,7 +131,7 @@
                         :datetime="displayDateRange.thisWeek.startTime + '-' + displayDateRange.thisWeek.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisWeek.type">
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisWeek.type">
                                 <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -147,7 +147,7 @@
                         :datetime="displayDateRange.thisMonth.startTime + '-' + displayDateRange.thisMonth.endTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisMonth.type">
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisMonth.type">
                                 <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -163,7 +163,7 @@
                         :datetime="displayDateRange.thisYear.displayTime"
                     >
                         <template #menus>
-                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transactions?dateType=' + allDateRanges.ThisYear.type">
+                            <v-list-item :prepend-icon="icons.viewDetails" :to="'/transaction/list?dateType=' + allDateRanges.ThisYear.type">
                                 <v-list-item-title>{{ $t('View Details') }}</v-list-item-title>
                             </v-list-item>
                         </template>
@@ -185,8 +185,8 @@
 <script>
 import { useTheme } from 'vuetify';
 
-import IncomeExpenseOverviewCard from './overview/IncomeExpenseOverviewCard.vue';
-import MonthlyIncomeAndExpenseCard from './overview/MonthlyIncomeAndExpenseCard.vue';
+import IncomeExpenseOverviewCard from './overview/cards/IncomeExpenseOverviewCard.vue';
+import MonthlyIncomeAndExpenseCard from './overview/cards/MonthlyIncomeAndExpenseCard.vue';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
@@ -385,8 +385,8 @@ export default {
             const minTime = e.monthStartTime;
             const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'months'), 1, 'seconds');
             const type = e.transactionType;
-            
-            this.$router.push(`/transactions?type=${type}&dateType=${datetimeConstants.allDateRanges.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
+
+            this.$router.push(`/transaction/list?type=${type}&dateType=${datetimeConstants.allDateRanges.Custom.type}&maxTime=${maxTime}&minTime=${minTime}`);
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.getDisplayCurrency(value, currencyCode, {

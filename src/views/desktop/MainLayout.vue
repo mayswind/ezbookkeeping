@@ -27,7 +27,7 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/transactions?dateType=7">
+                    <router-link to="/transaction/list?dateType=7">
                         <v-icon class="nav-item-icon" :icon="icons.transactions"/>
                         <span class="nav-item-title">{{ $t('Transaction List') }}</span>
                     </router-link>
@@ -44,19 +44,19 @@
                     </div>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/accounts">
+                    <router-link to="/account/list">
                         <v-icon class="nav-item-icon" :icon="icons.accounts"/>
                         <span class="nav-item-title">{{ $t('Account List') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/categories">
+                    <router-link to="/category/list">
                         <v-icon class="nav-item-icon" :icon="icons.categories"/>
                         <span class="nav-item-title">{{ $t('Transaction Categories') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
-                    <router-link to="/tags">
+                    <router-link to="/tag/list">
                         <v-icon class="nav-item-icon" :icon="icons.tags"/>
                         <span class="nav-item-title">{{ $t('Transaction Tags') }}</span>
                     </router-link>

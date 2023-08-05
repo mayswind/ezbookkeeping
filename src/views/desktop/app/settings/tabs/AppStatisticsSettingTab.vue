@@ -77,8 +77,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 
 import statisticsConstants from '@/consts/statistics.js';
 
-import AccountFilterSettingsCard from '@/views/desktop/statistics/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/statistics/CategoryFilterSettingsCard.vue';
+import AccountFilterSettingsCard from '@/views/desktop/statistics/settings/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/statistics/settings/cards/CategoryFilterSettingsCard.vue';
 
 export default {
     components: {

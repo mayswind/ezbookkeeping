@@ -245,8 +245,8 @@ import {
     mdiDotsVertical,
 } from '@mdi/js';
 
-import AccountFilterSettingsCard from '@/views/desktop/statistics/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/statistics/CategoryFilterSettingsCard.vue';
+import AccountFilterSettingsCard from './settings/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from './settings/cards/CategoryFilterSettingsCard.vue';
 
 export default {
     components: {
@@ -530,7 +530,7 @@ export default {
             return formatPercent(value, precision, lowPrecisionValue);
         },
         getItemLinkUrl(item) {
-            return `/transactions?${this.statisticsStore.getTransactionListPageParams(item)}`;
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(item)}`;
         }
     }
 }

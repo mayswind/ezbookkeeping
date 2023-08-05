@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import AppBasicSettingTab from './settings/AppBasicSettingTab.vue';
-import AppLockSettingTab from './settings/AppLockSettingTab.vue';
-import AppStatisticsSettingTab from './settings/AppStatisticsSettingTab.vue';
+import AppBasicSettingTab from './settings/tabs/AppBasicSettingTab.vue';
+import AppLockSettingTab from './settings/tabs/AppLockSettingTab.vue';
+import AppStatisticsSettingTab from './settings/tabs/AppStatisticsSettingTab.vue';
 
 import {
     mdiCogOutline,

@@ -8,14 +8,21 @@ import SignUpPage from '@/views/desktop/SignupPage.vue';
 import UnlockPage from '@/views/desktop/UnlockPage.vue';
 
 import HomePage from '@/views/desktop/HomePage.vue';
-import TransactionsPage from '@/views/desktop/TransactionsPage.vue';
+
+import TransactionListPage from '@/views/desktop/transactions/ListPage.vue';
+
 import StatisticsTransactionPage from '@/views/desktop/statistics/TransactionPage.vue';
-import AccountsPage from '@/views/desktop/AccountsPage.vue';
-import TransactionCategoriesPage from '@/views/desktop/TransactionCategoriesPage.vue';
-import TransactionTagsPage from '@/views/desktop/TransactionTagsPage.vue';
-import ExchangeRatesPage from '@/views/desktop/ExchangeRatesPage.vue';
+
+import AccountListPage from '@/views/desktop/accounts/ListPage.vue';
+
+import TransactionCategoryListPage from '@/views/desktop/categories/ListPage.vue';
+
+import TransactionTagListPage from '@/views/desktop/tags/ListPage.vue';
+
 import UserSettingsPage from '@/views/desktop/user/UserSettingsPage.vue';
 import AppSettingsPage from '@/views/desktop/app/AppSettingsPage.vue';
+
+import ExchangeRatesPage from '@/views/desktop/ExchangeRatesPage.vue';
 import AboutPage from '@/views/desktop/AboutPage.vue';
 
 function checkLogin() {
@@ -80,8 +87,8 @@ const router = createRouter({
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/transactions',
-                    component: TransactionsPage,
+                    path: '/transaction/list',
+                    component: TransactionListPage,
                     beforeEnter: checkLogin,
                     props: route => ({
                         initDateType: route.query.dateType,
@@ -98,18 +105,18 @@ const router = createRouter({
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/accounts',
-                    component: AccountsPage,
+                    path: '/account/list',
+                    component: AccountListPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/categories',
-                    component: TransactionCategoriesPage,
+                    path: '/category/list',
+                    component: TransactionCategoryListPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/tags',
-                    component: TransactionTagsPage,
+                    path: '/tag/list',
+                    component: TransactionTagListPage,
                     beforeEnter: checkLogin
                 },
                 {

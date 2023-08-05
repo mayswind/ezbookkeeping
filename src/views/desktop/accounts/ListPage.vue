@@ -2,209 +2,214 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <div class="d-flex flex-column flex-md-row">
-                    <div>
+                <v-layout>
+                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
                             <small>{{ $t('Net assets') }}</small>
-                            <p class="text-body-1 text-income mt-1 mb-3">
+                            <p class="text-body-1 text-income text-truncate mt-1 mb-3">
                                 <span v-if="!loading">{{ netAssets }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total liabilities') }}</small>
-                            <p class="text-body-1 text-expense mt-1 mb-3">
+                            <p class="text-body-1 text-expense text-truncate mt-1 mb-3">
                                 <span v-if="!loading">{{ totalLiabilities }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total assets') }}</small>
                             <p class="text-body-1 mt-1">
                                 <span v-if="!loading">{{ totalAssets }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="accounts-summary-skeleton mt-3 mb-5" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="account-category-tabs my-4" direction="vertical"
                                 :disabled="loading" v-model="activeAccountCategoryId">
-                            <v-tab :key="accountCategory.id" :value="accountCategory.id"
+                            <v-tab class="tab-text-truncate" :key="accountCategory.id" :value="accountCategory.id"
                                    v-for="accountCategory in allAccountCategories">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
-                                <div class="ml-2 d-flex flex-column">
-                                    <small class="text-left smaller">{{ accountCategoryTotalBalance(accountCategory) }}</small>
-                                    <div class="text-left">{{ $t(accountCategory.name) }}</div>
+                                <div class="d-flex flex-column text-truncate ml-2">
+                                    <small class="text-truncate text-left smaller">{{ accountCategoryTotalBalance(accountCategory) }}</small>
+                                    <span class="text-truncate text-left">{{ $t(accountCategory.name) }}</span>
                                 </div>
                             </v-tab>
                         </v-tabs>
-                    </div>
-                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition w-100-window-container" v-model="activeTab">
-                        <v-window-item value="accountPage">
-                            <v-card variant="flat">
-                                <template #title>
-                                    <div class="d-flex align-center">
-                                        <span>{{ $t('Account List') }}</span>
-                                        <v-btn class="ml-3" color="default" variant="outlined"
-                                               :disabled="loading" @click="add">{{ $t('Add') }}</v-btn>
-                                        <v-btn class="ml-3" color="primary" variant="tonal"
-                                               :disabled="loading" @click="saveSortResult"
-                                               v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
-                                        <v-btn density="compact" color="default" variant="text"
-                                               class="ml-2" :icon="true" :disabled="loading"
-                                               v-if="!loading" @click="reload">
-                                            <v-icon :icon="icons.refresh" size="24" />
-                                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                    </v-navigation-drawer>
+                    <v-main>
+                        <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
+                            <v-window-item value="accountPage">
+                                <v-card variant="flat" min-height="680">
+                                    <template #title>
+                                        <div class="title-and-toolbar d-flex align-center">
+                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
+                                                <v-icon :icon="icons.menu" size="24" />
+                                            </v-btn>
+                                            <span>{{ $t('Account List') }}</span>
+                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                                   :disabled="loading" @click="add">{{ $t('Add') }}</v-btn>
+                                            <v-btn class="ml-3" color="primary" variant="tonal"
+                                                   :disabled="loading" @click="saveSortResult"
+                                                   v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
+                                            <v-btn density="compact" color="default" variant="text"
+                                                   class="ml-2" :icon="true" :disabled="loading"
+                                                   v-if="!loading" @click="reload">
+                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                            </v-btn>
+                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                                            <v-spacer/>
+                                            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                                   :disabled="loading" :icon="true">
+                                                <v-icon :icon="icons.more" />
+                                                <v-menu activator="parent">
+                                                    <v-list>
+                                                        <v-list-item :prepend-icon="icons.show"
+                                                                     :title="$t('Show Hidden Account')"
+                                                                     v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                                                        <v-list-item :prepend-icon="icons.hide"
+                                                                     :title="$t('Hide Hidden Account')"
+                                                                     v-if="showHidden" @click="showHidden = false"></v-list-item>
+                                                    </v-list>
+                                                </v-menu>
+                                            </v-btn>
+                                        </div>
+                                    </template>
+
+                                    <v-card-text class="accounts-overview-title text-truncate pt-0">
+                                        <span class="text-subtitle-1">{{ $t('Balance') }}</span>
+                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
+                                        <span class="accounts-overview-amount ml-3" v-else-if="!loading || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
+                                        <v-btn class="ml-2" density="compact" color="default" variant="text"
+                                               :icon="true" :disabled="loading"
+                                               @click="showAccountBalance = !showAccountBalance">
+                                            <v-icon :icon="showAccountBalance ? icons.eyeSlash : icons.eye" size="20" />
+                                            <v-tooltip activator="parent">{{ showAccountBalance ? $t('Hide Account Balance') : $t('Show Account Balance') }}</v-tooltip>
                                         </v-btn>
-                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
-                                        <v-spacer/>
-                                        <v-btn density="comfortable" color="default" variant="text" class="ml-2"
-                                               :disabled="loading" :icon="true">
-                                            <v-icon :icon="icons.more" />
-                                            <v-menu activator="parent">
-                                                <v-list>
-                                                    <v-list-item :prepend-icon="icons.show"
-                                                                 :title="$t('Show Hidden Account')"
-                                                                 v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                                    <v-list-item :prepend-icon="icons.hide"
-                                                                 :title="$t('Hide Hidden Account')"
-                                                                 v-if="showHidden" @click="showHidden = false"></v-list-item>
-                                                </v-list>
-                                            </v-menu>
-                                        </v-btn>
+                                    </v-card-text>
+
+                                    <div class="pl-2 pr-2 pr-md-4 mt-n4" v-if="loading && !hasAccount(activeAccountCategory)">
+                                        <v-skeleton-loader type="paragraph" :loading="loading"
+                                                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
                                     </div>
-                                </template>
 
-                                <v-card-text class="accounts-overview-title pt-0">
-                                    <span class="text-subtitle-1">{{ $t('Balance') }}</span>
-                                    <span class="accounts-overview-amount ml-3">
-                                        {{ activeAccountCategoryTotalBalance }}
-                                    </span>
-                                    <v-btn class="ml-2" density="compact" color="default" variant="text"
-                                           :icon="true" :disabled="loading"
-                                           @click="showAccountBalance = !showAccountBalance">
-                                        <v-icon :icon="showAccountBalance ? icons.eyeSlash : icons.eye" size="20" />
-                                        <v-tooltip activator="parent">{{ showAccountBalance ? $t('Hide Account Balance') : $t('Show Account Balance') }}</v-tooltip>
-                                    </v-btn>
-                                </v-card-text>
+                                    <v-row class="pl-2 pr-2 pr-md-4" v-if="!loading && !hasAccount(activeAccountCategory)">
+                                        <v-col cols="12">
+                                            {{ $t('No available account') }}
+                                        </v-col>
+                                    </v-row>
 
-                                <div v-if="loading && !hasAccount(activeAccountCategory)">
-                                    <v-skeleton-loader type="paragraph" :loading="loading"
-                                                       :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
-                                </div>
+                                    <v-row class="pl-6 pr-6 pr-md-8">
+                                        <v-col cols="12">
+                                            <draggable-list
+                                                class="list-group"
+                                                item-key="id"
+                                                handle=".drag-handle"
+                                                ghost-class="dragging-item"
+                                                :disabled="activeAccountCategoryVisibleAccountCount <= 1"
+                                                :list="categorizedAccounts[activeAccountCategory.id].accounts"
+                                                v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length"
+                                                @change="onMove"
+                                            >
+                                                <template #item="{ element }">
+                                                    <div class="list-group-item">
+                                                        <v-card border class="card-title-with-bg account-card mb-8 h-auto" v-if="showHidden || !element.hidden">
+                                                            <template #title>
+                                                                <div class="account-title d-flex align-baseline">
+                                                                    <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
+                                                                              :color="element.color" :hidden-status="element.hidden" />
+                                                                    <span class="account-name text-truncate ml-2">{{ element.name }}</span>
+                                                                    <small class="account-currency text-truncate ml-2">
+                                                                        {{ accountCurrency(element) }}
+                                                                    </small>
+                                                                    <v-spacer/>
+                                                                    <span class="align-self-center">
+                                                                        <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
+                                                                                :icon="icons.drag"/>
+                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                                                    </span>
+                                                                </div>
 
-                                <v-row class="pl-4 pr-4 pr-md-8" v-if="!loading && !hasAccount(activeAccountCategory)">
-                                    <v-col cols="12">
-                                        {{ $t('No available account') }}
-                                    </v-col>
-                                </v-row>
+                                                                <div class="mt-4" v-if="element.type === allAccountTypes.MultiSubAccounts">
+                                                                    <v-btn-toggle
+                                                                        class="account-subaccounts"
+                                                                        variant="outlined"
+                                                                        color="primary"
+                                                                        density="compact"
+                                                                        mandatory="force"
+                                                                        divided rounded="xl"
+                                                                        :disabled="loading"
+                                                                        v-model="activeSubAccount[element.id]"
+                                                                    >
+                                                                        <v-btn :value="undefined">
+                                                                            <span>{{ $t('All') }}</span>
+                                                                        </v-btn>
+                                                                        <v-btn :key="subAccount.id" :value="subAccount.id"
+                                                                               v-for="subAccount in element.subAccounts"
+                                                                               v-show="showHidden || !subAccount.hidden">
+                                                                            <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
+                                                                                      :color="subAccount.color" :hidden-status="subAccount.hidden" />
+                                                                            <span class="ml-2">{{ subAccount.name }}</span>
+                                                                        </v-btn>
+                                                                    </v-btn-toggle>
+                                                                </div>
+                                                            </template>
 
-                                <v-row class="pl-4 pr-4 pr-md-8">
-                                    <v-col cols="12">
-                                        <draggable-list
-                                            class="list-group"
-                                            item-key="id"
-                                            handle=".drag-handle"
-                                            ghost-class="dragging-item"
-                                            :disabled="activeAccountCategoryVisibleAccountCount <= 1"
-                                            :list="categorizedAccounts[activeAccountCategory.id].accounts"
-                                            v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length"
-                                            @change="onMove"
-                                        >
-                                            <template #item="{ element }">
-                                                <div class="list-group-item">
-                                                    <v-card border class="card-title-with-bg account-card mb-8 h-auto" v-if="showHidden || !element.hidden">
-                                                        <template #title>
-                                                            <div class="account-title d-flex align-baseline">
-                                                                <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
-                                                                          :color="element.color" :hidden-status="element.hidden" />
-                                                                <span class="account-name ml-2">{{ element.name }}</span>
-                                                                <small class="account-currency ml-2">
-                                                                    {{ accountCurrency(element) }}
-                                                                </small>
-                                                                <v-spacer/>
-                                                                <span class="align-self-center">
-                                                                    <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                            :icon="icons.drag"/>
-                                                                    <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
-                                                                </span>
-                                                            </div>
+                                                            <v-divider/>
 
-                                                            <div class="mt-4" v-if="element.type === allAccountTypes.MultiSubAccounts">
-                                                                <v-btn-toggle
-                                                                    class="account-subaccounts"
-                                                                    variant="outlined"
-                                                                    color="primary"
-                                                                    density="compact"
-                                                                    mandatory="force"
-                                                                    divided rounded="xl"
-                                                                    :disabled="loading"
-                                                                    v-model="activeSubAccount[element.id]"
-                                                                >
-                                                                    <v-btn :value="undefined">
-                                                                        <span>{{ $t('All') }}</span>
+                                                            <v-card-text v-if="accountComment(element)">
+                                                                {{ accountComment(element) }}
+                                                            </v-card-text>
+
+                                                            <v-card-text>
+                                                                <div class="d-flex account-toolbar align-center">
+                                                                    <v-btn class="px-2" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="icons.transactions"
+                                                                           :to="`/transaction/list?accountId=${accountOrSubAccountId(element)}`">
+                                                                        {{ $t('Transaction List') }}
                                                                     </v-btn>
-                                                                    <v-btn :key="subAccount.id" :value="subAccount.id"
-                                                                           v-for="subAccount in element.subAccounts"
-                                                                           v-show="showHidden || !subAccount.hidden">
-                                                                        <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
-                                                                                  :color="subAccount.color" :hidden-status="subAccount.hidden" />
-                                                                        <span class="ml-2">{{ subAccount.name }}</span>
+                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="icons.edit"
+                                                                           @click="edit(element)">
+                                                                        {{ $t('Edit') }}
                                                                     </v-btn>
-                                                                </v-btn-toggle>
-                                                            </div>
-                                                        </template>
-
-                                                        <v-divider/>
-
-                                                        <v-card-text v-if="accountComment(element)">
-                                                            {{ accountComment(element) }}
-                                                        </v-card-text>
-
-                                                        <v-card-text>
-                                                            <div class="d-flex account-toolbar align-center">
-                                                                <v-btn class="px-2" density="comfortable" color="default" variant="text"
-                                                                       :disabled="loading" :prepend-icon="icons.transactions"
-                                                                       :to="`/transaction/list?accountId=${accountOrSubAccountId(element)}`">
-                                                                    {{ $t('Transaction List') }}
-                                                                </v-btn>
-                                                                <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                       :disabled="loading" :prepend-icon="icons.edit"
-                                                                       @click="edit(element)">
-                                                                    {{ $t('Edit') }}
-                                                                </v-btn>
-                                                                <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                       :disabled="loading" :prepend-icon="icons.hide"
-                                                                       v-if="!element.hidden"
-                                                                       @click="hide(element, true)">
-                                                                    {{ $t('Hide') }}
-                                                                </v-btn>
-                                                                <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                       :disabled="loading" :prepend-icon="icons.show"
-                                                                       v-if="element.hidden"
-                                                                       @click="hide(element, false)">
-                                                                    {{ $t('Show') }}
-                                                                </v-btn>
-                                                                <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                       :disabled="loading" :prepend-icon="icons.remove"
-                                                                       @click="remove(element)">
-                                                                    {{ $t('Delete') }}
-                                                                </v-btn>
-                                                                <v-spacer/>
-                                                                <span class="account-balance ml-2">{{ accountBalance(element) }}</span>
-                                                            </div>
-                                                        </v-card-text>
-                                                    </v-card>
-                                                </div>
-                                            </template>
-                                        </draggable-list>
-                                    </v-col>
-                                </v-row>
-                            </v-card>
-                        </v-window-item>
-                    </v-window>
-                </div>
+                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="icons.hide"
+                                                                           v-if="!element.hidden"
+                                                                           @click="hide(element, true)">
+                                                                        {{ $t('Hide') }}
+                                                                    </v-btn>
+                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="icons.show"
+                                                                           v-if="element.hidden"
+                                                                           @click="hide(element, false)">
+                                                                        {{ $t('Show') }}
+                                                                    </v-btn>
+                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading" :prepend-icon="icons.remove"
+                                                                           @click="remove(element)">
+                                                                        {{ $t('Delete') }}
+                                                                    </v-btn>
+                                                                    <v-spacer/>
+                                                                    <span class="account-balance ml-2">{{ accountBalance(element) }}</span>
+                                                                </div>
+                                                            </v-card-text>
+                                                        </v-card>
+                                                    </div>
+                                                </template>
+                                            </draggable-list>
+                                        </v-col>
+                                    </v-row>
+                                </v-card>
+                            </v-window-item>
+                        </v-window>
+                    </v-main>
+                </v-layout>
             </v-card>
         </v-col>
     </v-row>
@@ -214,6 +219,8 @@
 </template>
 
 <script>
+import { useDisplay } from 'vuetify';
+
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
@@ -233,6 +240,7 @@ import {
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiRefresh,
+    mdiMenu,
     mdiPencilOutline,
     mdiDeleteOutline,
     mdiListBoxOutline,
@@ -242,17 +250,22 @@ import {
 
 export default {
     data() {
+        const { mdAndUp } = useDisplay();
+
         return {
             activeAccountCategoryId: accountConstants.allCategories[0].id,
             activeTab: 'accountPage',
             activeSubAccount: {},
             loading: true,
             displayOrderModified: false,
+            alwaysShowNav: mdAndUp.value,
+            showNav: mdAndUp.value,
             showHidden: false,
             icons: {
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
                 refresh: mdiRefresh,
+                menu: mdiMenu,
                 edit: mdiPencilOutline,
                 show: mdiEyeOutline,
                 hide: mdiEyeOffOutline,
@@ -327,6 +340,22 @@ export default {
     },
     created() {
         this.reload(false);
+    },
+    setup() {
+        const display = useDisplay();
+
+        return {
+            display: display
+        };
+    },
+    watch: {
+        'display.mdAndUp.value': function (newValue) {
+            this.alwaysShowNav = newValue;
+
+            if (!this.showNav) {
+                this.showNav = newValue;
+            }
+        }
     },
     methods: {
         reload(force) {
@@ -500,17 +529,13 @@ export default {
 </script>
 
 <style>
-.accounts-summary-skeleton .v-skeleton-loader__text {
-    margin: 0;
-}
-
-.account-category-tabs .v-tab.v-tab {
+.account-category-tabs .v-tab {
     --v-btn-height: calc(var(--v-tabs-height) * 1.5);
 }
 
 .accounts-overview-title {
     line-height: 2rem !important;
-    height: 46px;
+    min-height: 52px;
     display: flex;
     align-items: flex-end;
 }

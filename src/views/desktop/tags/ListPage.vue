@@ -3,7 +3,7 @@
         <v-col cols="12">
             <v-card>
                 <template #title>
-                    <div class="d-flex align-center">
+                    <div class="title-and-toolbar d-flex align-center">
                         <span>{{ $t('Transaction Tags') }}</span>
                         <v-btn class="ml-3" color="default" variant="outlined"
                                :disabled="loading || updating || hasEditingTag" @click="add">{{ $t('Add') }}</v-btn>

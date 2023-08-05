@@ -100,8 +100,10 @@ input[type=number] {
     min-inline-size: 100%;
 }
 
-.w-100-window-container.v-window > .v-window__container {
-    width: 100%;
+.title-and-toolbar {
+    min-height: 38px;
+    flex-wrap: wrap;
+    row-gap: 1rem;
 }
 
 /** Common class for replacing the default style of vuetify **/
@@ -153,6 +155,18 @@ input[type=number] {
     height: 1rem;
 }
 
+.w-100-window-container.v-window > .v-window__container {
+    width: 100%;
+}
+
+.tab-text-truncate.v-tab > .v-btn__content {
+    overflow-x: hidden;
+}
+
+.skeleton-no-margin .v-skeleton-loader__text {
+    margin: 0;
+}
+
 /** Common class for replacing the default style of Materio **/
 .v-application,
 .text-body-1,
@@ -193,6 +207,10 @@ input[type=number] {
             color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
         }
     }
+}
+
+.v-btn-group--density-comfortable.v-btn-group {
+    height: 38px;
 }
 
 /** Replacing the default style of @vuepic/vue-datepicker **/

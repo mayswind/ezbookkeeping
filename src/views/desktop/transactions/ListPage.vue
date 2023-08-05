@@ -2,321 +2,307 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <div class="d-flex flex-column flex-md-row">
-                    <div>
+                <v-layout>
+                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <div class="transaction-type-buttons d-flex flex-column">
-                                <v-btn border :color="query.type === 0 ? 'primary' : 'default'"
-                                       :variant="query.type === 0 ? 'tonal' : 'outlined'" :disabled="loading"
-                                       @click="changeTypeFilter(0)">
-                                    {{ $t('All Types') }}
-                                </v-btn>
-                                <v-btn border :color="query.type === 1 ? 'primary' : 'default'"
-                                       :variant="query.type === 1 ? 'tonal' : 'outlined'" :disabled="loading"
-                                       @click="changeTypeFilter(1)">
-                                    {{ $t('Modify Balance') }}
-                                </v-btn>
-                                <v-btn border :color="query.type === 2 ? 'primary' : 'default'"
-                                       :variant="query.type === 2 ? 'tonal' : 'outlined'" :disabled="loading"
-                                       @click="changeTypeFilter(2)">
-                                    {{ $t('Income') }}
-                                </v-btn>
-                                <v-btn border :color="query.type === 3 ? 'primary' : 'default'"
-                                       :variant="query.type === 3 ? 'tonal' : 'outlined'" :disabled="loading"
-                                       @click="changeTypeFilter(3)">
-                                    {{ $t('Expense') }}
-                                </v-btn>
-                                <v-btn border :color="query.type === 4 ? 'primary' : 'default'"
-                                       :variant="query.type === 4 ? 'tonal' : 'outlined'" :disabled="loading"
-                                       @click="changeTypeFilter(4)">
-                                    {{ $t('Transfer') }}
-                                </v-btn>
-                            </div>
+                            <btn-vertical-group :disabled="loading" :buttons="[
+                                { name: $t('All Types'), value: 0 },
+                                { name: $t('Modify Balance'), value: 1 },
+                                { name: $t('Income'), value: 2 },
+                                { name: $t('Expense'), value: 3 },
+                                { name: $t('Transfer'), value: 4 }
+                            ]" v-model="query.type" @update:modelValue="changeTypeFilter" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="recentDateRangeType">
-                            <v-tab :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
+                            <v-tab class="tab-text-truncate" :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
                                    @click="changeDateFilter(recentDateRange)">
-                                {{ recentDateRange.displayName }}
+                                <span class="text-truncate">{{ recentDateRange.displayName }}</span>
                             </v-tab>
                         </v-tabs>
-                    </div>
-                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition w-100-window-container" v-model="activeTab">
-                        <v-window-item value="transactionPage">
-                            <v-card variant="flat">
-                                <template #title>
-                                    <div class="transaction-list-title d-flex align-center text-no-wrap">
-                                        <span>{{ $t('Transaction List') }}</span>
-                                        <v-btn class="ml-3" color="default" variant="outlined"
-                                               :disabled="loading || !canAddTransaction" @click="add">{{ $t('Add') }}</v-btn>
-                                        <v-btn density="compact" color="default" variant="text"
-                                               class="ml-2" :icon="true" :disabled="loading"
-                                               v-if="!loading" @click="reload">
-                                            <v-icon :icon="icons.refresh" size="24" />
-                                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                                        </v-btn>
-                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
-                                        <v-spacer/>
-                                        <div class="transaction-keyword-filter ml-2">
-                                            <v-text-field density="compact" :disabled="loading"
-                                                          :prepend-inner-icon="icons.search"
-                                                          :append-inner-icon="searchKeyword !== query.keyword ? icons.check : null"
-                                                          :placeholder="$t('Search transaction description')"
-                                                          v-model="searchKeyword"
-                                                          @click:append-inner="changeKeywordFilter(searchKeyword)"
-                                                          @keyup.enter="changeKeywordFilter(searchKeyword)"
-                                            />
+                    </v-navigation-drawer>
+                    <v-main>
+                        <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
+                            <v-window-item value="transactionPage">
+                                <v-card variant="flat" min-height="830">
+                                    <template #title>
+                                        <div class="title-and-toolbar d-flex align-center text-no-wrap">
+                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
+                                                <v-icon :icon="icons.menu" size="24" />
+                                            </v-btn>
+                                            <span>{{ $t('Transaction List') }}</span>
+                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                                   :disabled="loading || !canAddTransaction" @click="add">{{ $t('Add') }}</v-btn>
+                                            <v-btn density="compact" color="default" variant="text"
+                                                   class="ml-2" :icon="true" :disabled="loading"
+                                                   v-if="!loading" @click="reload">
+                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                            </v-btn>
+                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                                            <v-spacer/>
+                                            <div class="transaction-keyword-filter ml-2">
+                                                <v-text-field density="compact" :disabled="loading"
+                                                              :prepend-inner-icon="icons.search"
+                                                              :append-inner-icon="searchKeyword !== query.keyword ? icons.check : null"
+                                                              :placeholder="$t('Search transaction description')"
+                                                              v-model="searchKeyword"
+                                                              @click:append-inner="changeKeywordFilter(searchKeyword)"
+                                                              @keyup.enter="changeKeywordFilter(searchKeyword)"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
+                                    </template>
 
-                                <v-card-text class="pt-0">
-                                    <div class="transaction-list-datetime-range d-flex align-center">
-                                        <span class="text-body-1">{{ $t('Date Range') }}</span>
-                                        <span class="text-body-1 transaction-list-datetime-range-text ml-2">
-                                            <span v-if="!this.query.minTime && !this.query.maxTime">{{ $t('All') }}</span>
-                                            <span v-else-if="this.query.minTime || this.query.maxTime">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
-                                        </span>
-                                        <v-spacer/>
-                                        <div class="transaction-list-total-amount-text d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
-                                            <span class="ml-2 text-subtitle-1">{{ $t('Total Income') }}</span>
-                                            <span class="text-income ml-2" v-if="loading">
-                                                <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
+                                    <v-card-text class="pt-0">
+                                        <div class="transaction-list-datetime-range d-flex align-center">
+                                            <span class="text-body-1">{{ $t('Date Range') }}</span>
+                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2">
+                                                <span class="text-sm" v-if="!this.query.minTime && !this.query.maxTime">{{ $t('All') }}</span>
+                                                <span class="text-sm" v-else-if="this.query.minTime || this.query.maxTime">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
                                             </span>
-                                            <span class="text-income ml-2" v-else-if="!loading">
-                                                {{ currentMonthTotalAmount.income }}
-                                            </span>
-                                            <span class="text-subtitle-1 ml-3">{{ $t('Total Expense') }}</span>
-                                            <span class="text-income ml-2" v-if="loading">
-                                                <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
-                                            </span>
-                                            <span class="text-expense ml-2" v-else-if="!loading">
-                                                {{ currentMonthTotalAmount.expense }}
-                                            </span>
+                                            <v-spacer/>
+                                            <div class="skeleton-no-margin d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
+                                                <span class="ml-2 text-subtitle-1">{{ $t('Total Income') }}</span>
+                                                <span class="text-income ml-2" v-if="loading">
+                                                    <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
+                                                </span>
+                                                <span class="text-income ml-2" v-else-if="!loading">
+                                                    {{ currentMonthTotalAmount.income }}
+                                                </span>
+                                                <span class="text-subtitle-1 ml-3">{{ $t('Total Expense') }}</span>
+                                                <span class="text-income ml-2" v-if="loading">
+                                                    <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
+                                                </span>
+                                                <span class="text-expense ml-2" v-else-if="!loading">
+                                                    {{ currentMonthTotalAmount.expense }}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </v-card-text>
+                                    </v-card-text>
 
-                                <v-table class="transaction-table" :hover="!loading">
-                                    <thead>
-                                    <tr>
-                                        <th class="transaction-table-column-time text-uppercase">{{ $t('Time') }}</th>
-                                        <th class="transaction-table-column-category text-uppercase">
-                                            <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
-                                                    eager location="bottom" max-height="500"
-                                                    :disabled="query.type === 1"
-                                                    :close-on-content-click="false"
-                                                    @update:model-value="scrollCategoryMenuToSelectedItem">
-                                                <template #activator="{ props }">
-                                                    <div class="d-flex align-center"
-                                                        :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryId > 0 }" v-bind="props">
-                                                        <span>{{ queryCategoryName }}</span>
-                                                        <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
-                                                    </div>
-                                                </template>
-                                                <v-list :selected="[query.categoryId]">
-                                                    <v-list-item key="0" value="0" class="text-sm" density="compact"
-                                                                 :class="{ 'list-item-selected': query.categoryId === '0' }"
-                                                                 :append-icon="(query.categoryId === '0' ? icons.check : null)">
-                                                        <v-list-item-title class="cursor-pointer"
-                                                                           @click="changeCategoryFilter('0')">
-                                                            <div class="d-flex align-center">
-                                                                <v-icon :icon="icons.all" />
-                                                                <span class="text-sm ml-3">{{ $t('All') }}</span>
-                                                            </div>
-                                                        </v-list-item-title>
-                                                    </v-list-item>
-
-                                                    <template :key="categoryType"
-                                                              v-for="(categories, categoryType) in allPrimaryCategories">
-                                                        <v-list-item density="compact">
-                                                            <v-list-item-title>
-                                                                <span class="text-sm">{{ getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type') }}</span>
-                                                            </v-list-item-title>
-                                                        </v-list-item>
-
-                                                        <v-list-group :key="category.id" v-for="category in categories">
-                                                            <template #activator="{ props }" v-if="!category.hidden">
-                                                                <v-divider />
-                                                                <v-list-item class="text-sm" density="compact"
-                                                                             :class="getCategoryListItemCheckedClass(category, query.categoryId)"
-                                                                             v-bind="props">
-                                                                    <v-list-item-title>
-                                                                        <div class="d-flex align-center">
-                                                                            <ItemIcon icon-type="category" size="24px" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                                                            <span class="text-sm ml-3">{{ category.name }}</span>
-                                                                        </div>
-                                                                    </v-list-item-title>
-                                                                </v-list-item>
-                                                            </template>
-
-                                                            <v-divider />
-                                                            <v-list-item class="text-sm" density="compact"
-                                                                         :value="category.id"
-                                                                         :append-icon="(query.categoryId === category.id ? icons.check : null)">
-                                                                <v-list-item-title class="cursor-pointer"
-                                                                                   @click="changeCategoryFilter(category.id)">
-                                                                    <div class="d-flex align-center">
-                                                                        <v-icon :icon="icons.all" />
-                                                                        <span class="text-sm ml-3">{{ $t('All') }}</span>
-                                                                    </div>
-                                                                </v-list-item-title>
-                                                            </v-list-item>
-
-                                                            <template :key="subCategory.id"
-                                                                      v-for="subCategory in category.subCategories">
-                                                                <v-divider v-if="!subCategory.hidden" />
-                                                                <v-list-item class="text-sm" density="compact"
-                                                                             :value="subCategory.id"
-                                                                             :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
-                                                                             :append-icon="(query.categoryId === subCategory.id ? icons.check : null)"
-                                                                             v-if="!subCategory.hidden">
-                                                                    <v-list-item-title class="cursor-pointer"
-                                                                                       @click="changeCategoryFilter(subCategory.id)">
-                                                                        <div class="d-flex align-center">
-                                                                            <ItemIcon icon-type="category" size="24px" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                                                            <span class="text-sm ml-3">{{ subCategory.name }}</span>
-                                                                        </div>
-                                                                    </v-list-item-title>
-                                                                </v-list-item>
-                                                            </template>
-                                                        </v-list-group>
+                                    <v-table class="transaction-table" :hover="!loading">
+                                        <thead>
+                                        <tr>
+                                            <th class="transaction-table-column-time text-uppercase">{{ $t('Time') }}</th>
+                                            <th class="transaction-table-column-category text-uppercase">
+                                                <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
+                                                        eager location="bottom" max-height="500"
+                                                        :disabled="query.type === 1"
+                                                        :close-on-content-click="false"
+                                                        @update:model-value="scrollCategoryMenuToSelectedItem">
+                                                    <template #activator="{ props }">
+                                                        <div class="d-flex align-center"
+                                                            :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryId > 0 }" v-bind="props">
+                                                            <span>{{ queryCategoryName }}</span>
+                                                            <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
+                                                        </div>
                                                     </template>
-                                                </v-list>
-                                            </v-menu>
-                                        </th>
-                                        <th class="transaction-table-column-amount text-uppercase">{{ $t('Amount') }}</th>
-                                        <th class="transaction-table-column-account text-uppercase">
-                                            <v-menu ref="accountFilterMenu" class="transaction-account-menu"
-                                                    eager location="bottom" max-height="500"
-                                                    @update:model-value="scrollAccountMenuToSelectedItem">
-                                                <template #activator="{ props }">
-                                                    <div class="d-flex align-center cursor-pointer"
-                                                         :class="{ 'readonly': loading, 'text-primary': query.accountId > 0 }" v-bind="props">
-                                                        <span>{{ queryAccountName }}</span>
-                                                        <v-icon :icon="icons.dropdownMenu" />
-                                                    </div>
-                                                </template>
-                                                <v-list :selected="[query.accountId]">
-                                                    <v-list-item key="0" value="0" class="text-sm" density="compact"
-                                                                 :class="{ 'list-item-selected': query.accountId === '0' }"
-                                                                 :append-icon="(query.accountId === '0' ? icons.check : null)">
-                                                        <v-list-item-title class="cursor-pointer"
-                                                                           @click="changeAccountFilter('0')">
-                                                            <div class="d-flex align-center">
-                                                                <v-icon :icon="icons.all" />
-                                                                <span class="text-sm ml-3">{{ $t('All') }}</span>
-                                                            </div>
-                                                        </v-list-item-title>
-                                                    </v-list-item>
-                                                    <template :key="account.id"
-                                                              v-for="account in allAccounts">
-                                                        <v-divider v-if="!account.hidden" />
-                                                        <v-list-item class="text-sm" density="compact"
-                                                                     :value="account.id"
-                                                                     :class="{ 'list-item-selected': query.accountId === account.id }"
-                                                                     :append-icon="(query.accountId === account.id ? icons.check : null)"
-                                                                     v-if="!account.hidden">
+                                                    <v-list :selected="[query.categoryId]">
+                                                        <v-list-item key="0" value="0" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.categoryId === '0' }"
+                                                                     :append-icon="(query.categoryId === '0' ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="changeAccountFilter(account.id)">
+                                                                               @click="changeCategoryFilter('0')">
                                                                 <div class="d-flex align-center">
-                                                                    <ItemIcon icon-type="account" size="24px" :icon-id="account.icon" :color="account.color"></ItemIcon>
-                                                                    <span class="text-sm ml-3">{{ account.name }}</span>
+                                                                    <v-icon :icon="icons.all" />
+                                                                    <span class="text-sm ml-3">{{ $t('All') }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
+
+                                                        <template :key="categoryType"
+                                                                  v-for="(categories, categoryType) in allPrimaryCategories">
+                                                            <v-list-item density="compact">
+                                                                <v-list-item-title>
+                                                                    <span class="text-sm">{{ getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type') }}</span>
+                                                                </v-list-item-title>
+                                                            </v-list-item>
+
+                                                            <v-list-group :key="category.id" v-for="category in categories">
+                                                                <template #activator="{ props }" v-if="!category.hidden">
+                                                                    <v-divider />
+                                                                    <v-list-item class="text-sm" density="compact"
+                                                                                 :class="getCategoryListItemCheckedClass(category, query.categoryId)"
+                                                                                 v-bind="props">
+                                                                        <v-list-item-title>
+                                                                            <div class="d-flex align-center">
+                                                                                <ItemIcon icon-type="category" size="24px" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                                                <span class="text-sm ml-3">{{ category.name }}</span>
+                                                                            </div>
+                                                                        </v-list-item-title>
+                                                                    </v-list-item>
+                                                                </template>
+
+                                                                <v-divider />
+                                                                <v-list-item class="text-sm" density="compact"
+                                                                             :value="category.id"
+                                                                             :append-icon="(query.categoryId === category.id ? icons.check : null)">
+                                                                    <v-list-item-title class="cursor-pointer"
+                                                                                       @click="changeCategoryFilter(category.id)">
+                                                                        <div class="d-flex align-center">
+                                                                            <v-icon :icon="icons.all" />
+                                                                            <span class="text-sm ml-3">{{ $t('All') }}</span>
+                                                                        </div>
+                                                                    </v-list-item-title>
+                                                                </v-list-item>
+
+                                                                <template :key="subCategory.id"
+                                                                          v-for="subCategory in category.subCategories">
+                                                                    <v-divider v-if="!subCategory.hidden" />
+                                                                    <v-list-item class="text-sm" density="compact"
+                                                                                 :value="subCategory.id"
+                                                                                 :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
+                                                                                 :append-icon="(query.categoryId === subCategory.id ? icons.check : null)"
+                                                                                 v-if="!subCategory.hidden">
+                                                                        <v-list-item-title class="cursor-pointer"
+                                                                                           @click="changeCategoryFilter(subCategory.id)">
+                                                                            <div class="d-flex align-center">
+                                                                                <ItemIcon icon-type="category" size="24px" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                                                <span class="text-sm ml-3">{{ subCategory.name }}</span>
+                                                                            </div>
+                                                                        </v-list-item-title>
+                                                                    </v-list-item>
+                                                                </template>
+                                                            </v-list-group>
+                                                        </template>
+                                                    </v-list>
+                                                </v-menu>
+                                            </th>
+                                            <th class="transaction-table-column-amount text-uppercase">{{ $t('Amount') }}</th>
+                                            <th class="transaction-table-column-account text-uppercase">
+                                                <v-menu ref="accountFilterMenu" class="transaction-account-menu"
+                                                        eager location="bottom" max-height="500"
+                                                        @update:model-value="scrollAccountMenuToSelectedItem">
+                                                    <template #activator="{ props }">
+                                                        <div class="d-flex align-center cursor-pointer"
+                                                             :class="{ 'readonly': loading, 'text-primary': query.accountId > 0 }" v-bind="props">
+                                                            <span>{{ queryAccountName }}</span>
+                                                            <v-icon :icon="icons.dropdownMenu" />
+                                                        </div>
                                                     </template>
-                                                </v-list>
-                                            </v-menu>
-                                        </th>
-                                        <th class="transaction-table-column-description text-uppercase">{{ $t('Description') }}</th>
-                                    </tr>
-                                    </thead>
+                                                    <v-list :selected="[query.accountId]">
+                                                        <v-list-item key="0" value="0" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.accountId === '0' }"
+                                                                     :append-icon="(query.accountId === '0' ? icons.check : null)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="changeAccountFilter('0')">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.all" />
+                                                                    <span class="text-sm ml-3">{{ $t('All') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
+                                                        <template :key="account.id"
+                                                                  v-for="account in allAccounts">
+                                                            <v-divider v-if="!account.hidden" />
+                                                            <v-list-item class="text-sm" density="compact"
+                                                                         :value="account.id"
+                                                                         :class="{ 'list-item-selected': query.accountId === account.id }"
+                                                                         :append-icon="(query.accountId === account.id ? icons.check : null)"
+                                                                         v-if="!account.hidden">
+                                                                <v-list-item-title class="cursor-pointer"
+                                                                                   @click="changeAccountFilter(account.id)">
+                                                                    <div class="d-flex align-center">
+                                                                        <ItemIcon icon-type="account" size="24px" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                                                        <span class="text-sm ml-3">{{ account.name }}</span>
+                                                                    </div>
+                                                                </v-list-item-title>
+                                                            </v-list-item>
+                                                        </template>
+                                                    </v-list>
+                                                </v-menu>
+                                            </th>
+                                            <th class="transaction-table-column-description text-uppercase">{{ $t('Description') }}</th>
+                                        </tr>
+                                        </thead>
 
-                                    <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
-                                    <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]">
-                                        <td class="px-0" colspan="5">
-                                            <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-
-                                    <tbody v-if="!loading && (!transactions || !transactions.length || transactions.length < 1)">
-                                    <tr>
-                                        <td colspan="5">{{ $t('No transaction data') }}</td>
-                                    </tr>
-                                    </tbody>
-
-                                    <tbody :key="transaction.id"
-                                           :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
-                                           v-for="(transaction, idx) in transactions">
-                                        <tr class="transaction-list-row-date no-hover text-sm"
-                                            v-if="idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date))">
-                                            <td colspan="5" class="font-weight-bold">
-                                                <div class="d-flex align-center">
-                                                    <span>{{ getLongDate(transaction) }}</span>
-                                                    <v-chip class="ml-1" color="default" size="x-small">
-                                                        {{ getWeekdayLongName(transaction) }}
-                                                    </v-chip>
-                                                </div>
+                                        <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
+                                        <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]">
+                                            <td class="px-0" colspan="5">
+                                                <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>
                                         </tr>
-                                        <tr class="transaction-table-row-data text-sm cursor-pointer"
-                                            @click="show(transaction)">
-                                            <td class="transaction-table-column-time">
-                                                <div class="d-flex flex-column">
-                                                    <span>{{ getDisplayTime(transaction) }}</span>
-                                                    <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="transaction-table-column-category">
-                                                <div class="d-flex align-center">
-                                                    <ItemIcon size="24px" icon-type="category"
-                                                              :icon-id="transaction.category.icon"
-                                                              :color="transaction.category.color"
-                                                              v-if="transaction.category && transaction.category.color"></ItemIcon>
-                                                    <v-icon size="24" :icon="icons.modifyBalance" v-else-if="!transaction.category || !transaction.category.color" />
-                                                    <span class="ml-2" v-if="transaction.type === allTransactionTypes.ModifyBalance">
-                                                        {{ $t('Modify Balance') }}
-                                                    </span>
-                                                    <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
-                                                        {{ transaction.category.name }}
-                                                    </span>
-                                                    <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
-                                                        {{ getTransactionTypeName(transaction.type, 'Transaction') }}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
-                                                <div v-if="transaction.sourceAccount">
-                                                    <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                    <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
-                                                    <span v-else></span>
-                                                </div>
-                                            </td>
-                                            <td class="transaction-table-column-account">
-                                                <div class="d-flex align-center">
-                                                    <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
-                                                    <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
-                                                    <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="transaction-table-column-description text-truncate">
-                                                {{ transaction.comment }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </v-table>
+                                        </tbody>
 
-                                <div class="mt-2 mb-4">
-                                    <v-pagination :total-visible="6" :length="totalPageCount"
-                                                  v-model="paginationCurrentPage"></v-pagination>
-                                </div>
-                            </v-card>
-                        </v-window-item>
-                    </v-window>
-                </div>
+                                        <tbody v-if="!loading && (!transactions || !transactions.length || transactions.length < 1)">
+                                        <tr>
+                                            <td colspan="5">{{ $t('No transaction data') }}</td>
+                                        </tr>
+                                        </tbody>
+
+                                        <tbody :key="transaction.id"
+                                               :class="{ 'disabled': loading, 'has-bottom-border': idx < transactions.length - 1 }"
+                                               v-for="(transaction, idx) in transactions">
+                                            <tr class="transaction-list-row-date no-hover text-sm"
+                                                v-if="idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date))">
+                                                <td colspan="5" class="font-weight-bold">
+                                                    <div class="d-flex align-center">
+                                                        <span>{{ getLongDate(transaction) }}</span>
+                                                        <v-chip class="ml-1" color="default" size="x-small">
+                                                            {{ getWeekdayLongName(transaction) }}
+                                                        </v-chip>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="transaction-table-row-data text-sm cursor-pointer"
+                                                @click="show(transaction)">
+                                                <td class="transaction-table-column-time">
+                                                    <div class="d-flex flex-column">
+                                                        <span>{{ getDisplayTime(transaction) }}</span>
+                                                        <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="transaction-table-column-category">
+                                                    <div class="d-flex align-center">
+                                                        <ItemIcon size="24px" icon-type="category"
+                                                                  :icon-id="transaction.category.icon"
+                                                                  :color="transaction.category.color"
+                                                                  v-if="transaction.category && transaction.category.color"></ItemIcon>
+                                                        <v-icon size="24" :icon="icons.modifyBalance" v-else-if="!transaction.category || !transaction.category.color" />
+                                                        <span class="ml-2" v-if="transaction.type === allTransactionTypes.ModifyBalance">
+                                                            {{ $t('Modify Balance') }}
+                                                        </span>
+                                                        <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && transaction.category">
+                                                            {{ transaction.category.name }}
+                                                        </span>
+                                                        <span class="ml-2" v-else-if="transaction.type !== allTransactionTypes.ModifyBalance && !transaction.category">
+                                                            {{ getTransactionTypeName(transaction.type, 'Transaction') }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
+                                                    <div v-if="transaction.sourceAccount">
+                                                        <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
+                                                        <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
+                                                        <span v-else></span>
+                                                    </div>
+                                                </td>
+                                                <td class="transaction-table-column-account">
+                                                    <div class="d-flex align-center">
+                                                        <span v-if="transaction.sourceAccount">{{ transaction.sourceAccount.name }}</span>
+                                                        <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
+                                                        <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="transaction-table-column-description text-truncate">
+                                                    {{ transaction.comment }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </v-table>
+
+                                    <div class="mt-2 mb-4">
+                                        <v-pagination :total-visible="6" :length="totalPageCount"
+                                                      v-model="paginationCurrentPage"></v-pagination>
+                                    </div>
+                                </v-card>
+                            </v-window-item>
+                        </v-window>
+                    </v-main>
+                </v-layout>
             </v-card>
         </v-col>
     </v-row>
@@ -332,6 +318,8 @@
 </template>
 
 <script>
+import { useDisplay } from 'vuetify';
+
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
@@ -370,6 +358,7 @@ import {
     mdiCheck,
     mdiTextBoxCheckOutline,
     mdiRefresh,
+    mdiMenu,
     mdiMenuDown,
     mdiPencilBoxOutline,
     mdiArrowRight,
@@ -387,6 +376,8 @@ export default {
         'initAccountId'
     ],
     data() {
+        const { mdAndUp } = useDisplay();
+
         return {
             loading: true,
             updating: false,
@@ -396,6 +387,8 @@ export default {
             searchKeyword: '',
             currentPageTransactions: [],
             totalPageCount: 1,
+            alwaysShowNav: mdAndUp.value,
+            showNav: mdAndUp.value,
             showCustomDateRangeDialog: false,
             transactionRemoving: {},
             icons: {
@@ -403,6 +396,7 @@ export default {
                 check: mdiCheck,
                 all: mdiTextBoxCheckOutline,
                 refresh: mdiRefresh,
+                menu: mdiMenu,
                 dropdownMenu: mdiMenuDown,
                 modifyBalance: mdiPencilBoxOutline,
                 arrowRight: mdiArrowRight,
@@ -577,6 +571,22 @@ export default {
             accountId: this.initAccountId
         });
     },
+    setup() {
+        const display = useDisplay();
+
+        return {
+            display: display
+        };
+    },
+    watch: {
+        'display.mdAndUp.value': function (newValue) {
+            this.alwaysShowNav = newValue;
+
+            if (!this.showNav) {
+                this.showNav = newValue;
+            }
+        }
+    },
     beforeRouteUpdate(to) {
         if (to.query) {
             this.init({
@@ -707,10 +717,6 @@ export default {
             this.$router.push(this.getFilterLinkUrl());
         },
         changeTypeFilter(type) {
-            if (this.query.type === type) {
-                return;
-            }
-
             let removeCategoryFilter = false;
 
             if (type && this.query.categoryId) {
@@ -888,40 +894,22 @@ export default {
 
 <style>
 .transaction-keyword-filter .v-input--density-compact {
-    --v-input-control-height: 36px;
-    --v-input-padding-top: 5px;
-    --v-input-padding-bottom: 5px;
+    --v-input-control-height: 36px !important;
+    --v-input-padding-top: 5px !important;
+    --v-input-padding-bottom: 5px !important;
+    --v-input-chips-margin-top: 0px !important;
+    --v-input-chips-margin-bottom: 0px !important;
     inline-size: 20rem;
 }
 
-.transaction-type-buttons .v-btn:not(:first-child) {
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-}
-
-.transaction-type-buttons .v-btn:not(:last-child) {
-    border-bottom: 0;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-}
-
-.transaction-list-title {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
 .transaction-list-datetime-range {
-    height: 28px;
-    overflow-x: auto;
-    white-space: nowrap;
+    min-height: 28px;
+    flex-wrap: wrap;
+    row-gap: 1rem;
 }
 
 .transaction-list-datetime-range .transaction-list-datetime-range-text {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
-}
-
-.transaction-list-total-amount-text .v-skeleton-loader__text {
-    margin: 0;
 }
 
 .v-table.transaction-table .transaction-list-row-date > td {

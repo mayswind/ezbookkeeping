@@ -23,8 +23,11 @@ import { VIcon } from 'vuetify/components/VIcon';
 import { VImg } from 'vuetify/components/VImg';
 import { VInput } from 'vuetify/components/VInput';
 import { VLabel } from 'vuetify/components/VLabel';
+import { VLayout } from 'vuetify/components/VLayout';
 import { VList, VListGroup, VListImg, VListItem, VListItemAction, VListItemMedia, VListItemSubtitle, VListItemTitle, VListSubheader } from 'vuetify/components/VList';
+import { VMain } from 'vuetify/components/VMain';
 import { VMenu } from 'vuetify/components/VMenu';
+import { VNavigationDrawer } from 'vuetify/components/VNavigationDrawer';
 import { VOverlay } from 'vuetify/components/VOverlay';
 import { VPagination } from 'vuetify/components/VPagination';
 import { VProgressCircular } from 'vuetify/components/VProgressCircular';
@@ -77,6 +80,7 @@ import {
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
 
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
+import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
 import AmountInput from '@/components/desktop/AmountInput.vue';
 import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
@@ -132,6 +136,7 @@ const vuetify = createVuetify({
         VImg,
         VInput,
         VLabel,
+        VLayout,
         VList,
         VListGroup,
         VListImg,
@@ -141,7 +146,9 @@ const vuetify = createVuetify({
         VListItemSubtitle,
         VListItemTitle,
         VListSubheader,
+        VMain,
         VMenu,
+        VNavigationDrawer,
         VOverlay,
         VPagination,
         VProgressCircular,
@@ -168,7 +175,6 @@ const vuetify = createVuetify({
             mdi
         }
     },
-
     defaults: {
         VAlert: {
             VBtn: {
@@ -384,6 +390,7 @@ app.component('DraggableList', draggable);
 app.component('PinCodeInput', PinCodeInput);
 
 app.component('ItemIcon', ItemIcon);
+app.component('BtnVerticalGroup', BtnVerticalGroup);
 app.component('AmountInput', AmountInput);
 app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);

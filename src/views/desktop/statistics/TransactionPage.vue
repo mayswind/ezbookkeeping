@@ -2,43 +2,36 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <div class="d-flex flex-column flex-md-row">
-                    <div>
+                <v-layout>
+                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <v-btn-toggle
-                                variant="outlined"
-                                color="primary"
-                                density="comfortable"
-                                mandatory="force"
-                                divided
-                                :disabled="loading"
-                                v-model="query.chartType"
-                            >
-                                <v-btn :value="allChartTypes.Pie" @click="setChartType(allChartTypes.Pie)">
-                                    {{ $t('Pie Chart') }}
-                                </v-btn>
-                                <v-btn :value="allChartTypes.Bar" @click="setChartType(allChartTypes.Bar)">
-                                    {{ $t('Bar Chart') }}
-                                </v-btn>
-                            </v-btn-toggle>
+                            <btn-vertical-group :disabled="loading" :buttons="[
+                                { name: $t('Pie Chart'), value: allChartTypes.Pie },
+                                { name: $t('Bar Chart'), value: allChartTypes.Bar }
+                            ]" v-model="query.chartType" @update:modelValue="setChartType" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="query.chartDataType">
-                            <v-tab :key="dataType.type" :value="dataType.type"
+                            <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
                                    v-for="dataType in allChartDataTypes">
-                                {{ $t(dataType.name) }}
+                                <span class="text-truncate">{{ $t(dataType.name) }}</span>
+                                <v-tooltip activator="parent" location="right">{{ $t(dataType.name) }}</v-tooltip>
                             </v-tab>
                         </v-tabs>
-                    </div>
-                    <v-window class="d-flex flex-grow-1 ml-md-5 disable-tab-transition w-100-window-container" v-model="activeTab">
-                        <v-window-item value="statisticsPage">
-                            <v-card variant="flat">
-                                <template #title>
-                                    <div class="statistics-title d-flex align-center">
-                                        <span>{{ $t('Statistics Data') }}</span>
-                                        <div class="ml-4">
-                                            <v-btn-group color="default" density="comfortable" variant="outlined" divided>
+                    </v-navigation-drawer>
+                    <v-main>
+                        <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
+                            <v-window-item value="statisticsPage">
+                                <v-card variant="flat" min-height="680">
+                                    <template #title>
+                                        <div class="title-and-toolbar d-flex align-center">
+                                            <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
+                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
+                                                <v-icon :icon="icons.menu" size="24" />
+                                            </v-btn>
+                                            <span>{{ $t('Statistics Data') }}</span>
+                                            <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided>
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
                                                        @click="shiftDateRange(query.startTime, query.endTime, -1)"/>
@@ -90,108 +83,108 @@
                                                     </v-list-item>
                                                 </v-list>
                                             </v-menu>
+                                            <v-btn density="compact" color="default" variant="text"
+                                                   class="ml-2" :icon="true" :disabled="loading"
+                                                   v-if="!loading" @click="reload">
+                                                <v-icon :icon="icons.refresh" size="24" />
+                                                <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
+                                            </v-btn>
+                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                                            <v-spacer/>
+                                            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                                                   :disabled="loading" :icon="true">
+                                                <v-icon :icon="icons.more" />
+                                                <v-menu activator="parent">
+                                                    <v-list>
+                                                        <v-list-item :prepend-icon="icons.filter"
+                                                                     :title="$t('Filter Accounts')"
+                                                                     @click="showFilterAccountDialog = true"></v-list-item>
+                                                        <v-list-item :prepend-icon="icons.filter"
+                                                                     :title="$t('Filter Transaction Categories')"
+                                                                     @click="showFilterCategoryDialog = true"></v-list-item>
+                                                        <v-divider class="my-2"/>
+                                                        <v-list-item to="/app/settings?tab=statisticsSetting"
+                                                                     :prepend-icon="icons.filterSettings"
+                                                                     :title="$t('Settings')"></v-list-item>
+                                                    </v-list>
+                                                </v-menu>
+                                            </v-btn>
                                         </div>
-                                        <v-btn density="compact" color="default" variant="text"
-                                               class="ml-2" :icon="true" :disabled="loading"
-                                               v-if="!loading" @click="reload">
-                                            <v-icon :icon="icons.refresh" size="24" />
-                                            <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
-                                        </v-btn>
-                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
-                                        <v-spacer/>
-                                        <v-btn density="comfortable" color="default" variant="text" class="ml-2"
-                                               :disabled="loading" :icon="true">
-                                            <v-icon :icon="icons.more" />
-                                            <v-menu activator="parent">
-                                                <v-list>
-                                                    <v-list-item :prepend-icon="icons.filter"
-                                                                 :title="$t('Filter Accounts')"
-                                                                 @click="showFilterAccountDialog = true"></v-list-item>
-                                                    <v-list-item :prepend-icon="icons.filter"
-                                                                 :title="$t('Filter Transaction Categories')"
-                                                                 @click="showFilterCategoryDialog = true"></v-list-item>
-                                                    <v-divider class="my-2"/>
-                                                    <v-list-item to="/app/settings?tab=statisticsSetting"
-                                                                 :prepend-icon="icons.filterSettings"
-                                                                 :title="$t('Settings')"></v-list-item>
-                                                </v-list>
-                                            </v-menu>
-                                        </v-btn>
+                                    </template>
+
+                                    <div v-if="initing">
+                                        <v-skeleton-loader type="paragraph" :loading="initing"
+                                                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4 ]"></v-skeleton-loader>
                                     </div>
-                                </template>
 
-                                <div v-if="initing">
-                                    <v-skeleton-loader type="paragraph" :loading="initing"
-                                                       :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4 ]"></v-skeleton-loader>
-                                </div>
+                                    <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
+                                                 v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
+                                        <span class="text-subtitle-1">{{ totalAmountName }}</span>
+                                        <span class="statistics-overview-amount ml-3" :class="statisticsTextColor">
+                                            {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
+                                        </span>
+                                    </v-card-text>
 
-                                <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                             v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
-                                    <span class="text-subtitle-1">{{ totalAmountName }}</span>
-                                    <span class="statistics-overview-amount ml-3" :class="statisticsTextColor">
-                                        {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
-                                    </span>
-                                </v-card-text>
+                                    <v-card-text class="statistics-overview-title pt-0"
+                                                 v-else-if="!initing && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
+                                        <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
+                                    </v-card-text>
 
-                                <v-card-text class="statistics-overview-title pt-0"
-                                             v-else-if="!initing && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
-                                    <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
-                                </v-card-text>
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
+                                        <pie-chart
+                                            :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
+                                            :min-valid-percent="0.0001"
+                                            :show-value="showAmountInChart"
+                                            :enable-click-item="true"
+                                            :default-currency="defaultCurrency"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="totalAmount"
+                                            percent-field="percent"
+                                            currency-field="currency"
+                                            hidden-field="hidden"
+                                            @click="clickPieChartItem"
+                                        />
+                                    </v-card-text>
 
-                                <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
-                                    <pie-chart
-                                        :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
-                                        :min-valid-percent="0.0001"
-                                        :show-value="showAmountInChart"
-                                        :enable-click-item="true"
-                                        :default-currency="defaultCurrency"
-                                        id-field="id"
-                                        name-field="name"
-                                        value-field="totalAmount"
-                                        percent-field="percent"
-                                        currency-field="currency"
-                                        hidden-field="hidden"
-                                        @click="clickPieChartItem"
-                                    />
-                                </v-card-text>
-
-                                <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
-                                    <v-list rounded lines="two"
-                                            v-if="statisticsData && statisticsData.items && statisticsData.items.length">
-                                        <template :key="idx"
-                                                  v-for="(item, idx) in statisticsData.items">
-                                            <v-list-item class="pl-0" v-if="!item.hidden">
-                                                <template #prepend>
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
+                                        <v-list rounded lines="two"
+                                                v-if="statisticsData && statisticsData.items && statisticsData.items.length">
+                                            <template :key="idx"
+                                                      v-for="(item, idx) in statisticsData.items">
+                                                <v-list-item class="pl-0" v-if="!item.hidden">
+                                                    <template #prepend>
+                                                        <router-link class="statistics-list-item" :to="getItemLinkUrl(item)">
+                                                            <ItemIcon :icon-type="queryChartDataCategory" size="34px"
+                                                                      :icon-id="item.icon"
+                                                                      :color="item.color"></ItemIcon>
+                                                        </router-link>
+                                                    </template>
                                                     <router-link class="statistics-list-item" :to="getItemLinkUrl(item)">
-                                                        <ItemIcon :icon-type="queryChartDataCategory" size="34px"
-                                                                  :icon-id="item.icon"
-                                                                  :color="item.color"></ItemIcon>
+                                                        <div class="d-flex flex-column ml-2">
+                                                            <div class="d-flex">
+                                                                <span>{{ item.name }}</span>
+                                                                <small class="statistics-percent" v-if="item.percent >= 0">{{ getDisplayPercent(item.percent, 2, '&lt;0.01') }}</small>
+                                                                <v-spacer/>
+                                                                <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, (item.currency || defaultCurrency)) }}</span>
+                                                            </div>
+                                                            <div>
+                                                                <v-progress-linear :color="item.color ? '#' + item.color : 'primary'"
+                                                                                   :model-value="item.percent >= 0 ? item.percent : 0"
+                                                                                   :height="4"></v-progress-linear>
+                                                            </div>
+                                                        </div>
                                                     </router-link>
-                                                </template>
-                                                <router-link class="statistics-list-item" :to="getItemLinkUrl(item)">
-                                                    <div class="d-flex flex-column ml-2">
-                                                        <div class="d-flex">
-                                                            <span>{{ item.name }}</span>
-                                                            <small class="statistics-percent" v-if="item.percent >= 0">{{ getDisplayPercent(item.percent, 2, '&lt;0.01') }}</small>
-                                                            <v-spacer/>
-                                                            <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, (item.currency || defaultCurrency)) }}</span>
-                                                        </div>
-                                                        <div>
-                                                            <v-progress-linear :color="item.color ? '#' + item.color : 'primary'"
-                                                                               :model-value="item.percent >= 0 ? item.percent : 0"
-                                                                               :height="4"></v-progress-linear>
-                                                        </div>
-                                                    </div>
-                                                </router-link>
-                                            </v-list-item>
-                                            <v-divider v-if="!item.hidden && idx !== statisticsData.items.length - 1"/>
-                                        </template>
-                                    </v-list>
-                                </v-card-text>
-                            </v-card>
-                        </v-window-item>
-                    </v-window>
-                </div>
+                                                </v-list-item>
+                                                <v-divider v-if="!item.hidden && idx !== statisticsData.items.length - 1"/>
+                                            </template>
+                                        </v-list>
+                                    </v-card-text>
+                                </v-card>
+                            </v-window-item>
+                        </v-window>
+                    </v-main>
+                </v-layout>
             </v-card>
         </v-col>
     </v-row>
@@ -218,6 +211,8 @@
 </template>
 
 <script>
+import { useDisplay } from 'vuetify';
+
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
@@ -239,6 +234,7 @@ import {
     mdiArrowRight,
     mdiSort,
     mdiRefresh,
+    mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
     mdiPencilOutline,
@@ -254,10 +250,14 @@ export default {
         CategoryFilterSettingsCard
     },
     data() {
+        const { mdAndUp } = useDisplay();
+
         return {
             activeTab: 'statisticsPage',
             initing: true,
             loading: true,
+            alwaysShowNav: mdAndUp.value,
+            showNav: mdAndUp.value,
             showCustomDateRangeDialog: false,
             showFilterAccountDialog: false,
             showFilterCategoryDialog: false,
@@ -267,6 +267,7 @@ export default {
                 right: mdiArrowRight,
                 sort: mdiSort,
                 refresh: mdiRefresh,
+                menu: mdiMenu,
                 filter: mdiFilterOutline,
                 filterSettings: mdiFilterCogOutline,
                 pencil: mdiPencilOutline,
@@ -360,6 +361,13 @@ export default {
             this.statisticsStore.updateTransactionStatisticsFilter({
                 chartDataType: newValue
             });
+        },
+        'display.mdAndUp.value': function (newValue) {
+            this.alwaysShowNav = newValue;
+
+            if (!this.showNav) {
+                this.showNav = newValue;
+            }
         }
     },
     created() {
@@ -385,6 +393,13 @@ export default {
                 self.$refs.snackbar.showError(error);
             }
         });
+    },
+    setup() {
+        const display = useDisplay();
+
+        return {
+            display: display
+        };
     },
     methods: {
         reload(force) {
@@ -537,11 +552,6 @@ export default {
 </script>
 
 <style>
-.statistics-title {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
 .statistics-custom-datetime-range {
     font-size: 0.7rem;
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;

@@ -246,8 +246,7 @@ export default {
             return assetConstants.ezBookkeepingLogoPath;
         },
         mdAndDown() {
-            const { mdAndDown } = useDisplay();
-            return mdAndDown.value;
+            return this.display.mdAndDown.value;
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
@@ -276,9 +275,11 @@ export default {
         }
     },
     setup() {
+        const display = useDisplay();
         const theme = useTheme();
 
         return {
+            display: display,
             globalTheme: theme
         };
     },

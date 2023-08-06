@@ -116,7 +116,7 @@ export default {
             }
 
             const container = parent.find('.page-content');
-            const selectedItem = parent.find('.row.row-has-selected-item');
+            const selectedItem = parent.find('.row-has-selected-item');
 
             if (!container.length || !selectedItem.length) {
                 return;

@@ -1,5 +1,6 @@
 <template>
     <v-select
+        density="comfortable"
         item-title="icon"
         item-value="id"
         persistent-placeholder
@@ -9,8 +10,8 @@
         @update:menu="onMenuStateChanged"
     >
         <template #selection="{ item }">
-            <v-label>
-                <v-icon :icon="icons.square" :color="`#${item.raw}`" />
+            <v-label style="padding-top: 3px">
+                <v-icon size="28" :icon="icons.square" :color="`#${item.raw}`" />
             </v-label>
         </template>
 
@@ -21,11 +22,13 @@
                      :key="idx" v-for="(row, idx) in allColorRows">
                     <div class="text-center" :key="colorInfo.color" v-for="colorInfo in row">
                         <div class="cursor-pointer" @click="color = colorInfo.color">
-                            <v-icon class="ma-2" :icon="icons.square" :color="`#${colorInfo.color}`" v-if="!modelValue || modelValue !== colorInfo.color" />
+                            <v-icon class="ma-2" size="28"
+                                    :icon="icons.square" :color="`#${colorInfo.color}`"
+                                    v-if="!modelValue || modelValue !== colorInfo.color" />
                             <v-badge class="right-bottom-icon" color="primary"
                                      location="bottom right" offset-x="8" offset-y="8" :icon="icons.checked"
                                      v-if="modelValue && modelValue === colorInfo.color">
-                                <v-icon class="ma-2" :icon="icons.square" :color="`#${colorInfo.color}`" />
+                                <v-icon class="ma-2" size="28" :icon="icons.square" :color="`#${colorInfo.color}`" />
                             </v-badge>
                         </div>
                     </div>

@@ -7,7 +7,7 @@
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                 </v-toolbar-title>
             </v-toolbar>
-            <v-card-text class="pa-4 mt-2">
+            <v-card-text class="px-5 pt-7 pb-5">
                 <v-row>
                     <v-col cols="12" md="12">
                         <v-text-field

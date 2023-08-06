@@ -1,5 +1,6 @@
 <template>
     <v-select
+        density="comfortable"
         item-title="icon"
         item-value="id"
         persistent-placeholder
@@ -10,7 +11,7 @@
     >
         <template #selection="{ item }">
             <v-label>
-                <ItemIcon icon-type="category" size="23px" :icon-id="icon" :color="color" />
+                <ItemIcon icon-type="category" :icon-id="icon" :color="color" />
             </v-label>
         </template>
 

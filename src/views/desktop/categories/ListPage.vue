@@ -127,13 +127,6 @@
 
                                                             <v-spacer/>
 
-                                                            <v-btn class="hover-display px-2" color="default"
-                                                                   density="comfortable" variant="text"
-                                                                   :prepend-icon="icons.edit"
-                                                                   :disabled="loading || updating"
-                                                                   @click="edit(element)">
-                                                                {{ $t('Edit') }}
-                                                            </v-btn>
                                                             <v-btn class="hover-display px-2 ml-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :prepend-icon="element.hidden ? icons.show : icons.hide"
@@ -142,7 +135,14 @@
                                                                    @click="hide(element, !element.hidden)">
                                                                 {{ element.hidden ? $t('Show') : $t('Hide') }}
                                                             </v-btn>
-                                                            <v-btn class="hover-display px-2 ml-2" color="default"
+                                                            <v-btn class="hover-display px-2" color="default"
+                                                                   density="comfortable" variant="text"
+                                                                   :prepend-icon="icons.edit"
+                                                                   :disabled="loading || updating"
+                                                                   @click="edit(element)">
+                                                                {{ $t('Edit') }}
+                                                            </v-btn>
+                                                            <v-btn class="hover-display px-2" color="default"
                                                                    density="comfortable" variant="text"
                                                                    :prepend-icon="icons.remove"
                                                                    :loading="categoryRemoving[element.id]"
@@ -150,7 +150,7 @@
                                                                    @click="remove(element)">
                                                                 {{ $t('Delete') }}
                                                             </v-btn>
-                                                            <span>
+                                                            <span class="ml-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
                                                                         :icon="icons.drag"/>
                                                                 <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>

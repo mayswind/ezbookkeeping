@@ -98,7 +98,7 @@
                                                            :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
                                     </div>
 
-                                    <v-row class="pl-2 pr-2 pr-md-4" v-if="!loading && !hasAccount(activeAccountCategory)">
+                                    <v-row class="pl-5 pr-2 pr-md-4" v-if="!loading && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
                                             {{ $t('No available account') }}
                                         </v-col>
@@ -173,24 +173,18 @@
                                                                            :to="`/transaction/list?accountId=${accountOrSubAccountId(element)}`">
                                                                         {{ $t('Transaction List') }}
                                                                     </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                           :disabled="loading"
+                                                                           :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                                                           @click="hide(element, !element.hidden)">
+                                                                        {{ element.hidden ? $t('Show') : $t('Hide') }}
+                                                                    </v-btn>
+                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.edit"
                                                                            @click="edit(element)">
                                                                         {{ $t('Edit') }}
                                                                     </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                           :disabled="loading" :prepend-icon="icons.hide"
-                                                                           v-if="!element.hidden"
-                                                                           @click="hide(element, true)">
-                                                                        {{ $t('Hide') }}
-                                                                    </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
-                                                                           :disabled="loading" :prepend-icon="icons.show"
-                                                                           v-if="element.hidden"
-                                                                           @click="hide(element, false)">
-                                                                        {{ $t('Show') }}
-                                                                    </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-2" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.remove"
                                                                            @click="remove(element)">
                                                                         {{ $t('Delete') }}

@@ -104,15 +104,6 @@
 
                                         <v-spacer/>
 
-                                        <v-btn class="hover-display px-2" color="default"
-                                               density="comfortable" variant="text"
-                                               :prepend-icon="icons.edit"
-                                               :loading="tagUpdating[element.id]"
-                                               :disabled="loading || updating"
-                                               v-if="editingTag.id !== element.id"
-                                               @click="edit(element)">
-                                            {{ $t('Edit') }}
-                                        </v-btn>
                                         <v-btn class="hover-display px-2 ml-2" color="default"
                                                density="comfortable" variant="text"
                                                :prepend-icon="element.hidden ? icons.show : icons.hide"
@@ -122,7 +113,16 @@
                                                @click="hide(element, !element.hidden)">
                                             {{ element.hidden ? $t('Show') : $t('Hide') }}
                                         </v-btn>
-                                        <v-btn class="hover-display px-2 ml-2" color="default"
+                                        <v-btn class="hover-display px-2" color="default"
+                                               density="comfortable" variant="text"
+                                               :prepend-icon="icons.edit"
+                                               :loading="tagUpdating[element.id]"
+                                               :disabled="loading || updating"
+                                               v-if="editingTag.id !== element.id"
+                                               @click="edit(element)">
+                                            {{ $t('Edit') }}
+                                        </v-btn>
+                                        <v-btn class="hover-display px-2" color="default"
                                                density="comfortable" variant="text"
                                                :prepend-icon="icons.remove"
                                                :loading="tagRemoving[element.id]"
@@ -139,14 +139,14 @@
                                                v-if="editingTag.id === element.id" @click="save(editingTag)">
                                             {{ $t('Save') }}
                                         </v-btn>
-                                        <v-btn class="px-2 ml-2" color="default"
+                                        <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
                                                :prepend-icon="icons.cancel"
                                                :disabled="loading || updating"
                                                v-if="editingTag.id === element.id" @click="cancelSave(editingTag)">
                                             {{ $t('Cancel') }}
                                         </v-btn>
-                                        <span>
+                                        <span class="ml-2">
                                             <v-icon :class="!loading && !updating && availableTagCount > 1 ? 'drag-handle' : 'disabled'"
                                                     :icon="icons.drag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && availableTagCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
@@ -179,14 +179,14 @@
                                        @click="save(newTag)">
                                     {{ $t('Save') }}
                                 </v-btn>
-                                <v-btn class="px-2 ml-2" color="default"
+                                <v-btn class="px-2" color="default"
                                        density="comfortable" variant="text"
                                        :prepend-icon="icons.cancel"
                                        :disabled="loading || updating"
                                        @click="cancelSave(newTag)">
                                     {{ $t('Cancel') }}
                                 </v-btn>
-                                <span>
+                                <span class="ml-2">
                                     <v-icon class="disabled" :icon="icons.drag"/>
                                 </span>
                             </div>

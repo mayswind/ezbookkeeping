@@ -11,8 +11,9 @@
         </f7-toolbar>
         <f7-page-content>
             <f7-block class="margin-vertical no-padding">
-                <div class="grid grid-cols-7 padding-vertical-half padding-horizontal-half"
+                <div class="grid padding-vertical-half padding-horizontal-half"
                      :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
+                     :style="`grid-template-columns: repeat(${itemPerRow}, minmax(0, 1fr));`"
                      :key="idx" v-for="(row, idx) in allColorRows">
                     <div class="text-align-center" :key="colorInfo.color" v-for="colorInfo in row">
                         <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="colorInfo.color" @click="onColorClicked(colorInfo)">

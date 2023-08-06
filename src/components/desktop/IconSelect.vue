@@ -9,7 +9,7 @@
         v-model="icon"
         @update:menu="onMenuStateChanged"
     >
-        <template #selection="{ item }">
+        <template #selection>
             <v-label>
                 <ItemIcon icon-type="category" :icon-id="icon" :color="color" />
             </v-label>

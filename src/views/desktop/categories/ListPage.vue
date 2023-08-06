@@ -178,7 +178,7 @@
 </template>
 
 <script>
-import PresetCategoryDialog from './list/dialogs/PresetCategoryDialog.vue';
+import PresetCategoryDialog from './list/dialogs/PresetDialog.vue';
 
 import { useDisplay } from 'vuetify';
 

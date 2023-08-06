@@ -58,6 +58,8 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+    <snack-bar ref="snackbar" />
 </template>
 
 <script>

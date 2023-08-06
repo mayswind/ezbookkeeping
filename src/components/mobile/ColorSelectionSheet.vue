@@ -69,7 +69,6 @@ export default {
         onColorClicked(colorInfo) {
             this.currentValue = colorInfo.color;
             this.$emit('update:modelValue', this.currentValue);
-            this.$emit('update:show', false);
         },
         onSheetOpen(event) {
             this.currentValue = this.modelValue;

@@ -61,6 +61,7 @@
 
 <script>
 import { isArray } from '@/lib/common.js';
+import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -138,8 +139,8 @@ export default {
         onSheetOpen(event) {
             this.currentPrimaryValue = this.getPrimaryValueBySecondaryValue(this.modelValue);
             this.currentSecondaryValue = this.modelValue;
-            this.scrollToSelectedItem(event.$el, '.primary-list-container', 'li.primary-list-item-selected');
-            this.scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
+            scrollToSelectedItem(event.$el, '.primary-list-container', 'li.primary-list-item-selected');
+            scrollToSelectedItem(event.$el, '.secondary-list-container', 'li.secondary-list-item-selected');
         },
         onSheetClosed() {
             this.close();
@@ -215,27 +216,6 @@ export default {
             }
 
             return null;
-        },
-        scrollToSelectedItem(parent, containerSelector, selectedItemSelector) {
-            if (!parent || !parent.length) {
-                return;
-            }
-
-            const container = parent.find(containerSelector);
-            const selectedItem = parent.find(selectedItemSelector);
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
         },
         close() {
             this.$emit('update:show', false);

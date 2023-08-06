@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
+
 export default {
     props: [
         'modelValue',
@@ -92,7 +94,7 @@ export default {
         },
         onSheetOpen(event) {
             this.currentValue = this.modelValue;
-            this.scrollToSelectedItem(event.$el);
+            scrollToSelectedItem(event.$el, '.page-content', '.row-has-selected-item');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -109,27 +111,6 @@ export default {
             }
 
             return false;
-        },
-        scrollToSelectedItem(parent) {
-            if (!parent || !parent.length) {
-                return;
-            }
-
-            const container = parent.find('.page-content');
-            const selectedItem = parent.find('.row-has-selected-item');
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
         }
     }
 }

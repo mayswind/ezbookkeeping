@@ -435,7 +435,7 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
-import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
+import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -826,25 +826,7 @@ export default {
             });
         },
         scrollPopoverToSelectedItem(event) {
-            if (!event || !event.$el || !event.$el.length) {
-                return;
-            }
-
-            const container = event.$el.find('.popover-inner');
-            const selectedItem = event.$el.find('li.list-item-selected');
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
+            scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
         },
         getDisplayYearMonth(transactionMonthList) {
             return this.$locale.formatTimeToLongYearMonth(this.userStore, transactionMonthList.yearMonth);

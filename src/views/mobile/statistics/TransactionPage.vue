@@ -264,6 +264,7 @@ import {
     getShiftedDateRangeAndDateType,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
+import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -523,25 +524,7 @@ export default {
             this.f7router.navigate('/statistic/settings');
         },
         scrollPopoverToSelectedItem(event) {
-            if (!event || !event.$el || !event.$el.length) {
-                return;
-            }
-
-            const container = event.$el.find('.popover-inner');
-            const selectedItem = event.$el.find('li.list-item-selected');
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
+            scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
         },
         getDisplayAmount(amount, currency, textLimit) {
             amount = this.getDisplayCurrency(amount, currency);

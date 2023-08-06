@@ -40,6 +40,7 @@
 
 <script>
 import { isArray } from '@/lib/common.js';
+import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -101,7 +102,7 @@ export default {
     methods: {
         onSheetOpen(event) {
             this.currentValue = this.modelValue;
-            this.scrollToSelectedItem(event.$el);
+            scrollToSelectedItem(event.$el, '.page-content', '.treeview-item .treeview-item-selected');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -135,27 +136,6 @@ export default {
             } else {
                 return this.currentValue === subItem;
             }
-        },
-        scrollToSelectedItem(parent) {
-            if (!parent || !parent.length) {
-                return;
-            }
-
-            const container = parent.find('.page-content');
-            const selectedItem = parent.find('.treeview-item .treeview-item-selected');
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - selectedItem.outerHeight()) / 2;
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
         }
     }
 }

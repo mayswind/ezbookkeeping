@@ -139,3 +139,25 @@ export function getFontSizePreviewClassName(type) {
 
     return fontConstants.fontSizePreviewClassNamePrefix + fontConstants.defaultFontSize.className;
 }
+
+export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSelector) {
+    if (!parentEl || !parentEl.length) {
+        return;
+    }
+
+    const container = parentEl.find(containerSelector);
+    const selectedItem = parentEl.find(selectedItemSelector);
+
+    if (!container.length || !selectedItem.length) {
+        return;
+    }
+
+    let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+        - (container.outerHeight() - selectedItem.outerHeight()) / 2;
+
+    if (targetPos <= 0) {
+        return;
+    }
+
+    container.scrollTop(targetPos);
+}

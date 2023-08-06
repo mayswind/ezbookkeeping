@@ -351,7 +351,7 @@ import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType
 } from '@/lib/category.js';
-import { scrollToMenuListItem } from '@/lib/ui.desktop.js';
+import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
     mdiMagnify,
@@ -816,7 +816,7 @@ export default {
         },
         scrollMenuToSelectedItem(menu) {
             this.$nextTick(() => {
-                scrollToMenuListItem(menu.contentEl);
+                scrollToSelectedItem(menu.contentEl, 'div.v-list', 'div.v-list-item.list-item-selected');
             });
         },
         getDisplayTime(transaction) {

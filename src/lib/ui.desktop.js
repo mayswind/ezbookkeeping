@@ -19,19 +19,24 @@ export function getCssValue(element, name) {
     return computedStyle.getPropertyValue(name);
 }
 
-export function scrollToMenuListItem(listContentEl) {
-    if (!listContentEl) {
+export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSelector) {
+    if (!parentEl) {
         return;
     }
 
-    const lists = listContentEl.querySelectorAll('div.v-list');
+    let container = parentEl;
 
-    if (!lists.length || !lists[0]) {
-        return;
+    if (containerSelector) {
+        const lists = parentEl.querySelectorAll(containerSelector);
+
+        if (!lists.length || !lists[0]) {
+            return;
+        }
+
+        container = lists[0];
     }
 
-    const container = lists[0];
-    const selectedItems = container.querySelectorAll('div.v-list-item.list-item-selected');
+    const selectedItems = container.querySelectorAll(selectedItemSelector);
 
     if (!selectedItems.length || !selectedItems[0]) {
         return;

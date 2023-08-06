@@ -39,6 +39,7 @@ import { VSnackbar } from 'vuetify/components/VSnackbar';
 import { VSwitch } from 'vuetify/components/VSwitch';
 import { VTabs, VTab } from 'vuetify/components/VTabs';
 import { VTable } from 'vuetify/components/VTable';
+import { VTextarea } from 'vuetify/components/VTextarea';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VToolbar } from 'vuetify/components/VToolbar';
 import { VTooltip } from 'vuetify/components/VTooltip';
@@ -82,6 +83,8 @@ import PinCodeInput from '@/components/common/PinCodeInput.vue';
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
 import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
 import AmountInput from '@/components/desktop/AmountInput.vue';
+import ColorSelect from '@/components/desktop/ColorSelect.vue';
+import IconSelect from '@/components/desktop/IconSelect.vue';
 import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
@@ -162,6 +165,7 @@ const vuetify = createVuetify({
         VTabs,
         VTab,
         VTable,
+        VTextarea,
         VTextField,
         VToolbar,
         VTooltip,
@@ -392,6 +396,8 @@ app.component('PinCodeInput', PinCodeInput);
 app.component('ItemIcon', ItemIcon);
 app.component('BtnVerticalGroup', BtnVerticalGroup);
 app.component('AmountInput', AmountInput);
+app.component('ColorSelect', ColorSelect);
+app.component('IconSelect', IconSelect);
 app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);

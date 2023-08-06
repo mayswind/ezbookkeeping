@@ -170,7 +170,8 @@
         </v-col>
     </v-row>
 
-    <preset-category-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
+    <edit-dialog ref="editDialog" :persistent="true" />
+    <preset-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
                             @category:saved="presetCategorySaved" />
 
     <confirm-dialog ref="confirmDialog"/>
@@ -178,7 +179,8 @@
 </template>
 
 <script>
-import PresetCategoryDialog from './list/dialogs/PresetDialog.vue';
+import EditDialog from './list/dialogs/EditDialog.vue';
+import PresetDialog from './list/dialogs/PresetDialog.vue';
 
 import { useDisplay } from 'vuetify';
 
@@ -201,7 +203,8 @@ import {
 
 export default {
     components: {
-        PresetCategoryDialog
+        EditDialog,
+        PresetDialog
     },
     data() {
         const { mdAndUp } = useDisplay();
@@ -376,10 +379,36 @@ export default {
             });
         },
         add() {
+            const self = this;
 
+            self.$refs.editDialog.open({
+                type: self.activeCategoryType,
+                parentId: self.primaryCategoryId
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
-        edit() {
+        edit(category) {
+            const self = this;
 
+            self.$refs.editDialog.open({
+                id: category.id,
+                currentCategory: category
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
         hide(category, hidden) {
             const self = this;

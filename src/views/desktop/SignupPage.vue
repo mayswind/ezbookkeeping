@@ -124,6 +124,7 @@
                                         <v-autocomplete
                                             item-title="displayName"
                                             item-value="code"
+                                            auto-select-first
                                             :disabled="submitting"
                                             :label="$t('Default Currency')"
                                             :placeholder="$t('Default Currency')"

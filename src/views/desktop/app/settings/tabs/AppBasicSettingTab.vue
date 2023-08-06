@@ -25,6 +25,7 @@
                                 <v-autocomplete
                                     item-title="displayNameWithUtcOffset"
                                     item-value="name"
+                                    auto-select-first
                                     persistent-placeholder
                                     :label="$t('Timezone')"
                                     :placeholder="$t('Timezone')"

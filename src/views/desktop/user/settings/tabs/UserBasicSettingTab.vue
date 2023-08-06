@@ -137,6 +137,7 @@
                                 <v-autocomplete
                                     item-title="displayName"
                                     item-value="code"
+                                    auto-select-first
                                     persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Default Currency')"

@@ -9,12 +9,12 @@
                                 { name: $t('Expense'), value: allCategoryTypes.Expense },
                                 { name: $t('Income'), value: allCategoryTypes.Income },
                                 { name: $t('Transfer'), value: allCategoryTypes.Transfer }
-                            ]" v-model="activeCategoryType" @update:modelValue="switchActiveCategoryType" />
+                            ]" v-model="activeCategoryType" @update:modelValue="switchAllPrimaryCategories" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="primaryCategoryId">
-                            <v-tab class="tab-text-truncate" value="0" @click="primaryCategoryId = '0'">
+                            <v-tab class="tab-text-truncate" value="0" @click="switchAllPrimaryCategories">
                                 <span class="text-truncate">{{ $t('Primary Categories') }}</span>
                             </v-tab>
                             <template :key="category.id" v-for="category in primaryCategories">
@@ -191,7 +191,7 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
-import { getOuterHeight } from '@/lib/ui.desktop.js';
+import { getNavSideBarOuterHeight } from '@/lib/ui.desktop.js';
 
 import {
     mdiRefresh,
@@ -391,6 +391,8 @@ export default {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
                 }
+
+                self.updateCardMinHeight();
             }).catch(error => {
                 if (error) {
                     self.$refs.snackbar.showError(error);
@@ -407,6 +409,8 @@ export default {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
                 }
+
+                self.updateCardMinHeight();
             }).catch(error => {
                 if (error) {
                     self.$refs.snackbar.showError(error);
@@ -425,6 +429,8 @@ export default {
             }).then(() => {
                 self.updating = false;
                 self.categoryHiding[category.id] = false;
+
+                self.updateCardMinHeight();
             }).catch(error => {
                 self.updating = false;
                 self.categoryHiding[category.id] = false;
@@ -446,6 +452,8 @@ export default {
                 }).then(() => {
                     self.updating = false;
                     self.categoryRemoving[category.id] = false;
+
+                    self.updateCardMinHeight();
                 }).catch(error => {
                     self.updating = false;
                     self.categoryRemoving[category.id] = false;
@@ -462,16 +470,16 @@ export default {
                 this.reload(false);
             }
         },
-        switchActiveCategoryType() {
-            this.primaryCategoryId = '0';
-            this.updateCardMinHeight();
-        },
         isCategorySupportSwitch(category) {
             if (!category || category.hidden) {
                 return false;
             }
 
             return !category.parentId || category.parentId === '' || category.parentId === '0';
+        },
+        switchAllPrimaryCategories() {
+            this.primaryCategoryId = '0';
+            this.updateCardMinHeight();
         },
         switchPrimaryCategory(category) {
             if (!category || category.hidden) {
@@ -481,17 +489,16 @@ export default {
             if (!category.parentId || category.parentId === '' || category.parentId === '0') {
                 this.primaryCategoryId = category.id;
             }
+
+            this.updateCardMinHeight();
         },
         updateCardMinHeight() {
             const self = this
 
             self.$nextTick(() => {
                 if (self.$refs.navbar && self.$refs.navbar.$el && self.$refs.navbar.$el.nextElementSibling) {
-                    let navbarHeight = getOuterHeight(self.$refs.navbar.$el.nextElementSibling);
-
-                    if (navbarHeight > self.cardMinHeight) {
-                        self.cardMinHeight = navbarHeight;
-                    }
+                    let navbarHeight = getNavSideBarOuterHeight(self.$refs.navbar.$el.nextElementSibling);
+                    self.cardMinHeight = Math.max(navbarHeight, 680);
                 }
             });
         }

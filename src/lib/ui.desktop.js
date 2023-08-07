@@ -10,6 +10,32 @@ export function getOuterHeight(element) {
         .reduce((prev, cur) => prev + cur);
 }
 
+export function getNavSideBarOuterHeight(element) {
+    if (!element) {
+        return 0;
+    }
+
+    const contentEl = element.querySelectorAll('.v-navigation-drawer__content');
+
+    if (!contentEl || !contentEl[0]) {
+        return 0;
+    }
+
+    const children = contentEl[0].children;
+
+    if (!children || children.length < 1) {
+        return 0;
+    }
+
+    let totalHeight = 0;
+
+    for (let i = 0; i < children.length; i++) {
+        totalHeight += getOuterHeight(children[i]);
+    }
+
+    return totalHeight;
+}
+
 export function getCssValue(element, name) {
     if (!element) {
         return 0;

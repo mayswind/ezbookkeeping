@@ -122,7 +122,10 @@
                                                                 <ItemIcon icon-type="category"
                                                                           :icon-id="element.icon" :color="element.color"
                                                                           :hidden-status="element.hidden" />
-                                                                <span class="ml-2">{{ element.name }}</span>
+                                                                <div class="d-flex flex-column py-2">
+                                                                    <span class="ml-2">{{ element.name }}</span>
+                                                                    <span class="transaction-category-comment ml-2">{{ element.comment }}</span>
+                                                                </div>
                                                             </div>
 
                                                             <v-spacer/>
@@ -503,5 +506,10 @@ export default {
 
 .transaction-category-table tr.transaction-category-table-row:hover .hover-display {
     display: grid;
+}
+
+.transaction-category-table .transaction-category-comment {
+    font-size: 0.8rem;
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
 }
 </style>

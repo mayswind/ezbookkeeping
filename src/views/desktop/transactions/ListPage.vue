@@ -740,7 +740,9 @@ export default {
                 minTime: recentDateRange.minTime
             });
 
+            this.loading = true;
             this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
         changeCustomDateFilter(minTime, maxTime) {
@@ -756,7 +758,9 @@ export default {
 
             this.showCustomDateRangeDialog = false;
 
+            this.loading = true;
             this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
         changeTypeFilter(type) {
@@ -775,6 +779,9 @@ export default {
                 categoryId: removeCategoryFilter ? '0' : undefined
             });
 
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
         changeCategoryFilter(categoryId) {
@@ -786,6 +793,9 @@ export default {
                 categoryId: categoryId
             });
 
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
         changeAccountFilter(accountId) {
@@ -797,6 +807,9 @@ export default {
                 accountId: accountId
             });
 
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
         changeKeywordFilter(keyword) {

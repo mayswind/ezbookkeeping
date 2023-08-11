@@ -307,6 +307,11 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionsNextTimeId = 0;
             this.transactionListStateInvalid = true;
         },
+        clearTransactions() {
+            this.transactions = [];
+            this.transactionsNextTimeId = 0;
+            this.transactionListStateInvalid = true;
+        },
         initTransactionListFilter(filter) {
             if (filter && isNumber(filter.dateType)) {
                 this.transactionsFilter.dateType = filter.dateType;

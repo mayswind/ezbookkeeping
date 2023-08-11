@@ -1011,6 +1011,7 @@ export default {
     'Page Settings': 'Page Settings',
     'Overview Page': 'Overview Page',
     'Transaction List Page': 'Transaction List Page',
+    'Transactions Per Page': 'Transactions Per Page',
     'Show Monthly Total Amount': 'Show Monthly Total Amount',
     'Transaction Edit Page': 'Transaction Edit Page',
     'Automatically Add Geolocation': 'Automatically Add Geolocation',

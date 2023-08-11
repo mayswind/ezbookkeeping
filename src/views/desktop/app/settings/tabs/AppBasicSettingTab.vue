@@ -122,6 +122,15 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
+                                    persistent-placeholder
+                                    :label="$t('Transactions Per Page')"
+                                    :placeholder="$t('Transactions Per Page')"
+                                    :items="[ 5, 10, 15, 20, 25, 30, 50 ]"
+                                    v-model="itemsCountInTransactionListPage"
+                                />
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
@@ -262,6 +271,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setShowTotalAmountInTransactionListPage(value);
+            }
+        },
+        itemsCountInTransactionListPage: {
+            get: function () {
+                return this.settingsStore.appSettings.itemsCountInTransactionListPage;
+            },
+            set: function (value) {
+                this.settingsStore.setItemsCountInTransactionListPage(value);
             }
         },
         isAutoGetCurrentGeoLocation: {

@@ -15,6 +15,7 @@ const defaultSettings = {
     thousandsSeparator: true,
     currencyDisplayMode: currencyConstants.defaultCurrencyDisplayMode,
     showAmountInHomePage: true,
+    itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
     showAccountBalance: true,
     statistics: {
@@ -183,6 +184,14 @@ export function isShowAmountInHomePage() {
 
 export function setShowAmountInHomePage(value) {
     setOption('showAmountInHomePage', value);
+}
+
+export function getItemsCountInTransactionListPage() {
+    return getOption('itemsCountInTransactionListPage');
+}
+
+export function setItemsCountInTransactionListPage(value) {
+    setOption('itemsCountInTransactionListPage', value);
 }
 
 export function isShowTotalAmountInTransactionListPage() {

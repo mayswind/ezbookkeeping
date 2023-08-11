@@ -14,6 +14,13 @@
                             ]" v-model="query.type" @update:modelValue="changeTypeFilter" />
                         </div>
                         <v-divider />
+                        <div class="mx-6 mt-4">
+                            <small>{{ $t('Transactions Per Page') }}</small>
+                            <v-select class="mt-2" density="compact" :disabled="loading"
+                                      :items="[ 5, 10, 15, 20, 25, 30, 50 ]"
+                                      v-model="countPerPage"
+                            />
+                        </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="recentDateRangeType">
                             <v-tab class="tab-text-truncate" :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
@@ -25,7 +32,7 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="transactionPage">
-                                <v-card variant="flat" min-height="830">
+                                <v-card variant="flat" min-height="920">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center text-no-wrap">
                                             <v-btn class="mr-3 d-md-none" density="compact" color="default" variant="plain"
@@ -220,7 +227,7 @@
                                         </thead>
 
                                         <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
-                                        <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]">
+                                        <tr :key="itemIdx" v-for="itemIdx in skeletonData">
                                             <td class="px-0" colspan="5">
                                                 <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>
@@ -383,10 +390,10 @@ export default {
             updating: false,
             activeTab: 'transactionPage',
             currentPage: 1,
-            countPerPage: 15,
+            temporaryCountPerPage: null,
+            totalCount: 1,
             searchKeyword: '',
             currentPageTransactions: [],
-            totalPageCount: 1,
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
             showCustomDateRangeDialog: false,
@@ -465,6 +472,31 @@ export default {
         queryMonthlyData() {
             return isDateRangeMatchOneMonth(this.query.minTime, this.query.maxTime);
         },
+        countPerPage: {
+            get: function () {
+                if (this.temporaryCountPerPage) {
+                    return this.temporaryCountPerPage;
+                }
+
+                return this.settingsStore.appSettings.itemsCountInTransactionListPage;
+            },
+            set: function(value) {
+                const newTotalPageCount = Math.ceil(this.totalCount / value);
+
+                if (this.currentPage > newTotalPageCount) {
+                    this.currentPage = newTotalPageCount;
+                }
+
+                this.temporaryCountPerPage = value;
+
+                if (!this.queryMonthlyData) {
+                    this.reload(false);
+                }
+            }
+        },
+        totalPageCount() {
+            return Math.ceil(this.totalCount / this.countPerPage);
+        },
         paginationCurrentPage: {
             get: function () {
                 return this.currentPage;
@@ -476,6 +508,15 @@ export default {
                     this.reload(false);
                 }
             }
+        },
+        skeletonData() {
+            const data = [];
+
+            for (let i = 0; i < this.countPerPage; i++) {
+                data.push(i);
+            }
+
+            return data;
         },
         currentMonthTransactionData() {
             const allTransactions = this.transactionsStore.transactions;
@@ -665,7 +706,7 @@ export default {
                 self.currentPageTransactions = data && data.items && data.items.length ? data.items : [];
 
                 if (page <= 1) {
-                    self.totalPageCount = data && data.totalCount ? Math.ceil(data.totalCount / this.countPerPage) : 1;
+                    self.totalCount = data && data.totalCount ? data.totalCount : 1;
                 }
 
                 if (force) {
@@ -674,7 +715,7 @@ export default {
             }).catch(error => {
                 self.loading = false;
                 self.currentPageTransactions = [];
-                self.totalPageCount = 1;
+                self.totalCount = 1;
 
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
@@ -699,6 +740,7 @@ export default {
                 minTime: recentDateRange.minTime
             });
 
+            this.currentPageTransactions = [];
             this.$router.push(this.getFilterLinkUrl());
         },
         changeCustomDateFilter(minTime, maxTime) {
@@ -714,6 +756,7 @@ export default {
 
             this.showCustomDateRangeDialog = false;
 
+            this.currentPageTransactions = [];
             this.$router.push(this.getFilterLinkUrl());
         },
         changeTypeFilter(type) {
@@ -743,7 +786,6 @@ export default {
                 categoryId: categoryId
             });
 
-            this.showCategoryPopover = false;
             this.$router.push(this.getFilterLinkUrl());
         },
         changeAccountFilter(accountId) {

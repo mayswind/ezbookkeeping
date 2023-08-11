@@ -17,6 +17,7 @@ export const useSettingsStore = defineStore('settings', {
             thousandsSeparator: settings.isEnableThousandsSeparator(),
             currencyDisplayMode: settings.getCurrencyDisplayMode(),
             showAmountInHomePage: settings.isShowAmountInHomePage(),
+            itemsCountInTransactionListPage: settings.getItemsCountInTransactionListPage(),
             showTotalAmountInTransactionListPage: settings.isShowTotalAmountInTransactionListPage(),
             showAccountBalance: settings.isShowAccountBalance(),
             statistics: {
@@ -74,6 +75,10 @@ export const useSettingsStore = defineStore('settings', {
         setShowAmountInHomePage(value) {
             settings.setShowAmountInHomePage(value);
             this.appSettings.showAmountInHomePage = value;
+        },
+        setItemsCountInTransactionListPage(value) {
+            settings.setItemsCountInTransactionListPage(value);
+            this.appSettings.itemsCountInTransactionListPage = value;
         },
         setShowTotalAmountInTransactionListPage(value) {
             settings.setShowTotalAmountInTransactionListPage(value);

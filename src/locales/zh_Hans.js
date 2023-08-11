@@ -1011,6 +1011,7 @@ export default {
     'Page Settings': '页面设置',
     'Overview Page': '总览页面',
     'Transaction List Page': '交易列表页面',
+    'Transactions Per Page': '每页交易数',
     'Show Monthly Total Amount': '显示月度总金额',
     'Transaction Edit Page': '交易编辑页面',
     'Automatically Add Geolocation': '自动添加地理位置',

@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="ellipsis" v-if="!editAccountId && account.type === allAccountTypes.MultiSubAccounts" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': editAccountId || account.type !== allAccountTypes.MultiSubAccounts }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': isInputEmpty() || submitting }" :text="$t(saveButtonTitle)" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -584,11 +584,11 @@ export default {
         addSubAccount() {
             const self = this;
 
-            if (self.account.type !== this.allAccountTypes.MultiSubAccounts) {
+            if (self.account.type !== self.allAccountTypes.MultiSubAccounts) {
                 return;
             }
 
-            this.subAccounts.push({
+            self.subAccounts.push({
                 category: null,
                 type: null,
                 name: '',

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="600" :persistent="!!persistent" v-model="showState">
+    <v-dialog scrollable width="600" max-height="600" :persistent="!!persistent" v-model="showState">
         <v-card>
             <v-toolbar color="primary">
                 <v-toolbar-title>
@@ -38,6 +38,7 @@
                         <v-textarea
                             type="text"
                             persistent-placeholder
+                            rows="3"
                             :disabled="loading || submitting"
                             :label="$t('Description')"
                             :placeholder="$t('Your category description (optional)')"

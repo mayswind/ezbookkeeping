@@ -11,7 +11,7 @@
     >
         <template #selection>
             <v-label>
-                <ItemIcon icon-type="category" :icon-id="icon" :color="color" />
+                <ItemIcon :icon-type="iconType" :icon-id="icon" :color="color" />
             </v-label>
         </template>
 
@@ -48,6 +48,7 @@ export default {
         'modelValue',
         'disabled',
         'label',
+        'iconType',
         'color',
         'columnCount',
         'allIconInfos'

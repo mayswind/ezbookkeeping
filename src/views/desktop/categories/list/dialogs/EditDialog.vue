@@ -21,7 +21,8 @@
                         />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <icon-select :all-icon-infos="allCategoryIcons"
+                        <icon-select icon-type="category"
+                                     :all-icon-infos="allCategoryIcons"
                                       :label="$t('Category Icon')"
                                       :color="category.color"
                                       :disabled="loading || submitting"
@@ -263,7 +264,7 @@ export default {
         setCategory(category) {
             this.category.id = category.id;
             this.category.type = category.type;
-            this.category.parentId = category.type.parentId;
+            this.category.parentId = category.parentId;
             this.category.name = category.name;
             this.category.icon = category.icon;
             this.category.color = category.color;

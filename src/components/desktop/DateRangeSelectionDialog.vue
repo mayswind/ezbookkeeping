@@ -1,19 +1,23 @@
 <template>
-    <v-dialog width="460" :persistent="!!persistent" v-model="showState">
-        <v-card>
-            <v-toolbar color="primary">
-                <v-toolbar-title>{{ title }}</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text class="pa-4">
-                <p v-if="hint">{{ hint }}</p>
-                <span v-if="beginDateTime && endDateTime">
+    <v-dialog class="date-range-selection-dialog" width="640" :persistent="!!persistent" v-model="showState">
+        <v-card class="pa-2 pa-sm-4 pa-md-4">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <h5 class="text-h5">{{ $t(title) }}</h5>
+                </div>
+            </template>
+            <template #subtitle>
+                <div class="text-body-1 text-center text-wrap mt-6">
+                    <p v-if="hint">{{ hint }}</p>
+                    <span v-if="beginDateTime && endDateTime">
                     <span>{{ beginDateTime }}</span>
                     <span> - </span>
                     <span>{{ endDateTime }}</span>
                 </span>
-                <slot></slot>
-            </v-card-text>
-            <v-card-text class="pa-4 w-100 d-flex justify-center">
+                    <slot></slot>
+                </div>
+            </template>
+            <v-card-text class="mb-md-4 w-100 d-flex justify-center">
                 <vue-date-picker range inline enable-seconds auto-apply
                                  ref="datetimepicker"
                                  month-name-format="long"
@@ -35,11 +39,12 @@
                     </template>
                 </vue-date-picker>
             </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="gray" @click="cancel">{{ $t('Cancel') }}</v-btn>
-                <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ $t('OK') }}</v-btn>
-            </v-card-actions>
+            <v-card-text class="overflow-y-visible">
+                <div class="w-100 d-flex justify-center gap-4">
+                    <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ $t('OK') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                </div>
+            </v-card-text>
         </v-card>
     </v-dialog>
 </template>
@@ -196,3 +201,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.date-range-selection-dialog .dp__preset_ranges {
+    white-space: nowrap !important;
+}
+</style>

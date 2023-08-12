@@ -22,6 +22,10 @@ input[type=number] {
     pointer-events: none !important;
 }
 
+.overflow-y-visible {
+    overflow-y: visible !important;
+}
+
 .drag-handle {
     cursor: grab;
 }

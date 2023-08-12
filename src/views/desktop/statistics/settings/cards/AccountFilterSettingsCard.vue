@@ -1,30 +1,30 @@
 <template>
-    <v-card>
-        <v-toolbar color="primary" v-if="dialogMode">
-            <v-toolbar-title>{{ $t('Default Account Filter') }}</v-toolbar-title>
-            <v-spacer/>
-            <v-btn density="comfortable" color="default" variant="text" class="ml-2"
-                   :disabled="loading || !hasAnyAvailableAccount" :icon="true">
-                <v-icon :icon="icons.more" />
-                <v-menu activator="parent">
-                    <v-list>
-                        <v-list-item :prepend-icon="icons.selectAll"
-                                     :title="$t('Select All')"
-                                     @click="selectAll"></v-list-item>
-                        <v-list-item :prepend-icon="icons.selectNone"
-                                     :title="$t('Select None')"
-                                     @click="selectNone"></v-list-item>
-                        <v-list-item :prepend-icon="icons.selectInverse"
-                                     :title="$t('Invert Selection')"
-                                     @click="selectInvert"></v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-btn>
-        </v-toolbar>
-
-        <template #title v-if="!dialogMode">
-            <div class="d-flex align-center">
-                <span>{{ $t('Default Account Filter') }}</span>
+    <v-card :class="{ 'pa-2 pa-sm-4 pa-md-8': dialogMode }">
+        <template #title>
+            <div class="d-flex align-center justify-center" v-if="dialogMode">
+                <div class="w-100 text-center">
+                    <h5 class="text-h5">{{ $t(title) }}</h5>
+                </div>
+                <v-btn density="comfortable" color="default" variant="text" class="ml-2"
+                       :disabled="loading || !hasAnyAvailableAccount" :icon="true">
+                    <v-icon :icon="icons.more" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="icons.selectAll"
+                                         :title="$t('Select All')"
+                                         @click="selectAll"></v-list-item>
+                            <v-list-item :prepend-icon="icons.selectNone"
+                                         :title="$t('Select None')"
+                                         @click="selectNone"></v-list-item>
+                            <v-list-item :prepend-icon="icons.selectInverse"
+                                         :title="$t('Invert Selection')"
+                                         @click="selectInvert"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+            </div>
+            <div class="d-flex align-center" v-else-if="!dialogMode">
+                <span>{{ $t(title) }}</span>
                 <v-spacer/>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading" :icon="true">
@@ -51,11 +51,11 @@
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
         </div>
 
-        <v-card-text v-if="!loading && !hasAnyAvailableAccount">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyAvailableAccount">
             <span class="text-body-1">{{ $t('No available account') }}</span>
         </v-card-text>
 
-        <v-card-text v-else-if="!loading && hasAnyAvailableAccount">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyAvailableAccount">
             <v-expansion-panels class="account-categories" multiple v-model="expandAccountCategories">
                 <v-expansion-panel :key="accountCategory.category"
                                    :value="accountCategory.category"
@@ -112,11 +112,12 @@
             </v-expansion-panels>
         </v-card-text>
 
-        <v-card-actions class="mt-3" v-if="dialogMode">
-            <v-spacer></v-spacer>
-            <v-btn color="gray" @click="cancel">{{ $t('Cancel') }}</v-btn>
-            <v-btn color="primary" :disabled="!hasAnyAvailableAccount" @click="save">{{ $t('OK') }}</v-btn>
-        </v-card-actions>
+        <v-card-text class="overflow-y-visible" v-if="dialogMode">
+            <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+                <v-btn :disabled="!hasAnyAvailableAccount" @click="save">{{ $t(applyText) }}</v-btn>
+                <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
+            </div>
+        </v-card-text>
     </v-card>
 </template>
 

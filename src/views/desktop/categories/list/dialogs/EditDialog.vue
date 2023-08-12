@@ -1,64 +1,68 @@
 <template>
-    <v-dialog scrollable width="600" max-height="600" :persistent="!!persistent" v-model="showState">
-        <v-card>
-            <v-toolbar color="primary">
-                <v-toolbar-title>
-                    <span>{{ $t(title) }}</span>
+    <v-dialog width="800" max-height="600" :persistent="!!persistent" v-model="showState">
+        <v-card class="pa-2 pa-sm-4 pa-md-8">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <h5 class="text-h5">{{ $t(title) }}</h5>
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
-                </v-toolbar-title>
-            </v-toolbar>
-            <v-card-text class="px-5 pt-7 pb-5">
-                <v-row>
-                    <v-col cols="12" md="12">
-                        <v-text-field
-                            type="text"
-                            clearable
-                            persistent-placeholder
-                            :disabled="loading || submitting"
-                            :label="$t('Category Name')"
-                            :placeholder="$t('Category Name')"
-                            v-model="category.name"
-                        />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                        <icon-select icon-type="category"
-                                     :all-icon-infos="allCategoryIcons"
-                                      :label="$t('Category Icon')"
-                                      :color="category.color"
-                                      :disabled="loading || submitting"
-                                      v-model="category.icon" />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                        <color-select :all-color-infos="allCategoryColors"
-                                     :label="$t('Category Color')"
-                                     :disabled="loading || submitting"
-                                     v-model="category.color" />
-                    </v-col>
-                    <v-col cols="12" md="12">
-                        <v-textarea
-                            type="text"
-                            persistent-placeholder
-                            rows="3"
-                            :disabled="loading || submitting"
-                            :label="$t('Description')"
-                            :placeholder="$t('Your category description (optional)')"
-                            v-model="category.comment"
-                        />
-                    </v-col>
-                    <v-col class="pt-0" cols="12" md="12" v-if="editCategoryId">
-                        <v-switch inset :disabled="loading || submitting"
-                                  :label="$t('Visible')" v-model="category.visible"/>
-                    </v-col>
-                </v-row>
+                </div>
+            </template>
+            <v-card-text>
+                <v-form class="mt-2 mt-md-6">
+                    <v-row>
+                        <v-col cols="12" md="12">
+                            <v-text-field
+                                type="text"
+                                clearable
+                                persistent-placeholder
+                                :disabled="loading || submitting"
+                                :label="$t('Category Name')"
+                                :placeholder="$t('Category Name')"
+                                v-model="category.name"
+                            />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <icon-select icon-type="category"
+                                         :all-icon-infos="allCategoryIcons"
+                                          :label="$t('Category Icon')"
+                                          :color="category.color"
+                                          :disabled="loading || submitting"
+                                          v-model="category.icon" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <color-select :all-color-infos="allCategoryColors"
+                                         :label="$t('Category Color')"
+                                         :disabled="loading || submitting"
+                                         v-model="category.color" />
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-textarea
+                                type="text"
+                                persistent-placeholder
+                                rows="3"
+                                :disabled="loading || submitting"
+                                :label="$t('Description')"
+                                :placeholder="$t('Your category description (optional)')"
+                                v-model="category.comment"
+                            />
+                        </v-col>
+                        <v-col class="py-0" cols="12" md="12" v-if="editCategoryId">
+                            <v-switch inset :disabled="loading || submitting"
+                                      :label="$t('Visible')" v-model="category.visible"/>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="gray" :disabled="loading || submitting" @click="cancel">{{ $t('Cancel') }}</v-btn>
-                <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
-                    {{ $t(saveButtonTitle) }}
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
-                </v-btn>
-            </v-card-actions>
+            <v-card-text class="overflow-y-visible">
+                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+                    <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
+                        {{ $t(saveButtonTitle) }}
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                    </v-btn>
+                    <v-btn color="secondary" variant="tonal"
+                           :disabled="loading || submitting" @click="cancel">{{ $t('Cancel') }}</v-btn>
+                </div>
+            </v-card-text>
         </v-card>
     </v-dialog>
 

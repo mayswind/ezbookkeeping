@@ -1,10 +1,12 @@
 <template>
-    <v-dialog scrollable width="600" max-height="600" :persistent="!!persistent" v-model="showState">
-        <v-card>
-            <v-toolbar color="primary">
-                <v-toolbar-title>{{ $t('Default Categories') }}</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text class="preset-transaction-categories pb-4">
+    <v-dialog scrollable width="800" max-height="600" :persistent="!!persistent" v-model="showState">
+        <v-card class="pa-2 pa-sm-4 pa-md-8">
+            <template #title>
+                <div class="d-flex align-center justify-center">
+                    <h5 class="text-h5">{{ $t('Default Categories') }}</h5>
+                </div>
+            </template>
+            <v-card-text class="preset-transaction-categories mt-0 mt-sm-2 mt-md-4 pb-4">
                 <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                     <div class="d-flex align-center mb-1">
                         <h4>{{ getCategoryTypeName(categoryType) }}</h4>
@@ -48,14 +50,16 @@
                     </v-expansion-panels>
                 </template>
             </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="gray" :disabled="submitting" @click="showState = false">{{ $t('Cancel') }}</v-btn>
-                <v-btn :disabled="submitting" @click="save">
-                    {{ $t('Save') }}
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
-                </v-btn>
-            </v-card-actions>
+            <v-card-text class="overflow-y-visible">
+                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+                    <v-btn :disabled="submitting" @click="save">
+                        {{ $t('Save') }}
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                    </v-btn>
+                    <v-btn color="secondary" density="default" variant="tonal"
+                           :disabled="submitting" @click="showState = false">{{ $t('Cancel') }}</v-btn>
+                </div>
+            </v-card-text>
         </v-card>
     </v-dialog>
 

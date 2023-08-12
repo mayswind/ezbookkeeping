@@ -167,6 +167,35 @@ export function limitText(value, maxLength) {
     return value.substring(0, maxLength - 3) + '...';
 }
 
+export function getTextBefore(fullText, text) {
+    if (!text) {
+        return fullText;
+    }
+
+    const index = fullText.indexOf(text);
+
+    if (index >= 0) {
+        return fullText.substring(0, index);
+    }
+
+    return '';
+}
+
+export function getTextAfter(fullText, text) {
+    if (!text) {
+        return fullText;
+    }
+
+    let index = fullText.indexOf(text);
+
+    if (index >= 0) {
+        index += text.length;
+        return fullText.substring(index);
+    }
+
+    return '';
+}
+
 export function base64encode(arrayBuffer) {
     if (!arrayBuffer || arrayBuffer.length === 0) {
         return null;

@@ -176,16 +176,19 @@
                                                                     <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading"
                                                                            :prepend-icon="element.hidden ? icons.show : icons.hide"
+                                                                           v-if="!activeSubAccount[element.id]"
                                                                            @click="hide(element, !element.hidden)">
                                                                         {{ element.hidden ? $t('Show') : $t('Hide') }}
                                                                     </v-btn>
                                                                     <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.edit"
+                                                                           v-if="!activeSubAccount[element.id]"
                                                                            @click="edit(element)">
                                                                         {{ $t('Edit') }}
                                                                     </v-btn>
                                                                     <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.remove"
+                                                                           v-if="!activeSubAccount[element.id]"
                                                                            @click="remove(element)">
                                                                         {{ $t('Delete') }}
                                                                     </v-btn>
@@ -208,11 +211,15 @@
         </v-col>
     </v-row>
 
+    <edit-dialog ref="editDialog" :persistent="true" />
+
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script>
+import EditDialog from './list/dialogs/EditDialog.vue';
+
 import { useDisplay } from 'vuetify';
 
 import { mapStores } from 'pinia';
@@ -243,6 +250,9 @@ import {
 } from '@mdi/js';
 
 export default {
+    components: {
+        EditDialog
+    },
     data() {
         const { mdAndUp } = useDisplay();
 
@@ -470,10 +480,39 @@ export default {
             });
         },
         add() {
+            const self = this;
 
+            self.$refs.editDialog.open({
+                category: self.activeAccountCategoryId
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
-        edit() {
+        edit(account) {
+            const self = this;
 
+            self.$refs.editDialog.open({
+                id: account.id,
+                currentAccount: account
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+
+                if (self.accountsStore.accountListStateInvalid && !self.loading) {
+                    self.reload(false);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
         hide(account, hidden) {
             const self = this;

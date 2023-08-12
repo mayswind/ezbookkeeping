@@ -1,17 +1,34 @@
 <template>
-    <v-text-field type="number" :class="extraClass" :density="density" :disabled="disabled"
+    <v-text-field type="number" :class="extraClass"
+                  :density="density" :disabled="disabled"
+                  :label="label"
+                  :placeholder="placeholder"
+                  :persistent-placeholder="persistentPlaceholder"
                   :rules="enableRules ? rules : []" v-model="value"
-                  @keydown="onKeyUpDown" @keyup="onKeyUpDown"
-    ></v-text-field>
+                  @keydown="onKeyUpDown" @keyup="onKeyUpDown">
+        <template #prepend-inner v-if="currency && prependText">
+            <div style="margin-top: 2px">{{ prependText }}</div>
+        </template>
+        <template #append-inner v-if="currency && appendText">
+            <div class="text-no-wrap">{{ appendText }}</div>
+        </template>
+    </v-text-field>
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useSettingsStore } from '@/stores/setting.js';
+
 import transactionConstants from '@/consts/transaction.js';
 
 export default {
     props: [
         'class',
         'density',
+        'currency',
+        'label',
+        'placeholder',
+        'persistentPlaceholder',
         'disabled',
         'enableRules',
         'modelValue'
@@ -40,6 +57,7 @@ export default {
         }
     },
     computed: {
+        ...mapStores(useSettingsStore),
         value: {
             get: function () {
                 return this.modelValue;
@@ -50,6 +68,32 @@ export default {
         },
         extraClass() {
             return this.class;
+        },
+        prependText() {
+            if (!this.currency) {
+                return '';
+            }
+
+            const texts = this.getDisplayCurrencyPrependAndAppendText();
+
+            if (!texts) {
+                return '';
+            }
+
+            return texts.prependText;
+        },
+        appendText() {
+            if (!this.currency) {
+                return '';
+            }
+
+            const texts = this.getDisplayCurrencyPrependAndAppendText();
+
+            if (!texts) {
+                return '';
+            }
+
+            return texts.appendText;
         }
     },
     methods: {
@@ -95,6 +139,9 @@ export default {
             } catch (e) {
                 e.target.value = 0;
             }
+        },
+        getDisplayCurrencyPrependAndAppendText() {
+            return this.$locale.getDisplayCurrencyPrependAndAppendText(this.currency, this.settingsStore.appSettings.currencyDisplayMode);
         }
     }
 }

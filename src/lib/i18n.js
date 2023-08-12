@@ -4,12 +4,15 @@ import { defaultLanguage, allLanguages } from '@/locales/index.js';
 import datetime from '@/consts/datetime.js';
 import timezone from '@/consts/timezone.js';
 import currency from '@/consts/currency.js';
+import account from '@/consts/account.js';
 import category from '@/consts/category.js';
 import statistics from '@/consts/statistics.js';
 
 import {
     isString,
     isNumber,
+    getTextBefore,
+    getTextAfter,
     copyArrayTo
 } from './common.js';
 
@@ -685,6 +688,37 @@ function getDateRangeDisplayName(userStore, dateType, startTime, endTime, transl
     return `${displayStartTime} ~ ${displayEndTime}`;
 }
 
+function getAllAccountCategories(translateFn) {
+    const allAccountCategories = [];
+
+    for (let i = 0; i < account.allCategories.length; i++) {
+        const accountCategory = account.allCategories[i];
+
+        allAccountCategories.push({
+            id: accountCategory.id,
+            displayName: translateFn(accountCategory.name),
+            defaultAccountIconId: accountCategory.defaultAccountIconId
+        });
+    }
+
+    return allAccountCategories;
+}
+
+function getAllAccountTypes(translateFn) {
+    const allAccountTypes = [];
+
+    for (let i = 0; i < account.allAccountTypesArray.length; i++) {
+        const accountType = account.allAccountTypesArray[i];
+
+        allAccountTypes.push({
+            id: accountType.id,
+            displayName: translateFn(accountType.name)
+        });
+    }
+
+    return allAccountTypes;
+}
+
 function getAllStatisticsChartDataTypes(translateFn) {
     const allChartDataTypes = [];
 
@@ -889,6 +923,37 @@ function getDisplayCurrency(value, currencyCode, options, translateFn) {
     } else {
         return value;
     }
+}
+
+function getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMode, translateFn) {
+    const options = {
+        currencyDisplayMode: currencyDisplayMode,
+        notConvertValue: true
+    };
+
+    const placeholder = '***';
+    const finalText = getDisplayCurrency(placeholder, currencyCode, options, translateFn);
+
+    if (!finalText) {
+        return null;
+    }
+
+    let prependText = getTextBefore(finalText, placeholder);
+
+    if (prependText) {
+        prependText = prependText.trim();
+    }
+
+    let appendText = getTextAfter(finalText, placeholder);
+
+    if (appendText) {
+        appendText = appendText.trim();
+    }
+
+    return {
+        prependText: prependText,
+        appendText: appendText
+    };
 }
 
 function joinMultiText(textArray, translateFn) {
@@ -1123,6 +1188,8 @@ export function i18nFunctions(i18nGlobal) {
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
+        getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
+        getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
@@ -1130,6 +1197,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
+        getDisplayCurrencyPrependAndAppendText: (currencyCode, currencyDisplayMode) => getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMode, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),

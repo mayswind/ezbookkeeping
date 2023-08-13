@@ -40,6 +40,7 @@
 
 <script>
 import { arrayContainsFieldvalue } from '@/lib/common.js';
+import { getColorsInRows } from '@/lib/color.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
@@ -71,20 +72,7 @@ export default {
     },
     computed: {
         allColorRows() {
-            const ret = [];
-            let rowCount = -1;
-
-            for (let i = 0; i < this.allColorInfos.length; i++) {
-                if (i % this.itemPerRow === 0) {
-                    ret[++rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    color: this.allColorInfos[i]
-                });
-            }
-
-            return ret;
+            return getColorsInRows(this.allColorInfos, this.itemPerRow);
         },
         color: {
             get: function () {

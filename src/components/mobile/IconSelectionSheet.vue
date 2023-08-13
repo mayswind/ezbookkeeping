@@ -30,6 +30,7 @@
 
 <script>
 import { arrayContainsFieldvalue } from '@/lib/common.js';
+import { getIconsInRows } from '@/lib/icon.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -54,30 +55,7 @@ export default {
     },
     computed: {
         allIconRows() {
-            const ret = [];
-            let rowCount = 0;
-
-            for (let iconInfoId in this.allIconInfos) {
-                if (!Object.prototype.hasOwnProperty.call(this.allIconInfos, iconInfoId)) {
-                    continue;
-                }
-
-                const iconInfo = this.allIconInfos[iconInfoId];
-
-                if (!ret[rowCount]) {
-                    ret[rowCount] = [];
-                } else if (ret[rowCount] && ret[rowCount].length >= this.itemPerRow) {
-                    rowCount++;
-                    ret[rowCount] = [];
-                }
-
-                ret[rowCount].push({
-                    id: iconInfoId,
-                    icon: iconInfo.icon
-                });
-            }
-
-            return ret;
+            return getIconsInRows(this.allIconInfos, this.itemPerRow);
         },
         heightClass() {
             if (this.allIconRows.length > 10) {

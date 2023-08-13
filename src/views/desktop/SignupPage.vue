@@ -268,7 +268,7 @@ import {
 export default {
     data() {
         const userStore = useUserStore();
-        const newUser = userStore.generateNewUserInfo(this.$locale.getCurrentLanguageCode());
+        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageCode());
 
         return {
             user: newUser,

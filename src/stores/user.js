@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', {
         }
     },
     actions: {
-        generateNewUserInfo(language) {
+        generateNewUserModel(language) {
             const settingsStore = useSettingsStore();
 
             return {

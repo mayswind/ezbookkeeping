@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Account List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" v-if="!sortable && allAccountCount" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !allAccountCount }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link href="/account/add" icon-f7="plus" v-if="!sortable"></f7-link>
                 <f7-link :text="$t('Done')" :class="{ 'disabled': displayOrderSaving }" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
@@ -38,21 +38,29 @@
             </f7-card-header>
         </f7-card>
 
-        <f7-list strong inset dividers class="account-list margin-vertical skeleton-text"
-                 :key="listIdx" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
-            <f7-list-item group-title>
-                <small>Account Category</small>
-            </f7-list-item>
-            <f7-list-item class="nested-list-item" after="0.00 USD" link="#"
-                          :key="itemIdx" v-for="itemIdx in (listIdx === 1 ? [ 1 ] : [ 1, 2 ])">
-                <template #title>
-                    <div class="display-flex padding-top-half padding-bottom-half">
+        <div class="skeleton-text" :key="listIdx" v-for="listIdx in [ 1, 2, 3 ]" v-if="loading">
+            <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical">
+                <f7-list-item group-title :sortable="false">
+                    <small>
+                        <span>Account Category</span>
+                        <span style="margin-left: 10px">0.00 USD</span>
+                    </small>
+                </f7-list-item>
+                <f7-list-item class="nested-list-item" after="0.00 USD" link="#"
+                              :key="itemIdx" v-for="itemIdx in (listIdx === 1 ? [ 1 ] : [ 1, 2 ])">
+                    <template #media>
                         <f7-icon f7="app_fill"></f7-icon>
-                        <div class="nested-list-item-title">Account Name</div>
-                    </div>
-                </template>
-            </f7-list-item>
-        </f7-list>
+                    </template>
+                    <template #title>
+                        <div class="display-flex padding-top-half padding-bottom-half">
+                            <div class="nested-list-item-title">
+                                <span>Account Name</span>
+                            </div>
+                        </div>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </div>
 
         <f7-list strong inset dividers class="margin-vertical" v-if="!loading && noAvailableAccount">
             <f7-list-item :title="$t('No available account')"></f7-list-item>

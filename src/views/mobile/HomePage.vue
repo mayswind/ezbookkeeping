@@ -8,7 +8,7 @@
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
                     <span class="card-header-content" v-if="loading">
-                        <span class="home-summary-month">MM</span>
+                        <span class="home-summary-month">Month</span>
                         <span>·</span>
                         <small>Expense</small>
                     </span>

@@ -23,9 +23,8 @@
                 @click="showAccountCategorySheet = true"
             >
                 <list-item-selection-sheet value-type="item"
-                                           key-field="id" value-field="id" title-field="name"
+                                           key-field="id" value-field="id" title-field="displayName"
                                            icon-field="defaultAccountIconId" icon-type="account"
-                                           :title-i18n="true"
                                            :items="allAccountCategories"
                                            v-model:show="showAccountCategorySheet"
                                            v-model="account.category">
@@ -41,9 +40,8 @@
                 @click="showAccountTypeSheet = true"
             >
                 <list-item-selection-sheet value-type="item"
-                                           key-field="id" value-field="id" title-field="name"
+                                           key-field="id" value-field="id" title-field="displayName"
                                            :items="allAccountTypesArray"
-                                           :title-i18n="true"
                                            v-model:show="showAccountTypeSheet"
                                            v-model="account.type">
                 </list-item-selection-sheet>
@@ -481,10 +479,10 @@ export default {
             return accountConstants.allAccountTypes;
         },
         allAccountCategories() {
-            return accountConstants.allCategories;
+            return this.$locale.getAllAccountCategories();
         },
         allAccountTypesArray() {
-            return accountConstants.allAccountTypesArray;
+            return this.$locale.getAllAccountTypes();
         },
         allAccountIcons() {
             return iconConstants.allAccountIcons;
@@ -642,12 +640,10 @@ export default {
             return this.$locale.getCurrencyName(currencyCode);
         },
         getAccountTypeName(accountType) {
-            const typeName = getNameByKeyValue(this.allAccountTypesArray, accountType, 'id', 'name');
-            return this.$t(typeName);
+            return getNameByKeyValue(this.allAccountTypesArray, accountType, 'id', 'displayName');
         },
         getAccountCategoryName(accountCategory) {
-            const categoryName = getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'name');
-            return this.$t(categoryName);
+            return getNameByKeyValue(this.allAccountCategories, accountCategory, 'id', 'displayName');
         },
         getAccountBalance(account) {
             return this.getDisplayCurrency(account.balance, account.currency);

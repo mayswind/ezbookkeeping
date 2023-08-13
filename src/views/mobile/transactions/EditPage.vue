@@ -350,7 +350,6 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getUtcOffsetByUtcOffsetMinutes,
-    getDummyUnixTimeForLocalUsage,
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
 import {
@@ -358,11 +357,12 @@ import {
     getAllFilteredAccountsBalance
 } from '@/lib/account.js';
 import {
-    categoryTypeToTransactionType,
     getTransactionPrimaryCategoryName,
-    getTransactionSecondaryCategoryName
+    getTransactionSecondaryCategoryName,
+    getFirstAvailableCategoryId
 } from '@/lib/category.js';
 import { getMapProvider } from '@/lib/server_settings.js';
+import { setTransactionModelByTransaction } from '@/lib/transaction.js';
 
 export default {
     props: [
@@ -535,7 +535,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableIncomeCategories() {
@@ -543,7 +543,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableTransferCategories() {
@@ -551,7 +551,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
             return firstAvailableCategoryId !== '';
         },
         sourceAccountName() {
@@ -693,119 +693,21 @@ export default {
                 return;
             }
 
-            if ((!query.type || query.type === '0') && query.categoryId && query.categoryId !== '0' && self.allCategoriesMap[query.categoryId]) {
-                const category = self.allCategoriesMap[query.categoryId];
-                const type = categoryTypeToTransactionType(category.type);
-
-                if (isNumber(type)) {
-                    self.transaction.type = type;
-                }
-            }
-
-            if (self.allCategories[self.allCategoryTypes.Expense] &&
-                self.allCategories[self.allCategoryTypes.Expense].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Expense], query.categoryId)) {
-                    self.transaction.expenseCategory = query.categoryId;
-                }
-
-                if (!self.transaction.expenseCategory) {
-                    self.transaction.expenseCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Expense]);
-                }
-            }
-
-            if (self.allCategories[self.allCategoryTypes.Income] &&
-                self.allCategories[self.allCategoryTypes.Income].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Income], query.categoryId)) {
-                    self.transaction.incomeCategory = query.categoryId;
-                }
-
-                if (!self.transaction.incomeCategory) {
-                    self.transaction.incomeCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Income]);
-                }
-            }
-
-            if (self.allCategories[self.allCategoryTypes.Transfer] &&
-                self.allCategories[self.allCategoryTypes.Transfer].length) {
-                if (query.categoryId && query.categoryId !== '0' && self.isCategoryIdAvailable(self.allCategories[self.allCategoryTypes.Transfer], query.categoryId)) {
-                    self.transaction.transferCategory = query.categoryId;
-                }
-
-                if (!self.transaction.transferCategory) {
-                    self.transaction.transferCategory = self.getFirstAvailableCategoryId(self.allCategories[self.allCategoryTypes.Transfer]);
-                }
-            }
-
-            if (self.allVisibleAccounts.length) {
-                if (query.accountId && query.accountId !== '0') {
-                    for (let i = 0; i < self.allVisibleAccounts.length; i++) {
-                        if (self.allVisibleAccounts[i].id === query.accountId) {
-                            self.transaction.sourceAccountId = query.accountId;
-                            self.transaction.destinationAccountId = query.accountId;
-                            break;
-                        }
-                    }
-                }
-
-                if (!self.transaction.sourceAccountId) {
-                    if (self.defaultAccountId && self.allAccountsMap[self.defaultAccountId]) {
-                        self.transaction.sourceAccountId = self.defaultAccountId;
-                    } else {
-                        self.transaction.sourceAccountId = self.allVisibleAccounts[0].id;
-                    }
-                }
-
-                if (!self.transaction.destinationAccountId) {
-                    if (self.defaultAccountId && self.allAccountsMap[self.defaultAccountId]) {
-                        self.transaction.destinationAccountId = self.defaultAccountId;
-                    } else {
-                        self.transaction.destinationAccountId = self.allVisibleAccounts[0].id;
-                    }
-                }
-            }
-
-            if (query.id) {
-                const transaction = responses[3];
-
-                if (self.mode === 'edit') {
-                    self.transaction.id = transaction.id;
-                }
-
-                self.transaction.type = transaction.type;
-
-                if (self.transaction.type === self.allTransactionTypes.Expense) {
-                    self.transaction.expenseCategory = transaction.categoryId;
-                } else if (self.transaction.type === self.allTransactionTypes.Income) {
-                    self.transaction.incomeCategory = transaction.categoryId;
-                } else if (self.transaction.type === self.allTransactionTypes.Transfer) {
-                    self.transaction.transferCategory = transaction.categoryId;
-                }
-
-                if (self.mode === 'edit' || self.mode === 'view') {
-                    self.transaction.utcOffset = transaction.utcOffset;
-                    self.transaction.timeZone = null;
-                    self.transaction.time = getDummyUnixTimeForLocalUsage(transaction.time, self.transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
-                }
-
-                self.transaction.sourceAccountId = transaction.sourceAccountId;
-
-                if (transaction.destinationAccountId) {
-                    self.transaction.destinationAccountId = transaction.destinationAccountId;
-                }
-
-                self.transaction.sourceAmount = transaction.sourceAmount;
-
-                if (transaction.destinationAmount) {
-                    self.transaction.destinationAmount = transaction.destinationAmount;
-                }
-
-                self.transaction.hideAmount = transaction.hideAmount;
-                self.transaction.tagIds = transaction.tagIds || [];
-                self.transaction.comment = transaction.comment;
-
-                if (self.mode === 'edit' || self.mode === 'view') {
-                    self.transaction.geoLocation = transaction.geoLocation;
-                }
-            }
+            setTransactionModelByTransaction(
+                self.transaction,
+                query.id ? responses[3] : null,
+                self.allCategories,
+                self.allCategoriesMap,
+                self.allVisibleAccounts,
+                self.allAccountsMap,
+                self.defaultAccountId,
+                {
+                    type: query.type,
+                    categoryId: query.categoryId,
+                    accountId: query.accountId
+                },
+                (self.mode !== 'edit' && self.mode !== 'view')
+            );
 
             self.loading = false;
         }).catch(error => {
@@ -947,32 +849,6 @@ export default {
         clearGeoLocation() {
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
-        },
-        isCategoryIdAvailable(categories, categoryId) {
-            if (!categories || !categories.length) {
-                return false;
-            }
-
-            for (let i = 0; i < categories.length; i++) {
-                for (let j = 0; j < categories[i].subCategories.length; j++) {
-                    if (categories[i].subCategories[j].id === categoryId) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        },
-        getFirstAvailableCategoryId(categories) {
-            if (!categories || !categories.length) {
-                return '';
-            }
-
-            for (let i = 0; i < categories.length; i++) {
-                for (let j = 0; j < categories[i].subCategories.length; j++) {
-                    return categories[i].subCategories[j].id;
-                }
-            }
         },
         getFontClassByAmount(amount) {
             if (amount >= 100000000 || amount <= -100000000) {

@@ -116,6 +116,34 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
     return ret;
 }
 
+export function isCategoryIdAvailable(categories, categoryId) {
+    if (!categories || !categories.length) {
+        return false;
+    }
+
+    for (let i = 0; i < categories.length; i++) {
+        for (let j = 0; j < categories[i].subCategories.length; j++) {
+            if (categories[i].subCategories[j].id === categoryId) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+export function getFirstAvailableCategoryId(categories) {
+    if (!categories || !categories.length) {
+        return '';
+    }
+
+    for (let i = 0; i < categories.length; i++) {
+        for (let j = 0; j < categories[i].subCategories.length; j++) {
+            return categories[i].subCategories[j].id;
+        }
+    }
+}
+
 export function hasAnyAvailableCategory(allVisibleTransactionCategories) {
     for (let type in allVisibleTransactionCategories) {
         if (!Object.prototype.hasOwnProperty.call(allVisibleTransactionCategories, type)) {

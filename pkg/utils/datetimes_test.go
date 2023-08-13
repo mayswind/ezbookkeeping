@@ -35,9 +35,36 @@ func TestFormatUnixTimeToYearMonth(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestParseFromLongDateTimeToMinUnixTime(t *testing.T) {
+	expectedValue := int64(1690797600)
+	actualTime, err := ParseFromLongDateTimeToMinUnixTime("2023-08-01 00:00:00")
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromLongDateTimeToMaxUnixTime(t *testing.T) {
+	expectedValue := int64(1690891200)
+	actualTime, err := ParseFromLongDateTimeToMaxUnixTime("2023-08-01 00:00:00")
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestParseFromLongDateTime(t *testing.T) {
 	expectedValue := int64(1617228083)
 	actualTime, err := ParseFromLongDateTime("2021-04-01 06:01:23", 480)
+	assert.Equal(t, nil, err)
+
+	actualValue := actualTime.Unix()
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromLongDateTimeWithoutSecond(t *testing.T) {
+	expectedValue := int64(1691947440)
+	actualTime, err := ParseFromLongDateTimeWithoutSecond("2023-08-13 17:24", time.UTC)
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()
@@ -51,6 +78,14 @@ func TestParseFromShortDateTime(t *testing.T) {
 
 	actualValue := actualTime.Unix()
 	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsUnixTimeEqualsYearAndMonth(t *testing.T) {
+	actualValue := IsUnixTimeEqualsYearAndMonth(1691947440, time.UTC, 2023, 8)
+	assert.Equal(t, true, actualValue)
+
+	actualValue = IsUnixTimeEqualsYearAndMonth(1690847999, time.UTC, 2023, 8)
+	assert.Equal(t, false, actualValue)
 }
 
 func TestGetTimezoneOffsetMinutes(t *testing.T) {

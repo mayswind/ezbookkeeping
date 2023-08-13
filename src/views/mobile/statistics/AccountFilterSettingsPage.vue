@@ -121,7 +121,15 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import accountConstants from '@/consts/account.js';
 import { copyObjectTo } from '@/lib/common.js';
-import { getVisibleCategorizedAccounts } from '@/lib/account.js';
+import {
+    getVisibleCategorizedAccounts,
+    selectAccountOrSubAccounts,
+    selectAll,
+    selectNone,
+    selectInvert,
+    isAccountOrSubAccountsAllChecked,
+    isAccountOrSubAccountsHasButNotAllChecked
+} from '@/lib/account.js';
 
 export default {
     props: [
@@ -240,18 +248,7 @@ export default {
                 return;
             }
 
-            if (account.type === this.allAccountTypes.SingleAccount) {
-                this.filterAccountIds[account.id] = !e.target.checked;
-            } else if (account.type === this.allAccountTypes.MultiSubAccounts) {
-                if (!account.subAccounts || !account.subAccounts.length) {
-                    return;
-                }
-
-                for (let i = 0; i < account.subAccounts.length; i++) {
-                    const subAccount = account.subAccounts[i];
-                    this.filterAccountIds[subAccount.id] = !e.target.checked;
-                }
-            }
+            selectAccountOrSubAccounts(this.filterAccountIds, account, !e.target.checked);
         },
         selectAccount(e) {
             const accountId = e.target.value;
@@ -264,76 +261,22 @@ export default {
             this.filterAccountIds[account.id] = !e.target.checked;
         },
         selectAll() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = false;
-                }
-            }
+            selectAll(this.filterAccountIds, this.accountsStore.allAccountsMap);
         },
         selectNone() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = true;
-                }
-            }
+            selectNone(this.filterAccountIds, this.accountsStore.allAccountsMap);
         },
         selectInvert() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = !this.filterAccountIds[account.id];
-                }
-            }
+            selectInvert(this.filterAccountIds, this.accountsStore.allAccountsMap);
         },
         isAccountChecked(account, filterAccountIds) {
             return !filterAccountIds[account.id];
         },
         isAccountOrSubAccountsAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return !filterAccountIds[account.id];
-            }
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (filterAccountIds[subAccount.id]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isAccountOrSubAccountsAllChecked(account, filterAccountIds);
         },
         isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return false;
-            }
-
-            let checkedCount = 0;
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (!filterAccountIds[subAccount.id]) {
-                    checkedCount++;
-                }
-            }
-
-            return checkedCount > 0 && checkedCount < account.subAccounts.length;
+            return isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds);
         },
         getCollapseStates() {
             const collapseStates = {};

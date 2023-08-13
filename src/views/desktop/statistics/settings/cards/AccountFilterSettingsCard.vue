@@ -129,7 +129,15 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import accountConstants from '@/consts/account.js';
 import { copyObjectTo } from '@/lib/common.js';
-import { getVisibleCategorizedAccounts } from '@/lib/account.js';
+import {
+    getVisibleCategorizedAccounts,
+    selectAccountOrSubAccounts,
+    selectAll,
+    selectNone,
+    selectInvert,
+    isAccountOrSubAccountsAllChecked,
+    isAccountOrSubAccountsHasButNotAllChecked
+} from '@/lib/account.js';
 
 import {
     mdiSelectAll,
@@ -248,18 +256,7 @@ export default {
             this.$emit('settings:change', false);
         },
         selectAccountOrSubAccounts(account, value) {
-            if (account.type === this.allAccountTypes.SingleAccount) {
-                this.filterAccountIds[account.id] = !value;
-            } else if (account.type === this.allAccountTypes.MultiSubAccounts) {
-                if (!account.subAccounts || !account.subAccounts.length) {
-                    return;
-                }
-
-                for (let i = 0; i < account.subAccounts.length; i++) {
-                    const subAccount = account.subAccounts[i];
-                    this.filterAccountIds[subAccount.id] = !value;
-                }
-            }
+            selectAccountOrSubAccounts(this.filterAccountIds, account, !value);
 
             if (this.autoSave) {
                 this.save();
@@ -273,51 +270,21 @@ export default {
             }
         },
         selectAll() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = false;
-                }
-            }
+            selectAll(this.filterAccountIds, this.accountsStore.allAccountsMap);
 
             if (this.autoSave) {
                 this.save();
             }
         },
         selectNone() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = true;
-                }
-            }
+            selectNone(this.filterAccountIds, this.accountsStore.allAccountsMap);
 
             if (this.autoSave) {
                 this.save();
             }
         },
         selectInvert() {
-            for (let accountId in this.filterAccountIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterAccountIds, accountId)) {
-                    continue;
-                }
-
-                const account = this.accountsStore.allAccountsMap[accountId];
-
-                if (account && account.type === this.allAccountTypes.SingleAccount) {
-                    this.filterAccountIds[account.id] = !this.filterAccountIds[account.id];
-                }
-            }
+            selectInvert(this.filterAccountIds, this.accountsStore.allAccountsMap);
 
             if (this.autoSave) {
                 this.save();
@@ -327,34 +294,10 @@ export default {
             return !filterAccountIds[account.id];
         },
         isAccountOrSubAccountsAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return !filterAccountIds[account.id];
-            }
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (filterAccountIds[subAccount.id]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isAccountOrSubAccountsAllChecked(account, filterAccountIds);
         },
         isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
-            if (!account.subAccounts) {
-                return false;
-            }
-
-            let checkedCount = 0;
-
-            for (let i = 0; i < account.subAccounts.length; i++) {
-                const subAccount = account.subAccounts[i];
-                if (!filterAccountIds[subAccount.id]) {
-                    checkedCount++;
-                }
-            }
-
-            return checkedCount > 0 && checkedCount < account.subAccounts.length;
+            return isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds);
         }
     }
 }

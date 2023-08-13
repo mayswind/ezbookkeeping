@@ -214,3 +214,92 @@ export function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter
 
     return ret;
 }
+
+export function selectAccountOrSubAccounts(filterAccountIds, account, value) {
+    if (account.type === accountConstants.allAccountTypes.SingleAccount) {
+        filterAccountIds[account.id] = value;
+    } else if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+        if (!account.subAccounts || !account.subAccounts.length) {
+            return;
+        }
+
+        for (let i = 0; i < account.subAccounts.length; i++) {
+            const subAccount = account.subAccounts[i];
+            filterAccountIds[subAccount.id] = value;
+        }
+    }
+}
+
+export function selectAll(filterAccountIds, allAccountsMap) {
+    for (let accountId in filterAccountIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
+            continue;
+        }
+
+        const account = allAccountsMap[accountId];
+
+        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+            filterAccountIds[account.id] = false;
+        }
+    }
+}
+
+export function selectNone(filterAccountIds, allAccountsMap) {
+    for (let accountId in filterAccountIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
+            continue;
+        }
+
+        const account = allAccountsMap[accountId];
+
+        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+            filterAccountIds[account.id] = true;
+        }
+    }
+}
+
+export function selectInvert(filterAccountIds, allAccountsMap) {
+    for (let accountId in filterAccountIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterAccountIds, accountId)) {
+            continue;
+        }
+
+        const account = allAccountsMap[accountId];
+
+        if (account && account.type === accountConstants.allAccountTypes.SingleAccount) {
+            filterAccountIds[account.id] = !filterAccountIds[account.id];
+        }
+    }
+}
+
+export function isAccountOrSubAccountsAllChecked(account, filterAccountIds) {
+    if (!account.subAccounts) {
+        return !filterAccountIds[account.id];
+    }
+
+    for (let i = 0; i < account.subAccounts.length; i++) {
+        const subAccount = account.subAccounts[i];
+        if (filterAccountIds[subAccount.id]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds) {
+    if (!account.subAccounts) {
+        return false;
+    }
+
+    let checkedCount = 0;
+
+    for (let i = 0; i < account.subAccounts.length; i++) {
+        const subAccount = account.subAccounts[i];
+        if (!filterAccountIds[subAccount.id]) {
+            checkedCount++;
+        }
+    }
+
+    return checkedCount > 0 && checkedCount < account.subAccounts.length;
+}

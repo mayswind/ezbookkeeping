@@ -331,6 +331,20 @@ export function copyArrayTo(fromArray, toArray) {
     return toArray;
 }
 
+export function arrayContainsFieldvalue(array, fieldName, value) {
+    if (!value || !array || !array.length) {
+        return false;
+    }
+
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][fieldName] === value) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export function categoriedArrayToPlainArray(object) {
     const ret = [];
 

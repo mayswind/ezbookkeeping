@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { arrayContainsFieldvalue } from '@/lib/common.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -81,17 +82,7 @@ export default {
             this.$emit('update:show', false);
         },
         hasSelectedIcon(row) {
-            if (!this.currentValue || !row || !row.length) {
-                return false;
-            }
-
-            for (let i = 0; i < row.length; i++) {
-                if (row[i].id === this.currentValue) {
-                    return true;
-                }
-            }
-
-            return false;
+            return arrayContainsFieldvalue(row, 'id', this.currentValue);
         }
     }
 }

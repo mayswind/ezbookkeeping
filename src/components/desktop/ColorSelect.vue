@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { arrayContainsFieldvalue } from '@/lib/common.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
@@ -96,17 +97,7 @@ export default {
     },
     methods: {
         hasSelectedIcon(row) {
-            if (!this.modelValue || !row || !row.length) {
-                return false;
-            }
-
-            for (let i = 0; i < row.length; i++) {
-                if (row[i].id === this.modelValue) {
-                    return true;
-                }
-            }
-
-            return false;
+            return arrayContainsFieldvalue(row, 'id', this.modelValue);
         },
         onMenuStateChanged(state) {
             const self = this;

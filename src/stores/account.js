@@ -4,6 +4,9 @@ import { useUserStore } from './user.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
 import accountConstants from '@/consts/account.js';
+import currencyConstants from '@/consts/currency.js';
+import iconConstants from '@/consts/icon.js';
+import colorConstants from '@/consts/color.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isNumber, isEquals } from '@/lib/common.js';
@@ -249,6 +252,36 @@ export const useAccountsStore = defineStore('accounts', {
         }
     },
     actions: {
+        generateNewAccountModel() {
+            const userStore = useUserStore();
+
+            return {
+                category: 1,
+                type: accountConstants.allAccountTypes.SingleAccount,
+                name: '',
+                icon: iconConstants.defaultAccountIconId,
+                color: colorConstants.defaultAccountColor,
+                currency: userStore.currentUserDefaultCurrency,
+                balance: 0,
+                comment: '',
+                visible: true
+            };
+        },
+        generateNewSubAccountModel(parentAccount) {
+            const userStore = useUserStore();
+
+            return {
+                category: null,
+                type: null,
+                name: '',
+                icon: parentAccount.icon,
+                color: parentAccount.color,
+                currency: userStore.currentUserDefaultCurrency,
+                balance: 0,
+                comment: '',
+                visible: true
+            };
+        },
         updateAccountListInvalidState(invalidState) {
             this.accountListStateInvalid = invalidState;
         },
@@ -703,24 +736,67 @@ export const useAccountsStore = defineStore('accounts', {
                 });
             });
         },
-        saveAccount({ account }) {
+        saveAccount({ account, subAccounts, isEdit, isFloatBalance }) {
             const self = this;
-            const oldAccount = account.id ? self.allAccountsMap[account.id] : null;
+
+            const submitSubAccounts = [];
+
+            if (account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
+                for (let i = 0; i < subAccounts.length; i++) {
+                    const subAccount = subAccounts[i];
+                    const submitAccount = {
+                        category: account.category,
+                        type: accountConstants.allAccountTypes.SingleAccount,
+                        name: subAccount.name,
+                        icon: subAccount.icon,
+                        color: subAccount.color,
+                        currency: subAccount.currency,
+                        balance: isFloatBalance ? subAccount.balance * 100 : subAccount.balance,
+                        comment: subAccount.comment
+                    };
+
+                    if (isEdit) {
+                        submitAccount.id = subAccount.id;
+                        submitAccount.hidden = !subAccount.visible;
+                    }
+
+                    submitSubAccounts.push(submitAccount);
+                }
+            }
+
+            const submitAccount = {
+                category: account.category,
+                type: account.type,
+                name: account.name,
+                icon: account.icon,
+                color: account.color,
+                currency: account.type === accountConstants.allAccountTypes.SingleAccount ? account.currency : currencyConstants.parentAccountCurrencyPlaceholder,
+                balance: account.type === accountConstants.allAccountTypes.SingleAccount ? (isFloatBalance ? account.balance * 100 : account.balance) : 0,
+                comment: account.comment,
+                subAccounts: account.type === accountConstants.allAccountTypes.SingleAccount ? null : submitSubAccounts,
+            };
+
+            if (isEdit) {
+                submitAccount.id = account.id;
+                submitAccount.hidden = !account.visible;
+            }
+
+            const oldAccount = submitAccount.id ? self.allAccountsMap[submitAccount.id] : null;
 
             return new Promise((resolve, reject) => {
                 let promise = null;
 
-                if (!account.id) {
-                    promise = services.addAccount(account);
+                if (!submitAccount.id) {
+                    promise = services.addAccount(submitAccount);
                 } else {
-                    promise = services.modifyAccount(account);
+                    promise = services.modifyAccount(submitAccount);
                 }
 
                 promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        if (!account.id) {
+                        if (!submitAccount.id) {
                             reject({ message: 'Unable to add account' });
                         } else {
                             reject({ message: 'Unable to save account' });
@@ -728,7 +804,7 @@ export const useAccountsStore = defineStore('accounts', {
                         return;
                     }
 
-                    if (!account.id) {
+                    if (!submitAccount.id) {
                         addAccountToAccountList(self, data.result);
                     } else {
                         if (oldAccount && oldAccount.category === data.result.category) {
@@ -745,7 +821,7 @@ export const useAccountsStore = defineStore('accounts', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        if (!account.id) {
+                        if (!submitAccount.id) {
                             reject({ message: 'Unable to add account' });
                         } else {
                             reject({ message: 'Unable to save account' });

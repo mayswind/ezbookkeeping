@@ -1,5 +1,18 @@
 import accountConstants from '@/consts/account.js';
 
+export function setAccountModelByAnotherAccount(account, account2) {
+    account.id = account2.id;
+    account.category = account2.category;
+    account.type = account2.type;
+    account.name = account2.name;
+    account.icon = account2.icon;
+    account.color = account2.color;
+    account.currency = account2.currency;
+    account.balance = account2.balance;
+    account.comment = account2.comment;
+    account.visible = !account2.hidden;
+}
+
 export function getAccountCategoryInfo(categoryId) {
     for (let i = 0; i < accountConstants.allCategories.length; i++) {
         if (accountConstants.allCategories[i].id === categoryId) {
@@ -302,4 +315,22 @@ export function isAccountOrSubAccountsHasButNotAllChecked(account, filterAccount
     }
 
     return checkedCount > 0 && checkedCount < account.subAccounts.length;
+}
+
+export function setAccountSuitableIcon(account, oldCategory, newCategory) {
+    for (let i = 0; i < accountConstants.allCategories.length; i++) {
+        if (accountConstants.allCategories[i].id === oldCategory) {
+            if (account.icon !== accountConstants.allCategories[i].defaultAccountIconId) {
+                return;
+            } else {
+                break;
+            }
+        }
+    }
+
+    for (let i = 0; i < accountConstants.allCategories.length; i++) {
+        if (accountConstants.allCategories[i].id === newCategory) {
+            account.icon = accountConstants.allCategories[i].defaultAccountIconId;
+        }
+    }
 }

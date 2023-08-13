@@ -422,7 +422,6 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
-import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
 import accountConstants from '@/consts/account.js';
@@ -431,6 +430,10 @@ import colorConstants from '@/consts/color.js';
 import currencyConstants from '@/consts/currency.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import {
+    setAccountModelByAnotherAccount,
+    setAccountSuitableIcon
+} from '@/lib/account.js';
 
 export default {
     props: [
@@ -438,26 +441,17 @@ export default {
         'f7router'
     ],
     data() {
-        const userStore = useUserStore();
+        const accountsStore = useAccountsStore();
+        const newAccount = accountsStore.generateNewAccountModel();
+        newAccount.showIconSelectionSheet = false;
+        newAccount.showColorSelectionSheet = false;
+        newAccount.showBalanceSheet = false;
 
         return {
             editAccountId: null,
             loading: false,
             loadingError: null,
-            account: {
-                category: 1,
-                type: accountConstants.allAccountTypes.SingleAccount,
-                name: '',
-                icon: iconConstants.defaultAccountIconId,
-                color: colorConstants.defaultAccountColor,
-                currency: userStore.currentUserDefaultCurrency,
-                balance: 0,
-                comment: '',
-                visible: true,
-                showIconSelectionSheet: false,
-                showColorSelectionSheet: false,
-                showBalanceSheet: false
-            },
+            account: newAccount,
             subAccounts: [],
             subAccountToDelete: null,
             submitting: false,
@@ -468,7 +462,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore),
+        ...mapStores(useSettingsStore, useAccountsStore),
         title() {
             if (!this.editAccountId) {
                 return 'Add Account';
@@ -530,37 +524,18 @@ export default {
             self.accountsStore.getAccount({
                 accountId: self.editAccountId
             }).then(account => {
-                self.account.id = account.id;
-                self.account.category = account.category;
-                self.account.type = account.type;
-                self.account.name = account.name;
-                self.account.icon = account.icon;
-                self.account.color = account.color;
-                self.account.currency = account.currency;
-                self.account.balance = account.balance;
-                self.account.comment = account.comment;
-                self.account.visible = !account.hidden;
+                setAccountModelByAnotherAccount(self.account, account);
                 self.subAccounts = [];
 
                 if (account.subAccounts && account.subAccounts.length > 0) {
                     for (let i = 0; i < account.subAccounts.length; i++) {
-                        const subAccount = account.subAccounts[i];
+                        const subAccount = self.accountsStore.generateNewSubAccountModel(self.account);
+                        setAccountModelByAnotherAccount(subAccount, account.subAccounts[i]);
+                        subAccount.showIconSelectionSheet = false;
+                        subAccount.showColorSelectionSheet = false;
+                        subAccount.showBalanceSheet = false;
 
-                        self.subAccounts.push({
-                            id: subAccount.id,
-                            category: subAccount.category,
-                            type: subAccount.type,
-                            name: subAccount.name,
-                            icon: subAccount.icon,
-                            color: subAccount.color,
-                            currency: subAccount.currency,
-                            balance: subAccount.balance,
-                            comment: subAccount.comment,
-                            visible: !subAccount.hidden,
-                            showIconSelectionSheet: false,
-                            showColorSelectionSheet: false,
-                            showBalanceSheet: false
-                        });
+                        self.subAccounts.push(subAccount);
                     }
                 }
 
@@ -582,26 +557,16 @@ export default {
             this.$routeBackOnError(this.f7router, 'loadingError');
         },
         addSubAccount() {
-            const self = this;
-
-            if (self.account.type !== self.allAccountTypes.MultiSubAccounts) {
+            if (this.account.type !== this.allAccountTypes.MultiSubAccounts) {
                 return;
             }
 
-            self.subAccounts.push({
-                category: null,
-                type: null,
-                name: '',
-                icon: self.account.icon,
-                color: self.account.color,
-                currency: self.userStore.currentUserDefaultCurrency,
-                balance: 0,
-                comment: '',
-                visible: true,
-                showIconSelectionSheet: false,
-                showColorSelectionSheet: false,
-                showBalanceSheet: false
-            });
+            const subAccount = this.accountsStore.generateNewSubAccountModel(this.account);
+            subAccount.showIconSelectionSheet = false;
+            subAccount.showColorSelectionSheet = false;
+            subAccount.showBalanceSheet = false;
+
+            this.subAccounts.push(subAccount);
         },
         removeSubAccount(subAccount, confirm) {
             if (!subAccount) {
@@ -648,50 +613,11 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            const subAccounts = [];
-
-            if (self.account.type === self.allAccountTypes.MultiSubAccounts) {
-                for (let i = 0; i < self.subAccounts.length; i++) {
-                    const subAccount = self.subAccounts[i];
-                    const submitAccount = {
-                        category: self.account.category,
-                        type: self.allAccountTypes.SingleAccount,
-                        name: subAccount.name,
-                        icon: subAccount.icon,
-                        color: subAccount.color,
-                        currency: subAccount.currency,
-                        balance: subAccount.balance,
-                        comment: subAccount.comment
-                    };
-
-                    if (self.editAccountId) {
-                        submitAccount.id = subAccount.id;
-                        submitAccount.hidden = !subAccount.visible;
-                    }
-
-                    subAccounts.push(submitAccount);
-                }
-            }
-
-            const submitAccount = {
-                category: self.account.category,
-                type: self.account.type,
-                name: self.account.name,
-                icon: self.account.icon,
-                color: self.account.color,
-                currency: self.account.type === self.allAccountTypes.SingleAccount ? self.account.currency : currencyConstants.parentAccountCurrencyPlaceholder,
-                balance: self.account.type === self.allAccountTypes.SingleAccount ? self.account.balance : 0,
-                comment: self.account.comment,
-                subAccounts: self.account.type === self.allAccountTypes.SingleAccount ? null : subAccounts,
-            };
-
-            if (self.editAccountId) {
-                submitAccount.id = self.account.id;
-                submitAccount.hidden = !self.account.visible;
-            }
-
             self.accountsStore.saveAccount({
-                account: submitAccount
+                account: self.account,
+                subAccounts: self.subAccounts,
+                isEdit: !!self.editAccountId,
+                isFloatBalance: false
             }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();
@@ -733,21 +659,7 @@ export default {
             });
         },
         chooseSuitableIcon(oldCategory, newCategory) {
-            for (let i = 0; i < this.allAccountCategories.length; i++) {
-                if (this.allAccountCategories[i].id === oldCategory) {
-                    if (this.account.icon !== this.allAccountCategories[i].defaultAccountIconId) {
-                        return;
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            for (let i = 0; i < this.allAccountCategories.length; i++) {
-                if (this.allAccountCategories[i].id === newCategory) {
-                    this.account.icon = this.allAccountCategories[i].defaultAccountIconId;
-                }
-            }
+            setAccountSuitableIcon(this.account, oldCategory, newCategory);
         },
         isInputEmpty() {
             const isAccountEmpty = !!this.getInputEmptyProblemMessage(this.account, false);

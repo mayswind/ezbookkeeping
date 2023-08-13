@@ -19,7 +19,7 @@
                 </div>
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex align-center justify-center">
-                <v-card variant="flat" class="mt-12 mt-sm-0 pa-4" max-width="500">
+                <v-card variant="flat" class="mt-0 pa-4" max-width="500">
                     <v-card-text>
                         <h5 class="text-h5 mb-3">{{ $t('Welcome to ezBookkeeping') }}</h5>
                         <p class="mb-0">{{ $t('Please log in with your ezBookkeeping account') }}</p>

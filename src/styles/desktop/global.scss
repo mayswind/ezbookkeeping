@@ -98,6 +98,12 @@ input[type=number] {
     background-color: rgb(var(--v-theme-surface));
 }
 
+@media (max-width: 959px) and (max-height: 669px) {
+    .auth-card {
+        padding-top: 64px !important;
+    }
+}
+
 .auth-img-footer {
     position: absolute;
     inset-block-end: 0;

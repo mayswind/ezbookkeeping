@@ -347,7 +347,6 @@ import {
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
-    getCurrentUnixTime,
     getTimeDifferenceHoursAndMinutes,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
@@ -375,40 +374,14 @@ export default {
         'f7router'
     ],
     data() {
-        const self = this;
-        const settingsStore = useSettingsStore();
-        const query = self.f7route.query;
-        const now = getCurrentUnixTime();
-        const currentTimezone = settingsStore.appSettings.timeZone;
-
-        let defaultType = transactionConstants.allTransactionTypes.Expense;
-
-        if (query.type === transactionConstants.allTransactionTypes.Income.toString()) {
-            defaultType = transactionConstants.allTransactionTypes.Income;
-        } else if (query.type === transactionConstants.allTransactionTypes.Transfer.toString()) {
-            defaultType = transactionConstants.allTransactionTypes.Transfer;
-        }
+        const query = this.f7route.query;
+        const transactionsStore = useTransactionsStore();
+        const newTransaction = transactionsStore.generateNewTransactionModel(query.type);
 
         return {
             mode: 'add',
             editTransactionId: null,
-            transaction: {
-                type: defaultType,
-                time: now,
-                timeZone: currentTimezone,
-                utcOffset: getTimezoneOffsetMinutes(currentTimezone),
-                expenseCategory: '',
-                incomeCategory: '',
-                transferCategory: '',
-                sourceAccountId: '',
-                destinationAccountId: '',
-                sourceAmount: 0,
-                destinationAmount: 0,
-                hideAmount: false,
-                tagIds: [],
-                comment: '',
-                geoLocation: null
-            },
+            transaction: newTransaction,
             loading: true,
             loadingError: null,
             geoLocationStatus: null,

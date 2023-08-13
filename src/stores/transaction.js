@@ -13,6 +13,7 @@ import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isNumber, isString } from '@/lib/common.js';
 import {
+    getCurrentUnixTime,
     getTimezoneOffsetMinutes,
     parseDateFromUnixTime,
     getShortDate,
@@ -292,6 +293,37 @@ export const useTransactionsStore = defineStore('transactions', {
         }
     },
     actions: {
+        generateNewTransactionModel(type) {
+            const settingsStore = useSettingsStore();
+            const now = getCurrentUnixTime();
+            const currentTimezone = settingsStore.appSettings.timeZone;
+
+            let defaultType = transactionConstants.allTransactionTypes.Expense;
+
+            if (type === transactionConstants.allTransactionTypes.Income.toString()) {
+                defaultType = transactionConstants.allTransactionTypes.Income;
+            } else if (type === transactionConstants.allTransactionTypes.Transfer.toString()) {
+                defaultType = transactionConstants.allTransactionTypes.Transfer;
+            }
+
+            return {
+                type: defaultType,
+                time: now,
+                timeZone: currentTimezone,
+                utcOffset: getTimezoneOffsetMinutes(currentTimezone),
+                expenseCategory: '',
+                incomeCategory: '',
+                transferCategory: '',
+                sourceAccountId: '',
+                destinationAccountId: '',
+                sourceAmount: 0,
+                destinationAmount: 0,
+                hideAmount: false,
+                tagIds: [],
+                comment: '',
+                geoLocation: null
+            };
+        },
         updateTransactionListInvalidState(invalidState) {
             this.transactionListStateInvalid = invalidState;
         },

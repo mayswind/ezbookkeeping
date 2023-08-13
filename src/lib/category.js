@@ -115,3 +115,111 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
 
     return ret;
 }
+
+export function hasAnyAvailableCategory(allVisibleTransactionCategories) {
+    for (let type in allVisibleTransactionCategories) {
+        if (!Object.prototype.hasOwnProperty.call(allVisibleTransactionCategories, type)) {
+            continue;
+        }
+
+        const categoryType = allVisibleTransactionCategories[type];
+
+        if (categoryType.visibleCategories && categoryType.visibleCategories.length > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function hasAvailableCategory(allVisibleTransactionCategories) {
+    const result = {};
+
+    for (let type in allVisibleTransactionCategories) {
+        if (!Object.prototype.hasOwnProperty.call(allVisibleTransactionCategories, type)) {
+            continue;
+        }
+
+        const categoryType = allVisibleTransactionCategories[type];
+        result[type] = categoryType.visibleCategories && categoryType.visibleCategories.length > 0;
+    }
+
+    return result;
+}
+
+export function selectSubCategories(filterCategoryIds, category, value) {
+    if (!category || !category.subCategories || !category.subCategories.length) {
+        return;
+    }
+
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
+        filterCategoryIds[subCategory.id] = value;
+    }
+}
+
+export function selectAll(filterCategoryIds, allTransactionCategoriesMap) {
+    for (let categoryId in filterCategoryIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
+            continue;
+        }
+
+        const category = allTransactionCategoriesMap[categoryId];
+
+        if (category) {
+            filterCategoryIds[category.id] = false;
+        }
+    }
+}
+
+export function selectNone(filterCategoryIds, allTransactionCategoriesMap) {
+    for (let categoryId in filterCategoryIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
+            continue;
+        }
+
+        const category = allTransactionCategoriesMap[categoryId];
+
+        if (category) {
+            filterCategoryIds[category.id] = true;
+        }
+    }
+}
+
+export function selectInvert(filterCategoryIds, allTransactionCategoriesMap) {
+    for (let categoryId in filterCategoryIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterCategoryIds, categoryId)) {
+            continue;
+        }
+
+        const category = allTransactionCategoriesMap[categoryId];
+
+        if (category) {
+            filterCategoryIds[category.id] = !filterCategoryIds[category.id];
+        }
+    }
+}
+
+export function isSubCategoriesAllChecked(category, filterCategoryIds) {
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
+        if (filterCategoryIds[subCategory.id]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
+    let checkedCount = 0;
+
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
+        if (!filterCategoryIds[subCategory.id]) {
+            checkedCount++;
+        }
+    }
+
+    return checkedCount > 0 && checkedCount < category.subCategories.length;
+}

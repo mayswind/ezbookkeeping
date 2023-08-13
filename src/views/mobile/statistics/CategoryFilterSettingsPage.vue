@@ -130,7 +130,17 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import categoryConstants from '@/consts/category.js';
 import { copyObjectTo } from '@/lib/common.js';
-import { allVisibleTransactionCategories } from '@/lib/category.js';
+import {
+    allVisibleTransactionCategories,
+    hasAnyAvailableCategory,
+    hasAvailableCategory,
+    selectSubCategories,
+    selectAll,
+    selectNone,
+    selectInvert,
+    isSubCategoriesAllChecked,
+    isSubCategoriesHasButNotAllChecked
+} from '@/lib/category.js';
 
 export default {
     props: [
@@ -169,33 +179,10 @@ export default {
             return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories);
         },
         hasAnyAvailableCategory() {
-            for (let type in this.allVisibleTransactionCategories) {
-                if (!Object.prototype.hasOwnProperty.call(this.allVisibleTransactionCategories, type)) {
-                    continue;
-                }
-
-                const categoryType = this.allVisibleTransactionCategories[type];
-
-                if (categoryType.visibleCategories && categoryType.visibleCategories.length > 0) {
-                    return true;
-                }
-            }
-
-            return false;
+            return hasAnyAvailableCategory(this.allVisibleTransactionCategories);
         },
         hasAvailableCategory() {
-            const result = {};
-
-            for (let type in this.allVisibleTransactionCategories) {
-                if (!Object.prototype.hasOwnProperty.call(this.allVisibleTransactionCategories, type)) {
-                    continue;
-                }
-
-                const categoryType = this.allVisibleTransactionCategories[type];
-                result[type] = categoryType.visibleCategories && categoryType.visibleCategories.length > 0;
-            }
-
-            return result;
+            return hasAvailableCategory(this.allVisibleTransactionCategories);
         }
     },
     created() {
@@ -278,53 +265,16 @@ export default {
             const categoryId = e.target.value;
             const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
 
-            if (!category || !category.subCategories || !category.subCategories.length) {
-                return;
-            }
-
-            for (let i = 0; i < category.subCategories.length; i++) {
-                const subCategory = category.subCategories[i];
-                this.filterCategoryIds[subCategory.id] = !e.target.checked;
-            }
+            selectSubCategories(this.filterCategoryIds, category, !e.target.checked);
         },
         selectAll() {
-            for (let categoryId in this.filterCategoryIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterCategoryIds, categoryId)) {
-                    continue;
-                }
-
-                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                if (category) {
-                    this.filterCategoryIds[category.id] = false;
-                }
-            }
+            selectAll(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
         },
         selectNone() {
-            for (let categoryId in this.filterCategoryIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterCategoryIds, categoryId)) {
-                    continue;
-                }
-
-                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                if (category) {
-                    this.filterCategoryIds[category.id] = true;
-                }
-            }
+            selectNone(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
         },
         selectInvert() {
-            for (let categoryId in this.filterCategoryIds) {
-                if (!Object.prototype.hasOwnProperty.call(this.filterCategoryIds, categoryId)) {
-                    continue;
-                }
-
-                const category = this.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-
-                if (category) {
-                    this.filterCategoryIds[category.id] = !this.filterCategoryIds[category.id];
-                }
-            }
+            selectInvert(this.filterCategoryIds, this.transactionCategoriesStore.allTransactionCategoriesMap);
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {
@@ -342,26 +292,10 @@ export default {
             return !filterCategoryIds[category.id];
         },
         isSubCategoriesAllChecked(category, filterCategoryIds) {
-            for (let i = 0; i < category.subCategories.length; i++) {
-                const subCategory = category.subCategories[i];
-                if (filterCategoryIds[subCategory.id]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return isSubCategoriesAllChecked(category, filterCategoryIds);
         },
         isSubCategoriesHasButNotAllChecked(category, filterCategoryIds) {
-            let checkedCount = 0;
-
-            for (let i = 0; i < category.subCategories.length; i++) {
-                const subCategory = category.subCategories[i];
-                if (!filterCategoryIds[subCategory.id]) {
-                    checkedCount++;
-                }
-            }
-
-            return checkedCount > 0 && checkedCount < category.subCategories.length;
+            return isSubCategoriesHasButNotAllChecked(category, filterCategoryIds);
         },
         getCollapseStates() {
             const collapseStates = {};

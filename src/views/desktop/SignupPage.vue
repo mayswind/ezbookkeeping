@@ -37,7 +37,10 @@
                         <v-form>
                             <v-window-item value="basicSetting">
                                 <h5 class="text-h5 mb-1">{{ $t('Basic Information') }}</h5>
-                                <p class="text-sm mb-5">{{ $t('Enter Your Basic Information') }}</p>
+                                <p class="text-sm mb-5">
+                                    <span>{{ $t('Already have an account?') }}</span>
+                                    <router-link class="ml-1" to="/login">{{ $t('Click here to log in') }}</router-link>
+                                </p>
                                 <v-row>
                                     <v-col cols="12" md="6">
                                         <v-text-field

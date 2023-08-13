@@ -1,6 +1,17 @@
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 
+export function setCategoryModelByAnotherCategory(category, category2) {
+    category.id = category2.id;
+    category.type = category2.type;
+    category.parentId = category2.parentId;
+    category.name = category2.name;
+    category.icon = category2.icon;
+    category.color = category2.color;
+    category.comment = category2.comment;
+    category.visible = !category2.hidden;
+}
+
 export function transactionTypeToCategoryType(transactionType) {
     if (transactionType === transactionConstants.allTransactionTypes.Income) {
         return categoryConstants.allCategoryTypes.Income;

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 
 import categoryConstants from '@/consts/category.js';
+import iconConstants from '@/consts/icon.js';
+import colorConstants from '@/consts/color.js';
 import { isEquals } from '@/lib/common.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
@@ -126,6 +128,17 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
         transactionCategoryListStateInvalid: true,
     }),
     actions: {
+        generateNewTransactionCategoryModel(type, parentId) {
+            return {
+                type: type || categoryConstants.allCategoryTypes.Income,
+                name: '',
+                parentId: parentId || '0',
+                icon: iconConstants.defaultCategoryIconId,
+                color: colorConstants.defaultCategoryColor,
+                comment: '',
+                visible: true
+            };
+        },
         updateTransactionCategoryListInvalidState(invalidState) {
             this.transactionCategoryListStateInvalid = invalidState;
         },

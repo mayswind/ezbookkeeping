@@ -134,6 +134,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
+import { setCategoryModelByAnotherCategory } from '@/lib/category.js';
 
 export default {
     props: [
@@ -141,24 +142,17 @@ export default {
         'f7router'
     ],
     data() {
-        const self = this;
-        const query = self.f7route.query;
+        const transactionCategoriesStore = useTransactionCategoriesStore();
+        const query = this.f7route.query;
+        const newTransactionCategory = transactionCategoriesStore.generateNewTransactionCategoryModel(parseInt(query.type), query.parentId);
+        newTransactionCategory.showIconSelectionSheet = false;
+        newTransactionCategory.showColorSelectionSheet = false;
 
         return {
             editCategoryId: null,
             loading: false,
             loadingError: null,
-            category: {
-                type: parseInt(query.type),
-                name: '',
-                parentId: query.parentId,
-                icon: iconConstants.defaultCategoryIconId,
-                color: colorConstants.defaultCategoryColor,
-                comment: '',
-                visible: true,
-                showIconSelectionSheet: false,
-                showColorSelectionSheet: false
-            },
+            category: newTransactionCategory,
             submitting: false
         };
     },
@@ -216,15 +210,7 @@ export default {
             self.transactionCategoriesStore.getCategory({
                 categoryId: self.editCategoryId
             }).then(category => {
-                self.category.id = category.id;
-                self.category.type = category.type;
-                self.category.parentId = category.type.parentId;
-                self.category.name = category.name;
-                self.category.icon = category.icon;
-                self.category.color = category.color;
-                self.category.comment = category.comment;
-                self.category.visible = !category.hidden;
-
+                setCategoryModelByAnotherCategory(self.category, category);
                 self.loading = false;
             }).catch(error => {
                 if (error.processed) {

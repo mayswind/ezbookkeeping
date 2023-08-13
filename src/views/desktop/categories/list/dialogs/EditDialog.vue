@@ -76,6 +76,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
+import { setCategoryModelByAnotherCategory } from '@/lib/category.js';
 
 export default {
     props: [
@@ -86,19 +87,14 @@ export default {
         'open'
     ],
     data() {
+        const transactionCategoriesStore = useTransactionCategoriesStore();
+        const newTransactionCategory = transactionCategoriesStore.generateNewTransactionCategoryModel();
+
         return {
             showState: false,
             editCategoryId: null,
             loading: false,
-            category: {
-                type: categoryConstants.allCategoryTypes.Income,
-                name: '',
-                parentId: '0',
-                icon: iconConstants.defaultCategoryIconId,
-                color: colorConstants.defaultCategoryColor,
-                comment: '',
-                visible: true
-            },
+            category: newTransactionCategory,
             submitting: false,
             resolve: null,
             reject: null
@@ -148,25 +144,19 @@ export default {
             self.loading = true;
             self.submitting = false;
 
-            self.category.id = null;
-            self.category.type = categoryConstants.allCategoryTypes.Income;
-            self.category.parentId = '0';
-            self.category.name = '';
-            self.category.icon = iconConstants.defaultCategoryIconId;
-            self.category.color = colorConstants.defaultCategoryColor;
-            self.category.comment = '';
-            self.category.visible = true;
+            const newTransactionCategory = self.transactionCategoriesStore.generateNewTransactionCategoryModel();
+            setCategoryModelByAnotherCategory(self.category, newTransactionCategory);
 
             if (options.id) {
                 if (options.currentCategory) {
-                    self.setCategory(options.currentCategory);
+                    setCategoryModelByAnotherCategory(self.category, options.currentCategory);
                 }
 
                 self.editCategoryId = options.id;
                 self.transactionCategoriesStore.getCategory({
                     categoryId: self.editCategoryId
                 }).then(category => {
-                    self.setCategory(category);
+                    setCategoryModelByAnotherCategory(self.category, category);
                     self.loading = false;
                 }).catch(error => {
                     self.loading = false;
@@ -265,16 +255,6 @@ export default {
             }
 
             this.showState = false;
-        },
-        setCategory(category) {
-            this.category.id = category.id;
-            this.category.type = category.type;
-            this.category.parentId = category.parentId;
-            this.category.name = category.name;
-            this.category.icon = category.icon;
-            this.category.color = category.color;
-            this.category.comment = category.comment;
-            this.category.visible = !category.hidden;
         }
     }
 }

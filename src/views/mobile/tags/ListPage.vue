@@ -154,12 +154,12 @@ export default {
         'f7router'
     ],
     data() {
+        const transactionTagsStore = useTransactionTagsStore();
+        const newTransactionTag = transactionTagsStore.generateNewTransactionTagModel();
+
         return {
             newTag: null,
-            editingTag: {
-                id: '',
-                name: ''
-            },
+            editingTag: newTransactionTag,
             loading: true,
             loadingError: null,
             showHidden: false,

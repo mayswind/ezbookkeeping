@@ -222,12 +222,12 @@ import {
 
 export default {
     data() {
+        const transactionTagsStore = useTransactionTagsStore();
+        const newTransactionTag = transactionTagsStore.generateNewTransactionTagModel();
+
         return {
             newTag: null,
-            editingTag: {
-                id: '',
-                name: ''
-            },
+            editingTag: newTransactionTag,
             loading: true,
             updating: false,
             tagUpdating: {},

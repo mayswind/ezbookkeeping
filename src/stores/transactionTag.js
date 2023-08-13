@@ -60,6 +60,12 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
         transactionTagListStateInvalid: true,
     }),
     actions: {
+        generateNewTransactionTagModel() {
+            return {
+                id: '',
+                name: ''
+            };
+        },
         updateTransactionTagListInvalidState(invalidState) {
             this.transactionTagListStateInvalid = invalidState;
         },

@@ -933,6 +933,7 @@ export default {
     'No Location': 'No Location',
     'Getting Location...': 'Getting Location...',
     'Show on the map': 'Show on the map',
+    'Location on Map': 'Location on Map',
     'Update Geographic Location': 'Update Geographic Location',
     'Clear Geographic Location': 'Clear Geographic Location',
     'Unable to get current position': 'Unable to get current position',

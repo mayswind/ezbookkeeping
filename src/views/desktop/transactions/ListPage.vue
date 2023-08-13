@@ -319,12 +319,15 @@
                                  :max-time="query.maxTime"
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter" />
+    <edit-dialog ref="editDialog" :persistent="true" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script>
+import EditDialog from './list/dialogs/EditDialog.vue';
+
 import { useDisplay } from 'vuetify';
 
 import { mapStores } from 'pinia';
@@ -374,6 +377,9 @@ import {
 } from '@mdi/js';
 
 export default {
+    components: {
+        EditDialog
+    },
     props: [
         'initDateType',
         'initMaxTime',
@@ -825,16 +831,37 @@ export default {
             this.reload(false);
         },
         add() {
+            const self = this;
 
+            self.$refs.editDialog.open({
+                type: self.query.type,
+                categoryId: self.query.categoryId,
+                accountId: self.query.accountId
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
-        duplicate() {
+        show(transaction) {
+            const self = this;
 
-        },
-        show() {
-
-        },
-        edit() {
-
+            self.$refs.editDialog.open({
+                id: transaction.id,
+                currentTransaction: transaction
+            }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
         },
         remove(transaction) {
             const self = this;

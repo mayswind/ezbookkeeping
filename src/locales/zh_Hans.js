@@ -933,6 +933,7 @@ export default {
     'No Location': '没有位置',
     'Getting Location...': '正在获取位置...',
     'Show on the map': '在地图上显示',
+    'Location on Map': '地图上的位置',
     'Update Geographic Location': '更新地理位置',
     'Clear Geographic Location': '清除地理位置',
     'Unable to get current position': '无法获取当前地理位置',

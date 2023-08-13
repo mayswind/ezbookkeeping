@@ -248,23 +248,37 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 });
             });
         },
-        saveCategory({ category }) {
+        saveCategory({ category, isEdit }) {
             const self = this;
+
+            const submitCategory = {
+                type: category.type,
+                name: category.name,
+                parentId: category.parentId,
+                icon: category.icon,
+                color: category.color,
+                comment: category.comment
+            };
+
+            if (isEdit) {
+                submitCategory.id = category.id;
+                submitCategory.hidden = !category.visible;
+            }
 
             return new Promise((resolve, reject) => {
                 let promise = null;
 
-                if (!category.id) {
-                    promise = services.addTransactionCategory(category);
+                if (!submitCategory.id) {
+                    promise = services.addTransactionCategory(submitCategory);
                 } else {
-                    promise = services.modifyTransactionCategory(category);
+                    promise = services.modifyTransactionCategory(submitCategory);
                 }
 
                 promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        if (!category.id) {
+                        if (!submitCategory.id) {
                             reject({ message: 'Unable to add category' });
                         } else {
                             reject({ message: 'Unable to save category' });
@@ -276,7 +290,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                         data.result.subCategories = [];
                     }
 
-                    if (!category.id) {
+                    if (!submitCategory.id) {
                         addCategoryToTransactionCategoryList(self, data.result);
                     } else {
                         updateCategoryInTransactionCategoryList(self, data.result);
@@ -289,7 +303,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        if (!category.id) {
+                        if (!submitCategory.id) {
                             reject({ message: 'Unable to add category' });
                         } else {
                             reject({ message: 'Unable to save category' });

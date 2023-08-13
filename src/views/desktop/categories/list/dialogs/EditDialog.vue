@@ -209,22 +209,9 @@ export default {
 
             self.submitting = true;
 
-            const submitCategory = {
-                type: self.category.type,
-                name: self.category.name,
-                parentId: self.category.parentId,
-                icon: self.category.icon,
-                color: self.category.color,
-                comment: self.category.comment
-            };
-
-            if (self.editCategoryId) {
-                submitCategory.id = self.category.id;
-                submitCategory.hidden = !self.category.visible;
-            }
-
             self.transactionCategoriesStore.saveCategory({
-                category: submitCategory
+                category: self.category,
+                isEdit: !!self.editCategoryId
             }).then(() => {
                 self.submitting = false;
 

@@ -44,6 +44,10 @@ func main() {
 				Name:  "conf-path",
 				Usage: "Custom config `FILE` path",
 			},
+			&cli.BoolFlag{
+				Name:  "no-boot-log",
+				Usage: "Disable boot log",
+			},
 		},
 	}
 

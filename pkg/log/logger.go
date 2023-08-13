@@ -39,11 +39,13 @@ func init() {
 }
 
 // SetLoggerConfiguration sets the logger according to the config
-func SetLoggerConfiguration(config *settings.Config) error {
+func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) error {
 	var bootWriters []io.Writer
 	var writers []io.Writer
 
-	bootWriters = append(bootWriters, os.Stdout)
+	if !isDisableBootLog {
+		bootWriters = append(bootWriters, os.Stdout)
+	}
 
 	if config.EnableConsoleLog {
 		writers = append(writers, os.Stdout)
@@ -56,7 +58,10 @@ func SetLoggerConfiguration(config *settings.Config) error {
 			return err
 		}
 
-		bootWriters = append(bootWriters, logFile)
+		if !isDisableBootLog {
+			bootWriters = append(bootWriters, logFile)
+		}
+
 		writers = append(writers, logFile)
 	}
 

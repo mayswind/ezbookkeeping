@@ -249,6 +249,7 @@ import { useTheme } from 'vuetify';
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
@@ -266,20 +267,11 @@ import {
 
 export default {
     data() {
-        const self = this;
-        const settingsStore = useSettingsStore();
+        const userStore = useUserStore();
+        const newUser = userStore.generateNewUserInfo(this.$locale.getCurrentLanguageCode());
 
         return {
-            user: {
-                username: '',
-                password: '',
-                confirmPassword: '',
-                email: '',
-                nickname: '',
-                language: self.$locale.getCurrentLanguageCode(),
-                defaultCurrency: settingsStore.localeDefaultSettings.currency,
-                firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
-            },
+            user: newUser,
             currentStep: 'basicSetting',
             isPasswordVisible: false,
             isConfirmPasswordVisible: false,

@@ -61,6 +61,20 @@ export const useUserStore = defineStore('user', {
         }
     },
     actions: {
+        generateNewUserInfo(language) {
+            const settingsStore = useSettingsStore();
+
+            return {
+                username: '',
+                password: '',
+                confirmPassword: '',
+                email: '',
+                nickname: '',
+                language: language,
+                defaultCurrency: settingsStore.localeDefaultSettings.currency,
+                firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
+            };
+        },
         storeUserInfo(userInfo) {
             this.currentUserInfo = userInfo;
             userState.updateUserInfo(userInfo);

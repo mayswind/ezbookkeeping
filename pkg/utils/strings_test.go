@@ -72,6 +72,16 @@ func TestSubString_OverBoundary(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestGetFirstLowerCharString(t *testing.T) {
+	expectedValue := "fooBar"
+	actualValue := GetFirstLowerCharString("fooBar")
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "fooBar"
+	actualValue = GetFirstLowerCharString("FooBar")
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestGetRandomString(t *testing.T) {
 	actualValue, err := GetRandomString(10)
 	assert.Equal(t, nil, err)
@@ -100,6 +110,26 @@ func TestMD5Encode(t *testing.T) {
 	expectedValue = "d41d8cd98f00b204e9800998ecf8427e"
 	actualData = MD5Encode([]byte(str))
 	actualValue = fmt.Sprintf("%x", actualData)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestMD5EncodeToString(t *testing.T) {
+	str := "foobar"
+	expectedValue := "3858f62230ac3c915f300c664312c63f"
+	actualValue := MD5EncodeToString([]byte(str))
+	assert.Equal(t, expectedValue, actualValue)
+
+	str = ""
+	expectedValue = "d41d8cd98f00b204e9800998ecf8427e"
+	actualValue = MD5EncodeToString([]byte(str))
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncodePassword(t *testing.T) {
+	password := "foobar"
+	salt := "salt"
+	expectedValue := "QrpKShMygoe4Ym4ibnA7cNDzCcSonBkgFl69IrtnDmp3oROft3/Td/DNXjsweosa"
+	actualValue := EncodePassword(password, salt)
 	assert.Equal(t, expectedValue, actualValue)
 }
 

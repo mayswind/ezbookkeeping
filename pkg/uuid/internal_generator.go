@@ -95,8 +95,7 @@ func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []in
 	return uuids
 }
 
-// ParseUuidInfo returns a info struct which contains all information in uuid
-func (u *InternalUuidGenerator) ParseUuidInfo(uuid int64) *InternalUuidInfo {
+func (u *InternalUuidGenerator) parseInternalUuidInfo(uuid int64) *InternalUuidInfo {
 	seqId := uint32(uuid & internalUuidSeqIdMask)
 	uuid = uuid >> internalUuidSeqIdBits
 

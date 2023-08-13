@@ -18,7 +18,7 @@ func TestGenerateUuid(t *testing.T) {
 
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: expectedUuidServerId})
 	uuid := generator.GenerateUuid(expectedUuidType)
-	uuidInfo := generator.ParseUuidInfo(uuid)
+	uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 	actualUnixTime := uuidInfo.UnixTime
 	assert.Equal(t, uint32(expectedUnixTime), actualUnixTime)
@@ -37,19 +37,19 @@ func TestGenerateUuid(t *testing.T) {
 func TestGenerateUuid_MultiType(t *testing.T) {
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 1})
 	uuid := generator.GenerateUuid(UUID_TYPE_USER)
-	uuidInfo := generator.ParseUuidInfo(uuid)
+	uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 	expectedSeqId := 0
 	actualSeqId := uuidInfo.SequentialId
 	assert.Equal(t, uint32(expectedSeqId), actualSeqId)
 
 	uuid = generator.GenerateUuid(UUID_TYPE_ACCOUNT)
-	uuidInfo = generator.ParseUuidInfo(uuid)
+	uuidInfo = generator.parseInternalUuidInfo(uuid)
 	actualSeqId = uuidInfo.SequentialId
 	assert.Equal(t, uint32(expectedSeqId), actualSeqId)
 
 	uuid = generator.GenerateUuid(UUID_TYPE_TRANSACTION)
-	uuidInfo = generator.ParseUuidInfo(uuid)
+	uuidInfo = generator.parseInternalUuidInfo(uuid)
 	actualSeqId = uuidInfo.SequentialId
 	assert.Equal(t, uint32(expectedSeqId), actualSeqId)
 }
@@ -60,7 +60,7 @@ func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		uuid := generator.GenerateUuid(UUID_TYPE_USER)
-		uuidInfo := generator.ParseUuidInfo(uuid)
+		uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 		assert.Equal(t, uint32(expectedUnixTime), uuidInfo.UnixTime)
 		assert.Equal(t, uint32(i), uuidInfo.SequentialId)
@@ -71,7 +71,7 @@ func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		uuid := generator.GenerateUuid(UUID_TYPE_USER)
-		uuidInfo := generator.ParseUuidInfo(uuid)
+		uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 		assert.Equal(t, uint32(expectedUnixTime), uuidInfo.UnixTime)
 		assert.Equal(t, uint32(i), uuidInfo.SequentialId)
@@ -92,7 +92,7 @@ func TestGenerateUuid_10000TimesConcurrent(t *testing.T) {
 			for cycle := 0; cycle < 1000; cycle++ {
 				expectedUnixTime := time.Now().Unix()
 				uuid := generator.GenerateUuid(UUID_TYPE_USER)
-				uuidInfo := generator.ParseUuidInfo(uuid)
+				uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 				if uint32(expectedUnixTime) != uuidInfo.UnixTime {
 					mutex.Lock()
@@ -139,7 +139,7 @@ func TestGenerateUuids_Count255(t *testing.T) {
 	uuids := generator.GenerateUuids(expectedUuidType, expectedUuidCount)
 
 	for i := 0; i < int(expectedUuidCount); i++ {
-		uuidInfo := generator.ParseUuidInfo(uuids[i])
+		uuidInfo := generator.parseInternalUuidInfo(uuids[i])
 
 		actualUnixTime := uuidInfo.UnixTime
 		assert.Equal(t, uint32(expectedUnixTime), actualUnixTime)
@@ -171,7 +171,7 @@ func TestGenerateUuids_30TimesIn3Seconds(t *testing.T) {
 		var firstSeqId uint32
 
 		for i := 0; i < int(expectedUuidCount); i++ {
-			uuidInfo := generator.ParseUuidInfo(uuids[i])
+			uuidInfo := generator.parseInternalUuidInfo(uuids[i])
 
 			actualUnixTime := uuidInfo.UnixTime
 			assert.Equal(t, uint32(expectedUnixTime), actualUnixTime)
@@ -212,7 +212,7 @@ func TestGenerateUuids_20000TimesConcurrent(t *testing.T) {
 				uuids := generator.GenerateUuids(UUID_TYPE_USER, expectedUuidCount)
 
 				for i := 0; i < int(expectedUuidCount); i++ {
-					uuidInfo := generator.ParseUuidInfo(uuids[i])
+					uuidInfo := generator.parseInternalUuidInfo(uuids[i])
 
 					if uint32(expectedUnixTime) != uuidInfo.UnixTime {
 						mutex.Lock()

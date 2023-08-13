@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import { base64decode } from '@/lib/common.js';
+import { base64decode } from './common.js';
 
 const serverSettingsCookieKey = 'ebk_server_settings';
 

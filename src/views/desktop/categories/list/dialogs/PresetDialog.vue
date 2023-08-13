@@ -1,5 +1,5 @@
 <template>
-    <v-dialog scrollable width="800" max-height="600" :persistent="!!persistent" v-model="showState">
+    <v-dialog width="800" :persistent="!!persistent" v-model="showState">
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">

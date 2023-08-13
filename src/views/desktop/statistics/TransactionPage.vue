@@ -195,13 +195,13 @@
                                   v-model:show="showCustomDateRangeDialog"
                                   @dateRange:change="setCustomDateFilter" />
 
-    <v-dialog scrollable width="800" max-height="600" v-model="showFilterAccountDialog">
+    <v-dialog width="800" v-model="showFilterAccountDialog">
         <account-filter-settings-card
             :dialog-mode="true" :modify-default="false"
             @settings:change="showFilterAccountDialog = false" />
     </v-dialog>
 
-    <v-dialog scrollable width="800" max-height="600" v-model="showFilterCategoryDialog">
+    <v-dialog width="800" v-model="showFilterCategoryDialog">
         <category-filter-settings-card
             :dialog-mode="true" :modify-default="false"
             @settings:change="showFilterCategoryDialog = false" />

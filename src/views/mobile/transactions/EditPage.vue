@@ -582,34 +582,7 @@ export default {
             return getNameByKeyValue(this.allTimezones, this.transaction.timeZone, 'name', 'displayName');
         },
         transactionTimezoneTimeDifference() {
-            const defaultTimezoneOffset = getTimezoneOffsetMinutes();
-            const offsetTime = getTimeDifferenceHoursAndMinutes(this.transaction.utcOffset - defaultTimezoneOffset);
-
-            if (this.transaction.utcOffset > defaultTimezoneOffset) {
-                if (offsetTime.offsetMinutes) {
-                    return this.$t('format.misc.hoursMinutesAheadOfDefaultTimezone', {
-                        hours: offsetTime.offsetHours,
-                        minutes: offsetTime.offsetMinutes
-                    });
-                } else {
-                    return this.$t('format.misc.hoursAheadOfDefaultTimezone', {
-                        hours: offsetTime.offsetHours
-                    });
-                }
-            } else if (this.transaction.utcOffset < defaultTimezoneOffset) {
-                if (offsetTime.offsetMinutes) {
-                    return this.$t('format.misc.hoursMinutesBehindDefaultTimezone', {
-                        hours: offsetTime.offsetHours,
-                        minutes: offsetTime.offsetMinutes
-                    });
-                } else {
-                    return this.$t('format.misc.hoursBehindDefaultTimezone', {
-                        hours: offsetTime.offsetHours
-                    });
-                }
-            } else {
-                return this.$t('Same time as default timezone');
-            }
+            return this.$locale.getTimezoneDifferenceDisplayText(this.transaction.utcOffset);
         },
         sourceAmountClass() {
             const classes = {

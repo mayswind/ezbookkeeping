@@ -26,6 +26,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffset,
     getBrowserTimezoneOffsetMinutes,
+    getTimeDifferenceHoursAndMinutes,
     getDateTimeFormatType,
     getRecentMonthDateRanges,
     isDateRangeMatchFullYears,
@@ -542,6 +543,37 @@ function getAllTimezones(includeSystemDefault, translateFn) {
     })
 
     return allTimezoneInfos;
+}
+
+function getTimezoneDifferenceDisplayText(utcOffset, translateFn) {
+    const defaultTimezoneOffset = getTimezoneOffsetMinutes();
+    const offsetTime = getTimeDifferenceHoursAndMinutes(utcOffset - defaultTimezoneOffset);
+
+    if (utcOffset > defaultTimezoneOffset) {
+        if (offsetTime.offsetMinutes) {
+            return translateFn('format.misc.hoursMinutesAheadOfDefaultTimezone', {
+                hours: offsetTime.offsetHours,
+                minutes: offsetTime.offsetMinutes
+            });
+        } else {
+            return translateFn('format.misc.hoursAheadOfDefaultTimezone', {
+                hours: offsetTime.offsetHours
+            });
+        }
+    } else if (utcOffset < defaultTimezoneOffset) {
+        if (offsetTime.offsetMinutes) {
+            return translateFn('format.misc.hoursMinutesBehindDefaultTimezone', {
+                hours: offsetTime.offsetHours,
+                minutes: offsetTime.offsetMinutes
+            });
+        } else {
+            return translateFn('format.misc.hoursBehindDefaultTimezone', {
+                hours: offsetTime.offsetHours
+            });
+        }
+    } else {
+        return translateFn('Same time as default timezone');
+    }
 }
 
 function getAllCurrencies(translateFn) {
@@ -1183,6 +1215,7 @@ export function i18nFunctions(i18nGlobal) {
         isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
         isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
+        getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),

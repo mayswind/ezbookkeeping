@@ -23,6 +23,9 @@ import {
     getDay,
     getDayOfWeekName
 } from '@/lib/datetime.js';
+import {
+    stringCurrencyToNumeric
+} from '@/lib/currency.js';
 
 const emptyTransactionResult = {
     items: [],
@@ -323,6 +326,36 @@ export const useTransactionsStore = defineStore('transactions', {
                 comment: '',
                 geoLocation: null
             };
+        },
+        setTransactionSuitableDestinationAmount(transaction, oldValue, newValue) {
+            const accountsStore = useAccountsStore();
+            const exchangeRatesStore = useExchangeRatesStore();
+
+            if (transaction.type === transactionConstants.allTransactionTypes.Expense || transaction.type === transactionConstants.allTransactionTypes.Income) {
+                transaction.destinationAmount = newValue;
+            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+                const sourceAccount = accountsStore.allAccountsMap[transaction.sourceAccountId];
+                const destinationAccount = accountsStore.allAccountsMap[transaction.destinationAccountId];
+
+                if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
+                    const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
+                    const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
+
+                    if (isNumber(exchangedOldValue)) {
+                        oldValue = Math.floor(exchangedOldValue);
+                    }
+
+                    if (isNumber(exchangedNewValue)) {
+                        newValue = Math.floor(exchangedNewValue);
+                    }
+                }
+
+                if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue) &&
+                    (stringCurrencyToNumeric(transactionConstants.minAmount) <= newValue &&
+                        newValue <= stringCurrencyToNumeric(transactionConstants.maxAmount))) {
+                    transaction.destinationAmount = newValue;
+                }
+            }
         },
         updateTransactionListInvalidState(invalidState) {
             this.transactionListStateInvalid = invalidState;

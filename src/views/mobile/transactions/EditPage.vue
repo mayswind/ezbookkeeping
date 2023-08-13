@@ -347,16 +347,12 @@ import {
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
-    getTimeDifferenceHoursAndMinutes,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getUtcOffsetByUtcOffsetMinutes,
     getDummyUnixTimeForLocalUsage,
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
-import {
-    stringCurrencyToNumeric
-} from '@/lib/currency.js';
 import {
     getCategorizedAccounts,
     getAllFilteredAccountsBalance
@@ -638,31 +634,7 @@ export default {
                 return;
             }
 
-            if (this.transaction.type === this.allTransactionTypes.Expense || this.transaction.type === this.allTransactionTypes.Income) {
-                this.transaction.destinationAmount = newValue;
-            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
-                const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId]
-                const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId]
-
-                if (sourceAccount && destinationAccount && sourceAccount.currency !== destinationAccount.currency) {
-                    const exchangedOldValue = this.exchangeRatesStore.getExchangedAmount(oldValue, sourceAccount.currency, destinationAccount.currency);
-                    const exchangedNewValue = this.exchangeRatesStore.getExchangedAmount(newValue, sourceAccount.currency, destinationAccount.currency);
-
-                    if (isNumber(exchangedOldValue)) {
-                        oldValue = Math.floor(exchangedOldValue);
-                    }
-
-                    if (isNumber(exchangedNewValue)) {
-                        newValue = Math.floor(exchangedNewValue);
-                    }
-                }
-
-                if ((!sourceAccount || !destinationAccount || this.transaction.destinationAmount === oldValue) &&
-                    (stringCurrencyToNumeric(this.allowedMinAmount) <= newValue &&
-                        newValue <= stringCurrencyToNumeric(this.allowedMaxAmount))) {
-                    this.transaction.destinationAmount = newValue;
-                }
-            }
+            this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
         },
         'transaction.destinationAmount': function (newValue) {
             if (this.mode === 'view') {

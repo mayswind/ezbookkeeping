@@ -73,6 +73,24 @@ func ParseFromShortDateTime(t string, utcOffset int16) (time.Time, error) {
 	return time.ParseInLocation(shortDateTimeFormat, t, timezone)
 }
 
+func ParseFromElapsedSeconds(elapsedSeconds int) (string, error) {
+	if elapsedSeconds < 0 || elapsedSeconds >= 86400 {
+		return "", errs.ErrFormatInvalid
+	}
+
+	second := elapsedSeconds % 60
+	elapsedSeconds = elapsedSeconds - second
+	elapsedSeconds = elapsedSeconds / 60
+
+	minute := elapsedSeconds % 60
+	elapsedSeconds = elapsedSeconds - minute
+	elapsedSeconds = elapsedSeconds / 60
+
+	hour := elapsedSeconds
+
+	return fmt.Sprintf("%02d:%02d:%02d", hour, minute, second), nil
+}
+
 // IsUnixTimeEqualsYearAndMonth returns whether year and month of the unix time are equals to the specified year and month
 func IsUnixTimeEqualsYearAndMonth(unixTime int64, timezone *time.Location, year int32, month int32) bool {
 	date := parseFromUnixTime(unixTime).In(timezone)

@@ -80,6 +80,41 @@ func TestParseFromShortDateTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestParseFromElapsedSeconds(t *testing.T) {
+	expectedValue := "00:00:00"
+	actualValue, err := ParseFromElapsedSeconds(0)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "00:00:09"
+	actualValue, err = ParseFromElapsedSeconds(9)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "00:01:08"
+	actualValue, err = ParseFromElapsedSeconds(68)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "01:00:07"
+	actualValue, err = ParseFromElapsedSeconds(3607)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "23:59:59"
+	actualValue, err = ParseFromElapsedSeconds(86399)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseFromElapsedSeconds_InvalidTime(t *testing.T) {
+	_, err := ParseFromElapsedSeconds(-1)
+	assert.NotEqual(t, nil, err)
+
+	_, err = ParseFromElapsedSeconds(86400)
+	assert.NotEqual(t, nil, err)
+}
+
 func TestIsUnixTimeEqualsYearAndMonth(t *testing.T) {
 	actualValue := IsUnixTimeEqualsYearAndMonth(1691947440, time.UTC, 2023, 8)
 	assert.Equal(t, true, actualValue)

@@ -37,6 +37,7 @@ func main() {
 			cmd.Database,
 			cmd.UserData,
 			cmd.SecurityUtils,
+			cmd.Utilities,
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

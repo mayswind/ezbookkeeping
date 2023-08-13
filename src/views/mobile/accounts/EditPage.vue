@@ -425,7 +425,6 @@ import { useAccountsStore } from '@/stores/account.js';
 import accountConstants from '@/consts/account.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
-import currencyConstants from '@/consts/currency.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import {

@@ -13,7 +13,7 @@ import {
     getFirstAvailableCategoryId
 } from './category.js';
 
-export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, isNew) {
+export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData) {
     if ((!options.type || options.type === '0') && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
         const type = categoryTypeToTransactionType(category.type);
@@ -85,7 +85,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
     }
 
     if (transaction2) {
-        if (!isNew) {
+        if (setContextData) {
             transaction.id = transaction2.id;
         }
 
@@ -99,7 +99,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
             transaction.transferCategory = transaction2.categoryId;
         }
 
-        if (!isNew) {
+        if (setContextData) {
             transaction.utcOffset = transaction2.utcOffset;
             transaction.timeZone = transaction2.timeZone;
             transaction.time = getDummyUnixTimeForLocalUsage(transaction2.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
@@ -109,19 +109,23 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
         if (transaction2.destinationAccountId) {
             transaction.destinationAccountId = transaction2.destinationAccountId;
+        } else {
+            transaction.destinationAccountId = '';
         }
 
         transaction.sourceAmount = transaction2.sourceAmount;
 
         if (transaction2.destinationAmount) {
             transaction.destinationAmount = transaction2.destinationAmount;
+        } else {
+            transaction.destinationAccountId = 0;
         }
 
         transaction.hideAmount = transaction2.hideAmount;
         transaction.tagIds = transaction2.tagIds || [];
         transaction.comment = transaction2.comment;
 
-        if (!isNew) {
+        if (setContextData) {
             transaction.geoLocation = transaction2.geoLocation;
         }
     }

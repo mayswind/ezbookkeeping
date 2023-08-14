@@ -1,9 +1,8 @@
 <template>
-    <v-text-field type="number" :class="extraClass"
-                  :density="density" :disabled="disabled"
-                  :label="label"
-                  :placeholder="placeholder"
-                  :persistent-placeholder="persistentPlaceholder"
+    <v-text-field :type="hide ? 'password' : 'number'" :class="extraClass"
+                  :density="density" :readonly="!!readonly" :disabled="!!disabled"
+                  :label="label" :placeholder="placeholder"
+                  :persistent-placeholder="!!persistentPlaceholder"
                   :rules="enableRules ? rules : []" v-model="value"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown">
         <template #prepend-inner v-if="currency && prependText">
@@ -30,6 +29,8 @@ export default {
         'placeholder',
         'persistentPlaceholder',
         'disabled',
+        'readonly',
+        'hide',
         'enableRules',
         'modelValue'
     ],

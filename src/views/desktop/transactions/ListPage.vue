@@ -998,14 +998,6 @@ export default {
     height: 40px !important;
 }
 
-.transaction-table tr.transaction-table-row-data .hover-display {
-    display: none;
-}
-
-.transaction-table tr.transaction-table-row-data:hover .hover-display {
-    display: grid;
-}
-
 .transaction-table .transaction-table-column-time {
     width: 110px;
     white-space: nowrap;

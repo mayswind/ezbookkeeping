@@ -706,7 +706,7 @@ export default {
                     categoryId: query.categoryId,
                     accountId: query.accountId
                 },
-                (self.mode !== 'edit' && self.mode !== 'view')
+                (self.mode === 'edit' || self.mode === 'view')
             );
 
             self.loading = false;

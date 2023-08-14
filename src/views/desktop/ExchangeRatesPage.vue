@@ -49,7 +49,7 @@
                             <span v-else-if="loading">
                                 <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text"
                                                    :key="itemIdx" :loading="loading"
-                                                   v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]"></v-skeleton-loader>
+                                                   v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
                             </span>
                         </div>
                     </v-navigation-drawer>
@@ -89,7 +89,7 @@
 
                                         <tbody>
                                         <tr :key="itemIdx"
-                                            v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] : [])">
+                                            v-for="itemIdx in (loading && (!exchangeRatesData || !exchangeRatesData.exchangeRates || exchangeRatesData.exchangeRates.length < 1) ? [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] : [])">
                                             <td class="px-0">
                                                 <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>

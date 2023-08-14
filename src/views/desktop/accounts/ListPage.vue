@@ -173,20 +173,23 @@
                                                                            :to="`/transaction/list?accountId=${accountOrSubAccountId(element)}`">
                                                                         {{ $t('Transaction List') }}
                                                                     </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
                                                                            :prepend-icon="element.hidden ? icons.show : icons.hide"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="hide(element, !element.hidden)">
                                                                         {{ element.hidden ? $t('Show') : $t('Hide') }}
                                                                     </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="icons.edit"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="edit(element)">
                                                                         {{ $t('Edit') }}
                                                                     </v-btn>
-                                                                    <v-btn class="hover-display px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"
+                                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="icons.remove"
                                                                            v-if="!activeSubAccount[element.id]"
                                                                            @click="remove(element)">

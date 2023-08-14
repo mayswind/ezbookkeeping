@@ -104,8 +104,9 @@
 
                                         <v-spacer/>
 
-                                        <v-btn class="hover-display px-2 ml-2" color="default"
+                                        <v-btn class="px-2 ml-2" color="default"
                                                density="comfortable" variant="text"
+                                               :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                :prepend-icon="element.hidden ? icons.show : icons.hide"
                                                :loading="tagHiding[element.id]"
                                                :disabled="loading || updating"
@@ -113,8 +114,9 @@
                                                @click="hide(element, !element.hidden)">
                                             {{ element.hidden ? $t('Show') : $t('Hide') }}
                                         </v-btn>
-                                        <v-btn class="hover-display px-2" color="default"
+                                        <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
+                                               :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                :prepend-icon="icons.edit"
                                                :loading="tagUpdating[element.id]"
                                                :disabled="loading || updating"
@@ -122,8 +124,9 @@
                                                @click="edit(element)">
                                             {{ $t('Edit') }}
                                         </v-btn>
-                                        <v-btn class="hover-display px-2" color="default"
+                                        <v-btn class="px-2" color="default"
                                                density="comfortable" variant="text"
+                                               :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                :prepend-icon="icons.remove"
                                                :loading="tagRemoving[element.id]"
                                                :disabled="loading || updating"

@@ -106,8 +106,9 @@
                                                     <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
                                                     <span class="text-caption ml-1">{{ exchangeRate.currencyCode }}</span>
                                                     <v-spacer/>
-                                                    <v-btn class="hover-display px-2 ml-2 mr-3" color="default"
+                                                    <v-btn class="px-2 ml-2 mr-3" color="default"
                                                            density="comfortable" variant="text"
+                                                           :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            @click="setAsBaseline(exchangeRate.currencyCode, exchangeRate)">
                                                         {{ $t('Set As Baseline') }}
                                                     </v-btn>

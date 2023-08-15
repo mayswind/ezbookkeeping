@@ -42,7 +42,7 @@
                         <v-tab value="basicInfo">
                             <span>{{ $t('Basic Information') }}</span>
                         </v-tab>
-                        <v-tab value="map" :disabled="!transaction.geoLocation">
+                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="mapProvider">
                             <span>{{ $t('Location on Map') }}</span>
                         </v-tab>
                     </v-tabs>
@@ -232,7 +232,17 @@
                     <v-window-item value="map">
                         <v-row>
                             <v-col cols="12" md="12">
-
+                                <map-view ref="map" map-class="transaction-edit-map-view" :geo-location="transaction.geoLocation">
+                                    <template #error-title="{ mapSupported, mapDependencyLoaded }">
+                                        <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ $t('Unsupported Map Provider') }}</b></span>
+                                        <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ $t('Cannot Initialize Map') }}</b></span>
+                                    </template>
+                                    <template #error-content>
+                                        <p class="text-body-1">
+                                            {{ $t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.') }}
+                                        </p>
+                                    </template>
+                                </map-view>
                             </v-col>
                         </v-row>
                     </v-window-item>
@@ -442,6 +452,15 @@ export default {
         }
     },
     watch: {
+        'activeTab': function (newValue) {
+            if (newValue === 'map') {
+                this.$nextTick(() => {
+                    if (this.$refs.map) {
+                        this.$refs.map.init();
+                    }
+                });
+            }
+        },
         'transaction.sourceAmount': function (newValue, oldValue) {
             if (this.mode === 'view') {
                 return;
@@ -636,5 +655,27 @@ export default {
 <style>
 .transaction-edit-timezone.v-input input::placeholder {
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity)) !important;
+}
+
+.transaction-edit-map-view {
+    height: 220px;
+}
+
+@media (min-height: 630px) {
+    .transaction-edit-map-view {
+        height: 300px;
+    }
+}
+
+@media (min-height: 750px) {
+    .transaction-edit-map-view {
+        height: 400px;
+    }
+}
+
+@media (min-height: 900px) {
+    .transaction-edit-map-view {
+        height: 500px;
+    }
 }
 </style>

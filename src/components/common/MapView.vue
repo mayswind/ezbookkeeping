@@ -1,5 +1,5 @@
 <template>
-    <div ref="mapContainer" style="width: 100%" :style="{ 'height': mapHeight }"></div>
+    <div ref="mapContainer" style="width: 100%" :class="mapClass" :style="finalMapStyle"></div>
     <slot name="error-title"
           :mapSupported="mapSupported" :mapDependencyLoaded="mapDependencyLoaded"
           v-if="!mapSupported || !mapDependencyLoaded"></slot>
@@ -9,6 +9,9 @@
 </template>
 
 <script>
+import {
+    copyObjectTo
+} from '@/lib/common.js';
 import {
     createMapHolder,
     initMapInstance,
@@ -20,6 +23,8 @@ import {
 export default {
     props: [
         'height',
+        'mapClass',
+        'mapStyle',
         'geoLocation'
     ],
     expose: [
@@ -40,12 +45,18 @@ export default {
         }
     },
     computed: {
-        mapHeight() {
-            if (this.mapSupported && this.mapDependencyLoaded) {
-                return this.height;
+        finalMapStyle() {
+            const styles = copyObjectTo(this.mapStyle, {});
+
+            if (this.height) {
+                styles.height = this.height;
             }
 
-            return '0';
+            if (!this.mapSupported || !this.mapDependencyLoaded) {
+                styles.height = '0';
+            }
+
+            return styles;
         }
     },
     methods: {

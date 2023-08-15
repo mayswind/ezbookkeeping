@@ -18,45 +18,55 @@
                     <v-img max-width="600px" src="img/desktop/people3.svg"/>
                 </div>
             </v-col>
-            <v-col cols="12" md="4" class="auth-card d-flex align-center justify-center">
-                <v-card variant="flat" class="mt-12 mt-sm-0 pa-4" max-width="500">
-                    <v-card-text>
-                        <h5 class="text-h5 mb-3">{{ $t('Unlock Application') }}</h5>
-                        <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please input your PIN code or use WebAuthn to unlock application') }}</p>
-                        <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please input your PIN code to unlock application') }}</p>
-                    </v-card-text>
+            <v-col cols="12" md="4" class="auth-card d-flex flex-column">
+                <div class="d-flex align-center justify-center h-100">
+                    <v-card variant="flat" class="mt-0 px-4 pt-12" max-width="500">
+                        <v-card-text>
+                            <h5 class="text-h5 mb-3">{{ $t('Unlock Application') }}</h5>
+                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please input your PIN code or use WebAuthn to unlock application') }}</p>
+                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please input your PIN code to unlock application') }}</p>
+                        </v-card-text>
 
-                    <v-card-text>
-                        <v-form>
+                        <v-card-text class="pb-0 mb-6">
+                            <v-form>
+                                <v-row>
+                                    <v-col cols="12">
+                                        <pin-code-input :disabled="verifyingByWebAuthn" :autofocus="true"
+                                                        :secure="true" :length="6"
+                                                        v-model="pinCode" @pincode:confirm="unlockByPin" />
+                                    </v-col>
+
+                                    <v-col cols="12">
+                                        <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
+                                               @click="unlockByPin(pinCode)">
+                                            {{ $t('Unlock By PIN Code') }}
+                                        </v-btn>
+                                    </v-col>
+
+                                    <v-col cols="12" v-if="isWebAuthnAvailable">
+                                        <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
+                                               @click="unlockByWebAuthn">
+                                            {{ $t('Unlock By WebAuthn') }}
+                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
+                                        </v-btn>
+                                    </v-col>
+
+                                    <v-col cols="12" class="text-center">
+                                        <span class="me-1">{{ $t('Can\'t Unlock?') }}</span>
+                                        <a class="text-primary" href="javascript:void(0);" @click="relogin">
+                                            {{ $t('Re-login') }}
+                                        </a>
+                                    </v-col>
+                                </v-row>
+                            </v-form>
+                        </v-card-text>
+                    </v-card>
+                </div>
+                <v-spacer/>
+                <div class="d-flex align-center justify-center">
+                    <v-card variant="flat" class="px-4 pb-4" max-width="500">
+                        <v-card-text class="pt-0">
                             <v-row>
-                                <v-col cols="12">
-                                    <pin-code-input :disabled="verifyingByWebAuthn" :autofocus="true"
-                                                    :secure="true" :length="6"
-                                                    v-model="pinCode" @pincode:confirm="unlockByPin" />
-                                </v-col>
-
-                                <v-col cols="12">
-                                    <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
-                                           @click="unlockByPin(pinCode)">
-                                        {{ $t('Unlock By PIN Code') }}
-                                    </v-btn>
-                                </v-col>
-
-                                <v-col cols="12" v-if="isWebAuthnAvailable">
-                                    <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
-                                           @click="unlockByWebAuthn">
-                                        {{ $t('Unlock By WebAuthn') }}
-                                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
-                                    </v-btn>
-                                </v-col>
-
-                                <v-col cols="12" class="text-center">
-                                    <span class="me-1">{{ $t('Can\'t Unlock?') }}</span>
-                                    <a class="text-primary" href="javascript:void(0);" @click="relogin">
-                                        {{ $t('Re-login') }}
-                                    </a>
-                                </v-col>
-
                                 <v-col cols="12" class="text-center">
                                     <v-menu location="bottom">
                                         <template #activator="{ props }">
@@ -76,7 +86,7 @@
                                     </v-menu>
                                 </v-col>
 
-                                <v-col cols="12" class="d-flex align-center">
+                                <v-col cols="12" class="d-flex align-center pt-0">
                                     <v-divider />
                                 </v-col>
 
@@ -85,9 +95,9 @@
                                     <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
                                 </v-col>
                             </v-row>
-                        </v-form>
-                    </v-card-text>
-                </v-card>
+                        </v-card-text>
+                    </v-card>
+                </div>
             </v-col>
         </v-row>
 

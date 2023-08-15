@@ -11,7 +11,7 @@
                                 { name: $t('Income'), value: 2 },
                                 { name: $t('Expense'), value: 3 },
                                 { name: $t('Transfer'), value: 4 }
-                            ]" v-model="query.type" @update:modelValue="changeTypeFilter" />
+                            ]" v-model="query.type" @update:model-value="changeTypeFilter" />
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4">

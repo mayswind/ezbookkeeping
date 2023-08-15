@@ -9,7 +9,7 @@
                                 { name: $t('Expense'), value: allCategoryTypes.Expense },
                                 { name: $t('Income'), value: allCategoryTypes.Income },
                                 { name: $t('Transfer'), value: allCategoryTypes.Transfer }
-                            ]" v-model="activeCategoryType" @update:modelValue="switchAllPrimaryCategories" />
+                            ]" v-model="activeCategoryType" @update:model-value="switchAllPrimaryCategories" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"

@@ -8,7 +8,7 @@
                             <btn-vertical-group :disabled="loading" :buttons="[
                                 { name: $t('Pie Chart'), value: allChartTypes.Pie },
                                 { name: $t('Bar Chart'), value: allChartTypes.Bar }
-                            ]" v-model="query.chartType" @update:modelValue="setChartType" />
+                            ]" v-model="query.chartType" @update:model-value="setChartType" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows class="my-4" direction="vertical"

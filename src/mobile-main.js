@@ -90,6 +90,7 @@ import {
 } from '@/lib/ui.mobile.js';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
+import MapView from '@/components/common/MapView.vue';
 
 import ItemIcon from '@/components/mobile/ItemIcon.vue';
 import PieChart from '@/components/mobile/PieChart.vue';
@@ -165,6 +166,7 @@ app.use(i18n);
 app.component('VueDatePicker', VueDatePicker);
 
 app.component('PinCodeInput', PinCodeInput);
+app.component('MapView', MapView);
 
 app.component('ItemIcon', ItemIcon);
 app.component('PieChart', PieChart);

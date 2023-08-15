@@ -79,6 +79,7 @@ import {
 } from '@/lib/i18n.js';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
+import MapView from '@/components/common/MapView.vue';
 
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
 import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
@@ -392,6 +393,7 @@ app.component('VueDatePicker', VueDatePicker);
 app.component('DraggableList', draggable);
 
 app.component('PinCodeInput', PinCodeInput);
+app.component('MapView', MapView);
 
 app.component('ItemIcon', ItemIcon);
 app.component('BtnVerticalGroup', BtnVerticalGroup);

@@ -1,5 +1,5 @@
 <template>
-    <f7-page no-toolbar no-navbar no-swipeback login-screen>
+    <f7-page no-navbar no-swipeback login-screen hide-toolbar-on-scroll>
         <f7-login-screen-title>
             <img alt="logo" class="login-page-logo" :src="ezBookkeepingLogoPath" />
             <f7-block class="login-page-tile margin-vertical-half">{{ $t('global.app.title') }}</f7-block>
@@ -26,17 +26,25 @@
             </f7-block-footer>
         </f7-list>
 
-        <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
+        <f7-button class="padding-bottom" small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
 
-        <f7-list>
+        <f7-list class="login-page-bottom">
             <f7-block-footer>
-                <span>Powered by </span>
-                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>&nbsp;
-                <span>{{ version }}</span>
-            </f7-block-footer>
-            <f7-block-footer>
+                <div class="login-page-powered-by">
+                    <span>Powered by</span>
+                    <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>
+                    <span>{{ version }}</span>
+                </div>
             </f7-block-footer>
         </f7-list>
+
+        <f7-toolbar class="login-page-fixed-bottom" tabbar bottom :outline="false">
+            <div class="login-page-powered-by">
+                <span>Powered by</span>
+                <f7-link external href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</f7-link>
+                <span>{{ version }}</span>
+            </div>
+        </f7-toolbar>
 
         <f7-popover class="lang-popover-menu">
             <f7-list dividers>

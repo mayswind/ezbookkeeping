@@ -149,6 +149,43 @@ i.icon.la, i.icon.las, i.icon.lab {
     overflow-y: auto;
 }
 
+.login-page-fixed-bottom {
+    background-color: inherit !important;
+}
+
+.login-page-fixed-bottom > .toolbar-inner {
+    display: inline !important;
+    text-align: center;
+    font-size: var(--f7-font-size);
+}
+
+.login-page-powered-by > span {
+    color: var(--f7-block-footer-text-color);
+}
+
+.login-page-powered-by > a.link {
+    display: inline !important;
+    color: var(--f7-theme-color);
+    font-size: var(--f7-block-footer-font-size);
+    padding: 0 6px;
+}
+
+@media (max-height: 629px) {
+    .login-screen-content {
+        --f7-toolbar-height: 0;
+    }
+
+    .login-page-fixed-bottom {
+        display: none;
+    }
+}
+
+@media (min-height: 630px) {
+    .login-page-bottom {
+        display: none;
+    }
+}
+
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;

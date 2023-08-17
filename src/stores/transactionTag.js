@@ -59,6 +59,21 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
         allTransactionTagsMap: {},
         transactionTagListStateInvalid: true,
     }),
+    getters: {
+        allVisibleTags(state) {
+            const allVisibleTags = [];
+
+            for (let i = 0; i < state.allTransactionTags.length; i++) {
+                const tag = state.allTransactionTags[i];
+
+                if (!tag.hidden) {
+                    allVisibleTags.push(tag);
+                }
+            }
+
+            return allVisibleTags;
+        }
+    },
     actions: {
         generateNewTransactionTagModel() {
             return {

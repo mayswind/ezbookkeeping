@@ -208,11 +208,38 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="12" md="12">
-                                    <v-text-field
-                                        disabled
+                                    <v-autocomplete
+                                        item-title="name"
+                                        item-value="id"
+                                        auto-select-first
                                         persistent-placeholder
+                                        multiple
+                                        chips
+                                        :closable-chips="mode !== 'view'"
+                                        :readonly="mode === 'view'"
                                         :label="$t('Tags')"
-                                        :placeholder="$t('Tags')" />
+                                        :placeholder="$t('None')"
+                                        :items="allTags"
+                                        :no-data-text="$t('No available tag')"
+                                        v-model="transaction.tagIds"
+                                    >
+                                        <template #chip="{ props, item }">
+                                            <v-chip :prepend-icon="icons.tag" :text="item.title" v-bind="props"/>
+                                        </template>
+
+                                        <template #item="{ props, item }">
+                                            <v-list-item :value="item.value" v-bind="props">
+                                                <template #title>
+                                                    <v-list-item-title>
+                                                        <div class="d-flex align-center">
+                                                            <v-icon size="20" start :icon="icons.tag"/>
+                                                            <span>{{ item.title }}</span>
+                                                        </div>
+                                                    </v-list-item-title>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                    </v-autocomplete>
                                 </v-col>
                                 <v-col cols="12" md="12">
                                     <v-textarea
@@ -290,7 +317,8 @@ import { getMapProvider } from '@/lib/server_settings.js';
 import {
     mdiDotsVertical,
     mdiEyeOffOutline,
-    mdiEyeOutline
+    mdiEyeOutline,
+    mdiPound
 } from '@mdi/js';
 
 export default {
@@ -320,7 +348,8 @@ export default {
             icons: {
                 more: mdiDotsVertical,
                 show: mdiEyeOutline,
-                hide: mdiEyeOffOutline
+                hide: mdiEyeOffOutline,
+                tag: mdiPound
             }
         };
     },
@@ -400,7 +429,7 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allTags() {
-            return this.transactionTagsStore.allTransactionTags;
+            return this.transactionTagsStore.allVisibleTags;
         },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {

@@ -74,7 +74,7 @@
                                     v-model="newProfile.defaultAccountId"
                                 >
                                     <template #selection="{ item }">
-                                        <v-label v-if="item && item.value !== 0 && item.value !== '0'">
+                                        <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
                                             <ItemIcon class="mr-2" icon-type="account" size="23px"
                                                       :icon-id="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'icon')"
                                                       :color="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'color')"

@@ -10,7 +10,7 @@
         @update:menu="onMenuStateChanged"
     >
         <template #selection="{ item }">
-            <v-label style="padding-top: 3px">
+            <v-label class="cursor-pointer" style="padding-top: 3px">
                 <v-icon size="28" :icon="icons.square" :color="`#${item.raw}`" />
             </v-label>
         </template>

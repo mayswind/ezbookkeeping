@@ -92,7 +92,7 @@
                                         v-model="transaction.sourceAccountId"
                                     >
                                         <template #selection="{ item }">
-                                            <v-label v-if="item && item.value !== 0 && item.value !== '0'">
+                                            <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
                                                 <ItemIcon class="mr-2" icon-type="account" size="23px"
                                                           :icon-id="getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'icon')"
                                                           :color="getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'color')"
@@ -132,7 +132,7 @@
                                         v-model="transaction.destinationAccountId"
                                     >
                                         <template #selection="{ item }">
-                                            <v-label v-if="item && item.value !== 0 && item.value !== '0'">
+                                            <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
                                                 <ItemIcon class="mr-2" icon-type="account" size="23px"
                                                           :icon-id="getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'icon')"
                                                           :color="getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'color')"
@@ -195,8 +195,8 @@
                                         v-model="transaction"
                                     >
                                         <template #selection>
-                                            <span v-if="transaction.geoLocation">{{ `(${transaction.geoLocation.longitude}, ${transaction.geoLocation.latitude})` }}</span>
-                                            <span v-else-if="!transaction.geoLocation">{{ geoLocationStatusInfo }}</span>
+                                            <span class="cursor-pointer" v-if="transaction.geoLocation">{{ `(${transaction.geoLocation.longitude}, ${transaction.geoLocation.latitude})` }}</span>
+                                            <span class="cursor-pointer" v-else-if="!transaction.geoLocation">{{ geoLocationStatusInfo }}</span>
                                         </template>
 
                                         <template #no-data>

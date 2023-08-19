@@ -1079,9 +1079,9 @@ function setLanguage(i18nGlobal, locale, force) {
         weekdaysMin : getAllMinWeekdayNames(i18nGlobal.t),
         meridiem: function (hours) {
             if (hours > 11) {
-                return i18nGlobal.t('datetime.PM.upperCase');
+                return i18nGlobal.t('datetime.PM.content');
             } else {
-                return i18nGlobal.t('datetime.AM.upperCase');
+                return i18nGlobal.t('datetime.AM.content');
             }
         }
     });

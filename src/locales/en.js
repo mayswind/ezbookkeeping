@@ -81,10 +81,10 @@ export default {
     },
     'datetime': {
         'AM': {
-            'upperCase': 'AM'
+            'content': 'AM'
         },
         'PM': {
-            'upperCase': 'PM'
+            'content': 'PM'
         },
         'Monday': {
             'min': 'Mo',

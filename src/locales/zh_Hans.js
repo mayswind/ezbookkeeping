@@ -81,10 +81,10 @@ export default {
     },
     'datetime': {
         'AM': {
-            'upperCase': '上午'
+            'content': '上午'
         },
         'PM': {
-            'upperCase': '下午'
+            'content': '下午'
         },
         'Monday': {
             'min': '一',

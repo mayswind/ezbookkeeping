@@ -37,6 +37,9 @@
                     <template #month-overlay-value="{ text }">
                         {{ getMonthShortName(text) }}
                     </template>
+                    <template #am-pm-button="{ toggle, value }">
+                        <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ $t(`datetime.${value}.content`) }}</button>
+                    </template>
                 </vue-date-picker>
             </v-card-text>
             <v-card-text class="overflow-y-visible">

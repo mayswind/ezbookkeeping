@@ -28,6 +28,8 @@ export function numericCurrencyToString(num, enableThousandsSeparator, trimTailZ
         }
     }
 
+    integer = appendThousandsSeparator(integer, enableThousandsSeparator);
+
     if (decimals !== '') {
         str = `${integer}.${decimals}`;
     } else {

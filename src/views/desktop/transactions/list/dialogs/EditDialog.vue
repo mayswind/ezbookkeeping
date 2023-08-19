@@ -475,6 +475,8 @@ export default {
             } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 return 'primary';
             }
+
+            return null;
         },
         geoLocationStatusInfo() {
             if (this.geoLocationStatus === 'success') {

@@ -55,8 +55,8 @@
                             <v-row>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
                                     <amount-input persistent-placeholder
-                                                  :disabled="loading || submitting"
                                                   :readonly="mode === 'view'"
+                                                  :disabled="loading || submitting"
                                                   :hide="transaction.hideAmount"
                                                   :label="$t(sourceAmountName)"
                                                   :placeholder="$t(sourceAmountName)"
@@ -64,8 +64,8 @@
                                 </v-col>
                                 <v-col cols="12" :md="6" v-if="transaction.type === allTransactionTypes.Transfer">
                                     <amount-input persistent-placeholder
-                                                  :disabled="loading || submitting"
                                                   :readonly="mode === 'view'"
+                                                  :disabled="loading || submitting"
                                                   :hide="transaction.hideAmount"
                                                   :label="$t('Transfer In Amount')"
                                                   :placeholder="$t('Transfer In Amount')"
@@ -159,11 +159,12 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <v-text-field
-                                        disabled
-                                        persistent-placeholder
+                                    <dateTime-select
+                                        :readonly="mode === 'view'"
+                                        :disabled="loading || submitting"
                                         :label="$t('Transaction Time')"
-                                        :placeholder="$t('Transaction Time')" />
+                                        v-model="transaction.time"
+                                        @error="showDateTimeError" />
                                 </v-col>
                                 <v-col cols="12" md="6">
                                     <v-autocomplete
@@ -173,6 +174,7 @@
                                         auto-select-first
                                         persistent-placeholder
                                         :readonly="mode === 'view'"
+                                        :disabled="loading || submitting"
                                         :label="$t('Timezone')"
                                         :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : $t('Timezone')"
                                         :items="allTimezones"
@@ -217,6 +219,7 @@
                                         chips
                                         :closable-chips="mode !== 'view'"
                                         :readonly="mode === 'view'"
+                                        :disabled="loading || submitting"
                                         :label="$t('Tags')"
                                         :placeholder="$t('None')"
                                         :items="allTags"
@@ -611,6 +614,9 @@ export default {
             }
 
             this.showState = false;
+        },
+        showDateTimeError(error) {
+            this.$refs.snackbar.showError(error);
         },
         updateGeoLocation(forceUpdate) {
             const self = this;

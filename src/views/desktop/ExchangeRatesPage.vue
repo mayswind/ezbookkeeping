@@ -109,6 +109,7 @@
                                                     <v-btn class="px-2 ml-2 mr-3" color="default"
                                                            density="comfortable" variant="text"
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
+                                                           v-if="exchangeRate.currencyCode !== baseCurrency"
                                                            @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))">
                                                         {{ $t('Set As Baseline') }}
                                                     </v-btn>

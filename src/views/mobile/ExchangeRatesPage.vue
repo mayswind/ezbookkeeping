@@ -56,7 +56,7 @@
                         <small class="smaller">{{ exchangeRate.currencyCode }}</small>
                     </div>
                 </template>
-                <f7-swipeout-actions right>
+                <f7-swipeout-actions right v-if="exchangeRate.currencyCode !== baseCurrency">
                     <f7-swipeout-button color="primary" close :text="$t('Set As Baseline')" @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))"></f7-swipeout-button>
                 </f7-swipeout-actions>
             </f7-list-item>

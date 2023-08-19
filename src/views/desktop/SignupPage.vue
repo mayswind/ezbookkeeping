@@ -20,7 +20,7 @@
             </v-col>
             <v-col cols="12" md="8" class="auth-card d-flex align-center justify-center pa-10">
                 <v-card variant="flat" class="mt-12 mt-sm-0 pt-sm-12 pt-md-0">
-                    <StepsBar min-width="700" :steps="[
+                    <steps-bar min-width="700" :steps="[
                         {
                             'name': 'basicSetting',
                             'title': $t('User Information'),

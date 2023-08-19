@@ -151,7 +151,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models
 }
 
 // CreateAccounts saves a new account model to database
-func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAccounts []*models.Account) error {
+func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
 	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -190,6 +190,7 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 				Deleted:              false,
 				Type:                 models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,
 				TransactionTime:      transactionTime,
+				TimezoneUtcOffset:    utcOffset,
 				AccountId:            allAccounts[i].AccountId,
 				Amount:               allAccounts[i].Balance,
 				RelatedAccountId:     allAccounts[i].AccountId,

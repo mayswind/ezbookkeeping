@@ -136,6 +136,13 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	if accountCreateReq.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 		if len(accountCreateReq.SubAccounts) > 0 {
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub accounts")
@@ -196,7 +203,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
 	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
-	err = a.accounts.CreateAccounts(mainAccount, childrenAccounts)
+	err = a.accounts.CreateAccounts(mainAccount, childrenAccounts, utcOffset)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to create account \"id:%d\" for user \"uid:%d\", because %s", mainAccount.AccountId, uid, err.Error())

@@ -736,7 +736,7 @@ export const useAccountsStore = defineStore('accounts', {
                 });
             });
         },
-        saveAccount({ account, subAccounts, isEdit, isFloatBalance }) {
+        saveAccount({ account, subAccounts, isEdit }) {
             const self = this;
 
             const submitSubAccounts = [];
@@ -751,7 +751,7 @@ export const useAccountsStore = defineStore('accounts', {
                         icon: subAccount.icon,
                         color: subAccount.color,
                         currency: subAccount.currency,
-                        balance: isFloatBalance ? subAccount.balance * 100 : subAccount.balance,
+                        balance: subAccount.balance,
                         comment: subAccount.comment
                     };
 
@@ -771,7 +771,7 @@ export const useAccountsStore = defineStore('accounts', {
                 icon: account.icon,
                 color: account.color,
                 currency: account.type === accountConstants.allAccountTypes.SingleAccount ? account.currency : currencyConstants.parentAccountCurrencyPlaceholder,
-                balance: account.type === accountConstants.allAccountTypes.SingleAccount ? (isFloatBalance ? account.balance * 100 : account.balance) : 0,
+                balance: account.type === accountConstants.allAccountTypes.SingleAccount ? account.balance : 0,
                 comment: account.comment,
                 subAccounts: account.type === accountConstants.allAccountTypes.SingleAccount ? null : submitSubAccounts,
             };

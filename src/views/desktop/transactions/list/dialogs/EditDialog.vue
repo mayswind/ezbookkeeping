@@ -54,18 +54,20 @@
                         <v-form class="mt-2">
                             <v-row>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
-                                    <amount-input persistent-placeholder
+                                    <amount-input :color="sourceAmountColor"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
+                                                  :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
                                                   :label="$t(sourceAmountName)"
                                                   :placeholder="$t(sourceAmountName)"
                                                   v-model="transaction.sourceAmount"/>
                                 </v-col>
                                 <v-col cols="12" :md="6" v-if="transaction.type === allTransactionTypes.Transfer">
-                                    <amount-input persistent-placeholder
+                                    <amount-input color="primary"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
+                                                  :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
                                                   :label="$t('Transfer In Amount')"
                                                   :placeholder="$t('Transfer In Amount')"
@@ -464,6 +466,15 @@ export default {
         transactionTimezoneTimeDifference() {
             return this.$locale.getTimezoneDifferenceDisplayText(this.transaction.utcOffset);
         },
+        sourceAmountColor() {
+            if (this.transaction.type === this.allTransactionTypes.Expense) {
+                return 'expense';
+            } else if (this.transaction.type === this.allTransactionTypes.Income) {
+                return 'income';
+            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
+                return 'primary';
+            }
+        },
         geoLocationStatusInfo() {
             if (this.geoLocationStatus === 'success') {
                 return '';
@@ -538,8 +549,6 @@ export default {
             if (options && options.id) {
                 if (options.currentTransaction) {
                     self.setTransaction(options.currentTransaction, options, true);
-                    self.transaction.sourceAmount = self.transaction.sourceAmount / 100;
-                    self.transaction.destinationAmount = self.transaction.destinationAmount / 100;
                 }
 
                 self.mode = 'view';
@@ -574,8 +583,6 @@ export default {
                 if (options.id && responses[3]) {
                     const transaction = responses[3];
                     self.setTransaction(transaction, options, true);
-                    self.transaction.sourceAmount = self.transaction.sourceAmount / 100;
-                    self.transaction.destinationAmount = self.transaction.destinationAmount / 100;
                 } else {
                     self.setTransaction(null, options, true);
                 }

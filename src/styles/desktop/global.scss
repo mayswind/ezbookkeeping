@@ -223,6 +223,18 @@ input[type=number] {
     height: 38px;
 }
 
+.text-field-with-colored-label.v-text-field.text-primary .v-field-label.v-label {
+    color: rgba(var(--v-theme-primary), var(--v-medium-emphasis-opacity)) !important;
+}
+
+.text-field-with-colored-label.v-text-field.text-expense .v-field-label.v-label {
+    color: rgba(var(--v-theme-expense), var(--v-medium-emphasis-opacity)) !important;
+}
+
+.text-field-with-colored-label.v-text-field.text-income .v-field-label.v-label {
+    color: rgba(var(--v-theme-income), var(--v-medium-emphasis-opacity)) !important;
+}
+
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;

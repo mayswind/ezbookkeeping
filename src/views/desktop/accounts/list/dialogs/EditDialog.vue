@@ -124,8 +124,8 @@
                                     />
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
-                                    <amount-input persistent-placeholder
-                                                  :disabled="loading || submitting || !!editAccountId"
+                                    <amount-input :disabled="loading || submitting || !!editAccountId"
+                                                  :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
                                                   :label="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub Account Balance')"
                                                   :placeholder="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub Account Balance')"
@@ -436,14 +436,12 @@ export default {
         },
         setAccount(account) {
             setAccountModelByAnotherAccount(this.account, account);
-            this.account.balance = this.account.balance / 100;
             this.subAccounts = [];
 
             if (account.subAccounts && account.subAccounts.length > 0) {
                 for (let i = 0; i < account.subAccounts.length; i++) {
                     const subAccount = this.accountsStore.generateNewSubAccountModel(this.account);
                     setAccountModelByAnotherAccount(subAccount, account.subAccounts[i]);
-                    subAccount.balance = subAccount.balance / 100;
 
                     this.subAccounts.push(subAccount);
                 }

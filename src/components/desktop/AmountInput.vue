@@ -1,9 +1,12 @@
 <template>
-    <v-text-field :type="hide ? 'password' : 'number'" :class="extraClass"
+    <v-text-field class="text-field-with-colored-label"
+                  :type="hide ? 'password' : 'number'" :class="extraClass"
+                  :color="!readonly && !disabled ? color : undefined"
+                  :base-color="!readonly && !disabled ? color : undefined"
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
-                  :rules="enableRules ? rules : []" v-model="value"
+                  :rules="enableRules ? rules : []" v-model="currentValue"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown">
         <template #prepend-inner v-if="currency && prependText">
             <div style="margin-top: 2px">{{ prependText }}</div>
@@ -19,10 +22,12 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
 import transactionConstants from '@/consts/transaction.js';
+import { numericCurrencyToString, stringCurrencyToNumeric } from '@/lib/currency.js';
 
 export default {
     props: [
         'class',
+        'color',
         'density',
         'currency',
         'label',
@@ -41,6 +46,7 @@ export default {
         const self = this;
 
         return {
+            currentValue: numericCurrencyToString(self.modelValue),
             rules: [
                 (v) => {
                     if (v === '') {
@@ -59,16 +65,14 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore),
-        value: {
-            get: function () {
-                return this.modelValue;
-            },
-            set: function (value) {
-                this.$emit('update:modelValue', value);
-            }
-        },
         extraClass() {
-            return this.class;
+            let finalClass = this.class;
+
+            if (this.color && !this.readonly && !this.disabled) {
+                finalClass += ` text-${this.color}`;
+            }
+
+            return finalClass;
         },
         prependText() {
             if (!this.currency) {
@@ -97,6 +101,22 @@ export default {
             return texts.appendText;
         }
     },
+    watch: {
+        'modelValue': function (newValue) {
+            const numericCurrentValue = stringCurrencyToNumeric(this.currentValue);
+
+            if (newValue !== numericCurrentValue) {
+                const newStringValue = numericCurrencyToString(newValue, false, true);
+
+                if (!(newStringValue === '0' && this.currentValue === '')) {
+                    this.currentValue = newStringValue;
+                }
+            }
+        },
+        'currentValue': function (newValue) {
+            this.$emit('update:modelValue', stringCurrencyToNumeric(newValue));
+        }
+    },
     methods: {
         onKeyUpDown(e) {
             if (e.target.value === '' || e.target.value === 0) {
@@ -104,13 +124,15 @@ export default {
             }
 
             let decimalLength = 0;
+            let decimalIndex = e.target.value.indexOf('.');
 
-            if (e.target.value.indexOf('.') > 0) {
+            if (decimalIndex >= 0) {
                 decimalLength = e.target.value.length - e.target.value.indexOf('.') - 1;
             }
 
             if (decimalLength > 2) {
-                e.target.value = e.target.value.substring(0, e.target.value.length - 1);
+                e.target.value = e.target.value.substring(0, Math.min(decimalIndex + 3, e.target.value.length - 1));
+                this.currentValue = e.target.value;
                 e.preventDefault();
                 return;
             }
@@ -126,15 +148,15 @@ export default {
 
                 if (val < transactionConstants.minAmount) {
                     e.target.value = transactionConstants.minAmount;
+                    this.currentValue = e.target.value;
                     e.preventDefault();
                 } else if (val > transactionConstants.maxAmount) {
                     e.target.value = transactionConstants.maxAmount;
+                    this.currentValue = e.target.value;
                     e.preventDefault();
                 } else if (e.target.value.length > maxLength) {
                     e.target.value = e.target.value.substring(0, maxLength);
-                    e.preventDefault();
-                } else if (e.target.value.charAt(0) === '0' && e.target.value.length > 1) {
-                    e.target.value = e.target.value.substring(1);
+                    this.currentValue = e.target.value;
                     e.preventDefault();
                 }
             } catch (e) {

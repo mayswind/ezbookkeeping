@@ -714,15 +714,21 @@ export default {
     }
 }
 
-@media (min-height: 750px) {
+@media (min-height: 700px) {
     .transaction-edit-map-view {
-        height: 400px;
+        height: 350px;
+    }
+}
+
+@media (min-height: 800px) {
+    .transaction-edit-map-view {
+        height: 450px;
     }
 }
 
 @media (min-height: 900px) {
     .transaction-edit-map-view {
-        height: 500px;
+        height: 550px;
     }
 }
 </style>

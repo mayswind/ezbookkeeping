@@ -8,7 +8,7 @@
         v-model="dateTime"
     >
         <template #selection>
-            <v-label class="cursor-pointer">{{ displayTime }}</v-label>
+            <span class="text-truncate cursor-pointer">{{ displayTime }}</span>
         </template>
 
         <template #no-data>

@@ -185,7 +185,7 @@
                                         v-model="transaction.timeZone"
                                     >
                                         <template #selection="{ item }">
-                                            <span v-if="transaction.timeZone || transaction.timeZone === ''">
+                                            <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
                                                 {{ item.title }}
                                             </span>
                                         </template>

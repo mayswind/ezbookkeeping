@@ -1,8 +1,7 @@
 <template>
     <v-text-field class="text-field-with-colored-label"
                   :type="hide ? 'password' : 'number'" :class="extraClass"
-                  :color="!readonly && !disabled ? color : undefined"
-                  :base-color="!readonly && !disabled ? color : undefined"
+                  :color="color" :base-color="color"
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
@@ -68,7 +67,7 @@ export default {
         extraClass() {
             let finalClass = this.class;
 
-            if (this.color && !this.readonly && !this.disabled) {
+            if (this.color) {
                 finalClass += ` text-${this.color}`;
             }
 

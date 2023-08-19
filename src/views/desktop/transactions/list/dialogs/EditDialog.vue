@@ -54,7 +54,8 @@
                         <v-form class="mt-2">
                             <v-row>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
-                                    <amount-input :color="sourceAmountColor"
+                                    <amount-input class="transaction-edit-amount font-weight-bold"
+                                                  :color="sourceAmountColor"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -64,7 +65,7 @@
                                                   v-model="transaction.sourceAmount"/>
                                 </v-col>
                                 <v-col cols="12" :md="6" v-if="transaction.type === allTransactionTypes.Transfer">
-                                    <amount-input color="primary"
+                                    <amount-input class="transaction-edit-amount font-weight-bold" color="primary"
                                                   :readonly="mode === 'view'"
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
@@ -695,6 +696,10 @@ export default {
 </script>
 
 <style>
+.transaction-edit-amount .v-field__input > input {
+    font-size: 1.25rem;
+}
+
 .transaction-edit-timezone.v-input input::placeholder {
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity)) !important;
 }

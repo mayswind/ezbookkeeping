@@ -74,12 +74,47 @@
                                                   :placeholder="$t('Transfer In Amount')"
                                                   v-model="transaction.destinationAmount"/>
                                 </v-col>
-                                <v-col cols="12" md="12">
-                                    <v-text-field
-                                        disabled
-                                        persistent-placeholder
-                                        :label="$t('Category')"
-                                        :placeholder="$t('Category')" />
+                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Expense">
+                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                       primary-sub-items-field="subCategories"
+                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                       :readonly="mode === 'view'"
+                                                       :disabled="loading || submitting"
+                                                       :show-primary-name="true"
+                                                       :label="$t('Category')" :placeholder="$t('Category')"
+                                                       :items="allCategories[allCategoryTypes.Expense]"
+                                                       v-model="transaction.expenseCategory">
+                                    </two-column-select>
+                                </v-col>
+                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Income">
+                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                       primary-sub-items-field="subCategories"
+                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                       :readonly="mode === 'view'"
+                                                       :disabled="loading || submitting"
+                                                       :show-primary-name="true"
+                                                       :label="$t('Category')" :placeholder="$t('Category')"
+                                                       :items="allCategories[allCategoryTypes.Income]"
+                                                       v-model="transaction.incomeCategory">
+                                    </two-column-select>
+                                </v-col>
+                                <v-col cols="12" md="12" v-if="transaction.type === allTransactionTypes.Transfer">
+                                    <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                       primary-sub-items-field="subCategories"
+                                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                       :readonly="mode === 'view'"
+                                                       :disabled="loading || submitting"
+                                                       :show-primary-name="true"
+                                                       :label="$t('Category')" :placeholder="$t('Category')"
+                                                       :items="allCategories[allCategoryTypes.Transfer]"
+                                                       v-model="transaction.transferCategory">
+                                    </two-column-select>
                                 </v-col>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
                                     <v-select

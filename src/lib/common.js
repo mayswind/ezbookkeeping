@@ -220,6 +220,50 @@ export function stringToArrayBuffer(str){
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
 }
 
+export function getFirstItem(items) {
+    if (isArray(items)) {
+        if (items.length > 0) {
+            return items[0];
+        }
+    } else {
+        for (let field in items) {
+            if (!Object.prototype.hasOwnProperty.call(items, field)) {
+                continue;
+            }
+
+            return items[field];
+        }
+    }
+
+    return null;
+}
+
+export function getItemByKeyValue(src, value, keyField) {
+    if (isArray(src)) {
+        for (let i = 0; i < src.length; i++) {
+            const item = src[i];
+
+            if (item[keyField] === value) {
+                return item;
+            }
+        }
+    } else {
+        for (let field in src) {
+            if (!Object.prototype.hasOwnProperty.call(src, field)) {
+                continue;
+            }
+
+            const item = src[field];
+
+            if (item[keyField] === value) {
+                return item;
+            }
+        }
+    }
+
+    return null;
+}
+
 export function getNameByKeyValue(src, value, keyField, nameField, defaultName) {
     if (isArray(src)) {
         if (keyField) {
@@ -361,6 +405,56 @@ export function categorizedArrayToPlainArray(object) {
     }
 
     return ret;
+}
+
+export function isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue) {
+    for (let i = 0; i < primaryItem[primarySubItemsField].length; i++) {
+        const secondaryItem = primaryItem[primarySubItemsField][i];
+
+        if (secondaryValueField && secondaryItem[secondaryValueField] === secondaryValue) {
+            return true;
+        } else if (!secondaryValueField && secondaryItem === secondaryValue) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function getPrimaryValueBySecondaryValue(items, primarySubItemsField, primaryValueField, secondaryValueField, secondaryValue) {
+    if (primarySubItemsField) {
+        if (isArray(items)) {
+            for (let i = 0; i < items.length; i++) {
+                const primaryItem = items[i];
+
+                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue)) {
+                    if (primaryValueField) {
+                        return primaryItem[primaryValueField];
+                    } else {
+                        return primaryItem;
+                    }
+                }
+            }
+        } else {
+            for (let field in items) {
+                if (!Object.prototype.hasOwnProperty.call(items, field)) {
+                    continue;
+                }
+
+                const primaryItem = items[field];
+
+                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue)) {
+                    if (primaryValueField) {
+                        return primaryItem[primaryValueField];
+                    } else {
+                        return primaryItem;
+                    }
+                }
+            }
+        }
+    }
+
+    return null;
 }
 
 export function arrangeArrayWithNewStartIndex(array, startIndex) {

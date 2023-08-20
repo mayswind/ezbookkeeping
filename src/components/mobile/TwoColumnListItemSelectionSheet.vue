@@ -60,7 +60,10 @@
 </template>
 
 <script>
-import { isArray } from '@/lib/common.js';
+import {
+    getItemByKeyValue,
+    getPrimaryValueBySecondaryValue
+} from '@/lib/common.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -107,32 +110,10 @@ export default {
     computed: {
         selectedPrimaryItem() {
             if (this.primaryValueField) {
-                if (isArray(this.items)) {
-                    for (let i = 0; i < this.items.length; i++) {
-                        const item = this.items[i];
-
-                        if (this.currentPrimaryValue === item[this.primaryValueField]) {
-                            return item;
-                        }
-                    }
-                } else {
-                    for (let field in this.items) {
-                        if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
-                            continue;
-                        }
-
-                        const item = this.items[field];
-
-                        if (this.currentPrimaryValue === item[this.primaryValueField]) {
-                            return item;
-                        }
-                    }
-                }
+                return getItemByKeyValue(this.items, this.currentPrimaryValue, this.primaryValueField);
             } else {
                 return this.currentPrimaryValue;
             }
-
-            return null;
         }
     },
     methods: {
@@ -169,53 +150,8 @@ export default {
                 return this.currentSecondaryValue === subItem;
             }
         },
-        isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue) {
-            for (let i = 0; i < primaryItem[this.primarySubItemsField].length; i++) {
-                const secondaryItem = primaryItem[this.primarySubItemsField][i];
-
-                if (this.secondaryValueField && secondaryItem[this.secondaryValueField] === secondaryValue) {
-                    return true;
-                } else if (!this.secondaryValueField && secondaryItem === secondaryValue) {
-                    return true;
-                }
-            }
-
-            return false;
-        },
         getPrimaryValueBySecondaryValue(secondaryValue) {
-            if (this.primarySubItemsField) {
-                if (isArray(this.items)) {
-                    for (let i = 0; i < this.items.length; i++) {
-                        const primaryItem = this.items[i];
-
-                        if (this.isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue)) {
-                            if (this.primaryValueField) {
-                                return primaryItem[this.primaryValueField];
-                            } else {
-                                return primaryItem;
-                            }
-                        }
-                    }
-                } else {
-                    for (let field in this.items) {
-                        if (!Object.prototype.hasOwnProperty.call(this.items, field)) {
-                            continue;
-                        }
-
-                        const primaryItem = this.items[field];
-
-                        if (this.isPrimaryItemHasSecondaryValue(primaryItem, secondaryValue)) {
-                            if (this.primaryValueField) {
-                                return primaryItem[this.primaryValueField];
-                            } else {
-                                return primaryItem;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return null;
+            return getPrimaryValueBySecondaryValue(this.items, this.primarySubItemsField, this.primaryValueField, this.secondaryValueField, secondaryValue);
         },
         close() {
             this.$emit('update:show', false);

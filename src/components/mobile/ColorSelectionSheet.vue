@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { arrayContainsFieldvalue } from '@/lib/common.js';
+import { arrayContainsFieldValue } from '@/lib/common.js';
 import { getColorsInRows } from '@/lib/color.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
@@ -70,7 +70,7 @@ export default {
             this.$emit('update:show', false);
         },
         hasSelectedIcon(row) {
-            return arrayContainsFieldvalue(row, 'id', this.currentValue);
+            return arrayContainsFieldValue(row, 'id', this.currentValue);
         }
     }
 }

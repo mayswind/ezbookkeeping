@@ -331,7 +331,7 @@ export function copyArrayTo(fromArray, toArray) {
     return toArray;
 }
 
-export function arrayContainsFieldvalue(array, fieldName, value) {
+export function arrayContainsFieldValue(array, fieldName, value) {
     if (!value || !array || !array.length) {
         return false;
     }

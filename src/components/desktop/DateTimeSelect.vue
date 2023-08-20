@@ -64,9 +64,6 @@ export default {
         'update:modelValue',
         'error'
     ],
-    expose: [
-        'init'
-    ],
     data() {
         return {
             yearRange: [

@@ -278,8 +278,17 @@
                         {{ $t(saveButtonTitle) }}
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
-                    <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || submitting" @click="cancel">{{ $t(cancelButtonTitle) }}</v-btn>
+                    <v-btn variant="tonal" :disabled="loading || submitting"
+                           v-if="mode === 'view'" @click="duplicate">{{ $t('Duplicate') }}</v-btn>
+                    <v-btn color="warning" variant="tonal" :disabled="loading || submitting"
+                           v-if="mode === 'view'" @click="edit">{{ $t('Edit') }}</v-btn>
+                    <v-btn color="error" variant="tonal" :disabled="loading || submitting"
+                           v-if="mode === 'view'" @click="remove">
+                        {{ $t('Delete') }}
+                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                    </v-btn>
+                    <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
+                           @click="cancel">{{ $t(cancelButtonTitle) }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -303,10 +312,9 @@ import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import logger from '@/lib/logger.js';
 import {
-    getNameByKeyValue
-} from '@/lib/common.js';
-import {
-    getUtcOffsetByUtcOffsetMinutes
+    getUtcOffsetByUtcOffsetMinutes,
+    getTimezoneOffsetMinutes,
+    getCurrentUnixTime
 } from '@/lib/datetime.js';
 import {
     getFirstAvailableCategoryId
@@ -619,7 +627,82 @@ export default {
                 return;
             }
 
+            const doSubmit = function () {
+                self.submitting = true;
 
+                self.transactionsStore.saveTransaction({
+                    transaction: self.transaction,
+                    defaultCurrency: self.defaultCurrency,
+                    isEdit: self.mode === 'edit'
+                }).then(() => {
+                    self.submitting = false;
+
+                    if (self.resolve) {
+                        if (self.mode === 'add') {
+                            self.resolve({
+                                message: 'You have added a new transaction'
+                            });
+                        } else if (self.mode === 'edit') {
+                            self.resolve({
+                                message: 'You have saved this transaction'
+                            });
+                        }
+                    }
+
+                    self.showState = false;
+                }).catch(error => {
+                    self.submitting = false;
+
+                    if (!error.processed) {
+                        self.$refs.snackbar.showError(error);
+                    }
+                });
+            };
+
+            if (self.transaction.sourceAmount === 0) {
+                self.$refs.confirmDialog.open('Are you sure you want to save this transaction whose amount is 0?').then(() => {
+                    doSubmit();
+                });
+            } else {
+                doSubmit();
+            }
+        },
+        duplicate() {
+            this.editTransactionId = null;
+            this.transaction.id = null;
+            this.transaction.time = getCurrentUnixTime();
+            this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
+            this.transaction.utcOffset = getTimezoneOffsetMinutes(this.transaction.timeZone);
+            this.transaction.geoLocation = null;
+            this.mode = 'add';
+        },
+        edit() {
+            this.mode = 'edit';
+        },
+        remove() {
+            const self = this;
+
+            self.$refs.confirmDialog.open('Are you sure you want to delete this transaction?').then(() => {
+                self.submitting = true;
+
+                self.transactionsStore.deleteTransaction({
+                    transaction: self.transaction,
+                    defaultCurrency: self.defaultCurrency
+                }).then(() => {
+                    if (self.resolve) {
+                        self.resolve();
+                    }
+
+                    self.submitting = false;
+                    self.showState = false;
+                }).catch(error => {
+                    self.submitting = false;
+
+                    if (!error.processed) {
+                        self.$refs.snackbar.showError(error);
+                    }
+                });
+            });
         },
         cancel() {
             if (this.reject) {
@@ -675,9 +758,6 @@ export default {
         clearGeoLocation() {
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
-        },
-        getAccountNameByKeyValue(src, value, keyField, nameField, defaultName) {
-            return getNameByKeyValue(this.allAccounts, src, value, keyField, nameField, defaultName);
         },
         setTransaction(transaction, options, setContextData) {
             setTransactionModelByTransaction(

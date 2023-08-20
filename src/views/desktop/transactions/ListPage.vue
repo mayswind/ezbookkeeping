@@ -839,6 +839,8 @@ export default {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
                 }
+
+                self.reload(false);
             }).catch(error => {
                 if (error) {
                     self.$refs.snackbar.showError(error);
@@ -855,6 +857,8 @@ export default {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
                 }
+
+                self.reload(false);
             }).catch(error => {
                 if (error) {
                     self.$refs.snackbar.showError(error);

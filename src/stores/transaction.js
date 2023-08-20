@@ -15,6 +15,8 @@ import { isNumber, isString } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
     getTimezoneOffsetMinutes,
+    getBrowserTimezoneOffsetMinutes,
+    getActualUnixTimeForStore,
     parseDateFromUnixTime,
     getShortDate,
     getYear,
@@ -651,25 +653,55 @@ export const useTransactionsStore = defineStore('transactions', {
                 });
             });
         },
-        saveTransaction({ transaction, defaultCurrency }) {
+        saveTransaction({ transaction, defaultCurrency, isEdit }) {
             const self = this;
             const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
+            const submitTransaction = {
+                type: transaction.type,
+                time: getActualUnixTimeForStore(transaction.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes()),
+                sourceAccountId: transaction.sourceAccountId,
+                sourceAmount: transaction.sourceAmount,
+                destinationAccountId: '0',
+                destinationAmount: 0,
+                hideAmount: transaction.hideAmount,
+                tagIds: transaction.tagIds,
+                comment: transaction.comment,
+                geoLocation: transaction.geoLocation,
+                utcOffset: transaction.utcOffset
+            };
+
+            if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                submitTransaction.categoryId = transaction.expenseCategory;
+            } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                submitTransaction.categoryId = transaction.incomeCategory;
+            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+                submitTransaction.categoryId = transaction.transferCategory;
+                submitTransaction.destinationAccountId = transaction.destinationAccountId;
+                submitTransaction.destinationAmount = transaction.destinationAmount;
+            } else {
+                return Promise.reject('An error has occurred');
+            }
+
+            if (isEdit) {
+                submitTransaction.id = transaction.id;
+            }
+
             return new Promise((resolve, reject) => {
                 let promise = null;
 
-                if (!transaction.id) {
-                    promise = services.addTransaction(transaction);
+                if (!submitTransaction.id) {
+                    promise = services.addTransaction(submitTransaction);
                 } else {
-                    promise = services.modifyTransaction(transaction);
+                    promise = services.modifyTransaction(submitTransaction);
                 }
 
                 promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        if (!transaction.id) {
+                        if (!submitTransaction.id) {
                             reject({ message: 'Unable to add transaction' });
                         } else {
                             reject({ message: 'Unable to save transaction' });
@@ -677,7 +709,7 @@ export const useTransactionsStore = defineStore('transactions', {
                         return;
                     }
 
-                    if (!transaction.id) {
+                    if (!submitTransaction.id) {
                         if (!self.transactionListStateInvalid) {
                             self.updateTransactionListInvalidState(true);
                         }
@@ -710,7 +742,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        if (!transaction.id) {
+                        if (!submitTransaction.id) {
                             reject({ message: 'Unable to add transaction' });
                         } else {
                             reject({ message: 'Unable to save transaction' });

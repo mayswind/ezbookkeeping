@@ -674,44 +674,14 @@ export default {
                 return;
             }
 
-            const submitTransaction = {
-                type: self.transaction.type,
-                time: getActualUnixTimeForStore(self.transaction.time, self.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()),
-                sourceAccountId: self.transaction.sourceAccountId,
-                sourceAmount: self.transaction.sourceAmount,
-                destinationAccountId: '0',
-                destinationAmount: 0,
-                hideAmount: self.transaction.hideAmount,
-                tagIds: self.transaction.tagIds,
-                comment: self.transaction.comment,
-                geoLocation: self.transaction.geoLocation,
-                utcOffset: self.transaction.utcOffset
-            };
-
-            if (self.transaction.type === self.allTransactionTypes.Expense) {
-                submitTransaction.categoryId = self.transaction.expenseCategory;
-            } else if (self.transaction.type === self.allTransactionTypes.Income) {
-                submitTransaction.categoryId = self.transaction.incomeCategory;
-            } else if (self.transaction.type === self.allTransactionTypes.Transfer) {
-                submitTransaction.categoryId = self.transaction.transferCategory;
-                submitTransaction.destinationAccountId = self.transaction.destinationAccountId;
-                submitTransaction.destinationAmount = self.transaction.destinationAmount;
-            } else {
-                self.$toast('An error has occurred');
-                return;
-            }
-
-            if (self.mode === 'edit') {
-                submitTransaction.id = self.transaction.id;
-            }
-
             const doSubmit = function () {
                 self.submitting = true;
                 self.$showLoading(() => self.submitting);
 
                 self.transactionsStore.saveTransaction({
-                    transaction: submitTransaction,
-                    defaultCurrency: self.defaultCurrency
+                    transaction: self.transaction,
+                    defaultCurrency: self.defaultCurrency,
+                    isEdit: self.mode === 'edit'
                 }).then(() => {
                     self.submitting = false;
                     self.$hideLoading();
@@ -733,7 +703,7 @@ export default {
                 });
             };
 
-            if (submitTransaction.sourceAmount === 0) {
+            if (self.transaction.sourceAmount === 0) {
                 self.$confirm('Are you sure you want to save this transaction whose amount is 0?', () => {
                     doSubmit();
                 });

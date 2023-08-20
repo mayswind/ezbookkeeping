@@ -62,43 +62,22 @@
                             </v-col>
 
                             <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="name"
-                                    item-value="id"
-                                    persistent-placeholder
-                                    :disabled="loading || saving || !allVisibleAccounts.length"
-                                    :label="$t('Default Account')"
-                                    :placeholder="$t('Default Account')"
-                                    :items="allVisibleAccounts"
-                                    :no-data-text="$t('No results')"
-                                    v-model="newProfile.defaultAccountId"
-                                >
-                                    <template #selection="{ item }">
-                                        <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
-                                            <ItemIcon class="mr-2" icon-type="account" size="23px"
-                                                      :icon-id="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'icon')"
-                                                      :color="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'color')"
-                                                      v-if="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'icon')" />
-                                            <span>{{ getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Not Specified')) }}</span>
-                                        </v-label>
-                                        <v-label v-if="!item || item.value === 0 || item.value === '0'">{{ $t('Not Specified') }}</v-label>
-                                    </template>
-
-                                    <template #item="{ props, item }">
-                                        <v-list-item :value="item.value" v-bind="props">
-                                            <template #title>
-                                                <v-list-item-title>
-                                                    <div class="d-flex align-center">
-                                                        <ItemIcon icon-type="account"
-                                                                  :icon-id="item.raw.icon" :color="item.raw.color"
-                                                                  v-if="item.raw" />
-                                                        <span class="ml-2">{{ item.title }}</span>
-                                                    </div>
-                                                </v-list-item-title>
-                                            </template>
-                                        </v-list-item>
-                                    </template>
-                                </v-select>
+                                <two-column-select primary-key-field="id" primary-value-field="category"
+                                                   primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                   primary-sub-items-field="accounts"
+                                                   :primary-title-i18n="true"
+                                                   secondary-key-field="id" secondary-value-field="id"
+                                                   secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                   :disabled="loading || saving || !allVisibleAccounts.length"
+                                                   :show-secondary-icon="true"
+                                                   :label="$t('Default Account')"
+                                                   :placeholder="$t('Default Account')"
+                                                   :items="allCategorizedAccounts"
+                                                   :no-item-text="$t('Not Specified')"
+                                                   v-model="newProfile.defaultAccountId">
+                                </two-column-select>
                             </v-col>
 
                             <v-col cols="12" md="6">
@@ -249,6 +228,7 @@ import { getNameByKeyValue } from '@/lib/common.js';
 import {
     mdiAccount
 } from '@mdi/js';
+import {getCategorizedAccounts} from "@/lib/account";
 
 export default {
     data() {
@@ -303,6 +283,9 @@ export default {
         },
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
+        },
+        allCategorizedAccounts() {
+            return getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {
             return this.$locale.getAllWeekDays();

@@ -12,6 +12,10 @@
             <div class="d-flex align-center text-truncate cursor-pointer">
                 <span class="text-truncate" v-if="showPrimaryName">{{ primaryItemDisplayName }}</span>
                 <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="showPrimaryName" />
+                <ItemIcon class="mr-2" icon-type="account" size="21.5px"
+                          :icon-id="selectedSecondaryItem ? selectedSecondaryItem[secondaryIconField] : null"
+                          :color="selectedSecondaryItem ? selectedSecondaryItem[secondaryColorField] : null"
+                          v-if="selectedSecondaryItem && showSecondaryIcon" />
                 <span class="text-truncate">{{ secondaryItemDisplayName }}</span>
             </div>
         </template>
@@ -33,7 +37,7 @@
                     </v-list>
                 </div>
                 <div class="secondary-list-container">
-                    <v-list>
+                    <v-list v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                         <v-list-item :class="{ 'secondary-list-item-selected v-list-item--active text-primary': isSecondarySelected(subItem) }"
                                      :title="$tIf(subItem[secondaryTitleField], secondaryTitleI18n)"
                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
@@ -71,6 +75,7 @@ export default {
         'readonly',
         'label',
         'showPrimaryName',
+        'showSecondaryIcon',
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',
@@ -90,6 +95,7 @@ export default {
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',
+        'noItemText',
         'items'
     ],
     emits: [
@@ -133,12 +139,22 @@ export default {
                 return this.currentPrimaryValue;
             }
         },
+        selectedSecondaryItem() {
+            if (this.currentSecondaryValue && this.selectedPrimaryItem && this.selectedPrimaryItem[this.primarySubItemsField]) {
+                return getItemByKeyValue(this.selectedPrimaryItem[this.primarySubItemsField], this.currentSecondaryValue, this.secondaryValueField);
+            } else {
+                return null;
+            }
+        },
+        noItemDisplayName() {
+            return this.noItemText ? this.noItemText : this.$t('None');
+        },
         primaryItemDisplayName() {
             if (this.primaryValueField && this.primaryTitleField) {
                 if (this.currentPrimaryValue) {
-                    return getNameByKeyValue(this.items, this.currentPrimaryValue, this.primaryValueField, this.primaryTitleField);
+                    return getNameByKeyValue(this.items, this.currentPrimaryValue, this.primaryValueField, this.primaryTitleField, this.noItemDisplayName);
                 } else {
-                    return this.$t('None');
+                    return this.noItemDisplayName;
                 }
             } else {
                 return this.currentPrimaryValue;
@@ -146,10 +162,10 @@ export default {
         },
         secondaryItemDisplayName() {
             if (this.secondaryValueField && this.secondaryTitleField) {
-                if (this.currentSecondaryValue) {
-                    return getNameByKeyValue(this.selectedPrimaryItem[this.primarySubItemsField], this.currentSecondaryValue, this.secondaryValueField, this.secondaryTitleField);
+                if (this.currentSecondaryValue && this.selectedPrimaryItem && this.selectedPrimaryItem[this.primarySubItemsField]) {
+                    return getNameByKeyValue(this.selectedPrimaryItem[this.primarySubItemsField], this.currentSecondaryValue, this.secondaryValueField, this.secondaryTitleField, this.noItemDisplayName);
                 } else {
-                    return this.$t('None');
+                    return this.noItemDisplayName;
                 }
             } else {
                 return this.currentSecondaryValue;
@@ -215,7 +231,7 @@ export default {
 .two-column-select-menu .primary-list-container,
 .two-column-select-menu .secondary-list-container {
     width: 100%;
-    height: 310px;
+    max-height: 310px;
     overflow-y: scroll;
 }
 </style>

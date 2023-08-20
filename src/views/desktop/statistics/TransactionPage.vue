@@ -112,17 +112,17 @@
                                         </div>
                                     </template>
 
-                                    <div v-if="initing">
-                                        <v-skeleton-loader type="paragraph" :loading="initing"
-                                                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4 ]"></v-skeleton-loader>
-                                    </div>
-
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
+                                                 v-if="initing || (statisticsData && statisticsData.items && statisticsData.items.length)">
                                         <span class="text-subtitle-1">{{ totalAmountName }}</span>
-                                        <span class="statistics-overview-amount ml-3" :class="statisticsTextColor">
+                                        <span class="statistics-overview-amount ml-3"
+                                              :class="statisticsTextColor"
+                                              v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
                                             {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
                                         </span>
+                                        <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2"
+                                                           width="120px" type="text" :loading="true"
+                                                           v-else-if="initing"></v-skeleton-loader>
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
@@ -130,7 +130,19 @@
                                         <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Pie">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allChartTypes.Pie">
+                                        <pie-chart
+                                            :items="[
+                                                {id: '1', name: '---', value: 60, color: '7c7c7f'},
+                                                {id: '2', name: '---', value: 20, color: 'a5a5aa'},
+                                                {id: '3', name: '---', value: 20, color: 'c5c5c9'}
+                                            ]"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="value"
+                                            color-field="color"
+                                            v-if="initing"
+                                        ></pie-chart>
                                         <pie-chart
                                             :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
                                             :min-valid-percent="0.0001"
@@ -143,13 +155,32 @@
                                             percent-field="percent"
                                             currency-field="currency"
                                             hidden-field="hidden"
+                                            v-else-if="!initing"
                                             @click="clickPieChartItem"
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="!initing && query.chartType === allChartTypes.Bar">
-                                        <v-list rounded lines="two"
-                                                v-if="statisticsData && statisticsData.items && statisticsData.items.length">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allChartTypes.Bar">
+                                        <v-list rounded lines="two" v-if="initing">
+                                            <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
+                                                <v-list-item class="pl-0">
+                                                    <template #prepend>
+                                                        <v-icon class="disabled mr-0" size="34" :icon="icons.square" />
+                                                    </template>
+                                                    <div class="d-flex flex-column ml-2">
+                                                        <div class="d-flex">
+                                                            <v-skeleton-loader class="skeleton-no-margin my-2"
+                                                                               width="120px" type="text" :loading="true"></v-skeleton-loader>
+                                                        </div>
+                                                        <div>
+                                                            <v-progress-linear :model-value="0" :height="4"></v-progress-linear>
+                                                        </div>
+                                                    </div>
+                                                </v-list-item>
+                                                <v-divider v-if="itemIdx < 3"/>
+                                            </template>
+                                        </v-list>
+                                        <v-list rounded lines="two" v-else-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
                                             <template :key="idx"
                                                       v-for="(item, idx) in statisticsData.items">
                                                 <v-list-item class="pl-0" v-if="!item.hidden">
@@ -234,11 +265,12 @@ import {
     mdiArrowRight,
     mdiSort,
     mdiRefresh,
+    mdiSquareRounded,
     mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
     mdiPencilOutline,
-    mdiDotsVertical,
+    mdiDotsVertical
 } from '@mdi/js';
 
 import AccountFilterSettingsCard from './settings/cards/AccountFilterSettingsCard.vue';
@@ -267,6 +299,7 @@ export default {
                 right: mdiArrowRight,
                 sort: mdiSort,
                 refresh: mdiRefresh,
+                square: mdiSquareRounded,
                 menu: mdiMenu,
                 filter: mdiFilterOutline,
                 filterSettings: mdiFilterCogOutline,

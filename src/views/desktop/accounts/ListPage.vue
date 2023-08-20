@@ -7,22 +7,22 @@
                         <div class="mx-6 my-4">
                             <small>{{ $t('Net assets') }}</small>
                             <p class="text-body-1 text-income text-truncate mt-1 mb-3">
-                                <span v-if="!loading">{{ netAssets }}</span>
-                                <span v-else-if="loading">
+                                <span v-if="!loading || allAccountCount > 0">{{ netAssets }}</span>
+                                <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total liabilities') }}</small>
                             <p class="text-body-1 text-expense text-truncate mt-1 mb-3">
-                                <span v-if="!loading">{{ totalLiabilities }}</span>
-                                <span v-else-if="loading">
+                                <span v-if="!loading || allAccountCount > 0">{{ totalLiabilities }}</span>
+                                <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                             <small>{{ $t('Total assets') }}</small>
                             <p class="text-body-1 mt-1">
-                                <span v-if="!loading">{{ totalAssets }}</span>
-                                <span v-else-if="loading">
+                                <span v-if="!loading || allAccountCount > 0">{{ totalAssets }}</span>
+                                <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
@@ -34,7 +34,11 @@
                                    v-for="accountCategory in allAccountCategories">
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                                 <div class="d-flex flex-column text-truncate ml-2">
-                                    <small class="text-truncate text-left smaller">{{ accountCategoryTotalBalance(accountCategory) }}</small>
+                                    <small class="text-truncate text-left smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
+                                    <small class="text-truncate text-left smaller" v-else-if="loading && allAccountCount <= 0">
+                                        <v-skeleton-loader class="skeleton-no-margin"
+                                                           width="100px" height="16" type="text" :loading="true"></v-skeleton-loader>
+                                    </small>
                                     <span class="text-truncate text-left">{{ $t(accountCategory.name) }}</span>
                                 </div>
                             </v-tab>
@@ -93,10 +97,39 @@
                                         </v-btn>
                                     </v-card-text>
 
-                                    <div class="pl-2 pr-2 pr-md-4 mt-n4" v-if="loading && !hasAccount(activeAccountCategory)">
-                                        <v-skeleton-loader type="paragraph" :loading="loading"
-                                                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
-                                    </div>
+                                    <v-row class="pl-6 pr-6 pr-md-8" v-if="loading && !hasAccount(activeAccountCategory)">
+                                        <v-col cols="12">
+                                            <v-card border class="card-title-with-bg account-card mb-8 h-auto">
+                                                <template #title>
+                                                    <div class="account-title d-flex align-center">
+                                                        <v-icon class="disabled mr-0" size="28px" :icon="icons.square" />
+                                                        <span class="account-name text-truncate ml-2">
+                                                            <v-skeleton-loader class="skeleton-no-margin my-1"
+                                                                               width="120px" type="text" :loading="true"></v-skeleton-loader>
+                                                        </span>
+                                                        <v-spacer/>
+                                                        <span class="align-self-center">
+                                                            <v-icon class="disabled" :icon="icons.drag"/>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                                <v-divider/>
+                                                <v-card-text>
+                                                    <div class="d-flex account-toolbar align-center">
+                                                        <v-btn class="px-2" density="comfortable" color="default" variant="text"
+                                                               :disabled="true" :prepend-icon="icons.transactions">
+                                                            {{ $t('Transaction List') }}
+                                                        </v-btn>
+                                                        <v-spacer/>
+                                                        <span class="account-balance ml-2">
+                                                            <v-skeleton-loader class="skeleton-no-margin"
+                                                                               width="100px" type="text" :loading="true"></v-skeleton-loader>
+                                                        </span>
+                                                    </div>
+                                                </v-card-text>
+                                            </v-card>
+                                        </v-col>
+                                    </v-row>
 
                                     <v-row class="pl-5 pr-2 pr-md-4" v-if="!loading && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
@@ -244,12 +277,13 @@ import {
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiRefresh,
+    mdiSquareRounded,
     mdiMenu,
     mdiPencilOutline,
     mdiDeleteOutline,
     mdiListBoxOutline,
     mdiDrag,
-    mdiDotsVertical,
+    mdiDotsVertical
 } from '@mdi/js';
 
 export default {
@@ -272,6 +306,7 @@ export default {
                 eye: mdiEyeOutline,
                 eyeSlash: mdiEyeOffOutline,
                 refresh: mdiRefresh,
+                square: mdiSquareRounded,
                 menu: mdiMenu,
                 edit: mdiPencilOutline,
                 show: mdiEyeOutline,
@@ -296,6 +331,9 @@ export default {
         },
         categorizedAccounts() {
             return this.accountsStore.allCategorizedAccounts;
+        },
+        allAccountCount() {
+            return this.accountsStore.allAvailableAccountsCount;
         },
         netAssets() {
             const netAssets = this.accountsStore.getNetAssets(this.showAccountBalance);

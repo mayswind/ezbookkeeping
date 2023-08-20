@@ -10,22 +10,22 @@
     >
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
-                <span class="text-truncate" v-if="showPrimaryName">{{ primaryItemDisplayName }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="showPrimaryName" />
+                <span class="text-truncate" v-if="!selectedPrimaryItem && !selectedSecondaryItem">{{ noItemDisplayName }}</span>
+                <span class="text-truncate" v-if="showPrimaryName && selectedPrimaryItem">{{ primaryItemDisplayName }}</span>
+                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="showPrimaryName && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="mr-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem ? selectedSecondaryItem[secondaryIconField] : null"
                           :color="selectedSecondaryItem ? selectedSecondaryItem[secondaryColorField] : null"
                           v-if="selectedSecondaryItem && showSecondaryIcon" />
-                <span class="text-truncate">{{ secondaryItemDisplayName }}</span>
+                <span class="text-truncate" v-if="selectedSecondaryItem">{{ secondaryItemDisplayName }}</span>
             </div>
         </template>
 
         <template #no-data>
             <div ref="dropdownMenu" class="two-column-list-container">
                 <div class="primary-list-container">
-                    <v-list>
+                    <v-list :class="{ 'list-item-with-header': !!primaryHeaderField, 'list-item-with-footer': !!primaryFooterField }">
                         <v-list-item :class="{ 'primary-list-item-selected v-list-item--active text-primary': item === selectedPrimaryItem }"
-                                     :title="$tIf(item[primaryTitleField], primaryTitleI18n)"
                                      :key="primaryKeyField ? item[primaryKeyField] : item"
                                      v-for="item in items"
                                      @click="onPrimaryItemClicked(item)">
@@ -33,19 +33,29 @@
                                 <ItemIcon class="mr-2" :icon-type="primaryIconType"
                                           :icon-id="item[primaryIconField]" :color="item[primaryColorField]"></ItemIcon>
                             </template>
+                            <template #title>
+                                <div class="list-item-header" v-if="primaryHeaderField">{{ $tIf(item[primaryHeaderField], primaryHeaderI18n) }}</div>
+                                <div>{{ $tIf(item[primaryTitleField], primaryTitleI18n) }}</div>
+                                <div class="list-item-footer" v-if="primaryFooterField">{{ $tIf(item[primaryFooterField], primaryFooterI18n) }}</div>
+                            </template>
                         </v-list-item>
                     </v-list>
                 </div>
                 <div class="secondary-list-container">
-                    <v-list v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
+                    <v-list :class="{ 'list-item-with-header': !!secondaryHeaderField, 'list-item-with-footer': !!secondaryFooterField }"
+                            v-if="selectedPrimaryItem && primarySubItemsField && selectedPrimaryItem[primarySubItemsField]">
                         <v-list-item :class="{ 'secondary-list-item-selected v-list-item--active text-primary': isSecondarySelected(subItem) }"
-                                     :title="$tIf(subItem[secondaryTitleField], secondaryTitleI18n)"
                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                      v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
                                 <ItemIcon class="mr-2" :icon-type="secondaryIconType"
                                           :icon-id="subItem[secondaryIconField]" :color="subItem[secondaryColorField]"></ItemIcon>
+                            </template>
+                            <template #title>
+                                <div class="list-item-header" v-if="secondaryHeaderField">{{ $tIf(subItem[secondaryHeaderField], secondaryHeaderI18n) }}</div>
+                                <div>{{ $tIf(subItem[secondaryTitleField], secondaryTitleI18n) }}</div>
+                                <div class="list-item-footer" v-if="secondaryFooterField">{{ $tIf(subItem[secondaryFooterField], secondaryFooterI18n) }}</div>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -80,6 +90,8 @@ export default {
         'primaryValueField',
         'primaryTitleField',
         'primaryTitleI18n',
+        'primaryHeaderField',
+        'primaryHeaderI18n',
         'primaryFooterField',
         'primaryFooterI18n',
         'primaryIconField',
@@ -90,6 +102,8 @@ export default {
         'secondaryValueField',
         'secondaryTitleField',
         'secondaryTitleI18n',
+        'secondaryHeaderField',
+        'secondaryHeaderI18n',
         'secondaryFooterField',
         'secondaryFooterI18n',
         'secondaryIconField',
@@ -233,5 +247,25 @@ export default {
     width: 100%;
     max-height: 310px;
     overflow-y: scroll;
+}
+
+.two-column-select-menu .list-item-with-header > .v-list-item,
+.two-column-select-menu .list-item-with-footer > .v-list-item {
+    min-height: 58px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.two-column-select-menu .list-item-with-header.list-item-with-footer > .v-list-item {
+    min-height: 78px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.two-column-select-menu .list-item-header,
+.two-column-select-menu .list-item-footer {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+    font-size: 0.75rem;
+    line-height: 1.2rem;
 }
 </style>

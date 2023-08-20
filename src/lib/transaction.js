@@ -92,11 +92,11 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         transaction.type = transaction2.type;
 
         if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
-            transaction.expenseCategory = transaction2.categoryId;
+            transaction.expenseCategory = transaction2.categoryId || '';
         } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
-            transaction.incomeCategory = transaction2.categoryId;
+            transaction.incomeCategory = transaction2.categoryId || '';
         } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
-            transaction.transferCategory = transaction2.categoryId;
+            transaction.transferCategory = transaction2.categoryId || '';
         }
 
         if (setContextData) {
@@ -118,7 +118,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         if (transaction2.destinationAmount) {
             transaction.destinationAmount = transaction2.destinationAmount;
         } else {
-            transaction.destinationAccountId = 0;
+            transaction.destinationAmount = 0;
         }
 
         transaction.hideAmount = transaction2.hideAmount;

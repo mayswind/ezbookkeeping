@@ -342,8 +342,6 @@ import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import logger from '@/lib/logger.js';
 import {
-    isNumber,
-    copyObjectTo,
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
@@ -352,10 +350,6 @@ import {
     getUtcOffsetByUtcOffsetMinutes,
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
-import {
-    getCategorizedAccounts,
-    getAllFilteredAccountsBalance
-} from '@/lib/account.js';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
@@ -458,68 +452,10 @@ export default {
             return this.accountsStore.allAccountsMap;
         },
         categorizedAccounts() {
-            const categorizedAccounts = copyObjectTo(getCategorizedAccounts(this.allVisibleAccounts), {});
-
-            for (let category in categorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
-                    continue;
-                }
-
-                const accountCategory = categorizedAccounts[category];
-
-                if (accountCategory.accounts) {
-                    for (let i = 0; i < accountCategory.accounts.length; i++) {
-                        const account = accountCategory.accounts[i];
-
-                        if (this.showAccountBalance && account.isAsset) {
-                            account.displayBalance = this.getDisplayCurrency(account.balance, account.currency);
-                        } else if (this.showAccountBalance && account.isLiability) {
-                            account.displayBalance = this.getDisplayCurrency(-account.balance, account.currency);
-                        } else {
-                            account.displayBalance = '***';
-                        }
-                    }
-                }
-
-                if (this.showAccountBalance) {
-                    const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
-                    let totalBalance = 0;
-                    let hasUnCalculatedAmount = false;
-
-                    for (let i = 0; i < accountsBalance.length; i++) {
-                        if (accountsBalance[i].currency === this.defaultCurrency) {
-                            if (accountsBalance[i].isAsset) {
-                                totalBalance += accountsBalance[i].balance;
-                            } else if (accountsBalance[i].isLiability) {
-                                totalBalance -= accountsBalance[i].balance;
-                            }
-                        } else {
-                            const balance = this.exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, this.defaultCurrency);
-
-                            if (!isNumber(balance)) {
-                                hasUnCalculatedAmount = true;
-                                continue;
-                            }
-
-                            if (accountsBalance[i].isAsset) {
-                                totalBalance += Math.floor(balance);
-                            } else if (accountsBalance[i].isLiability) {
-                                totalBalance -= Math.floor(balance);
-                            }
-                        }
-                    }
-
-                    if (hasUnCalculatedAmount) {
-                        totalBalance = totalBalance + '+';
-                    }
-
-                    accountCategory.displayBalance = this.getDisplayCurrency(totalBalance, this.defaultCurrency);
-                } else {
-                    accountCategory.displayBalance = '***';
-                }
-            }
-
-            return categorizedAccounts;
+            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.exchangeRatesStore, this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
         },
         allCategories() {
             return this.transactionCategoriesStore.allTransactionCategories;

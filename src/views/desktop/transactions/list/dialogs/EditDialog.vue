@@ -81,7 +81,7 @@
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
-                                                       :disabled="loading || submitting"
+                                                       :disabled="loading || submitting || !hasAvailableExpenseCategories"
                                                        :show-primary-name="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Expense]"
@@ -95,7 +95,7 @@
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
-                                                       :disabled="loading || submitting"
+                                                       :disabled="loading || submitting || !hasAvailableIncomeCategories"
                                                        :show-primary-name="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Income]"
@@ -109,7 +109,7 @@
                                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
-                                                       :disabled="loading || submitting"
+                                                       :disabled="loading || submitting || !hasAvailableTransferCategories"
                                                        :show-primary-name="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Transfer]"
@@ -117,84 +117,40 @@
                                     </two-column-select>
                                 </v-col>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
-                                    <v-select
-                                        item-title="name"
-                                        item-value="id"
-                                        persistent-placeholder
-                                        :readonly="mode === 'view'"
-                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                        :label="$t(sourceAccountTitle)"
-                                        :placeholder="$t(sourceAccountTitle)"
-                                        :items="allVisibleAccounts"
-                                        :no-data-text="$t('No results')"
-                                        v-model="transaction.sourceAccountId"
-                                    >
-                                        <template #selection="{ item }">
-                                            <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
-                                                <ItemIcon class="mr-2" icon-type="account" size="23px"
-                                                          :icon-id="getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'icon')"
-                                                          :color="getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'color')"
-                                                          v-if="getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'icon')" />
-                                                <span>{{ getAccountNameByKeyValue(transaction.sourceAccountId, 'id', 'name', $t('Not Specified')) }}</span>
-                                            </v-label>
-                                            <v-label v-if="!item || item.value === 0 || item.value === '0'">{{ $t('Not Specified') }}</v-label>
-                                        </template>
-
-                                        <template #item="{ props, item }">
-                                            <v-list-item :value="item.value" v-bind="props">
-                                                <template #title>
-                                                    <v-list-item-title>
-                                                        <div class="d-flex align-center">
-                                                            <ItemIcon icon-type="account"
-                                                                      :icon-id="item.raw.icon" :color="item.raw.color"
-                                                                      v-if="item.raw" />
-                                                            <span class="ml-2">{{ item.title }}</span>
-                                                        </div>
-                                                    </v-list-item-title>
-                                                </template>
-                                            </v-list-item>
-                                        </template>
-                                    </v-select>
+                                    <two-column-select primary-key-field="id" primary-value-field="category"
+                                                       primary-title-field="name" primary-footer-field="displayBalance"
+                                                       primary-icon-field="icon" primary-icon-type="account"
+                                                       primary-sub-items-field="accounts"
+                                                       :primary-title-i18n="true"
+                                                       secondary-key-field="id" secondary-value-field="id"
+                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                       :readonly="mode === 'view'"
+                                                       :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                       :show-secondary-icon="true"
+                                                       :label="$t(sourceAccountTitle)"
+                                                       :placeholder="$t(sourceAccountTitle)"
+                                                       :items="categorizedAccounts"
+                                                       v-model="transaction.sourceAccountId">
+                                    </two-column-select>
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="transaction.type === allTransactionTypes.Transfer">
-                                    <v-select
-                                        item-title="name"
-                                        item-value="id"
-                                        persistent-placeholder
-                                        :readonly="mode === 'view'"
-                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                        :label="$t('Destination Account')"
-                                        :placeholder="$t('Destination Account')"
-                                        :items="allVisibleAccounts"
-                                        :no-data-text="$t('No results')"
-                                        v-model="transaction.destinationAccountId"
-                                    >
-                                        <template #selection="{ item }">
-                                            <v-label class="cursor-pointer" v-if="item && item.value !== 0 && item.value !== '0'">
-                                                <ItemIcon class="mr-2" icon-type="account" size="23px"
-                                                          :icon-id="getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'icon')"
-                                                          :color="getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'color')"
-                                                          v-if="getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'icon')" />
-                                                <span>{{ getAccountNameByKeyValue(transaction.destinationAccountId, 'id', 'name', $t('Not Specified')) }}</span>
-                                            </v-label>
-                                            <v-label v-if="!item || item.value === 0 || item.value === '0'">{{ $t('Not Specified') }}</v-label>
-                                        </template>
-
-                                        <template #item="{ props, item }">
-                                            <v-list-item :value="item.value" v-bind="props">
-                                                <template #title>
-                                                    <v-list-item-title>
-                                                        <div class="d-flex align-center">
-                                                            <ItemIcon icon-type="account"
-                                                                      :icon-id="item.raw.icon" :color="item.raw.color"
-                                                                      v-if="item.raw" />
-                                                            <span class="ml-2">{{ item.title }}</span>
-                                                        </div>
-                                                    </v-list-item-title>
-                                                </template>
-                                            </v-list-item>
-                                        </template>
-                                    </v-select>
+                                    <two-column-select primary-key-field="id" primary-value-field="category"
+                                                       primary-title-field="name" primary-footer-field="displayBalance"
+                                                       primary-icon-field="icon" primary-icon-type="account"
+                                                       primary-sub-items-field="accounts"
+                                                       :primary-title-i18n="true"
+                                                       secondary-key-field="id" secondary-value-field="id"
+                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                       :readonly="mode === 'view'"
+                                                       :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                       :show-secondary-icon="true"
+                                                       :label="$t('Destination Account')"
+                                                       :placeholder="$t('Destination Account')"
+                                                       :items="categorizedAccounts"
+                                                       v-model="transaction.destinationAccountId">
+                                    </two-column-select>
                                 </v-col>
                                 <v-col cols="12" md="6">
                                     <date-time-select
@@ -352,6 +308,9 @@ import {
 import {
     getUtcOffsetByUtcOffsetMinutes
 } from '@/lib/datetime.js';
+import {
+    getFirstAvailableCategoryId
+} from '@/lib/category.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
 import { getMapProvider } from '@/lib/server_settings.js';
 
@@ -460,6 +419,12 @@ export default {
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
         },
+        categorizedAccounts() {
+            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.exchangeRatesStore, this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, {
+                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
+                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
+            });
+        },
         allAccountsMap() {
             return this.accountsStore.allAccountsMap;
         },
@@ -477,7 +442,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Expense]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableIncomeCategories() {
@@ -485,7 +450,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Income]);
             return firstAvailableCategoryId !== '';
         },
         hasAvailableTransferCategories() {
@@ -493,7 +458,7 @@ export default {
                 return false;
             }
 
-            const firstAvailableCategoryId = this.getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
+            const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
             return firstAvailableCategoryId !== '';
         },
         transactionDisplayTimezone() {
@@ -521,6 +486,9 @@ export default {
             } else {
                 return this.$t('No Location');
             }
+        },
+        showAccountBalance() {
+            return this.settingsStore.appSettings.showAccountBalance;
         },
         mapProvider() {
             return getMapProvider();

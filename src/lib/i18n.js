@@ -13,6 +13,7 @@ import {
     isNumber,
     getTextBefore,
     getTextAfter,
+    copyObjectTo,
     copyArrayTo
 } from './common.js';
 
@@ -36,6 +37,11 @@ import {
 import {
     numericCurrencyToString
 } from './currency.js';
+
+import {
+    getCategorizedAccounts,
+    getAllFilteredAccountsBalance
+} from '@/lib/account.js';
 
 import logger from './logger.js';
 import services from './services.js';
@@ -988,6 +994,71 @@ function getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMod
     };
 }
 
+function getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options, translateFn) {
+    const categorizedAccounts = copyObjectTo(getCategorizedAccounts(allVisibleAccounts), {});
+
+    for (let category in categorizedAccounts) {
+        if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
+            continue;
+        }
+
+        const accountCategory = categorizedAccounts[category];
+
+        if (accountCategory.accounts) {
+            for (let i = 0; i < accountCategory.accounts.length; i++) {
+                const account = accountCategory.accounts[i];
+
+                if (showAccountBalance && account.isAsset) {
+                    account.displayBalance = getDisplayCurrency(account.balance, account.currency, options, translateFn);
+                } else if (showAccountBalance && account.isLiability) {
+                    account.displayBalance = getDisplayCurrency(-account.balance, account.currency, options, translateFn);
+                } else {
+                    account.displayBalance = '***';
+                }
+            }
+        }
+
+        if (showAccountBalance) {
+            const accountsBalance = getAllFilteredAccountsBalance(categorizedAccounts, account => account.category === accountCategory.category);
+            let totalBalance = 0;
+            let hasUnCalculatedAmount = false;
+
+            for (let i = 0; i < accountsBalance.length; i++) {
+                if (accountsBalance[i].currency === defaultCurrency) {
+                    if (accountsBalance[i].isAsset) {
+                        totalBalance += accountsBalance[i].balance;
+                    } else if (accountsBalance[i].isLiability) {
+                        totalBalance -= accountsBalance[i].balance;
+                    }
+                } else {
+                    const balance = exchangeRatesStore.getExchangedAmount(accountsBalance[i].balance, accountsBalance[i].currency, defaultCurrency);
+
+                    if (!isNumber(balance)) {
+                        hasUnCalculatedAmount = true;
+                        continue;
+                    }
+
+                    if (accountsBalance[i].isAsset) {
+                        totalBalance += Math.floor(balance);
+                    } else if (accountsBalance[i].isLiability) {
+                        totalBalance -= Math.floor(balance);
+                    }
+                }
+            }
+
+            if (hasUnCalculatedAmount) {
+                totalBalance = totalBalance + '+';
+            }
+
+            accountCategory.displayBalance = getDisplayCurrency(totalBalance, defaultCurrency, options, translateFn);
+        } else {
+            accountCategory.displayBalance = '***';
+        }
+    }
+
+    return categorizedAccounts;
+}
+
 function joinMultiText(textArray, translateFn) {
     if (!textArray || !textArray.length) {
         return '';
@@ -1231,6 +1302,7 @@ export function i18nFunctions(i18nGlobal) {
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
         getDisplayCurrencyPrependAndAppendText: (currencyCode, currencyDisplayMode) => getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMode, i18nGlobal.t),
+        getCategorizedAccountsWithDisplayBalance: (exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options) => getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),

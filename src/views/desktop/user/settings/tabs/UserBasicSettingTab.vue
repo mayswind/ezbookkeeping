@@ -224,11 +224,11 @@ import { useAccountsStore } from '@/stores/account.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import { getCategorizedAccounts } from '@/lib/account.js';
 
 import {
     mdiAccount
 } from '@mdi/js';
-import {getCategorizedAccounts} from "@/lib/account";
 
 export default {
     data() {

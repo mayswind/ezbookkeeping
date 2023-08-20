@@ -45,7 +45,7 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.14.1/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.15.1/LICENSE"
     },
     {
         "name": "jwt-go",
@@ -79,7 +79,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.9.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.12.0:LICENSE"
     },
     {
         "name": "barcode",
@@ -108,7 +108,7 @@
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.4/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.6/LICENSE"
     },
     {
         "name": "vue-router",
@@ -126,7 +126,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.11/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.13/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -138,13 +138,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.2.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.0/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.2.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.0/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -162,7 +162,7 @@
         "name": "Swiper",
         "copyright": "Copyright (c) 2019 Vladimir Kharlampidi",
         "url": "https://swiperjs.com",
-        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v10.0.4/LICENSE"
+        "licenseUrl": "https://github.com/nolimits4web/swiper/blob/v10.2.0/LICENSE"
     },
     {
         "name": "Skeleton Elements",
@@ -174,13 +174,13 @@
         "name": "Apache ECharts",
         "copyright": "Copyright © 2017-2023, The Apache Software Foundation Apache ECharts, ECharts, Apache, the Apache feather, and the Apache ECharts project logo are either registered trademarks or trademarks of the Apache Software Foundation.",
         "url": "https://echarts.apache.org/",
-        "licenseUrl": "https://github.com/apache/echarts/blob/5.4.2/LICENSE"
+        "licenseUrl": "https://github.com/apache/echarts/blob/5.4.3/LICENSE"
     },
     {
         "name": "vue-echarts",
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.0/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.1/LICENSE"
     },
     {
         "name": "vue3-perfect-scrollbar",

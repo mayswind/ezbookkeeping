@@ -366,8 +366,7 @@ export default {
             self.accountsStore.saveAccount({
                 account: self.account,
                 subAccounts: self.subAccounts,
-                isEdit: !!self.editAccountId,
-                isFloatBalance: true
+                isEdit: !!self.editAccountId
             }).then(() => {
                 self.submitting = false;
 

@@ -613,8 +613,7 @@ export default {
             self.accountsStore.saveAccount({
                 account: self.account,
                 subAccounts: self.subAccounts,
-                isEdit: !!self.editAccountId,
-                isFloatBalance: false
+                isEdit: !!self.editAccountId
             }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();

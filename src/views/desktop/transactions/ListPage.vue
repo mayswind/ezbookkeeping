@@ -403,7 +403,6 @@ export default {
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
             showCustomDateRangeDialog: false,
-            transactionRemoving: {},
             icons: {
                 search: mdiMagnify,
                 check: mdiCheck,
@@ -413,7 +412,6 @@ export default {
                 dropdownMenu: mdiMenuDown,
                 modifyBalance: mdiPencilBoxOutline,
                 arrowRight: mdiArrowRight,
-                remove: mdiDeleteOutline,
                 more: mdiDotsVertical
             }
         };
@@ -861,29 +859,6 @@ export default {
                 if (error) {
                     self.$refs.snackbar.showError(error);
                 }
-            });
-        },
-        remove(transaction) {
-            const self = this;
-
-            self.$refs.confirmDialog.open('Are you sure you want to delete this transaction?').then(() => {
-                self.updating = true;
-                self.transactionRemoving[transaction.id] = true;
-
-                self.transactionsStore.deleteTransaction({
-                    transaction: transaction,
-                    defaultCurrency: self.defaultCurrency
-                }).then(() => {
-                    self.updating = false;
-                    self.transactionRemoving[transaction.id] = false;
-                }).catch(error => {
-                    self.updating = false;
-                    self.transactionRemoving[transaction.id] = false;
-
-                    if (!error.processed) {
-                        self.$refs.snackbar.showError(error);
-                    }
-                });
             });
         },
         scrollCategoryMenuToSelectedItem(opened) {

@@ -14,6 +14,7 @@ import { formatPercent } from '@/lib/common.js';
 
 export default {
     props: [
+        'skeleton',
         'items',
         'idField',
         'nameField',
@@ -202,7 +203,8 @@ export default {
                             formatter: params => {
                                 return params.data ? params.data.displayName : '';
                             }
-                        }
+                        },
+                        animation: !self.skeleton
                     }
                 ],
                 media: [

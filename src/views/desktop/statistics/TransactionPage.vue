@@ -137,6 +137,7 @@
                                                 {id: '2', name: '---', value: 20, color: 'a5a5aa'},
                                                 {id: '3', name: '---', value: 20, color: 'c5c5c9'}
                                             ]"
+                                            :skeleton="true"
                                             id-field="id"
                                             name-field="name"
                                             value-field="value"

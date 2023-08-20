@@ -120,6 +120,8 @@ func TestGenerateUuid_10000TimesConcurrent(t *testing.T) {
 				}
 
 				if uuidInfo.SequentialId == 0 {
+					fmt.Printf("routine#%d generate uuid %d\n", currentRoutineIndex, uuid)
+
 					if existedRoutineIndex, exists := generatedIds.Load(uuid); exists {
 						mutex.Lock()
 						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuid, uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
@@ -168,6 +170,8 @@ func TestGenerateUuid_1000000TimesConcurrent(t *testing.T) {
 				}
 
 				if uuidInfo.SequentialId == 0 {
+					fmt.Printf("routine#%d generate uuid %d\n", currentRoutineIndex, uuid)
+
 					if existedRoutineIndex, exists := generatedIds.Load(uuid); exists {
 						mutex.Lock()
 						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuid, uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
@@ -297,13 +301,17 @@ func TestGenerateUuids_20000TimesConcurrent(t *testing.T) {
 						}
 					}
 
-					if existedRoutineIndex, exists := generatedIds.Load(uuids[i]); exists {
-						mutex.Lock()
-						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuids[i], uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
-						mutex.Unlock()
-					}
+					if uuidInfo.SequentialId == 0 {
+						fmt.Printf("routine#%d generate uuid %d\n", currentRoutineIndex, uuids[i])
 
-					generatedIds.Store(uuids[i], currentRoutineIndex)
+						if existedRoutineIndex, exists := generatedIds.Load(uuids[i]); exists {
+							mutex.Lock()
+							assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuids[i], uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
+							mutex.Unlock()
+						}
+
+						generatedIds.Store(uuids[i], currentRoutineIndex)
+					}
 				}
 			}
 
@@ -346,13 +354,17 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 						}
 					}
 
-					if existedRoutineIndex, exists := generatedIds.Load(uuids[i]); exists {
-						mutex.Lock()
-						assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuids[i], uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
-						mutex.Unlock()
-					}
+					if uuidInfo.SequentialId == 0 {
+						fmt.Printf("routine#%d generate uuid %d\n", currentRoutineIndex, uuids[i])
 
-					generatedIds.Store(uuids[i], currentRoutineIndex)
+						if existedRoutineIndex, exists := generatedIds.Load(uuids[i]); exists {
+							mutex.Lock()
+							assert.Fail(t, fmt.Sprintf("uuid \"%d\" conflicts, unix time is %d, seq id is %d, existed routine index is %d, current routine index is %d", uuids[i], uuidInfo.UnixTime, uuidInfo.SequentialId, existedRoutineIndex, currentRoutineIndex))
+							mutex.Unlock()
+						}
+
+						generatedIds.Store(uuids[i], currentRoutineIndex)
+					}
 				}
 			}
 

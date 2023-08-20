@@ -255,7 +255,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
 import categoryConstants from '@/consts/category.js';
-import { categoriedArrayToPlainArray } from '@/lib/common.js';
+import { categorizedArrayToPlainArray } from '@/lib/common.js';
 
 import {
     mdiArrowLeft,
@@ -415,7 +415,7 @@ export default {
             let submitCategories = [];
 
             if (self.usePresetCategories) {
-                submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
+                submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({

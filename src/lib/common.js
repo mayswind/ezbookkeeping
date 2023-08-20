@@ -345,7 +345,7 @@ export function arrayContainsFieldValue(array, fieldName, value) {
     return false;
 }
 
-export function categoriedArrayToPlainArray(object) {
+export function categorizedArrayToPlainArray(object) {
     const ret = [];
 
     for (let field in object) {

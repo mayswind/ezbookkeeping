@@ -71,7 +71,7 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
-import { categoriedArrayToPlainArray } from '@/lib/common.js';
+import { categorizedArrayToPlainArray } from '@/lib/common.js';
 
 import {
     mdiDotsVertical
@@ -131,7 +131,7 @@ export default {
 
             self.submitting = true;
 
-            const submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
+            const submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
 
             self.transactionCategoriesStore.addCategories({
                 categories: submitCategories

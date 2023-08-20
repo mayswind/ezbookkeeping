@@ -59,7 +59,7 @@ import { mapStores } from 'pinia';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 
 import categoryConstants from '@/consts/category.js';
-import { getObjectOwnFieldCount, categoriedArrayToPlainArray } from '@/lib/common.js';
+import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.js';
 
 export default {
     props: [
@@ -115,7 +115,7 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            const submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
+            const submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
 
             self.transactionCategoriesStore.addCategories({
                 categories: submitCategories

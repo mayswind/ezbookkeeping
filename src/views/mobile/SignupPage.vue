@@ -182,7 +182,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
-import { getNameByKeyValue, categoriedArrayToPlainArray } from '@/lib/common.js';
+import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.js';
 
 export default {
     props: [
@@ -298,7 +298,7 @@ export default {
             let submitCategories = [];
 
             if (self.usePresetCategories) {
-                submitCategories = categoriedArrayToPlainArray(self.allPresetCategories);
+                submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({

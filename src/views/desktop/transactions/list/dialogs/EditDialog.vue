@@ -698,7 +698,7 @@ export default {
 </script>
 
 <style>
-.transaction-edit-amount .v-field__input > input {
+.transaction-edit-amount .v-field__field > input {
     font-size: 1.25rem;
 }
 

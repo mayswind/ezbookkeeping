@@ -372,7 +372,6 @@ import {
     mdiMenuDown,
     mdiPencilBoxOutline,
     mdiArrowRight,
-    mdiDeleteOutline,
     mdiDotsVertical
 } from '@mdi/js';
 

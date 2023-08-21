@@ -116,7 +116,7 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
     return ret;
 }
 
-export function isCategoryIdAvailable(categories, categoryId) {
+export function isSubCategoryIdAvailable(categories, categoryId) {
     if (!categories || !categories.length) {
         return false;
     }
@@ -142,6 +142,26 @@ export function getFirstAvailableCategoryId(categories) {
             return categories[i].subCategories[j].id;
         }
     }
+}
+
+export function getFirstAvaiableSubCategoryId(categories, categoryId) {
+    if (!categories || !categories.length) {
+        return '';
+    }
+
+    for (let i = 0; i < categories.length; i++) {
+        if (categories[i].id !== categoryId) {
+            continue;
+        }
+
+        if (categories[i].subCategories.length <= 0) {
+            return '';
+        }
+
+        return categories[i].subCategories[0].id;
+    }
+
+    return '';
 }
 
 export function hasAnyAvailableCategory(allVisibleTransactionCategories) {

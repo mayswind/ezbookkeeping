@@ -9,8 +9,9 @@ import {
 } from './datetime.js';
 import {
     categoryTypeToTransactionType,
-    isCategoryIdAvailable,
-    getFirstAvailableCategoryId
+    isSubCategoryIdAvailable,
+    getFirstAvailableCategoryId,
+    getFirstAvaiableSubCategoryId
 } from './category.js';
 
 export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData) {
@@ -25,8 +26,12 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
     if (allCategories[categoryConstants.allCategoryTypes.Expense] &&
         allCategories[categoryConstants.allCategoryTypes.Expense].length) {
-        if (options.categoryId && options.categoryId !== '0' && isCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId)) {
-            transaction.expenseCategory = options.categoryId;
+        if (options.categoryId && options.categoryId !== '0') {
+            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId)) {
+                transaction.expenseCategory = options.categoryId;
+            } else {
+                transaction.expenseCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId);
+            }
         }
 
         if (!transaction.expenseCategory) {
@@ -36,8 +41,12 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
     if (allCategories[categoryConstants.allCategoryTypes.Income] &&
         allCategories[categoryConstants.allCategoryTypes.Income].length) {
-        if (options.categoryId && options.categoryId !== '0' && isCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId)) {
-            transaction.incomeCategory = options.categoryId;
+        if (options.categoryId && options.categoryId !== '0') {
+            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId)) {
+                transaction.incomeCategory = options.categoryId;
+            } else {
+                transaction.incomeCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId);
+            }
         }
 
         if (!transaction.incomeCategory) {
@@ -47,8 +56,12 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
     if (allCategories[categoryConstants.allCategoryTypes.Transfer] &&
         allCategories[categoryConstants.allCategoryTypes.Transfer].length) {
-        if (options.categoryId && options.categoryId !== '0' && isCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId)) {
-            transaction.transferCategory = options.categoryId;
+        if (options.categoryId && options.categoryId !== '0') {
+            if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId)) {
+                transaction.transferCategory = options.categoryId;
+            } else {
+                transaction.transferCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId);
+            }
         }
 
         if (!transaction.transferCategory) {

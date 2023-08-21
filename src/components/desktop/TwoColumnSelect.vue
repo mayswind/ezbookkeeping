@@ -36,9 +36,9 @@
                                           :icon-id="item[primaryIconField]" :color="item[primaryColorField]"></ItemIcon>
                             </template>
                             <template #title>
-                                <div class="list-item-header" v-if="primaryHeaderField">{{ $tIf(item[primaryHeaderField], primaryHeaderI18n) }}</div>
-                                <div>{{ $tIf(item[primaryTitleField], primaryTitleI18n) }}</div>
-                                <div class="list-item-footer" v-if="primaryFooterField">{{ $tIf(item[primaryFooterField], primaryFooterI18n) }}</div>
+                                <div class="list-item-header text-truncate" v-if="primaryHeaderField">{{ $tIf(item[primaryHeaderField], primaryHeaderI18n) }}</div>
+                                <div class="text-truncate">{{ $tIf(item[primaryTitleField], primaryTitleI18n) }}</div>
+                                <div class="list-item-footer text-truncate" v-if="primaryFooterField">{{ $tIf(item[primaryFooterField], primaryFooterI18n) }}</div>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -55,9 +55,9 @@
                                           :icon-id="subItem[secondaryIconField]" :color="subItem[secondaryColorField]"></ItemIcon>
                             </template>
                             <template #title>
-                                <div class="list-item-header" v-if="secondaryHeaderField">{{ $tIf(subItem[secondaryHeaderField], secondaryHeaderI18n) }}</div>
-                                <div>{{ $tIf(subItem[secondaryTitleField], secondaryTitleI18n) }}</div>
-                                <div class="list-item-footer" v-if="secondaryFooterField">{{ $tIf(subItem[secondaryFooterField], secondaryFooterI18n) }}</div>
+                                <div class="list-item-header text-truncate" v-if="secondaryHeaderField">{{ $tIf(subItem[secondaryHeaderField], secondaryHeaderI18n) }}</div>
+                                <div class="text-truncate">{{ $tIf(subItem[secondaryTitleField], secondaryTitleI18n) }}</div>
+                                <div class="list-item-footer text-truncate" v-if="secondaryFooterField">{{ $tIf(subItem[secondaryFooterField], secondaryFooterI18n) }}</div>
                             </template>
                         </v-list-item>
                     </v-list>

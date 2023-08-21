@@ -254,7 +254,8 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr class="transaction-table-row-data text-sm cursor-pointer"
+                                            <tr class="transaction-table-row-data text-sm"
+                                                :class="{ 'cursor-pointer': transaction.type !== allTransactionTypes.ModifyBalance }"
                                                 @click="show(transaction)">
                                                 <td class="transaction-table-column-time">
                                                     <div class="d-flex flex-column">
@@ -848,6 +849,10 @@ export default {
         },
         show(transaction) {
             const self = this;
+
+            if (transaction.type === self.allTransactionTypes.ModifyBalance) {
+                return;
+            }
 
             self.$refs.editDialog.open({
                 id: transaction.id,

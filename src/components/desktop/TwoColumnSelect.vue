@@ -6,6 +6,7 @@
         :label="label"
         :menu-props="{ 'content-class': 'two-column-select-menu' }"
         v-model="currentSecondaryValue"
+        v-model:menu="menuState"
         @update:menu="onMenuStateChanged"
     >
         <template #selection>
@@ -117,6 +118,7 @@ export default {
     ],
     data() {
         return {
+            menuState: false,
             icons: {
                 chevronRight: mdiChevronRight
             }
@@ -143,6 +145,7 @@ export default {
                 return this.modelValue;
             },
             set: function (value) {
+                this.menuState = false;
                 this.$emit('update:modelValue', value);
             }
         },

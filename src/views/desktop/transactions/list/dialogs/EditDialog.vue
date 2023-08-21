@@ -279,11 +279,13 @@
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view'" @click="duplicate">{{ $t('Duplicate') }}</v-btn>
+                           v-if="mode === 'view' && transaction.type !== allTransactionTypes.ModifyBalance"
+                           @click="duplicate">{{ $t('Duplicate') }}</v-btn>
                     <v-btn color="warning" variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view'" @click="edit">{{ $t('Edit') }}</v-btn>
+                           v-if="mode === 'view' && originalTransactionEditable && transaction.type !== allTransactionTypes.ModifyBalance"
+                           @click="edit">{{ $t('Edit') }}</v-btn>
                     <v-btn color="error" variant="tonal" :disabled="loading || submitting"
-                           v-if="mode === 'view'" @click="remove">
+                           v-if="mode === 'view' && originalTransactionEditable" @click="remove">
                         {{ $t('Delete') }}
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
@@ -346,6 +348,7 @@ export default {
             mode: 'add',
             activeTab: 'basicInfo',
             editTransactionId: null,
+            originalTransactionEditable: false,
             loading: true,
             transaction: newTransaction,
             geoLocationStatus: null,
@@ -550,6 +553,7 @@ export default {
             self.activeTab = 'basicInfo';
             self.loading = true;
             self.submitting = false;
+            self.originalTransactionEditable = false;
 
             const newTransaction = self.transactionsStore.generateNewTransactionModel(options.type);
             self.setTransaction(newTransaction, options, true);
@@ -597,6 +601,7 @@ export default {
                 if (options.id && responses[3]) {
                     const transaction = responses[3];
                     self.setTransaction(transaction, options, true);
+                    self.originalTransactionEditable = transaction.editable;
                 } else {
                     self.setTransaction(null, options, true);
                 }

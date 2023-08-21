@@ -85,7 +85,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableExpenseCategories"
-                                                       :show-primary-name="true"
+                                                       :show-selection-primary-text="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Expense]"
                                                        v-model="transaction.expenseCategory">
@@ -99,7 +99,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableIncomeCategories"
-                                                       :show-primary-name="true"
+                                                       :show-selection-primary-text="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Income]"
                                                        v-model="transaction.incomeCategory">
@@ -113,7 +113,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableTransferCategories"
-                                                       :show-primary-name="true"
+                                                       :show-selection-primary-text="true"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Transfer]"
                                                        v-model="transaction.transferCategory">

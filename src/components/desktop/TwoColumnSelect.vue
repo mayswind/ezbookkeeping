@@ -12,14 +12,14 @@
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
                 <span class="text-truncate" v-if="selectionText">{{ selectionText }}</span>
-                <span class="text-truncate" v-if="!selectionText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noItemDisplayName }}</span>
-                <span class="text-truncate" v-if="!selectionText && showPrimaryName && selectedPrimaryItem">{{ primaryItemDisplayName }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!selectionText && showPrimaryName && selectedPrimaryItem && selectedSecondaryItem" />
+                <span class="text-truncate" v-if="!selectionText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
+                <span class="text-truncate" v-if="!selectionText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
+                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!selectionText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="mr-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem ? selectedSecondaryItem[secondaryIconField] : null"
                           :color="selectedSecondaryItem ? selectedSecondaryItem[secondaryColorField] : null"
-                          v-if="!selectionText && selectedSecondaryItem && showSecondaryIcon" />
-                <span class="text-truncate" v-if="!selectionText && selectedSecondaryItem">{{ secondaryItemDisplayName }}</span>
+                          v-if="!selectionText && selectedSecondaryItem && showSelectionSecondaryIcon" />
+                <span class="text-truncate" v-if="!selectionText && selectedSecondaryItem">{{ selectionSecondaryItemText }}</span>
             </div>
         </template>
 
@@ -87,8 +87,8 @@ export default {
         'readonly',
         'label',
         'selectionText',
-        'showPrimaryName',
-        'showSecondaryIcon',
+        'showSelectionPrimaryText',
+        'showSelectionSecondaryIcon',
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',
@@ -165,26 +165,26 @@ export default {
                 return null;
             }
         },
-        noItemDisplayName() {
+        noSelectionText() {
             return this.noItemText ? this.noItemText : this.$t('None');
         },
-        primaryItemDisplayName() {
+        selectionPrimaryItemText() {
             if (this.primaryValueField && this.primaryTitleField) {
                 if (this.currentPrimaryValue) {
-                    return getNameByKeyValue(this.items, this.currentPrimaryValue, this.primaryValueField, this.primaryTitleField, this.noItemDisplayName);
+                    return getNameByKeyValue(this.items, this.currentPrimaryValue, this.primaryValueField, this.primaryTitleField, this.noSelectionText);
                 } else {
-                    return this.noItemDisplayName;
+                    return this.noSelectionText;
                 }
             } else {
                 return this.currentPrimaryValue;
             }
         },
-        secondaryItemDisplayName() {
+        selectionSecondaryItemText() {
             if (this.secondaryValueField && this.secondaryTitleField) {
                 if (this.currentSecondaryValue && this.selectedPrimaryItem && this.selectedPrimaryItem[this.primarySubItemsField]) {
-                    return getNameByKeyValue(this.selectedPrimaryItem[this.primarySubItemsField], this.currentSecondaryValue, this.secondaryValueField, this.secondaryTitleField, this.noItemDisplayName);
+                    return getNameByKeyValue(this.selectedPrimaryItem[this.primarySubItemsField], this.currentSecondaryValue, this.secondaryValueField, this.secondaryTitleField, this.noSelectionText);
                 } else {
-                    return this.noItemDisplayName;
+                    return this.noSelectionText;
                 }
             } else {
                 return this.currentSecondaryValue;

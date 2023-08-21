@@ -415,7 +415,7 @@ export default {
             } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 return 'Transfer Out Amount';
             } else {
-                return '';
+                return 'Amount';
             }
         },
         sourceAccountTitle() {
@@ -424,7 +424,7 @@ export default {
             } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
                 return 'Source Account';
             } else {
-                return '';
+                return 'Account';
             }
         },
         defaultCurrency() {

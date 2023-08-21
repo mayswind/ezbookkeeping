@@ -276,7 +276,7 @@
                 </v-window>
             </v-card-text>
             <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
+                <div class="w-100 d-flex justify-center flex-wrap mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn :disabled="inputIsEmpty || loading || submitting" v-if="mode !== 'view'" @click="save">
                         {{ $t(saveButtonTitle) }}
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>

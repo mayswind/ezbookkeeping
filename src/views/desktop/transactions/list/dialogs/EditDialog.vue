@@ -130,7 +130,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :show-secondary-icon="true"
+                                                       :selection-text="sourceAccountName"
                                                        :label="$t(sourceAccountTitle)"
                                                        :placeholder="$t(sourceAccountTitle)"
                                                        :items="categorizedAccounts"
@@ -148,7 +148,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :show-secondary-icon="true"
+                                                       :selection-text="destinationAccountName"
                                                        :label="$t('Destination Account')"
                                                        :placeholder="$t('Destination Account')"
                                                        :items="categorizedAccounts"
@@ -317,6 +317,9 @@ import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import logger from '@/lib/logger.js';
 import {
+    getNameByKeyValue
+} from '@/lib/common.js';
+import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
@@ -474,6 +477,20 @@ export default {
 
             const firstAvailableCategoryId = getFirstAvailableCategoryId(this.allCategories[this.allCategoryTypes.Transfer]);
             return firstAvailableCategoryId !== '';
+        },
+        sourceAccountName() {
+            if (this.transaction.sourceAccountId) {
+                return getNameByKeyValue(this.allAccounts, this.transaction.sourceAccountId, 'id', 'name');
+            } else {
+                return this.$t('None');
+            }
+        },
+        destinationAccountName() {
+            if (this.transaction.destinationAccountId) {
+                return getNameByKeyValue(this.allAccounts, this.transaction.destinationAccountId, 'id', 'name');
+            } else {
+                return this.$t('None');
+            }
         },
         transactionDisplayTimezone() {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;

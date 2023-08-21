@@ -11,14 +11,15 @@
     >
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
-                <span class="text-truncate" v-if="!selectedPrimaryItem && !selectedSecondaryItem">{{ noItemDisplayName }}</span>
-                <span class="text-truncate" v-if="showPrimaryName && selectedPrimaryItem">{{ primaryItemDisplayName }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="showPrimaryName && selectedPrimaryItem && selectedSecondaryItem" />
+                <span class="text-truncate" v-if="selectionText">{{ selectionText }}</span>
+                <span class="text-truncate" v-if="!selectionText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noItemDisplayName }}</span>
+                <span class="text-truncate" v-if="!selectionText && showPrimaryName && selectedPrimaryItem">{{ primaryItemDisplayName }}</span>
+                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!selectionText && showPrimaryName && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="mr-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem ? selectedSecondaryItem[secondaryIconField] : null"
                           :color="selectedSecondaryItem ? selectedSecondaryItem[secondaryColorField] : null"
-                          v-if="selectedSecondaryItem && showSecondaryIcon" />
-                <span class="text-truncate" v-if="selectedSecondaryItem">{{ secondaryItemDisplayName }}</span>
+                          v-if="!selectionText && selectedSecondaryItem && showSecondaryIcon" />
+                <span class="text-truncate" v-if="!selectionText && selectedSecondaryItem">{{ secondaryItemDisplayName }}</span>
             </div>
         </template>
 
@@ -85,6 +86,7 @@ export default {
         'disabled',
         'readonly',
         'label',
+        'selectionText',
         'showPrimaryName',
         'showSecondaryIcon',
         'primaryKeyField',

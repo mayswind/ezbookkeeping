@@ -27,14 +27,17 @@
                 <div class="mb-4">
                     <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': mode !== 'add' }"
                             :disabled="loading || submitting" v-model="transaction.type">
-                        <v-tab :value="allTransactionTypes.Expense">
+                        <v-tab :value="allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Expense') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Income">
+                        <v-tab :value="allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Income') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Transfer">
+                        <v-tab :value="allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Transfer') }}</span>
+                        </v-tab>
+                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="transaction.type === allTransactionTypes.ModifyBalance">
+                            <span>{{ $t('Modify Balance') }}</span>
                         </v-tab>
                     </v-tabs>
                     <v-divider class="my-2"/>

@@ -10,9 +10,17 @@
 
             <f7-subnavbar>
                 <f7-segmented strong :class="{ 'readonly': mode !== 'add' }">
-                    <f7-button :text="$t('Expense')" :active="transaction.type === allTransactionTypes.Expense" @click="transaction.type = allTransactionTypes.Expense"></f7-button>
-                    <f7-button :text="$t('Income')" :active="transaction.type === allTransactionTypes.Income" @click="transaction.type = allTransactionTypes.Income"></f7-button>
-                    <f7-button :text="$t('Transfer')" :active="transaction.type === allTransactionTypes.Transfer" @click="transaction.type = allTransactionTypes.Transfer"></f7-button>
+                    <f7-button :text="$t('Expense')" :active="transaction.type === allTransactionTypes.Expense"
+                               v-if="transaction.type !== allTransactionTypes.ModifyBalance"
+                               @click="transaction.type = allTransactionTypes.Expense"></f7-button>
+                    <f7-button :text="$t('Income')" :active="transaction.type === allTransactionTypes.Income"
+                               v-if="transaction.type !== allTransactionTypes.ModifyBalance"
+                               @click="transaction.type = allTransactionTypes.Income"></f7-button>
+                    <f7-button :text="$t('Transfer')" :active="transaction.type === allTransactionTypes.Transfer"
+                               v-if="transaction.type !== allTransactionTypes.ModifyBalance"
+                               @click="transaction.type = allTransactionTypes.Transfer"></f7-button>
+                    <f7-button :text="$t('Modify Balance')" :active="transaction.type === allTransactionTypes.ModifyBalance"
+                               v-if="transaction.type === allTransactionTypes.ModifyBalance"></f7-button>
                 </f7-segmented>
             </f7-subnavbar>
         </f7-navbar>
@@ -55,7 +63,7 @@
             </f7-list-item>
 
             <f7-list-item
-                class="transaction-edit-amount"
+                class="transaction-edit-amount text-color-primary"
                 link="#" no-chevron
                 :class="destinationAmountClass"
                 :header="$t('Transfer In Amount')"
@@ -519,8 +527,9 @@ export default {
         sourceAmountClass() {
             const classes = {
                 'readonly': this.mode === 'view',
-                'color-teal': this.transaction.type === this.allTransactionTypes.Expense,
-                'color-red': this.transaction.type === this.allTransactionTypes.Income,
+                'text-color-teal': this.transaction.type === this.allTransactionTypes.Expense,
+                'text-color-red': this.transaction.type === this.allTransactionTypes.Income,
+                'text-color-primary': this.transaction.type === this.allTransactionTypes.Transfer
             };
 
             classes[this.getFontClassByAmount(this.transaction.sourceAmount)] = true;
@@ -802,7 +811,6 @@ export default {
 
 .transaction-edit-amount {
     line-height: 53px;
-    color: var(--f7-theme-color);
 }
 
 .transaction-edit-amount .item-title {

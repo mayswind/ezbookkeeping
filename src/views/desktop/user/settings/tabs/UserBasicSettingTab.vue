@@ -71,7 +71,6 @@
                                                    secondary-title-field="name"
                                                    secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                    :disabled="loading || saving || !allVisibleAccounts.length"
-                                                   :show-secondary-icon="true"
                                                    :label="$t('Default Account')"
                                                    :placeholder="$t('Default Account')"
                                                    :items="allCategorizedAccounts"

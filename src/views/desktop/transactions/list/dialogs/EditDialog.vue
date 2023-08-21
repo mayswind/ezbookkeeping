@@ -192,6 +192,7 @@
                                         :disabled="loading || submitting"
                                         :label="$t('Geographic Location')"
                                         v-model="transaction"
+                                        v-model:menu="geoMenuState"
                                     >
                                         <template #selection>
                                             <span class="cursor-pointer" v-if="transaction.geoLocation">{{ `(${transaction.geoLocation.longitude}, ${transaction.geoLocation.latitude})` }}</span>
@@ -358,6 +359,7 @@ export default {
             loading: true,
             transaction: newTransaction,
             geoLocationStatus: null,
+            geoMenuState: false,
             submitting: false,
             isSupportGeoLocation: !!navigator.geolocation,
             resolve: null,
@@ -741,6 +743,7 @@ export default {
         },
         updateGeoLocation(forceUpdate) {
             const self = this;
+            self.geoMenuState = false;
 
             if (!self.isSupportGeoLocation) {
                 logger.warn('this browser does not support geo location');
@@ -781,6 +784,7 @@ export default {
             self.geoLocationStatus = 'getting';
         },
         clearGeoLocation() {
+            this.geoMenuState = false;
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
         },

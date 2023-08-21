@@ -32,7 +32,7 @@
 
                 <v-card-text class="pb-0">
                     <v-row class="mb-3">
-                        <v-col cols="12" md="4">
+                        <v-col cols="12" md="12">
                             <div style="max-width: 428px">
                                 <pin-code-input :secure="true" :length="6" v-model="pinCode" />
                             </div>

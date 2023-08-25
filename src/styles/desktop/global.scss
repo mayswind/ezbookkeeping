@@ -159,6 +159,12 @@ input[type=number] {
     }
 }
 
+.v-input--density-default .v-field--variant-outlined .v-field__outline__start,
+.v-input--density-comfortable .v-field--variant-outlined .v-field__outline__start,
+.v-input--density-compact .v-field--variant-outlined .v-field__outline__start{
+    flex: 0 0 12px;
+}
+
 .right-bottom-icon .v-badge__badge {
     padding: 0;
     min-width: 16px;

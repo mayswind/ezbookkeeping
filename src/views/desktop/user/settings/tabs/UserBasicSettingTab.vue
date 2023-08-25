@@ -19,14 +19,16 @@
                         <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
                     </v-avatar>
                     <div class="d-flex flex-column justify-center gap-5">
-                        <p class="text-body-1 mb-0">
+                        <div class="d-flex text-body-1">
                             <span class="me-1">{{ $t('Username:') }}</span>
-                            <span>{{ oldProfile.username }}</span>
-                        </p>
-                        <p class="text-body-1 mb-0">
+                            <v-skeleton-loader class="skeleton-no-margin" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                            <span v-if="!loading">{{ oldProfile.username }}</span>
+                        </div>
+                        <div class="d-flex text-body-1">
                             <span class="me-1">{{ $t('Avatar Provider:') }}</span>
-                            <span>{{ currentUserAvatarProvider }}</span>
-                        </p>
+                            <v-skeleton-loader class="skeleton-no-margin" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                            <span v-if="!loading">{{ currentUserAvatarProvider }}</span>
+                        </div>
                     </div>
                 </v-card-text>
 

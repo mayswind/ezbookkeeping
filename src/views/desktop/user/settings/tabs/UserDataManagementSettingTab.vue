@@ -27,7 +27,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction') }}</span>
-                                    <span class="text-h6">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -41,7 +42,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Accounts') }}</span>
-                                    <span class="text-h6">{{ displayDataStatistics ? displayDataStatistics.totalAccountCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalAccountCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -55,7 +57,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction Categories') }}</span>
-                                    <span class="text-h6">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -69,7 +72,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction Tags') }}</span>
-                                    <span class="text-h6">{{ displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -85,7 +89,7 @@
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">
-                    <v-btn :disabled="exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'" @click="exportData">
+                    <v-btn :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'" @click="exportData">
                         {{ $t('Export Data') }}
                         <v-progress-circular indeterminate size="24" class="ml-2" v-if="exportingData"></v-progress-circular>
                     </v-btn>
@@ -115,7 +119,7 @@
                                     autocomplete="current-password"
                                     clearable variant="underlined"
                                     color="error"
-                                    :disabled="clearingData"
+                                    :disabled="loadingDataStatistics || clearingData"
                                     :placeholder="$t('Current Password')"
                                     :type="isCurrentPasswordVisible ? 'text' : 'password'"
                                     :append-inner-icon="isCurrentPasswordVisible ? icons.eyeSlash : icons.eye"
@@ -128,7 +132,7 @@
                     </v-card-text>
 
                     <v-card-text class="d-flex flex-wrap gap-4">
-                        <v-btn color="error" :disabled="!currentPasswordForClearData || clearingData" @click="clearData">
+                        <v-btn color="error" :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData" @click="clearData">
                             {{ $t('Clear User Data') }}
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="clearingData"></v-progress-circular>
                         </v-btn>

@@ -8,13 +8,14 @@
                 </template>
 
                 <v-card-text class="pb-0">
-                    <p class="text-body-1 font-weight-semibold" v-if="!new2FAQRCode">
+                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <p class="text-body-1 font-weight-semibold" v-if="!loading && !new2FAQRCode">
                         {{ status === true ? $t('Two-factor authentication has been enabled.') : $t('Two-factor authentication is not enabled yet.') }}
                     </p>
-                    <p class="text-body-1" v-if="new2FAQRCode">
+                    <p class="text-body-1" v-if="!loading && new2FAQRCode">
                         {{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}
                     </p>
-                    <p class="text-body-1" v-if="status === true">
+                    <p class="text-body-1" v-if="!loading && status === true">
                         {{ $t('Please enter your current password when disable two factor authentication or regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}
                     </p>
                 </v-card-text>

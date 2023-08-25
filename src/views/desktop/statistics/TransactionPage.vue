@@ -166,7 +166,9 @@
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                                                 <v-list-item class="pl-0">
                                                     <template #prepend>
-                                                        <v-icon class="disabled mr-0" size="34" :icon="icons.square" />
+                                                        <div>
+                                                            <v-icon class="disabled mr-0" size="34" :icon="icons.square" />
+                                                        </div>
                                                     </template>
                                                     <div class="d-flex flex-column ml-2">
                                                         <div class="d-flex">

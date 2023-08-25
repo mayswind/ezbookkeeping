@@ -487,12 +487,16 @@ export default {
 }
 
 .transaction-tags-table tr:last-child .v-text-field.v-text-field--plain-underlined .v-input__prepend {
-    padding-top: 11px;
+    padding-top: 8px;
 }
 
 .transaction-tags-table .v-text-field .v-field__input {
     font-size: 0.875rem;
-    padding-top: 1px;
+    padding-top: 2px;
     color: rgba(var(--v-theme-on-surface));
+}
+
+.transaction-tags-table .v-text-field .v-field__clearable {
+    padding-top: var(--v-input-padding-top);
 }
 </style>

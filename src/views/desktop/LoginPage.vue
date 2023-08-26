@@ -20,7 +20,7 @@
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">
                 <div class="d-flex align-center justify-center h-100">
-                    <v-card variant="flat" class="mt-0 px-4 pt-12" max-width="500">
+                    <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h5 class="text-h5 mb-3">{{ $t('Welcome to ezBookkeeping') }}</h5>
                             <p class="mb-0">{{ $t('Please log in with your ezBookkeeping account') }}</p>
@@ -125,7 +125,7 @@
                 </div>
                 <v-spacer/>
                 <div class="d-flex align-center justify-center">
-                    <v-card variant="flat" class="px-4 pb-4" max-width="500">
+                    <v-card variant="flat" class="w-100 px-4 pb-4" max-width="500">
                         <v-card-text class="pt-0">
                             <v-row>
                                 <v-col cols="12" class="text-center">

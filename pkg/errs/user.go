@@ -23,4 +23,7 @@ var (
 	ErrUserRegistrationNotAllowed   = NewNormalError(NormalSubcategoryUser, 14, http.StatusBadRequest, "user registration not allowed")
 	ErrUserDefaultAccountIsInvalid  = NewNormalError(NormalSubcategoryUser, 15, http.StatusBadRequest, "user default account is invalid")
 	ErrUserIsDisabled               = NewNormalError(NormalSubcategoryUser, 16, http.StatusBadRequest, "user is disabled")
+	ErrEmptyIsInvalid               = NewNormalError(NormalSubcategoryUser, 17, http.StatusBadRequest, "email is invalid")
+	ErrEmailIsEmptyOrInvalid        = NewNormalError(NormalSubcategoryUser, 18, http.StatusBadRequest, "email is empty or invalid")
+	ErrNewPasswordEqualsOldInvalid  = NewNormalError(NormalSubcategoryUser, 19, http.StatusBadRequest, "new password equals old password")
 )

@@ -56,6 +56,25 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 	c.Next()
 }
 
+// JWTResetPasswordAuthorization verifies whether current request is password reset
+func JWTResetPasswordAuthorization(c *core.Context) {
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+
+	if err != nil {
+		utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)
+		return
+	}
+
+	if claims.Type != core.USER_TOKEN_TYPE_RESET_PASSWORD {
+		log.WarnfWithRequestId(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+		return
+	}
+
+	c.SetTokenClaims(claims)
+	c.Next()
+}
+
 func jwtAuthorization(c *core.Context, source TokenSourceType) {
 	claims, err := getTokenClaims(c, source)
 

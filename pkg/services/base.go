@@ -2,6 +2,8 @@ package services
 
 import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
@@ -34,6 +36,20 @@ type ServiceUsingConfig struct {
 // CurrentConfig returns the current config
 func (s *ServiceUsingConfig) CurrentConfig() *settings.Config {
 	return s.container.Current
+}
+
+// ServiceUsingMailer represents a service that need to use mailer
+type ServiceUsingMailer struct {
+	container *mail.MailerContainer
+}
+
+// SendMail sends an email according to argument
+func (s *ServiceUsingMailer) SendMail(message *mail.MailMessage) error {
+	if s.container.Current == nil {
+		return errs.ErrSmtpServerNotEnabled
+	}
+
+	return s.container.Current.SendMail(message)
 }
 
 // ServiceUsingUuid represents a service that need to use uuid

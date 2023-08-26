@@ -5,6 +5,8 @@ import userState from '@/lib/userstate.js';
 import MainLayout from '@/views/desktop/MainLayout.vue';
 import LoginPage from '@/views/desktop/LoginPage.vue';
 import SignUpPage from '@/views/desktop/SignupPage.vue';
+import ForgetPasswordPage from '@/views/desktop/ForgetPasswordPage.vue';
+import ResetPasswordPage from '@/views/desktop/ResetPasswordPage.vue';
 import UnlockPage from '@/views/desktop/UnlockPage.vue';
 
 import HomePage from '@/views/desktop/HomePage.vue';
@@ -156,6 +158,18 @@ const router = createRouter({
             path: '/signup',
             component: SignUpPage,
             beforeEnter: checkNotLogin
+        },
+        {
+            path: '/forgetpassword',
+            component: ForgetPasswordPage,
+            beforeEnter: checkNotLogin
+        },
+        {
+            path: '/resetpassword',
+            component: ResetPasswordPage,
+            props: route => ({
+                token: route.query.token
+            })
         },
         {
             path: '/unlock',

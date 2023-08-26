@@ -95,6 +95,11 @@
                                             <a href="javascript:void(0);" @click="showMobileQrCode = true">
                                                 <span class="nav-item-title">{{ $t('Use on Mobile Device') }}</span>
                                             </a>
+                                            <v-spacer/>
+                                            <router-link class="text-primary" to="/forgetpassword"
+                                                         :class="{'disabled': !isUserForgetPasswordEnabled}">
+                                                {{ $t('Forget Password?') }}
+                                            </router-link>
                                         </div>
                                     </v-col>
 
@@ -176,7 +181,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
-import { isUserRegistrationEnabled } from '@/lib/server_settings.js';
+import { isUserRegistrationEnabled, isUserForgetPasswordEnabled } from '@/lib/server_settings.js';
 
 import {
     mdiEyeOutline,
@@ -220,6 +225,9 @@ export default {
         },
         isUserRegistrationEnabled() {
             return isUserRegistrationEnabled();
+        },
+        isUserForgetPasswordEnabled() {
+            return isUserForgetPasswordEnabled();
         },
         inputIsEmpty() {
             return !this.username || !this.password;

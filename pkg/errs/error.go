@@ -14,6 +14,7 @@ const (
 	SystemSubcategoryDefault  = 0
 	SystemSubcategorySetting  = 1
 	SystemSubcategoryDatabase = 2
+	SystemSubcategoryMail     = 3
 )
 
 // Sub categories of normal error

@@ -17,6 +17,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.Context) {
 		settingsArr := []string{
 			buildBooleanSetting("r", config.EnableUserRegister),
+			buildBooleanSetting("f", config.EnableUserForgetPassword),
 			buildBooleanSetting("e", config.EnableDataExport),
 			buildStringSetting("m", strings.Replace(config.MapProvider, "_", "-", -1)),
 		}

@@ -82,6 +82,12 @@
         "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.12.0:LICENSE"
     },
     {
+        "name": "Gomail",
+        "copyright": "Copyright (c) 2014 Alexandre Cesaro",
+        "url": "https://github.com/go-mail/mail",
+        "licenseUrl": "https://github.com/go-mail/mail/blob/v2.3.1/LICENSE"
+    },
+    {
         "name": "barcode",
         "copyright": "Copyright (c) 2014 Florian Sundermann",
         "url": "https://github.com/boombuler/barcode",

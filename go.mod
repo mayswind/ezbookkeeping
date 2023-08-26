@@ -19,6 +19,7 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	golang.org/x/crypto v0.12.0
 	gopkg.in/ini.v1 v1.67.0
+	gopkg.in/mail.v2 v2.3.1
 	xorm.io/xorm v1.3.2
 )
 
@@ -58,6 +59,7 @@ require (
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	xorm.io/builder v0.3.12 // indirect
 )

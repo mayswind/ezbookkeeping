@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
@@ -83,6 +84,15 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 		return nil, err
 	}
 
+	err = mail.InitializeMailer(config)
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf("[initializer.initializeSystem] initializes mailer failed, because %s", err.Error())
+		}
+		return nil, err
+	}
+
 	err = exchangerates.InitializeExchangeRatesDataSource(config)
 
 	if err != nil {
@@ -110,6 +120,7 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	}
 
 	clonedConfig.DatabaseConfig.DatabasePassword = "****"
+	clonedConfig.SmtpConfig.SmtpPasswd = "****"
 	clonedConfig.SecretKey = "****"
 
 	return clonedConfig

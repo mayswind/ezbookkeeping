@@ -88,6 +88,11 @@ func (s *TokenService) CreateRequire2FAToken(user *models.User, ctx *core.Contex
 	return s.createToken(user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(ctx), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 }
 
+// CreatePasswordResetToken generates a new password reset token and saves to database
+func (s *TokenService) CreatePasswordResetToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
+	return s.createToken(user, core.USER_TOKEN_TYPE_RESET_PASSWORD, s.getUserAgent(ctx), s.CurrentConfig().ForgetPasswordTokenExpiredTimeDuration)
+}
+
 // DeleteToken deletes given token from database
 func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 	if tokenRecord.Uid <= 0 {

@@ -35,6 +35,9 @@
                     </small>
                 </template>
                 <template #after>
+                    <small>
+                        <f7-link :class="{'disabled': !isUserForgetPasswordEnabled}" @click="showForgetPasswordSheet = true">{{ $t('Forget Password?') }}</f7-link>
+                    </small>
                 </template>
             </f7-list-item>
         </f7-list>
@@ -127,6 +130,37 @@
                 </div>
             </f7-page-content>
         </f7-sheet>
+
+        <f7-sheet
+            style="height:auto"
+            :opened="showForgetPasswordSheet" @sheet:closed="showForgetPasswordSheet = false"
+        >
+            <f7-page-content>
+                <div class="display-flex padding justify-content-space-between align-items-center">
+                    <div class="ebk-sheet-title"><b>{{ $t('Forget Password?') }}</b></div>
+                </div>
+                <div class="padding-horizontal padding-bottom">
+                    <p class="no-margin">
+                        <span>{{ $t('Please input your email address used for registration and we\'ll send you an email with reset password link') }}</span>
+                    </p>
+                    <f7-list strong class="no-margin">
+                        <f7-list-input
+                            type="email"
+                            autocomplete="email"
+                            outline
+                            floating-label
+                            clear-button
+                            class="no-margin no-padding-bottom"
+                            :label="$t('E-mail')"
+                            :placeholder="$t('Your email address')"
+                            v-model:value="forgetPasswordEmail"
+                            @keyup.enter="requestResetPassword"
+                        ></f7-list-input>
+                    </f7-list>
+                    <f7-button large fill :class="{ 'disabled': !forgetPasswordEmail || requestingForgetPassword }" :text="$t('Send Reset Link')" @click="requestResetPassword"></f7-button>
+                </div>
+            </f7-page-content>
+        </f7-sheet>
     </f7-page>
 </template>
 
@@ -137,7 +171,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
-import { isUserRegistrationEnabled } from '@/lib/server_settings.js';
+import { isUserRegistrationEnabled, isUserForgetPasswordEnabled } from '@/lib/server_settings.js';
 import { getDesktopVersionPath } from '@/lib/version.js';
 import { isModalShowing } from '@/lib/ui.mobile.js';
 
@@ -152,9 +186,12 @@ export default {
             passcode: '',
             backupCode: '',
             tempToken: '',
+            forgetPasswordEmail: '',
             logining: false,
             verifying: false,
+            requestingForgetPassword: false,
             show2faSheet: false,
+            showForgetPasswordSheet: false,
             twoFAVerifyType: 'passcode'
         };
     },
@@ -174,6 +211,9 @@ export default {
         },
         isUserRegistrationEnabled() {
             return isUserRegistrationEnabled();
+        },
+        isUserForgetPasswordEnabled() {
+            return isUserForgetPasswordEnabled();
         },
         inputIsEmpty() {
             return !this.username || !this.password;
@@ -301,6 +341,33 @@ export default {
                 router.refreshPage();
             }).catch(error => {
                 self.verifying = false;
+                self.$hideLoading();
+
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
+        },
+        requestResetPassword() {
+            const self = this;
+
+            if (!self.forgetPasswordEmail) {
+                self.$alert('Email address cannot be empty');
+                return;
+            }
+
+            self.requestingForgetPassword = true;
+            self.$showLoading(() => self.requestingForgetPassword);
+
+            self.rootStore.requestResetPassword({
+                email: self.forgetPasswordEmail
+            }).then(() => {
+                self.requestingForgetPassword = false;
+                self.$hideLoading();
+
+                self.$toast('Password reset email has been sent');
+            }).catch(error => {
+                self.requestingForgetPassword = false;
                 self.$hideLoading();
 
                 if (!error.processed) {

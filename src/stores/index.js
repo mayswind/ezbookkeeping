@@ -247,6 +247,60 @@ export const useRootStore = defineStore('root', {
             userState.clearWebAuthnConfig();
             this.resetAllStates(true);
         },
+        requestResetPassword({ email }) {
+            return new Promise((resolve, reject) => {
+                services.requestResetPassword({
+                    email
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to send password reset email' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to send password reset email', error);
+
+                    if (error && error.processed) {
+                        reject(error);
+                    } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else {
+                        reject({ message: 'Unable to send password reset email' });
+                    }
+                });
+            });
+        },
+        resetPassword({ email, token, password }) {
+            return new Promise((resolve, reject) => {
+                services.resetPassword({
+                    token,
+                    email,
+                    password
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to reset password' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to reset password', error);
+
+                    if (error && error.processed) {
+                        reject(error);
+                    } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else {
+                        reject({ message: 'Unable to reset password' });
+                    }
+                });
+            });
+        },
         updateUserProfile({ profile, currentPassword }) {
             return new Promise((resolve, reject) => {
                 services.updateProfile({

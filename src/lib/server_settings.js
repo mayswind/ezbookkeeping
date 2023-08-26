@@ -33,6 +33,10 @@ export function isUserRegistrationEnabled() {
     return getServerSetting('r') === '1';
 }
 
+export function isUserForgetPasswordEnabled() {
+    return getServerSetting('f') === '1';
+}
+
 export function isDataExportingEnabled() {
     return getServerSetting('e') === '1';
 }

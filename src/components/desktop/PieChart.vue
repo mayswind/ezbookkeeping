@@ -1,5 +1,5 @@
 <template>
-    <v-chart class="pie-chart-container" autoresize :option="chartOptions"
+    <v-chart autoresize class="pie-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
              @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
@@ -303,6 +303,22 @@ export default {
 @media (min-width: 600px) {
     .pie-chart-container {
         height: 500px;
+    }
+}
+
+.pie-chart-container.transition-in {
+    animation: pie-chart-skeleton-fade-in 2s 1;
+}
+
+@keyframes pie-chart-skeleton-fade-in {
+    0% {
+        opacity: 0;
+    }
+    20% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
 </style>

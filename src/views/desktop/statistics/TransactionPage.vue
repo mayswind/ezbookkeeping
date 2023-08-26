@@ -30,7 +30,7 @@
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
-                                            <span>{{ $t('Statistics Data') }}</span>
+                                            <span>{{ $t('Statistics & Analysis') }}</span>
                                             <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided>
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"

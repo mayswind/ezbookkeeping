@@ -29,24 +29,24 @@
                 <li class="nav-link">
                     <router-link to="/transaction/list?dateType=7">
                         <v-icon class="nav-item-icon" :icon="icons.transactions"/>
-                        <span class="nav-item-title">{{ $t('Transaction List') }}</span>
+                        <span class="nav-item-title">{{ $t('Transaction Details') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
                     <router-link to="/statistics/transaction">
                         <v-icon class="nav-item-icon" :icon="icons.statistics"/>
-                        <span class="nav-item-title">{{ $t('Statistics Data') }}</span>
+                        <span class="nav-item-title">{{ $t('Statistics & Analysis') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
-                        <span class="title-text">{{ $t('Data Management') }}</span>
+                        <span class="title-text">{{ $t('Basis Data') }}</span>
                     </div>
                 </li>
                 <li class="nav-link">
                     <router-link to="/account/list">
                         <v-icon class="nav-item-icon" :icon="icons.accounts"/>
-                        <span class="nav-item-title">{{ $t('Account List') }}</span>
+                        <span class="nav-item-title">{{ $t('Accounts') }}</span>
                     </router-link>
                 </li>
                 <li class="nav-link">
@@ -63,7 +63,7 @@
                 </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
-                        <span class="title-text">{{ $t('Other') }}</span>
+                        <span class="title-text">{{ $t('Miscellaneous') }}</span>
                     </div>
                 </li>
                 <li class="nav-link">

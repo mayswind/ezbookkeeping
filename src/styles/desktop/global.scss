@@ -22,6 +22,10 @@ input[type=number] {
     pointer-events: none !important;
 }
 
+.smaller {
+    font-size: 0.75rem;
+}
+
 .overflow-y-visible {
     overflow-y: visible !important;
 }
@@ -114,6 +118,10 @@ input[type=number] {
     min-height: 38px;
     flex-wrap: wrap;
     row-gap: 1rem;
+}
+
+.text-field-append-text {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
 
 /** Common class for replacing the default style of vuetify **/

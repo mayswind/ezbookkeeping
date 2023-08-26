@@ -134,7 +134,11 @@
                                             :items="allCurrencies"
                                             :no-data-text="$t('No results')"
                                             v-model="user.defaultCurrency"
-                                        />
+                                        >
+                                            <template #append-inner>
+                                                <small class="text-field-append-text smaller">{{ user.defaultCurrency }}</small>
+                                            </template>
+                                        </v-autocomplete>
                                     </v-col>
 
                                     <v-col cols="12" md="6">

@@ -121,7 +121,11 @@
                                         :items="allCurrencies"
                                         :no-data-text="$t('No results')"
                                         v-model="selectedAccount.currency"
-                                    />
+                                    >
+                                        <template #append-inner>
+                                            <small class="text-field-append-text smaller">{{ selectedAccount.currency }}</small>
+                                        </template>
+                                    </v-autocomplete>
                                 </v-col>
                                 <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
                                     <amount-input :disabled="loading || submitting || !!editAccountId"

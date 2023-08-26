@@ -11,7 +11,7 @@
     >
         <template #selection="{ item }">
             <v-label class="cursor-pointer" style="padding-top: 3px">
-                <v-icon size="28" :icon="icons.square" :color="`#${item.raw}`" />
+                <v-icon size="28" :icon="icons.square" :color="getFinalColor(item.raw)"/>
             </v-label>
         </template>
 
@@ -23,12 +23,12 @@
                     <div class="text-center" :key="colorInfo.color" v-for="colorInfo in row">
                         <div class="cursor-pointer" @click="color = colorInfo.color">
                             <v-icon class="ma-2" size="28"
-                                    :icon="icons.square" :color="`#${colorInfo.color}`"
+                                    :icon="icons.square" :color="getFinalColor(colorInfo.color)"
                                     v-if="!modelValue || modelValue !== colorInfo.color" />
                             <v-badge class="right-bottom-icon" color="primary"
                                      location="bottom right" offset-x="8" offset-y="8" :icon="icons.checked"
                                      v-if="modelValue && modelValue === colorInfo.color">
-                                <v-icon class="ma-2" size="28" :icon="icons.square" :color="`#${colorInfo.color}`" />
+                                <v-icon class="ma-2" size="28" :icon="icons.square" :color="getFinalColor(colorInfo.color)" />
                             </v-badge>
                         </div>
                     </div>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import colorConstants from '@/consts/color.js';
 import { arrayContainsFieldValue } from '@/lib/common.js';
 import { getColorsInRows } from '@/lib/color.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
@@ -86,6 +87,13 @@ export default {
     methods: {
         hasSelectedIcon(row) {
             return arrayContainsFieldValue(row, 'id', this.modelValue);
+        },
+        getFinalColor(color) {
+            if (color && color !== colorConstants.defaultAccountColor) {
+                return '#' + color;
+            } else {
+                return 'var(--default-icon-color)';
+            }
         },
         onMenuStateChanged(state) {
             const self = this;

@@ -281,7 +281,7 @@ export default {
                     self.tempToken = authResponse.token;
                     self.show2faInput = true;
 
-                    this.$nextTick(() => {
+                    self.$nextTick(() => {
                         if (self.$refs.passcodeInput) {
                             self.$refs.passcodeInput.focus();
                             self.$refs.passcodeInput.select();
@@ -300,7 +300,7 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
-                this.$router.replace('/');
+                self.$router.replace('/');
             }).catch(error => {
                 self.logining = false;
 
@@ -316,10 +316,10 @@ export default {
                 return;
             }
 
-            if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
+            if (self.twoFAVerifyType === 'passcode' && !self.passcode) {
                 self.$refs.snackbar.showMessage('Passcode cannot be empty');
                 return;
-            } else if (this.twoFAVerifyType === 'backupcode' && !this.backupCode) {
+            } else if (self.twoFAVerifyType === 'backupcode' && !self.backupCode) {
                 self.$refs.snackbar.showMessage('Backup code cannot be empty');
                 return;
             }
@@ -342,7 +342,7 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
-                this.$router.replace('/');
+                self.$router.replace('/');
             }).catch(error => {
                 self.verifying = false;
 

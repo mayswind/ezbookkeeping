@@ -171,13 +171,13 @@ export default {
                 return;
             }
 
-            this.verifyingByWebAuthn = true;
+            self.verifyingByWebAuthn = true;
 
             webauthn.verifyCredential(
                 self.userStore.currentUserInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
-                this.verifyingByWebAuthn = false;
+                self.verifyingByWebAuthn = false;
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
@@ -193,7 +193,7 @@ export default {
 
                 self.$router.replace('/');
             }).catch(error => {
-                this.verifyingByWebAuthn = false;
+                self.verifyingByWebAuthn = false;
                 logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {

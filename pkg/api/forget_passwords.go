@@ -46,6 +46,11 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrUserNotFound
 	}
 
+	if !user.EmailVerified {
+		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" has not verified email", user.Uid)
+		return nil, errs.ErrEmptyIsNotVerified
+	}
+
 	token, _, err := a.tokens.CreatePasswordResetToken(user, c)
 
 	if err != nil {

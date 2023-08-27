@@ -584,6 +584,7 @@ export default {
         'email is invalid': '邮箱无效',
         'email is empty or invalid': '邮箱为空或无效',
         'new password equals old password': '新密码与旧密码相同',
+        'email is not verified': '邮箱没有验证过',
         'unauthorized access': '未授权的登录',
         'current token is invalid': '当前认证令牌无效',
         'current token is expired': '当前认证令牌已过期',

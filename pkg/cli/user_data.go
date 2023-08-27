@@ -177,6 +177,11 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return err
 	}
 
+	if !user.EmailVerified {
+		log.BootWarnf("[user_data.SendPasswordResetMail] user \"uid:%d\" has not verified email", user.Uid)
+		return errs.ErrEmptyIsNotVerified
+	}
+
 	token, _, err := l.tokens.CreatePasswordResetToken(user, nil)
 
 	if err != nil {

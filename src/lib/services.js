@@ -17,7 +17,7 @@ axios.defaults.timeout = api.defaultTimeout;
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 
-    if (token) {
+    if (token && !config.noAuth) {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -114,6 +114,7 @@ export default {
             email,
             password
         }, {
+            noAuth: true,
             ignoreError: true
         });
     },

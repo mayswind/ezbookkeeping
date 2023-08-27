@@ -153,7 +153,7 @@ func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
 	})
 }
 
-// DeleteTokensBeforeTime deletes tokens that is created before specific tim
+// DeleteTokensBeforeTime deletes tokens that is created before specific time
 func (s *TokenService) DeleteTokensBeforeTime(uid int64, expireTime int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

@@ -133,7 +133,7 @@
         </v-row>
 
         <confirm-dialog ref="confirmDialog"/>
-        <snack-bar ref="snackbar" />
+        <snack-bar ref="snackbar" @update:show="onSnackbarShowStateChanged" />
     </div>
 </template>
 
@@ -164,6 +164,7 @@ export default {
             isNewPasswordVisible: false,
             isConfirmPasswordVisible: false,
             updating: false,
+            passwordChanged: false,
             icons: {
                 left: mdiChevronLeft,
                 eye: mdiEyeOutline,
@@ -214,6 +215,7 @@ export default {
     methods: {
         resetPassword() {
             const self = this;
+            self.passwordChanged = false;
 
             const problemMessage = self.inputProblemMessage;
 
@@ -230,14 +232,21 @@ export default {
                 password: self.newPassword
             }).then(() => {
                 self.updating = false;
+                self.passwordChanged = true;
                 self.$refs.snackbar.showMessage('Password has been updated');
             }).catch(error => {
                 self.updating = false;
+                self.passwordChanged = false;
 
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
                 }
             });
+        },
+        onSnackbarShowStateChanged(newValue) {
+            if (!newValue && this.passwordChanged) {
+                this.$router.replace('/login');
+            }
         },
         changeLanguage(locale) {
             const localeDefaultSettings = this.$locale.setLanguage(locale);

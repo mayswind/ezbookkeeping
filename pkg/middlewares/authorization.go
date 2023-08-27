@@ -65,7 +65,7 @@ func JWTResetPasswordAuthorization(c *core.Context) {
 		return
 	}
 
-	if claims.Type != core.USER_TOKEN_TYPE_RESET_PASSWORD {
+	if claims.Type != core.USER_TOKEN_TYPE_PASSWORD_RESET {
 		log.WarnfWithRequestId(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
 		return

@@ -16,12 +16,12 @@ var (
 
 // InitializeMailer initializes the current mailer according to the config
 func InitializeMailer(config *settings.Config) error {
-	if !config.EnableSmtp {
+	if !config.EnableSMTP {
 		Container.Current = nil
 		return nil
 	}
 
-	mailer, err := NewDefaultMailer(config.SmtpConfig)
+	mailer, err := NewDefaultMailer(config.SMTPConfig)
 
 	if err != nil {
 		return err

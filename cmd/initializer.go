@@ -120,7 +120,7 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 	}
 
 	clonedConfig.DatabaseConfig.DatabasePassword = "****"
-	clonedConfig.SmtpConfig.SmtpPasswd = "****"
+	clonedConfig.SMTPConfig.SMTPPasswd = "****"
 	clonedConfig.SecretKey = "****"
 
 	return clonedConfig

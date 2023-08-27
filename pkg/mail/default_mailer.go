@@ -18,23 +18,23 @@ type DefaultMailer struct {
 }
 
 // NewDefaultMailer returns a new default mailer
-func NewDefaultMailer(smtpConfig *settings.SmtpConfig) (*DefaultMailer, error) {
-	host, portStr, err := net.SplitHostPort(smtpConfig.SmtpHost)
+func NewDefaultMailer(smtpConfig *settings.SMTPConfig) (*DefaultMailer, error) {
+	host, portStr, err := net.SplitHostPort(smtpConfig.SMTPHost)
 
 	if err != nil {
-		return nil, errs.ErrSmtpServerHostInvalid
+		return nil, errs.ErrSMTPServerHostInvalid
 	}
 
 	port, err := utils.StringToInt(portStr)
 
 	if err != nil {
-		return nil, errs.ErrSmtpServerHostInvalid
+		return nil, errs.ErrSMTPServerHostInvalid
 	}
 
-	dialer := mail.NewDialer(host, port, smtpConfig.SmtpUser, smtpConfig.SmtpPasswd)
+	dialer := mail.NewDialer(host, port, smtpConfig.SMTPUser, smtpConfig.SMTPPasswd)
 	dialer.TLSConfig = &tls.Config{
 		ServerName:         host,
-		InsecureSkipVerify: smtpConfig.SmtpSkipTLSVerify,
+		InsecureSkipVerify: smtpConfig.SMTPSkipTLSVerify,
 	}
 
 	mailer := &DefaultMailer{
@@ -48,7 +48,7 @@ func NewDefaultMailer(smtpConfig *settings.SmtpConfig) (*DefaultMailer, error) {
 // SendMail sends an email according to argument
 func (m *DefaultMailer) SendMail(message *MailMessage) error {
 	if m.dialer == nil {
-		return errs.ErrSmtpServerNotEnabled
+		return errs.ErrSMTPServerNotEnabled
 	}
 
 	mailMessage := mail.NewMessage()

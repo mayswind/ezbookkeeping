@@ -113,10 +113,10 @@ const (
 	defaultLogMode  string = "console"
 	defaultLoglevel Level  = LOGLEVEL_INFO
 
-	defaultSecretKey                      string = "ezbookkeeping"
-	defaultTokenExpiredTime               uint32 = 604800 // 7 days
-	defaultTemporaryTokenExpiredTime      uint32 = 300    // 5 minutes
-	defaultForgetPasswordTokenExpiredTime uint32 = 3600   // 60 minutes
+	defaultSecretKey                     string = "ezbookkeeping"
+	defaultTokenExpiredTime              uint32 = 604800 // 7 days
+	defaultTemporaryTokenExpiredTime     uint32 = 300    // 5 minutes
+	defaultPasswordResetTokenExpiredTime uint32 = 3600   // 60 minutes
 
 	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
 )
@@ -138,12 +138,12 @@ type DatabaseConfig struct {
 	ConnectionMaxLifeTime uint32
 }
 
-// SmtpConfig represents the smtp setting config
-type SmtpConfig struct {
-	SmtpHost          string
-	SmtpUser          string
-	SmtpPasswd        string
-	SmtpSkipTLSVerify bool
+// SMTPConfig represents the SMTP setting config
+type SMTPConfig struct {
+	SMTPHost          string
+	SMTPUser          string
+	SMTPPasswd        string
+	SMTPSkipTLSVerify bool
 	FromAddress       string
 }
 
@@ -178,8 +178,8 @@ type Config struct {
 	AutoUpdateDatabase bool
 
 	// Mail
-	EnableSmtp bool
-	SmtpConfig *SmtpConfig
+	EnableSMTP bool
+	SMTPConfig *SMTPConfig
 
 	// Log
 	LogModes         []string
@@ -194,15 +194,15 @@ type Config struct {
 	UuidServerId      uint8
 
 	// Secret
-	SecretKey                              string
-	EnableTwoFactor                        bool
-	TokenExpiredTime                       uint32
-	TokenExpiredTimeDuration               time.Duration
-	TemporaryTokenExpiredTime              uint32
-	TemporaryTokenExpiredTimeDuration      time.Duration
-	ForgetPasswordTokenExpiredTime         uint32
-	ForgetPasswordTokenExpiredTimeDuration time.Duration
-	EnableRequestIdHeader                  bool
+	SecretKey                             string
+	EnableTwoFactor                       bool
+	TokenExpiredTime                      uint32
+	TokenExpiredTimeDuration              time.Duration
+	TemporaryTokenExpiredTime             uint32
+	TemporaryTokenExpiredTimeDuration     time.Duration
+	PasswordResetTokenExpiredTime         uint32
+	PasswordResetTokenExpiredTimeDuration time.Duration
+	EnableRequestIdHeader                 bool
 
 	// User
 	EnableUserRegister       bool
@@ -418,17 +418,17 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 }
 
 func loadMailConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	config.EnableSmtp = getConfigItemBoolValue(configFile, sectionName, "enable_smtp", false)
+	config.EnableSMTP = getConfigItemBoolValue(configFile, sectionName, "enable_smtp", false)
 
-	smtpConfig := &SmtpConfig{}
-	smtpConfig.SmtpHost = getConfigItemStringValue(configFile, sectionName, "smtp_host")
-	smtpConfig.SmtpUser = getConfigItemStringValue(configFile, sectionName, "smtp_user")
-	smtpConfig.SmtpPasswd = getConfigItemStringValue(configFile, sectionName, "smtp_passwd")
-	smtpConfig.SmtpSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "smtp_skip_tls_verify", false)
+	smtpConfig := &SMTPConfig{}
+	smtpConfig.SMTPHost = getConfigItemStringValue(configFile, sectionName, "smtp_host")
+	smtpConfig.SMTPUser = getConfigItemStringValue(configFile, sectionName, "smtp_user")
+	smtpConfig.SMTPPasswd = getConfigItemStringValue(configFile, sectionName, "smtp_passwd")
+	smtpConfig.SMTPSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "smtp_skip_tls_verify", false)
 
 	smtpConfig.FromAddress = getConfigItemStringValue(configFile, sectionName, "from_address")
 
-	config.SmtpConfig = smtpConfig
+	config.SMTPConfig = smtpConfig
 
 	return nil
 }
@@ -481,8 +481,8 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	config.TemporaryTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
 	config.TemporaryTokenExpiredTimeDuration = time.Duration(config.TemporaryTokenExpiredTime) * time.Second
 
-	config.ForgetPasswordTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "forget_password_token_expired_time", defaultForgetPasswordTokenExpiredTime)
-	config.ForgetPasswordTokenExpiredTimeDuration = time.Duration(config.ForgetPasswordTokenExpiredTime) * time.Second
+	config.PasswordResetTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "password_reset_token_expired_time", defaultPasswordResetTokenExpiredTime)
+	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
 
 	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
 

@@ -35,8 +35,8 @@ var (
 
 // SendPasswordResetEmail sends password reset email according to specified parameters
 func (s *ForgetPasswordService) SendPasswordResetEmail(user *models.User, passwordResetToken string, backupLocale string) error {
-	if !s.CurrentConfig().EnableSmtp {
-		return errs.ErrSmtpServerNotEnabled
+	if !s.CurrentConfig().EnableSMTP {
+		return errs.ErrSMTPServerNotEnabled
 	}
 
 	locale := user.Language
@@ -48,7 +48,7 @@ func (s *ForgetPasswordService) SendPasswordResetEmail(user *models.User, passwo
 	localeTextItems := locales.GetLocaleTextItems(locale)
 	forgetPasswordTextItems := localeTextItems.ForgetPasswordMailTextItems
 
-	expireTimeInMinutes := s.CurrentConfig().ForgetPasswordTokenExpiredTimeDuration.Minutes()
+	expireTimeInMinutes := s.CurrentConfig().PasswordResetTokenExpiredTimeDuration.Minutes()
 	passwordResetUrl := fmt.Sprintf(passwordResetUrlFormat, s.CurrentConfig().RootUrl, url.QueryEscape(passwordResetToken))
 
 	tmpl, err := templates.GetTemplate("email/password_reset")

@@ -46,7 +46,7 @@ type ServiceUsingMailer struct {
 // SendMail sends an email according to argument
 func (s *ServiceUsingMailer) SendMail(message *mail.MailMessage) error {
 	if s.container.Current == nil {
-		return errs.ErrSmtpServerNotEnabled
+		return errs.ErrSMTPServerNotEnabled
 	}
 
 	return s.container.Current.SendMail(message)

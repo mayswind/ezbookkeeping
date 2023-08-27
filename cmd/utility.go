@@ -80,8 +80,8 @@ func sendTestMail(c *cli.Context) error {
 		return err
 	}
 
-	if !config.EnableSmtp || mail.Container.Current == nil {
-		return errs.ErrSmtpServerNotEnabled
+	if !config.EnableSMTP || mail.Container.Current == nil {
+		return errs.ErrSMTPServerNotEnabled
 	}
 
 	toAddress := c.String("to")

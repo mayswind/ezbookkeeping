@@ -19,5 +19,5 @@ var (
 	ErrTokenRecordNotFound                  = NewNormalError(NormalSubcategoryToken, 10, http.StatusBadRequest, "token is not found")
 	ErrTokenExpired                         = NewNormalError(NormalSubcategoryToken, 11, http.StatusBadRequest, "token is expired")
 	ErrTokenIsEmpty                         = NewNormalError(NormalSubcategoryToken, 12, http.StatusBadRequest, "token is empty")
-	ErrPasswordResetTokenIsInvalidOrExpired = NewNormalError(NormalSubcategoryToken, 13, http.StatusBadRequest, "password reset token is invalid or expired")
+	ErrPasswordResetTokenIsInvalidOrExpired = NewNormalError(NormalSubcategoryToken, 14, http.StatusBadRequest, "password reset token is invalid or expired")
 )

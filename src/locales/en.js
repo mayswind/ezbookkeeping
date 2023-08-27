@@ -558,7 +558,7 @@ export default {
         'api not found': 'Failed to request api',
         'not implemented': 'Not implemented',
         'database operation failed': 'Database operation failed',
-        'smtp server is not enabled': 'Smtp server is not enabled',
+        'SMTP server is not enabled': 'SMTP server is not enabled',
         'incomplete or incorrect submission': 'Incomplete or incorrect submission',
         'operation failed': 'Operation failed',
         'nothing will be updated': 'Nothing will be updated',

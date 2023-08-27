@@ -90,7 +90,7 @@ func (s *TokenService) CreateRequire2FAToken(user *models.User, ctx *core.Contex
 
 // CreatePasswordResetToken generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
-	return s.createToken(user, core.USER_TOKEN_TYPE_RESET_PASSWORD, s.getUserAgent(ctx), s.CurrentConfig().ForgetPasswordTokenExpiredTimeDuration)
+	return s.createToken(user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(ctx), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
 }
 
 // DeleteToken deletes given token from database

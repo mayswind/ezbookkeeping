@@ -302,6 +302,52 @@ func (s *UserService) DisableUser(username string) error {
 	return nil
 }
 
+// SetUserEmailVerified sets user email address verified
+func (s *UserService) SetUserEmailVerified(username string) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		EmailVerified:   true,
+		UpdatedUnixTime: now,
+	}
+
+	updatedRows, err := s.UserDB().Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
+// SetUserEmailUnverified sets user email address unverified
+func (s *UserService) SetUserEmailUnverified(username string) error {
+	if username == "" {
+		return errs.ErrUsernameIsEmpty
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		EmailVerified:   false,
+		UpdatedUnixTime: now,
+	}
+
+	updatedRows, err := s.UserDB().Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+
+	if err != nil {
+		return err
+	} else if updatedRows < 1 {
+		return errs.ErrUserNotFound
+	}
+	return nil
+}
+
 // DeleteUser deletes an existed user from database
 func (s *UserService) DeleteUser(username string) error {
 	if username == "" {

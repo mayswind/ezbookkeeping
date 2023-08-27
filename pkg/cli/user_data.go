@@ -233,6 +233,40 @@ func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
 	return nil
 }
 
+// SetUserEmailVerified sets user email address verified
+func (l *UserDataCli) SetUserEmailVerified(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.SetUserEmailVerified] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.SetUserEmailVerified(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.SetUserEmailVerified] failed to set user email address verified by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// SetUserEmailUnverified sets user email address unverified
+func (l *UserDataCli) SetUserEmailUnverified(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.SetUserEmailUnverified] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	err := l.users.SetUserEmailUnverified(username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.SetUserEmailUnverified] failed to set user email address unverified by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // DeleteUser deletes user according to the specified user name
 func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 	if username == "" {

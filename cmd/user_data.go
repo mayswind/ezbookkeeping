@@ -87,6 +87,19 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "send-password-reset-mail",
+			Usage:  "Send password reset mail",
+			Action: sendPasswordResetMail,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "user-enable",
 			Usage:  "Enable specified user",
 			Action: enableUser,
@@ -261,6 +274,26 @@ func modifyUserPassword(c *cli.Context) error {
 	}
 
 	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
+
+	return nil
+}
+
+func sendPasswordResetMail(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	err = clis.UserData.SendPasswordResetMail(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.sendPasswordResetMail] error occurs when sending password reset email")
+		return err
+	}
+
+	log.BootInfof("[user_data.sendPasswordResetMail] a password reset email for user \"%s\" has been sent", username)
 
 	return nil
 }

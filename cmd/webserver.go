@@ -202,12 +202,12 @@ func startWebServer(c *cli.Context) error {
 		}
 
 		if config.EnableUserForgetPassword {
-			apiRoute.POST("/forget_password/request.json", bindApiWithTokenUpdate(api.ForgetPasswords.UserForgetPasswordRequestHandler, config))
+			apiRoute.POST("/forget_password/request.json", bindApi(api.ForgetPasswords.UserForgetPasswordRequestHandler))
 
 			resetPasswordRoute := apiRoute.Group("/forget_password/reset")
 			resetPasswordRoute.Use(bindMiddleware(middlewares.JWTResetPasswordAuthorization))
 			{
-				resetPasswordRoute.POST("/by_token.json", bindApiWithTokenUpdate(api.ForgetPasswords.UserResetPasswordHandler, config))
+				resetPasswordRoute.POST("/by_token.json", bindApi(api.ForgetPasswords.UserResetPasswordHandler))
 			}
 		}
 

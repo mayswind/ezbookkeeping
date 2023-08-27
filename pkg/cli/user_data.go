@@ -184,7 +184,7 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return err
 	}
 
-	err = l.forgetPasswords.SendPasswordResetEmail(user, token)
+	err = l.forgetPasswords.SendPasswordResetEmail(user, token, "")
 
 	if err != nil {
 		log.BootWarnf("[user_data.SendPasswordResetMail] cannot send email to \"%s\", because %s", user.Email, err.Error())

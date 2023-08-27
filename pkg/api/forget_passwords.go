@@ -53,7 +53,7 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrTokenGenerating
 	}
 
-	err = a.forgetPasswords.SendPasswordResetEmail(user, token)
+	err = a.forgetPasswords.SendPasswordResetEmail(user, token, c.GetClientLocale())
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())

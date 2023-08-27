@@ -34,12 +34,18 @@ var (
 )
 
 // SendPasswordResetEmail sends password reset email according to specified parameters
-func (s *ForgetPasswordService) SendPasswordResetEmail(user *models.User, passwordResetToken string) error {
+func (s *ForgetPasswordService) SendPasswordResetEmail(user *models.User, passwordResetToken string, backupLocale string) error {
 	if !s.CurrentConfig().EnableSmtp {
 		return errs.ErrSmtpServerNotEnabled
 	}
 
-	localeTextItems := locales.GetLocaleTextItems(user.Language)
+	locale := user.Language
+
+	if locale == "" {
+		locale = backupLocale
+	}
+
+	localeTextItems := locales.GetLocaleTextItems(locale)
 	forgetPasswordTextItems := localeTextItems.ForgetPasswordMailTextItems
 
 	expireTimeInMinutes := s.CurrentConfig().ForgetPasswordTokenExpiredTimeDuration.Minutes()

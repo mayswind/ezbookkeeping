@@ -13,6 +13,9 @@ const textualTokenFieldKey = "TOKEN_STRING"
 const tokenClaimsFieldKey = "TOKEN_CLAIMS"
 const responseErrorFieldKey = "RESPONSE_ERROR"
 
+// AcceptLanguageHeaderName represents the header name of accept language
+const AcceptLanguageHeaderName = "Accept-Language"
+
 // ClientTimezoneOffsetHeaderName represents the header name of client timezone offset
 const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
 
@@ -79,6 +82,13 @@ func (c *Context) GetCurrentUid() int64 {
 	}
 
 	return claims.Uid
+}
+
+// GetClientLocale returns the client locale name
+func (c *Context) GetClientLocale() string {
+	value := c.GetHeader(AcceptLanguageHeaderName)
+
+	return value
 }
 
 // GetClientTimezoneOffset returns the client timezone offset

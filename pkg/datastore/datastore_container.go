@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"strings"
@@ -126,15 +127,11 @@ func getMysqlConnectionString(dbConfig *settings.DatabaseConfig) (string, error)
 }
 
 func getPostgresConnectionString(dbConfig *settings.DatabaseConfig) (string, error) {
-	host, port := "", ""
-	fields := strings.Split(dbConfig.DatabaseHost, ":")
+	host, port, err := net.SplitHostPort(dbConfig.DatabaseHost)
 
-	if len(fields) != 2 {
+	if err != nil {
 		return "", errs.ErrDatabaseHostInvalid
 	}
-
-	host = strings.TrimSpace(fields[0])
-	port = strings.TrimSpace(fields[1])
 
 	if strings.HasPrefix(dbConfig.DatabaseHost, "/") { // unix socket path
 		return fmt.Sprintf("postgres://%s:%s@:%s/%s?sslmode=%s&host=%s",

@@ -35,7 +35,7 @@ type InternalUuidInfo struct {
 
 // InternalUuidGenerator represents internal bundled uuid generator
 type InternalUuidGenerator struct {
-	uuidSeqNumbers [1 << internalUuidTypeBits]uint64
+	uuidSeqNumbers [1 << internalUuidTypeBits]atomic.Uint64
 	uuidServerId   uint8
 }
 
@@ -71,7 +71,7 @@ func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []in
 
 	for {
 		unixTime = uint64(time.Now().Unix())
-		newLastSeqId = atomic.AddUint64(&u.uuidSeqNumbers[uuidType], uint64(count))
+		newLastSeqId = u.uuidSeqNumbers[uuidType].Add(uint64(count))
 
 		if newLastSeqId>>seqNumberIdBits == unixTime {
 			newFirstSeqId = newLastSeqId - uint64(count-1)
@@ -82,7 +82,7 @@ func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []in
 		newFirstSeqId = unixTime << seqNumberIdBits
 		newLastSeqId = newFirstSeqId + uint64(count-1)
 
-		if atomic.CompareAndSwapUint64(&u.uuidSeqNumbers[uuidType], currentSeqId, newLastSeqId) {
+		if u.uuidSeqNumbers[uuidType].CompareAndSwap(currentSeqId, newLastSeqId) {
 			break
 		}
 	}

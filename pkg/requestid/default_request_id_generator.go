@@ -45,7 +45,7 @@ type RequestIdInfo struct {
 type DefaultRequestIdGenerator struct {
 	serverUniqId   uint16
 	instanceUniqId uint16
-	requestSeqId   uint32
+	requestSeqId   atomic.Uint32
 }
 
 // NewDefaultRequestIdGenerator returns a new default request id generator
@@ -154,7 +154,7 @@ func (r *DefaultRequestIdGenerator) getRequestId(serverUniqId uint16, instanceUn
 
 	secondsAndRandomNumber := (secondsLow17bits << randomNumberBits) | randomNumberLow15bits
 
-	seqId := atomic.AddUint32(&r.requestSeqId, 1)
+	seqId := r.requestSeqId.Add(1)
 	seqIdLow31bits := seqId & reqSeqNumberBitsMask
 
 	seqIdAndClientIpv6Flag := (seqIdLow31bits << clientIpv6Bit) | (clientIpv6Flag & clientIpv6BitMask)

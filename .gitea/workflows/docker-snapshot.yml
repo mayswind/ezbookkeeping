@@ -23,6 +23,12 @@ jobs:
             type=raw,value=latest-snapshot
             type=sha,format=short,prefix=SNAPSHOT-
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Set up the environment
         run: |
           sed -i 's#FROM #FROM ${{ secrets.DOCKER_REPO }}/mirrors/#g' Dockerfile
@@ -42,6 +48,7 @@ jobs:
         with:
           file: Dockerfile
           context: .
+          platforms: ${{ vars.BUILD_PLATFORMS }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

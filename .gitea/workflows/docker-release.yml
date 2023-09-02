@@ -23,6 +23,12 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Set up the environment
         run: |
           cat >> docker/custom-backend-pre-setup.sh <<EOF
@@ -41,6 +47,7 @@ jobs:
         with:
           file: Dockerfile
           context: .
+          platforms: ${{ vars.BUILD_PLATFORMS }}
           push: true
           build-args: |
             RELEASE_BUILD=1

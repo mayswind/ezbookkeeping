@@ -5,6 +5,7 @@ import (
 
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -30,18 +31,18 @@ var (
 )
 
 // GetTotalCategoryCountByUid returns total category count of user
-func (s *TransactionCategoryService) GetTotalCategoryCountByUid(uid int64) (int64, error) {
+func (s *TransactionCategoryService) GetTotalCategoryCountByUid(c *core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionCategory{})
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionCategory{})
 
 	return count, err
 }
 
 // GetAllCategoriesByUid returns all transaction category models of user
-func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetAllCategoriesByUid(c *core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -62,13 +63,13 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(uid int64, categoryTy
 	}
 
 	var categories []*models.TransactionCategory
-	err := s.UserDataDB(uid).Where(condition, conditionParams...).OrderBy("type asc, parent_category_id asc, display_order asc").Find(&categories)
+	err := s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("type asc, parent_category_id asc, display_order asc").Find(&categories)
 
 	return categories, err
 }
 
 // GetCategoryByCategoryId returns a transaction category model according to transaction category id
-func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, categoryId int64) (*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetCategoryByCategoryId(c *core.Context, uid int64, categoryId int64) (*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -78,7 +79,7 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).ID(categoryId).Where("uid=? AND deleted=?", uid, false).Get(category)
+	has, err := s.UserDataDB(uid).NewSession(c).ID(categoryId).Where("uid=? AND deleted=?", uid, false).Get(category)
 
 	if err != nil {
 		return nil, err
@@ -90,7 +91,7 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(uid int64, category
 }
 
 // GetCategoriesByCategoryIds returns transaction category models according to transaction category ids
-func (s *TransactionCategoryService) GetCategoriesByCategoryIds(uid int64, categoryIds []int64) (map[int64]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetCategoriesByCategoryIds(c *core.Context, uid int64, categoryIds []int64) (map[int64]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -100,7 +101,7 @@ func (s *TransactionCategoryService) GetCategoriesByCategoryIds(uid int64, categ
 	}
 
 	var categories []*models.TransactionCategory
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("category_id", categoryIds).Find(&categories)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("category_id", categoryIds).Find(&categories)
 
 	if err != nil {
 		return nil, err
@@ -111,13 +112,13 @@ func (s *TransactionCategoryService) GetCategoriesByCategoryIds(uid int64, categ
 }
 
 // GetMaxDisplayOrder returns the max display order according to transaction category type
-func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType models.TransactionCategoryType) (int32, error) {
+func (s *TransactionCategoryService) GetMaxDisplayOrder(c *core.Context, uid int64, categoryType models.TransactionCategoryType) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionParentId).OrderBy("display_order desc").Limit(1).Get(category)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, models.LevelOneTransactionParentId).OrderBy("display_order desc").Limit(1).Get(category)
 
 	if err != nil {
 		return 0, err
@@ -131,7 +132,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(uid int64, categoryType 
 }
 
 // GetMaxSubCategoryDisplayOrder returns the max display order of sub transaction category according to transaction category type and parent transaction category id
-func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int32, error) {
+func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(c *core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -141,7 +142,7 @@ func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, ca
 	}
 
 	category := &models.TransactionCategory{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, parentCategoryId).OrderBy("display_order desc").Limit(1).Get(category)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_category_id", "display_order").Where("uid=? AND deleted=? AND type=? AND parent_category_id=?", uid, false, categoryType, parentCategoryId).OrderBy("display_order desc").Limit(1).Get(category)
 
 	if err != nil {
 		return 0, err
@@ -155,7 +156,7 @@ func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(uid int64, ca
 }
 
 // CreateCategory saves a new transaction category model to database
-func (s *TransactionCategoryService) CreateCategory(category *models.TransactionCategory) error {
+func (s *TransactionCategoryService) CreateCategory(c *core.Context, category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -166,14 +167,14 @@ func (s *TransactionCategoryService) CreateCategory(category *models.Transaction
 	category.CreatedUnixTime = time.Now().Unix()
 	category.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(category.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(category.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Insert(category)
 		return err
 	})
 }
 
 // CreateCategories saves a few transaction category models to database
-func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) CreateCategories(c *core.Context, uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -206,7 +207,7 @@ func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[
 		}
 	}
 
-	err := s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	err := s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(allCategories); i++ {
 			category := allCategories[i]
 			_, err := sess.Insert(category)
@@ -227,14 +228,14 @@ func (s *TransactionCategoryService) CreateCategories(uid int64, categories map[
 }
 
 // ModifyCategory saves an existed transaction category model to database
-func (s *TransactionCategoryService) ModifyCategory(category *models.TransactionCategory) error {
+func (s *TransactionCategoryService) ModifyCategory(c *core.Context, category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
 	category.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(category.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(category.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		updatedRows, err := sess.ID(category.CategoryId).Cols("name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", category.Uid, false).Update(category)
 
 		if err != nil {
@@ -248,7 +249,7 @@ func (s *TransactionCategoryService) ModifyCategory(category *models.Transaction
 }
 
 // HideCategory updates hidden field of given transaction categories
-func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden bool) error {
+func (s *TransactionCategoryService) HideCategory(c *core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -260,7 +261,7 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 		UpdatedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("category_id", ids).Update(updateModel)
 
 		if err != nil {
@@ -274,7 +275,7 @@ func (s *TransactionCategoryService) HideCategory(uid int64, ids []int64, hidden
 }
 
 // ModifyCategoryDisplayOrders updates display order of given transaction categories
-func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, categories []*models.TransactionCategory) error {
+func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(c *core.Context, uid int64, categories []*models.TransactionCategory) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -283,7 +284,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 		categories[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(categories); i++ {
 			category := categories[i]
 			updatedRows, err := sess.ID(category.CategoryId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(category)
@@ -300,7 +301,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(uid int64, cate
 }
 
 // DeleteCategory deletes an existed transaction category from database
-func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64) error {
+func (s *TransactionCategoryService) DeleteCategory(c *core.Context, uid int64, categoryId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -312,7 +313,7 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		var categoryAndSubCategories []*models.TransactionCategory
 		err := sess.Where("uid=? AND deleted=? AND (category_id=? OR parent_category_id=?)", uid, false, categoryId, categoryId).Find(&categoryAndSubCategories)
 
@@ -349,7 +350,7 @@ func (s *TransactionCategoryService) DeleteCategory(uid int64, categoryId int64)
 }
 
 // DeleteAllCategories deletes all existed transaction categories from database
-func (s *TransactionCategoryService) DeleteAllCategories(uid int64) error {
+func (s *TransactionCategoryService) DeleteAllCategories(c *core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -361,7 +362,7 @@ func (s *TransactionCategoryService) DeleteAllCategories(uid int64) error {
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		exists, err := sess.Cols("uid", "deleted", "category_id").Where("uid=? AND deleted=? AND category_id<>?", uid, false, 0).Limit(1).Exist(&models.Transaction{})
 
 		if err != nil {

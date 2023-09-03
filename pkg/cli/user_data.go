@@ -86,7 +86,7 @@ func (l *UserDataCli) AddNewUser(c *cli.Context, username string, email string, 
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 	}
 
-	err := l.users.CreateUser(user)
+	err := l.users.CreateUser(nil, user)
 
 	if err != nil {
 		log.BootErrorf("[user_data.AddNewUser] failed to create user \"%s\", because %s", user.Username, err.Error())
@@ -105,7 +105,7 @@ func (l *UserDataCli) GetUserByUsername(c *cli.Context, username string) (*model
 		return nil, errs.ErrUsernameIsEmpty
 	}
 
-	user, err := l.users.GetUserByUsername(username)
+	user, err := l.users.GetUserByUsername(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.GetUserByUsername] failed to get user by user name \"%s\", because %s", username, err.Error())
@@ -127,7 +127,7 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 		return errs.ErrPasswordIsEmpty
 	}
 
-	user, err := l.users.GetUserByUsername(username)
+	user, err := l.users.GetUserByUsername(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ModifyUserPassword] failed to get user by user name \"%s\", because %s", username, err.Error())
@@ -144,7 +144,7 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 		Password: password,
 	}
 
-	_, err = l.users.UpdateUser(userNew, false)
+	_, err = l.users.UpdateUser(nil, userNew, false)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ModifyUserPassword] failed to update user \"%s\" password, because %s", user.Username, err.Error())
@@ -152,7 +152,7 @@ func (l *UserDataCli) ModifyUserPassword(c *cli.Context, username string, passwo
 	}
 
 	now := time.Now().Unix()
-	err = l.tokens.DeleteTokensBeforeTime(user.Uid, now)
+	err = l.tokens.DeleteTokensBeforeTime(nil, user.Uid, now)
 
 	if err == nil {
 		log.BootInfof("[user_data.ModifyUserPassword] revoke old tokens before unix time \"%d\" for user \"%s\"", now, user.Username)
@@ -170,7 +170,7 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return errs.ErrUsernameIsEmpty
 	}
 
-	user, err := l.users.GetUserByUsername(username)
+	user, err := l.users.GetUserByUsername(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.SendPasswordResetMail] failed to get user by user name \"%s\", because %s", username, err.Error())
@@ -182,14 +182,14 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return errs.ErrEmptyIsNotVerified
 	}
 
-	token, _, err := l.tokens.CreatePasswordResetToken(user, nil)
+	token, _, err := l.tokens.CreatePasswordResetToken(nil, user)
 
 	if err != nil {
 		log.BootErrorf("[user_data.SendPasswordResetMail] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return err
 	}
 
-	err = l.forgetPasswords.SendPasswordResetEmail(user, token, "")
+	err = l.forgetPasswords.SendPasswordResetEmail(nil, user, token, "")
 
 	if err != nil {
 		log.BootWarnf("[user_data.SendPasswordResetMail] cannot send email to \"%s\", because %s", user.Email, err.Error())
@@ -206,7 +206,7 @@ func (l *UserDataCli) EnableUser(c *cli.Context, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.EnableUser(username)
+	err := l.users.EnableUser(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.EnableUser] failed to set user enabled by user name \"%s\", because %s", username, err.Error())
@@ -223,7 +223,7 @@ func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.DisableUser(username)
+	err := l.users.DisableUser(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DisableUser] failed to set user disabled by user name \"%s\", because %s", username, err.Error())
@@ -240,7 +240,7 @@ func (l *UserDataCli) SetUserEmailVerified(c *cli.Context, username string) erro
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.SetUserEmailVerified(username)
+	err := l.users.SetUserEmailVerified(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.SetUserEmailVerified] failed to set user email address verified by user name \"%s\", because %s", username, err.Error())
@@ -257,7 +257,7 @@ func (l *UserDataCli) SetUserEmailUnverified(c *cli.Context, username string) er
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.SetUserEmailUnverified(username)
+	err := l.users.SetUserEmailUnverified(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.SetUserEmailUnverified] failed to set user email address unverified by user name \"%s\", because %s", username, err.Error())
@@ -274,7 +274,7 @@ func (l *UserDataCli) DeleteUser(c *cli.Context, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.DeleteUser(username)
+	err := l.users.DeleteUser(nil, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DeleteUser] failed to delete user by user name \"%s\", because %s", username, err.Error())
@@ -298,7 +298,7 @@ func (l *UserDataCli) ListUserTokens(c *cli.Context, username string) ([]*models
 		return nil, err
 	}
 
-	tokens, err := l.tokens.GetAllUnexpiredNormalTokensByUid(uid)
+	tokens, err := l.tokens.GetAllUnexpiredNormalTokensByUid(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ListUserTokens] failed to get tokens of user \"%s\", because %s", username, err.Error())
@@ -323,7 +323,7 @@ func (l *UserDataCli) ClearUserTokens(c *cli.Context, username string) error {
 	}
 
 	now := time.Now().Unix()
-	err = l.tokens.DeleteTokensBeforeTime(uid, now)
+	err = l.tokens.DeleteTokensBeforeTime(nil, uid, now)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ClearUserTokens] failed to delete tokens of user \"%s\", because %s", username, err.Error())
@@ -347,7 +347,7 @@ func (l *UserDataCli) DisableUserTwoFactorAuthorization(c *cli.Context, username
 		return err
 	}
 
-	enableTwoFactor, err := l.twoFactorAuthorizations.ExistsTwoFactorSetting(uid)
+	enableTwoFactor, err := l.twoFactorAuthorizations.ExistsTwoFactorSetting(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to check two factor setting, because %s", err.Error())
@@ -358,14 +358,14 @@ func (l *UserDataCli) DisableUserTwoFactorAuthorization(c *cli.Context, username
 		return errs.ErrTwoFactorIsNotEnabled
 	}
 
-	err = l.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(uid)
+	err = l.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor recovery codes for user \"%s\"", username)
 		return err
 	}
 
-	err = l.twoFactorAuthorizations.DeleteTwoFactorSetting(uid)
+	err = l.twoFactorAuthorizations.DeleteTwoFactorSetting(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor setting for user \"%s\"", username)
@@ -404,7 +404,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		}
 	}
 
-	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForGettingTransactions, false)
+	allTransactions, err := l.transactions.GetAllTransactions(nil, uid, pageCountForGettingTransactions, false)
 
 	if err != nil {
 		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to all transactions for user \"%s\", because %s", username, err.Error())
@@ -516,7 +516,7 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte
 		return nil, err
 	}
 
-	allTransactions, err := l.transactions.GetAllTransactions(uid, pageCountForDataExport, true)
+	allTransactions, err := l.transactions.GetAllTransactions(nil, uid, pageCountForDataExport, true)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to all transactions for user \"%s\", because %s", username, err.Error())
@@ -550,7 +550,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 		return nil, nil, nil, nil, errs.ErrUserIdInvalid
 	}
 
-	accounts, err := l.accounts.GetAllAccountsByUid(uid)
+	accounts, err := l.accounts.GetAllAccountsByUid(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"%s\", because %s", username, err.Error())
@@ -559,7 +559,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	accountMap = l.accounts.GetAccountMapByList(accounts)
 
-	categories, err := l.categories.GetAllCategoriesByUid(uid, 0, -1)
+	categories, err := l.categories.GetAllCategoriesByUid(nil, uid, 0, -1)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"%s\", because %s", username, err.Error())
@@ -568,7 +568,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	categoryMap = l.categories.GetCategoryMapByList(categories)
 
-	tags, err := l.tags.GetAllTagsByUid(uid)
+	tags, err := l.tags.GetAllTagsByUid(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"%s\", because %s", username, err.Error())
@@ -577,7 +577,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	tagMap = l.tags.GetTagMapByList(tags)
 
-	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(uid)
+	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"%s\", because %s", username, err.Error())

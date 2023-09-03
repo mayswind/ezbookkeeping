@@ -7,6 +7,7 @@ import (
 	"github.com/pquerna/otp/totp"
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -45,13 +46,13 @@ var (
 )
 
 // GetUserTwoFactorSettingByUid returns the 2fa setting model according to user uid
-func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(uid int64) (*models.TwoFactor, error) {
+func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c *core.Context, uid int64) (*models.TwoFactor, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
 	twoFactor := &models.TwoFactor{}
-	has, err := s.UserDB().Where("uid=?", uid).Get(twoFactor)
+	has, err := s.UserDB().NewSession(c).Where("uid=?", uid).Get(twoFactor)
 
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(uid int64) 
 }
 
 // GenerateTwoFactorSecret generates a new 2fa secret
-func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(user *models.User) (*otp.Key, error) {
+func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c *core.Context, user *models.User) (*otp.Key, error) {
 	if user == nil {
 		return nil, errs.ErrUserNotFound
 	}
@@ -85,7 +86,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(user *models.Use
 }
 
 // CreateTwoFactorSetting saves a new 2fa setting to database
-func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models.TwoFactor) error {
+func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c *core.Context, twoFactor *models.TwoFactor) error {
 	if twoFactor.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -99,19 +100,19 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(twoFactor *models
 
 	twoFactor.CreatedUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Insert(twoFactor)
 		return err
 	})
 }
 
 // DeleteTwoFactorSetting deletes an existed 2fa setting from database
-func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error {
+func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(c *core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=?", uid).Delete(&models.TwoFactor{})
 
 		if err != nil {
@@ -125,22 +126,22 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(uid int64) error 
 }
 
 // ExistsTwoFactorSetting returns whether the given user has existed 2fa setting
-func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(uid int64) (bool, error) {
+func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(c *core.Context, uid int64) (bool, error) {
 	if uid <= 0 {
 		return false, errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().Cols("uid").Where("uid=?", uid).Exist(&models.TwoFactor{})
+	return s.UserDB().NewSession(c).Cols("uid").Where("uid=?", uid).Exist(&models.TwoFactor{})
 }
 
 // GetAndUseUserTwoFactorRecoveryCode checks whether the given 2fa recovery code exists and marks it used
-func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid int64, recoveryCode string, salt string) error {
+func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(c *core.Context, uid int64, recoveryCode string, salt string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
 	recoveryCode = utils.EncodePassword(recoveryCode, salt)
-	exists, err := s.UserDB().Cols("uid", "recovery_code").Where("uid=? AND recovery_code=? AND used=?", uid, recoveryCode, false).Exist(&models.TwoFactorRecoveryCode{})
+	exists, err := s.UserDB().NewSession(c).Cols("uid", "recovery_code").Where("uid=? AND recovery_code=? AND used=?", uid, recoveryCode, false).Exist(&models.TwoFactorRecoveryCode{})
 
 	if err != nil {
 		return err
@@ -148,7 +149,7 @@ func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(uid i
 		return errs.ErrTwoFactorRecoveryCodeNotExist
 	}
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Cols("used", "used_unix_time").Where("uid=? AND recovery_code=?", uid, recoveryCode).Update(&models.TwoFactorRecoveryCode{Used: true, UsedUnixTime: time.Now().Unix()})
 		return err
 	})
@@ -172,7 +173,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]stri
 }
 
 // CreateTwoFactorRecoveryCodes saves new 2fa recovery codes to database
-func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, recoveryCodes []string, salt string) error {
+func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(c *core.Context, uid int64, recoveryCodes []string, salt string) error {
 	twoFactorRecoveryCodes := make([]*models.TwoFactorRecoveryCode, len(recoveryCodes))
 
 	for i := 0; i < len(recoveryCodes); i++ {
@@ -184,7 +185,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, 
 		}
 	}
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 
 		if err != nil {
@@ -205,12 +206,12 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(uid int64, 
 }
 
 // DeleteTwoFactorRecoveryCodes deletes existed 2fa recovery codes from database
-func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(uid int64) error {
+func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(c *core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 		return err
 	})

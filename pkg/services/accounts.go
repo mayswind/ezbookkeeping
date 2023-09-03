@@ -5,6 +5,7 @@ import (
 
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -31,30 +32,30 @@ var (
 )
 
 // GetTotalAccountCountByUid returns total account count of user
-func (s *AccountService) GetTotalAccountCountByUid(uid int64) (int64, error) {
+func (s *AccountService) GetTotalAccountCountByUid(c *core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Account{})
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.Account{})
 
 	return count, err
 }
 
 // GetAllAccountsByUid returns all account models of user
-func (s *AccountService) GetAllAccountsByUid(uid int64) ([]*models.Account, error) {
+func (s *AccountService) GetAllAccountsByUid(c *core.Context, uid int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
 	var accounts []*models.Account
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).OrderBy("parent_account_id asc, display_order asc").Find(&accounts)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).OrderBy("parent_account_id asc, display_order asc").Find(&accounts)
 
 	return accounts, err
 }
 
 // GetAccountAndSubAccountsByAccountId returns account model and sub account models according to account id
-func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
+func (s *AccountService) GetAccountAndSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -64,13 +65,13 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(uid int64, accountI
 	}
 
 	var accounts []*models.Account
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).OrderBy("parent_account_id asc, display_order asc").Find(&accounts)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).OrderBy("parent_account_id asc, display_order asc").Find(&accounts)
 
 	return accounts, err
 }
 
 // GetSubAccountsByAccountId returns sub account models according to account id
-func (s *AccountService) GetSubAccountsByAccountId(uid int64, accountId int64) ([]*models.Account, error) {
+func (s *AccountService) GetSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -80,13 +81,13 @@ func (s *AccountService) GetSubAccountsByAccountId(uid int64, accountId int64) (
 	}
 
 	var accounts []*models.Account
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, accountId).OrderBy("display_order asc").Find(&accounts)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, accountId).OrderBy("display_order asc").Find(&accounts)
 
 	return accounts, err
 }
 
 // GetAccountsByAccountIds returns account models according to account ids
-func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) (map[int64]*models.Account, error) {
+func (s *AccountService) GetAccountsByAccountIds(c *core.Context, uid int64, accountIds []int64) (map[int64]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -96,7 +97,7 @@ func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) 
 	}
 
 	var accounts []*models.Account
-	err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).In("account_id", accountIds).Find(&accounts)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("account_id", accountIds).Find(&accounts)
 
 	if err != nil {
 		return nil, err
@@ -107,13 +108,13 @@ func (s *AccountService) GetAccountsByAccountIds(uid int64, accountIds []int64) 
 }
 
 // GetMaxDisplayOrder returns the max display order according to account category
-func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCategory) (int32, error) {
+func (s *AccountService) GetMaxDisplayOrder(c *core.Context, uid int64, category models.AccountCategory) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
 	account := &models.Account{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, models.LevelOneAccountParentId, category).OrderBy("display_order desc").Limit(1).Get(account)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, models.LevelOneAccountParentId, category).OrderBy("display_order desc").Limit(1).Get(account)
 
 	if err != nil {
 		return 0, err
@@ -127,7 +128,7 @@ func (s *AccountService) GetMaxDisplayOrder(uid int64, category models.AccountCa
 }
 
 // GetMaxSubAccountDisplayOrder returns the max display order of sub account according to account category and parent account id
-func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
+func (s *AccountService) GetMaxSubAccountDisplayOrder(c *core.Context, uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -137,7 +138,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models
 	}
 
 	account := &models.Account{}
-	has, err := s.UserDataDB(uid).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, parentAccountId, category).OrderBy("display_order desc").Limit(1).Get(account)
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "parent_account_id", "display_order").Where("uid=? AND deleted=? AND parent_account_id=? AND category=?", uid, false, parentAccountId, category).OrderBy("display_order desc").Limit(1).Get(account)
 
 	if err != nil {
 		return 0, err
@@ -151,7 +152,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(uid int64, category models
 }
 
 // CreateAccounts saves a new account model to database
-func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
+func (s *AccountService) CreateAccounts(c *core.Context, mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
 	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -204,7 +205,7 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 		}
 	}
 
-	return s.UserDataDB(mainAccount.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(mainAccount.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(allAccounts); i++ {
 			account := allAccounts[i]
 			_, err := sess.Insert(account)
@@ -228,7 +229,7 @@ func (s *AccountService) CreateAccounts(mainAccount *models.Account, childrenAcc
 }
 
 // ModifyAccounts saves an existed account model to database
-func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) error {
+func (s *AccountService) ModifyAccounts(c *core.Context, uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -239,7 +240,7 @@ func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) e
 		accounts[i].UpdatedUnixTime = now
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
 			updatedRows, err := sess.ID(account.AccountId).Cols("name", "category", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
@@ -256,7 +257,7 @@ func (s *AccountService) ModifyAccounts(uid int64, accounts []*models.Account) e
 }
 
 // HideAccount updates hidden field of given accounts
-func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error {
+func (s *AccountService) HideAccount(c *core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -268,7 +269,7 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 		UpdatedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("account_id", ids).Update(updateModel)
 
 		if err != nil {
@@ -282,7 +283,7 @@ func (s *AccountService) HideAccount(uid int64, ids []int64, hidden bool) error 
 }
 
 // ModifyAccountDisplayOrders updates display order of given accounts
-func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*models.Account) error {
+func (s *AccountService) ModifyAccountDisplayOrders(c *core.Context, uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -291,7 +292,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 		accounts[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(accounts); i++ {
 			account := accounts[i]
 			updatedRows, err := sess.ID(account.AccountId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(account)
@@ -308,7 +309,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(uid int64, accounts []*model
 }
 
 // DeleteAccount deletes an existed account from database
-func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
+func (s *AccountService) DeleteAccount(c *core.Context, uid int64, accountId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -321,7 +322,7 @@ func (s *AccountService) DeleteAccount(uid int64, accountId int64) error {
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		var accountAndSubAccounts []*models.Account
 		err := sess.Where("uid=? AND deleted=? AND (account_id=? OR parent_account_id=?)", uid, false, accountId, accountId).Find(&accountAndSubAccounts)
 

@@ -33,7 +33,7 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (interfa
 	}
 
 	uid := c.GetCurrentUid()
-	categories, err := a.categories.GetAllCategoriesByUid(uid, categoryListReq.Type, categoryListReq.ParentId)
+	categories, err := a.categories.GetAllCategoriesByUid(c, uid, categoryListReq.Type, categoryListReq.ParentId)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryListHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
@@ -54,7 +54,7 @@ func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (interfac
 	}
 
 	uid := c.GetCurrentUid()
-	category, err := a.categories.GetCategoryByCategoryId(uid, categoryGetReq.Id)
+	category, err := a.categories.GetCategoryByCategoryId(c, uid, categoryGetReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryGetHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryGetReq.Id, uid, err.Error())
@@ -84,7 +84,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 	uid := c.GetCurrentUid()
 
 	if categoryCreateReq.ParentId > 0 {
-		parentCategory, err := a.categories.GetCategoryByCategoryId(uid, categoryCreateReq.ParentId)
+		parentCategory, err := a.categories.GetCategoryByCategoryId(c, uid, categoryCreateReq.ParentId)
 
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
@@ -105,9 +105,9 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 	var maxOrderId int32
 
 	if categoryCreateReq.ParentId <= 0 {
-		maxOrderId, err = a.categories.GetMaxDisplayOrder(uid, categoryCreateReq.Type)
+		maxOrderId, err = a.categories.GetMaxDisplayOrder(c, uid, categoryCreateReq.Type)
 	} else {
-		maxOrderId, err = a.categories.GetMaxSubCategoryDisplayOrder(uid, categoryCreateReq.Type, categoryCreateReq.ParentId)
+		maxOrderId, err = a.categories.GetMaxSubCategoryDisplayOrder(c, uid, categoryCreateReq.Type, categoryCreateReq.ParentId)
 	}
 
 	if err != nil {
@@ -117,7 +117,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 
 	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
 
-	err = a.categories.CreateCategory(category)
+	err = a.categories.CreateCategory(c, category)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to create category \"id:%d\" for user \"uid:%d\", because %s", category.CategoryId, uid, err.Error())
@@ -153,7 +153,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		var maxOrderId, exists = categoryTypeMaxOrderMap[categoryCreateReq.Type]
 
 		if !exists {
-			maxOrderId, err = a.categories.GetMaxDisplayOrder(uid, categoryCreateReq.Type)
+			maxOrderId, err = a.categories.GetMaxDisplayOrder(c, uid, categoryCreateReq.Type)
 
 			if err != nil {
 				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
@@ -181,7 +181,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 		totalCount++
 	}
 
-	categories, err := a.categories.CreateCategories(uid, categoriesMap)
+	categories, err := a.categories.CreateCategories(c, uid, categoriesMap)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
@@ -204,7 +204,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (inter
 	}
 
 	uid := c.GetCurrentUid()
-	category, err := a.categories.GetCategoryByCategoryId(uid, categoryModifyReq.Id)
+	category, err := a.categories.GetCategoryByCategoryId(c, uid, categoryModifyReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
@@ -229,7 +229,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (inter
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.categories.ModifyCategory(newCategory)
+	err = a.categories.ModifyCategory(c, newCategory)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to update category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
@@ -257,7 +257,7 @@ func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (interfa
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.categories.HideCategory(uid, []int64{categoryHideReq.Id}, categoryHideReq.Hidden)
+	err = a.categories.HideCategory(c, uid, []int64{categoryHideReq.Id}, categoryHideReq.Hidden)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryHideHandler] failed to hide category \"id:%d\" for user \"uid:%d\", because %s", categoryHideReq.Id, uid, err.Error())
@@ -292,7 +292,7 @@ func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (interfa
 		categories[i] = category
 	}
 
-	err = a.categories.ModifyCategoryDisplayOrders(uid, categories)
+	err = a.categories.ModifyCategoryDisplayOrders(c, uid, categories)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryMoveHandler] failed to move categories for user \"uid:%d\", because %s", uid, err.Error())
@@ -314,7 +314,7 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (inter
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.categories.DeleteCategory(uid, categoryDeleteReq.Id)
+	err = a.categories.DeleteCategory(c, uid, categoryDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] failed to delete category \"id:%d\" for user \"uid:%d\", because %s", categoryDeleteReq.Id, uid, err.Error())

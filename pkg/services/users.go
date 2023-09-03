@@ -5,6 +5,7 @@ import (
 
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -31,14 +32,14 @@ var (
 )
 
 // GetUserByUsernameOrEmailAndPassword returns the user model according to login name and password
-func (s *UserService) GetUserByUsernameOrEmailAndPassword(loginname string, password string) (*models.User, error) {
+func (s *UserService) GetUserByUsernameOrEmailAndPassword(c *core.Context, loginname string, password string) (*models.User, error) {
 	var user *models.User
 	var err error
 
 	if utils.IsValidUsername(loginname) {
-		user, err = s.GetUserByUsername(loginname)
+		user, err = s.GetUserByUsername(c, loginname)
 	} else if utils.IsValidEmail(loginname) {
-		user, err = s.GetUserByEmail(loginname)
+		user, err = s.GetUserByEmail(c, loginname)
 	} else {
 		err = errs.ErrLoginNameInvalid
 	}
@@ -55,13 +56,13 @@ func (s *UserService) GetUserByUsernameOrEmailAndPassword(loginname string, pass
 }
 
 // GetUserById returns the user model according to user uid
-func (s *UserService) GetUserById(uid int64) (*models.User, error) {
+func (s *UserService) GetUserById(c *core.Context, uid int64) (*models.User, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
 	user := &models.User{}
-	has, err := s.UserDB().ID(uid).Where("deleted=?", false).Get(user)
+	has, err := s.UserDB().NewSession(c).ID(uid).Where("deleted=?", false).Get(user)
 
 	if err != nil {
 		return nil, err
@@ -73,13 +74,13 @@ func (s *UserService) GetUserById(uid int64) (*models.User, error) {
 }
 
 // GetUserByUsername returns the user model according to user name
-func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
+func (s *UserService) GetUserByUsername(c *core.Context, username string) (*models.User, error) {
 	if username == "" {
 		return nil, errs.ErrUsernameIsEmpty
 	}
 
 	user := &models.User{}
-	has, err := s.UserDB().Where("username=? AND deleted=?", username, false).Get(user)
+	has, err := s.UserDB().NewSession(c).Where("username=? AND deleted=?", username, false).Get(user)
 
 	if err != nil {
 		return nil, err
@@ -91,13 +92,13 @@ func (s *UserService) GetUserByUsername(username string) (*models.User, error) {
 }
 
 // GetUserByEmail returns the user model according to user email
-func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+func (s *UserService) GetUserByEmail(c *core.Context, email string) (*models.User, error) {
 	if email == "" {
 		return nil, errs.ErrEmailIsEmpty
 	}
 
 	user := &models.User{}
-	has, err := s.UserDB().Where("email=? AND deleted=?", email, false).Get(user)
+	has, err := s.UserDB().NewSession(c).Where("email=? AND deleted=?", email, false).Get(user)
 
 	if err != nil {
 		return nil, err
@@ -109,8 +110,8 @@ func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser saves a new user model to database
-func (s *UserService) CreateUser(user *models.User) error {
-	exists, err := s.ExistsUsername(user.Username)
+func (s *UserService) CreateUser(c *core.Context, user *models.User) error {
+	exists, err := s.ExistsUsername(c, user.Username)
 
 	if err != nil {
 		return err
@@ -118,7 +119,7 @@ func (s *UserService) CreateUser(user *models.User) error {
 		return errs.ErrUsernameAlreadyExists
 	}
 
-	exists, err = s.ExistsEmail(user.Email)
+	exists, err = s.ExistsEmail(c, user.Email)
 
 	if err != nil {
 		return err
@@ -143,14 +144,14 @@ func (s *UserService) CreateUser(user *models.User) error {
 	user.UpdatedUnixTime = time.Now().Unix()
 	user.LastLoginUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Insert(user)
 		return err
 	})
 }
 
 // UpdateUser saves an existed user model to database
-func (s *UserService) UpdateUser(user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, err error) {
+func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, err error) {
 	if user.Uid <= 0 {
 		return false, errs.ErrUserIdInvalid
 	}
@@ -161,7 +162,7 @@ func (s *UserService) UpdateUser(user *models.User, modifyUserLanguage bool) (ke
 	keyProfileUpdated = false
 
 	if user.Email != "" {
-		exists, err := s.ExistsEmail(user.Email)
+		exists, err := s.ExistsEmail(c, user.Email)
 
 		if err != nil {
 			return false, err
@@ -225,7 +226,7 @@ func (s *UserService) UpdateUser(user *models.User, modifyUserLanguage bool) (ke
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 
-	err = s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	err = s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		updatedRows, err := sess.ID(user.Uid).Cols(updateCols...).Where("deleted=?", false).Update(user)
 
 		if err != nil {
@@ -245,19 +246,19 @@ func (s *UserService) UpdateUser(user *models.User, modifyUserLanguage bool) (ke
 }
 
 // UpdateUserLastLoginTime updates the last login time field
-func (s *UserService) UpdateUserLastLoginTime(uid int64) error {
+func (s *UserService) UpdateUserLastLoginTime(c *core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.ID(uid).Cols("last_login_unix_time").Where("deleted=?", false).Update(&models.User{LastLoginUnixTime: time.Now().Unix()})
 		return err
 	})
 }
 
 // EnableUser sets user enabled
-func (s *UserService) EnableUser(username string) error {
+func (s *UserService) EnableUser(c *core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -269,7 +270,7 @@ func (s *UserService) EnableUser(username string) error {
 		UpdatedUnixTime: now,
 	}
 
-	updatedRows, err := s.UserDB().Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+	updatedRows, err := s.UserDB().NewSession(c).Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
 
 	if err != nil {
 		return err
@@ -280,7 +281,7 @@ func (s *UserService) EnableUser(username string) error {
 }
 
 // DisableUser sets user disabled
-func (s *UserService) DisableUser(username string) error {
+func (s *UserService) DisableUser(c *core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -292,7 +293,7 @@ func (s *UserService) DisableUser(username string) error {
 		UpdatedUnixTime: now,
 	}
 
-	updatedRows, err := s.UserDB().Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+	updatedRows, err := s.UserDB().NewSession(c).Cols("disabled", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
 
 	if err != nil {
 		return err
@@ -303,7 +304,7 @@ func (s *UserService) DisableUser(username string) error {
 }
 
 // SetUserEmailVerified sets user email address verified
-func (s *UserService) SetUserEmailVerified(username string) error {
+func (s *UserService) SetUserEmailVerified(c *core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -315,7 +316,7 @@ func (s *UserService) SetUserEmailVerified(username string) error {
 		UpdatedUnixTime: now,
 	}
 
-	updatedRows, err := s.UserDB().Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+	updatedRows, err := s.UserDB().NewSession(c).Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
 
 	if err != nil {
 		return err
@@ -326,7 +327,7 @@ func (s *UserService) SetUserEmailVerified(username string) error {
 }
 
 // SetUserEmailUnverified sets user email address unverified
-func (s *UserService) SetUserEmailUnverified(username string) error {
+func (s *UserService) SetUserEmailUnverified(c *core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -338,7 +339,7 @@ func (s *UserService) SetUserEmailUnverified(username string) error {
 		UpdatedUnixTime: now,
 	}
 
-	updatedRows, err := s.UserDB().Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+	updatedRows, err := s.UserDB().NewSession(c).Cols("email_verified", "updated_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
 
 	if err != nil {
 		return err
@@ -349,7 +350,7 @@ func (s *UserService) SetUserEmailUnverified(username string) error {
 }
 
 // DeleteUser deletes an existed user from database
-func (s *UserService) DeleteUser(username string) error {
+func (s *UserService) DeleteUser(c *core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -361,7 +362,7 @@ func (s *UserService) DeleteUser(username string) error {
 		DeletedUnixTime: now,
 	}
 
-	deletedRows, err := s.UserDB().Cols("deleted", "deleted_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
+	deletedRows, err := s.UserDB().NewSession(c).Cols("deleted", "deleted_unix_time").Where("username=? AND deleted=?", username, false).Update(updateModel)
 
 	if err != nil {
 		return err
@@ -372,21 +373,21 @@ func (s *UserService) DeleteUser(username string) error {
 }
 
 // ExistsUsername returns whether the given user name exists
-func (s *UserService) ExistsUsername(username string) (bool, error) {
+func (s *UserService) ExistsUsername(c *core.Context, username string) (bool, error) {
 	if username == "" {
 		return false, errs.ErrUsernameIsEmpty
 	}
 
-	return s.UserDB().Cols("username").Where("username=? AND deleted=?", username, false).Exist(&models.User{})
+	return s.UserDB().NewSession(c).Cols("username").Where("username=? AND deleted=?", username, false).Exist(&models.User{})
 }
 
 // ExistsEmail returns whether the given user email exists
-func (s *UserService) ExistsEmail(email string) (bool, error) {
+func (s *UserService) ExistsEmail(c *core.Context, email string) (bool, error) {
 	if email == "" {
 		return false, errs.ErrEmailIsEmpty
 	}
 
-	return s.UserDB().Cols("email").Where("email=? AND deleted=?", email, false).Exist(&models.User{})
+	return s.UserDB().NewSession(c).Cols("email").Where("email=? AND deleted=?", email, false).Exist(&models.User{})
 }
 
 // IsPasswordEqualsUserPassword returns whether the given password is correct

@@ -104,14 +104,14 @@ func initializeDatabase(dbConfig *settings.DatabaseConfig) (*Database, error) {
 	engineGroup.SetConnMaxLifetime(time.Duration(dbConfig.ConnectionMaxLifeTime) * time.Second)
 
 	return &Database{
-		EngineGroup: engineGroup,
+		engineGroup: engineGroup,
 	}, nil
 }
 
 func setDatabaseLogger(database *Database, config *settings.Config) {
 	if config.EnableQueryLog {
-		database.SetLogger(NewXOrmLoggerAdapter(config.EnableQueryLog, config.LogLevel))
-		database.ShowSQL(true)
+		database.engineGroup.SetLogger(NewXOrmLoggerAdapter(config.EnableQueryLog, config.LogLevel))
+		database.engineGroup.ShowSQL(true)
 	}
 }
 

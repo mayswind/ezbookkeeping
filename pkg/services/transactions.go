@@ -7,6 +7,7 @@ import (
 
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -33,23 +34,23 @@ var (
 )
 
 // GetTotalTransactionCountByUid returns total transaction count of user
-func (s *TransactionService) GetTotalTransactionCountByUid(uid int64) (int64, error) {
+func (s *TransactionService) GetTotalTransactionCountByUid(c *core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	count, err := s.UserDataDB(uid).Where("uid=? AND deleted=?", uid, false).Count(&models.Transaction{})
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.Transaction{})
 
 	return count, err
 }
 
 // GetAllTransactions returns all transactions
-func (s *TransactionService) GetAllTransactions(uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAllTransactions(c *core.Context, uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
 	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	var allTransactions []*models.Transaction
 
 	for maxTransactionTime > 0 {
-		transactions, err := s.GetAllTransactionsByMaxTime(uid, maxTransactionTime, pageCount, noDuplicated)
+		transactions, err := s.GetAllTransactionsByMaxTime(c, uid, maxTransactionTime, pageCount, noDuplicated)
 
 		if err != nil {
 			return nil, err
@@ -69,12 +70,12 @@ func (s *TransactionService) GetAllTransactions(uid int64, pageCount int32, noDu
 }
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(uid, maxTransactionTime, 0, 0, nil, nil, "", 1, count, false, noDuplicated)
+func (s *TransactionService) GetAllTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
+	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, "", 1, count, false, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -99,13 +100,13 @@ func (s *TransactionService) GetTransactionsByMaxTime(uid int64, maxTransactionT
 	}
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, noDuplicated)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).Limit(int(actualCount), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).Limit(int(actualCount), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
 
 // GetTransactionsInMonthByPage returns all transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -125,7 +126,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32,
 	var transactions []*models.Transaction
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
-	err = s.UserDataDB(uid).Where(condition, conditionParams...).OrderBy("transaction_time desc").Find(&transactions)
+	err = s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("transaction_time desc").Find(&transactions)
 
 	transactionsInMonth := make([]*models.Transaction, 0, len(transactions))
 
@@ -143,7 +144,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(uid int64, year int32,
 }
 
 // GetTransactionByTransactionId returns a transaction model according to transaction id
-func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactionId int64) (*models.Transaction, error) {
+func (s *TransactionService) GetTransactionByTransactionId(c *core.Context, uid int64, transactionId int64) (*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -153,7 +154,7 @@ func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactio
 	}
 
 	transaction := &models.Transaction{}
-	has, err := s.UserDataDB(uid).ID(transactionId).Where("uid=? AND deleted=?", uid, false).Get(transaction)
+	has, err := s.UserDataDB(uid).NewSession(c).ID(transactionId).Where("uid=? AND deleted=?", uid, false).Get(transaction)
 
 	if err != nil {
 		return nil, err
@@ -165,12 +166,12 @@ func (s *TransactionService) GetTransactionByTransactionId(uid int64, transactio
 }
 
 // GetAllTransactionCount returns total count of transactions
-func (s *TransactionService) GetAllTransactionCount(uid int64) (int64, error) {
-	return s.GetTransactionCount(uid, 0, 0, 0, nil, nil, "")
+func (s *TransactionService) GetAllTransactionCount(c *core.Context, uid int64) (int64, error) {
+	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, "")
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
+func (s *TransactionService) GetMonthTransactionCount(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -186,21 +187,21 @@ func (s *TransactionService) GetMonthTransactionCount(uid int64, year int32, mon
 	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
 	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
 
-	return s.GetTransactionCount(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword)
+	return s.GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword)
 }
 
 // GetTransactionCount returns count of transactions
-func (s *TransactionService) GetTransactionCount(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) (int64, error) {
+func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
 	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
-	return s.UserDataDB(uid).Where(condition, conditionParams...).Count(&models.Transaction{})
+	return s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).Count(&models.Transaction{})
 }
 
 // CreateTransaction saves a new transaction to database
-func (s *TransactionService) CreateTransaction(transaction *models.Transaction, tagIds []int64) error {
+func (s *TransactionService) CreateTransaction(c *core.Context, transaction *models.Transaction, tagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -247,7 +248,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 		}
 	}
 
-	return s.UserDataDB(transaction.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Get and verify source and destination account
 		sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
 
@@ -411,7 +412,7 @@ func (s *TransactionService) CreateTransaction(transaction *models.Transaction, 
 }
 
 // ModifyTransaction saves an existed transaction to database
-func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, addTagIds []int64, removeTagIds []int64) error {
+func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *models.Transaction, addTagIds []int64, removeTagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -441,7 +442,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 		}
 	}
 
-	err := s.UserDataDB(transaction.Uid).DoTransaction(func(sess *xorm.Session) error {
+	err := s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
 		has, err := sess.ID(transaction.TransactionId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(oldTransaction)
@@ -782,7 +783,7 @@ func (s *TransactionService) ModifyTransaction(transaction *models.Transaction, 
 }
 
 // DeleteTransaction deletes an existed transaction from database
-func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) error {
+func (s *TransactionService) DeleteTransaction(c *core.Context, uid int64, transactionId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -799,7 +800,7 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
 		has, err := sess.ID(transactionId).Where("uid=? AND deleted=?", uid, false).Get(oldTransaction)
@@ -902,7 +903,7 @@ func (s *TransactionService) DeleteTransaction(uid int64, transactionId int64) e
 }
 
 // DeleteAllTransactions deletes all existed transactions from database
-func (s *TransactionService) DeleteAllTransactions(uid int64) error {
+func (s *TransactionService) DeleteAllTransactions(c *core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -925,7 +926,7 @@ func (s *TransactionService) DeleteAllTransactions(uid int64) error {
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Update all transaction to deleted
 		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
@@ -992,7 +993,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 }
 
 // GetAccountsTotalIncomeAndExpense returns the every accounts total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUnixTime int64, endUnixTime int64) (map[int64]int64, map[int64]int64, error) {
+func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c *core.Context, uid int64, startUnixTime int64, endUnixTime int64) (map[int64]int64, map[int64]int64, error) {
 	if uid <= 0 {
 		return nil, nil, errs.ErrUserIdInvalid
 	}
@@ -1001,7 +1002,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUn
 	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
 
 	var transactionTotalAmounts []*models.Transaction
-	err := s.UserDataDB(uid).Select("type, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("type, account_id").Find(&transactionTotalAmounts)
+	err := s.UserDataDB(uid).NewSession(c).Select("type, account_id, SUM(amount) as amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, startTransactionTime, endTransactionTime).GroupBy("type, account_id").Find(&transactionTotalAmounts)
 
 	if err != nil {
 		return nil, nil, err
@@ -1024,7 +1025,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(uid int64, startUn
 }
 
 // GetAccountsMonthTotalIncomeAndExpense returns the every accounts total income and expense amount in month by specific date range
-func (s *TransactionService) GetAccountsMonthTotalIncomeAndExpense(uid int64, startUnixTime int64, endUnixTime int64, pageCount int) (map[string]models.TransactionAccountsAmount, error) {
+func (s *TransactionService) GetAccountsMonthTotalIncomeAndExpense(c *core.Context, uid int64, startUnixTime int64, endUnixTime int64, pageCount int) (map[string]models.TransactionAccountsAmount, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -1039,7 +1040,7 @@ func (s *TransactionService) GetAccountsMonthTotalIncomeAndExpense(uid int64, st
 	for maxTransactionTime > 0 {
 		var transactions []*models.Transaction
 
-		err := s.UserDataDB(uid).Select("uid, type, account_id, transaction_time, timezone_utc_offset, amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, minTransactionTime, maxTransactionTime).Limit(pageCount, 0).OrderBy("transaction_time desc").Find(&transactions)
+		err := s.UserDataDB(uid).NewSession(c).Select("uid, type, account_id, transaction_time, timezone_utc_offset, amount").Where("uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?", uid, false, models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_EXPENSE, minTransactionTime, maxTransactionTime).Limit(pageCount, 0).OrderBy("transaction_time desc").Find(&transactions)
 
 		if err != nil {
 			return nil, err
@@ -1091,7 +1092,7 @@ func (s *TransactionService) GetAccountsMonthTotalIncomeAndExpense(uid int64, st
 }
 
 // GetAccountsAndCategoriesTotalIncomeAndExpense returns the every accounts and categories total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(uid int64, startUnixTime int64, endUnixTime int64) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *core.Context, uid int64, startUnixTime int64, endUnixTime int64) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -1114,7 +1115,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(uid i
 	}
 
 	var transactionTotalAmounts []*models.Transaction
-	err := s.UserDataDB(uid).Select("category_id, account_id, SUM(amount) as amount").Where(condition, conditionParams...).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
+	err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, SUM(amount) as amount").Where(condition, conditionParams...).GroupBy("category_id, account_id").Find(&transactionTotalAmounts)
 
 	if err != nil {
 		return nil, err

@@ -63,7 +63,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 	}
 
-	err = a.users.CreateUser(user)
+	err = a.users.CreateUser(c, user)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[users.UserRegisterHandler] failed to create user \"%s\", because %s", user.Username, err.Error())
@@ -77,7 +77,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		User:    user.ToUserBasicInfo(),
 	}
 
-	token, claims, err := a.tokens.CreateToken(user, c)
+	token, claims, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[users.UserRegisterHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -96,7 +96,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 // UserProfileHandler returns user profile of current user
 func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	user, err := a.users.GetUserById(uid)
+	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
@@ -121,7 +121,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	}
 
 	uid := c.GetCurrentUid()
-	user, err := a.users.GetUserById(uid)
+	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
@@ -164,7 +164,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	}
 
 	if userUpdateReq.DefaultAccountId > 0 && userUpdateReq.DefaultAccountId != user.DefaultAccountId {
-		accounts, err := a.accounts.GetAccountsByAccountIds(uid, []int64{userUpdateReq.DefaultAccountId})
+		accounts, err := a.accounts.GetAccountsByAccountIds(c, uid, []int64{userUpdateReq.DefaultAccountId})
 
 		if err != nil || len(accounts) < 1 {
 			return nil, errs.Or(err, errs.ErrUserDefaultAccountIsInvalid)
@@ -242,7 +242,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	keyProfileUpdated, err := a.users.UpdateUser(userNew, modifyUserLanguage)
+	keyProfileUpdated, err := a.users.UpdateUser(c, userNew, modifyUserLanguage)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -257,7 +257,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 	if keyProfileUpdated {
 		now := time.Now().Unix()
-		err = a.tokens.DeleteTokensBeforeTime(uid, now)
+		err = a.tokens.DeleteTokensBeforeTime(c, uid, now)
 
 		if err == nil {
 			log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] revoke old tokens before unix time \"%d\" for user \"uid:%d\"", now, user.Uid)
@@ -265,7 +265,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 			log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to revoke old tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 		}
 
-		token, claims, err := a.tokens.CreateToken(user, c)
+		token, claims, err := a.tokens.CreateToken(c, user)
 
 		if err != nil {
 			log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())

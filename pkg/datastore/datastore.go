@@ -3,6 +3,7 @@ package datastore
 import (
 	"xorm.io/xorm"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
@@ -17,13 +18,13 @@ func (s *DataStore) Choose(key int64) *Database {
 }
 
 // Query returns a new database session in a specific database by sharding key
-func (s *DataStore) Query(key int64) *xorm.Session {
-	return s.Choose(key).NewSession()
+func (s *DataStore) Query(c *core.Context, key int64) *xorm.Session {
+	return s.Choose(key).NewSession(c)
 }
 
 // DoTransaction runs a new database transaction in a specific database by sharding key
-func (s *DataStore) DoTransaction(key int64, fn func(sess *xorm.Session) error) (err error) {
-	return s.Choose(key).DoTransaction(fn)
+func (s *DataStore) DoTransaction(key int64, c *core.Context, fn func(sess *xorm.Session) error) (err error) {
+	return s.Choose(key).DoTransaction(c, fn)
 }
 
 // SyncStructs updates database structs by database models
@@ -31,7 +32,7 @@ func (s *DataStore) SyncStructs(beans ...interface{}) error {
 	var err error
 
 	for i := 0; i < len(s.databases); i++ {
-		err = s.databases[i].Sync2(beans...)
+		err = s.databases[i].engineGroup.Sync2(beans...)
 
 		if err != nil {
 			return err

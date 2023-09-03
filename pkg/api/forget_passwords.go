@@ -36,7 +36,7 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrEmailIsEmptyOrInvalid
 	}
 
-	user, err := a.users.GetUserByEmail(request.Email)
+	user, err := a.users.GetUserByEmail(c, request.Email)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
@@ -51,14 +51,14 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrEmptyIsNotVerified
 	}
 
-	token, _, err := a.tokens.CreatePasswordResetToken(user, c)
+	token, _, err := a.tokens.CreatePasswordResetToken(c, user)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.ErrTokenGenerating
 	}
 
-	err = a.forgetPasswords.SendPasswordResetEmail(user, token, c.GetClientLocale())
+	err = a.forgetPasswords.SendPasswordResetEmail(c, user, token, c.GetClientLocale())
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())
@@ -79,7 +79,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 	}
 
 	uid := c.GetCurrentUid()
-	user, err := a.users.GetUserById(uid)
+	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
@@ -96,7 +96,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 
 	if a.users.IsPasswordEqualsUserPassword(request.Password, user) {
 		oldTokenClaims := c.GetTokenClaims()
-		err = a.tokens.DeleteTokenByClaims(oldTokenClaims)
+		err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
 
 		if err != nil {
 			log.WarnfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] failed to revoke password reset token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
@@ -111,7 +111,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 		Password: request.Password,
 	}
 
-	_, err = a.users.UpdateUser(userNew, false)
+	_, err = a.users.UpdateUser(c, userNew, false)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -119,7 +119,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 	}
 
 	now := time.Now().Unix()
-	err = a.tokens.DeleteTokensBeforeTime(uid, now)
+	err = a.tokens.DeleteTokensBeforeTime(c, uid, now)
 
 	if err == nil {
 		log.InfofWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] revoke old tokens before unix time \"%d\" for user \"uid:%d\"", now, user.Uid)

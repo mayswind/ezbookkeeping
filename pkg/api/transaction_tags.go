@@ -25,7 +25,7 @@ var (
 // TagListHandler returns transaction tag list of current user
 func (a *TransactionTagsApi) TagListHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	tags, err := a.tags.GetAllTagsByUid(uid)
+	tags, err := a.tags.GetAllTagsByUid(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagListHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
@@ -54,7 +54,7 @@ func (a *TransactionTagsApi) TagGetHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	tag, err := a.tags.GetTagByTagId(uid, tagGetReq.Id)
+	tag, err := a.tags.GetTagByTagId(c, uid, tagGetReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagGetHandler] failed to get tag \"id:%d\" for user \"uid:%d\", because %s", tagGetReq.Id, uid, err.Error())
@@ -78,7 +78,7 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.Context) (interface{}, *er
 
 	uid := c.GetCurrentUid()
 
-	maxOrderId, err := a.tags.GetMaxDisplayOrder(uid)
+	maxOrderId, err := a.tags.GetMaxDisplayOrder(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
@@ -87,7 +87,7 @@ func (a *TransactionTagsApi) TagCreateHandler(c *core.Context) (interface{}, *er
 
 	tag := a.createNewTagModel(uid, &tagCreateReq, maxOrderId+1)
 
-	err = a.tags.CreateTag(tag)
+	err = a.tags.CreateTag(c, tag)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagCreateHandler] failed to create tag \"id:%d\" for user \"uid:%d\", because %s", tag.TagId, uid, err.Error())
@@ -112,7 +112,7 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.Context) (interface{}, *er
 	}
 
 	uid := c.GetCurrentUid()
-	tag, err := a.tags.GetTagByTagId(uid, tagModifyReq.Id)
+	tag, err := a.tags.GetTagByTagId(c, uid, tagModifyReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagModifyHandler] failed to get tag \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.Id, uid, err.Error())
@@ -129,7 +129,7 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.Context) (interface{}, *er
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.tags.ModifyTag(newTag)
+	err = a.tags.ModifyTag(c, newTag)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagModifyHandler] failed to update tag \"id:%d\" for user \"uid:%d\", because %s", tagModifyReq.Id, uid, err.Error())
@@ -155,7 +155,7 @@ func (a *TransactionTagsApi) TagHideHandler(c *core.Context) (interface{}, *errs
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.tags.HideTag(uid, []int64{tagHideReq.Id}, tagHideReq.Hidden)
+	err = a.tags.HideTag(c, uid, []int64{tagHideReq.Id}, tagHideReq.Hidden)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.CategoryHideHandler] failed to hide tag \"id:%d\" for user \"uid:%d\", because %s", tagHideReq.Id, uid, err.Error())
@@ -190,7 +190,7 @@ func (a *TransactionTagsApi) TagMoveHandler(c *core.Context) (interface{}, *errs
 		tags[i] = tag
 	}
 
-	err = a.tags.ModifyTagDisplayOrders(uid, tags)
+	err = a.tags.ModifyTagDisplayOrders(c, uid, tags)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.CategoryMoveHandler] failed to move tags for user \"uid:%d\", because %s", uid, err.Error())
@@ -212,7 +212,7 @@ func (a *TransactionTagsApi) TagDeleteHandler(c *core.Context) (interface{}, *er
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.tags.DeleteTag(uid, tagDeleteReq.Id)
+	err = a.tags.DeleteTag(c, uid, tagDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transaction_tags.TagDeleteHandler] failed to delete tag \"id:%d\" for user \"uid:%d\", because %s", tagDeleteReq.Id, uid, err.Error())

@@ -34,7 +34,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 	}
 
 	uid := c.GetCurrentUid()
-	accounts, err := a.accounts.GetAllAccountsByUid(uid)
+	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountListHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
@@ -94,7 +94,7 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 	}
 
 	uid := c.GetCurrentUid()
-	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(uid, accountGetReq.Id)
+	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountGetReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
@@ -193,7 +193,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	maxOrderId, err := a.accounts.GetMaxDisplayOrder(uid, accountCreateReq.Category)
+	maxOrderId, err := a.accounts.GetMaxDisplayOrder(c, uid, accountCreateReq.Category)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
@@ -203,7 +203,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
 	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
-	err = a.accounts.CreateAccounts(mainAccount, childrenAccounts, utcOffset)
+	err = a.accounts.CreateAccounts(c, mainAccount, childrenAccounts, utcOffset)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to create account \"id:%d\" for user \"uid:%d\", because %s", mainAccount.AccountId, uid, err.Error())
@@ -236,7 +236,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(uid, accountModifyReq.Id)
+	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountModifyReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
@@ -282,7 +282,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.accounts.ModifyAccounts(uid, toUpdateAccounts)
+	err = a.accounts.ModifyAccounts(c, uid, toUpdateAccounts)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to update account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
@@ -342,7 +342,7 @@ func (a *AccountsApi) AccountHideHandler(c *core.Context) (interface{}, *errs.Er
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.accounts.HideAccount(uid, []int64{accountHideReq.Id}, accountHideReq.Hidden)
+	err = a.accounts.HideAccount(c, uid, []int64{accountHideReq.Id}, accountHideReq.Hidden)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountHideHandler] failed to hide account \"id:%d\" for user \"uid:%d\", because %s", accountHideReq.Id, uid, err.Error())
@@ -377,7 +377,7 @@ func (a *AccountsApi) AccountMoveHandler(c *core.Context) (interface{}, *errs.Er
 		accounts[i] = account
 	}
 
-	err = a.accounts.ModifyAccountDisplayOrders(uid, accounts)
+	err = a.accounts.ModifyAccountDisplayOrders(c, uid, accounts)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountMoveHandler] failed to move accounts for user \"uid:%d\", because %s", uid, err.Error())
@@ -399,7 +399,7 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.accounts.DeleteAccount(uid, accountDeleteReq.Id)
+	err = a.accounts.DeleteAccount(c, uid, accountDeleteReq.Id)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())

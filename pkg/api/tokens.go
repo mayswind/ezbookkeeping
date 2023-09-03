@@ -28,7 +28,7 @@ var (
 // TokenListHandler returns available token list of current user
 func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	tokens, err := a.tokens.GetAllUnexpiredNormalTokensByUid(uid)
+	tokens, err := a.tokens.GetAllUnexpiredNormalTokensByUid(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[tokens.TokenListHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
@@ -82,7 +82,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 	}
 
 	tokenId := a.tokens.GenerateTokenId(tokenRecord)
-	err = a.tokens.DeleteToken(tokenRecord)
+	err = a.tokens.DeleteToken(c, tokenRecord)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[token.TokenRevokeCurrentHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenId, claims.Uid, err.Error())
@@ -120,7 +120,7 @@ func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Erro
 		return nil, errs.ErrInvalidTokenId
 	}
 
-	err = a.tokens.DeleteToken(tokenRecord)
+	err = a.tokens.DeleteToken(c, tokenRecord)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[token.TokenRevokeHandler] failed to revoke token \"id:%s\" for user \"uid:%d\", because %s", tokenRevokeReq.TokenId, uid, err.Error())
@@ -134,7 +134,7 @@ func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Erro
 // TokenRevokeAllHandler revokes all tokens of current user except current token
 func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	tokens, err := a.tokens.GetAllTokensByUid(uid)
+	tokens, err := a.tokens.GetAllTokensByUid(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[tokens.TokenRevokeAllHandler] failed to get all tokens for user \"uid:%d\", because %s", uid, err.Error())
@@ -155,7 +155,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 
 	tokens = append(tokens[:currentTokenIndex], tokens[currentTokenIndex+1:]...)
 
-	err = a.tokens.DeleteTokens(uid, tokens)
+	err = a.tokens.DeleteTokens(c, uid, tokens)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[token.TokenRevokeAllHandler] failed to revoke all tokens for user \"uid:%d\", because %s", uid, err.Error())
@@ -169,14 +169,14 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 // TokenRefreshHandler refresh current token of current user
 func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Error) {
 	uid := c.GetCurrentUid()
-	user, err := a.users.GetUserById(uid)
+	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[token.TokenRefreshHandler] failed to get user \"uid:%d\" info, because %s", uid, err.Error())
 		return nil, errs.ErrUserNotFound
 	}
 
-	token, claims, err := a.tokens.CreateToken(user, c)
+	token, claims, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[token.TokenRefreshHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())

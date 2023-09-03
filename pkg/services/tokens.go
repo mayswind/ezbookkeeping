@@ -38,19 +38,19 @@ var (
 )
 
 // GetAllTokensByUid returns all token models of given user
-func (s *TokenService) GetAllTokensByUid(uid int64) ([]*models.TokenRecord, error) {
+func (s *TokenService) GetAllTokensByUid(c *core.Context, uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=?", uid).Find(&tokenRecords)
+	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=?", uid).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
 
 // GetAllUnexpiredNormalTokensByUid returns all available token models of given user
-func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.TokenRecord, error) {
+func (s *TokenService) GetAllUnexpiredNormalTokensByUid(c *core.Context, uid int64) ([]*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -58,7 +58,7 @@ func (s *TokenService) GetAllUnexpiredNormalTokensByUid(uid int64) ([]*models.To
 	now := time.Now().Unix()
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
+	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
@@ -79,22 +79,22 @@ func (s *TokenService) ParseTokenByCookie(c *core.Context, tokenCookieName strin
 }
 
 // CreateToken generates a new normal token and saves to database
-func (s *TokenService) CreateToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
-	return s.createToken(user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(ctx), s.CurrentConfig().TokenExpiredTimeDuration)
+func (s *TokenService) CreateToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
+	return s.createToken(c, user, core.USER_TOKEN_TYPE_NORMAL, s.getUserAgent(c), s.CurrentConfig().TokenExpiredTimeDuration)
 }
 
 // CreateRequire2FAToken generates a new token requiring user to verify 2fa passcode and saves to database
-func (s *TokenService) CreateRequire2FAToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
-	return s.createToken(user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(ctx), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
+func (s *TokenService) CreateRequire2FAToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
+	return s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 }
 
 // CreatePasswordResetToken generates a new password reset token and saves to database
-func (s *TokenService) CreatePasswordResetToken(user *models.User, ctx *core.Context) (string, *core.UserTokenClaims, error) {
-	return s.createToken(user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(ctx), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+func (s *TokenService) CreatePasswordResetToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
+	return s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
 }
 
 // DeleteToken deletes given token from database
-func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
+func (s *TokenService) DeleteToken(c *core.Context, tokenRecord *models.TokenRecord) error {
 	if tokenRecord.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -103,7 +103,7 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
 
 		if err != nil {
@@ -117,12 +117,12 @@ func (s *TokenService) DeleteToken(tokenRecord *models.TokenRecord) error {
 }
 
 // DeleteTokens deletes given tokens from database
-func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecord) error {
+func (s *TokenService) DeleteTokens(c *core.Context, uid int64, tokenRecords []*models.TokenRecord) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(tokenRecords); i++ {
 			tokenRecord := tokenRecords[i]
 			deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
@@ -139,14 +139,14 @@ func (s *TokenService) DeleteTokens(uid int64, tokenRecords []*models.TokenRecor
 }
 
 // DeleteTokenByClaims deletes given token from database
-func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
+func (s *TokenService) DeleteTokenByClaims(c *core.Context, claims *core.UserTokenClaims) error {
 	userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 
 	if err != nil {
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.DeleteToken(&models.TokenRecord{
+	return s.DeleteToken(c, &models.TokenRecord{
 		Uid:             claims.Uid,
 		UserTokenId:     userTokenId,
 		CreatedUnixTime: claims.IssuedAt,
@@ -154,12 +154,12 @@ func (s *TokenService) DeleteTokenByClaims(claims *core.UserTokenClaims) error {
 }
 
 // DeleteTokensBeforeTime deletes tokens that is created before specific time
-func (s *TokenService) DeleteTokensBeforeTime(uid int64, expireTime int64) error {
+func (s *TokenService) DeleteTokensBeforeTime(c *core.Context, uid int64, expireTime int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=? AND created_unix_time<?", uid, expireTime).Delete(&models.TokenRecord{})
 		return err
 	})
@@ -218,7 +218,7 @@ func (s *TokenService) parseToken(c *core.Context, extractor request.Extractor) 
 				return nil, errs.ErrInvalidUserTokenId
 			}
 
-			tokenRecord, err := s.getTokenRecord(claims.Uid, userTokenId, claims.IssuedAt)
+			tokenRecord, err := s.getTokenRecord(c, claims.Uid, userTokenId, claims.IssuedAt)
 
 			if err != nil {
 				log.WarnfWithRequestId(c, "[tokens.ParseToken] token \"utid:%s\" of user \"uid:%d\" record not found, because %s", claims.UserTokenId, claims.Uid, err.Error())
@@ -261,7 +261,7 @@ func (s *TokenService) parseToken(c *core.Context, extractor request.Extractor) 
 	return token, claims, err
 }
 
-func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, error) {
+func (s *TokenService) createToken(c *core.Context, user *models.User, tokenType core.TokenType, userAgent string, expiryDate time.Duration) (string, *core.UserTokenClaims, error) {
 	var err error
 	now := time.Now()
 
@@ -294,7 +294,7 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 		return "", nil, err
 	}
 
-	err = s.createTokenRecord(tokenRecord)
+	err = s.createTokenRecord(c, tokenRecord)
 
 	if err != nil {
 		return "", nil, err
@@ -303,7 +303,7 @@ func (s *TokenService) createToken(user *models.User, tokenType core.TokenType, 
 	return tokenString, claims, err
 }
 
-func (s *TokenService) getTokenRecord(uid int64, userTokenId int64, createUnixTime int64) (*models.TokenRecord, error) {
+func (s *TokenService) getTokenRecord(c *core.Context, uid int64, userTokenId int64, createUnixTime int64) (*models.TokenRecord, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -313,7 +313,7 @@ func (s *TokenService) getTokenRecord(uid int64, userTokenId int64, createUnixTi
 	}
 
 	tokenRecord := &models.TokenRecord{}
-	has, err := s.TokenDB(uid).Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, userTokenId, createUnixTime).Limit(1).Get(tokenRecord)
+	has, err := s.TokenDB(uid).NewSession(c).Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, userTokenId, createUnixTime).Limit(1).Get(tokenRecord)
 
 	if err != nil {
 		return nil, err
@@ -326,7 +326,7 @@ func (s *TokenService) getTokenRecord(uid int64, userTokenId int64, createUnixTi
 	return tokenRecord, nil
 }
 
-func (s *TokenService) createTokenRecord(tokenRecord *models.TokenRecord) error {
+func (s *TokenService) createTokenRecord(c *core.Context, tokenRecord *models.TokenRecord) error {
 	if tokenRecord.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -335,7 +335,7 @@ func (s *TokenService) createTokenRecord(tokenRecord *models.TokenRecord) error 
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTransaction(func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Insert(tokenRecord)
 		return err
 	})

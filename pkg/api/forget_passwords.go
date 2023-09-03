@@ -46,9 +46,14 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.Disabled {
+		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" is disabled", user.Uid)
+		return nil, errs.ErrUserIsDisabled
+	}
+
 	if !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" has not verified email", user.Uid)
-		return nil, errs.ErrEmptyIsNotVerified
+		return nil, errs.ErrEmailIsNotVerified
 	}
 
 	token, _, err := a.tokens.CreatePasswordResetToken(c, user)
@@ -87,6 +92,16 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 		}
 
 		return nil, errs.ErrUserNotFound
+	}
+
+	if user.Disabled {
+		log.WarnfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] user \"uid:%d\" is disabled", user.Uid)
+		return nil, errs.ErrUserIsDisabled
+	}
+
+	if !user.EmailVerified {
+		log.WarnfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] user \"uid:%d\" has not verified email", user.Uid)
+		return nil, errs.ErrEmailIsNotVerified
 	}
 
 	if user.Email != request.Email {

@@ -113,6 +113,19 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "user-resend-verify-email",
+			Usage:  "Resend user verify email",
+			Action: resendUserVerifyEmail,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "user-set-email-verified",
 			Usage:  "Set user email address verified",
 			Action: setUserEmailVerified,
@@ -360,6 +373,26 @@ func disableUser(c *cli.Context) error {
 	}
 
 	log.BootInfof("[user_data.disableUser] user \"%s\" has been set disabled", username)
+
+	return nil
+}
+
+func resendUserVerifyEmail(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	err = clis.UserData.ResendVerifyEmail(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.resendUserVerifyEmail] error occurs when resending user verify email")
+		return err
+	}
+
+	log.BootInfof("[user_data.resendUserVerifyEmail] verify email for user \"%s\" has been resent", username)
 
 	return nil
 }

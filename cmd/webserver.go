@@ -201,6 +201,16 @@ func startWebServer(c *cli.Context) error {
 			apiRoute.POST("/register.json", bindApiWithTokenUpdate(api.Users.UserRegisterHandler, config))
 		}
 
+		if config.EnableUserVerifyEmail {
+			apiRoute.POST("/verify_email/resend.json", bindApi(api.Users.UserSendVerifyEmailByUnloginUserHandler))
+
+			emailVerifyRoute := apiRoute.Group("/verify_email")
+			emailVerifyRoute.Use(bindMiddleware(middlewares.JWTEmailVerifyAuthorization))
+			{
+				emailVerifyRoute.POST("/by_token.json", bindApi(api.Users.UserEmailVerifyHandler))
+			}
+		}
+
 		if config.EnableUserForgetPassword {
 			apiRoute.POST("/forget_password/request.json", bindApi(api.ForgetPasswords.UserForgetPasswordRequestHandler))
 
@@ -225,6 +235,10 @@ func startWebServer(c *cli.Context) error {
 			// Users
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler))
 			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))
+
+			if config.EnableUserVerifyEmail {
+				apiV1Route.POST("/users/verify_email/resend.json", bindApi(api.Users.UserSendVerifyEmailByLoginedUserHandler))
+			}
 
 			// Two Factor Authorization
 			if config.EnableTwoFactor {

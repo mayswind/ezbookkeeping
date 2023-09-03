@@ -312,6 +312,11 @@ export default {
             }).catch(error => {
                 self.logining = false;
 
+                if (error.error && error.error.errorCode === 201020 && error.error.context && error.error.context.email) {
+                    self.$router.push('/verify_email?email=' + encodeURIComponent(error.error.context.email));
+                    return;
+                }
+
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
                 }

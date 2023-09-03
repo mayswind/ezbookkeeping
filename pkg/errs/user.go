@@ -27,4 +27,5 @@ var (
 	ErrEmailIsEmptyOrInvalid        = NewNormalError(NormalSubcategoryUser, 18, http.StatusBadRequest, "email is empty or invalid")
 	ErrNewPasswordEqualsOldInvalid  = NewNormalError(NormalSubcategoryUser, 19, http.StatusBadRequest, "new password equals old password")
 	ErrEmailIsNotVerified           = NewNormalError(NormalSubcategoryUser, 20, http.StatusBadRequest, "email is not verified")
+	ErrEmailIsVerified              = NewNormalError(NormalSubcategoryUser, 21, http.StatusBadRequest, "email is verified")
 )

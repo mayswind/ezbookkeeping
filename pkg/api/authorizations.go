@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // AuthorizationsApi represents authorization api
@@ -46,6 +47,13 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 	if user.Disabled {
 		log.WarnfWithRequestId(c, "[authorizations.AuthorizeHandler] login failed for user \"%s\", because user is disabled", credential.LoginName)
 		return nil, errs.ErrUserIsDisabled
+	}
+
+	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+		log.WarnfWithRequestId(c, "[authorizations.AuthorizeHandler] login failed for user \"%s\", because user has not verified email", credential.LoginName)
+		return nil, errs.NewErrorWithContext(errs.ErrEmailIsNotVerified, map[string]string{
+			"email": user.Email,
+		})
 	}
 
 	err = a.users.UpdateUserLastLoginTime(c, user.Uid)
@@ -121,6 +129,16 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.Disabled {
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" is disabled", user.Uid)
+		return nil, errs.ErrUserIsDisabled
+	}
+
+	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has not verified email", user.Uid)
+		return nil, errs.ErrEmailIsNotVerified
+	}
+
 	oldTokenClaims := c.GetTokenClaims()
 	err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
 
@@ -173,6 +191,16 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 		return nil, errs.ErrUserNotFound
 	}
 
+	if user.Disabled {
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" is disabled", user.Uid)
+		return nil, errs.ErrUserIsDisabled
+	}
+
+	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has not verified email", user.Uid)
+		return nil, errs.ErrEmailIsNotVerified
+	}
+
 	err = a.twoFactorAuthorizations.GetAndUseUserTwoFactorRecoveryCode(c, uid, credential.RecoveryCode, user.Salt)
 
 	if err != nil {
@@ -205,8 +233,9 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 
 func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) *models.AuthResponse {
 	return &models.AuthResponse{
-		Token:   token,
-		Need2FA: need2FA,
-		User:    user.ToUserBasicInfo(),
+		Token:           token,
+		Need2FA:         need2FA,
+		NeedVerifyEmail: false,
+		User:            user.ToUserBasicInfo(),
 	}
 }

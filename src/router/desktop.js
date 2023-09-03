@@ -5,6 +5,7 @@ import userState from '@/lib/userstate.js';
 import MainLayout from '@/views/desktop/MainLayout.vue';
 import LoginPage from '@/views/desktop/LoginPage.vue';
 import SignUpPage from '@/views/desktop/SignupPage.vue';
+import VerifyEmailPage from '@/views/desktop/VerifyEmailPage.vue';
 import ForgetPasswordPage from '@/views/desktop/ForgetPasswordPage.vue';
 import ResetPasswordPage from '@/views/desktop/ResetPasswordPage.vue';
 import UnlockPage from '@/views/desktop/UnlockPage.vue';
@@ -158,6 +159,14 @@ const router = createRouter({
             path: '/signup',
             component: SignUpPage,
             beforeEnter: checkNotLogin
+        },
+        {
+            path: '/verify_email',
+            component: VerifyEmailPage,
+            props: route => ({
+                email: route.query.email,
+                token: route.query.token
+            })
         },
         {
             path: '/forgetpassword',

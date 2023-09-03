@@ -1,6 +1,13 @@
 package locales
 
 var en = &LocaleTextItems{
+	VerifyEmailTextItems: &VerifyEmailTextItems{
+		Title:                     "Verify Email",
+		SalutationFormat:          "Hi %s,",
+		DescriptionAboveBtn:       "Please click the link below to confirm your email address.",
+		VerifyEmail:               "Verify Email",
+		DescriptionBelowBtnFormat: "If you did not sign up for %s account, please simply disregard this email. If you cannot click the link above, please copy the above url and paste it into your browser. The verify email link will be expired after %v minutes.",
+	},
 	ForgetPasswordMailTextItems: &ForgetPasswordMailTextItems{
 		Title:                     "Reset Your Password",
 		SalutationFormat:          "Hi %s,",

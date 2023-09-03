@@ -45,12 +45,18 @@ func PrintJsonErrorResult(c *core.Context, err *errs.Error) {
 		}
 	}
 
-	c.AbortWithStatusJSON(err.HttpStatusCode, gin.H{
+	result := gin.H{
 		"success":      false,
 		"errorCode":    err.Code(),
 		"errorMessage": errorMessage,
 		"path":         c.Request.URL.Path,
-	})
+	}
+
+	if err.Context != nil {
+		result["context"] = err.Context
+	}
+
+	c.AbortWithStatusJSON(err.HttpStatusCode, result)
 }
 
 // PrintDataErrorResult writes error response in custom content type to current http context

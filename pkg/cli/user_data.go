@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
@@ -177,9 +178,9 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return err
 	}
 
-	if !user.EmailVerified {
+	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.BootWarnf("[user_data.SendPasswordResetMail] user \"uid:%d\" has not verified email", user.Uid)
-		return errs.ErrEmptyIsNotVerified
+		return errs.ErrEmailIsNotVerified
 	}
 
 	token, _, err := l.tokens.CreatePasswordResetToken(nil, user)
@@ -227,6 +228,42 @@ func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
 
 	if err != nil {
 		log.BootErrorf("[user_data.DisableUser] failed to set user disabled by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// ResendVerifyEmail resends an email with account activation link
+func (l *UserDataCli) ResendVerifyEmail(c *cli.Context, username string) error {
+	if username == "" {
+		log.BootErrorf("[user_data.ResendVerifyEmail] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	user, err := l.users.GetUserByUsername(nil, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ResendVerifyEmail] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if user.EmailVerified {
+		log.BootWarnf("[user_data.ResendVerifyEmail] user \"uid:%d\" email has been verified", user.Uid)
+		return errs.ErrEmailIsVerified
+	}
+
+	token, _, err := l.tokens.CreateEmailVerifyToken(nil, user)
+
+	if err != nil {
+		log.BootErrorf("[user_data.ResendVerifyEmail] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return errs.ErrTokenGenerating
+	}
+
+	err = l.users.SendVerifyEmail(user, token, "")
+
+	if err != nil {
+		log.BootErrorf("[user_data.ResendVerifyEmail] cannot send email to \"%s\", because %s", user.Email, err.Error())
 		return err
 	}
 

@@ -247,6 +247,69 @@ export const useRootStore = defineStore('root', {
             userState.clearWebAuthnConfig();
             this.resetAllStates(true);
         },
+        verifyEmail({ token, requestNewToken }) {
+            return new Promise((resolve, reject) => {
+                services.verifyEmail({
+                    token,
+                    requestNewToken
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to verify email' });
+                        return;
+                    }
+
+                    if (data.result.newToken && isString(data.result.newToken)) {
+                        userState.updateToken(data.result.newToken);
+                    }
+
+                    if (data.result.user && isObject(data.result.user)) {
+                        const userStore = useUserStore();
+                        userStore.storeUserInfo(data.result.user);
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to verify email', error);
+
+                    if (error && error.processed) {
+                        reject(error);
+                    } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else {
+                        reject({ message: 'Unable to verify email' });
+                    }
+                });
+            });
+        },
+        resendVerifyEmailByUnloginUser({ email, password }) {
+            return new Promise((resolve, reject) => {
+                services.resendVerifyEmailByUnloginUser({
+                    email,
+                    password
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to resend verify email' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to resend verify email', error);
+
+                    if (error && error.processed) {
+                        reject(error);
+                    } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else {
+                        reject({ message: 'Unable to resend verify email' });
+                    }
+                });
+            });
+        },
         requestResetPassword({ email }) {
             return new Promise((resolve, reject) => {
                 services.requestResetPassword({
@@ -359,6 +422,30 @@ export const useRootStore = defineStore('root', {
                         reject({ message: 'Unable to update user profile' });
                     } else {
                         reject(error);
+                    }
+                });
+            });
+        },
+        resendVerifyEmailByLoginedUser() {
+            return new Promise((resolve, reject) => {
+                services.resendVerifyEmailByLoginedUser().then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to resend verify email' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to resend verify email', error);
+
+                    if (error && error.processed) {
+                        reject(error);
+                    } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else {
+                        reject({ message: 'Unable to resend verify email' });
                     }
                 });
             });

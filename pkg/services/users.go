@@ -1,6 +1,9 @@
 package services
 
 import (
+	"bytes"
+	"fmt"
+	"net/url"
 	"time"
 
 	"xorm.io/xorm"
@@ -8,14 +11,22 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/locales"
+	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/templates"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
+const verifyEmailUrlFormat = "%sdesktop/#/verify_email?token=%s"
+
 // UserService represents user service
 type UserService struct {
 	ServiceUsingDB
+	ServiceUsingConfig
+	ServiceUsingMailer
 	ServiceUsingUuid
 }
 
@@ -24,6 +35,12 @@ var (
 	Users = &UserService{
 		ServiceUsingDB: ServiceUsingDB{
 			container: datastore.Container,
+		},
+		ServiceUsingConfig: ServiceUsingConfig{
+			container: settings.Container,
+		},
+		ServiceUsingMailer: ServiceUsingMailer{
+			container: mail.Container,
 		},
 		ServiceUsingUuid: ServiceUsingUuid{
 			container: uuid.Container,
@@ -388,6 +405,60 @@ func (s *UserService) ExistsEmail(c *core.Context, email string) (bool, error) {
 	}
 
 	return s.UserDB().NewSession(c).Cols("email").Where("email=? AND deleted=?", email, false).Exist(&models.User{})
+}
+
+// SendVerifyEmail sends verify email according to specified parameters
+func (s *UserService) SendVerifyEmail(user *models.User, verifyEmailToken string, backupLocale string) error {
+	if !s.CurrentConfig().EnableSMTP {
+		return errs.ErrSMTPServerNotEnabled
+	}
+
+	locale := user.Language
+
+	if locale == "" {
+		locale = backupLocale
+	}
+
+	localeTextItems := locales.GetLocaleTextItems(locale)
+	verifyEmailTextItems := localeTextItems.VerifyEmailTextItems
+
+	expireTimeInMinutes := s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration.Minutes()
+	verifyEmailUrl := fmt.Sprintf(verifyEmailUrlFormat, s.CurrentConfig().RootUrl, url.QueryEscape(verifyEmailToken))
+
+	tmpl, err := templates.GetTemplate(templates.TEMPLATE_VERIFY_EMAIL)
+
+	if err != nil {
+		return err
+	}
+
+	templateParams := map[string]interface{}{
+		"AppName": s.CurrentConfig().AppName,
+		"VerifyEmail": map[string]interface{}{
+			"Title":               verifyEmailTextItems.Title,
+			"Salutation":          fmt.Sprintf(verifyEmailTextItems.SalutationFormat, user.Nickname),
+			"DescriptionAboveBtn": verifyEmailTextItems.DescriptionAboveBtn,
+			"VerifyEmailUrl":      verifyEmailUrl,
+			"VerifyEmail":         verifyEmailTextItems.VerifyEmail,
+			"DescriptionBelowBtn": fmt.Sprintf(verifyEmailTextItems.DescriptionBelowBtnFormat, s.CurrentConfig().AppName, expireTimeInMinutes),
+		},
+	}
+
+	var bodyBuffer bytes.Buffer
+	err = tmpl.Execute(&bodyBuffer, templateParams)
+
+	if err != nil {
+		return err
+	}
+
+	message := &mail.MailMessage{
+		To:      user.Email,
+		Subject: verifyEmailTextItems.Title,
+		Body:    bodyBuffer.String(),
+	}
+
+	err = s.SendMail(message)
+
+	return err
 }
 
 // IsPasswordEqualsUserPassword returns whether the given password is correct

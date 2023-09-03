@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // ForgetPasswordsApi represents user forget password api
@@ -51,7 +52,7 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if !user.EmailVerified {
+	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}
@@ -99,7 +100,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if !user.EmailVerified {
+	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}

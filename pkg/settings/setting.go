@@ -116,6 +116,7 @@ const (
 	defaultSecretKey                     string = "ezbookkeeping"
 	defaultTokenExpiredTime              uint32 = 604800 // 7 days
 	defaultTemporaryTokenExpiredTime     uint32 = 300    // 5 minutes
+	defaultEmailVerifyTokenExpiredTime   uint32 = 3600   // 60 minutes
 	defaultPasswordResetTokenExpiredTime uint32 = 3600   // 60 minutes
 
 	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
@@ -200,14 +201,19 @@ type Config struct {
 	TokenExpiredTimeDuration              time.Duration
 	TemporaryTokenExpiredTime             uint32
 	TemporaryTokenExpiredTimeDuration     time.Duration
+	EmailVerifyTokenExpiredTime           uint32
+	EmailVerifyTokenExpiredTimeDuration   time.Duration
 	PasswordResetTokenExpiredTime         uint32
 	PasswordResetTokenExpiredTimeDuration time.Duration
 	EnableRequestIdHeader                 bool
 
 	// User
-	EnableUserRegister       bool
-	EnableUserForgetPassword bool
-	AvatarProvider           string
+	EnableUserRegister               bool
+	EnableUserVerifyEmail            bool
+	EnableUserForceVerifyEmail       bool
+	EnableUserForgetPassword         bool
+	ForgetPasswordRequireVerifyEmail bool
+	AvatarProvider                   string
 
 	// Data
 	EnableDataExport bool
@@ -481,6 +487,9 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	config.TemporaryTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
 	config.TemporaryTokenExpiredTimeDuration = time.Duration(config.TemporaryTokenExpiredTime) * time.Second
 
+	config.EmailVerifyTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "email_verify_token_expired_time", defaultEmailVerifyTokenExpiredTime)
+	config.EmailVerifyTokenExpiredTimeDuration = time.Duration(config.EmailVerifyTokenExpiredTime) * time.Second
+
 	config.PasswordResetTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "password_reset_token_expired_time", defaultPasswordResetTokenExpiredTime)
 	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
 
@@ -491,7 +500,10 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 
 func loadUserConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableUserRegister = getConfigItemBoolValue(configFile, sectionName, "enable_register", false)
+	config.EnableUserVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_email_verify", false)
+	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
+	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
 
 	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == "" {
 		config.AvatarProvider = ""

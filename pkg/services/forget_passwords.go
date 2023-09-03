@@ -52,7 +52,7 @@ func (s *ForgetPasswordService) SendPasswordResetEmail(c *core.Context, user *mo
 	expireTimeInMinutes := s.CurrentConfig().PasswordResetTokenExpiredTimeDuration.Minutes()
 	passwordResetUrl := fmt.Sprintf(passwordResetUrlFormat, s.CurrentConfig().RootUrl, url.QueryEscape(passwordResetToken))
 
-	tmpl, err := templates.GetTemplate("email/password_reset")
+	tmpl, err := templates.GetTemplate(templates.TEMPLATE_PASSWORD_RESET)
 
 	if err != nil {
 		return err

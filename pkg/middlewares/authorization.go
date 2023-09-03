@@ -56,6 +56,25 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 	c.Next()
 }
 
+// JWTEmailVerifyAuthorization verifies whether current request is email verification
+func JWTEmailVerifyAuthorization(c *core.Context) {
+	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+
+	if err != nil {
+		utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
+		return
+	}
+
+	if claims.Type != core.USER_TOKEN_TYPE_EMAIL_VERIFY {
+		log.WarnfWithRequestId(c, "[authorization.JWTEmailVerifyAuthorization] user \"uid:%d\" token is not for email verification", claims.Uid)
+		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
+		return
+	}
+
+	c.SetTokenClaims(claims)
+	c.Next()
+}
+
 // JWTResetPasswordAuthorization verifies whether current request is password reset
 func JWTResetPasswordAuthorization(c *core.Context) {
 	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)

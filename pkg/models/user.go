@@ -108,6 +108,23 @@ type UserRegisterRequest struct {
 	FirstDayOfWeek  WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
 }
 
+// UserVerifyEmailRequest represents all parameters of user verify email request
+type UserVerifyEmailRequest struct {
+	RequestNewToken bool `json:"requestNewToken" binding:"omitempty"`
+}
+
+// UserVerifyEmailResponse represents all response parameters after user have verified email
+type UserVerifyEmailResponse struct {
+	NewToken string         `json:"newToken,omitempty"`
+	User     *UserBasicInfo `json:"user"`
+}
+
+// UserResendVerifyEmailRequest represents all parameters of user resend verify email request
+type UserResendVerifyEmailRequest struct {
+	Email    string `json:"email" binding:"omitempty,max=100,validEmail"`
+	Password string `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 // UserProfileUpdateRequest represents all parameters of user updating profile request
 type UserProfileUpdateRequest struct {
 	Email                string                `json:"email" binding:"omitempty,notBlank,max=100,validEmail"`
@@ -147,6 +164,7 @@ type UserProfileResponse struct {
 	ShortDateFormat      ShortDateFormat      `json:"shortDateFormat"`
 	LongTimeFormat       LongTimeFormat       `json:"longTimeFormat"`
 	ShortTimeFormat      ShortTimeFormat      `json:"shortTimeFormat"`
+	EmailVerified        bool                 `json:"emailVerified"`
 	LastLoginAt          int64                `json:"lastLoginAt"`
 }
 
@@ -229,6 +247,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		ShortDateFormat:      u.ShortDateFormat,
 		LongTimeFormat:       u.LongTimeFormat,
 		ShortTimeFormat:      u.ShortTimeFormat,
+		EmailVerified:        u.EmailVerified,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}
 }

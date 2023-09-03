@@ -88,6 +88,11 @@ func (s *TokenService) CreateRequire2FAToken(c *core.Context, user *models.User)
 	return s.createToken(c, user, core.USER_TOKEN_TYPE_REQUIRE_2FA, s.getUserAgent(c), s.CurrentConfig().TemporaryTokenExpiredTimeDuration)
 }
 
+// CreateEmailVerifyToken generates a new email verify token and saves to database
+func (s *TokenService) CreateEmailVerifyToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
+	return s.createToken(c, user, core.USER_TOKEN_TYPE_EMAIL_VERIFY, s.getUserAgent(c), s.CurrentConfig().EmailVerifyTokenExpiredTimeDuration)
+}
+
 // CreatePasswordResetToken generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
 	return s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
@@ -161,6 +166,18 @@ func (s *TokenService) DeleteTokensBeforeTime(c *core.Context, uid int64, expire
 
 	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Where("uid=? AND created_unix_time<?", uid, expireTime).Delete(&models.TokenRecord{})
+		return err
+	})
+}
+
+// DeleteTokensByTypeBeforeTime deletes tokens that is specified type and created before specific time
+func (s *TokenService) DeleteTokensByTypeBeforeTime(c *core.Context, uid int64, tokenType core.TokenType, expireTime int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.Where("uid=? AND token_type=? AND created_unix_time<?", uid, tokenType, expireTime).Delete(&models.TokenRecord{})
 		return err
 	})
 }

@@ -102,6 +102,22 @@ export default {
             firstDayOfWeek
         });
     },
+    verifyEmail: ({ token, requestNewToken }) => {
+        return axios.post('verify_email/by_token.json?token=' + token, {
+            requestNewToken
+        }, {
+            noAuth: true,
+            ignoreError: true
+        });
+    },
+    resendVerifyEmailByUnloginUser: ({ email, password }) => {
+        return axios.post('verify_email/resend.json', {
+            email,
+            password
+        }, {
+            timeout: api.requestForgetPasswordTimeout
+        });
+    },
     requestResetPassword: ({ email }) => {
         return axios.post('forget_password/request.json', {
             email
@@ -171,6 +187,11 @@ export default {
             shortDateFormat,
             longTimeFormat,
             shortTimeFormat
+        });
+    },
+    resendVerifyEmailByLoginedUser: () => {
+        return axios.post('v1/users/verify_email/resend.json', {}, {
+            timeout: api.requestForgetPasswordTimeout
         });
     },
     get2FAStatus: () => {

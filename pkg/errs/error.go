@@ -38,6 +38,7 @@ type Error struct {
 	HttpStatusCode int
 	Message        string
 	BaseError      []error
+	Context        interface{}
 }
 
 // Error returns the error message
@@ -79,6 +80,19 @@ func NewIncompleteOrIncorrectSubmissionError(err error) *Error {
 		ErrIncompleteOrIncorrectSubmission.Index,
 		ErrIncompleteOrIncorrectSubmission.HttpStatusCode,
 		ErrIncompleteOrIncorrectSubmission.Message, err)
+}
+
+// NewErrorWithContext returns a new error instance with specified context
+func NewErrorWithContext(baseError *Error, context interface{}) *Error {
+	return &Error{
+		Category:       baseError.Category,
+		SubCategory:    baseError.SubCategory,
+		Index:          baseError.Index,
+		HttpStatusCode: baseError.HttpStatusCode,
+		Message:        baseError.Message,
+		BaseError:      baseError.BaseError,
+		Context:        context,
+	}
 }
 
 // Or would return the error from err parameter if the this error is defined in this project,

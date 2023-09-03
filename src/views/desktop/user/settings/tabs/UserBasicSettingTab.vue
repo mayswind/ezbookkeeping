@@ -25,9 +25,9 @@
                             <span v-if="!loading">{{ oldProfile.username }}</span>
                         </div>
                         <div class="d-flex text-body-1">
-                            <span class="me-1">{{ $t('Avatar Provider:') }}</span>
-                            <v-skeleton-loader class="skeleton-no-margin" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                            <span v-if="!loading">{{ currentUserAvatarProvider }}</span>
+                            <span class="me-1" v-if="!loading && emailVerified">{{ $t('Email has been verified') }}</span>
+                            <span class="me-1" v-if="!loading && !emailVerified">{{ $t('Email has not been verified') }}</span>
+                            <v-skeleton-loader class="skeleton-no-margin mt-2 mb-1" type="text" style="width: 160px" :loading="true" v-if="loading"></v-skeleton-loader>
                         </div>
                     </div>
                 </v-card-text>
@@ -268,6 +268,7 @@ export default {
                 longTimeFormat: 0,
                 shortTimeFormat: 0
             },
+            emailVerified: false,
             loading: true,
             saving: false,
             icons: {
@@ -309,13 +310,6 @@ export default {
         },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
-        },
-        currentUserAvatarProvider() {
-            if (this.oldProfile.avatarProvider === 'gravatar') {
-                return 'Gravatar';
-            } else {
-                return this.$t('None');
-            }
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;
@@ -383,6 +377,7 @@ export default {
         Promise.all(promises).then(responses => {
             const profile = responses[1];
             self.setCurrentUserProfile(profile);
+            self.emailVerified = profile.emailVerified;
             self.loading = false;
         }).catch(error => {
             self.oldProfile.nickname = '';

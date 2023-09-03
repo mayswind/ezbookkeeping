@@ -37,6 +37,10 @@ export function isUserForgetPasswordEnabled() {
     return getServerSetting('f') === '1';
 }
 
+export function isUserVerifyEmailEnabled() {
+    return getServerSetting('v') === '1';
+}
+
 export function isDataExportingEnabled() {
     return getServerSetting('e') === '1';
 }

@@ -100,74 +100,74 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 
 // Debugf logs debug log with custom format
 func Debugf(format string, args ...interface{}) {
-	defaultLogger.Debugf(getFinalLog(format, args...))
+	defaultLogger.Debug(getFinalLog(format, args...))
 }
 
 // DebugfWithRequestId logs debug log with custom format and request id
 func DebugfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debugf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debug(getFinalLog(format, args...))
 }
 
 // Infof logs info log with custom format
 func Infof(format string, args ...interface{}) {
-	defaultLogger.Infof(getFinalLog(format, args...))
+	defaultLogger.Info(getFinalLog(format, args...))
 }
 
 // InfofWithRequestId logs info log with custom format and request id
 func InfofWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
 }
 
 // Warnf logs warn log with custom format
 func Warnf(format string, args ...interface{}) {
-	defaultLogger.Warnf(getFinalLog(format, args...))
+	defaultLogger.Warn(getFinalLog(format, args...))
 }
 
 // WarnfWithRequestId logs warn log with custom format and request id
 func WarnfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warnf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warn(getFinalLog(format, args...))
 }
 
 // Errorf logs error log with custom format
 func Errorf(format string, args ...interface{}) {
-	defaultLogger.Errorf(getFinalLog(format, args...))
+	defaultLogger.Error(getFinalLog(format, args...))
 }
 
 // ErrorfWithRequestId logs error log with custom format and request id
 func ErrorfWithRequestId(c *core.Context, format string, args ...interface{}) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Errorf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Error(getFinalLog(format, args...))
 }
 
 // ErrorfWithRequestIdAndExtra logs error log with custom format and request id and extra info
 func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...interface{}) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Errorf(getFinalLog(format, args...))
+	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Error(getFinalLog(format, args...))
 }
 
 // BootInfof logs boot info log
 func BootInfof(format string, args ...interface{}) {
 	if bootLogger != nil {
-		bootLogger.Infof(getFinalLog(format, args...))
+		bootLogger.Info(getFinalLog(format, args...))
 	}
 }
 
 // BootWarnf logs boot warn log
 func BootWarnf(format string, args ...interface{}) {
 	if bootLogger != nil {
-		bootLogger.Warnf(getFinalLog(format, args...))
+		bootLogger.Warn(getFinalLog(format, args...))
 	}
 }
 
 // BootErrorf logs boot error log
 func BootErrorf(format string, args ...interface{}) {
 	if bootLogger != nil {
-		bootLogger.Errorf(getFinalLog(format, args...))
+		bootLogger.Error(getFinalLog(format, args...))
 	}
 }
 
 // Requestf logs http request log with custom format
 func Requestf(c *core.Context, format string, args ...interface{}) {
 	if requestLogger != nil {
-		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Infof(getFinalLog(format, args...))
+		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
 	}
 }
 
@@ -181,7 +181,7 @@ func SqlQuery(args ...interface{}) {
 // SqlQueryf logs sql query log with custom format
 func SqlQueryf(format string, args ...interface{}) {
 	if sqlQueryLogger != nil {
-		sqlQueryLogger.Infof(getFinalLog(format, args...))
+		sqlQueryLogger.Info(getFinalLog(format, args...))
 	}
 }
 

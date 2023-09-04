@@ -48,7 +48,7 @@ jobs:
         with:
           file: Dockerfile
           context: .
-          platforms: ${{ vars.BUILD_PLATFORMS }}
+          platforms: ${{ vars.BUILD_SNAPSHOT_PLATFORMS }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

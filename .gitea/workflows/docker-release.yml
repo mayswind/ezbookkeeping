@@ -47,7 +47,7 @@ jobs:
         with:
           file: Dockerfile
           context: .
-          platforms: ${{ vars.BUILD_PLATFORMS }}
+          platforms: ${{ vars.BUILD_RELEASE_PLATFORMS }}
           push: true
           build-args: |
             RELEASE_BUILD=1

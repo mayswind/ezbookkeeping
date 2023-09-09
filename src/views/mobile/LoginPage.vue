@@ -131,10 +131,11 @@
             </f7-page-content>
         </f7-sheet>
 
-        <f7-sheet
+        <f7-sheet swipe-to-close swipe-handler=".swipe-handler"
             style="height:auto"
             :opened="showForgetPasswordSheet" @sheet:closed="showForgetPasswordSheet = false"
         >
+            <div class="swipe-handler" style="z-index: 10"></div>
             <f7-page-content>
                 <div class="display-flex padding justify-content-space-between align-items-center">
                     <div class="ebk-sheet-title"><b>{{ $t('Forget Password?') }}</b></div>

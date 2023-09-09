@@ -821,6 +821,7 @@ export default {
     'Log In': 'Log In',
     'Click here to log in': 'Click here to log in',
     'Back to log in': 'Back to log in',
+    'Back to home': 'Back to home',
     'Don\'t have an account?': 'Don\'t have an account?',
     'Forget Password?': 'Forget Password?',
     'Create an account': 'Create an account',

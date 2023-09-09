@@ -821,6 +821,7 @@ export default {
     'Log In': '登录',
     'Click here to log in': '点击这里登录',
     'Back to log in': '返回登录页',
+    'Back to home': '返回首页',
     'Don\'t have an account?': '还没有账号？',
     'Forget Password?': '忘记密码？',
     'Create an account': '创建新账号',

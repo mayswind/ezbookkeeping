@@ -60,10 +60,11 @@
                                     </v-col>
 
                                     <v-col cols="12">
-                                        <router-link class="d-flex align-center justify-center" to="/login"
+                                        <router-link class="d-flex align-center justify-center" :to="verified ? '/' : '/login'"
                                                      :class="{ 'disabled': loading || resending }">
                                             <v-icon :icon="icons.left"/>
-                                            <span>{{ $t('Back to log in') }}</span>
+                                            <span v-if="!verified">{{ $t('Back to log in') }}</span>
+                                            <span v-else-if="verified">{{ $t('Back to home') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>

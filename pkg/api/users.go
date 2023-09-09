@@ -78,6 +78,20 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		User:            user.ToUserBasicInfo(),
 	}
 
+	if settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {
+		token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[users.UserRegisterHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
+		} else {
+			err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+
+			if err != nil {
+				log.WarnfWithRequestId(c, "[users.UserRegisterHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
+			}
+		}
+	}
+
 	if authResp.NeedVerifyEmail {
 		return authResp, nil
 	}

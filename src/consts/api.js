@@ -1,4 +1,5 @@
 const defaultTimeout = 10000; // 10s
+const requestVerifyEmailTimeout = 30000; // 30s
 const requestForgetPasswordTimeout = 30000; // 30s
 const baseApiUrlPath = '/api';
 const baseQrcodePath = '/qrcode';
@@ -10,6 +11,7 @@ const amapJavascriptUrl = 'https://webapi.amap.com/maps?v=2.0';
 
 export default {
     defaultTimeout: defaultTimeout,
+    requestVerifyEmailTimeout: requestVerifyEmailTimeout,
     requestForgetPasswordTimeout: requestForgetPasswordTimeout,
     baseApiUrlPath: baseApiUrlPath,
     baseQrcodePath: baseQrcodePath,

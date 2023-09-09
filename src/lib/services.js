@@ -100,6 +100,8 @@ export default {
             language,
             defaultCurrency,
             firstDayOfWeek
+        }, {
+            timeout: api.requestVerifyEmailTimeout
         });
     },
     verifyEmail: ({ token, requestNewToken }) => {
@@ -115,7 +117,7 @@ export default {
             email,
             password
         }, {
-            timeout: api.requestForgetPasswordTimeout
+            timeout: api.requestVerifyEmailTimeout
         });
     },
     requestResetPassword: ({ email }) => {
@@ -191,7 +193,7 @@ export default {
     },
     resendVerifyEmailByLoginedUser: () => {
         return axios.post('v1/users/verify_email/resend.json', {}, {
-            timeout: api.requestForgetPasswordTimeout
+            timeout: api.requestVerifyEmailTimeout
         });
     },
     get2FAStatus: () => {

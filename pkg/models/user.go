@@ -89,6 +89,7 @@ type UserBasicInfo struct {
 	ShortDateFormat      ShortDateFormat      `json:"shortDateFormat"`
 	LongTimeFormat       LongTimeFormat       `json:"longTimeFormat"`
 	ShortTimeFormat      ShortTimeFormat      `json:"shortTimeFormat"`
+	EmailVerified        bool                 `json:"emailVerified"`
 }
 
 // UserLoginRequest represents all parameters of user login request
@@ -227,6 +228,7 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		ShortDateFormat:      u.ShortDateFormat,
 		LongTimeFormat:       u.LongTimeFormat,
 		ShortTimeFormat:      u.ShortTimeFormat,
+		EmailVerified:        u.EmailVerified,
 	}
 }
 

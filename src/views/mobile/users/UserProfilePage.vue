@@ -3,7 +3,8 @@
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('User Profile')"></f7-nav-title>
-            <f7-nav-right>
+            <f7-nav-right class="navbar-compact-icons">
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="$t('Save')" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -53,7 +54,7 @@
                 type="email"
                 autocomplete="email"
                 clear-button
-                :label="$t('E-mail')"
+                :label="$t('E-mail') + ' ' + (emailVerified ? $t('(Verified)') : $t('(Unverified)'))"
                 :placeholder="$t('Your email address')"
                 v-model:value="newProfile.email"
             ></f7-list-input>
@@ -208,6 +209,17 @@
             <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
+        <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group>
+                <f7-actions-button :class="{ 'disabled': loading || resending }" @click="resendVerifyEmail"
+                                   v-if="!loading && !emailVerified"
+                >{{ $t('Resend Validation Email') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
+            </f7-actions-group>
+        </f7-actions>
+
         <password-input-sheet :title="$t('Modify Password')"
                               :hint="$t('Please enter your current password when modifying your password')"
                               :confirm-disabled="saving"
@@ -263,12 +275,15 @@ export default {
                 longTimeFormat: 0,
                 shortTimeFormat: 0
             },
+            emailVerified: false,
             currentPassword: '',
             loading: true,
             loadingError: null,
+            resending: false,
             saving: false,
             showInputPasswordSheet: false,
-            showAccountSheet: false
+            showAccountSheet: false,
+            showMoreActionSheet: false
         };
     },
     computed: {
@@ -453,6 +468,26 @@ export default {
                 }
             });
         },
+        resendVerifyEmail() {
+            const self = this;
+
+            self.resending = true;
+            self.$showLoading(() => self.resending);
+
+            self.rootStore.resendVerifyEmailByLoginedUser().then(() => {
+                self.resending = false;
+                self.$hideLoading();
+
+                self.$toast('Validation email has been sent');
+            }).catch(error => {
+                self.resending = false;
+                self.$hideLoading();
+
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
+        },
         getNameByKeyValue(src, value, keyField, nameField, defaultName) {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);
         },
@@ -460,6 +495,8 @@ export default {
             return this.$locale.getCurrencyName(currencyCode);
         },
         setCurrentUserProfile(profile) {
+            this.emailVerified = profile.emailVerified;
+
             this.oldProfile.email = profile.email;
             this.oldProfile.nickname = profile.nickname;
             this.oldProfile.defaultAccountId = profile.defaultAccountId;

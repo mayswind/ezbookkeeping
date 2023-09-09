@@ -324,11 +324,15 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	keyProfileUpdated, err := a.users.UpdateUser(c, userNew, modifyUserLanguage)
+	keyProfileUpdated, emailSetToUnverified, err := a.users.UpdateUser(c, userNew, modifyUserLanguage)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if emailSetToUnverified {
+		user.EmailVerified = false
 	}
 
 	log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" has updated successfully", user.Uid)

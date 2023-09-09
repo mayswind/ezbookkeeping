@@ -1066,6 +1066,8 @@ export default {
     'Basic Settings': '基本设置',
     'Security Settings': '安全设置',
     'Two-Factor Authentication Settings': '两步验证设置',
+    '(Verified)': '(已验证)',
+    '(Unverified)': '(未验证)',
     'Email has been verified': '邮箱地址已验证',
     'Email has not been verified': '邮箱地址未验证',
     'Username:': '用户名：',

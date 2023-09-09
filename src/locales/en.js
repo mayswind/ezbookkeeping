@@ -1066,6 +1066,8 @@ export default {
     'Basic Settings': 'Basic Settings',
     'Security Settings': 'Security Settings',
     'Two-Factor Authentication Settings': 'Two-Factor Authentication Settings',
+    '(Verified)': '(Verified)',
+    '(Unverified)': '(Unverified)',
     'Email has been verified': 'Email has been verified',
     'Email has not been verified': 'Email has not been verified',
     'Username:': 'Username:',

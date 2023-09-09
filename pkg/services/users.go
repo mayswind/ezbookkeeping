@@ -168,29 +168,32 @@ func (s *UserService) CreateUser(c *core.Context, user *models.User) error {
 }
 
 // UpdateUser saves an existed user model to database
-func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, err error) {
+func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, emailSetToUnverified bool, err error) {
 	if user.Uid <= 0 {
-		return false, errs.ErrUserIdInvalid
+		return false, false, errs.ErrUserIdInvalid
 	}
 
 	updateCols := make([]string, 0, 8)
 
 	now := time.Now().Unix()
 	keyProfileUpdated = false
+	emailSetToUnverified = false
 
 	if user.Email != "" {
 		exists, err := s.ExistsEmail(c, user.Email)
 
 		if err != nil {
-			return false, err
+			return false, false, err
 		} else if exists {
-			return false, errs.ErrUserEmailAlreadyExists
+			return false, false, errs.ErrUserEmailAlreadyExists
 		}
 
 		user.EmailVerified = false
 
 		updateCols = append(updateCols, "email")
 		updateCols = append(updateCols, "email_verified")
+
+		emailSetToUnverified = true
 	}
 
 	if user.Password != "" {
@@ -256,10 +259,10 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 	})
 
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
 
-	return keyProfileUpdated, nil
+	return keyProfileUpdated, emailSetToUnverified, nil
 }
 
 // UpdateUserLastLoginTime updates the last login time field

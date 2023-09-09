@@ -18,15 +18,20 @@
                         </v-img>
                         <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
                     </v-avatar>
-                    <div class="d-flex flex-column justify-center gap-5">
+                    <div class="d-flex flex-column justify-center gap-3">
                         <div class="d-flex text-body-1">
                             <span class="me-1">{{ $t('Username:') }}</span>
                             <v-skeleton-loader class="skeleton-no-margin" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
                             <span v-if="!loading">{{ oldProfile.username }}</span>
                         </div>
-                        <div class="d-flex text-body-1">
-                            <span class="me-1" v-if="!loading && emailVerified">{{ $t('Email has been verified') }}</span>
-                            <span class="me-1" v-if="!loading && !emailVerified">{{ $t('Email has not been verified') }}</span>
+                        <div class="d-flex text-body-1 align-center" style="height: 40px;">
+                            <span v-if="!loading && emailVerified">{{ $t('Email has been verified') }}</span>
+                            <span v-if="!loading && !emailVerified">{{ $t('Email has not been verified') }}</span>
+                            <v-btn class="ml-2 px-2" size="small" variant="text" :disabled="loading || resending"
+                                   @click="resendVerifyEmail" v-if="!loading && !emailVerified">
+                                {{ $t('Resend Validation Email') }}
+                                <v-progress-circular indeterminate size="18" class="ml-2" v-if="resending"></v-progress-circular>
+                            </v-btn>
                             <v-skeleton-loader class="skeleton-no-margin mt-2 mb-1" type="text" style="width: 160px" :loading="true" v-if="loading"></v-skeleton-loader>
                         </div>
                     </div>
@@ -270,6 +275,7 @@ export default {
             },
             emailVerified: false,
             loading: true,
+            resending: false,
             saving: false,
             icons: {
                 user: mdiAccount
@@ -377,7 +383,6 @@ export default {
         Promise.all(promises).then(responses => {
             const profile = responses[1];
             self.setCurrentUserProfile(profile);
-            self.emailVerified = profile.emailVerified;
             self.loading = false;
         }).catch(error => {
             self.oldProfile.nickname = '';
@@ -428,10 +433,28 @@ export default {
         reset() {
             this.setCurrentUserProfile(this.oldProfile);
         },
+        resendVerifyEmail() {
+            const self = this;
+
+            self.resending = true;
+
+            self.rootStore.resendVerifyEmailByLoginedUser().then(() => {
+                self.resending = false;
+                self.$refs.snackbar.showMessage('Validation email has been sent');
+            }).catch(error => {
+                self.resending = false;
+
+                if (!error.processed) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
+        },
         getNameByKeyValue(src, value, keyField, nameField, defaultName) {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);
         },
         setCurrentUserProfile(profile) {
+            this.emailVerified = profile.emailVerified;
+
             this.oldProfile.username = profile.username;
             this.oldProfile.email = profile.email;
             this.oldProfile.nickname = profile.nickname;

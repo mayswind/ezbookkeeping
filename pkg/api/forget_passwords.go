@@ -131,7 +131,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interfac
 		Password: request.Password,
 	}
 
-	_, err = a.users.UpdateUser(c, userNew, false)
+	_, _, err = a.users.UpdateUser(c, userNew, false)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())

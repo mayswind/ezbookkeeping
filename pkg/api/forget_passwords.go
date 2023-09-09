@@ -57,6 +57,10 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrEmailIsNotVerified
 	}
 
+	if !settings.Container.Current.EnableSMTP {
+		return nil, errs.ErrSMTPServerNotEnabled
+	}
+
 	token, _, err := a.tokens.CreatePasswordResetToken(c, user)
 
 	if err != nil {

@@ -382,6 +382,10 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (int
 		return nil, errs.ErrEmailIsVerified
 	}
 
+	if !settings.Container.Current.EnableSMTP {
+		return nil, errs.ErrSMTPServerNotEnabled
+	}
+
 	token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
 
 	if err != nil {
@@ -415,6 +419,10 @@ func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (int
 	if user.EmailVerified {
 		log.WarnfWithRequestId(c, "[users.UserSendVerifyEmailByLoginedUserHandler] user \"uid:%d\" email has been verified", user.Uid)
 		return nil, errs.ErrEmailIsVerified
+	}
+
+	if !settings.Container.Current.EnableSMTP {
+		return nil, errs.ErrSMTPServerNotEnabled
 	}
 
 	token, _, err := a.tokens.CreateEmailVerifyToken(c, user)

@@ -37,7 +37,7 @@
                         <v-form>
                             <v-window-item value="basicSetting">
                                 <h5 class="text-h5 mb-1">{{ $t('Basic Information') }}</h5>
-                                <p class="text-sm mb-5">
+                                <p class="text-sm mt-2 mb-5">
                                     <span>{{ $t('Already have an account?') }}</span>
                                     <router-link class="ml-1" to="/login">{{ $t('Click here to log in') }}</router-link>
                                 </p>
@@ -157,7 +157,7 @@
 
                             <v-window-item value="presetCategories" class="signup-preset-categories">
                                 <h5 class="text-h5 mb-1">{{ $t('Preset Categories') }}</h5>
-                                <p class="text-sm mb-5">{{ $t('Set Whether You Use The Preset Transaction Categories') }}</p>
+                                <p class="text-sm mt-2 mb-5">{{ $t('Set Whether You Use The Preset Transaction Categories') }}</p>
 
                                 <v-row class="mb-5">
                                     <v-col cols="12" sm="6">

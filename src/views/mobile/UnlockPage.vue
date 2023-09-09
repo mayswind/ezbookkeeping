@@ -26,7 +26,7 @@
             </f7-block-footer>
         </f7-list>
 
-        <f7-button class="padding-bottom" small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
+        <f7-button small popover-open=".lang-popover-menu" :text="currentLanguageName"></f7-button>
 
         <f7-list class="login-page-bottom">
             <f7-block-footer>

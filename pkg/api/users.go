@@ -162,11 +162,10 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (interface{}, *errs.E
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	now := time.Now().Unix()
-	err = a.tokens.DeleteTokensByTypeBeforeTime(c, uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY, now)
+	err = a.tokens.DeleteTokensByType(c, uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY)
 
 	if err == nil {
-		log.InfofWithRequestId(c, "[users.UserEmailVerifyHandler] revoke old email verify tokens before unix time \"%d\" for user \"uid:%d\"", now, user.Uid)
+		log.InfofWithRequestId(c, "[users.UserEmailVerifyHandler] revoke old email verify tokens for user \"uid:%d\"", user.Uid)
 	} else {
 		log.WarnfWithRequestId(c, "[users.UserEmailVerifyHandler] failed to revoke old email verify tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 	}
@@ -359,18 +358,24 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 	}
 
 	if emailSetToUnverified && settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {
-		token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
+		err = a.tokens.DeleteTokensByType(c, uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
+			log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to revoke old email verify tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 		} else {
-			go func() {
-				err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+			token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
 
-				if err != nil {
-					log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
-				}
-			}()
+			if err != nil {
+				log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
+			} else {
+				go func() {
+					err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+
+					if err != nil {
+						log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
+					}
+				}()
+			}
 		}
 	}
 

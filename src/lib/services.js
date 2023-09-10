@@ -101,8 +101,6 @@ export default {
             defaultCurrency,
             firstDayOfWeek,
             categories
-        }, {
-            timeout: api.requestVerifyEmailTimeout
         });
     },
     verifyEmail: ({ token, requestNewToken }) => {
@@ -117,15 +115,11 @@ export default {
         return axios.post('verify_email/resend.json', {
             email,
             password
-        }, {
-            timeout: api.requestVerifyEmailTimeout
         });
     },
     requestResetPassword: ({ email }) => {
         return axios.post('forget_password/request.json', {
             email
-        }, {
-            timeout: api.requestForgetPasswordTimeout
         });
     },
     resetPassword: ({ email, token, password }) => {
@@ -190,14 +184,10 @@ export default {
             shortDateFormat,
             longTimeFormat,
             shortTimeFormat
-        }, {
-            timeout: api.requestVerifyEmailTimeout
         });
     },
     resendVerifyEmailByLoginedUser: () => {
-        return axios.post('v1/users/verify_email/resend.json', {}, {
-            timeout: api.requestVerifyEmailTimeout
-        });
+        return axios.post('v1/users/verify_email/resend.json');
     },
     get2FAStatus: () => {
         return axios.get('v1/users/2fa/status.json');

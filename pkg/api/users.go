@@ -99,11 +99,13 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[users.UserRegisterHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
 		} else {
-			err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+			go func() {
+				err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
 
-			if err != nil {
-				log.WarnfWithRequestId(c, "[users.UserRegisterHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
-			}
+				if err != nil {
+					log.WarnfWithRequestId(c, "[users.UserRegisterHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
+				}
+			}()
 		}
 	}
 
@@ -362,11 +364,13 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
 		} else {
-			err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+			go func() {
+				err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
 
-			if err != nil {
-				log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
-			}
+				if err != nil {
+					log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
+				}
+			}()
 		}
 	}
 
@@ -440,12 +444,13 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (int
 		return nil, errs.ErrTokenGenerating
 	}
 
-	err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+	go func() {
+		err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
 
-	if err != nil {
-		log.WarnfWithRequestId(c, "[users.UserSendVerifyEmailByUnloginUserHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
+		if err != nil {
+			log.WarnfWithRequestId(c, "[users.UserSendVerifyEmailByUnloginUserHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())
+		}
+	}()
 
 	return true, nil
 }
@@ -479,12 +484,13 @@ func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (int
 		return nil, errs.ErrTokenGenerating
 	}
 
-	err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+	go func() {
+		err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
 
-	if err != nil {
-		log.WarnfWithRequestId(c, "[users.UserSendVerifyEmailByLoginedUserHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
+		if err != nil {
+			log.WarnfWithRequestId(c, "[users.UserSendVerifyEmailByLoginedUserHandler] cannot send email to \"%s\", because %s", user.Email, err.Error())
+		}
+	}()
 
 	return true, nil
 }

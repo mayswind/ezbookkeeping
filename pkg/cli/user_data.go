@@ -236,6 +236,10 @@ func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
 
 // ResendVerifyEmail resends an email with account activation link
 func (l *UserDataCli) ResendVerifyEmail(c *cli.Context, username string) error {
+	if !settings.Container.Current.EnableUserVerifyEmail {
+		return errs.ErrEmailValidationNotAllowed
+	}
+
 	if username == "" {
 		log.BootErrorf("[user_data.ResendVerifyEmail] user name is empty")
 		return errs.ErrUsernameIsEmpty

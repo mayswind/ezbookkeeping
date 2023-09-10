@@ -586,6 +586,7 @@ export default {
         'new password equals old password': 'New password equals old password',
         'email is not verified': 'Email is not verified',
         'email is verified': 'Email is verified',
+        'email validation not allowed': 'Email validation is not allowed',
         'unauthorized access': 'Unauthorized access',
         'current token is invalid': 'Current token is invalid',
         'current token is expired': 'Current token is expired',

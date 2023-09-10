@@ -410,6 +410,10 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 
 // UserSendVerifyEmailByUnloginUserHandler sends unlogin user verify email
 func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (interface{}, *errs.Error) {
+	if !settings.Container.Current.EnableUserVerifyEmail {
+		return nil, errs.ErrEmailValidationNotAllowed
+	}
+
 	var userResendVerifyEmailReq models.UserResendVerifyEmailRequest
 	err := c.ShouldBindJSON(&userResendVerifyEmailReq)
 
@@ -462,6 +466,10 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (int
 
 // UserSendVerifyEmailByLoginedUserHandler sends logined user verify email
 func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (interface{}, *errs.Error) {
+	if !settings.Container.Current.EnableUserVerifyEmail {
+		return nil, errs.ErrEmailValidationNotAllowed
+	}
+
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 

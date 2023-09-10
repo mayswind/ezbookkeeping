@@ -586,6 +586,7 @@ export default {
         'new password equals old password': '新密码与旧密码相同',
         'email is not verified': '邮箱还未验证通过',
         'email is verified': '邮箱已经验证过',
+        'email validation not allowed': '不允许邮箱验证',
         'unauthorized access': '未授权的登录',
         'current token is invalid': '当前认证令牌无效',
         'current token is expired': '当前认证令牌已过期',

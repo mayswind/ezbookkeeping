@@ -295,21 +295,24 @@ export default {
             self.submitting = true;
             self.$showLoading(() => self.submitting);
 
-            let submitCategories = [];
+            let presetCategories = [];
 
             if (self.usePresetCategories) {
-                submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
+                presetCategories = categorizedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({
-                user: self.user
+                user: self.user,
+                presetCategories: presetCategories
             }).then(response => {
                 if (!self.$user.isUserLogined()) {
                     self.submitting = false;
                     self.$hideLoading();
 
-                    if (self.usePresetCategories) {
-                        self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    if (self.usePresetCategories && !response.presetCategoriesSaved) {
+                        self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.', 5000);
+                    } else if (response.needVerifyEmail) {
+                        self.$toast('You have been successfully registered. Account activation link has been sent to your email address, please activate your account first.', 5000);
                     } else {
                         self.$toast('You have been successfully registered');
                     }
@@ -327,30 +330,16 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
-                if (!self.usePresetCategories) {
-                    self.submitting = false;
-                    self.$hideLoading();
+                self.submitting = false;
+                self.$hideLoading();
 
+                if (self.usePresetCategories && !response.presetCategoriesSaved) {
+                    self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                } else {
                     self.$toast('You have been successfully registered');
-                    router.navigate('/');
-                    return;
                 }
 
-                self.transactionCategoriesStore.addCategories({
-                    categories: submitCategories
-                }).then(() => {
-                    self.submitting = false;
-                    self.$hideLoading();
-
-                    self.$toast('You have been successfully registered');
-                    router.navigate('/');
-                }).catch(() => {
-                    self.submitting = false;
-                    self.$hideLoading();
-
-                    self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
-                    router.navigate('/');
-                });
+                router.navigate('/');
             }).catch(error => {
                 self.submitting = false;
                 self.$hideLoading();

@@ -91,7 +91,7 @@ export default {
             }
         });
     },
-    register: ({ username, email, nickname, password, language, defaultCurrency, firstDayOfWeek }) => {
+    register: ({ username, email, nickname, password, language, defaultCurrency, firstDayOfWeek, categories }) => {
         return axios.post('register.json', {
             username,
             email,
@@ -99,7 +99,8 @@ export default {
             password,
             language,
             defaultCurrency,
-            firstDayOfWeek
+            firstDayOfWeek,
+            categories
         }, {
             timeout: api.requestVerifyEmailTimeout
         });

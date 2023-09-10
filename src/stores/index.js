@@ -159,7 +159,7 @@ export const useRootStore = defineStore('root', {
                 });
             });
         },
-        register({ user }) {
+        register({ user, presetCategories }) {
             const settingsStore = useSettingsStore();
 
             return new Promise((resolve, reject) => {
@@ -170,7 +170,8 @@ export const useRootStore = defineStore('root', {
                     nickname: user.nickname,
                     language: user.language,
                     defaultCurrency: user.defaultCurrency,
-                    firstDayOfWeek: user.firstDayOfWeek
+                    firstDayOfWeek: user.firstDayOfWeek,
+                    categories: presetCategories
                 }).then(response => {
                     const data = response.data;
 

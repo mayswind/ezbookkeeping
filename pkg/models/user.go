@@ -107,6 +107,7 @@ type UserRegisterRequest struct {
 	Language        string  `json:"language" binding:"required,min=2,max=16"`
 	DefaultCurrency string  `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
 	FirstDayOfWeek  WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	TransactionCategoryCreateBatchRequest
 }
 
 // UserVerifyEmailRequest represents all parameters of user verify email request

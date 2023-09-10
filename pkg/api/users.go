@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin/binding"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -36,7 +38,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 	}
 
 	var userRegisterReq models.UserRegisterRequest
-	err := c.ShouldBindJSON(&userRegisterReq)
+	err := c.ShouldBindBodyWith(&userRegisterReq, binding.JSON)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[users.UserRegisterHandler] parse request failed, because %s", err.Error())
@@ -72,10 +74,23 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 
 	log.InfofWithRequestId(c, "[users.UserRegisterHandler] user \"%s\" has registered successfully, uid is %d", user.Username, user.Uid)
 
-	authResp := &models.AuthResponse{
-		Need2FA:         false,
-		NeedVerifyEmail: settings.Container.Current.EnableUserForceVerifyEmail,
-		User:            user.ToUserBasicInfo(),
+	presetCategoriesSaved := false
+
+	if len(userRegisterReq.Categories) > 0 {
+		_, err = TransactionCategories.createBatchCategories(c, user.Uid, &userRegisterReq.TransactionCategoryCreateBatchRequest)
+
+		if err == nil {
+			presetCategoriesSaved = true
+		}
+	}
+
+	authResp := &models.RegisterResponse{
+		AuthResponse: models.AuthResponse{
+			Need2FA: false,
+			User:    user.ToUserBasicInfo(),
+		},
+		NeedVerifyEmail:       settings.Container.Current.EnableUserForceVerifyEmail,
+		PresetCategoriesSaved: presetCategoriesSaved,
 	}
 
 	if settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {

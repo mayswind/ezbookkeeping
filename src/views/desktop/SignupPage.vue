@@ -20,18 +20,7 @@
             </v-col>
             <v-col cols="12" md="8" class="auth-card d-flex align-center justify-center pa-10">
                 <v-card variant="flat" class="mt-12 mt-sm-0 pt-sm-12 pt-md-0">
-                    <steps-bar min-width="700" :steps="[
-                        {
-                            'name': 'basicSetting',
-                            'title': $t('User Information'),
-                            'subTitle': $t('Basic Information')
-                        },
-                        {
-                            'name': 'presetCategories',
-                            'title': $t('Transaction Categories'),
-                            'subTitle': $t('Preset Categories')
-                        }
-                    ]" :current-step="currentStep" @step:change="switchToTab" />
+                    <steps-bar min-width="700" :steps="allSteps" :current-step="currentStep" @step:change="switchToTab" />
 
                     <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
                         <v-form>
@@ -47,7 +36,7 @@
                                             type="text"
                                             autocomplete="username"
                                             clearable
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Username')"
                                             :placeholder="$t('Your username')"
                                             v-model="user.username"
@@ -59,7 +48,7 @@
                                             type="text"
                                             autocomplete="nickname"
                                             clearable
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Nickname')"
                                             :placeholder="$t('Your nickname')"
                                             v-model="user.nickname"
@@ -72,7 +61,7 @@
                                             type="email"
                                             autocomplete="email"
                                             clearable
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('E-mail')"
                                             :placeholder="$t('Your email address')"
                                             v-model="user.email"
@@ -84,7 +73,7 @@
                                         <v-text-field
                                             autocomplete="new-password"
                                             clearable
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Password')"
                                             :placeholder="$t('Your password, at least 6 characters')"
                                             :type="isPasswordVisible ? 'text' : 'password'"
@@ -97,7 +86,7 @@
                                         <v-text-field
                                             autocomplete="new-password"
                                             clearable
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Confirmation Password')"
                                             :placeholder="$t('Re-enter the password')"
                                             :type="isConfirmPasswordVisible ? 'text' : 'password'"
@@ -113,7 +102,7 @@
                                         <v-select
                                             item-title="displayName"
                                             item-value="code"
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Language')"
                                             :placeholder="$t('Language')"
                                             :items="allLanguages"
@@ -128,7 +117,7 @@
                                             item-title="displayName"
                                             item-value="code"
                                             auto-select-first
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('Default Currency')"
                                             :placeholder="$t('Default Currency')"
                                             :items="allCurrencies"
@@ -145,7 +134,7 @@
                                         <v-select
                                             item-title="displayName"
                                             item-value="type"
-                                            :disabled="submitting"
+                                            :disabled="submitting || navigateToHomePage"
                                             :label="$t('First Day of Week')"
                                             :placeholder="$t('First Day of Week')"
                                             :items="allWeekDays"
@@ -162,7 +151,7 @@
                                 <v-row class="mb-5">
                                     <v-col cols="12" sm="6">
                                         <v-switch inset
-                                                  :disabled="submitting"
+                                                  :disabled="submitting || navigateToHomePage"
                                                   :label="$t('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>
@@ -170,7 +159,7 @@
                                         <v-menu location="bottom">
                                             <template #activator="{ props }">
                                                 <v-btn variant="text"
-                                                       :disabled="submitting"
+                                                       :disabled="submitting || navigateToHomePage"
                                                        v-bind="props">{{ currentLanguageName }}</v-btn>
                                             </template>
                                             <v-list>
@@ -186,7 +175,7 @@
                                     </v-col>
                                 </v-row>
 
-                                <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting }" style="max-height: 323px">
+                                <div class="overflow-y-auto px-3" :class="{ 'disabled': !usePresetCategories || submitting || navigateToHomePage }" style="max-height: 323px">
                                     <v-row :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                                         <v-col cols="12" md="12">
                                             <h4 class="mb-3">{{ getCategoryTypeName(categoryType) }}</h4>
@@ -217,33 +206,41 @@
                                     </v-row>
                                 </div>
                             </v-window-item>
+
+                            <v-window-item value="finalResult" v-if="finalResultMessage">
+                                <h5 class="text-h5 mb-1">{{ $t('Registration Complete') }}</h5>
+                                <p class="my-5">{{ finalResultMessage }}</p>
+                            </v-window-item>
                         </v-form>
                     </v-window>
 
                     <div class="d-flex justify-sm-space-between gap-4 flex-wrap justify-center mt-5">
-                        <v-btn :color="currentStep === 'basicSetting' ? 'default' : 'primary'"
-                               :disabled="currentStep === 'basicSetting' || submitting"
+                        <v-btn :color="(currentStep === 'basicSetting' || currentStep === 'finalResult') ? 'default' : 'primary'"
+                               :disabled="currentStep === 'basicSetting' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :prepend-icon="icons.previous"
                                @click="switchToPreviousTab">{{ $t('Previous') }}</v-btn>
-                        <v-btn :color="currentStep === 'presetCategories' ? 'secondary' : 'primary'"
-                               :disabled="currentStep === 'presetCategories' || submitting"
+                        <v-btn :color="(currentStep === 'presetCategories' || currentStep === 'finalResult') ? 'secondary' : 'primary'"
+                               :disabled="currentStep === 'presetCategories' || currentStep === 'finalResult' || submitting || navigateToHomePage"
                                :append-icon="icons.next"
                                @click="switchToNextTab"
-                               v-if="currentStep !== 'presetCategories'">{{ $t('Next') }}</v-btn>
+                               v-if="currentStep === 'basicSetting'">{{ $t('Next') }}</v-btn>
                         <v-btn color="expense"
-                               :disabled="submitting"
+                               :disabled="submitting || navigateToHomePage"
                                :append-icon="!submitting ? icons.submit : null"
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
                             {{ $t('Submit') }}
                             <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
                         </v-btn>
+                        <v-btn :append-icon="icons.next"
+                               @click="navigateToLogin"
+                               v-if="currentStep === 'finalResult'">{{ $t('Continue') }}</v-btn>
                     </div>
                 </v-card>
             </v-col>
         </v-row>
 
-        <snack-bar ref="snackbar" />
+        <snack-bar ref="snackbar" @update:show="onSnackbarShowStateChanged" />
     </div>
 </template>
 
@@ -281,6 +278,8 @@ export default {
             isConfirmPasswordVisible: false,
             submitting: false,
             usePresetCategories: false,
+            finalResultMessage: null,
+            navigateToHomePage: false,
             icons: {
                 previous: mdiArrowLeft,
                 next: mdiArrowRight,
@@ -341,6 +340,30 @@ export default {
 
             return languageInfo.displayName;
         },
+        allSteps() {
+            const allSteps = [
+                {
+                    name: 'basicSetting',
+                    title: this.$t('User Information'),
+                    subTitle: this.$t('Basic Information')
+                },
+                {
+                    name: 'presetCategories',
+                    title: this.$t('Transaction Categories'),
+                    subTitle: this.$t('Preset Categories')
+                }
+            ];
+
+            if (this.finalResultMessage) {
+                allSteps.push({
+                    name: 'finalResult',
+                    title: this.$t('Complete'),
+                    subTitle: this.$t('Registration Complete')
+                });
+            }
+
+            return allSteps;
+        },
         inputIsEmpty() {
             return !!this.inputEmptyProblemMessage;
         },
@@ -381,7 +404,7 @@ export default {
     },
     methods: {
         switchToTab(tabName) {
-            if (this.submitting) {
+            if (this.submitting || this.currentStep === 'finalResult' || this.navigateToHomePage) {
                 return;
             }
 
@@ -414,27 +437,33 @@ export default {
                 return;
             }
 
+            self.navigateToHomePage = false;
             self.submitting = true;
 
-            let submitCategories = [];
+            let presetCategories = [];
 
             if (self.usePresetCategories) {
-                submitCategories = categorizedArrayToPlainArray(self.allPresetCategories);
+                presetCategories = categorizedArrayToPlainArray(self.allPresetCategories);
             }
 
             self.rootStore.register({
-                user: self.user
+                user: self.user,
+                presetCategories: presetCategories
             }).then(response => {
                 if (!self.$user.isUserLogined()) {
                     self.submitting = false;
 
-                    if (self.usePresetCategories) {
-                        self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    if (self.usePresetCategories && !response.presetCategoriesSaved) {
+                        self.finalResultMessage = self.$t('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                        self.currentStep = 'finalResult';
+                    } else if (response.needVerifyEmail) {
+                        self.finalResultMessage = self.$t('You have been successfully registered. Account activation link has been sent to your email address, please activate your account first.');
+                        self.currentStep = 'finalResult';
                     } else {
                         self.$refs.snackbar.showMessage('You have been successfully registered');
+                        self.navigateToHomePage = true;
                     }
 
-                    self.$router.replace('/');
                     return;
                 }
 
@@ -447,27 +476,15 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
-                if (!self.usePresetCategories) {
-                    self.submitting = false;
+                self.submitting = false;
 
+                if (self.usePresetCategories && !response.presetCategoriesSaved) {
+                    self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                } else {
                     self.$refs.snackbar.showMessage('You have been successfully registered');
-                    self.$router.replace('/');
-                    return;
                 }
 
-                self.transactionCategoriesStore.addCategories({
-                    categories: submitCategories
-                }).then(() => {
-                    self.submitting = false;
-
-                    self.$refs.snackbar.showMessage('You have been successfully registered');
-                    self.$router.replace('/');
-                }).catch(() => {
-                    self.submitting = false;
-
-                    self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
-                    self.$router.replace('/');
-                });
+                self.navigateToHomePage = true;
             }).catch(error => {
                 self.submitting = false;
 
@@ -475,6 +492,14 @@ export default {
                     self.$refs.snackbar.showError(error);
                 }
             });
+        },
+        navigateToLogin() {
+            this.$router.push('/');
+        },
+        onSnackbarShowStateChanged(newValue) {
+            if (!newValue && this.navigateToHomePage) {
+                this.$router.replace('/');
+            }
         },
         getCategoryTypeName(categoryType) {
             switch (categoryType) {

@@ -3,6 +3,8 @@ package api
 import (
 	"sort"
 
+	"github.com/gin-gonic/gin/binding"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -134,7 +136,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 // CategoryCreateBatchHandler saves some new transaction category by request parameters for current user
 func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (interface{}, *errs.Error) {
 	var categoryCreateBatchReq models.TransactionCategoryCreateBatchRequest
-	err := c.ShouldBindJSON(&categoryCreateBatchReq)
+	err := c.ShouldBindBodyWith(&categoryCreateBatchReq, binding.JSON)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] parse request failed, because %s", err.Error())
@@ -143,52 +145,11 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 
 	uid := c.GetCurrentUid()
 
-	categoryTypeMaxOrderMap := make(map[models.TransactionCategoryType]int32)
-	categoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
-	categoriesMap[nil] = make([]*models.TransactionCategory, len(categoryCreateBatchReq.Categories))
-	totalCount := 0
-
-	for i := 0; i < len(categoryCreateBatchReq.Categories); i++ {
-		categoryCreateReq := categoryCreateBatchReq.Categories[i]
-		var maxOrderId, exists = categoryTypeMaxOrderMap[categoryCreateReq.Type]
-
-		if !exists {
-			maxOrderId, err = a.categories.GetMaxDisplayOrder(c, uid, categoryCreateReq.Type)
-
-			if err != nil {
-				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
-				return nil, errs.Or(err, errs.ErrOperationFailed)
-			}
-		}
-
-		category := a.createNewCategoryModel(uid, &models.TransactionCategoryCreateRequest{
-			Name:  categoryCreateReq.Name,
-			Type:  categoryCreateReq.Type,
-			Icon:  categoryCreateReq.Icon,
-			Color: categoryCreateReq.Color,
-		}, maxOrderId+1)
-
-		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
-
-		for j := int32(0); j < int32(len(categoryCreateReq.SubCategories)); j++ {
-			subCategory := a.createNewCategoryModel(uid, categoryCreateReq.SubCategories[j], j+1)
-			categoriesMap[category][j] = subCategory
-			totalCount++
-		}
-
-		categoriesMap[nil][i] = category
-		categoryTypeMaxOrderMap[categoryCreateReq.Type] = maxOrderId + 1
-		totalCount++
-	}
-
-	categories, err := a.categories.CreateCategories(c, uid, categoriesMap)
+	categories, err := a.createBatchCategories(c, uid, &categoryCreateBatchReq)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
-
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] user \"uid:%d\" has created categoroies successfully", uid)
 
 	return a.getTransactionCategoryListByTypeResponse(categories, 0)
 }
@@ -323,6 +284,58 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (inter
 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] user \"uid:%d\" has deleted category \"id:%d\"", uid, categoryDeleteReq.Id)
 	return true, nil
+}
+
+func (a *TransactionCategoriesApi) createBatchCategories(c *core.Context, uid int64, categoryCreateBatchReq *models.TransactionCategoryCreateBatchRequest) ([]*models.TransactionCategory, error) {
+	var err error
+	categoryTypeMaxOrderMap := make(map[models.TransactionCategoryType]int32)
+	categoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
+	categoriesMap[nil] = make([]*models.TransactionCategory, len(categoryCreateBatchReq.Categories))
+	totalCount := 0
+
+	for i := 0; i < len(categoryCreateBatchReq.Categories); i++ {
+		categoryCreateReq := categoryCreateBatchReq.Categories[i]
+		var maxOrderId, exists = categoryTypeMaxOrderMap[categoryCreateReq.Type]
+
+		if !exists {
+			maxOrderId, err = a.categories.GetMaxDisplayOrder(c, uid, categoryCreateReq.Type)
+
+			if err != nil {
+				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrOperationFailed)
+			}
+		}
+
+		category := a.createNewCategoryModel(uid, &models.TransactionCategoryCreateRequest{
+			Name:  categoryCreateReq.Name,
+			Type:  categoryCreateReq.Type,
+			Icon:  categoryCreateReq.Icon,
+			Color: categoryCreateReq.Color,
+		}, maxOrderId+1)
+
+		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
+
+		for j := int32(0); j < int32(len(categoryCreateReq.SubCategories)); j++ {
+			subCategory := a.createNewCategoryModel(uid, categoryCreateReq.SubCategories[j], j+1)
+			categoriesMap[category][j] = subCategory
+			totalCount++
+		}
+
+		categoriesMap[nil][i] = category
+		categoryTypeMaxOrderMap[categoryCreateReq.Type] = maxOrderId + 1
+		totalCount++
+	}
+
+	categories, err := a.categories.CreateCategories(c, uid, categoriesMap)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transaction_categories.createBatchCategories] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.InfofWithRequestId(c, "[transaction_categories.createBatchCategories] user \"uid:%d\" has created categories successfully", uid)
+
+	return categories, nil
 }
 
 func (a *TransactionCategoriesApi) createNewCategoryModel(uid int64, categoryCreateReq *models.TransactionCategoryCreateRequest, order int32) *models.TransactionCategory {

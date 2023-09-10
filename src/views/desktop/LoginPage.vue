@@ -181,7 +181,11 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
-import { isUserRegistrationEnabled, isUserForgetPasswordEnabled } from '@/lib/server_settings.js';
+import {
+    isUserRegistrationEnabled,
+    isUserForgetPasswordEnabled,
+    isUserVerifyEmailEnabled
+} from '@/lib/server_settings.js';
 
 import {
     mdiEyeOutline,
@@ -244,6 +248,9 @@ export default {
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();
+        },
+        isUserVerifyEmailEnabled() {
+            return isUserVerifyEmailEnabled();
         }
     },
     setup() {
@@ -312,7 +319,7 @@ export default {
             }).catch(error => {
                 self.logining = false;
 
-                if (error.error && error.error.errorCode === 201020 && error.error.context && error.error.context.email) {
+                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === 201020 && error.error.context && error.error.context.email) {
                     self.$router.push('/verify_email?email=' + encodeURIComponent(error.error.context.email));
                     return;
                 }

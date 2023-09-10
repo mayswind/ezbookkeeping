@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('User Profile')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !isUserVerifyEmailEnabled || loading || emailVerified }" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :class="{ 'disabled': inputIsNotChanged || inputIsInvalid || saving }" :text="$t('Save')" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -212,7 +212,7 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading || resending }" @click="resendVerifyEmail"
-                                   v-if="!loading && !emailVerified"
+                                   v-if="isUserVerifyEmailEnabled && !loading && !emailVerified"
                 >{{ $t('Resend Validation Email') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -240,6 +240,7 @@ import { useAccountsStore } from '@/stores/account.js';
 
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
+import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
 
 export default {
     props: [
@@ -332,6 +333,9 @@ export default {
         },
         currentDayOfWeekName() {
             return getNameByKeyValue(this.allWeekDays, this.newProfile.firstDayOfWeek, 'type', 'displayName');
+        },
+        isUserVerifyEmailEnabled() {
+            return isUserVerifyEmailEnabled();
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;

@@ -28,7 +28,7 @@
                             <span v-if="!loading && emailVerified">{{ $t('Email has been verified') }}</span>
                             <span v-if="!loading && !emailVerified">{{ $t('Email has not been verified') }}</span>
                             <v-btn class="ml-2 px-2" size="small" variant="text" :disabled="loading || resending"
-                                   @click="resendVerifyEmail" v-if="!loading && !emailVerified">
+                                   @click="resendVerifyEmail" v-if="isUserVerifyEmailEnabled && !loading && !emailVerified">
                                 {{ $t('Resend Validation Email') }}
                                 <v-progress-circular indeterminate size="18" class="ml-2" v-if="resending"></v-progress-circular>
                             </v-btn>
@@ -235,6 +235,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
+import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
 
 import {
     mdiAccount
@@ -316,6 +317,9 @@ export default {
         },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
+        },
+        isUserVerifyEmailEnabled() {
+            return isUserVerifyEmailEnabled();
         },
         inputIsNotChanged() {
             return !!this.inputIsNotChangedProblemMessage;

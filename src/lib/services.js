@@ -190,6 +190,8 @@ export default {
             shortDateFormat,
             longTimeFormat,
             shortTimeFormat
+        }, {
+            timeout: api.requestVerifyEmailTimeout
         });
     },
     resendVerifyEmailByLoginedUser: () => {

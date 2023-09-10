@@ -356,6 +356,20 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 		User: user.ToUserBasicInfo(),
 	}
 
+	if emailSetToUnverified && settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {
+		token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[users.UserUpdateProfileHandler] failed to create email verify token for user \"uid:%d\", because %s", user.Uid, err.Error())
+		} else {
+			err = a.users.SendVerifyEmail(user, token, c.GetClientLocale())
+
+			if err != nil {
+				log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] cannot send verify email to \"%s\", because %s", user.Email, err.Error())
+			}
+		}
+	}
+
 	if keyProfileUpdated {
 		now := time.Now().Unix()
 		err = a.tokens.DeleteTokensBeforeTime(c, uid, now)

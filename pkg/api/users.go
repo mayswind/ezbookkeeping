@@ -89,7 +89,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 			Need2FA: false,
 			User:    user.ToUserBasicInfo(),
 		},
-		NeedVerifyEmail:       settings.Container.Current.EnableUserForceVerifyEmail,
+		NeedVerifyEmail:       settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableUserForceVerifyEmail,
 		PresetCategoriesSaved: presetCategoriesSaved,
 	}
 
@@ -109,7 +109,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 		}
 	}
 
-	if authResp.NeedVerifyEmail {
+	if settings.Container.Current.EnableUserForceVerifyEmail {
 		return authResp, nil
 	}
 

@@ -77,10 +77,13 @@ func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []in
 	for {
 		unixTime = uint64(time.Now().Unix())
 		newLastSeqId = u.uuidSeqNumbers[uuidType].Add(uint64(count))
+		newSeqUnixTime := newLastSeqId >> seqNumberIdBits
 
-		if newLastSeqId>>seqNumberIdBits == unixTime {
+		if unixTime == newSeqUnixTime {
 			newFirstSeqId = newLastSeqId - uint64(count-1)
 			break
+		} else if unixTime < newSeqUnixTime {
+			continue
 		}
 
 		currentSeqId := newLastSeqId

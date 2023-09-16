@@ -222,6 +222,11 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 	}
 
 	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint8(needUuidCount))
+
+	if len(uuids) < needUuidCount {
+		return errs.ErrSystemIsBusy
+	}
+
 	transaction.TransactionId = uuids[0]
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
@@ -237,8 +242,14 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 	transactionTagIndexs := make([]*models.TransactionTagIndex, len(tagIds))
 
 	for i := 0; i < len(tagIds); i++ {
+		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
+
+		if tagIndexId < 1 {
+			return errs.ErrSystemIsBusy
+		}
+
 		transactionTagIndexs[i] = &models.TransactionTagIndex{
-			TagIndexId:      s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX),
+			TagIndexId:      tagIndexId,
 			Uid:             transaction.Uid,
 			Deleted:         false,
 			TagId:           tagIds[i],
@@ -431,8 +442,14 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 	transactionTagIndexs := make([]*models.TransactionTagIndex, len(addTagIds))
 
 	for i := 0; i < len(addTagIds); i++ {
+		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
+
+		if tagIndexId < 1 {
+			return errs.ErrSystemIsBusy
+		}
+
 		transactionTagIndexs[i] = &models.TransactionTagIndex{
-			TagIndexId:      s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX),
+			TagIndexId:      tagIndexId,
 			Uid:             transaction.Uid,
 			Deleted:         false,
 			TagId:           addTagIds[i],

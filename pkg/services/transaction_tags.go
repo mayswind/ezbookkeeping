@@ -160,6 +160,10 @@ func (s *TransactionTagService) CreateTag(c *core.Context, tag *models.Transacti
 
 	tag.TagId = s.GenerateUuid(uuid.UUID_TYPE_TAG)
 
+	if tag.TagId < 1 {
+		return errs.ErrSystemIsBusy
+	}
+
 	tag.Deleted = false
 	tag.CreatedUnixTime = time.Now().Unix()
 	tag.UpdatedUnixTime = time.Now().Unix()

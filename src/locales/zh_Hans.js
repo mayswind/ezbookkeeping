@@ -557,6 +557,7 @@ export default {
         'system error': '系统错误',
         'api not found': '接口调用失败',
         'not implemented': '未实现',
+        'system is busy': '系统繁忙',
         'database operation failed': '数据库操作失败',
         'SMTP server is not enabled': 'SMTP 服务器没有启用',
         'incomplete or incorrect submission': '提交不完整或不正确',

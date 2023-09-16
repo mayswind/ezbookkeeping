@@ -557,6 +557,7 @@ export default {
         'system error': 'System Error',
         'api not found': 'Failed to request api',
         'not implemented': 'Not implemented',
+        'system is busy': 'System is busy',
         'database operation failed': 'Database operation failed',
         'SMTP server is not enabled': 'SMTP server is not enabled',
         'incomplete or incorrect submission': 'Incomplete or incorrect submission',

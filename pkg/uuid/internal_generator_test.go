@@ -374,3 +374,25 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 
 	waitGroup.Wait()
 }
+
+func TestGenerateUuid_Over524287Times(t *testing.T) {
+	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 1})
+	onceGenerateCount := uint8(255)
+	generationStartUnixTime := time.Now().Unix()
+
+	for i := 0; i < 2057; i++ { // 2056*255=524280, 2057*255=524,535 (only can generates 524,287 uuids per second)
+		uuids := generator.GenerateUuids(UUID_TYPE_USER, onceGenerateCount)
+
+		if i < 2056 {
+			if len(uuids) < int(onceGenerateCount) {
+				assert.Fail(t, fmt.Sprintf("%d uuids should be generated", onceGenerateCount))
+			}
+		} else {
+			generationEndUnixTime := time.Now().Unix()
+
+			if generationStartUnixTime == generationEndUnixTime && len(uuids) > 0 {
+				assert.Fail(t, fmt.Sprintf("uuids should not be generated because there are too many uuids in one second"))
+			}
+		}
+	}
+}

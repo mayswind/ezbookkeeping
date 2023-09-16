@@ -163,6 +163,10 @@ func (s *TransactionCategoryService) CreateCategory(c *core.Context, category *m
 
 	category.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
 
+	if category.CategoryId < 1 {
+		return errs.ErrSystemIsBusy
+	}
+
 	category.Deleted = false
 	category.CreatedUnixTime = time.Now().Unix()
 	category.UpdatedUnixTime = time.Now().Unix()
@@ -186,6 +190,10 @@ func (s *TransactionCategoryService) CreateCategories(c *core.Context, uid int64
 		primaryCategory := primaryCategories[i]
 		primaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
 
+		if primaryCategory.CategoryId < 1 {
+			return nil, errs.ErrSystemIsBusy
+		}
+
 		primaryCategory.Deleted = false
 		primaryCategory.CreatedUnixTime = time.Now().Unix()
 		primaryCategory.UpdatedUnixTime = time.Now().Unix()
@@ -197,6 +205,11 @@ func (s *TransactionCategoryService) CreateCategories(c *core.Context, uid int64
 		for j := 0; j < len(secondaryCategories); j++ {
 			secondaryCategory := secondaryCategories[j]
 			secondaryCategory.CategoryId = s.GenerateUuid(uuid.UUID_TYPE_CATEGORY)
+
+			if secondaryCategory.CategoryId < 1 {
+				return nil, errs.ErrSystemIsBusy
+			}
+
 			secondaryCategory.ParentCategoryId = primaryCategory.CategoryId
 
 			secondaryCategory.Deleted = false

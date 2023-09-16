@@ -163,12 +163,22 @@ func (s *AccountService) CreateAccounts(c *core.Context, mainAccount *models.Acc
 	var allInitTransactions []*models.Transaction
 
 	mainAccount.AccountId = s.GenerateUuid(uuid.UUID_TYPE_ACCOUNT)
+
+	if mainAccount.AccountId < 1 {
+		return errs.ErrSystemIsBusy
+	}
+
 	allAccounts[0] = mainAccount
 
 	if mainAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		for i := 0; i < len(childrenAccounts); i++ {
 			childAccount := childrenAccounts[i]
 			childAccount.AccountId = s.GenerateUuid(uuid.UUID_TYPE_ACCOUNT)
+
+			if childAccount.AccountId < 1 {
+				return errs.ErrSystemIsBusy
+			}
+
 			childAccount.ParentAccountId = mainAccount.AccountId
 			childAccount.Uid = mainAccount.Uid
 			childAccount.Type = models.ACCOUNT_TYPE_SINGLE_ACCOUNT
@@ -185,8 +195,14 @@ func (s *AccountService) CreateAccounts(c *core.Context, mainAccount *models.Acc
 		allAccounts[i].UpdatedUnixTime = now
 
 		if allAccounts[i].Balance != 0 {
+			transactionId := s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION)
+
+			if transactionId < 1 {
+				return errs.ErrSystemIsBusy
+			}
+
 			newTransaction := &models.Transaction{
-				TransactionId:        s.GenerateUuid(uuid.UUID_TYPE_TRANSACTION),
+				TransactionId:        transactionId,
 				Uid:                  allAccounts[i].Uid,
 				Deleted:              false,
 				Type:                 models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,

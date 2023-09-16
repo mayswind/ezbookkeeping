@@ -153,6 +153,11 @@ func (s *UserService) CreateUser(c *core.Context, user *models.User) error {
 	}
 
 	user.Uid = s.GenerateUuid(uuid.UUID_TYPE_USER)
+
+	if user.Uid < 1 {
+		return errs.ErrSystemIsBusy
+	}
+
 	user.Password = utils.EncodePassword(user.Password, user.Salt)
 
 	user.Deleted = false

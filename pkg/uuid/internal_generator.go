@@ -51,6 +51,11 @@ func NewInternalUuidGenerator(config *settings.Config) (*InternalUuidGenerator, 
 // GenerateUuid generates a new uuid
 func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 	uuids := u.GenerateUuids(idType, 1)
+
+	if len(uuids) < 1 {
+		return 0
+	}
+
 	return uuids[0]
 }
 
@@ -89,6 +94,12 @@ func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []in
 
 	for i := 0; i < int(count); i++ {
 		seqId := (newFirstSeqId + uint64(i)) & seqNumberIdMask
+
+		// the internal uuid generator can only generate 524,287 ids per second for specified type
+		if seqId > internalUuidSeqIdMask {
+			return nil
+		}
+
 		uuids[i] = u.assembleUuid(unixTime, uuidType, seqId)
 	}
 

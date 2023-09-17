@@ -3,7 +3,7 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h5 class="text-h5">{{ $t(title) }}</h5>
+                    <h5 class="text-h5">{{ title }}</h5>
                 </div>
             </template>
             <template #subtitle>

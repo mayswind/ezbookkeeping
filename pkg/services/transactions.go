@@ -1115,7 +1115,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 	}
 
 	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
-	conditionParams := make([]interface{}, 0, 8)
+	conditionParams := make([]any, 0, 8)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
@@ -1153,9 +1153,9 @@ func (s *TransactionService) GetTransactionMapByList(transactions []*models.Tran
 	return transactionMap
 }
 
-func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, noDuplicated bool) (string, []interface{}) {
+func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, noDuplicated bool) (string, []any) {
 	condition := "uid=? AND deleted=?"
-	conditionParams := make([]interface{}, 0, 16)
+	conditionParams := make([]any, 0, 16)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 

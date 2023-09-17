@@ -28,7 +28,7 @@ var (
 )
 
 // AuthorizeHandler verifies and authorizes current login request
-func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (any, *errs.Error) {
 	var credential models.UserLoginRequest
 	err := c.ShouldBindJSON(&credential)
 
@@ -109,7 +109,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 }
 
 // TwoFactorAuthorizeHandler verifies and authorizes current 2fa login by passcode
-func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (any, *errs.Error) {
 	var credential models.TwoFactorLoginRequest
 	err := c.ShouldBindJSON(&credential)
 
@@ -172,7 +172,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (interfac
 }
 
 // TwoFactorAuthorizeByRecoveryCodeHandler verifies and authorizes current 2fa login by recovery code
-func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Context) (any, *errs.Error) {
 	var credential models.TwoFactorRecoveryCodeLoginRequest
 	err := c.ShouldBindJSON(&credential)
 

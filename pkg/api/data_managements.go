@@ -119,7 +119,7 @@ func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string,
 }
 
 // DataStatisticsHandler returns user data statistics
-func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	totalAccountCount, err := a.accounts.GetTotalAccountCountByUid(c, uid)
 
@@ -160,7 +160,7 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (interface{}
 }
 
 // ClearDataHandler deletes all user data
-func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error) {
 	var clearDataReq models.ClearDataRequest
 	err := c.ShouldBindJSON(&clearDataReq)
 

@@ -32,7 +32,7 @@ var (
 )
 
 // UserRegisterHandler saves a new user by request parameters
-func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserRegisterHandler(c *core.Context) (any, *errs.Error) {
 	if !settings.Container.Current.EnableUserRegister {
 		return nil, errs.ErrUserRegistrationNotAllowed
 	}
@@ -130,7 +130,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (interface{}, *errs.Erro
 }
 
 // UserEmailVerifyHandler sets user email address verified
-func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (any, *errs.Error) {
 	var userVerifyEmailReq models.UserVerifyEmailRequest
 	err := c.ShouldBindJSON(&userVerifyEmailReq)
 
@@ -192,7 +192,7 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (interface{}, *errs.E
 }
 
 // UserProfileHandler returns user profile of current user
-func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserProfileHandler(c *core.Context) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 
@@ -209,7 +209,7 @@ func (a *UsersApi) UserProfileHandler(c *core.Context) (interface{}, *errs.Error
 }
 
 // UserUpdateProfileHandler saves user profile by request parameters for current user
-func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) {
 	var userUpdateReq models.UserProfileUpdateRequest
 	err := c.ShouldBindJSON(&userUpdateReq)
 
@@ -409,7 +409,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (interface{}, *errs
 }
 
 // UserSendVerifyEmailByUnloginUserHandler sends unlogin user verify email
-func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (any, *errs.Error) {
 	if !settings.Container.Current.EnableUserVerifyEmail {
 		return nil, errs.ErrEmailValidationNotAllowed
 	}
@@ -465,7 +465,7 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (int
 }
 
 // UserSendVerifyEmailByLoginedUserHandler sends logined user verify email
-func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (any, *errs.Error) {
 	if !settings.Container.Current.EnableUserVerifyEmail {
 		return nil, errs.ErrEmailValidationNotAllowed
 	}

@@ -33,7 +33,7 @@ type BankOfCanadaExchangeRateData struct {
 }
 
 // BankOfCanadaObservationData represents the observation data from bank of Canada
-type BankOfCanadaObservationData map[string]interface{}
+type BankOfCanadaObservationData map[string]any
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from bank of Canada
 func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Context) *models.LatestExchangeRateResponse {
@@ -62,7 +62,7 @@ func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Cont
 
 			currencyCode := utils.SubString(typeName, 2, 3)
 
-			if data, ok := exchangeRateData.(map[string]interface{}); ok {
+			if data, ok := exchangeRateData.(map[string]any); ok {
 				exchangeRate := data["v"]
 
 				if exchangeRateValue, ok2 := exchangeRate.(string); ok2 {

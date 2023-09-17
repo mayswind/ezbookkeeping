@@ -14,42 +14,42 @@ type XOrmLoggerAdapter struct {
 }
 
 // Debug logs debug log
-func (logger XOrmLoggerAdapter) Debug(v ...interface{}) {
+func (logger XOrmLoggerAdapter) Debug(v ...any) {
 	log.SqlQuery(v...)
 }
 
 // Debugf logs debug log with custom format
-func (logger XOrmLoggerAdapter) Debugf(format string, v ...interface{}) {
+func (logger XOrmLoggerAdapter) Debugf(format string, v ...any) {
 	log.SqlQueryf(format, v...)
 }
 
 // Info logs info log
-func (logger XOrmLoggerAdapter) Info(v ...interface{}) {
+func (logger XOrmLoggerAdapter) Info(v ...any) {
 	log.SqlQuery(v...)
 }
 
 // Infof logs info log with custom format
-func (logger XOrmLoggerAdapter) Infof(format string, v ...interface{}) {
+func (logger XOrmLoggerAdapter) Infof(format string, v ...any) {
 	log.SqlQueryf(format, v...)
 }
 
 // Warn logs warn log
-func (logger XOrmLoggerAdapter) Warn(v ...interface{}) {
+func (logger XOrmLoggerAdapter) Warn(v ...any) {
 	log.SqlQuery(v...)
 }
 
 // Warnf logs warn log with custom format
-func (logger XOrmLoggerAdapter) Warnf(format string, v ...interface{}) {
+func (logger XOrmLoggerAdapter) Warnf(format string, v ...any) {
 	log.SqlQueryf(format, v...)
 }
 
 // Error logs error log
-func (logger XOrmLoggerAdapter) Error(v ...interface{}) {
+func (logger XOrmLoggerAdapter) Error(v ...any) {
 	log.SqlQuery(v...)
 }
 
 // Errorf logs error log with custom format
-func (logger XOrmLoggerAdapter) Errorf(format string, v ...interface{}) {
+func (logger XOrmLoggerAdapter) Errorf(format string, v ...any) {
 	log.SqlQueryf(format, v...)
 }
 

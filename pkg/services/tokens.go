@@ -237,7 +237,7 @@ func (s *TokenService) parseToken(c *core.Context, extractor request.Extractor) 
 	claims := &core.UserTokenClaims{}
 
 	token, err := request.ParseFromRequest(c.Request, extractor,
-		func(token *jwt.Token) (interface{}, error) {
+		func(token *jwt.Token) (any, error) {
 			now := time.Now().Unix()
 			userTokenId, err := utils.StringToInt64(claims.UserTokenId)
 

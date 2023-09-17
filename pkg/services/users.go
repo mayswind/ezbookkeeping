@@ -439,9 +439,9 @@ func (s *UserService) SendVerifyEmail(user *models.User, verifyEmailToken string
 		return err
 	}
 
-	templateParams := map[string]interface{}{
+	templateParams := map[string]any{
 		"AppName": s.CurrentConfig().AppName,
-		"VerifyEmail": map[string]interface{}{
+		"VerifyEmail": map[string]any{
 			"Title":               verifyEmailTextItems.Title,
 			"Salutation":          fmt.Sprintf(verifyEmailTextItems.SalutationFormat, user.Nickname),
 			"DescriptionAboveBtn": verifyEmailTextItems.DescriptionAboveBtn,

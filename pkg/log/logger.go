@@ -99,93 +99,93 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 }
 
 // Debugf logs debug log with custom format
-func Debugf(format string, args ...interface{}) {
+func Debugf(format string, args ...any) {
 	defaultLogger.Debug(getFinalLog(format, args...))
 }
 
 // DebugfWithRequestId logs debug log with custom format and request id
-func DebugfWithRequestId(c *core.Context, format string, args ...interface{}) {
+func DebugfWithRequestId(c *core.Context, format string, args ...any) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debug(getFinalLog(format, args...))
 }
 
 // Infof logs info log with custom format
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...any) {
 	defaultLogger.Info(getFinalLog(format, args...))
 }
 
 // InfofWithRequestId logs info log with custom format and request id
-func InfofWithRequestId(c *core.Context, format string, args ...interface{}) {
+func InfofWithRequestId(c *core.Context, format string, args ...any) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
 }
 
 // Warnf logs warn log with custom format
-func Warnf(format string, args ...interface{}) {
+func Warnf(format string, args ...any) {
 	defaultLogger.Warn(getFinalLog(format, args...))
 }
 
 // WarnfWithRequestId logs warn log with custom format and request id
-func WarnfWithRequestId(c *core.Context, format string, args ...interface{}) {
+func WarnfWithRequestId(c *core.Context, format string, args ...any) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warn(getFinalLog(format, args...))
 }
 
 // Errorf logs error log with custom format
-func Errorf(format string, args ...interface{}) {
+func Errorf(format string, args ...any) {
 	defaultLogger.Error(getFinalLog(format, args...))
 }
 
 // ErrorfWithRequestId logs error log with custom format and request id
-func ErrorfWithRequestId(c *core.Context, format string, args ...interface{}) {
+func ErrorfWithRequestId(c *core.Context, format string, args ...any) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Error(getFinalLog(format, args...))
 }
 
 // ErrorfWithRequestIdAndExtra logs error log with custom format and request id and extra info
-func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...interface{}) {
+func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...any) {
 	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Error(getFinalLog(format, args...))
 }
 
 // BootInfof logs boot info log
-func BootInfof(format string, args ...interface{}) {
+func BootInfof(format string, args ...any) {
 	if bootLogger != nil {
 		bootLogger.Info(getFinalLog(format, args...))
 	}
 }
 
 // BootWarnf logs boot warn log
-func BootWarnf(format string, args ...interface{}) {
+func BootWarnf(format string, args ...any) {
 	if bootLogger != nil {
 		bootLogger.Warn(getFinalLog(format, args...))
 	}
 }
 
 // BootErrorf logs boot error log
-func BootErrorf(format string, args ...interface{}) {
+func BootErrorf(format string, args ...any) {
 	if bootLogger != nil {
 		bootLogger.Error(getFinalLog(format, args...))
 	}
 }
 
 // Requestf logs http request log with custom format
-func Requestf(c *core.Context, format string, args ...interface{}) {
+func Requestf(c *core.Context, format string, args ...any) {
 	if requestLogger != nil {
 		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
 	}
 }
 
 // SqlQuery logs sql query log
-func SqlQuery(args ...interface{}) {
+func SqlQuery(args ...any) {
 	if sqlQueryLogger != nil {
 		sqlQueryLogger.Info(args...)
 	}
 }
 
 // SqlQueryf logs sql query log with custom format
-func SqlQueryf(format string, args ...interface{}) {
+func SqlQueryf(format string, args ...any) {
 	if sqlQueryLogger != nil {
 		sqlQueryLogger.Info(getFinalLog(format, args...))
 	}
 }
 
-func getFinalLog(format string, args ...interface{}) string {
+func getFinalLog(format string, args ...any) string {
 	result := fmt.Sprintf(format, args...)
 	result = strings.Replace(result, "\n", " ", -1)
 

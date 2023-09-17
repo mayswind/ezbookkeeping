@@ -38,7 +38,7 @@ type Error struct {
 	HttpStatusCode int
 	Message        string
 	BaseError      []error
-	Context        interface{}
+	Context        any
 }
 
 // Error returns the error message
@@ -83,7 +83,7 @@ func NewIncompleteOrIncorrectSubmissionError(err error) *Error {
 }
 
 // NewErrorWithContext returns a new error instance with specified context
-func NewErrorWithContext(baseError *Error, context interface{}) *Error {
+func NewErrorWithContext(baseError *Error, context any) *Error {
 	return &Error{
 		Category:       baseError.Category,
 		SubCategory:    baseError.SubCategory,

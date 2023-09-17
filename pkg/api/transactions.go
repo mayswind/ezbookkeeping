@@ -37,7 +37,7 @@ var (
 )
 
 // TransactionCountHandler returns transaction total count of current user
-func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.Error) {
 	var transactionCountReq models.TransactionCountRequest
 	err := c.ShouldBindQuery(&transactionCountReq)
 
@@ -77,7 +77,7 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (interface{},
 }
 
 // TransactionListHandler returns transaction list of current user
-func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Error) {
 	var transactionListReq models.TransactionListByMaxTimeRequest
 	err := c.ShouldBindQuery(&transactionListReq)
 
@@ -168,7 +168,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (interface{}, 
 }
 
 // TransactionMonthListHandler returns all transaction list of current user by month
-func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *errs.Error) {
 	var transactionListReq models.TransactionListInMonthByPageRequest
 	err := c.ShouldBindQuery(&transactionListReq)
 
@@ -232,7 +232,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (interfac
 }
 
 // TransactionStatisticsHandler returns transaction statistics of current user
-func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *errs.Error) {
 	var statisticReq models.TransactionStatisticRequest
 	err := c.ShouldBindQuery(&statisticReq)
 
@@ -269,7 +269,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (interfa
 }
 
 // TransactionAmountsHandler returns transaction amounts of current user
-func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs.Error) {
 	var transactionAmountsReq models.TransactionAmountsRequest
 	err := c.ShouldBindQuery(&transactionAmountsReq)
 
@@ -382,7 +382,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (interface{
 }
 
 // TransactionMonthAmountsHandler returns every month transaction amounts of current user
-func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (any, *errs.Error) {
 	var transactionAmountsReq models.TransactionMonthAmountsRequest
 	err := c.ShouldBindQuery(&transactionAmountsReq)
 
@@ -496,7 +496,7 @@ func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (inter
 }
 
 // TransactionGetHandler returns one specific transaction of current user
-func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Error) {
 	var transactionGetReq models.TransactionGetRequest
 	err := c.ShouldBindQuery(&transactionGetReq)
 
@@ -612,7 +612,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (interface{}, *
 }
 
 // TransactionCreateHandler saves a new transaction by request parameters for current user
-func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.Error) {
 	var transactionCreateReq models.TransactionCreateRequest
 	err := c.ShouldBindJSON(&transactionCreateReq)
 
@@ -684,7 +684,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (interface{}
 }
 
 // TransactionModifyHandler saves an existed transaction by request parameters for current user
-func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.Error) {
 	var transactionModifyReq models.TransactionModifyRequest
 	err := c.ShouldBindJSON(&transactionModifyReq)
 
@@ -804,7 +804,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (interface{}
 }
 
 // TransactionDeleteHandler deletes an existed transaction by request parameters for current user
-func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (any, *errs.Error) {
 	var transactionDeleteReq models.TransactionDeleteRequest
 	err := c.ShouldBindJSON(&transactionDeleteReq)
 

@@ -12,7 +12,7 @@ import (
 )
 
 // PrintJsonSuccessResult writes success response in json format to current http context
-func PrintJsonSuccessResult(c *core.Context, result interface{}) {
+func PrintJsonSuccessResult(c *core.Context, result any) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  result,

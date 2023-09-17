@@ -28,7 +28,7 @@ var (
 )
 
 // UserForgetPasswordRequestHandler generates password reset link and send user an email with this link
-func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (any, *errs.Error) {
 	var request models.ForgetPasswordRequest
 	err := c.ShouldBindJSON(&request)
 
@@ -80,7 +80,7 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 }
 
 // UserResetPasswordHandler resets user password by request parameters
-func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (any, *errs.Error) {
 	var request models.PasswordResetRequest
 	err := c.ShouldBindJSON(&request)
 

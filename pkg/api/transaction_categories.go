@@ -25,7 +25,7 @@ var (
 )
 
 // CategoryListHandler returns transaction category list of current user
-func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (any, *errs.Error) {
 	var categoryListReq models.TransactionCategoryListRequest
 	err := c.ShouldBindQuery(&categoryListReq)
 
@@ -46,7 +46,7 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (interfa
 }
 
 // CategoryGetHandler returns one specific transaction category of current user
-func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (any, *errs.Error) {
 	var categoryGetReq models.TransactionCategoryGetRequest
 	err := c.ShouldBindQuery(&categoryGetReq)
 
@@ -69,7 +69,7 @@ func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (interfac
 }
 
 // CategoryCreateHandler saves a new transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, *errs.Error) {
 	var categoryCreateReq models.TransactionCategoryCreateRequest
 	err := c.ShouldBindJSON(&categoryCreateReq)
 
@@ -134,7 +134,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (inter
 }
 
 // CategoryCreateBatchHandler saves some new transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (any, *errs.Error) {
 	var categoryCreateBatchReq models.TransactionCategoryCreateBatchRequest
 	err := c.ShouldBindBodyWith(&categoryCreateBatchReq, binding.JSON)
 
@@ -155,7 +155,7 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 }
 
 // CategoryModifyHandler saves an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, *errs.Error) {
 	var categoryModifyReq models.TransactionCategoryModifyRequest
 	err := c.ShouldBindJSON(&categoryModifyReq)
 
@@ -208,7 +208,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (inter
 }
 
 // CategoryHideHandler hides an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (any, *errs.Error) {
 	var categoryHideReq models.TransactionCategoryHideRequest
 	err := c.ShouldBindJSON(&categoryHideReq)
 
@@ -230,7 +230,7 @@ func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (interfa
 }
 
 // CategoryMoveHandler moves display order of existed transaction categories by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (any, *errs.Error) {
 	var categoryMoveReq models.TransactionCategoryMoveRequest
 	err := c.ShouldBindJSON(&categoryMoveReq)
 
@@ -265,7 +265,7 @@ func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (interfa
 }
 
 // CategoryDeleteHandler deletes an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (any, *errs.Error) {
 	var categoryDeleteReq models.TransactionCategoryDeleteRequest
 	err := c.ShouldBindJSON(&categoryDeleteReq)
 

@@ -26,7 +26,7 @@ var (
 )
 
 // TokenListHandler returns available token list of current user
-func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TokensApi) TokenListHandler(c *core.Context) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	tokens, err := a.tokens.GetAllUnexpiredNormalTokensByUid(c, uid)
 
@@ -61,7 +61,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (interface{}, *errs.Error)
 }
 
 // TokenRevokeCurrentHandler revokes current token of current user
-func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (any, *errs.Error) {
 	_, claims, err := a.tokens.ParseTokenByHeader(c)
 
 	if err != nil {
@@ -94,7 +94,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.Context) (interface{}, *er
 }
 
 // TokenRevokeHandler revokes specific token of current user
-func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TokensApi) TokenRevokeHandler(c *core.Context) (any, *errs.Error) {
 	var tokenRevokeReq models.TokenRevokeRequest
 	err := c.ShouldBindJSON(&tokenRevokeReq)
 
@@ -132,7 +132,7 @@ func (a *TokensApi) TokenRevokeHandler(c *core.Context) (interface{}, *errs.Erro
 }
 
 // TokenRevokeAllHandler revokes all tokens of current user except current token
-func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	tokens, err := a.tokens.GetAllTokensByUid(c, uid)
 
@@ -167,7 +167,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.Context) (interface{}, *errs.E
 }
 
 // TokenRefreshHandler refresh current token of current user
-func (a *TokensApi) TokenRefreshHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 

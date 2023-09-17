@@ -15,7 +15,7 @@ var (
 )
 
 // HealthStatusHandler returns the health status of current service
-func (a *HealthsApi) HealthStatusHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *HealthsApi) HealthStatusHandler(c *core.Context) (any, *errs.Error) {
 	result := make(map[string]string)
 
 	result["version"] = settings.Version

@@ -24,7 +24,7 @@ var (
 )
 
 // AccountListHandler returns accounts list of current user
-func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountListHandler(c *core.Context) (any, *errs.Error) {
 	var accountListReq models.AccountListRequest
 	err := c.ShouldBindQuery(&accountListReq)
 
@@ -84,7 +84,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (interface{}, *errs.Er
 }
 
 // AccountGetHandler returns one specific account of current user
-func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountGetHandler(c *core.Context) (any, *errs.Error) {
 	var accountGetReq models.AccountGetRequest
 	err := c.ShouldBindQuery(&accountGetReq)
 
@@ -127,7 +127,7 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (interface{}, *errs.Err
 }
 
 // AccountCreateHandler saves a new account by request parameters for current user
-func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	var accountCreateReq models.AccountCreateRequest
 	err := c.ShouldBindJSON(&accountCreateReq)
 
@@ -226,7 +226,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (interface{}, *errs.
 }
 
 // AccountModifyHandler saves an existed account by request parameters for current user
-func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
 	var accountModifyReq models.AccountModifyRequest
 	err := c.ShouldBindJSON(&accountModifyReq)
 
@@ -332,7 +332,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (interface{}, *errs.
 }
 
 // AccountHideHandler hides an existed account by request parameters for current user
-func (a *AccountsApi) AccountHideHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountHideHandler(c *core.Context) (any, *errs.Error) {
 	var accountHideReq models.AccountHideRequest
 	err := c.ShouldBindJSON(&accountHideReq)
 
@@ -354,7 +354,7 @@ func (a *AccountsApi) AccountHideHandler(c *core.Context) (interface{}, *errs.Er
 }
 
 // AccountMoveHandler moves display order of existed accounts by request parameters for current user
-func (a *AccountsApi) AccountMoveHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountMoveHandler(c *core.Context) (any, *errs.Error) {
 	var accountMoveReq models.AccountMoveRequest
 	err := c.ShouldBindJSON(&accountMoveReq)
 
@@ -389,7 +389,7 @@ func (a *AccountsApi) AccountMoveHandler(c *core.Context) (interface{}, *errs.Er
 }
 
 // AccountDeleteHandler deletes an existed account by request parameters for current user
-func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (any, *errs.Error) {
 	var accountDeleteReq models.AccountDeleteRequest
 	err := c.ShouldBindJSON(&accountDeleteReq)
 

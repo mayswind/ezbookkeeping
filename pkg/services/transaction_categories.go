@@ -48,7 +48,7 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(c *core.Context, uid 
 	}
 
 	condition := "uid=? AND deleted=?"
-	conditionParams := make([]interface{}, 0, 8)
+	conditionParams := make([]any, 0, 8)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
 

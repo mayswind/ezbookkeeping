@@ -28,7 +28,7 @@ func (s *DataStore) DoTransaction(key int64, c *core.Context, fn func(sess *xorm
 }
 
 // SyncStructs updates database structs by database models
-func (s *DataStore) SyncStructs(beans ...interface{}) error {
+func (s *DataStore) SyncStructs(beans ...any) error {
 	var err error
 
 	for i := 0; i < len(s.databases); i++ {

@@ -24,7 +24,7 @@ var (
 )
 
 // LatestExchangeRateHandler returns latest exchange rate data
-func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface{}, *errs.Error) {
+func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *errs.Error) {
 	dataSource := exchangerates.Container.Current
 
 	if dataSource == nil {

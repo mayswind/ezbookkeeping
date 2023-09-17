@@ -10,7 +10,7 @@ import (
 type MiddlewareHandlerFunc func(*Context)
 
 // ApiHandlerFunc represents the api handler function
-type ApiHandlerFunc func(*Context) (interface{}, *errs.Error)
+type ApiHandlerFunc func(*Context) (any, *errs.Error)
 
 // DataHandlerFunc represents the handler function that returns byte array
 type DataHandlerFunc func(*Context) ([]byte, string, *errs.Error)

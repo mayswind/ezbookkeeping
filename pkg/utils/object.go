@@ -8,7 +8,7 @@ import (
 )
 
 // Clone deep-clones src object to dst object
-func Clone(src, dst interface{}) error {
+func Clone(src, dst any) error {
 	var buf bytes.Buffer
 
 	if err := gob.NewEncoder(&buf).Encode(src); err != nil {
@@ -25,7 +25,7 @@ func Clone(src, dst interface{}) error {
 }
 
 // PrintObjectFields prints all fields in specified object
-func PrintObjectFields(obj interface{}) {
+func PrintObjectFields(obj any) {
 	if obj == nil {
 		return
 	}

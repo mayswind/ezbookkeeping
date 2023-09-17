@@ -72,7 +72,9 @@ export default {
             'hoursAheadOfDefaultTimezone': '{hours} hour(s) ahead of default timezone',
             'hoursMinutesBehindDefaultTimezone': '{hours} hour(s) and {minutes} minutes behind default timezone',
             'hoursMinutesAheadOfDefaultTimezone': '{hours} hour(s) and {minutes} minutes ahead of default timezone',
-            'youHaveAccounts': 'You have recorded {count} accounts'
+            'youHaveAccounts': 'You have recorded {count} accounts',
+            'accountActivationAndResendValidationEmailTip': 'Account activation link has been sent to your email address: {email}, If you don\'t receive the mail, please fill password again and click the button below to resend the validation mail.',
+            'resendValidationEmailTip': 'If you don\'t receive the mail, please fill password again and click the button below to resend the validation mail to: {email}'
         }
     },
     'dataExport': {
@@ -854,9 +856,6 @@ export default {
     'PIN code is wrong': 'PIN code is wrong',
     'Verify your email': 'Verify your email',
     'Verifying...': 'Verifying...',
-    'Account activation link has been sent to your email address:': 'Account activation link has been sent to your email address:',
-    ', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.': ', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.',
-    'If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:': 'If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:',
     'Resend Validation Email': 'Resend Validation Email',
     'Validation email has been sent': 'Validation email has been sent',
     'Unable to verify email': 'Unable to verify email',

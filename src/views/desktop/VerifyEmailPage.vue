@@ -27,13 +27,7 @@
                             <p class="mb-0" v-if="token && verified">{{ $t('Email has been verified') }}</p>
                             <p class="mb-0" v-if="token && !verified && errorMessage">{{ errorMessage }}</p>
                             <p class="mb-0" v-if="!token && !email">{{ $t('Parameter Invalid') }}</p>
-                            <p class="mb-0" v-if="!token && email">
-                                <span v-if="hasValidEmailVerifyToken">{{ $t('Account activation link has been sent to your email address:') }}</span>
-                                <span class="ml-1" v-if="hasValidEmailVerifyToken">{{ email }}</span>
-                                <span class="ml-1" v-if="hasValidEmailVerifyToken">{{ $t(', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.') }}</span>
-                                <span v-if="!hasValidEmailVerifyToken">{{ $t('If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:') }}</span>
-                                <span class="ml-1" v-if="!hasValidEmailVerifyToken">{{ email }}</span>
-                            </p>
+                            <p class="mb-0" v-if="!token && email">{{ $t(hasValidEmailVerifyToken ? 'format.misc.accountActivationAndResendValidationEmailTip' : 'format.misc.resendValidationEmailTip', { email: email }) }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">

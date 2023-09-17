@@ -162,6 +162,15 @@
                 </div>
             </f7-page-content>
         </f7-sheet>
+
+        <password-input-sheet :title="$t('Verify your email')"
+                              :hint="$t(hasValidEmailVerifyToken ? 'format.misc.accountActivationAndResendValidationEmailTip' : 'format.misc.resendValidationEmailTip', { email: resendVerifyEmail })"
+                              :confirm-disabled="requestingResendVerifyEmail"
+                              :cancel-disabled="requestingResendVerifyEmail"
+                              v-model:show="showVerifyEmailSheet"
+                              v-model="currentPasswordForResendVerifyEmail"
+                              @password:confirm="requestResendVerifyEmail">
+        </password-input-sheet>
     </f7-page>
 </template>
 
@@ -172,7 +181,11 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
-import { isUserRegistrationEnabled, isUserForgetPasswordEnabled } from '@/lib/server_settings.js';
+import {
+    isUserRegistrationEnabled,
+    isUserForgetPasswordEnabled,
+    isUserVerifyEmailEnabled
+} from '@/lib/server_settings.js';
 import { getDesktopVersionPath } from '@/lib/version.js';
 import { isModalShowing } from '@/lib/ui.mobile.js';
 
@@ -188,11 +201,16 @@ export default {
             backupCode: '',
             tempToken: '',
             forgetPasswordEmail: '',
+            resendVerifyEmail: '',
+            hasValidEmailVerifyToken: false,
+            currentPasswordForResendVerifyEmail: '',
             logining: false,
             verifying: false,
             requestingForgetPassword: false,
+            requestingResendVerifyEmail: false,
             show2faSheet: false,
             showForgetPasswordSheet: false,
+            showVerifyEmailSheet: false,
             twoFAVerifyType: 'passcode'
         };
     },
@@ -238,6 +256,9 @@ export default {
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();
+        },
+        isUserVerifyEmailEnabled() {
+            return isUserVerifyEmailEnabled();
         }
     },
     methods: {
@@ -261,6 +282,9 @@ export default {
             }
 
             self.logining = true;
+            self.resendVerifyEmail = '';
+            self.hasValidEmailVerifyToken = false;
+            self.currentPasswordForResendVerifyEmail = '';
             self.$showLoading(() => self.logining);
 
             self.rootStore.authorize({
@@ -289,6 +313,14 @@ export default {
             }).catch(error => {
                 self.logining = false;
                 self.$hideLoading();
+
+                if (self.isUserVerifyEmailEnabled && error.error && error.error.errorCode === 201020 && error.error.context && error.error.context.email) {
+                    self.resendVerifyEmail = error.error.context.email;
+                    self.hasValidEmailVerifyToken = error.error.context.hasValidEmailVerifyToken || false;
+                    self.currentPasswordForResendVerifyEmail = '';
+                    self.showVerifyEmailSheet = true;
+                    return;
+                }
 
                 if (!error.processed) {
                     self.$toast(error.message || error);
@@ -369,6 +401,35 @@ export default {
                 self.$toast('Password reset email has been sent');
             }).catch(error => {
                 self.requestingForgetPassword = false;
+                self.$hideLoading();
+
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
+        },
+        requestResendVerifyEmail() {
+            const self = this;
+
+            if (!self.currentPasswordForResendVerifyEmail) {
+                self.$toast('Current password cannot be empty');
+                return;
+            }
+
+            self.requestingResendVerifyEmail = true;
+            self.$showLoading(() => self.requestingResendVerifyEmail);
+
+            self.rootStore.resendVerifyEmailByUnloginUser({
+                email: self.resendVerifyEmail,
+                password: self.currentPasswordForResendVerifyEmail
+            }).then(() => {
+                self.requestingResendVerifyEmail = false;
+                self.$hideLoading();
+
+                self.$toast('Validation email has been sent');
+                self.showVerifyEmailSheet = false;
+            }).catch(error => {
+                self.requestingResendVerifyEmail = false;
                 self.$hideLoading();
 
                 if (!error.processed) {

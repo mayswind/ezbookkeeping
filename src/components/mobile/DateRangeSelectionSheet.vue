@@ -26,7 +26,7 @@
                                  :day-names="dayNames"
                                  :is24="is24Hour"
                                  :partial-range="false"
-                                 :preset-ranges="presetRanges"
+                                 :preset-dates="presetRanges"
                                  v-model="dateRange">
                     <template #month="{ text }">
                         {{ getMonthShortName(text) }}
@@ -144,7 +144,7 @@ export default {
 
                 presetRanges.push({
                     label: this.$t(dateRangeType.name),
-                    range: [
+                    value: [
                         getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.minTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),
                         getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(dateRange.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
                     ]
@@ -164,6 +164,7 @@ export default {
                 this.dateRange[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(this.maxTime, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
             }
 
+            window.dispatchEvent(new Event('resize')); // fix vue-datepicker preset max-width
             this.$refs.datetimepicker.switchView('calendar');
         },
         onSheetClosed() {

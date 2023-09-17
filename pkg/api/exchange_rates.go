@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/tls"
 	"io"
 	"net/http"
 	"sort"
@@ -32,8 +33,17 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (interface
 
 	uid := c.GetCurrentUid()
 
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+
+	if settings.Container.Current.ExchangeRatesSkipTLSVerify {
+		transport.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+
 	client := &http.Client{
-		Timeout: time.Duration(settings.Container.Current.ExchangeRatesRequestTimeout) * time.Millisecond,
+		Transport: transport,
+		Timeout:   time.Duration(settings.Container.Current.ExchangeRatesRequestTimeout) * time.Millisecond,
 	}
 
 	urls := dataSource.GetRequestUrls()

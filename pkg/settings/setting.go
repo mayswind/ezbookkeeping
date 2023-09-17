@@ -232,6 +232,7 @@ type Config struct {
 	// Exchange Rates
 	ExchangeRatesDataSource     string
 	ExchangeRatesRequestTimeout uint32
+	ExchangeRatesSkipTLSVerify  bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -590,6 +591,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 	}
 
 	config.ExchangeRatesRequestTimeout = getConfigItemUint32Value(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
+	config.ExchangeRatesSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "skip_tls_verify", false)
 
 	return nil
 }

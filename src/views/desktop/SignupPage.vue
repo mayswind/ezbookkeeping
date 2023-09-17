@@ -482,6 +482,7 @@ export default {
                     self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
                 } else {
                     self.$refs.snackbar.showMessage('You have been successfully registered');
+                    self.$router.replace('/');
                 }
 
                 self.navigateToHomePage = true;

@@ -182,6 +182,17 @@ func (s *TokenService) DeleteTokensByType(c *core.Context, uid int64, tokenType 
 	})
 }
 
+// ExistsValidTokenByType returns whether the given token type exists
+func (s *TokenService) ExistsValidTokenByType(c *core.Context, uid int64, tokenType core.TokenType) (bool, error) {
+	if uid <= 0 {
+		return false, errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	return s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, tokenType, now).Exist(&models.TokenRecord{})
+}
+
 // ParseFromTokenId returns token model according to token id
 func (s *TokenService) ParseFromTokenId(tokenId string) (*models.TokenRecord, error) {
 	pairs := strings.Split(tokenId, ":")

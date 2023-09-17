@@ -28,9 +28,11 @@
                             <p class="mb-0" v-if="token && !verified && errorMessage">{{ errorMessage }}</p>
                             <p class="mb-0" v-if="!token && !email">{{ $t('Parameter Invalid') }}</p>
                             <p class="mb-0" v-if="!token && email">
-                                <span>{{ $t('Account activation link has been sent to your email address:') }}</span>
-                                <span class="ml-1">{{ email }}</span>
-                                <span class="ml-1">{{ $t(', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.') }}</span>
+                                <span v-if="hasValidEmailVerifyToken">{{ $t('Account activation link has been sent to your email address:') }}</span>
+                                <span class="ml-1" v-if="hasValidEmailVerifyToken">{{ email }}</span>
+                                <span class="ml-1" v-if="hasValidEmailVerifyToken">{{ $t(', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.') }}</span>
+                                <span v-if="!hasValidEmailVerifyToken">{{ $t('If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:') }}</span>
+                                <span class="ml-1" v-if="!hasValidEmailVerifyToken">{{ email }}</span>
                             </p>
                         </v-card-text>
 
@@ -135,7 +137,8 @@ import {
 export default {
     props: [
         'email',
-        'token'
+        'token',
+        'hasValidEmailVerifyToken'
     ],
     data() {
         return {

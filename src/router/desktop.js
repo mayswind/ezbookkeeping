@@ -165,7 +165,8 @@ const router = createRouter({
             component: VerifyEmailPage,
             props: route => ({
                 email: route.query.email,
-                token: route.query.token
+                token: route.query.token,
+                hasValidEmailVerifyToken: route.query.emailSent === 'true'
             })
         },
         {

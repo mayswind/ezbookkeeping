@@ -856,6 +856,7 @@ export default {
     'Verifying...': 'Verifying...',
     'Account activation link has been sent to your email address:': 'Account activation link has been sent to your email address:',
     ', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.': ', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.',
+    'If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:': 'If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:',
     'Resend Validation Email': 'Resend Validation Email',
     'Validation email has been sent': 'Validation email has been sent',
     'Unable to verify email': 'Unable to verify email',

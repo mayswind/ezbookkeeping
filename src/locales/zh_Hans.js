@@ -856,6 +856,7 @@ export default {
     'Verifying...': '正在验证...',
     'Account activation link has been sent to your email address:': '账号激活链接已经发送到您的邮箱地址：',
     ', If you don\'t receive the mail, fill password and click the button below to resend the verify mail.': '，如果您没有收到邮件，输入密码并点击下方的按钮重新发送验证邮件。',
+    'If you don\'t receive the mail, fill password and click the button below to resend the verify mail to:': '如果您没有收到邮件，输入密码并点击下方的按钮重新发送验证邮件到：',
     'Resend Validation Email': '重发验证邮件',
     'Validation email has been sent': '验证邮件已发送',
     'Unable to verify email': '无法验证邮箱',

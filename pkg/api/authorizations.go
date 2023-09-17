@@ -50,9 +50,18 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (interface{}, *err
 	}
 
 	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+		hasValidEmailVerifyToken, err := a.tokens.ExistsValidTokenByType(c, user.Uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[authorizations.AuthorizeHandler] failed check whether user \"uid:%d\" has valid verify email token, because %s", user.Uid, err.Error())
+			hasValidEmailVerifyToken = false
+		}
+
 		log.WarnfWithRequestId(c, "[authorizations.AuthorizeHandler] login failed for user \"%s\", because user has not verified email", credential.LoginName)
-		return nil, errs.NewErrorWithContext(errs.ErrEmailIsNotVerified, map[string]string{
-			"email": user.Email,
+
+		return nil, errs.NewErrorWithContext(errs.ErrEmailIsNotVerified, map[string]any{
+			"email":                    user.Email,
+			"hasValidEmailVerifyToken": hasValidEmailVerifyToken,
 		})
 	}
 

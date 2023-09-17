@@ -159,6 +159,9 @@
                         ></f7-list-input>
                     </f7-list>
                     <f7-button large fill :class="{ 'disabled': !forgetPasswordEmail || requestingForgetPassword }" :text="$t('Send Reset Link')" @click="requestResetPassword"></f7-button>
+                    <div class="margin-top text-align-center">
+                        <f7-link :class="{ 'disabled': requestingForgetPassword }" @click="showForgetPasswordSheet = false" :text="$t('Cancel')"></f7-link>
+                    </div>
                 </div>
             </f7-page-content>
         </f7-sheet>

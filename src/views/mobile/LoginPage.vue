@@ -402,6 +402,7 @@ export default {
                 self.$hideLoading();
 
                 self.$toast('Password reset email has been sent');
+                self.showForgetPasswordSheet = false;
             }).catch(error => {
                 self.requestingForgetPassword = false;
                 self.$hideLoading();

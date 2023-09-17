@@ -36,7 +36,7 @@
                 </template>
                 <template #after>
                     <small>
-                        <f7-link :class="{'disabled': !isUserForgetPasswordEnabled}" @click="showForgetPasswordSheet = true">{{ $t('Forget Password?') }}</f7-link>
+                        <f7-link :class="{'disabled': !isUserForgetPasswordEnabled}" @click="forgetPasswordEmail = ''; showForgetPasswordSheet = true">{{ $t('Forget Password?') }}</f7-link>
                     </small>
                 </template>
             </f7-list-item>

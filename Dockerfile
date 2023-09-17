@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.20.7-alpine3.17 AS be-builder
+FROM golang:1.20.8-alpine3.17 AS be-builder
 ARG RELEASE_BUILD
 ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping

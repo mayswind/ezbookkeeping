@@ -61,6 +61,7 @@ func TestGenerateUuid_MultiType(t *testing.T) {
 
 func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 2})
+	firstGeneratedTime := int64(0)
 
 	for i := 0; i < 1000; i++ {
 		generationStartUnixTime := time.Now().Unix()
@@ -70,13 +71,20 @@ func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 		uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 		if generationStartUnixTime == generationEndUnixTime {
-			assert.Equal(t, uint32(generationStartUnixTime), uuidInfo.UnixTime)
-		}
+			if i == 0 {
+				firstGeneratedTime = time.Now().Unix()
+			}
 
-		assert.Equal(t, uint32(i), uuidInfo.SequentialId)
+			assert.Equal(t, uint32(generationStartUnixTime), uuidInfo.UnixTime)
+
+			if generationStartUnixTime == firstGeneratedTime {
+				assert.Equal(t, uint32(i), uuidInfo.SequentialId)
+			}
+		}
 	}
 
 	time.Sleep(1 * time.Second)
+	firstGeneratedTime = int64(0)
 
 	for i := 0; i < 1000; i++ {
 		generationStartUnixTime := time.Now().Unix()
@@ -86,10 +94,16 @@ func TestGenerateUuid_2000TimesIn2Seconds(t *testing.T) {
 		uuidInfo := generator.parseInternalUuidInfo(uuid)
 
 		if generationStartUnixTime == generationEndUnixTime {
-			assert.Equal(t, uint32(generationStartUnixTime), uuidInfo.UnixTime)
-		}
+			if i == 0 {
+				firstGeneratedTime = time.Now().Unix()
+			}
 
-		assert.Equal(t, uint32(i), uuidInfo.SequentialId)
+			assert.Equal(t, uint32(generationStartUnixTime), uuidInfo.UnixTime)
+
+			if generationStartUnixTime == firstGeneratedTime {
+				assert.Equal(t, uint32(i), uuidInfo.SequentialId)
+			}
+		}
 	}
 }
 

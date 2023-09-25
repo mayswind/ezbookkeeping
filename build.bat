@@ -89,7 +89,7 @@ goto :pre_parse_args
 
 :post_parse_args
     if "%RELEASE%"=="" set "RELEASE=0"
-    
+
     if "%RELEASE%"=="0" (
         set "RELEASE_TYPE=snapshot"
     ) else (
@@ -122,6 +122,7 @@ goto :pre_parse_args
     goto :end
 
 :build_backend
+    setlocal enabledelayedexpansion
     echo Pulling backend dependencies...
     call go get .
 
@@ -129,7 +130,7 @@ goto :pre_parse_args
         echo Executing backend lint checking...
         call go vet -v .\...
 
-        if not "%errorlevel%"=="0" (
+        if !errorlevel! neq 0 (
             call :echo_red "Error: Failed to pass lint checking"
             goto :end
         )
@@ -140,11 +141,13 @@ goto :pre_parse_args
         call go clean -cache
         call go test .\... -v
 
-        if not "%errorlevel%"=="0" (
+        if !errorlevel! neq 0 (
             call :echo_red "Error: Failed to pass unit testing"
             goto :end
         )
     )
+
+    endlocal
 
     set "CGO_ENABLED=1"
 
@@ -166,6 +169,7 @@ goto :pre_parse_args
     goto :eof
 
 :build_frontend
+    setlocal enabledelayedexpansion
     echo Pulling frontend dependencies...
     call npm install
 
@@ -174,11 +178,13 @@ goto :pre_parse_args
 
         call npm run lint
 
-        if not "%errorlevel%"=="0" (
+        if !errorlevel! neq 0 (
             call :echo_red "Error: Failed to pass lint checking"
             goto :end
         )
     )
+
+    endlocal
 
     echo Building frontend files(%RELEASE_TYPE%)...
 
@@ -193,7 +199,7 @@ goto :pre_parse_args
     goto :eof
 
 :build_package
-    setlocal
+    setlocal enabledelayedexpansion
     set "package_file_name=%VERSION%"
 
     if "%RELEASE%"=="0" (
@@ -221,7 +227,7 @@ goto :pre_parse_args
 
     cd package
 
-    if not "%errorlevel%"=="0" (
+    if !errorlevel! neq 0 (
         call :echo_red "Error: Build Failed"
         goto :end
     )

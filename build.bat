@@ -209,7 +209,7 @@ goto :pre_parse_args
 
     set "package_file_name=ezbookkeeping-%package_file_name%-windows.zip"
 
-    if defined PACKAGE_FILENAME set set "package_file_name=%PACKAGE_FILENAME%"
+    if defined PACKAGE_FILENAME set "package_file_name=%PACKAGE_FILENAME%"
 
     echo Building package archive "%package_file_name%" (%RELEASE_TYPE%)...
 

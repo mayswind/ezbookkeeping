@@ -223,6 +223,7 @@ goto :pre_parse_args
     xcopy ezbookkeeping.exe package\
     xcopy dist package\public /e /i
     xcopy conf package\conf /e /i
+    xcopy templates package\templates /e /i
     xcopy LICENSE package\
 
     cd package

@@ -206,6 +206,7 @@ build_package() {
     cp ezbookkeeping package/
     cp -R dist package/public
     cp -R conf package/conf
+    cp -R templates package/templates
     cp LICENSE package/
 
     cd package || { echo_red "Error: Build Failed"; exit 1; }

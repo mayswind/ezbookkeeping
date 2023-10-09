@@ -78,16 +78,13 @@ export default defineConfig(async () => {
                         'mobile.html',
                         'desktop.html',
                         'robots.txt',
-                        'img/splash_screens/*',
                         'img/desktop/*',
                         'fonts/*.eot',
                         'fonts/*.ttf',
                         'fonts/*.svg',
                         'fonts/*.woff',
-                        'css/vendor-desktop-*.css',
-                        'css/desktop-*.css',
-                        'js/vendor-desktop-*.js',
-                        'js/desktop-*.js'
+                        'css/*.css',
+                        'js/*.js'
                     ],
                     runtimeCaching: [
                         {
@@ -107,7 +104,7 @@ export default defineConfig(async () => {
                             handler: 'NetworkFirst'
                         },
                         {
-                            urlPattern: /.*\/img\/(splash_screens|desktop)\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
+                            urlPattern: /.*\/img\/desktop\/.*\.(png|jpg|jpeg|gif|tiff|bmp|svg)/,
                             handler: 'StaleWhileRevalidate'
                         },
                         {
@@ -115,11 +112,11 @@ export default defineConfig(async () => {
                             handler: 'CacheFirst'
                         },
                         {
-                            urlPattern: /.*\/css\/(vendor-desktop-\.*|desktop-\.*)\.css/,
+                            urlPattern: /.*\/css\/.*\.css/,
                             handler: 'CacheFirst'
                         },
                         {
-                            urlPattern: /.*\/js\/(vendor-desktop-\.*|desktop-\.*)\.js/,
+                            urlPattern: /.*\/js\/.*\.js/,
                             handler: 'CacheFirst'
                         }
                     ],

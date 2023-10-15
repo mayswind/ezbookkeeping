@@ -10,10 +10,10 @@
                 <div class="text-body-1 text-center text-wrap mt-6">
                     <p v-if="hint">{{ hint }}</p>
                     <span v-if="beginDateTime && endDateTime">
-                    <span>{{ beginDateTime }}</span>
-                    <span> - </span>
-                    <span>{{ endDateTime }}</span>
-                </span>
+                        <span>{{ beginDateTime }}</span>
+                        <span> - </span>
+                        <span>{{ endDateTime }}</span>
+                    </span>
                     <slot></slot>
                 </div>
             </template>

@@ -114,25 +114,25 @@
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.6/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.7/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.2.4/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.2.5/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.2.2/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.5.0/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.16/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.21/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -198,13 +198,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v6.1.0/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v7.2.0/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.4.0/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.5.1/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -256,9 +256,9 @@
     },
     {
         "name": "UAParser.js",
-        "copyright": "Copyright (c) 2012-2021 Faisal Salman <f@faisalman.com>",
+        "copyright": "Copyright (c) 2012-2023 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
-        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.35/license.md"
+        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.36/license.md"
     },
     {
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",

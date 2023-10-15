@@ -257,6 +257,10 @@ input[type=number] {
     flex-direction: column
 }
 
+.dp__main .dp--tp-wrap {
+    max-width: 100%;
+}
+
 .dp__main .dp__preset_range {
     white-space: inherit;
 }

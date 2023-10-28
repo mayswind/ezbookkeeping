@@ -53,6 +53,25 @@ export function isMapDataFetchProxyEnabled() {
     return getServerSetting('mp') === '1';
 }
 
+export function getCustomMapTileServerUrl() {
+    return getServerDecodedSetting('cmsu');
+}
+
+export function getCustomMapMinZoomLevel() {
+    const zoomLevelSettings = (getServerSetting('cmzl') || '').split('-');
+    return (zoomLevelSettings && zoomLevelSettings[0]) ? parseInt(zoomLevelSettings[0]) : 1;
+}
+
+export function getCustomMapMaxZoomLevel() {
+    const zoomLevelSettings = (getServerSetting('cmzl') || '').split('-');
+    return (zoomLevelSettings && zoomLevelSettings[1]) ? parseInt(zoomLevelSettings[1]) : 18;
+}
+
+export function getCustomMapDefaultZoomLevel() {
+    const zoomLevelSettings = (getServerSetting('cmzl') || '').split('-');
+    return (zoomLevelSettings && zoomLevelSettings[2]) ? parseInt(zoomLevelSettings[2]) : 14;
+}
+
 export function getTomTomMapAPIKey() {
     return getServerDecodedSetting('tmak');
 }

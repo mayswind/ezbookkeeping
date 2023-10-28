@@ -1,5 +1,12 @@
 import mapConstants from '@/consts/map.js';
-import { isMapDataFetchProxyEnabled, getTomTomMapAPIKey } from '@/lib/server_settings.js';
+import {
+    isMapDataFetchProxyEnabled,
+    getCustomMapTileServerUrl,
+    getCustomMapMinZoomLevel,
+    getCustomMapMaxZoomLevel,
+    getCustomMapDefaultZoomLevel,
+    getTomTomMapAPIKey
+} from '@/lib/server_settings.js';
 import services from '@/lib/services.js';
 
 const leafletHolder = {
@@ -16,7 +23,7 @@ export function loadLeafletMapAssets() {
 export function createLeafletMapHolder(mapProvider) {
     const mapTileSource = mapConstants.leafletTileSources[mapProvider];
 
-    if (!mapTileSource) {
+    if (mapProvider !== 'custom' && !mapTileSource) {
         return null;
     }
 
@@ -24,8 +31,8 @@ export function createLeafletMapHolder(mapProvider) {
         mapProvider: mapProvider,
         dependencyLoaded: !!leafletHolder.leaflet,
         inited: false,
-        defaultZoomLevel: mapTileSource.defaultZoomLevel,
-        minZoomLevel: mapTileSource.minZoom,
+        defaultZoomLevel: mapProvider !== 'custom' ? mapTileSource.defaultZoomLevel : getCustomMapDefaultZoomLevel(),
+        minZoomLevel: mapProvider !== 'custom' ? mapTileSource.minZoom : getCustomMapMinZoomLevel(),
         leafletInstance: null,
         leafletTileLayer: null,
         leafletZoomControl: null,
@@ -46,7 +53,13 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
         attributionControl: false,
         zoomControl: false
     });
-    let mapTileSource = Object.assign({}, mapConstants.leafletTileSources[mapHolder.mapProvider]);
+    let mapTileSource = null;
+
+    if (mapHolder.mapProvider !== 'custom') {
+        mapTileSource = Object.assign({}, mapConstants.leafletTileSources[mapHolder.mapProvider]);
+    } else {
+        mapTileSource = createCustomMapSource();
+    }
 
     if (isMapDataFetchProxyEnabled()) {
         mapTileSource.tileUrlFormat = services.generateMapProxyTileImageUrl(mapHolder.mapProvider, options.language);
@@ -136,4 +149,14 @@ export function removeLeafletMapCenterMaker(mapHolder) {
 
     mapHolder.leafletCenterMarker.remove();
     mapHolder.leafletCenterMarker = null;
+}
+
+function createCustomMapSource() {
+    return {
+        tileUrlFormat: getCustomMapTileServerUrl(),
+        tileUrlSubDomains: '',
+        minZoom: getCustomMapMinZoomLevel(),
+        maxZoom: getCustomMapMaxZoomLevel(),
+        defaultZoomLevel: getCustomMapDefaultZoomLevel()
+    };
 }

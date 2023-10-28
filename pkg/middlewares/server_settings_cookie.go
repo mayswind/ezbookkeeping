@@ -29,8 +29,17 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 				config.MapProvider == settings.OpenTopoMapProvider ||
 				config.MapProvider == settings.OPNVKarteMapProvider ||
 				config.MapProvider == settings.CyclOSMMapProvider ||
-				config.MapProvider == settings.TomTomMapProvider) {
+				config.MapProvider == settings.TomTomMapProvider ||
+				config.MapProvider == settings.CustomProvider) {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
+		}
+
+		if config.MapProvider == settings.CustomProvider {
+			settingsArr = append(settingsArr, buildStringSetting("cmzl", fmt.Sprintf("%d-%d-%d", config.CustomMapTileServerMinZoomLevel, config.CustomMapTileServerMaxZoomLevel, config.CustomMapTileServerDefaultZoomLevel)))
+
+			if !config.EnableMapDataFetchProxy {
+				settingsArr = append(settingsArr, buildEncodedStringSetting("cmsu", config.CustomMapTileServerUrl))
+			}
 		}
 
 		if config.MapProvider == settings.TomTomMapProvider && config.TomTomMapAPIKey != "" && !config.EnableMapDataFetchProxy {

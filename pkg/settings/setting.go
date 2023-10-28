@@ -78,6 +78,7 @@ const (
 	TomTomMapProvider                      string = "tomtom"
 	BaiduMapProvider                       string = "baidumap"
 	AmapProvider                           string = "amap"
+	CustomProvider                         string = "custom"
 )
 
 // Amap security verification method
@@ -219,15 +220,19 @@ type Config struct {
 	EnableDataExport bool
 
 	// Map
-	MapProvider                    string
-	TomTomMapAPIKey                string
-	GoogleMapAPIKey                string
-	BaiduMapAK                     string
-	AmapApplicationKey             string
-	AmapSecurityVerificationMethod string
-	AmapApplicationSecret          string
-	AmapApiExternalProxyUrl        string
-	EnableMapDataFetchProxy        bool
+	MapProvider                         string
+	TomTomMapAPIKey                     string
+	GoogleMapAPIKey                     string
+	BaiduMapAK                          string
+	AmapApplicationKey                  string
+	AmapSecurityVerificationMethod      string
+	AmapApplicationSecret               string
+	AmapApiExternalProxyUrl             string
+	CustomMapTileServerUrl              string
+	CustomMapTileServerMinZoomLevel     uint8
+	CustomMapTileServerMaxZoomLevel     uint8
+	CustomMapTileServerDefaultZoomLevel uint8
+	EnableMapDataFetchProxy             bool
 
 	// Exchange Rates
 	ExchangeRatesDataSource     string
@@ -544,6 +549,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = BaiduMapProvider
 	} else if mapProvider == AmapProvider {
 		config.MapProvider = AmapProvider
+	} else if mapProvider == CustomProvider {
+		config.MapProvider = CustomProvider
 	} else {
 		return errs.ErrInvalidMapProvider
 	}
@@ -568,6 +575,11 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 
 	config.AmapApplicationSecret = getConfigItemStringValue(configFile, sectionName, "amap_application_secret")
 	config.AmapApiExternalProxyUrl = getConfigItemStringValue(configFile, sectionName, "amap_api_external_proxy_url")
+
+	config.CustomMapTileServerUrl = getConfigItemStringValue(configFile, sectionName, "custom_map_tile_server_url")
+	config.CustomMapTileServerMinZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_min_zoom_level", 1)
+	config.CustomMapTileServerMaxZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_max_zoom_level", 18)
+	config.CustomMapTileServerDefaultZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_default_zoom_level", 14)
 
 	return nil
 }

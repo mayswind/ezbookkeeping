@@ -40,7 +40,7 @@ import {
 } from './amap.js';
 
 export function loadMapAssets(language) {
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         return loadLeafletMapAssets(language);
     } else if (getMapProvider() === 'googlemap') {
         return loadGoogleMapAssets(language);
@@ -52,7 +52,7 @@ export function loadMapAssets(language) {
 }
 
 export function createMapHolder() {
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         return createLeafletMapHolder(getMapProvider());
     } else if (getMapProvider() === 'googlemap') {
         return createGoogleMapHolder(getMapProvider());
@@ -70,7 +70,7 @@ export function initMapInstance(mapHolder, mapContainer, options) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         createLeafletMapInstance(mapHolder, mapContainer, options);
     } else if (mapHolder.mapProvider === 'googlemap') {
         createGoogleMapInstance(mapHolder, mapContainer, options);
@@ -86,7 +86,7 @@ export function setMapCenterTo(mapHolder, center, zoomLevel) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         setLeafletMapCenterTo(mapHolder, center, zoomLevel);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterTo(mapHolder, center, zoomLevel);
@@ -102,7 +102,7 @@ export function setMapCenterMarker(mapHolder, position) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         setLeafletMapCenterMaker(mapHolder, position);
     } else if (mapHolder.mapProvider === 'googlemap') {
         setGoogleMapCenterMaker(mapHolder, position);
@@ -118,7 +118,7 @@ export function removeMapCenterMarker(mapHolder) {
         return;
     }
 
-    if (mapConstants.leafletTileSources[getMapProvider()]) {
+    if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {
         removeLeafletMapCenterMaker(mapHolder);
     } else if (mapHolder.mapProvider === 'googlemap') {
         removeGoogleMapCenterMaker(mapHolder);

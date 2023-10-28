@@ -50,6 +50,8 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		if language != "" {
 			targetUrl = targetUrl + "&language=" + language
 		}
+	} else if mapProvider == settings.CustomProvider {
+		targetUrl = settings.Container.Current.CustomMapTileServerUrl
 	} else {
 		return nil, errs.ErrParameterInvalid
 	}

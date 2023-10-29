@@ -84,7 +84,8 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
 
     const tileLayer = leaflet.tileLayer(mapTileSource.tileUrlFormat, {
         subdomains: mapTileSource.tileUrlSubDomains,
-        maxZoom: mapTileSource.maxZoom
+        maxZoom: mapTileSource.maxZoom,
+        minZoom: mapTileSource.minZoom
     });
     tileLayer.addTo(leafletInstance);
 

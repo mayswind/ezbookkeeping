@@ -45,7 +45,7 @@
     "vue-router": "^4.2.5",
     "vue3-perfect-scrollbar": "^1.6.1",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.3.21"
+    "vuetify": "^3.3.23"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.1",

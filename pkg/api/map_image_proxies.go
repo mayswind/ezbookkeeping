@@ -32,6 +32,10 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 	mapProvider := strings.Replace(c.Query("provider"), "-", "_", -1)
 	targetUrl := ""
 
+	if mapProvider != settings.Container.Current.MapProvider {
+		return nil, errs.ErrMapProviderNotCurrent
+	}
+
 	if mapProvider == settings.OpenStreetMapProvider {
 		targetUrl = openStreetMapTileImageUrlFormat
 	} else if mapProvider == settings.OpenStreetMapHumanitarianStyleProvider {

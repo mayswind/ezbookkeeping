@@ -36,6 +36,16 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		return nil, errs.ErrMapProviderNotCurrent
 	}
 
+	zoomLevel := c.Param("zoomLevel")
+	coordinateX := c.Param("coordinateX")
+	fileName := c.Param("fileName")
+	fileNameParts := strings.Split(fileName, ".")
+	coordinateY := fileNameParts[0]
+
+	if len(fileNameParts) != 2 || fileNameParts[len(fileNameParts)-1] != "png" {
+		return nil, errs.ErrImageExtensionNotSupported
+	}
+
 	if mapProvider == settings.OpenStreetMapProvider {
 		targetUrl = openStreetMapTileImageUrlFormat
 	} else if mapProvider == settings.OpenStreetMapHumanitarianStyleProvider {
@@ -60,11 +70,6 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 	}
 
 	director := func(req *http.Request) {
-		zoomLevel := c.Param("zoomLevel")
-		coordinateX := c.Param("coordinateX")
-		fileName := c.Param("fileName")
-		coordinateY := strings.Split(fileName, ".")[0]
-
 		imageRawUrl := targetUrl
 		imageRawUrl = strings.Replace(imageRawUrl, "{z}", zoomLevel, -1)
 		imageRawUrl = strings.Replace(imageRawUrl, "{x}", coordinateX, -1)

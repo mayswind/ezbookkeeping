@@ -20,6 +20,7 @@ const pageCountForDataExport = 1000
 // UserDataCli represents user data cli
 type UserDataCli struct {
 	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
+	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
 	accounts                 *services.AccountService
 	transactions             *services.TransactionService
 	categories               *services.TransactionCategoryService
@@ -34,6 +35,7 @@ type UserDataCli struct {
 var (
 	UserData = &UserDataCli{
 		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
+		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
 		accounts:                 services.Accounts,
 		transactions:             services.Transactions,
 		categories:               services.TransactionCategories,
@@ -537,7 +539,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 }
 
 // ExportTransaction returns csv file content according user all transactions
-func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte, error) {
+func (l *UserDataCli) ExportTransaction(c *cli.Context, username string, fileType string) ([]byte, error) {
 	if username == "" {
 		log.BootErrorf("[user_data.ExportTransaction] user name is empty")
 		return nil, errs.ErrUsernameIsEmpty
@@ -564,7 +566,15 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string) ([]byte
 		return nil, err
 	}
 
-	result, err := l.ezBookKeepingCsvExporter.ToExportedContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	var dataExporter converters.DataConverter
+
+	if fileType == "tsv" {
+		dataExporter = l.ezBookKeepingTsvExporter
+	} else {
+		dataExporter = l.ezBookKeepingCsvExporter
+	}
+
+	result, err := dataExporter.ToExportedContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())

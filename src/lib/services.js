@@ -214,8 +214,14 @@ export default {
     getUserDataStatistics: () => {
         return axios.get('v1/data/statistics.json');
     },
-    getExportedUserData: () => {
-        return axios.get('v1/data/export.csv');
+    getExportedUserData: (fileType) => {
+        if (fileType === 'csv') {
+            return axios.get('v1/data/export.csv');
+        } else if (fileType === 'tsv') {
+            return axios.get('v1/data/export.tsv');
+        } else {
+            return Promise.reject('Parameter Invalid');
+        }
     },
     clearData: ({ password }) => {
         return axios.post('v1/data/clear.json', {

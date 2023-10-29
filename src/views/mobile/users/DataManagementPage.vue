@@ -30,7 +30,19 @@
             <div class="swipe-handler" style="z-index: 10"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all data to csv file?') }}</b></div>
+                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all data to file?') }}</b></div>
+                </div>
+                <div class="padding-bottom padding-horizontal">
+                    <f7-list class="export-file-type-list no-margin" dividers>
+                        <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
+                                      :title="$t('Export Data To CSV File')"
+                                      :checked="exportFileType === 'csv'" @change="exportFileType = 'csv'">
+                        </f7-list-item>
+                        <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
+                                      :title="$t('Export Data To TSV File')"
+                                      :checked="exportFileType === 'tsv'" @change="exportFileType = 'tsv'">
+                        </f7-list-item>
+                    </f7-list>
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin-top margin-bottom-half">{{ $t('It may take a long time, please wait for a few minutes.') }}</p>
@@ -73,6 +85,7 @@ export default {
             loading: true,
             loadingError: null,
             dataStatistics: null,
+            exportFileType: 'csv',
             exportingData: false,
             exportedData: null,
             currentPasswordForClearData: '',
@@ -109,10 +122,10 @@ export default {
             if (nickname) {
                 return this.$t('dataExport.exportFilename', {
                     nickname: nickname
-                }) + '.csv';
+                }) + '.' + this.exportFileType;
             }
 
-            return this.$t('dataExport.defaultExportFilename') + '.csv';
+            return this.$t('dataExport.defaultExportFilename') + '.' + this.exportFileType;
         },
     },
     created() {
@@ -142,7 +155,7 @@ export default {
             self.$showLoading();
             self.exportingData = true;
 
-            self.userStore.getExportedUserData().then(data => {
+            self.userStore.getExportedUserData(self.exportFileType).then(data => {
                 self.exportedData = URL.createObjectURL(data);
                 self.exportingData = false;
                 self.$hideLoading();
@@ -202,3 +215,9 @@ export default {
     }
 };
 </script>
+
+<style>
+.export-file-type-list.list > ul > li > .item-content {
+    padding-left: 0;
+}
+</style>

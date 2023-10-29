@@ -9,4 +9,5 @@ var (
 	ErrMethodNotAllowed = NewSystemError(SystemSubcategoryDefault, 2, http.StatusMethodNotAllowed, "method not allowed")
 	ErrNotImplemented   = NewSystemError(SystemSubcategoryDefault, 3, http.StatusNotImplemented, "not implemented")
 	ErrSystemIsBusy     = NewSystemError(SystemSubcategoryDefault, 4, http.StatusNotImplemented, "system is busy")
+	ErrNotSupported     = NewSystemError(SystemSubcategoryDefault, 5, http.StatusBadRequest, "not supported")
 )

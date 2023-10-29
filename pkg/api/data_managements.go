@@ -19,103 +19,38 @@ const pageCountForDataExport = 1000
 
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
-	exporter     *converters.EzBookKeepingCSVFileExporter
-	tokens       *services.TokenService
-	users        *services.UserService
-	accounts     *services.AccountService
-	transactions *services.TransactionService
-	categories   *services.TransactionCategoryService
-	tags         *services.TransactionTagService
+	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
+	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
+	tokens                   *services.TokenService
+	users                    *services.UserService
+	accounts                 *services.AccountService
+	transactions             *services.TransactionService
+	categories               *services.TransactionCategoryService
+	tags                     *services.TransactionTagService
 }
 
 // Initialize a data management api singleton instance
 var (
 	DataManagements = &DataManagementsApi{
-		exporter:     &converters.EzBookKeepingCSVFileExporter{},
-		tokens:       services.Tokens,
-		users:        services.Users,
-		accounts:     services.Accounts,
-		transactions: services.Transactions,
-		categories:   services.TransactionCategories,
-		tags:         services.TransactionTags,
+		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
+		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
+		tokens:                   services.Tokens,
+		users:                    services.Users,
+		accounts:                 services.Accounts,
+		transactions:             services.Transactions,
+		categories:               services.TransactionCategories,
+		tags:                     services.TransactionTags,
 	}
 )
 
-// ExportDataHandler returns exported data in csv format
-func (a *DataManagementsApi) ExportDataHandler(c *core.Context) ([]byte, string, *errs.Error) {
-	if !settings.Container.Current.EnableDataExport {
-		return nil, "", errs.ErrDataExportNotAllowed
-	}
+// ExportDataToEzbookkeepingCSVHandler returns exported data in csv format
+func (a *DataManagementsApi) ExportDataToEzbookkeepingCSVHandler(c *core.Context) ([]byte, string, *errs.Error) {
+	return a.getExportedFileContent(c, "csv")
+}
 
-	timezone := time.Local
-	utcOffset, err := c.GetClientTimezoneOffset()
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
-	} else {
-		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
-	}
-
-	uid := c.GetCurrentUid()
-	user, err := a.users.GetUserById(c, uid)
-
-	if err != nil {
-		if !errs.IsCustomError(err) {
-			log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
-		}
-
-		return nil, "", errs.ErrUserNotFound
-	}
-
-	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	categories, err := a.categories.GetAllCategoriesByUid(c, uid, 0, -1)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	tags, err := a.tags.GetAllTagsByUid(c, uid)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	tagIndexs, err := a.tags.GetAllTagIdsOfAllTransactions(c, uid)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	accountMap := a.accounts.GetAccountMapByList(accounts)
-	categoryMap := a.categories.GetCategoryMapByList(categories)
-	tagMap := a.tags.GetTagMapByList(tags)
-
-	allTransactions, err := a.transactions.GetAllTransactions(c, uid, pageCountForDataExport, true)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	result, err := a.exporter.ToExportedContent(uid, timezone, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
-		return nil, "", errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	fileName := a.getFileName(user, timezone)
-
-	return result, fileName, nil
+// ExportDataToEzbookkeepingTSVHandler returns exported data in csv format
+func (a *DataManagementsApi) ExportDataToEzbookkeepingTSVHandler(c *core.Context) ([]byte, string, *errs.Error) {
+	return a.getExportedFileContent(c, "tsv")
 }
 
 // DataStatisticsHandler returns user data statistics
@@ -209,11 +144,95 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error
 	return true, nil
 }
 
-func (a *DataManagementsApi) getFileName(user *models.User, timezone *time.Location) string {
+func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType string) ([]byte, string, *errs.Error) {
+	if !settings.Container.Current.EnableDataExport {
+		return nil, "", errs.ErrDataExportNotAllowed
+	}
+
+	timezone := time.Local
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
+	} else {
+		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, "", errs.ErrUserNotFound
+	}
+
+	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	categories, err := a.categories.GetAllCategoriesByUid(c, uid, 0, -1)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	tags, err := a.tags.GetAllTagsByUid(c, uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	tagIndexs, err := a.tags.GetAllTagIdsOfAllTransactions(c, uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	accountMap := a.accounts.GetAccountMapByList(accounts)
+	categoryMap := a.categories.GetCategoryMapByList(categories)
+	tagMap := a.tags.GetTagMapByList(tags)
+
+	allTransactions, err := a.transactions.GetAllTransactions(c, uid, pageCountForDataExport, true)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	var dataExporter converters.DataConverter
+
+	if fileType == "tsv" {
+		dataExporter = a.ezBookKeepingTsvExporter
+	} else {
+		dataExporter = a.ezBookKeepingCsvExporter
+	}
+
+	result, err := dataExporter.ToExportedContent(uid, timezone, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
+		return nil, "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	fileName := a.getFileName(user, timezone, fileType)
+
+	return result, fileName, nil
+}
+
+func (a *DataManagementsApi) getFileName(user *models.User, timezone *time.Location, fileExtension string) string {
 	currentTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(time.Now().Unix(), timezone)
 	currentTime = strings.Replace(currentTime, "-", "_", -1)
 	currentTime = strings.Replace(currentTime, " ", "_", -1)
 	currentTime = strings.Replace(currentTime, ":", "_", -1)
 
-	return fmt.Sprintf("%s_%s.csv", user.Username, currentTime)
+	return fmt.Sprintf("%s_%s.%s", user.Username, currentTime, fileExtension)
 }

@@ -85,14 +85,27 @@
         <v-col cols="12" v-if="isDataExportingEnabled">
             <v-card :class="{ 'disabled': exportingData }" :title="$t('Export Data')">
                 <v-card-text>
-                    <span class="text-body-1">{{ $t('Export all data to csv file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
+                    <span class="text-body-1">{{ $t('Export all data to file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">
-                    <v-btn :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'" @click="exportData">
-                        {{ $t('Export Data') }}
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="exportingData"></v-progress-circular>
-                    </v-btn>
+                    <v-btn-group variant="elevated" density="comfortable" color="primary"
+                                  :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
+                        <v-btn>
+                            {{ $t('Export Data') }}
+                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="exportingData"></v-progress-circular>
+                            <v-menu activator="parent">
+                                <v-list :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
+                                    <v-list-item @click="exportData('csv')">
+                                        <v-list-item-title>{{ $t('Export Data To CSV File') }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item @click="exportData('tsv')">
+                                        <v-list-item-title>{{ $t('Export Data To TSV File') }}</v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-btn>
+                    </v-btn-group>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -209,17 +222,6 @@ export default {
         },
         isDataExportingEnabled() {
             return isDataExportingEnabled();
-        },
-        exportFileName() {
-            const nickname = this.userStore.currentUserNickname;
-
-            if (nickname) {
-                return this.$t('dataExport.exportFilename', {
-                    nickname: nickname
-                }) + '.csv';
-            }
-
-            return this.$t('dataExport.defaultExportFilename') + '.csv';
         }
     },
     created() {
@@ -250,7 +252,7 @@ export default {
                 }
             });
         },
-        exportData() {
+        exportData(fileType) {
             const self = this;
 
             if (self.exportingData) {
@@ -259,8 +261,8 @@ export default {
 
             self.exportingData = true;
 
-            self.userStore.getExportedUserData().then(data => {
-                startDownloadFile(self.exportFileName, data);
+            self.userStore.getExportedUserData(fileType).then(data => {
+                startDownloadFile(self.getExportFileName(fileType), data);
                 self.exportingData = false;
             }).catch(error => {
                 self.exportingData = false;
@@ -301,6 +303,17 @@ export default {
                     }
                 });
             });
+        },
+        getExportFileName(fileExtension) {
+            const nickname = this.userStore.currentUserNickname;
+
+            if (nickname) {
+                return this.$t('dataExport.exportFilename', {
+                    nickname: nickname
+                }) + '.' + fileExtension;
+            }
+
+            return this.$t('dataExport.defaultExportFilename') + '.' + fileExtension;
         }
     }
 }

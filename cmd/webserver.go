@@ -256,7 +256,8 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.POST("/data/clear.json", bindApi(api.DataManagements.ClearDataHandler))
 
 			if config.EnableDataExport {
-				apiV1Route.GET("/data/export.csv", bindCsv(api.DataManagements.ExportDataHandler))
+				apiV1Route.GET("/data/export.csv", bindCsv(api.DataManagements.ExportDataToEzbookkeepingCSVHandler))
+				apiV1Route.GET("/data/export.tsv", bindTsv(api.DataManagements.ExportDataToEzbookkeepingTSVHandler))
 			}
 
 			// Accounts
@@ -372,6 +373,19 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
 			utils.PrintDataSuccessResult(c, "text/csv", fileName, result)
+		}
+	}
+}
+
+func bindTsv(fn core.DataHandlerFunc) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		result, fileName, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			utils.PrintDataSuccessResult(c, "text/tab-separated-values", fileName, result)
 		}
 	}
 }

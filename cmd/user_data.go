@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"os"
 
@@ -231,7 +232,7 @@ var UserData = &cli.Command{
 		},
 		{
 			Name:   "transaction-export",
-			Usage:  "Export user all transactions to csv file",
+			Usage:  "Export user all transactions to file",
 			Action: exportUserTransaction,
 			Flags: []cli.Flag{
 				&cli.StringFlag{
@@ -245,6 +246,12 @@ var UserData = &cli.Command{
 					Aliases:  []string{"f"},
 					Required: true,
 					Usage:    "Specific exported file path (e.g. transaction.csv)",
+				},
+				&cli.StringFlag{
+					Name:     "type",
+					Aliases:  []string{"t"},
+					Required: false,
+					Usage:    "Export file type, support csv or tsv, default is csv",
 				},
 			},
 		},
@@ -555,6 +562,12 @@ func exportUserTransaction(c *cli.Context) error {
 
 	username := c.String("username")
 	filePath := c.String("file")
+	fileType := c.String("type")
+
+	if fileType != "" && fileType != "csv" && fileType != "tsv" {
+		log.BootErrorf("[user_data.exportUserTransaction] export file type is not supported")
+		return errs.ErrNotSupported
+	}
 
 	if filePath == "" {
 		log.BootErrorf("[user_data.exportUserTransaction] export file path is not specified")
@@ -570,7 +583,7 @@ func exportUserTransaction(c *cli.Context) error {
 
 	log.BootInfof("[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
 
-	content, err := clis.UserData.ExportTransaction(c, username)
+	content, err := clis.UserData.ExportTransaction(c, username, fileType)
 
 	if err != nil {
 		log.BootErrorf("[user_data.exportUserTransaction] error occurs when exporting user data")

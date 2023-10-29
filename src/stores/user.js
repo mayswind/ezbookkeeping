@@ -131,12 +131,17 @@ export const useUserStore = defineStore('user', {
                 });
             });
         },
-        getExportedUserData() {
+        getExportedUserData(fileType) {
             return new Promise((resolve, reject) => {
-                services.getExportedUserData().then(response => {
-                    if (response && response.headers && response.headers['content-type'] !== 'text/csv') {
-                        reject({ message: 'Unable to get exported user data' });
-                        return;
+                services.getExportedUserData(fileType).then(response => {
+                    if (response && response.headers) {
+                        if (fileType === 'csv' && response.headers['content-type'] !== 'text/csv') {
+                            reject({ message: 'Unable to get exported user data' });
+                            return;
+                        } else if (fileType === 'tsv' && response.headers['content-type'] !== 'text/tab-separated-values') {
+                            reject({ message: 'Unable to get exported user data' });
+                            return;
+                        }
                     }
 
                     const blob = new Blob([response.data], { type: response.headers['content-type'] });

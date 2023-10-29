@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -12,12 +11,12 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
-const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/%s/%s/%s"                       // https://tile.openstreetmap.org/{z}/{x}/{y}.png
-const openStreetMapHumanitarianStyleTileImageUrlFormat = "https://a.tile.openstreetmap.fr/hot/%s/%s/%s" // https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png
-const openTopoMapTileImageUrlFormat = "https://tile.opentopomap.org/%s/%s/%s"                           // https://tile.opentopomap.org/{z}/{x}/{y}.png
-const opnvKarteMapTileImageUrlFormat = "https://tileserver.memomaps.de/tilegen/%s/%s/%s"                // https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png
-const cyclOSMMapTileImageUrlFormat = "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/%s/%s/%s"         // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png
-const tomtomMapTileImageUrlFormat = "https://api.tomtom.com/map/1/tile/basic/main/%s/%s/%s"             // https://api.tomtom.com/map/{versionNumber}/tile/{layer}/{style}/{z}/{x}/{y}.png?key={key}&language={language}
+const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"                       // https://tile.openstreetmap.org/{z}/{x}/{y}.png
+const openStreetMapHumanitarianStyleTileImageUrlFormat = "https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" // https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png
+const openTopoMapTileImageUrlFormat = "https://tile.opentopomap.org/{z}/{x}/{y}.png"                           // https://tile.opentopomap.org/{z}/{x}/{y}.png
+const opnvKarteMapTileImageUrlFormat = "https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png"                // https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png
+const cyclOSMMapTileImageUrlFormat = "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png"         // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png
+const tomtomMapTileImageUrlFormat = "https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png"             // https://api.tomtom.com/map/{versionNumber}/tile/{layer}/{style}/{z}/{x}/{y}.png?key={key}&language={language}
 
 // MapImageProxy represents map image proxy
 type MapImageProxy struct {
@@ -60,8 +59,12 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		zoomLevel := c.Param("zoomLevel")
 		coordinateX := c.Param("coordinateX")
 		fileName := c.Param("fileName")
+		coordinateY := strings.Split(fileName, ".")[0]
 
-		imageRawUrl := fmt.Sprintf(targetUrl, zoomLevel, coordinateX, fileName)
+		imageRawUrl := targetUrl
+		imageRawUrl = strings.Replace(imageRawUrl, "{z}", zoomLevel, -1)
+		imageRawUrl = strings.Replace(imageRawUrl, "{x}", coordinateX, -1)
+		imageRawUrl = strings.Replace(imageRawUrl, "{y}", coordinateY, -1)
 		imageUrl, _ := url.Parse(imageRawUrl)
 
 		req.URL = imageUrl

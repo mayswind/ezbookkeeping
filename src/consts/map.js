@@ -39,6 +39,14 @@ const leafletTileSources = {
         defaultZoomLevel: 14,
         attribution : '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render" class="external" target="_blank">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a> contributors'
     },
+    'cartodb': {
+        tileUrlFormat: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+        tileUrlSubDomains: 'abcd',
+        minZoom: 1,
+        maxZoom: 20,
+        defaultZoomLevel: 14,
+        attribution : '&copy; <a href="http://www.openstreetmap.org/copyright" class="external" target="_blank">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions" class="external" target="_blank">CARTO</a>'
+    },
     'tomtom': {
         tileUrlFormat: 'https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png',
         tileUrlSubDomains: 'abcd',

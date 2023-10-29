@@ -29,6 +29,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 				config.MapProvider == settings.OpenTopoMapProvider ||
 				config.MapProvider == settings.OPNVKarteMapProvider ||
 				config.MapProvider == settings.CyclOSMMapProvider ||
+				config.MapProvider == settings.CartoDBMapProvider ||
 				config.MapProvider == settings.TomTomMapProvider ||
 				config.MapProvider == settings.CustomProvider) {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))

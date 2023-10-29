@@ -74,8 +74,9 @@ const (
 	OpenTopoMapProvider                    string = "opentopomap"
 	OPNVKarteMapProvider                   string = "opnvkarte"
 	CyclOSMMapProvider                     string = "cyclosm"
-	GoogleMapProvider                      string = "googlemap"
+	CartoDBMapProvider                     string = "cartodb"
 	TomTomMapProvider                      string = "tomtom"
+	GoogleMapProvider                      string = "googlemap"
 	BaiduMapProvider                       string = "baidumap"
 	AmapProvider                           string = "amap"
 	CustomProvider                         string = "custom"
@@ -541,10 +542,12 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = OPNVKarteMapProvider
 	} else if mapProvider == CyclOSMMapProvider {
 		config.MapProvider = CyclOSMMapProvider
-	} else if mapProvider == GoogleMapProvider {
-		config.MapProvider = GoogleMapProvider
+	} else if mapProvider == CartoDBMapProvider {
+		config.MapProvider = CartoDBMapProvider
 	} else if mapProvider == TomTomMapProvider {
 		config.MapProvider = TomTomMapProvider
+	} else if mapProvider == GoogleMapProvider {
+		config.MapProvider = GoogleMapProvider
 	} else if mapProvider == BaiduMapProvider {
 		config.MapProvider = BaiduMapProvider
 	} else if mapProvider == AmapProvider {

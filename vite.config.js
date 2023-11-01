@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import git from 'git-rev-sync';
 
 import packageFile from './package.json';
-import thirdPartyLicenseFile from './third-patry-dependencies.json';
+import thirdPartyLicenseFile from './third-party-dependencies.json';
 
 const SRC_DIR = resolve(__dirname, './src');
 const PUBLIC_DIR = resolve(__dirname, './public');

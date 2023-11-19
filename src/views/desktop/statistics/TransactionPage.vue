@@ -619,7 +619,7 @@ export default {
 }
 
 .statistics-list-item .statistics-percent {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     opacity: 0.7;
     margin-left: 6px;
 }

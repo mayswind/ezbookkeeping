@@ -108,7 +108,7 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.3.4/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.3.9/LICENSE"
     },
     {
         "name": "Pinia",
@@ -126,13 +126,13 @@
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.5.0/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.8.0/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.3.23/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.4.4/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -258,7 +258,7 @@
         "name": "UAParser.js",
         "copyright": "Copyright (c) 2012-2023 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
-        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.36/license.md"
+        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.37/license.md"
     },
     {
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",

@@ -33,7 +33,7 @@ import { VPagination } from 'vuetify/components/VPagination';
 import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { VProgressLinear } from 'vuetify/components/VProgressLinear';
 import { VSelect } from 'vuetify/components/VSelect';
-import { VSkeletonLoader } from 'vuetify/labs/VSkeletonLoader';
+import { VSkeletonLoader } from 'vuetify/components/VSkeletonLoader';
 import { VSlideGroup, VSlideGroupItem } from 'vuetify/components/VSlideGroup';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
 import { VSwitch } from 'vuetify/components/VSwitch';

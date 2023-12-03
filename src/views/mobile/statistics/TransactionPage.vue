@@ -186,13 +186,13 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
+            <f7-link :class="{ 'disabled': reloading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
-            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
+            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
+            <f7-link :class="{ 'disabled': reloading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" @click="setChartType(allChartTypes.Pie)">
@@ -274,6 +274,7 @@ export default {
         return {
             loading: true,
             loadingError: null,
+            reloading: false,
             showChartDataTypePopover: false,
             showSortingTypePopover: false,
             showDatePopover: false,
@@ -389,6 +390,8 @@ export default {
             const force = !!done;
             let dispatchPromise = null;
 
+            self.reloading = true;
+
             if (self.query.chartDataType === self.allChartDataTypes.ExpenseByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.ExpenseByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
@@ -407,6 +410,8 @@ export default {
 
             if (dispatchPromise) {
                 dispatchPromise.then(() => {
+                    self.reloading = false;
+
                     if (done) {
                         done();
                     }
@@ -415,6 +420,8 @@ export default {
                         self.$toast('Data has been updated');
                     }
                 }).catch(error => {
+                    self.reloading = false;
+
                     if (done) {
                         done();
                     }
@@ -423,6 +430,8 @@ export default {
                         self.$toast(error.message || error);
                     }
                 });
+            } else {
+                self.reloading = false;
             }
         },
         setChartType(chartType) {

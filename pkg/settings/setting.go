@@ -222,6 +222,8 @@ type Config struct {
 
 	// Map
 	MapProvider                         string
+	EnableMapDataFetchProxy             bool
+	MapProxy                            string
 	TomTomMapAPIKey                     string
 	GoogleMapAPIKey                     string
 	BaiduMapAK                          string
@@ -233,11 +235,11 @@ type Config struct {
 	CustomMapTileServerMinZoomLevel     uint8
 	CustomMapTileServerMaxZoomLevel     uint8
 	CustomMapTileServerDefaultZoomLevel uint8
-	EnableMapDataFetchProxy             bool
 
 	// Exchange Rates
 	ExchangeRatesDataSource     string
 	ExchangeRatesRequestTimeout uint32
+	ExchangeRatesProxy          string
 	ExchangeRatesSkipTLSVerify  bool
 }
 
@@ -559,6 +561,7 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	}
 
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+	config.MapProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	config.TomTomMapAPIKey = getConfigItemStringValue(configFile, sectionName, "tomtom_map_api_key")
 	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
@@ -605,6 +608,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		return errs.ErrInvalidExchangeRatesDataSource
 	}
 
+	config.ExchangeRatesProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	config.ExchangeRatesRequestTimeout = getConfigItemUint32Value(configFile, sectionName, "request_timeout", defaultExchangeRatesDataRequestTimeout)
 	config.ExchangeRatesSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "skip_tls_verify", false)
 

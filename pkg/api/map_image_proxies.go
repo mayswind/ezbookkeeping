@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"                          // https://tile.openstreetmap.org/{z}/{x}/{y}.png
@@ -73,6 +74,9 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		return nil, errs.ErrParameterInvalid
 	}
 
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	utils.SetProxyUrl(transport, settings.Container.Current.MapProxy)
+
 	director := func(req *http.Request) {
 		imageRawUrl := targetUrl
 		imageRawUrl = strings.Replace(imageRawUrl, "{z}", zoomLevel, -1)
@@ -86,5 +90,8 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		req.Host = imageUrl.Host
 	}
 
-	return &httputil.ReverseProxy{Director: director}, nil
+	return &httputil.ReverseProxy{
+		Transport: transport,
+		Director:  director,
+	}, nil
 }

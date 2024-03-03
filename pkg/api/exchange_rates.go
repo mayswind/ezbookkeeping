@@ -13,6 +13,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // ExchangeRatesApi represents exchange rate api
@@ -34,6 +35,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 	uid := c.GetCurrentUid()
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
+	utils.SetProxyUrl(transport, settings.Container.Current.ExchangeRatesProxy)
 
 	if settings.Container.Current.ExchangeRatesSkipTLSVerify {
 		transport.TLSClientConfig = &tls.Config{

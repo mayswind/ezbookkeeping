@@ -18,6 +18,7 @@ import {
 } from './common.js';
 
 import {
+    isPM,
     parseDateFromUnixTime,
     formatUnixTime,
     formatTime,
@@ -307,6 +308,13 @@ function getCurrencyName(currencyCode, translateFn) {
     return translateFn(`currency.${currencyCode}`);
 }
 
+function getAllMeridiemIndicatorNames(translateFn) {
+    return [
+        translateFn('datetime.AM.content'),
+        translateFn('datetime.PM.content')
+    ];
+}
+
 function getAllLongMonthNames(translateFn) {
     return [
         translateFn('datetime.January.long'),
@@ -469,10 +477,22 @@ function isLongTime24HourFormat(translateFn, formatTypeValue) {
     return type.is24HourFormat;
 }
 
+function isLongTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
+    const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
+    const type = getDateTimeFormatType(datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
+    return type.isMeridiemIndicatorFirst;
+}
+
 function isShortTime24HourFormat(translateFn, formatTypeValue) {
     const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
     const type = getDateTimeFormatType(datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
     return type.is24HourFormat;
+}
+
+function isShortTimeMeridiemIndicatorFirst(translateFn, formatTypeValue) {
+    const defaultShortTimeFormatTypeName = translateFn('default.shortTimeFormat');
+    const type = getDateTimeFormatType(datetime.allShortTimeFormat, datetime.allShortTimeFormatArray, defaultShortTimeFormatTypeName, datetime.defaultShortTimeFormat, formatTypeValue);
+    return type.isMeridiemIndicatorFirst;
 }
 
 function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFormatPathPrefix, localeDefaultFormatTypeName, systemDefaultFormatType) {
@@ -1149,7 +1169,7 @@ function setLanguage(i18nGlobal, locale, force) {
         weekdaysShort : getAllShortWeekdayNames(i18nGlobal.t),
         weekdaysMin : getAllMinWeekdayNames(i18nGlobal.t),
         meridiem: function (hours) {
-            if (hours > 11) {
+            if (isPM(hours)) {
                 return i18nGlobal.t('datetime.PM.content');
             } else {
                 return i18nGlobal.t('datetime.AM.content');
@@ -1256,6 +1276,7 @@ export function i18nFunctions(i18nGlobal) {
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),
         getDefaultFirstDayOfWeek: () => getDefaultFirstDayOfWeek(i18nGlobal.t),
         getCurrencyName: (currencyCode) => getCurrencyName(currencyCode, i18nGlobal.t),
+        getAllMeridiemIndicatorNames: () => getAllMeridiemIndicatorNames(i18nGlobal.t),
         getAllLongMonthNames: () => getAllLongMonthNames(i18nGlobal.t),
         getAllShortMonthNames: () => getAllShortMonthNames(i18nGlobal.t),
         getAllLongWeekdayNames: () => getAllLongWeekdayNames(i18nGlobal.t),
@@ -1284,7 +1305,9 @@ export function i18nFunctions(i18nGlobal) {
         formatTimeToLongYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat)),
         formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18nGlobal.t, userStore.currentUserShortDateFormat)),
         isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
+        isLongTimeMeridiemIndicatorFirst: (userStore) => isLongTimeMeridiemIndicatorFirst(i18nGlobal.t, userStore.currentUserLongTimeFormat),
         isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),
+        isShortTimeMeridiemIndicatorFirst: (userStore) => isShortTimeMeridiemIndicatorFirst(i18nGlobal.t, userStore.currentUserShortTimeFormat),
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),

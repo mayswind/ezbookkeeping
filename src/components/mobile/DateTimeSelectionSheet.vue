@@ -16,12 +16,12 @@
                              month-name-format="long"
                              six-weeks="center"
                              class="justify-content-center"
+                             :enable-time-picker="false"
                              :clearable="false"
                              :dark="isDarkMode"
                              :week-start="firstDayOfWeek"
                              :year-range="yearRange"
                              :day-names="dayNames"
-                             :is24="is24Hour"
                              v-model="dateTime">
                 <template #month="{ text }">
                     {{ getMonthShortName(text) }}
@@ -29,10 +29,11 @@
                 <template #month-overlay-value="{ text }">
                     {{ getMonthShortName(text) }}
                 </template>
-                <template #am-pm-button="{ toggle, value }">
-                    <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ $t(`datetime.${value}.content`) }}</button>
-                </template>
             </vue-date-picker>
+            <div class="block block-outline no-margin no-padding padding-vertical-half">
+                <div id="time-picker-container" class="time-picker-container"></div>
+            </div>
+            <input id="time-picker-input" style="display: none" type="text" readonly="readonly"/>
         </f7-page-content>
     </f7-sheet>
 </template>
@@ -41,14 +42,18 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
+import datetimeConstants from '@/consts/datetime.js';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
     getCurrentDateTime,
     getUnixTime,
     getLocalDatetimeFromUnixTime,
-    getYear
+    getYear,
+    getTimeValues,
+    getCombinedDatetimeByDateAndTimeValues
 } from '@/lib/datetime.js';
+import { createInlinePicker } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -60,19 +65,28 @@ export default {
         'update:show'
     ],
     data() {
+        const userStore = useUserStore();
         const self = this;
+
+        self.is24Hour = self.$locale.isLongTime24HourFormat(userStore);
+        self.isMeridiemIndicatorFirst = self.$locale.isLongTimeMeridiemIndicatorFirst(userStore);
+        self.timePickerHolder = null;
+
         let value = getCurrentUnixTime();
 
         if (self.modelValue) {
             value = self.modelValue;
         }
 
+        const datetime = getLocalDatetimeFromUnixTime(value);
+
         return {
             yearRange: [
                 2000,
                 getYear(getCurrentDateTime()) + 1
             ],
-            dateTime: getLocalDatetimeFromUnixTime(value),
+            dateTime: datetime,
+            timeValues: self.getTimeValues(datetime),
         }
     },
     computed: {
@@ -85,31 +99,55 @@ export default {
         },
         dayNames() {
             return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
-        },
-        is24Hour() {
-            return this.$locale.isLongTime24HourFormat(this.userStore);
+        }
+    },
+    beforeUnmount() {
+        if (this.timePickerHolder) {
+            this.timePickerHolder.destroy();
+            this.timePickerHolder = null;
         }
     },
     methods: {
         onSheetOpen() {
-            if (this.modelValue) {
-                this.dateTime = getLocalDatetimeFromUnixTime(this.modelValue)
+            const self = this;
+
+            if (self.modelValue) {
+                self.dateTime = getLocalDatetimeFromUnixTime(self.modelValue);
             }
 
-            this.$refs.datetimepicker.switchView('calendar');
+            self.timeValues = self.getTimeValues(self.dateTime);
+
+            if (!self.timePickerHolder) {
+                self.timePickerHolder = createInlinePicker('#time-picker-container', '#time-picker-input',
+                    self.getTimePickerColumns(), self.timeValues, {
+                        change(picker, values) {
+                            self.timeValues = values;
+                        }
+                    });
+            } else {
+                self.timePickerHolder.setValue(self.timeValues);
+            }
+
+            self.$refs.datetimepicker.switchView('calendar');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
         },
         setCurrentTime() {
             this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime())
+            this.timeValues = this.getTimeValues(this.dateTime);
+
+            if (this.timePickerHolder) {
+                this.timePickerHolder.setValue(this.timeValues);
+            }
         },
         confirm() {
             if (!this.dateTime) {
                 return;
             }
 
-            const unixTime = getUnixTime(this.dateTime);
+            const finalDatetime = getCombinedDatetimeByDateAndTimeValues(this.dateTime, this.timeValues, this.is24Hour, this.isMeridiemIndicatorFirst);
+            const unixTime = getUnixTime(finalDatetime);
 
             if (unixTime < 0) {
                 this.$toast('Date is too early');
@@ -121,6 +159,83 @@ export default {
         },
         getMonthShortName(month) {
             return this.$locale.getMonthShortName(month);
+        },
+        getTimeValues(datetime) {
+            return getTimeValues(datetime, this.is24Hour, this.isMeridiemIndicatorFirst);
+        },
+        getTimePickerColumns() {
+            const self = this;
+            const ret = [];
+
+            if (!self.is24Hour && this.isMeridiemIndicatorFirst) {
+                ret.push({
+                    values: datetimeConstants.allMeridiemIndicatorsArray,
+                    displayValues: self.$locale.getAllMeridiemIndicatorNames()
+                });
+            }
+
+            // Hours
+            ret.push({
+                values: self.generateAllHours()
+            });
+            // Divider
+            ret.push({
+                divider: true,
+                content: ':',
+            });
+            // Minutes
+            ret.push({
+                values: self.generateAllMinutesOrSeconds()
+            });
+            // Divider
+            ret.push({
+                divider: true,
+                content: ':',
+            });
+            // Seconds
+            ret.push({
+                values: self.generateAllMinutesOrSeconds()
+            });
+
+            if (!self.is24Hour && !this.isMeridiemIndicatorFirst) {
+                ret.push({
+                    values: datetimeConstants.allMeridiemIndicatorsArray,
+                    displayValues: self.$locale.getAllMeridiemIndicatorNames()
+                });
+            }
+
+            return ret;
+        },
+        getDisplayTimeValue(value) {
+            if (value < 10) {
+                return `0${value}`;
+            } else {
+                return value.toString();
+            }
+        },
+        generateAllHours() {
+            const ret = [];
+            const startHour = this.is24Hour ? 0 : 1;
+            const endHour = this.is24Hour ? 23 : 11;
+
+            if (!this.is24Hour) {
+                ret.push('12');
+            }
+
+            for (let i = startHour; i <= endHour; i++) {
+                ret.push(this.getDisplayTimeValue(i));
+            }
+
+            return ret;
+        },
+        generateAllMinutesOrSeconds() {
+            const ret = [];
+
+            for (let i = 0; i < 60; i++) {
+                ret.push(this.getDisplayTimeValue(i));
+            }
+
+            return ret;
         }
     }
 }
@@ -129,5 +244,9 @@ export default {
 <style>
 .date-time-selection-sheet .dp__menu {
     border: 0;
+}
+
+.date-time-selection-sheet .time-picker-container .picker-columns {
+    justify-content: space-evenly;
 }
 </style>

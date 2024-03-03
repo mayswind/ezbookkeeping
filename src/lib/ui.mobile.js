@@ -73,6 +73,18 @@ export function hideLoading() {
     });
 }
 
+export function createInlinePicker(containerEl, inputEl, cols, value, events) {
+    return f7.picker.create({
+        containerEl: containerEl,
+        inputEl: inputEl,
+        toolbar: false,
+        rotateEffect: true,
+        value: value,
+        cols: cols,
+        on: events || {}
+    });
+}
+
 export function routeBackOnError(f7router, errorPropertyName) {
     const self = this;
     const router = f7router;

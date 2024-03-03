@@ -1,3 +1,13 @@
+const allMeridiemIndicators = {
+    AM: 'AM',
+    PM: 'PM'
+};
+
+const allMeridiemIndicatorsArray = [
+    allMeridiemIndicators.AM,
+    allMeridiemIndicators.PM
+];
+
 const allMonthsArray = [
     'January',
     'February',
@@ -100,17 +110,20 @@ const allLongTimeFormat = {
     HHMMSS: {
         type: 1,
         key: 'hh_mm_ss',
-        is24HourFormat: true
+        is24HourFormat: true,
+        isMeridiemIndicatorFirst: null
     },
     AHHMMSS: {
         type: 2,
         key: 'a_hh_mm_ss',
-        is24HourFormat: false
+        is24HourFormat: false,
+        isMeridiemIndicatorFirst: true
     },
     HHMMSSA: {
         type: 3,
         key: 'hh_mm_ss_a',
-        is24HourFormat: false
+        is24HourFormat: false,
+        isMeridiemIndicatorFirst: false
     }
 };
 
@@ -124,17 +137,20 @@ const allShortTimeFormat = {
     HHMM: {
         type: 1,
         key: 'hh_mm',
-        is24HourFormat: true
+        is24HourFormat: true,
+        isMeridiemIndicatorFirst: null
     },
     AHHMM: {
         type: 2,
         key: 'a_hh_mm',
-        is24HourFormat: false
+        is24HourFormat: false,
+        isMeridiemIndicatorFirst: true
     },
     HHMMA: {
         type: 3,
         key: 'hh_mm_a',
-        is24HourFormat: false
+        is24HourFormat: false,
+        isMeridiemIndicatorFirst: false
     }
 };
 
@@ -203,6 +219,8 @@ const defaultShortTimeFormat = allShortTimeFormat.HHMM;
 const defaultDateTimeFormatValue = 0;
 
 export default {
+    allMeridiemIndicators: allMeridiemIndicators,
+    allMeridiemIndicatorsArray: allMeridiemIndicatorsArray,
     allWeekDays: allWeekDays,
     allWeekDaysArray: allWeekDaysArray,
     allMonthsArray: allMonthsArray,

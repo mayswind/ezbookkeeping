@@ -3,6 +3,14 @@ import moment from 'moment';
 import dateTimeConstants from '@/consts/datetime.js';
 import { isNumber } from './common.js';
 
+export function isPM(hour) {
+    if (hour > 11) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function getUtcOffsetMinutesByUtcOffset(utcOffset) {
     if (!utcOffset) {
         return 0;
@@ -143,6 +151,10 @@ export function getMonthName(date) {
     return dateTimeConstants.allMonthsArray[dayOfWeek];
 }
 
+export function getAMOrPM(date) {
+    return isPM(moment(date).hour()) ? dateTimeConstants.allMeridiemIndicators.PM : dateTimeConstants.allMeridiemIndicators.AM;
+}
+
 export function getHour(date) {
     return moment(date).hour();
 }
@@ -153,6 +165,35 @@ export function getMinute(date) {
 
 export function getSecond(date) {
     return moment(date).second();
+}
+
+export function getTimeValues(date, is24Hour, isMeridiemIndicatorFirst) {
+    if (is24Hour) {
+        return moment(date).format('HH mm ss').split(' ');
+    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
+        return [getAMOrPM(date)].concat(moment(date).format('hh mm ss').split(' '));
+    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
+        return moment(date).format('hh mm ss').split(' ').concat([getAMOrPM(date)]);
+    }
+}
+
+export function getCombinedDatetimeByDateAndTimeValues(date, timeValues, is24Hour, isMeridiemIndicatorFirst) {
+    const datetime = moment(date);
+    let time = datetime;
+
+    if (is24Hour) {
+        time = moment(timeValues.join(' '), 'HH mm ss');
+    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
+        time = moment(timeValues.join(' '), 'A HH mm ss');
+    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
+        time = moment(timeValues.join(' '), 'HH mm ss A');
+    }
+
+    datetime.hour(time.hour());
+    datetime.minute(time.minute());
+    datetime.second(time.second());
+
+    return datetime;
 }
 
 export function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {

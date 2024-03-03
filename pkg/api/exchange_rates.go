@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/tls"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -52,7 +53,10 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 	exchangeRateResps := make([]*models.LatestExchangeRateResponse, 0, len(urls))
 
 	for i := 0; i < len(urls); i++ {
-		resp, err := client.Get(urls[i])
+		req, _ := http.NewRequest("GET", urls[i], nil)
+		req.Header.Set("User-Agent", fmt.Sprintf("ezBookkeeping/%s ", settings.Version))
+
+		resp, err := client.Do(req)
 
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())

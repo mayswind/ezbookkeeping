@@ -73,7 +73,7 @@
                                                   :disabled="loading || submitting"
                                                   :persistent-placeholder="true"
                                                   :hide="transaction.hideAmount"
-                                                  :label="$t('Transfer In Amount')"
+                                                  :label="transferInAmountTitle"
                                                   :placeholder="$t('Transfer In Amount')"
                                                   v-model="transaction.destinationAmount"/>
                                 </v-col>
@@ -326,6 +326,9 @@ import {
     getCurrentUnixTime
 } from '@/lib/datetime.js';
 import {
+    getAdaptiveDisplayAmountRate
+} from '@/lib/currency.js';
+import {
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
@@ -416,6 +419,24 @@ export default {
             } else {
                 return 'Account';
             }
+        },
+        transferInAmountTitle() {
+            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
+            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
+
+            if (!sourceAccount || !destinationAccount || sourceAccount.currency === destinationAccount.currency) {
+                return this.$t('Transfer In Amount');
+            }
+
+            const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
+            const toExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[destinationAccount.currency];
+            const amountRate = getAdaptiveDisplayAmountRate(this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate, this.settingsStore.appSettings.thousandsSeparator);
+
+            if (!amountRate) {
+                return this.$t('Transfer In Amount');
+            }
+
+            return this.$t('Transfer In Amount') + ` (${amountRate})`;
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;

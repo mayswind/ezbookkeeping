@@ -126,3 +126,27 @@ export function getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator
         return appendThousandsSeparator(trimmedRateStr, isEnableThousandsSeparator);
     }
 }
+
+export function getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, isEnableThousandsSeparator) {
+    if (!amount1 || !amount2 || amount1 === amount2) {
+        if (!fromExchangeRate || !fromExchangeRate.rate || !toExchangeRate || !toExchangeRate.rate) {
+            return null;
+        }
+
+        amount1 = fromExchangeRate.rate;
+        amount2 = toExchangeRate.rate;
+    }
+
+    amount1 = parseFloat(amount1);
+    amount2 = parseFloat(amount2);
+
+    if (amount1 > amount2) {
+        const rateStr = (amount1 / amount2).toString();
+        const displayRateStr = getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator);
+        return `${displayRateStr} : 1`;
+    } else {
+        const rateStr = (amount2 / amount1).toString();
+        const displayRateStr = getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator);
+        return `1 : ${displayRateStr}`;
+    }
+}

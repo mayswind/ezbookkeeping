@@ -66,7 +66,7 @@
                 class="transaction-edit-amount text-color-primary"
                 link="#" no-chevron
                 :class="destinationAmountClass"
-                :header="$t('Transfer In Amount')"
+                :header="transferInAmountTitle"
                 :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount)"
                 @click="showDestinationAmountSheet = true"
                 v-if="transaction.type === allTransactionTypes.Transfer"
@@ -359,6 +359,9 @@ import {
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
 import {
+    getAdaptiveDisplayAmountRate
+} from '@/lib/currency.js';
+import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
@@ -434,6 +437,24 @@ export default {
             } else {
                 return 'Account';
             }
+        },
+        transferInAmountTitle() {
+            const sourceAccount = this.allAccountsMap[this.transaction.sourceAccountId];
+            const destinationAccount = this.allAccountsMap[this.transaction.destinationAccountId];
+
+            if (!sourceAccount || !destinationAccount || sourceAccount.currency === destinationAccount.currency) {
+                return this.$t('Transfer In Amount');
+            }
+
+            const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
+            const toExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[destinationAccount.currency];
+            const amountRate = getAdaptiveDisplayAmountRate(this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate, this.settingsStore.appSettings.thousandsSeparator);
+
+            if (!amountRate) {
+                return this.$t('Transfer In Amount');
+            }
+
+            return this.$t('Transfer In Amount') + ` (${amountRate})`;
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;

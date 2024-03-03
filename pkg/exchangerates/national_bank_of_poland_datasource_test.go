@@ -10,11 +10,22 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-const nationalBankOfPolandMinimumRequiredContent = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-	"<exchange_rates table=\"A\" date=\"2021-04-02\" number=\"064/A/NBP/2021\" uid=\"21a064\">\n" +
-	"  <mid-rate currency=\"US Dollar\" units=\"1\" code=\"USD\">3.8986</mid-rate>\n" +
-	"  <mid-rate currency=\"Yuan Renminbi\" units=\"1\" code=\"CNY\">0.5941</mid-rate>\n" +
-	"</exchange_rates>"
+const nationalBankOfPolandMinimumRequiredContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+	"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+	"  <ExchangeRatesTable>\n" +
+	"    <EffectiveDate>2024-02-28</EffectiveDate>\n" +
+	"    <Rates>\n" +
+	"      <Rate>\n" +
+	"        <Code>USD</Code>\n" +
+	"        <Mid>3.9922</Mid>\n" +
+	"      </Rate>\n" +
+	"      <Rate>\n" +
+	"        <Code>CNY</Code>\n" +
+	"        <Mid>0.5545</Mid>\n" +
+	"      </Rate>\n" +
+	"    </Rates>\n" +
+	"  </ExchangeRatesTable>\n" +
+	"</ArrayOfExchangeRatesTable>"
 
 func TestNationalBankOfPolandDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
@@ -37,11 +48,11 @@ func TestNationalBankOfPolandDataSource_StandardDataExtractExchangeRates(t *test
 	assert.Equal(t, nil, err)
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "USD",
-		Rate:     "0.25650233417124096",
+		Rate:     "0.2504884524823406",
 	})
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "CNY",
-		Rate:     "1.68321831341525",
+		Rate:     "1.8034265103697025",
 	})
 }
 
@@ -61,7 +72,33 @@ func TestNationalBankOfPolandDataSource_OnlyXMLHeader(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"))
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"))
+	assert.NotEqual(t, nil, err)
+}
+
+func TestNationalBankOfPolandDataSource_EmptyArrayOfExchangeRatesTable(t *testing.T) {
+	dataSource := &NationalBankOfPolandDataSource{}
+	context := &core.Context{
+		Context: &gin.Context{},
+	}
+
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"</ArrayOfExchangeRatesTable>"))
+	assert.NotEqual(t, nil, err)
+}
+
+func TestNationalBankOfPolandDataSource_EmptyExchangeRatesTable(t *testing.T) {
+	dataSource := &NationalBankOfPolandDataSource{}
+	context := &core.Context{
+		Context: &gin.Context{},
+	}
+
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
 	assert.NotEqual(t, nil, err)
 }
 
@@ -71,9 +108,14 @@ func TestNationalBankOfPolandDataSource_EmptyExchangeRatesContent(t *testing.T) 
 		Context: &gin.Context{},
 	}
 
-	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"+
-		"<exchange_rates table=\"A\" date=\"2021-04-02\" number=\"064/A/NBP/2021\" uid=\"21a064\">\n"+
-		"</exchange_rates>"))
+	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"    <EffectiveDate>2024-02-28</EffectiveDate>\n"+
+		"    <Rates>\n"+
+		"    </Rates>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
 	assert.NotEqual(t, nil, err)
 }
 
@@ -83,10 +125,18 @@ func TestNationalBankOfPolandDataSource_InvalidCurrency(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"+
-		"<exchange_rates table=\"A\" date=\"2021-04-02\" number=\"064/A/NBP/2021\" uid=\"21a064\">\n"+
-		"  <mid-rate currency=\"XXX\" units=\"1\" code=\"XXX\">1</mid-rate>\n"+
-		"</exchange_rates>"))
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"    <EffectiveDate>2024-02-28</EffectiveDate>\n"+
+		"    <Rates>\n"+
+		"      <Rate>\n"+
+		"        <Code>XXX</Code>\n"+
+		"        <Mid>1</Mid>\n"+
+		"      </Rate>\n"+
+		"    </Rates>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }
@@ -97,10 +147,18 @@ func TestNationalBankOfPolandDataSource_EmptyRate(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"+
-		"<exchange_rates table=\"A\" date=\"2021-04-02\" number=\"064/A/NBP/2021\" uid=\"21a064\">\n"+
-		"  <mid-rate currency=\"US Dollar\" units=\"1\" code=\"USD\"></mid-rate>\n"+
-		"</exchange_rates>"))
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"    <EffectiveDate>2024-02-28</EffectiveDate>\n"+
+		"    <Rates>\n"+
+		"      <Rate>\n"+
+		"        <Code>USD</Code>\n"+
+		"        <Mid></Mid>\n"+
+		"      </Rate>\n"+
+		"    </Rates>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }
@@ -111,10 +169,18 @@ func TestNationalBankOfPolandDataSource_InvalidRate(t *testing.T) {
 		Context: &gin.Context{},
 	}
 
-	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"+
-		"<exchange_rates table=\"A\" date=\"2021-04-02\" number=\"064/A/NBP/2021\" uid=\"21a064\">\n"+
-		"  <mid-rate currency=\"US Dollar\" units=\"1\" code=\"USD\">null</mid-rate>\n"+
-		"</exchange_rates>"))
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
+		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
+		"  <ExchangeRatesTable>\n"+
+		"    <EffectiveDate>2024-02-28</EffectiveDate>\n"+
+		"    <Rates>\n"+
+		"      <Rate>\n"+
+		"        <Code>USD</Code>\n"+
+		"        <Mid>null</Mid>\n"+
+		"      </Rate>\n"+
+		"    </Rates>\n"+
+		"  </ExchangeRatesTable>\n"+
+		"</ArrayOfExchangeRatesTable>"))
 	assert.Equal(t, nil, err)
 	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 0)
 }

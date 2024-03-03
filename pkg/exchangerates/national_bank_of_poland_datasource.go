@@ -14,9 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
-const nationalBankOfPolandDailyExchangeRateUrl = "https://www.nbp.pl/kursy/xml/en/lastaen.xml"
-const nationalBankOfPolandInconvertibleCurrencyExchangeRateUrl = "https://www.nbp.pl/kursy/xml/en/lastben.xml"
-const nationalBankOfPolandExchangeRateReferenceUrl = "https://www.nbp.pl/homen.aspx?f=/kursy/kursyen.htm"
+const nationalBankOfPolandDailyExchangeRateUrl = "https://api.nbp.pl/api/exchangerates/tables/A?format=xml"
+const nationalBankOfPolandInconvertibleCurrencyExchangeRateUrl = "https://api.nbp.pl/api/exchangerates/tables/B?format=xml"
+const nationalBankOfPolandExchangeRateReferenceUrl = "https://nbp.pl/en/statistic-and-financial-reporting/rates/"
 const nationalBankOfPolandDataSource = "Narodowy Bank Polski"
 const nationalBankOfPolandBaseCurrency = "PLN"
 
@@ -30,16 +30,15 @@ type NationalBankOfPolandDataSource struct {
 
 // NationalBankOfPolandExchangeRateData represents the whole data from National Bank of Poland
 type NationalBankOfPolandExchangeRateData struct {
-	XMLName          xml.Name                            `xml:"exchange_rates"`
-	Date             string                              `xml:"date,attr"`
-	AllExchangeRates []*NationalBankOfPolandExchangeRate `xml:"mid-rate"`
+	XMLName          xml.Name                            `xml:"ArrayOfExchangeRatesTable"`
+	Date             string                              `xml:"ExchangeRatesTable>EffectiveDate"`
+	AllExchangeRates []*NationalBankOfPolandExchangeRate `xml:"ExchangeRatesTable>Rates>Rate"`
 }
 
 // NationalBankOfPolandExchangeRate represents the exchange rate data from National Bank of Poland
 type NationalBankOfPolandExchangeRate struct {
-	Currency string `xml:"code,attr"`
-	Units    string `xml:"units,attr"`
-	Rate     string `xml:",chardata"`
+	Currency string `xml:"Code"`
+	Rate     string `xml:"Mid"`
 }
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from National Bank of Poland
@@ -95,13 +94,6 @@ func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c *c
 
 // ToLatestExchangeRate returns a data pair according to original data from National Bank of Poland
 func (e *NationalBankOfPolandExchangeRate) ToLatestExchangeRate(c *core.Context) *models.LatestExchangeRate {
-	amount, err := utils.StringToInt64(e.Units)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRate] failed to parse amount, currency is %s, amount is %s", e.Currency, e.Units)
-		return nil
-	}
-
 	rate, err := utils.StringToFloat64(e.Rate)
 
 	if err != nil {
@@ -114,7 +106,7 @@ func (e *NationalBankOfPolandExchangeRate) ToLatestExchangeRate(c *core.Context)
 		return nil
 	}
 
-	finalRate := float64(amount) / rate
+	finalRate := 1 / rate
 
 	if math.IsInf(finalRate, 0) {
 		return nil

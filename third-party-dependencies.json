@@ -33,7 +33,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.25.7/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.27.1/LICENSE"
     },
     {
         "name": "INI",
@@ -45,13 +45,13 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.15.1/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.19.0/LICENSE"
     },
     {
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.0.0/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.0/LICENSE"
     },
     {
         "name": "otp",
@@ -73,13 +73,13 @@
         "name": "go-sqlite3",
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.16/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.22/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.12.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.20.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -102,7 +102,7 @@
         "name": "Testify",
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",
-        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.8.4/LICENSE"
+        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.9.0/LICENSE"
     },
     {
         "name": "vuejs/core",

@@ -1,6 +1,6 @@
 module github.com/mayswind/ezbookkeeping
 
-go 1.20
+go 1.21
 
 require (
 	github.com/boombuler/barcode v1.0.1

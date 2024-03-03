@@ -603,8 +603,8 @@ export default {
 </script>
 
 <style>
-.account-category-tabs .v-tab {
-    --v-btn-height: calc(var(--v-tabs-height) * 1.5);
+.account-category-tabs .v-tab.v-tab.v-btn {
+    height: calc(var(--v-tabs-height) * 1.5);
 }
 
 .accounts-overview-title {

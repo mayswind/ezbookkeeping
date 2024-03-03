@@ -12,6 +12,19 @@
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
+                                <v-list-item :prepend-icon="icons.swap"
+                                             :title="$t('Swap Account')"
+                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             @click="swapTransactionData(true, false)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.swap"
+                                             :title="$t('Swap Amount')"
+                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             @click="swapTransactionData(false, true)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.swap"
+                                             :title="$t('Swap Account and Amount')"
+                                             v-if="transaction.type === allTransactionTypes.Transfer"
+                                             @click="swapTransactionData(true, true)"></v-list-item>
+                                <v-divider v-if="transaction.type === allTransactionTypes.Transfer" />
                                 <v-list-item :prepend-icon="icons.show"
                                              :title="$t('Show Amount')"
                                              v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
@@ -338,6 +351,7 @@ import {
     mdiDotsVertical,
     mdiEyeOffOutline,
     mdiEyeOutline,
+    mdiSwapHorizontal,
     mdiPound
 } from '@mdi/js';
 
@@ -371,6 +385,7 @@ export default {
                 more: mdiDotsVertical,
                 show: mdiEyeOutline,
                 hide: mdiEyeOffOutline,
+                swap: mdiSwapHorizontal,
                 tag: mdiPound
             }
         };
@@ -808,6 +823,19 @@ export default {
             this.geoMenuState = false;
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
+        },
+        swapTransactionData(swapAccount, swapAmount) {
+            if (swapAccount) {
+                const oldSourceAccountId = this.transaction.sourceAccountId;
+                this.transaction.sourceAccountId = this.transaction.destinationAccountId;
+                this.transaction.destinationAccountId = oldSourceAccountId;
+            }
+
+            if (swapAmount) {
+                const oldSourceAmount = this.transaction.sourceAmount;
+                this.transaction.sourceAmount = this.transaction.destinationAmount;
+                this.transaction.destinationAmount = oldSourceAmount;
+            }
         },
         setTransaction(transaction, options, setContextData) {
             setTransactionModelByTransaction(

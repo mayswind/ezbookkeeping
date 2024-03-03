@@ -319,6 +319,11 @@
         </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group v-if="transaction.type === allTransactionTypes.Transfer">
+                <f7-actions-button @click="swapTransactionData(true, false)">{{ $t('Swap Account') }}</f7-actions-button>
+                <f7-actions-button @click="swapTransactionData(false, true)">{{ $t('Swap Amount') }}</f7-actions-button>
+                <f7-actions-button @click="swapTransactionData(true, true)">{{ $t('Swap Account and Amount') }}</f7-actions-button>
+            </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ $t('Show Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ $t('Hide Amount') }}</f7-actions-button>
@@ -785,6 +790,19 @@ export default {
         clearGeoLocation() {
             this.geoLocationStatus = null;
             this.transaction.geoLocation = null;
+        },
+        swapTransactionData(swapAccount, swapAmount) {
+            if (swapAccount) {
+                const oldSourceAccountId = this.transaction.sourceAccountId;
+                this.transaction.sourceAccountId = this.transaction.destinationAccountId;
+                this.transaction.destinationAccountId = oldSourceAccountId;
+            }
+
+            if (swapAmount) {
+                const oldSourceAmount = this.transaction.sourceAmount;
+                this.transaction.sourceAmount = this.transaction.destinationAmount;
+                this.transaction.destinationAmount = oldSourceAmount;
+            }
         },
         getFontClassByAmount(amount) {
             if (amount >= 100000000 || amount <= -100000000) {

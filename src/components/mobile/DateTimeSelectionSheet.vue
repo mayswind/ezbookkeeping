@@ -22,6 +22,7 @@
                              :week-start="firstDayOfWeek"
                              :year-range="yearRange"
                              :day-names="dayNames"
+                             :year-first="isYearFirst"
                              v-model="dateTime">
                 <template #month="{ text }">
                     {{ getMonthShortName(text) }}
@@ -99,6 +100,9 @@ export default {
         },
         dayNames() {
             return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
+        },
+        isYearFirst() {
+            return this.$locale.isLongDateMonthAfterYear(this.userStore);
         }
     },
     beforeUnmount() {

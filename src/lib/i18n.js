@@ -461,6 +461,18 @@ function getI18nShortMonthDayFormat(translateFn, formatTypeValue) {
     return getDateTimeFormat(translateFn, datetime.allShortDateFormat, datetime.allShortDateFormatArray, 'format.shortMonthDay', defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
 }
 
+function isLongDateMonthAfterYear(translateFn, formatTypeValue) {
+    const defaultLongDateFormatTypeName = translateFn('default.longDateFormat');
+    const type = getDateTimeFormatType(datetime.allLongDateFormat, datetime.allLongDateFormatArray, defaultLongDateFormatTypeName, datetime.defaultLongDateFormat, formatTypeValue);
+    return type.isMonthAfterYear;
+}
+
+function isShortDateMonthAfterYear(translateFn, formatTypeValue) {
+    const defaultShortDateFormatTypeName = translateFn('default.shortDateFormat');
+    const type = getDateTimeFormatType(datetime.allShortDateFormat, datetime.allShortDateFormatArray, defaultShortDateFormatTypeName, datetime.defaultShortDateFormat, formatTypeValue);
+    return type.isMonthAfterYear;
+}
+
 function getI18nLongTimeFormat(translateFn, formatTypeValue) {
     const defaultLongTimeFormatTypeName = translateFn('default.longTimeFormat');
     return getDateTimeFormat(translateFn, datetime.allLongTimeFormat, datetime.allLongTimeFormatArray, 'format.longTime', defaultLongTimeFormatTypeName, datetime.defaultLongTimeFormat, formatTypeValue);
@@ -1304,6 +1316,8 @@ export function i18nFunctions(i18nGlobal) {
         formatUnixTimeToShortTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatTimeToLongYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nLongYearMonthFormat(i18nGlobal.t, userStore.currentUserLongDateFormat)),
         formatTimeToShortYearMonth: (userStore, dateTime) => formatTime(dateTime, getI18nShortYearMonthFormat(i18nGlobal.t, userStore.currentUserShortDateFormat)),
+        isLongDateMonthAfterYear: (userStore) => isLongDateMonthAfterYear(i18nGlobal.t, userStore.currentUserLongDateFormat),
+        isShortDateMonthAfterYear: (userStore) => isShortDateMonthAfterYear(i18nGlobal.t, userStore.currentUserShortDateFormat),
         isLongTime24HourFormat: (userStore) => isLongTime24HourFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat),
         isLongTimeMeridiemIndicatorFirst: (userStore) => isLongTimeMeridiemIndicatorFirst(i18nGlobal.t, userStore.currentUserLongTimeFormat),
         isShortTime24HourFormat: (userStore) => isShortTime24HourFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat),

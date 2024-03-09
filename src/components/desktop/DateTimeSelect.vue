@@ -20,6 +20,7 @@
                              :week-start="firstDayOfWeek"
                              :year-range="yearRange"
                              :day-names="dayNames"
+                             :year-first="isYearFirst"
                              :is24="is24Hour"
                              v-model="dateTime">
                 <template #month="{ text }">
@@ -98,6 +99,9 @@ export default {
         dayNames() {
             return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
         },
+        isYearFirst() {
+            return this.$locale.isLongDateMonthAfterYear(this.userStore);
+        },
         is24Hour() {
             return this.$locale.isLongTime24HourFormat(this.userStore);
         },
@@ -113,9 +117,6 @@ export default {
         };
     },
     methods: {
-        setCurrentTime() {
-            this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime())
-        },
         getMonthShortName(month) {
             return this.$locale.getMonthShortName(month);
         }

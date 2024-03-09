@@ -67,15 +67,18 @@ const allWeekDaysArray = [
 const allLongDateFormat = {
     YYYYMMDD: {
         type: 1,
-        key: 'yyyy_mm_dd'
+        key: 'yyyy_mm_dd',
+        isMonthAfterYear: true
     },
     MMDDYYYY: {
         type: 2,
-        key: 'mm_dd_yyyy'
+        key: 'mm_dd_yyyy',
+        isMonthAfterYear: false
     },
     DDMMYYYY: {
         type: 3,
-        key: 'dd_mm_yyyy'
+        key: 'dd_mm_yyyy',
+        isMonthAfterYear: false
     }
 };
 
@@ -88,15 +91,18 @@ const allLongDateFormatArray = [
 const allShortDateFormat = {
     YYYYMMDD: {
         type: 1,
-        key: 'yyyy_mm_dd'
+        key: 'yyyy_mm_dd',
+        isMonthAfterYear: true
     },
     MMDDYYYY: {
         type: 2,
-        key: 'mm_dd_yyyy'
+        key: 'mm_dd_yyyy',
+        isMonthAfterYear: false
     },
     DDMMYYYY: {
         type: 3,
-        key: 'dd_mm_yyyy'
+        key: 'dd_mm_yyyy',
+        isMonthAfterYear: false
     }
 };
 

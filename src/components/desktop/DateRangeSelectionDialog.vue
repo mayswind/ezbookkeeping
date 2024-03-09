@@ -27,6 +27,7 @@
                                  :week-start="firstDayOfWeek"
                                  :year-range="yearRange"
                                  :day-names="dayNames"
+                                 :year-first="isYearFirst"
                                  :is24="is24Hour"
                                  :partial-range="false"
                                  :preset-dates="presetRanges"
@@ -129,6 +130,9 @@ export default {
         },
         dayNames() {
             return arrangeArrayWithNewStartIndex(this.$locale.getAllMinWeekdayNames(), this.firstDayOfWeek);
+        },
+        isYearFirst() {
+            return this.$locale.isLongDateMonthAfterYear(this.userStore);
         },
         is24Hour() {
             return this.$locale.isLongTime24HourFormat(this.userStore);

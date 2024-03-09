@@ -49,12 +49,10 @@
                                                                 @click="setDateFilter(dateRange.type)">
                                                                 {{ $t(dateRange.name) }}
                                                                 <div class="statistics-custom-datetime-range" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
-                                                                    <small>
-                                                                        <span>{{ queryStartTime }}</span>
-                                                                        <span>&nbsp;-&nbsp;</span>
-                                                                        <br/>
-                                                                        <span>{{ queryEndTime }}</span>
-                                                                    </small>
+                                                                    <span>{{ queryStartTime }}</span>
+                                                                    <span>&nbsp;-&nbsp;</span>
+                                                                    <br/>
+                                                                    <span>{{ queryEndTime }}</span>
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
@@ -590,6 +588,7 @@ export default {
 <style>
 .statistics-custom-datetime-range {
     font-size: 0.7rem;
+    line-height: 1rem;
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;
 }
 

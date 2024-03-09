@@ -614,7 +614,7 @@ export default {
             self.originalTransactionEditable = false;
 
             const newTransaction = self.transactionsStore.generateNewTransactionModel(options.type);
-            self.setTransaction(newTransaction, options, true);
+            self.setTransaction(newTransaction, options, true, false);
 
             const promises = [
                 self.accountsStore.loadAllAccounts({ force: false }),
@@ -624,7 +624,7 @@ export default {
 
             if (options && options.id) {
                 if (options.currentTransaction) {
-                    self.setTransaction(options.currentTransaction, options, true);
+                    self.setTransaction(options.currentTransaction, options, true, true);
                 }
 
                 self.mode = 'view';
@@ -658,10 +658,10 @@ export default {
 
                 if (options.id && responses[3]) {
                     const transaction = responses[3];
-                    self.setTransaction(transaction, options, true);
+                    self.setTransaction(transaction, options, true, true);
                     self.originalTransactionEditable = transaction.editable;
                 } else {
-                    self.setTransaction(null, options, true);
+                    self.setTransaction(null, options, true, true);
                 }
 
                 self.loading = false;
@@ -837,7 +837,7 @@ export default {
                 this.transaction.destinationAmount = oldSourceAmount;
             }
         },
-        setTransaction(transaction, options, setContextData) {
+        setTransaction(transaction, options, setContextData, convertContextTime) {
             setTransactionModelByTransaction(
                 this.transaction,
                 transaction,
@@ -851,7 +851,8 @@ export default {
                     categoryId: options.categoryId,
                     accountId: options.accountId
                 },
-                setContextData
+                setContextData,
+                convertContextTime
             );
         }
     }

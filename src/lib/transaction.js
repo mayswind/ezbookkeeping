@@ -14,7 +14,7 @@ import {
     getFirstAvaiableSubCategoryId
 } from './category.js';
 
-export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData) {
+export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData, convertContextTime) {
     if ((!options.type || options.type === '0') && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
         const type = categoryTypeToTransactionType(category.type);
@@ -115,7 +115,12 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
         if (setContextData) {
             transaction.utcOffset = transaction2.utcOffset;
             transaction.timeZone = transaction2.timeZone;
-            transaction.time = getDummyUnixTimeForLocalUsage(transaction2.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
+
+            if (convertContextTime) {
+                transaction.time = getDummyUnixTimeForLocalUsage(transaction2.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes());
+            } else {
+                transaction.time = transaction2.time;
+            }
         }
 
         transaction.sourceAccountId = transaction2.sourceAccountId;

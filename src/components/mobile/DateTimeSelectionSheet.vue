@@ -52,7 +52,7 @@ import {
     getLocalDatetimeFromUnixTime,
     getYear,
     getTimeValues,
-    getCombinedDatetimeByDateAndTimeValues
+    setTimeValuesToDate
 } from '@/lib/datetime.js';
 import { createInlinePicker } from '@/lib/ui.mobile.js';
 
@@ -126,6 +126,7 @@ export default {
                     self.getTimePickerColumns(), self.timeValues, {
                         change(picker, values) {
                             self.timeValues = values;
+                            setTimeValuesToDate(self.dateTime, self.timeValues, self.is24Hour, self.isMeridiemIndicatorFirst);
                         }
                     });
             } else {
@@ -138,7 +139,7 @@ export default {
             this.$emit('update:show', false);
         },
         setCurrentTime() {
-            this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime())
+            this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime());
             this.timeValues = this.getTimeValues(this.dateTime);
 
             if (this.timePickerHolder) {
@@ -150,8 +151,7 @@ export default {
                 return;
             }
 
-            const finalDatetime = getCombinedDatetimeByDateAndTimeValues(this.dateTime, this.timeValues, this.is24Hour, this.isMeridiemIndicatorFirst);
-            const unixTime = getUnixTime(finalDatetime);
+            const unixTime = getUnixTime(this.dateTime);
 
             if (unixTime < 0) {
                 this.$toast('Date is too early');

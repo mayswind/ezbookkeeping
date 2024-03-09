@@ -3,6 +3,24 @@ import moment from 'moment';
 import dateTimeConstants from '@/consts/datetime.js';
 import { isNumber } from './common.js';
 
+export function getTwoDigitsString(value) {
+    if (value < 10) {
+        return '0' + value;
+    } else {
+        return value.toString();
+    }
+}
+
+export function getHourIn12HourFormat(hour) {
+    hour = hour % 12;
+
+    if (hour === 0) {
+        hour = 12;
+    }
+
+    return hour;
+}
+
 export function isPM(hour) {
     if (hour > 11) {
         return true;
@@ -151,8 +169,8 @@ export function getMonthName(date) {
     return dateTimeConstants.allMonthsArray[dayOfWeek];
 }
 
-export function getAMOrPM(date) {
-    return isPM(moment(date).hour()) ? dateTimeConstants.allMeridiemIndicators.PM : dateTimeConstants.allMeridiemIndicators.AM;
+export function getAMOrPM(hour) {
+    return isPM(hour) ? dateTimeConstants.allMeridiemIndicators.PM : dateTimeConstants.allMeridiemIndicators.AM;
 }
 
 export function getHour(date) {
@@ -165,35 +183,6 @@ export function getMinute(date) {
 
 export function getSecond(date) {
     return moment(date).second();
-}
-
-export function getTimeValues(date, is24Hour, isMeridiemIndicatorFirst) {
-    if (is24Hour) {
-        return moment(date).format('HH mm ss').split(' ');
-    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
-        return [getAMOrPM(date)].concat(moment(date).format('hh mm ss').split(' '));
-    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
-        return moment(date).format('hh mm ss').split(' ').concat([getAMOrPM(date)]);
-    }
-}
-
-export function getCombinedDatetimeByDateAndTimeValues(date, timeValues, is24Hour, isMeridiemIndicatorFirst) {
-    const datetime = moment(date);
-    let time = datetime;
-
-    if (is24Hour) {
-        time = moment(timeValues.join(' '), 'HH mm ss');
-    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
-        time = moment(timeValues.join(' '), 'A HH mm ss');
-    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
-        time = moment(timeValues.join(' '), 'HH mm ss A');
-    }
-
-    datetime.hour(time.hour());
-    datetime.minute(time.minute());
-    datetime.second(time.second());
-
-    return datetime;
 }
 
 export function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {
@@ -454,6 +443,60 @@ export function getRecentDateRangeType(allRecentMonthDateRanges, dateType, minTi
     }
 
     return getRecentDateRangeTypeByDateType(allRecentMonthDateRanges, dateTimeConstants.allDateRanges.Custom.type);
+}
+
+export function getTimeValues(date, is24Hour, isMeridiemIndicatorFirst) {
+    const hourMinuteSeconds = [
+        getTwoDigitsString(is24Hour ? date.getHours() : getHourIn12HourFormat(date.getHours())),
+        getTwoDigitsString(date.getMinutes()),
+        getTwoDigitsString(date.getSeconds())
+    ];
+
+    if (is24Hour) {
+        return hourMinuteSeconds;
+    } else if (/*!is24Hour && */isMeridiemIndicatorFirst) {
+        return [getAMOrPM(date.getHours())].concat(hourMinuteSeconds);
+    } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
+        return hourMinuteSeconds.concat([getAMOrPM(date.getHours())]);
+    }
+}
+
+export function setTimeValuesToDate(date, timeValues, is24Hour, isMeridiemIndicatorFirst) {
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+
+    if (is24Hour) {
+        hours = parseInt(timeValues[0]);
+        minutes = parseInt(timeValues[1]);
+        seconds = parseInt(timeValues[2]);
+    } else {
+        let meridiemIndicator;
+
+        if (/*!is24Hour && */isMeridiemIndicatorFirst) {
+            meridiemIndicator = timeValues[0];
+            hours = parseInt(timeValues[1]);
+            minutes = parseInt(timeValues[2]);
+            seconds = parseInt(timeValues[3]);
+        } else /* !is24Hour && !isMeridiemIndicatorFirst */ {
+            hours = parseInt(timeValues[0]);
+            minutes = parseInt(timeValues[1]);
+            seconds = parseInt(timeValues[2]);
+            meridiemIndicator = timeValues[3];
+        }
+
+        if (hours === 12) {
+            hours = 0;
+        }
+
+        if (meridiemIndicator === dateTimeConstants.allMeridiemIndicators.PM) {
+            hours += 12;
+        }
+    }
+
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(seconds);
 }
 
 export function isDateRangeMatchFullYears(minTime, maxTime) {

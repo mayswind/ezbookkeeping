@@ -45,7 +45,6 @@ import { useUserStore } from '@/stores/user.js';
 
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
 import {
-    getCurrentUnixTime,
     getCurrentDateTime,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,

@@ -482,18 +482,18 @@ export default {
     opacity: var(--v-medium-emphasis-opacity);
 }
 
-.transaction-tags-table .v-text-field.v-text-field--plain-underlined .v-input__prepend {
-    padding-top: 12px;
-}
-
-.transaction-tags-table tr:last-child .v-text-field.v-text-field--plain-underlined .v-input__prepend {
-    padding-top: 8px;
+.transaction-tags-table .v-text-field.v-input--plain-underlined .v-input__prepend {
+    padding-top: 6px;
 }
 
 .transaction-tags-table .v-text-field .v-field__input {
     font-size: 0.875rem;
-    padding-top: 2px;
+    padding-top: 0;
     color: rgba(var(--v-theme-on-surface));
+}
+
+.transaction-tags-table tr:last-child .v-text-field .v-field__input {
+    padding-bottom: 1px;
 }
 
 .transaction-tags-table .v-text-field .v-field__clearable {

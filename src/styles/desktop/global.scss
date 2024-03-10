@@ -130,7 +130,8 @@ input[type=number] {
 .v-input.v-input--readonly .v-field .v-text-field__prefix,
 .v-input.v-input--readonly .v-field .v-text-field__suffix,
 .v-input.v-input--readonly .v-field .v-field__input,
-.v-input.v-input--readonly .v-field.v-field {
+.v-input.v-input--readonly .v-field.v-field,
+.v-input.v-input--readonly .cursor-pointer {
     cursor: default !important;
 }
 

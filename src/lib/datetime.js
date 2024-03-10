@@ -461,7 +461,8 @@ export function getTimeValues(date, is24Hour, isMeridiemIndicatorFirst) {
     }
 }
 
-export function setTimeValuesToDate(date, timeValues, is24Hour, isMeridiemIndicatorFirst) {
+export function getCombinedDateAndTimeValues(date, timeValues, is24Hour, isMeridiemIndicatorFirst) {
+    let newDateTime = new Date(date.valueOf());
     let hours = 0;
     let minutes = 0;
     let seconds = 0;
@@ -494,9 +495,11 @@ export function setTimeValuesToDate(date, timeValues, is24Hour, isMeridiemIndica
         }
     }
 
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(seconds);
+    newDateTime.setHours(hours);
+    newDateTime.setMinutes(minutes);
+    newDateTime.setSeconds(seconds);
+
+    return newDateTime;
 }
 
 export function isDateRangeMatchFullYears(minTime, maxTime) {

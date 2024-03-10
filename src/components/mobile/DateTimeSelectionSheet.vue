@@ -4,37 +4,46 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="$t('Now')" @click="setCurrentTime"></f7-link>
+                <f7-link :text="switchButtonTitle" @click="switchMode"></f7-link>
             </div>
             <div class="right">
                 <f7-link :text="$t('Done')" @click="confirm"></f7-link>
             </div>
         </f7-toolbar>
-        <f7-page-content>
-            <vue-date-picker inline enable-seconds auto-apply
-                             ref="datetimepicker"
-                             month-name-format="long"
-                             six-weeks="center"
-                             class="justify-content-center"
-                             :enable-time-picker="false"
-                             :clearable="false"
-                             :dark="isDarkMode"
-                             :week-start="firstDayOfWeek"
-                             :year-range="yearRange"
-                             :day-names="dayNames"
-                             :year-first="isYearFirst"
-                             v-model="dateTime">
-                <template #month="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-                <template #month-overlay-value="{ text }">
-                    {{ getMonthShortName(text) }}
-                </template>
-            </vue-date-picker>
-            <div class="block block-outline no-margin no-padding padding-vertical-half">
+        <f7-page-content class="padding-bottom">
+            <div class="block block-outline no-margin no-padding">
+                <vue-date-picker inline enable-seconds auto-apply
+                                 ref="datetimepicker"
+                                 month-name-format="long"
+                                 six-weeks="center"
+                                 class="justify-content-center"
+                                 :enable-time-picker="false"
+                                 :clearable="false"
+                                 :dark="isDarkMode"
+                                 :week-start="firstDayOfWeek"
+                                 :year-range="yearRange"
+                                 :day-names="dayNames"
+                                 :year-first="isYearFirst"
+                                 v-model="dateTime"
+                                 v-show="mode === 'date'">
+                    <template #month="{ text }">
+                        {{ getMonthShortName(text) }}
+                    </template>
+                    <template #month-overlay-value="{ text }">
+                        {{ getMonthShortName(text) }}
+                    </template>
+                </vue-date-picker>
+            </div>
+            <div class="block block-outline no-margin no-padding padding-vertical-half" v-show="mode === 'time'">
                 <div id="time-picker-container" class="time-picker-container"></div>
             </div>
             <input id="time-picker-input" style="display: none" type="text" readonly="readonly"/>
+            <div class="margin-top text-align-center">
+                <div class="display-flex padding-horizontal justify-content-space-between">
+                    <div class="align-self-center">{{ displayTime }}</div>
+                    <f7-button fill :text="$t('Now')" @click="setCurrentTime"></f7-button>
+                </div>
+            </div>
         </f7-page-content>
     </f7-sheet>
 </template>
@@ -49,10 +58,13 @@ import {
     getCurrentUnixTime,
     getCurrentDateTime,
     getUnixTime,
+    getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
+    getActualUnixTimeForStore,
+    getTimezoneOffsetMinutes,
     getYear,
     getTimeValues,
-    setTimeValuesToDate
+    getCombinedDateAndTimeValues
 } from '@/lib/datetime.js';
 import { createInlinePicker } from '@/lib/ui.mobile.js';
 
@@ -82,6 +94,7 @@ export default {
         const datetime = getLocalDatetimeFromUnixTime(value);
 
         return {
+            mode: 'time',
             yearRange: [
                 2000,
                 getYear(getCurrentDateTime()) + 1
@@ -103,6 +116,16 @@ export default {
         },
         isYearFirst() {
             return this.$locale.isLongDateMonthAfterYear(this.userStore);
+        },
+        displayTime() {
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(getUnixTime(this.dateTime), getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+        },
+        switchButtonTitle() {
+            if (this.mode === 'time') {
+                return this.$t('Date');
+            } else {
+                return this.$t('Time');
+            }
         }
     },
     beforeUnmount() {
@@ -114,6 +137,7 @@ export default {
     methods: {
         onSheetOpen() {
             const self = this;
+            self.mode = 'time';
 
             if (self.modelValue) {
                 self.dateTime = getLocalDatetimeFromUnixTime(self.modelValue);
@@ -126,17 +150,26 @@ export default {
                     self.getTimePickerColumns(), self.timeValues, {
                         change(picker, values) {
                             self.timeValues = values;
-                            setTimeValuesToDate(self.dateTime, self.timeValues, self.is24Hour, self.isMeridiemIndicatorFirst);
+                            self.dateTime = getCombinedDateAndTimeValues(self.dateTime, self.timeValues, self.is24Hour, self.isMeridiemIndicatorFirst);
                         }
                     });
             } else {
-                self.timePickerHolder.setValue(self.timeValues);
+                self.$nextTick(() => {
+                    self.timePickerHolder.setValue(self.timeValues);
+                });
             }
 
             self.$refs.datetimepicker.switchView('calendar');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
+        },
+        switchMode() {
+            if (this.mode === 'time') {
+                this.mode = 'date';
+            } else {
+                this.mode = 'time';
+            }
         },
         setCurrentTime() {
             this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime());

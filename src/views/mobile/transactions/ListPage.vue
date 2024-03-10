@@ -25,9 +25,15 @@
             </f7-subnavbar>
         </f7-navbar>
 
-        <f7-toolbar tabbar bottom>
-            <f7-link class="tabbar-text-with-ellipsis" popover-open=".date-popover-menu">
+        <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
+            <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
+                <f7-icon f7="arrow_left_square"></f7-icon>
+            </f7-link>
+            <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ queryDateRangeName }}</span>
+            </f7-link>
+            <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
+                <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ queryTransactionTypeName }}</span>
@@ -432,6 +438,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
+    getShiftedDateRangeAndDateType,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
@@ -494,19 +501,7 @@ export default {
                 return this.$t('Date');
             }
 
-            for (let dateRangeField in this.allDateRanges) {
-                if (!Object.prototype.hasOwnProperty.call(this.allDateRanges, dateRangeField)) {
-                    continue;
-                }
-
-                const dateRange = this.allDateRanges[dateRangeField];
-
-                if (dateRange && dateRange.type === this.query.dateType && dateRange.name) {
-                    return this.$t(dateRange.name);
-                }
-            }
-
-            return this.$t('Date');
+            return this.$locale.getDateRangeDisplayName(this.userStore, this.query.dateType, this.query.minTime, this.query.maxTime);
         },
         queryMinTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.minTime);
@@ -824,6 +819,21 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        shiftDateRange(minTime, maxTime, scale) {
+            if (this.query.dateType === this.allDateRanges.All.type) {
+                return;
+            }
+
+            const newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek);
+
+            this.transactionsStore.updateTransactionListFilter({
+                dateType: newDateRange.dateType,
+                maxTime: newDateRange.maxTime,
+                minTime: newDateRange.minTime
+            });
+
+            this.reload(null);
         },
         scrollPopoverToSelectedItem(event) {
             scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');

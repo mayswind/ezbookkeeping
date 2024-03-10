@@ -352,7 +352,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     }
                 }
 
-                if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue) &&
+                if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue || transaction.destinationAmount === 0) &&
                     (stringCurrencyToNumeric(transactionConstants.minAmount) <= newValue &&
                         newValue <= stringCurrencyToNumeric(transactionConstants.maxAmount))) {
                     transaction.destinationAmount = newValue;

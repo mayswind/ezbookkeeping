@@ -262,6 +262,7 @@
                                                     <div class="d-flex flex-column">
                                                         <span>{{ getDisplayTime(transaction) }}</span>
                                                         <span class="text-caption" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimezone(transaction) }}</span>
+                                                        <v-tooltip activator="parent" v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ getDisplayTimeInDefaultTimezone(transaction) }}</v-tooltip>
                                                     </div>
                                                 </td>
                                                 <td class="transaction-table-column-category">
@@ -352,6 +353,7 @@ import {
     getUnixTime,
     getSpecifiedDayFirstUnixTime,
     getUtcOffsetByUtcOffsetMinutes,
+    getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
@@ -890,6 +892,9 @@ export default {
         },
         getDisplayTime(transaction) {
             return this.$locale.formatUnixTimeToShortTime(this.userStore, transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes);
+        },
+        getDisplayTimeInDefaultTimezone(transaction) {
+            return `${this.$locale.formatUnixTimeToLongDateTime(this.userStore, transaction.time)} (UTC${getTimezoneOffset(this.settingsStore.appSettings.timeZone)})`;
         },
         getDisplayTimezone(transaction) {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;

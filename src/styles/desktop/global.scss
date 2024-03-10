@@ -125,6 +125,15 @@ input[type=number] {
 }
 
 /** Common class for replacing the default style of vuetify **/
+.v-input.v-input--readonly input,
+.v-input.v-input--readonly textarea,
+.v-input.v-input--readonly .v-field .v-text-field__prefix,
+.v-input.v-input--readonly .v-field .v-text-field__suffix,
+.v-input.v-input--readonly .v-field .v-field__input,
+.v-input.v-input--readonly .v-field.v-field {
+    cursor: default !important;
+}
+
 .v-table {
     th {
         background: rgb(var(--v-table-header-background)) !important;

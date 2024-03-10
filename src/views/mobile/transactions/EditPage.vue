@@ -216,10 +216,10 @@
             <f7-list-item
                 class="list-item-with-header-and-title"
                 link="#" no-chevron
-                :class="{ 'readonly': mode === 'view' }"
+                :class="{ 'readonly': mode === 'view' && transaction.utcOffset === currentTimezoneOffsetMinutes }"
                 :header="$t('Transaction Time')"
                 :title="transactionDisplayTime"
-                @click="showTransactionDateTimeSheet = true"
+                @click="mode !== 'view' ? showTransactionDateTimeSheet = true : showTimeInDefaultTimezone = !showTimeInDefaultTimezone"
             >
                 <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"
                                            v-model="transaction.time">
@@ -358,6 +358,7 @@ import {
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
+    getTimezoneOffset,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getUtcOffsetByUtcOffsetMinutes,
@@ -393,6 +394,7 @@ export default {
             geoLocationStatus: null,
             submitting: false,
             isSupportGeoLocation: !!navigator.geolocation,
+            showTimeInDefaultTimezone: false,
             showGeoLocationActionSheet: false,
             showMoreActionSheet: false,
             showSourceAmountSheet: false,
@@ -460,6 +462,9 @@ export default {
             }
 
             return this.$t('Transfer In Amount') + ` (${amountRate})`;
+        },
+        currentTimezoneOffsetMinutes() {
+            return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
@@ -539,7 +544,11 @@ export default {
             }
         },
         transactionDisplayTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+            if (this.mode !== 'view' || !this.showTimeInDefaultTimezone) {
+                return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+            }
+
+            return `${this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, this.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${getTimezoneOffset(this.settingsStore.appSettings.timeZone)})`;
         },
         transactionDisplayTimezone() {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;

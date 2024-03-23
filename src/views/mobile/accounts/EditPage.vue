@@ -36,7 +36,7 @@
                 class="list-item-with-header-and-title"
                 :class="{ 'disabled': editAccountId }"
                 :header="$t('Account Type')"
-                :title="this.getAccountTypeName(account.type)"
+                :title="getAccountTypeName(account.type)"
                 @click="showAccountTypeSheet = true"
             >
                 <list-item-selection-sheet value-type="item"

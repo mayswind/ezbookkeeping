@@ -676,6 +676,15 @@ function getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, trans
     const allRecentMonthDateRanges = [];
     const recentDateRanges = getRecentMonthDateRanges(12);
 
+    if (includeAll) {
+        allRecentMonthDateRanges.push({
+            dateType: datetime.allDateRanges.All.type,
+            minTime: 0,
+            maxTime: 0,
+            displayName: translateFn('All')
+        });
+    }
+
     for (let i = 0; i < recentDateRanges.length; i++) {
         const recentDateRange = recentDateRanges[i];
 
@@ -687,15 +696,6 @@ function getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, trans
             month: recentDateRange.month,
             isPreset: true,
             displayName: formatUnixTime(recentDateRange.minTime, getI18nLongYearMonthFormat(translateFn, userStore.currentUserLongDateFormat))
-        });
-    }
-
-    if (includeAll) {
-        allRecentMonthDateRanges.push({
-            dateType: datetime.allDateRanges.All.type,
-            minTime: 0,
-            maxTime: 0,
-            displayName: translateFn('All')
         });
     }
 

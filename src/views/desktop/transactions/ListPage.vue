@@ -66,9 +66,21 @@
                                     <v-card-text class="pt-0">
                                         <div class="transaction-list-datetime-range d-flex align-center">
                                             <span class="text-body-1">{{ $t('Date Range') }}</span>
-                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2">
-                                                <span class="text-sm" v-if="!this.query.minTime && !this.query.maxTime">{{ $t('All') }}</span>
-                                                <span class="text-sm" v-else-if="this.query.minTime || this.query.maxTime">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
+                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2"
+                                                  v-if="!query.minTime && !query.maxTime">
+                                                <span class="text-sm">{{ $t('All') }}</span>
+                                            </span>
+                                            <span class="text-body-1 transaction-list-datetime-range-text ml-2"
+                                                  v-else-if="query.minTime || query.maxTime">
+                                                <v-btn class="mr-1" size="small"
+                                                       density="comfortable" color="default" variant="outlined"
+                                                       :icon="icons.arrowLeft" :disabled="loading"
+                                                       @click="shiftDateRange(query.minTime, query.maxTime, -1)"/>
+                                                <span class="text-sm">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
+                                                <v-btn class="ml-1" size="small"
+                                                       density="comfortable" color="default" variant="outlined"
+                                                       :icon="icons.arrowRight" :disabled="loading"
+                                                       @click="shiftDateRange(query.minTime, query.maxTime, 1)"/>
                                             </span>
                                             <v-spacer/>
                                             <div class="skeleton-no-margin d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
@@ -357,6 +369,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
+    getShiftedDateRangeAndDateType,
     getDateRangeByDateType,
     getRecentDateRangeType,
     isDateRangeMatchOneMonth
@@ -375,6 +388,7 @@ import {
     mdiMenu,
     mdiMenuDown,
     mdiPencilBoxOutline,
+    mdiArrowLeft,
     mdiArrowRight,
     mdiDotsVertical
 } from '@mdi/js';
@@ -415,6 +429,7 @@ export default {
                 menu: mdiMenu,
                 dropdownMenu: mdiMenuDown,
                 modifyBalance: mdiPencilBoxOutline,
+                arrowLeft: mdiArrowLeft,
                 arrowRight: mdiArrowRight,
                 more: mdiDotsVertical
             }
@@ -729,6 +744,24 @@ export default {
                     self.$refs.snackbar.showError(error);
                 }
             });
+        },
+        shiftDateRange(startTime, endTime, scale) {
+            if (this.recentDateRangeType === datetimeConstants.allDateRanges.All.type) {
+                return;
+            }
+
+            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek);
+
+            this.transactionsStore.updateTransactionListFilter({
+                dateType: newDateRange.dateType,
+                maxTime: newDateRange.maxTime,
+                minTime: newDateRange.minTime
+            });
+
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
+            this.$router.push(this.getFilterLinkUrl());
         },
         changeDateFilter(recentDateRange) {
             if (recentDateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&

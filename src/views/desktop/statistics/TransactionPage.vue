@@ -202,6 +202,7 @@
                                                             </div>
                                                             <div>
                                                                 <v-progress-linear :color="item.color ? '#' + item.color : 'primary'"
+                                                                                   :bg-color="isDarkMode ? '#161616' : '#f8f8f8'" :bg-opacity="1"
                                                                                    :model-value="item.percent >= 0 ? item.percent : 0"
                                                                                    :height="4"></v-progress-linear>
                                                             </div>
@@ -243,7 +244,7 @@
 </template>
 
 <script>
-import { useDisplay } from 'vuetify';
+import { useDisplay, useTheme } from 'vuetify';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
@@ -311,6 +312,9 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useStatisticsStore),
+        isDarkMode() {
+            return this.globalTheme.global.name.value === 'dark';
+        },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
         },
@@ -430,9 +434,11 @@ export default {
     },
     setup() {
         const display = useDisplay();
+        const theme = useTheme();
 
         return {
-            display: display
+            display: display,
+            globalTheme: theme
         };
     },
     methods: {

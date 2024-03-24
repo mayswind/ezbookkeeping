@@ -13,8 +13,8 @@ import (
 type EzBookKeepingPlainFileExporter struct {
 }
 
-const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Tags,Description\n"
-const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"
+const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
 // toExportedContent returns the exported plain data
 func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, timezone *time.Location, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
@@ -22,11 +22,15 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 
 	ret.Grow(len(transactions) * 100)
 
-	if separator == "," {
-		ret.WriteString(headerLine)
-	} else {
-		ret.WriteString(strings.Replace(headerLine, ",", separator, -1))
+	actualHeaderLine := headerLine
+	actualDataLineFormat := dataLineFormat
+
+	if separator != "," {
+		actualHeaderLine = strings.Replace(headerLine, ",", separator, -1)
+		actualDataLineFormat = strings.Replace(dataLineFormat, ",", separator, -1)
 	}
+
+	ret.WriteString(actualHeaderLine)
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
@@ -47,6 +51,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		account2 := ""
 		account2Currency := ""
 		account2Amount := ""
+		geoLocation := ""
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			account2 = e.replaceDelimiters(e.getAccountName(transaction.RelatedAccountId, accountMap), separator)
@@ -54,14 +59,14 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 			account2Amount = e.getDisplayAmount(transaction.RelatedAccountAmount)
 		}
 
+		if transaction.GeoLongitude != 0 || transaction.GeoLatitude != 0 {
+			geoLocation = fmt.Sprintf("%f %f", transaction.GeoLongitude, transaction.GeoLatitude)
+		}
+
 		tags := e.replaceDelimiters(e.getTags(transaction.TransactionId, allTagIndexs, tagMap), separator)
 		comment := e.replaceDelimiters(transaction.Comment, separator)
 
-		if separator == "," {
-			ret.WriteString(fmt.Sprintf(dataLineFormat, transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, tags, comment))
-		} else {
-			ret.WriteString(fmt.Sprintf(strings.Replace(dataLineFormat, ",", separator, -1), transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, tags, comment))
-		}
+		ret.WriteString(fmt.Sprintf(actualDataLineFormat, transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, geoLocation, tags, comment))
 	}
 
 	return []byte(ret.String()), nil

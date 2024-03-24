@@ -16,6 +16,7 @@
         <f7-popover class="chart-data-type-popover-menu"
                     v-model:opened="showChartDataTypePopover">
             <f7-list dividers>
+                <f7-list-item group-title :title="$t('Categorical Analysis')" />
                 <f7-list-item :title="$t(dataType.name)"
                               :key="dataType.type"
                               v-for="dataType in allChartDataTypes"

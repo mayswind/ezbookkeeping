@@ -62,6 +62,12 @@ const allSortingTypes = {
     }
 };
 
+const allSortingTypesArray = [
+    allSortingTypes.Amount,
+    allSortingTypes.DisplayOrder,
+    allSortingTypes.Name
+]
+
 const defaultSortingType = allSortingTypes.Amount.type;
 
 export default {
@@ -71,5 +77,6 @@ export default {
     defaultChartDataType: defaultChartDataType,
     defaultDataRangeType: datetime.allDateRanges.ThisMonth.type,
     allSortingTypes: allSortingTypes,
+    allSortingTypesArray: allSortingTypesArray,
     defaultSortingType: defaultSortingType,
 };

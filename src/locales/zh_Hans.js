@@ -996,6 +996,7 @@ export default {
     'Amount value exceeds limitation': '金额数值超出限制',
     'Unable to delete this transaction': '无法删除该交易',
     'Unable to get transaction statistics': '无法获取交易统计数据',
+    'Categorical Analysis': '分类分析',
     'Total Amount': '总金额',
     'Total Assets': '总资产',
     'Total Liabilities': '总负债',

@@ -996,6 +996,7 @@ export default {
     'Amount value exceeds limitation': 'Amount value exceeds limitation',
     'Unable to delete this transaction': 'Unable to delete this transaction',
     'Unable to get transaction statistics': 'Unable to get transaction statistics',
+    'Categorical Analysis': 'Categorical Analysis',
     'Total Amount': 'Total Amount',
     'Total Assets': 'Total Assets',
     'Total Liabilities': 'Total Liabilities',

@@ -6,13 +6,53 @@
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
                             <btn-vertical-group :disabled="loading" :buttons="[
-                                { name: $t('Pie Chart'), value: allChartTypes.Pie },
-                                { name: $t('Bar Chart'), value: allChartTypes.Bar }
-                            ]" v-model="query.chartType" @update:model-value="setChartType" />
+                                { name: $t('Categorical Analysis'), value: 'categoricalAnalysis' },
+                            ]" v-model="activeTab" />
                         </div>
                         <v-divider />
+                        <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
+                            <small>{{ $t('Chart Type') }}</small>
+                            <v-select
+                                item-title="name"
+                                item-value="type"
+                                class="mt-2"
+                                density="compact"
+                                :disabled="loading"
+                                :items="allChartTypesArray"
+                                v-model="queryChartType"
+                            >
+                                <template #selection="{ item }">
+                                    <span class="cursor-pointer">{{ $t(item.title) }}</span>
+                                </template>
+
+                                <template #item="{ props, item }">
+                                    <v-list-item v-bind="props" :title="$t(item.title)"></v-list-item>
+                                </template>
+                            </v-select>
+                        </div>
+                        <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
+                            <small>{{ $t('Sort By') }}</small>
+                            <v-select
+                                item-title="name"
+                                item-value="type"
+                                class="mt-2"
+                                density="compact"
+                                :disabled="loading"
+                                :items="allSortingTypesArray"
+                                v-model="querySortingType"
+                            >
+                                <template #selection="{ item }">
+                                    <span class="cursor-pointer">{{ $t(item.title) }}</span>
+                                </template>
+
+                                <template #item="{ props, item }">
+                                    <v-list-item v-bind="props" :title="$t(item.title)"></v-list-item>
+                                </template>
+                            </v-select>
+                        </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
-                                :disabled="loading" v-model="query.chartDataType">
+                                :disabled="loading" v-model="query.chartDataType"
+                                v-if="activeTab === 'categoricalAnalysis'">
                             <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
                                    v-for="dataType in allChartDataTypes">
                                 <span class="text-truncate">{{ $t(dataType.name) }}</span>
@@ -22,7 +62,7 @@
                     </v-navigation-drawer>
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
-                            <v-window-item value="statisticsPage">
+                            <v-window-item value="categoricalAnalysis">
                                 <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
@@ -63,24 +103,6 @@
                                                        @click="shiftDateRange(query.startTime, query.endTime, 1)"/>
                                             </v-btn-group>
 
-                                            <v-menu location="bottom">
-                                                <template #activator="{ props }">
-                                                    <v-btn class="ml-3" color="default" variant="outlined"
-                                                           :prepend-icon="icons.sort" :disabled="loading"
-                                                           v-bind="props">{{ querySortingTypeName }}</v-btn>
-                                                </template>
-                                                <v-list>
-                                                    <v-list-item :key="sortingType.type" :value="sortingType.type"
-                                                                 :append-icon="(query.sortingType === sortingType.type ? icons.check : null)"
-                                                                 v-for="sortingType in allSortingTypes">
-                                                        <v-list-item-title
-                                                            class="cursor-pointer"
-                                                            @click="setSortingType(sortingType.type)">
-                                                            {{ $t(sortingType.fullName) }}
-                                                        </v-list-item-title>
-                                                    </v-list-item>
-                                                </v-list>
-                                            </v-menu>
                                             <v-btn density="compact" color="default" variant="text"
                                                    class="ml-2" :icon="true" :disabled="loading"
                                                    v-if="!loading" @click="reload">
@@ -255,7 +277,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { getNameByKeyValue, limitText, formatPercent } from '@/lib/common.js'
+import { limitText, formatPercent } from '@/lib/common.js'
 import {
     getShiftedDateRangeAndDateType,
     getDateRangeByDateType
@@ -287,7 +309,7 @@ export default {
         const { mdAndUp } = useDisplay();
 
         return {
-            activeTab: 'statisticsPage',
+            activeTab: 'categoricalAnalysis',
             initing: true,
             loading: true,
             alwaysShowNav: mdAndUp.value,
@@ -327,9 +349,21 @@ export default {
         queryChartDataCategory() {
             return this.statisticsStore.transactionStatisticsChartDataCategory;
         },
-        querySortingTypeName() {
-            const querySortingTypeName = getNameByKeyValue(this.allSortingTypes, this.query.sortingType, 'type', 'fullName', 'System Default');
-            return this.$t(querySortingTypeName);
+        queryChartType: {
+            get: function () {
+                return this.query.chartType;
+            },
+            set: function(value) {
+                this.setChartType(value);
+            }
+        },
+        querySortingType: {
+            get: function () {
+                return this.query.sortingType;
+            },
+            set: function(value) {
+                this.setSortingType(value);
+            }
         },
         queryStartTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.startTime);
@@ -340,11 +374,26 @@ export default {
         allChartTypes() {
             return statisticsConstants.allChartTypes;
         },
+        allChartTypesArray() {
+            return [
+                {
+                    name: 'Pie Chart',
+                    type: this.allChartTypes.Pie
+                },
+                {
+                    name: 'Bar Chart',
+                    type: this.allChartTypes.Bar
+                }
+            ];
+        },
         allChartDataTypes() {
             return statisticsConstants.allChartDataTypes;
         },
         allSortingTypes() {
             return statisticsConstants.allSortingTypes;
+        },
+        allSortingTypesArray() {
+            return statisticsConstants.allSortingTypesArray;
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;

@@ -689,7 +689,7 @@ export default {
         'month': 'Month',
         'page': 'Page Index',
         'count': 'Count',
-        'comment': 'Comment',
+        'comment': 'Description',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter} is invalid',

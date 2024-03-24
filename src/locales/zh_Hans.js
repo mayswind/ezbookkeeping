@@ -689,7 +689,7 @@ export default {
         'month': '月份',
         'page': '页码索引',
         'count': '数量',
-        'comment': '备注',
+        'comment': '描述',
     },
     'parameterizedError': {
         'parameter invalid': '{parameter}无效',

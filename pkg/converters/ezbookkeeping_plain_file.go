@@ -13,7 +13,7 @@ import (
 type EzBookKeepingPlainFileExporter struct {
 }
 
-const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Tags,Comment\n"
+const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Tags,Description\n"
 const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
 // toExportedContent returns the exported plain data

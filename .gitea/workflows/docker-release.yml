@@ -31,6 +31,7 @@ jobs:
 
       - name: Set up the environment
         run: |
+          sed -r -i 's#FROM( --.*)? (.*:.*)?#FROM\1 ${{ secrets.DOCKER_REPO }}/mirrors/\2#g' Dockerfile
           cat >> docker/custom-backend-pre-setup.sh <<EOF
           #!/bin/sh
           ${{ vars.CUSTOM_BACKEND_PRE_SETUP }}

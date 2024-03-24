@@ -59,9 +59,6 @@
     "vite-plugin-pwa": "^0.19.2",
     "vite-plugin-vuetify": "^2.0.2"
   },
-  "overrides": {
-    "rollup": "npm:@rollup/wasm-node"
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",

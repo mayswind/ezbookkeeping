@@ -97,10 +97,10 @@
                             <v-menu activator="parent">
                                 <v-list :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                                     <v-list-item @click="exportData('csv')">
-                                        <v-list-item-title>{{ $t('Export Data To CSV File') }}</v-list-item-title>
+                                        <v-list-item-title>{{ $t('CSV (Comma-separated values) File') }}</v-list-item-title>
                                     </v-list-item>
                                     <v-list-item @click="exportData('tsv')">
-                                        <v-list-item-title>{{ $t('Export Data To TSV File') }}</v-list-item-title>
+                                        <v-list-item-title>{{ $t('TSV (Tab-separated values) File') }}</v-list-item-title>
                                     </v-list-item>
                                 </v-list>
                             </v-menu>

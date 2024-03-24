@@ -35,11 +35,11 @@
                 <div class="padding-bottom padding-horizontal">
                     <f7-list class="export-file-type-list no-margin" dividers>
                         <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
-                                      :title="$t('Export Data To CSV File')"
+                                      :title="$t('CSV (Comma-separated values) File')"
                                       :checked="exportFileType === 'csv'" @change="exportFileType = 'csv'">
                         </f7-list-item>
                         <f7-list-item radio radio-icon="start" :class="{ 'disabled': exportingData || exportedData }"
-                                      :title="$t('Export Data To TSV File')"
+                                      :title="$t('TSV (Tab-separated values) File')"
                                       :checked="exportFileType === 'tsv'" @change="exportFileType = 'tsv'">
                         </f7-list-item>
                     </f7-list>

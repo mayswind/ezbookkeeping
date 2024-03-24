@@ -30,7 +30,7 @@
             <div class="swipe-handler" style="z-index: 10"></div>
             <f7-page-content class="margin-top no-padding-top">
                 <div class="display-flex padding justify-content-space-between align-items-center">
-                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all data to file?') }}</b></div>
+                    <div class="ebk-sheet-title"><b>{{ $t('Are you sure you want to export all transaction data to file?') }}</b></div>
                 </div>
                 <div class="padding-bottom padding-horizontal">
                     <f7-list class="export-file-type-list no-margin" dividers>

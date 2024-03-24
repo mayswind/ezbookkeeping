@@ -85,7 +85,7 @@
         <v-col cols="12" v-if="isDataExportingEnabled">
             <v-card :class="{ 'disabled': exportingData }" :title="$t('Export Data')">
                 <v-card-text>
-                    <span class="text-body-1">{{ $t('Export all data to file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
+                    <span class="text-body-1">{{ $t('Export all transaction data to file.') }}&nbsp;{{ $t('It may take a long time, please wait for a few minutes.') }}</span>
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">

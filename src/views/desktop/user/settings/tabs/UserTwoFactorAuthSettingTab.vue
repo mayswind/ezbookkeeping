@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': loading }">
                 <template #title>
                     <span>{{ $t('Two-Factor Authentication') }}</span>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text class="pb-0">
@@ -59,19 +59,19 @@
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
                             <v-btn :disabled="!currentPassword || loading || disabling " v-if="status === true" @click="disable">
                                 {{ $t('Disable two-factor authentication') }}
-                                <v-progress-circular indeterminate size="24" class="ml-2" v-if="disabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="disabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPassword || loading || regenerating" v-if="status === true" @click="regenerateBackupCode()">
                                 {{ $t('Regenerate Backup Codes') }}
-                                <v-progress-circular indeterminate size="24" class="ml-2" v-if="regenerating"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="regenerating"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="loading || enabling" v-if="status === false && !new2FAQRCode" @click="enable">
                                 {{ $t('Enable two-factor authentication') }}
-                                <v-progress-circular indeterminate size="24" class="ml-2" v-if="enabling"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPasscode || loading || enableConfirming" v-if="status === false && new2FAQRCode" @click="enableConfirm">
                                 {{ $t('Continue') }}
-                                <v-progress-circular indeterminate size="24" class="ml-2" v-if="enableConfirming"></v-progress-circular>
+                                <v-progress-circular indeterminate size="22" class="ml-2" v-if="enableConfirming"></v-progress-circular>
                             </v-btn>
                         </v-col>
                     </v-row>

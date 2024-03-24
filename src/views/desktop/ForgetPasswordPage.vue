@@ -46,7 +46,7 @@
                                     <v-col cols="12">
                                         <v-btn block type="submit" :disabled="!email || requesting" @click="requestResetPassword">
                                             {{ $t('Send Reset Link') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="requesting"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="requesting"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

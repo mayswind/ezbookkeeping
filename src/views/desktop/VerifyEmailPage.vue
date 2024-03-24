@@ -51,7 +51,7 @@
                                     <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled">
                                         <v-btn block type="submit" :disabled="loading || resending || !password" @click="resendEmail">
                                             {{ $t('Resend Validation Email') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="resending"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="resending"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

@@ -47,7 +47,7 @@
                                         <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
                                                @click="unlockByWebAuthn">
                                             {{ $t('Unlock By WebAuthn') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

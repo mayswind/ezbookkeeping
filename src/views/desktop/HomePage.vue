@@ -15,7 +15,7 @@
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingOverview"></v-progress-circular>
+                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loadingOverview"></v-progress-circular>
                     </div>
                 </template>
 

@@ -159,7 +159,7 @@
                 <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
                     <v-btn :disabled="isInputEmpty() || loading || submitting" @click="save">
                         {{ $t(saveButtonTitle) }}
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                        <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
                     <v-btn color="secondary" variant="tonal"
                            :disabled="loading || submitting" @click="cancel">{{ $t('Cancel') }}</v-btn>

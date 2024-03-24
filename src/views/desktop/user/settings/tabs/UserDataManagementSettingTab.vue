@@ -11,7 +11,7 @@
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingDataStatistics"></v-progress-circular>
+                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loadingDataStatistics"></v-progress-circular>
                     </div>
                 </template>
 
@@ -93,7 +93,7 @@
                                   :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                         <v-btn>
                             {{ $t('Export Data') }}
-                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="exportingData"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="exportingData"></v-progress-circular>
                             <v-menu activator="parent">
                                 <v-list :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                                     <v-list-item @click="exportData('csv')">
@@ -147,7 +147,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn color="error" :disabled="loadingDataStatistics || !currentPasswordForClearData || clearingData" @click="clearData">
                             {{ $t('Clear User Data') }}
-                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="clearingData"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="clearingData"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
                 </v-form>

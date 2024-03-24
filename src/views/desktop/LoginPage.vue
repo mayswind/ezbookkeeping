@@ -107,12 +107,12 @@
                                         <v-btn block :disabled="inputIsEmpty || logining || verifying"
                                                @click="login" v-if="!show2faInput">
                                             {{ $t('Log In') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="logining"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="logining"></v-progress-circular>
                                         </v-btn>
                                         <v-btn block :disabled="twoFAInputIsEmpty || logining || verifying"
                                                @click="verify" v-else-if="show2faInput">
                                             {{ $t('Continue') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="verifying"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifying"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

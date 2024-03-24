@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': loading || saving }">
                 <template #title>
                     <span>{{ $t('Basic Settings') }}</span>
-                    <v-progress-circular indeterminate size="24" class="ml-2" v-if="loading"></v-progress-circular>
+                    <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                 </template>
 
                 <v-card-text class="d-flex">
@@ -209,7 +209,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="inputIsNotChanged || inputIsInvalid || saving" @click="save">
                             {{ $t('Save changes') }}
-                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="saving"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="saving"></v-progress-circular>
                         </v-btn>
 
                         <v-btn color="default" variant="tonal" @click="reset">

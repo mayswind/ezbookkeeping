@@ -230,7 +230,7 @@
                                @click="submit"
                                v-if="currentStep === 'presetCategories'">
                             {{ $t('Submit') }}
-                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="submitting"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                         </v-btn>
                         <v-btn :append-icon="icons.next"
                                @click="navigateToLogin"

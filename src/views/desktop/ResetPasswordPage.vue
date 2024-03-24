@@ -77,7 +77,7 @@
                                     <v-col cols="12">
                                         <v-btn block :disabled="!email || !newPassword || !confirmPassword || updating" @click="resetPassword">
                                             {{ $t('Update Password') }}
-                                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="updating"></v-progress-circular>
+                                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="updating"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
 

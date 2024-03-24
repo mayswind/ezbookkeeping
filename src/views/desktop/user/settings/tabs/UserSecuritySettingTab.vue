@@ -65,7 +65,7 @@
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="!currentPassword || !newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
                             {{ $t('Save changes') }}
-                            <v-progress-circular indeterminate size="24" class="ml-2" v-if="updatingPassword"></v-progress-circular>
+                            <v-progress-circular indeterminate size="22" class="ml-2" v-if="updatingPassword"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
                 </v-form>
@@ -83,7 +83,7 @@
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="24" class="ml-2" v-if="loadingSession"></v-progress-circular>
+                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loadingSession"></v-progress-circular>
                     </div>
                 </template>
 

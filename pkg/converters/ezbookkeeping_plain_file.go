@@ -39,9 +39,9 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		transactionTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
 		transactionTimezone := utils.FormatTimezoneOffset(transactionTimeZone)
 		transactionType := e.getTransactionTypeName(transaction.Type)
-		category := e.getTransactionCategoryName(transaction.CategoryId, categoryMap)
-		subCategory := e.getTransactionSubCategoryName(transaction.CategoryId, categoryMap)
-		account := e.getAccountName(transaction.AccountId, accountMap)
+		category := e.replaceDelimiters(e.getTransactionCategoryName(transaction.CategoryId, categoryMap), separator)
+		subCategory := e.replaceDelimiters(e.getTransactionSubCategoryName(transaction.CategoryId, categoryMap), separator)
+		account := e.replaceDelimiters(e.getAccountName(transaction.AccountId, accountMap), separator)
 		accountCurrency := e.getAccountCurrency(transaction.AccountId, accountMap)
 		amount := e.getDisplayAmount(transaction.Amount)
 		account2 := ""
@@ -49,13 +49,13 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		account2Amount := ""
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			account2 = e.getAccountName(transaction.RelatedAccountId, accountMap)
+			account2 = e.replaceDelimiters(e.getAccountName(transaction.RelatedAccountId, accountMap), separator)
 			account2Currency = e.getAccountCurrency(transaction.RelatedAccountId, accountMap)
 			account2Amount = e.getDisplayAmount(transaction.RelatedAccountAmount)
 		}
 
-		tags := e.getTags(transaction.TransactionId, allTagIndexs, tagMap)
-		comment := e.getComment(transaction.Comment, separator)
+		tags := e.replaceDelimiters(e.getTags(transaction.TransactionId, allTagIndexs, tagMap), separator)
+		comment := e.replaceDelimiters(transaction.Comment, separator)
 
 		if separator == "," {
 			ret.WriteString(fmt.Sprintf(dataLineFormat, transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, tags, comment))
@@ -178,10 +178,10 @@ func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagInde
 	return ret.String()
 }
 
-func (e *EzBookKeepingPlainFileExporter) getComment(comment string, separator string) string {
-	comment = strings.Replace(comment, separator, " ", -1)
-	comment = strings.Replace(comment, "\r\n", " ", -1)
-	comment = strings.Replace(comment, "\n", " ", -1)
+func (e *EzBookKeepingPlainFileExporter) replaceDelimiters(text string, separator string) string {
+	text = strings.Replace(text, separator, " ", -1)
+	text = strings.Replace(text, "\r\n", " ", -1)
+	text = strings.Replace(text, "\n", " ", -1)
 
-	return comment
+	return text
 }

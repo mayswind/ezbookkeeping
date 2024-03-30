@@ -175,13 +175,6 @@ function getAllLanguageInfos() {
 function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
     const ret = [];
 
-    if (includeSystemDefault) {
-        ret.push({
-            code: '',
-            displayName: translateFn('System Default')
-        });
-    }
-
     for (const code in allLanguages) {
         if (!Object.prototype.hasOwnProperty.call(allLanguages, code)) {
             continue;
@@ -192,6 +185,17 @@ function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
         ret.push({
             code: code,
             displayName: languageInfo.displayName
+        });
+    }
+
+    ret.sort(function (lang1, lang2) {
+        return lang1.code.localeCompare(lang2.code);
+    });
+
+    if (includeSystemDefault) {
+        ret.splice(0, 0, {
+            code: '',
+            displayName: translateFn('System Default')
         });
     }
 

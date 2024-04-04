@@ -216,6 +216,15 @@ func TestGetUnixTimeFromTransactionTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestGetTransactionTimeRangeByYearMonth(t *testing.T) {
+	expectedMinValue := int64(1704016800000)
+	expectedMaxValue := int64(1706788799999)
+	actualMinValue, actualMaxValue, err := GetTransactionTimeRangeByYearMonth(2024, 1)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedMinValue, actualMinValue)
+	assert.Equal(t, expectedMaxValue, actualMaxValue)
+}
+
 func TestParseFromUnixTime(t *testing.T) {
 	expectedValue := int64(1617228083)
 	actualTime := parseFromUnixTime(expectedValue)

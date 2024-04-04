@@ -111,17 +111,11 @@ func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid i
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	startMinUnixTime, err := utils.ParseFromLongDateTimeToMinUnixTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month))
-	startMaxUnixTime, err := utils.ParseFromLongDateTimeToMaxUnixTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month))
+	minTransactionTime, maxTransactionTime, err := utils.GetTransactionTimeRangeByYearMonth(year, month)
 
 	if err != nil {
 		return nil, errs.ErrSystemError
 	}
-
-	endMaxUnixTime := startMaxUnixTime.AddDate(0, 1, 0)
-
-	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startMinUnixTime.Unix())
-	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endMaxUnixTime.Unix()) - 1
 
 	var transactions []*models.Transaction
 

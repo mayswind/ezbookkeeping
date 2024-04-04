@@ -15,13 +15,13 @@
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v0.0.6/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.0.0/LICENSE"
     },
     {
         "name": "xorm",
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.2/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.9/LICENSE"
     },
     {
         "name": "Logrus",
@@ -51,7 +51,7 @@
         "name": "jwt-go",
         "copyright": "Copyright (c) 2012 Dave Grijalva, Copyright (c) 2021 golang-jwt maintainers",
         "url": "https://github.com/golang-jwt/jwt",
-        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.0/LICENSE"
+        "licenseUrl": "https://github.com/golang-jwt/jwt/blob/v5.2.1/LICENSE"
     },
     {
         "name": "otp",
@@ -61,7 +61,7 @@
     {
         "name": "Go-MySQL-Driver",
         "url": "https://github.com/go-sql-driver/mysql",
-        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.7.1/LICENSE"
+        "licenseUrl": "https://github.com/go-sql-driver/mysql/blob/v1.8.1/LICENSE"
     },
     {
         "name": "pq",
@@ -79,7 +79,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.20.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.21.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -126,13 +126,13 @@
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.10.1/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.11.0/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.5.7/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.5.14/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -144,13 +144,13 @@
         "name": "Framework7",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.2/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.3/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.2/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v8.3.3/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -186,7 +186,7 @@
         "name": "vue-echarts",
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.1/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.9/LICENSE"
     },
     {
         "name": "vue3-perfect-scrollbar",
@@ -198,13 +198,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v8.2.0/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v8.3.2/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.6.7/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.6.8/LICENSE"
     },
     {
         "name": "Moment.js",

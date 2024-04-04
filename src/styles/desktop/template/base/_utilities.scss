@@ -54,8 +54,17 @@ $card-spacer-content: 16px;
     color: #fff !important;
 }
 
+.text-white-variant {
+    color: rgba(255, 255, 255, var(--v-high-emphasis-opacity));
+}
+
 .bg-var-theme-background {
     background-color: rgba(var(--v-theme-on-background), var(--v-hover-opacity)) !important;
+}
+
+.bg-global-primary {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 // [/^bg-light-(\w+)$/, ([, w]) => ({ backgroundColor: `rgba(var(--v-theme-${w}), var(--v-activated-opacity))` })],
@@ -72,6 +81,14 @@ $card-spacer-content: 16px;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     text-overflow: ellipsis;
+}
+
+.custom-badge {
+    .v-badge__badge {
+        border-radius: 6px !important;
+        block-size: 12px !important;
+        inline-size: 12px !important;
+    }
 }
 
 .leading-normal {
@@ -96,7 +113,7 @@ $card-spacer-content: 16px;
         .v-btn--icon.v-btn--density-default {
             block-size: calc(var(--v-btn-height) + -10px);
             color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
-            inline-size: calc(var(--v-btn-height) + -10px);
+            inline-size: calc(var(--v-btn-height) + -8px);
 
             &.v-btn--active {
                 color: #fff;
@@ -104,6 +121,17 @@ $card-spacer-content: 16px;
 
             .v-btn__overlay {
                 opacity: 0;
+            }
+
+            .v-ripple__container {
+                display: none;
+            }
+
+            .v-btn__content {
+                .v-icon {
+                    block-size: 8px !important;
+                    inline-size: 8px !important;
+                }
             }
         }
     }
@@ -138,5 +166,12 @@ $card-spacer-content: 16px;
         color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
         font-size: 14px;
         line-height: 1.25rem;
+    }
+
+    .timeline-chip{
+        border-radius: 6px;
+        background: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
+        padding-block: 5px;
+        padding-inline: 10px
     }
 }

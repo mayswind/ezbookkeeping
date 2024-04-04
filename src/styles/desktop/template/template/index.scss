@@ -4,6 +4,10 @@
 @use "sass:map";
 @use "@/styles/desktop/template/base";
 
+// layouts
+@use "./vertical-nav";
+@use "./default-layout-w-vertical-nav";
+
 // Components
 @use "./components";
 

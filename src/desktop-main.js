@@ -95,7 +95,7 @@ import PieChartComponent from '@/components/desktop/PieChart.vue';
 import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
-import '@/styles/desktop/template/base/libs/vuetify/_index.scss';
+import '@/styles/desktop/template/vuetify/index.scss';
 import '@/styles/desktop/template/template/index.scss';
 import '@/styles/desktop/template/layout/index.scss';
 import '@/styles/desktop/template/layout/component/index.scss';
@@ -274,19 +274,28 @@ const vuetify = createVuetify({
                 dark: false,
                 colors: {
                     'primary': '#c67e48',
+                    'primary-darken-1': '#9a6238',
+                    'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
-                    'on-secondary': '#fff',
+                    'secondary-darken-1': '#545659',
+                    'on-secondary': '#ffffff',
                     'success': '#4cd964',
+                    'success-darken-1': '#3ba64d',
+                    'on-success': '#ffffff',
                     'info': '#2196f3',
+                    'info-darken-1': '#1a74bd',
+                    'on-info': '#ffffff',
                     'warning': '#ff9500',
+                    'warning-darken-1': '#d07a01',
+                    'on-warning': '#ffffff',
                     'error': '#ff3b30',
+                    'error-darken-1': '#c73027',
+                    'on-error': '#ffffff',
                     'income': '#ff3b30',
                     'expense': '#009688',
-                    'on-primary': '#ffffff',
-                    'on-success': '#ffffff',
-                    'on-warning': '#ffffff',
                     'background': '#faf8f4',
                     'on-background': '#413935',
+                    'surface': '#fff',
                     'on-surface': '#413935',
                     'grey-50': '#fafafa',
                     'grey-100': '#f0f2f8',
@@ -300,41 +309,59 @@ const vuetify = createVuetify({
                     'grey-900': '#212121',
                     'perfect-scrollbar-thumb': '#dbdade',
                     'skin-bordered-background': '#fff',
-                    'skin-bordered-surface': '#fff'
+                    'skin-bordered-surface': '#fff',
+                    'expansion-panel-text-custom-bg': '#fafafa'
                 },
                 variables: {
                     'code-color': '#ff8000',
                     'overlay-scrim-background': '#413935',
+                    'tooltip-background': '#1A0E33',
                     'overlay-scrim-opacity': 0.5,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
-                    'selected-opacity': 0.12,
-                    'activated-opacity': 0.1,
+                    'selected-opacity': 0.08,
+                    'activated-opacity': 0.16,
                     'pressed-opacity': 0.14,
                     'dragged-opacity': 0.1,
+                    'disabled-opacity': 0.4,
                     'border-color': '#413f3b',
-                    'table-header-background': '#fdfcf9',
-                    'custom-background': '#f9f8f9',
-                    'shadow-key-umbra-opacity': 'rgba(var(--v-theme-on-surface), 0.08)',
-                    'shadow-key-penumbra-opacity': 'rgba(var(--v-theme-on-surface), 0.12)',
-                    'shadow-key-ambient-opacity': 'rgba(var(--v-theme-on-surface), 0.04)'
+                    'border-opacity': 0.12,
+                    'table-header-color': '#F6F7FB',
+                    'high-emphasis-opacity': 0.9,
+                    'medium-emphasis-opacity': 0.7,
+
+                    // 👉 shadows
+                    'shadow-key-umbra-color': '#2E263D',
+                    'shadow-xs-opacity': '0.16',
+                    'shadow-sm-opacity': '0.18',
+                    'shadow-md-opacity': '0.20',
+                    'shadow-lg-opacity': '0.22',
+                    'shadow-xl-opacity': '0.24',
                 }
             },
             dark: {
                 dark: true,
                 colors: {
                     'primary': '#c67e48',
+                    'primary-darken-1': '#9a6238',
+                    'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
+                    'secondary-darken-1': '#545659',
                     'on-secondary': '#fff',
                     'success': '#4cd964',
+                    'success-darken-1': '#3ba64d',
+                    'on-success': '#ffffff',
                     'info': '#2196f3',
+                    'info-darken-1': '#1a74bd',
+                    'on-info': '#ffffff',
                     'warning': '#ff9500',
+                    'warning-darken-1': '#d07a01',
+                    'on-warning': '#ffffff',
                     'error': '#ff3b30',
+                    'error-darken-1': '#c73027',
+                    'on-error': '#ffffff',
                     'income': '#ff3b30',
                     'expense': '#009688',
-                    'on-primary': '#ffffff',
-                    'on-success': '#ffffff',
-                    'on-warning': '#ffffff',
                     'background': '#000000',
                     'on-background': '#fcf0e3',
                     'surface': '#1c1c1d',
@@ -351,24 +378,34 @@ const vuetify = createVuetify({
                     'grey-900': '#eaeaea',
                     'perfect-scrollbar-thumb': '#4a5072',
                     'skin-bordered-background': '#312d4b',
-                    'skin-bordered-surface': '#312d4b'
+                    'skin-bordered-surface': '#312d4b',
+                    'expansion-panel-text-custom-bg': '#373350'
                 },
                 variables: {
                     'code-color': '#ff8000',
                     'overlay-scrim-background': '#1c1c1d',
-                    'overlay-scrim-opacity': 0.6,
+                    'tooltip-background': '#F7F4FF',
+                    'overlay-scrim-opacity': 0.5,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
-                    'selected-opacity': 0.12,
-                    'activated-opacity': 0.1,
+                    'selected-opacity': 0.08,
+                    'activated-opacity': 0.16,
                     'pressed-opacity': 0.14,
+                    'disabled-opacity': 0.4,
                     'dragged-opacity': 0.1,
                     'border-color': '#edece9',
-                    'table-header-background': '#312f2b',
-                    'custom-background': '#373452',
-                    'shadow-key-umbra-opacity': 'rgba(20, 18, 33, 0.08)',
-                    'shadow-key-penumbra-opacity': 'rgba(20, 18, 33, 0.12)',
-                    'shadow-key-ambient-opacity': 'rgba(20, 18, 33, 0.04)'
+                    'border-opacity': 0.12,
+                    'table-header-color': '#3D3759',
+                    'high-emphasis-opacity': 0.9,
+                    'medium-emphasis-opacity': 0.7,
+
+                    // 👉 Shadows
+                    'shadow-key-umbra-color': '#131120',
+                    'shadow-xs-opacity': '0.20',
+                    'shadow-sm-opacity': '0.22',
+                    'shadow-md-opacity': '0.24',
+                    'shadow-lg-opacity': '0.26',
+                    'shadow-xl-opacity': '0.28',
                 }
             }
         }

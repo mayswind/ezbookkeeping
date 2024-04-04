@@ -4,7 +4,7 @@
 @use "sass:map";
 @use "./utils";
 
-$vertical-nav-horizontal-padding-custom: 1.375rem 1rem;
+$vertical-nav-horizontal-padding-custom: 1.4375rem 1rem;
 
 // ℹ️ We created this SCSS var to extract the start padding
 // Docs: https://sass-lang.com/documentation/modules/string
@@ -14,23 +14,46 @@ $vertical-nav-horizontal-padding-custom: 1.375rem 1rem;
 // string.slice(0 8px, 2, -1) => 8px => $card-actions-padding-x
 
 $vertical-nav-horizontal-padding-start: utils.get-first-value($vertical-nav-horizontal-padding-custom) !default;
-$vertical-nav-items-icon-margin-inline-end: 0.625rem !default;
+$vertical-nav-items-icon-margin-inline-end: 0 !default;
 
 @forward "@/styles/desktop/template/base/variables" with (
   $layout-vertical-nav-collapsed-width: 68px !default,
   // ℹ️ This is used to keep consistency between nav items and nav header left & right margin
   // This is used by nav items & nav header
-  $vertical-nav-horizontal-spacing: 0 0.7rem !default,
+  $vertical-nav-horizontal-spacing: 0 1rem !default,
   $vertical-nav-horizontal-padding: $vertical-nav-horizontal-padding-custom !default,
   // Vertical nav header padding
-  $vertical-nav-header-padding: 1rem 0.25rem 1rem $vertical-nav-horizontal-padding-start !default,
-);
+  $vertical-nav-header-padding: 1.25rem 0 1.25rem $vertical-nav-horizontal-padding-start !default,
 
-// 👉 Custom Variables
-$avatar-font-sizes: (
-    "x-small":12,
-    "small":14,
-    "default":18,
-    "large":20,
-    "x-large":24
-) !default;
+  // Vertical nav icons
+  $vertical-nav-items-icon-size: 1.375rem !default,
+  $vertical-nav-items-nested-icon-size: 0.75rem !default,
+
+
+  // Section title margin top (when its not first child)
+  $vertical-nav-section-title-mt: 1.25rem !default,
+
+  $layout-vertical-nav-footer-height: 54px !default,
+
+  // Horizontal nav icons
+  $horizontal-nav-items-icon-size: 1.375rem !default,
+  $horizontal-nav-items-icon-margin-inline-end: 0.5rem !default,
+
+  // 👉 Horizontal nav
+  $horizontal-nav-padding: 0.625rem !default,
+  $horizontal-nav-third-level-icon-size: 0.75rem !default,
+
+  // Gap between top level horizontal nav items
+  $horizontal-nav-top-level-items-gap: 8px !default,
+
+  // ℹ️ This variable is used for horizontal nav popper content's `margin-top` and "The bridge"'s height. We need to sync both values.
+  $horizontal-nav-popper-content-top: calc(0.625rem + 0.375rem - 0.25rem) !default,
+
+  $font-sizes: (
+    "sm": 0.8125rem,
+    "base": 0.9375rem,
+  ),
+  $font-line-height: (
+    "base": 1.375rem,
+  ),
+);

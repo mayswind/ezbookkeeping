@@ -1,11 +1,30 @@
 /** Materio Template styles **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
-.bg-var-theme-background {
-    background-color: rgba(var(--v-theme-on-surface), var(--v-hover-opacity)) !important;
-}
+.v-timeline{
+    .v-timeline-item {
+        .app-timeline-title {
+            color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.15px;
+            line-height: 1.375rem;
+        }
 
-// 👉 Pagination small-select dropdown for table
+        .app-timeline-meta {
+            color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity));
+            font-size: 13px;
+            letter-spacing: 0.4px;
+            line-height: 1.125rem;
+        }
+
+        .app-timeline-text {
+            color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+            font-size: .9375rem;
+            line-height: 1.375rem;
+        }
+    }
+}
 
 .per-page-select {
     margin-block: auto;
@@ -13,7 +32,6 @@
     .v-field__input {
         align-items: center;
         padding: 2px;
-        font-size: 14px;
     }
 
     .v-field__append-inner {
@@ -24,4 +42,13 @@
             margin-inline-start: 0 !important;
         }
     }
+}
+
+.leading-normal {
+    font-weight: 600;
+    letter-spacing: .0094rem;
+}
+
+.bg-custom-background{
+    background-color: rgb(var(--v-table-header-color)) !important;
 }

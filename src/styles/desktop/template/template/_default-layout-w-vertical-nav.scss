@@ -1,0 +1,31 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/configured-variables/template" as variables;
+@use "@/styles/desktop/template/base/mixins";
+
+$header: ".layout-navbar";
+
+@if variables.$layout-vertical-nav-navbar-is-contained {
+    $header: ".layout-navbar .navbar-content-container";
+}
+
+.layout-wrapper.layout-nav-type-vertical {
+    // 👉 Layout footer
+    .layout-footer {
+        $ele-layout-footer: &;
+
+        .footer-content-container {
+            // Sticky footer
+            @at-root {
+                // ℹ️ .layout-footer-sticky#{$ele-layout-footer} => .layout-footer-sticky.layout-wrapper.layout-nav-type-vertical .layout-footer
+                .layout-footer-sticky#{$ele-layout-footer} {
+                    .footer-content-container {
+                        box-shadow: 0 -4px 8px -4px rgba(var(--v-shadow-key-umbra-color), 42%);
+                        padding-inline: 1.5rem;
+                    }
+                }
+            }
+        }
+    }
+}

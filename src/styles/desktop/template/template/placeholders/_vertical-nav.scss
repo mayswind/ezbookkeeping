@@ -3,8 +3,15 @@
 
 @use "@/styles/desktop/configured-variables/template" as variables;
 
+%nav-header-action {
+    color:rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+}
+
 // ℹ️ Add divider around section title
 %vertical-nav-section-title {
+    block-size: 2rem;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
     /*
       ℹ️ We will use this to add gap between divider and text.
       Moreover, we will use this to adjust the `flex-basis` property of left divider
@@ -45,18 +52,13 @@
 
 %vertical-nav-item-interactive {
     // Add pill shape styles
-    block-size: 2.625rem !important;
+    block-size: 2.375rem !important;
     border-end-end-radius: 3.125rem !important;
     border-end-start-radius: 0 !important;
     border-start-end-radius: 3.125rem !important;
     border-start-start-radius: 0 !important;
-}
 
-%vertical-nav-item-interactive {
     // ℹ️ Wobble effect
-    // transition: margin-inline 0.4s ease-in-out;
-    // will-change: margin-inline;
-
     transition: margin-inline 0.15s ease-in-out;
     will-change: margin-inline;
 
@@ -64,4 +66,30 @@
     .layout-nav-type-vertical.layout-vertical-nav-collapsed .layout-vertical-nav:not(.hovered) & {
         margin-inline: 0 5px;
     }
+}
+
+// Vertical nav item badge styles
+%vertical-nav-item-badge {
+    font-size: 0.75rem;
+    line-height: 20px;
+    padding-block: 1px;
+    padding-inline: 0.625rem;
+}
+
+// Nav items styles (including section title)
+%vertical-nav-item {
+    gap: .5rem;
+    padding-block: 0.4375rem;
+}
+
+
+// ℹ️ Icon styling for icon nested inside another nav item (2nd level)
+%vertical-nav-items-nested-icon {
+    color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+    margin-inline: .375rem;
+}
+
+%vertical-nav-items-icon-after-2nd-level {
+    margin-inline-start: 1rem;
+    visibility: visible;
 }

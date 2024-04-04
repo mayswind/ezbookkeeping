@@ -4,7 +4,6 @@
 @use "@/styles/desktop/configured-variables/template" as variables;
 @use "./placeholders" as *;
 @use "@/styles/desktop/template/template/placeholders" as *;
-@use "vuetify/lib/styles/tools/_elevation" as mixins_elevation;
 @use "./misc";
 @use "./mixins";
 
@@ -33,7 +32,7 @@ $header: ".layout-navbar";
         // Scrolled styles for sticky navbar
         @at-root {
             /* ℹ️ This html selector with not selector is required when:
-              dialog is opened and window don't have any scroll. This removes window-scrolled class from layout and out style broke
+              dialog is opened and window don't have any scroll. This removes window-scrolled class from layout and our style broke
           */
             html.v-overlay-scroll-blocked:not([style*="--v-body-scroll-y: 0px;"]) .layout-navbar-sticky,
             &.window-scrolled.layout-navbar-sticky {

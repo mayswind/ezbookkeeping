@@ -1,0 +1,41 @@
+/** Materio Template Vuetify variables **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/utils";
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+// 👉 Body
+// set body font size 15px
+body {
+    font-size: 15px !important;
+}
+
+// 👉 Typography
+.text-h1,
+.text-h2,
+.text-h3,
+.text-h4,
+.text-h5,
+.text-h6,
+.text-overline,
+.v-input {
+    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.text-caption{
+    color: rgba(var(--v-theme-on-background), var(--v-disabled-opacity));
+}
+
+.v-card-subtitle,
+.text-subtitle-1,
+.text-subtitle-2 {
+    color: rgba(var(--v-theme-on-background), 0.55);
+}
+
+// 👉 Input placeholder alignment
+.v-input--density-compact{
+    input::placeholder {
+        position: relative;
+        inset-block-start: 1px;
+    }
+}

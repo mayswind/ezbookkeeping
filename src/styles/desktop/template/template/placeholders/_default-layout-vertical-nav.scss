@@ -1,0 +1,14 @@
+/** Materio Template styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/configured-variables/template" as variables;
+@use "@/styles/desktop/template/base/mixins";
+
+%default-layout-vertical-nav-floating-navbar-and-sticky-elevated-navbar-scrolled {
+    box-shadow: 0 4px 8px -4px rgba(var(--v-shadow-key-umbra-color), 42%);
+
+    // If navbar is contained => Squeeze navbar content on scroll
+    @if variables.$layout-vertical-nav-navbar-is-contained {
+        padding-inline: 1.5rem;
+    }
+}

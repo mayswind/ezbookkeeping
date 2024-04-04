@@ -6,7 +6,7 @@ $ps-hover-size: 0.375rem;
 $ps-track-size: 0.5rem;
 
 .ps__thumb-y {
-    inline-size: $ps-size;
+    inline-size: $ps-size !important;
     inset-inline-end: 0.0625rem;
 }
 
@@ -29,7 +29,7 @@ $ps-track-size: 0.5rem;
 .ps__rail-y.ps--clicking .ps__thumb-y,
 .ps__rail-y:focus > .ps__thumb-y,
 .ps__rail-y:hover > .ps__thumb-y {
-    inline-size: $ps-hover-size;
+    inline-size: $ps-hover-size !important;
 }
 
 .ps__thumb-x,

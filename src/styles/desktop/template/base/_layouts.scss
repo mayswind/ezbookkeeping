@@ -50,7 +50,7 @@
 // 👉 Floating navbar styles
 @if variables.$vertical-nav-navbar-style == "floating" {
     // ℹ️ Add spacing above navbar if navbar is floating (was in %layout-navbar-sticky placeholder)
-    .layout-wrapper.layout-nav-type-vertical.layout-navbar-sticky {
+    body .layout-wrapper.layout-nav-type-vertical.layout-navbar-sticky {
         .layout-navbar {
             inset-block-start: variables.$vertical-nav-floating-navbar-top;
         }

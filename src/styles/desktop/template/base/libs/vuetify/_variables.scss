@@ -1,6 +1,8 @@
 /** Materio Template base classes **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
+@use "sass:map";
+
 // 👉 Shadow opacities
 $shadow-key-umbra-opacity-custom: var(--v-shadow-key-umbra-opacity);
 $shadow-key-penumbra-opacity-custom: var(--v-shadow-key-penumbra-opacity);
@@ -47,7 +49,16 @@ $card-transition-property-custom: box-shadow, opacity;
     // 👉 VTimeline
     $timeline-dot-size: 34px !default,
 
+    // 👉 table
+    $table-transition-property:  height !default,
+
     // 👉 VOverlay
     $overlay-opacity: 1 !default,
+
+    // 👉 VContainer
+    $container-max-widths: (
+        "xl": 1440px,
+        "xxl": 1440px
+    ) !default,
 )
 ;

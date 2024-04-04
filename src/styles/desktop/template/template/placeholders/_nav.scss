@@ -1,11 +1,20 @@
 /** Materio Template styles **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
+@use "@/styles/desktop/template/base/mixins";
+
 %nav-link-active {
-    background:
-        linear-gradient(
-                -72.47deg,
-                rgb(var(--v-theme-primary)) 22.16%,
-                rgba(var(--v-theme-primary), 0.7) 76.47%
-        ) !important;
+    background: linear-gradient(-72.47deg, rgb(var(--v-theme-primary)) 22.16%,
+        rgba(var(--v-theme-primary), 0.7) 76.47%) !important;
+
+    i { color: rgb(var(--v-theme-on-primary)) !important; }
+
+    @include mixins.elevation(4);
+}
+
+// ℹ️ This is common style that needs to be applied to both navs
+%nav {
+    .nav-item-title {
+        line-height: 1.375rem;
+    }
 }

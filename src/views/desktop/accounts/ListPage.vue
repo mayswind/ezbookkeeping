@@ -5,22 +5,22 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <small>{{ $t('Net assets') }}</small>
-                            <p class="text-body-1 text-income text-truncate mt-1 mb-3">
+                            <span class="text-subtitle-2">{{ $t('Net assets') }}</span>
+                            <p class="account-statistic-item-value text-income text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ netAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <small>{{ $t('Total liabilities') }}</small>
-                            <p class="text-body-1 text-expense text-truncate mt-1 mb-3">
+                            <span class="text-subtitle-2">{{ $t('Total liabilities') }}</span>
+                            <p class="account-statistic-item-value text-expense text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalLiabilities }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <small>{{ $t('Total assets') }}</small>
-                            <p class="text-body-1 mt-1">
+                            <span class="text-subtitle-2">{{ $t('Total assets') }}</span>
+                            <p class="account-statistic-item-value mt-1">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
@@ -35,7 +35,7 @@
                                 <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                                 <div class="d-flex flex-column text-truncate ml-2">
                                     <small class="text-truncate text-left smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
-                                    <small class="text-truncate text-left smaller" v-else-if="loading && allAccountCount <= 0">
+                                    <small class="text-truncate text-left smaller my-1" v-else-if="loading && allAccountCount <= 0">
                                         <v-skeleton-loader class="skeleton-no-margin"
                                                            width="100px" height="16" type="text" :loading="true"></v-skeleton-loader>
                                     </small>
@@ -60,13 +60,14 @@
                                             <v-btn class="ml-3" color="primary" variant="tonal"
                                                    :disabled="loading" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ml-2" :icon="true" :disabled="loading"
-                                                   v-if="!loading" @click="reload">
+                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20"/>
+                                                </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
                                                 <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                                             </v-btn>
-                                            <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading" :icon="true">
@@ -86,7 +87,7 @@
                                     </template>
 
                                     <v-card-text class="accounts-overview-title text-truncate pt-0">
-                                        <span class="text-subtitle-1">{{ $t('Balance') }}</span>
+                                        <span class="accounts-overview-subtitle">{{ $t('Balance') }}</span>
                                         <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
                                         <span class="accounts-overview-amount ml-3" v-else-if="!loading || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
                                         <v-btn class="ml-2" density="compact" color="default" variant="text"
@@ -603,6 +604,10 @@ export default {
 </script>
 
 <style>
+.account-statistic-item-value {
+    font-size: 1rem;
+}
+
 .account-category-tabs .v-tab.v-tab.v-btn {
     height: calc(var(--v-tabs-height) * 1.5);
 }
@@ -619,6 +624,11 @@ export default {
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.accounts-overview-subtitle {
+    font-size: 1rem;
+    line-height: 1.75rem;
 }
 
 .account-card > .v-card-item {
@@ -643,6 +653,35 @@ export default {
 .account-card .account-subaccounts {
     overflow-x: auto;
     white-space: nowrap;
+}
+
+.account-card .account-subaccounts.v-btn-toggle {
+    height: auto !important;
+    padding: 0;
+    border: none;
+}
+
+.account-card .account-subaccounts.v-btn-toggle > .v-btn {
+    border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.account-card .account-subaccounts.v-btn-toggle > .v-btn:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+}
+
+.account-card .account-subaccounts.v-btn-toggle > .v-btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.account-card .account-subaccounts.v-btn-toggle > .v-btn {
+    border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.account-card .account-subaccounts.v-btn-toggle button.v-btn {
+    width: auto !important;
 }
 
 .account-card .account-toolbar {

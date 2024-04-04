@@ -15,7 +15,7 @@
                 :options="{ wheelPropagation: false }"
                 @ps-scroll-y="handleNavScroll"
             >
-                <li class="nav-link">
+                <li class="nav-link home-link">
                     <router-link to="/">
                         <v-icon class="nav-item-icon" :icon="icons.overview"/>
                         <span class="nav-item-title">{{ $t('Overview') }}</span>
@@ -119,7 +119,7 @@
                                 <v-list>
                                     <v-list-item>
                                         <template #prepend>
-                                            <v-list-item-action start>
+                                            <v-list-item-action>
                                                 <v-avatar color="primary" variant="tonal">
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                                         <template #placeholder>
@@ -322,7 +322,11 @@ export default {
 
 <style>
 .main-logo {
-    width: 1.8em;
-    height: 1.8em;
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.nav-link.home-link > a:not(.router-link-exact-active):hover::before {
+    opacity: calc(var(--v-hover-opacity)* var(--v-theme-overlay-multiplier));
 }
 </style>

@@ -15,7 +15,7 @@
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4">
-                            <small>{{ $t('Transactions Per Page') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Transactions Per Page') }}</span>
                             <v-select class="mt-2" density="compact" :disabled="loading"
                                       :items="[ 5, 10, 15, 20, 25, 30, 50 ]"
                                       v-model="countPerPage"
@@ -42,13 +42,14 @@
                                             <span>{{ $t('Transaction List') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
                                                    :disabled="loading || !canAddTransaction" @click="add">{{ $t('Add') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ml-2" :icon="true" :disabled="loading"
-                                                   v-if="!loading" @click="reload">
+                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20"/>
+                                                </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
                                                 <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                                             </v-btn>
-                                            <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                                             <v-spacer/>
                                             <div class="transaction-keyword-filter ml-2">
                                                 <v-text-field density="compact" :disabled="loading"
@@ -72,13 +73,13 @@
                                             </span>
                                             <span class="text-body-1 transaction-list-datetime-range-text ml-2"
                                                   v-else-if="query.minTime || query.maxTime">
-                                                <v-btn class="mr-1" size="small"
-                                                       density="comfortable" color="default" variant="outlined"
+                                                <v-btn class="mr-1" size="x-small"
+                                                       density="compact" color="default" variant="outlined"
                                                        :icon="icons.arrowLeft" :disabled="loading"
                                                        @click="shiftDateRange(query.minTime, query.maxTime, -1)"/>
                                                 <span class="text-sm">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
-                                                <v-btn class="ml-1" size="small"
-                                                       density="comfortable" color="default" variant="outlined"
+                                                <v-btn class="ml-1" size="x-small"
+                                                       density="compact" color="default" variant="outlined"
                                                        :icon="icons.arrowRight" :disabled="loading"
                                                        @click="shiftDateRange(query.minTime, query.maxTime, 1)"/>
                                             </span>
@@ -105,8 +106,8 @@
                                     <v-table class="transaction-table" :hover="!loading">
                                         <thead>
                                         <tr>
-                                            <th class="transaction-table-column-time text-uppercase">{{ $t('Time') }}</th>
-                                            <th class="transaction-table-column-category text-uppercase">
+                                            <th class="transaction-table-column-time">{{ $t('Time') }}</th>
+                                            <th class="transaction-table-column-category">
                                                 <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
                                                         eager location="bottom" max-height="500"
                                                         :disabled="query.type === 1"
@@ -191,8 +192,8 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-amount text-uppercase">{{ $t('Amount') }}</th>
-                                            <th class="transaction-table-column-account text-uppercase">
+                                            <th class="transaction-table-column-amount">{{ $t('Amount') }}</th>
+                                            <th class="transaction-table-column-account">
                                                 <v-menu ref="accountFilterMenu" class="transaction-account-menu"
                                                         eager location="bottom" max-height="500"
                                                         @update:model-value="scrollAccountMenuToSelectedItem">
@@ -235,7 +236,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-description text-uppercase">{{ $t('Description') }}</th>
+                                            <th class="transaction-table-column-description">{{ $t('Description') }}</th>
                                         </tr>
                                         </thead>
 

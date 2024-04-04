@@ -77,23 +77,24 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ $t('Device & Sessions') }}</span>
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ml-2" :icon="true"
-                               v-if="!loadingSession" @click="reloadSessions">
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ml-2" :icon="true" :loading="loadingSession" @click="reloadSessions">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loadingSession"></v-progress-circular>
                     </div>
                 </template>
 
                 <v-table class="table-striped text-no-wrap" :hover="!loadingSession">
                     <thead>
                     <tr>
-                        <th class="text-uppercase">{{ $t('Type') }}</th>
-                        <th class="text-uppercase">{{ $t('Device Info') }}</th>
-                        <th class="text-uppercase">{{ $t('Last Activity Time') }}</th>
-                        <th class="text-uppercase text-right">
+                        <th>{{ $t('Type') }}</th>
+                        <th>{{ $t('Device Info') }}</th>
+                        <th>{{ $t('Last Activity Time') }}</th>
+                        <th class="text-right">
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="sessions.length < 2 || loadingSession"
                                    @click="revokeAllSessions">

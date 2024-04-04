@@ -5,13 +5,14 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ $t('Data Management') }}</span>
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ml-2" :icon="true"
-                               v-if="!loadingDataStatistics" @click="reloadUserDataStatistics(true)">
+                        <v-btn density="compact" color="default" variant="text" size="24"
+                               class="ml-2" :icon="true" :loading="loadingDataStatistics" @click="reloadUserDataStatistics(true)">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loadingDataStatistics"></v-progress-circular>
                     </div>
                 </template>
 
@@ -27,8 +28,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -42,8 +43,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Accounts') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalAccountCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalAccountCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -57,8 +58,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction Categories') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -72,8 +73,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-caption">{{ $t('Transaction Tags') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-h6" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-' }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-' }}</span>
                                 </div>
                             </div>
                         </v-col>

@@ -4,8 +4,8 @@
             <v-toolbar :color="finalColor">
                 <v-toolbar-title>{{ titleContent }}</v-toolbar-title>
             </v-toolbar>
-            <v-card-text v-if="textContent" class="pa-4">{{ textContent }}</v-card-text>
-            <v-card-actions>
+            <v-card-text v-if="textContent" class="pa-4 pb-6">{{ textContent }}</v-card-text>
+            <v-card-actions class="px-4 pb-4">
                 <v-spacer></v-spacer>
                 <v-btn color="gray" @click="cancel">{{ $t('Cancel') }}</v-btn>
                 <v-btn :color="finalColor" @click="confirm">{{ $t('OK') }}</v-btn>

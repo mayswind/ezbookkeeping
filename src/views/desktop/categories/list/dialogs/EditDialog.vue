@@ -3,12 +3,12 @@
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h5 class="text-h5">{{ $t(title) }}</h5>
+                    <h4 class="text-h4">{{ $t(title) }}</h4>
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                 </div>
             </template>
-            <v-card-text>
-                <v-form class="mt-2 mt-md-6">
+            <v-card-text class="pt-0">
+                <v-form class="mt-md-6">
                     <v-row>
                         <v-col cols="12" md="12">
                             <v-text-field
@@ -47,7 +47,7 @@
                             />
                         </v-col>
                         <v-col class="py-0" cols="12" md="12" v-if="editCategoryId">
-                            <v-switch inset :disabled="loading || submitting"
+                            <v-switch :disabled="loading || submitting"
                                       :label="$t('Visible')" v-model="category.visible"/>
                         </v-col>
                     </v-row>

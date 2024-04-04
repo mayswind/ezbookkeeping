@@ -22,7 +22,7 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h5 class="text-h5 mb-3">{{ $t('Verify your email') }}</h5>
+                            <h4 class="text-h4 mb-2">{{ $t('Verify your email') }}</h4>
                             <p class="mb-0" v-if="token && loading">{{ $t('Verifying...') }}</p>
                             <p class="mb-0" v-if="token && verified">{{ $t('Email has been verified') }}</p>
                             <p class="mb-0" v-if="token && !verified && errorMessage">{{ errorMessage }}</p>

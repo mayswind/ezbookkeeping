@@ -12,11 +12,10 @@
                 </v-card-text>
 
                 <v-card-text v-if="isEnableApplicationLock">
-                    <v-switch inset :disabled="true"
+                    <v-switch :disabled="true"
                               :label="$t('Unlock By PIN Code')"
                               v-model="isEnableApplicationLock"/>
-                    <v-switch inset
-                              :label="$t('Unlock By WebAuthn')"
+                    <v-switch class="mt-2" :label="$t('Unlock By WebAuthn')"
                               :loading="enablingWebAuthn"
                               v-model="isEnableApplicationLockWebAuthn"/>
                 </v-card-text>

@@ -25,7 +25,7 @@
                     <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
                         <v-form>
                             <v-window-item value="basicSetting">
-                                <h5 class="text-h5 mb-1">{{ $t('Basic Information') }}</h5>
+                                <h4 class="text-h4 mb-1">{{ $t('Basic Information') }}</h4>
                                 <p class="text-sm mt-2 mb-5">
                                     <span>{{ $t('Already have an account?') }}</span>
                                     <router-link class="ml-1" to="/login">{{ $t('Click here to log in') }}</router-link>
@@ -145,13 +145,12 @@
                             </v-window-item>
 
                             <v-window-item value="presetCategories" class="signup-preset-categories">
-                                <h5 class="text-h5 mb-1">{{ $t('Preset Categories') }}</h5>
+                                <h4 class="text-h4 mb-1">{{ $t('Preset Categories') }}</h4>
                                 <p class="text-sm mt-2 mb-5">{{ $t('Set Whether You Use The Preset Transaction Categories') }}</p>
 
-                                <v-row class="mb-5">
+                                <v-row>
                                     <v-col cols="12" sm="6">
-                                        <v-switch inset
-                                                  :disabled="submitting || navigateToHomePage"
+                                        <v-switch :disabled="submitting || navigateToHomePage"
                                                   :label="$t('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>
@@ -208,7 +207,7 @@
                             </v-window-item>
 
                             <v-window-item value="finalResult" v-if="finalResultMessage">
-                                <h5 class="text-h5 mb-1">{{ $t('Registration Complete') }}</h5>
+                                <h4 class="text-h4 mb-1">{{ $t('Registration Complete') }}</h4>
                                 <p class="my-5">{{ finalResultMessage }}</p>
                             </v-window-item>
                         </v-form>

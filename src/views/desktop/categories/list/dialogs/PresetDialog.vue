@@ -3,10 +3,10 @@
         <v-card class="pa-2 pa-sm-4 pa-md-8">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h5 class="text-h5">{{ $t('Default Categories') }}</h5>
+                    <h4 class="text-h4">{{ $t('Default Categories') }}</h4>
                 </div>
             </template>
-            <v-card-text class="preset-transaction-categories mt-0 mt-sm-2 mt-md-4 pb-4">
+            <v-card-text class="preset-transaction-categories mt-sm-2 mt-md-4 pt-0">
                 <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
                     <div class="d-flex align-center mb-1">
                         <h4>{{ getCategoryTypeName(categoryType) }}</h4>

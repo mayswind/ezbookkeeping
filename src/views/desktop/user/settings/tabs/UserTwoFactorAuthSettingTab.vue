@@ -84,7 +84,7 @@
                 <template #title>
                     <span>{{ $t('Backup Code') }}</span>
                     <v-btn id="copy-to-clipboard-icon" ref="copyToClipboardIcon"
-                           density="compact" color="default" variant="text"
+                           density="compact" color="default" variant="text" size="24"
                            class="ml-2" :icon="true">
                         <v-icon :icon="icons.copy" size="20" />
                         <v-tooltip activator="parent">{{ $t('Copy') }}</v-tooltip>
@@ -348,5 +348,9 @@ export default {
 
 .backup-code {
     font-family: monospace;
+}
+
+.backup-code textarea {
+    resize: none;
 }
 </style>

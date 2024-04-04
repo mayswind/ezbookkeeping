@@ -3,11 +3,11 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h5 class="text-h5">{{ $t('Use on Mobile Device') }}</h5>
+                    <h4 class="text-h4">{{ $t('Use on Mobile Device') }}</h4>
                 </div>
             </template>
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-6">{{ $t('You can scan the below QR code on your mobile device.') }}</div>
+                <div class="text-body-1 text-center text-wrap mt-4">{{ $t('You can scan the below QR code on your mobile device.') }}</div>
             </template>
             <v-card-text class="mb-md-4">
                 <v-row>

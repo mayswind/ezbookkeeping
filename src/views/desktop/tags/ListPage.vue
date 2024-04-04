@@ -10,13 +10,15 @@
                         <v-btn class="ml-3" color="primary" variant="tonal"
                                :disabled="loading || updating || hasEditingTag" @click="saveSortResult"
                                v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
-                        <v-btn density="compact" color="default" variant="text"
+                        <v-btn density="compact" color="default" variant="text" size="24"
                                class="ml-2" :icon="true" :disabled="loading || updating || hasEditingTag"
-                               v-if="!loading" @click="reload">
+                               :loading="loading" @click="reload">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
+                            </template>
                             <v-icon :icon="icons.refresh" size="24" />
                             <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                         </v-btn>
-                        <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                         <v-spacer/>
                         <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                :disabled="loading || updating || hasEditingTag" :icon="true">
@@ -38,7 +40,7 @@
                 <v-table class="transaction-tags-table table-striped" :hover="!loading">
                     <thead>
                     <tr>
-                        <th class="text-uppercase">
+                        <th>
                             <div class="d-flex align-center">
                                 <span>{{ $t('Tag Title') }}</span>
                                 <v-spacer/>
@@ -81,7 +83,7 @@
                                                 <v-icon size="20" start :icon="icons.tag"/>
                                             </v-badge>
                                             <v-icon size="20" start :icon="icons.tag" v-else-if="!element.hidden"/>
-                                            <span>{{ element.name }}</span>
+                                            <span class="transaction-tag-name">{{ element.name }}</span>
                                         </div>
 
                                         <v-text-field class="w-100 mr-2" type="text"
@@ -470,7 +472,19 @@ export default {
 }
 
 .transaction-tags-table tr.transaction-tags-table-row-tag:hover .hover-display {
-    display: grid;
+    display: inline-grid;
+}
+
+.transaction-tags-table tr:not(:last-child) > td > div {
+    padding-bottom: 1px;
+}
+
+.transaction-tags-table .has-bottom-border tr:last-child > td > div {
+    padding-bottom: 1px;
+}
+
+.transaction-tags-table tr.transaction-tags-table-row-tag .right-bottom-icon .v-badge__badge {
+    padding-bottom: 1px;
 }
 
 .transaction-tags-table .v-text-field .v-input__prepend {
@@ -483,7 +497,7 @@ export default {
 }
 
 .transaction-tags-table .v-text-field.v-input--plain-underlined .v-input__prepend {
-    padding-top: 6px;
+    padding-top: 10px;
 }
 
 .transaction-tags-table .v-text-field .v-field__input {
@@ -492,7 +506,11 @@ export default {
     color: rgba(var(--v-theme-on-surface));
 }
 
-.transaction-tags-table tr:last-child .v-text-field .v-field__input {
+.transaction-tags-table .transaction-tag-name {
+    font-size: 0.875rem;
+}
+
+.transaction-tags-table tr .v-text-field .v-field__input {
     padding-bottom: 1px;
 }
 

@@ -241,10 +241,6 @@ input[type=number] {
     }
 }
 
-.v-btn-group--density-comfortable.v-btn-group {
-    height: 38px;
-}
-
 .text-field-with-colored-label.v-text-field.text-primary .v-field-label.v-label {
     color: rgba(var(--v-theme-primary), var(--v-medium-emphasis-opacity)) !important;
 }
@@ -255,6 +251,55 @@ input[type=number] {
 
 .text-field-with-colored-label.v-text-field.text-income .v-field-label.v-label {
     color: rgba(var(--v-theme-income), var(--v-medium-emphasis-opacity)) !important;
+}
+
+.v-switch.v-switch--inset {
+    .v-switch__track {
+        min-width: 1.875rem !important;
+    }
+}
+
+body .v-tabs:not(.v-tabs-pill) {
+    &.v-tabs--vertical {
+        .v-tab__slider {
+            inset-inline-end: unset;
+            inset-inline-start: 0;
+        }
+    }
+
+    .v-tab {
+        &.v-tab--selected {
+            &.v-btn.v-btn--variant-text {
+                &:hover, &:active, &:focus {
+                    .v-btn__overlay {
+                        --v-hover-opacity: 0.04;
+                    }
+                }
+            }
+        }
+
+        &:not(.v-tab--selected) {
+            &.v-btn.v-btn--variant-text {
+                &:hover, &:active, &:focus {
+                    color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+
+                    .v-btn__overlay {
+                        --v-hover-opacity: 0.04;
+                    }
+                }
+            }
+        }
+    }
+}
+
+body .v-btn-group {
+    &.v-btn-group--density-comfortable {
+        height: 38px;
+    }
+
+    &.v-btn-group--divided .v-btn:not(:last-child) {
+        border-inline-end-color: rgba(var(--v-border-color), var(--v-border-opacity));
+    }
 }
 
 /** Replacing the default style of @vuepic/vue-datepicker **/

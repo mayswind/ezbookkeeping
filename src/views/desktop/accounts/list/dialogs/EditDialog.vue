@@ -4,7 +4,7 @@
             <template #title>
                 <div class="d-flex align-center justify-center">
                     <div class="d-flex w-100 align-center justify-center">
-                        <h5 class="text-h5">{{ $t(title) }}</h5>
+                        <h4 class="text-h4">{{ $t(title) }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
@@ -20,7 +20,7 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card-text class="d-flex flex-column flex-md-row mt-2 mt-md-4">
+            <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
                 <div class="mb-4" v-if="account.type === allAccountTypes.MultiSubAccounts">
                     <v-tabs direction="vertical" :disabled="loading || submitting" v-model="currentAccountIndex">
                         <v-tab :value="-1">
@@ -147,7 +147,7 @@
                                     />
                                 </v-col>
                                 <v-col class="py-0" cols="12" md="12" v-if="editAccountId">
-                                    <v-switch inset :disabled="loading || submitting"
+                                    <v-switch :disabled="loading || submitting"
                                               :label="$t('Visible')" v-model="selectedAccount.visible"/>
                                 </v-col>
                             </v-row>

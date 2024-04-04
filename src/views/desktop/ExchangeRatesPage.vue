@@ -5,7 +5,7 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <small>{{ $t('Data source') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Data source') }}</span>
                             <p class="text-body-1 mt-1 mb-3">
                                 <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                                 <span v-else-if="!loading && exchangeRatesData && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
@@ -14,23 +14,23 @@
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
-                            <small v-if="exchangeRatesDataUpdateTime || loading">{{ $t('Last Updated') }}</small>
+                            <span class="text-subtitle-2" v-if="exchangeRatesDataUpdateTime || loading">{{ $t('Last Updated') }}</span>
                             <p class="text-body-1 mt-1" v-if="exchangeRatesDataUpdateTime || loading">
                                 <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
                                 <span v-if="loading">
-                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-5" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </p>
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4">
-                            <small>{{ $t('Base Amount') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Base Amount') }}</span>
                             <amount-input class="mt-2" density="compact"
                                           :disabled="loading || !exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length"
                                           v-model="baseAmount"/>
                         </div>
                         <div class="mx-6 mt-4">
-                            <small>{{ $t('Base Currency') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Base Currency') }}</span>
                         </div>
                         <v-tabs show-arrows class="mb-4" direction="vertical"
                                 :disabled="loading" v-model="baseCurrency"
@@ -64,20 +64,21 @@
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
                                             <span>{{ $t('Exchange Rates Data') }}</span>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ml-2" :icon="true"
-                                                   v-if="!loading" @click="reload">
+                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20"/>
+                                                </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
                                                 <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                                             </v-btn>
-                                            <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                                         </div>
                                     </template>
 
                                     <v-table class="exchange-rates-table table-striped" :hover="!loading">
                                         <thead>
                                         <tr>
-                                            <th class="text-uppercase">
+                                            <th>
                                                 <div class="d-flex align-center">
                                                     <span>{{ $t('Currency') }}</span>
                                                     <v-spacer/>

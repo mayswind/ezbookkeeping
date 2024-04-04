@@ -190,6 +190,7 @@ const vuetify = createVuetify({
         },
         VAutocomplete: {
             variant: 'outlined',
+            density: 'comfortable',
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -216,14 +217,17 @@ const vuetify = createVuetify({
             color: 'primary'
         },
         VPagination: {
+            density: 'comfortable',
             activeColor: 'primary'
         },
         VRadio: {
+            density: 'comfortable',
             color: 'primary',
             hideDetails: 'auto'
         },
         VSelect: {
             variant: 'outlined',
+            density: 'comfortable',
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -232,6 +236,7 @@ const vuetify = createVuetify({
             hideDetails: 'auto'
         },
         VSwitch: {
+            inset: true,
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -252,11 +257,13 @@ const vuetify = createVuetify({
         },
         VTextarea: {
             variant: 'outlined',
+            density: 'comfortable',
             color: 'primary',
             hideDetails: 'auto'
         },
         VTextField: {
             variant: 'outlined',
+            density: 'comfortable',
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -274,22 +281,22 @@ const vuetify = createVuetify({
                 dark: false,
                 colors: {
                     'primary': '#c67e48',
-                    'primary-darken-1': '#9a6238',
+                    'primary-darken-1': '#b67443',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
                     'secondary-darken-1': '#545659',
                     'on-secondary': '#ffffff',
                     'success': '#4cd964',
-                    'success-darken-1': '#3ba64d',
+                    'success-darken-1': '#40b654',
                     'on-success': '#ffffff',
                     'info': '#2196f3',
-                    'info-darken-1': '#1a74bd',
+                    'info-darken-1': '#1e85d7',
                     'on-info': '#ffffff',
                     'warning': '#ff9500',
-                    'warning-darken-1': '#d07a01',
+                    'warning-darken-1': '#de8201',
                     'on-warning': '#ffffff',
                     'error': '#ff3b30',
-                    'error-darken-1': '#c73027',
+                    'error-darken-1': '#e1342b',
                     'on-error': '#ffffff',
                     'income': '#ff3b30',
                     'expense': '#009688',
@@ -315,7 +322,7 @@ const vuetify = createVuetify({
                 variables: {
                     'code-color': '#ff8000',
                     'overlay-scrim-background': '#413935',
-                    'tooltip-background': '#1A0E33',
+                    'tooltip-background': '#212121',
                     'overlay-scrim-opacity': 0.5,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
@@ -326,12 +333,12 @@ const vuetify = createVuetify({
                     'disabled-opacity': 0.4,
                     'border-color': '#413f3b',
                     'border-opacity': 0.12,
-                    'table-header-color': '#F6F7FB',
+                    'table-header-color': '#fdfcf9',
                     'high-emphasis-opacity': 0.9,
                     'medium-emphasis-opacity': 0.7,
 
                     // 👉 shadows
-                    'shadow-key-umbra-color': '#2E263D',
+                    'shadow-key-umbra-color': '#413935',
                     'shadow-xs-opacity': '0.16',
                     'shadow-sm-opacity': '0.18',
                     'shadow-md-opacity': '0.20',
@@ -343,22 +350,22 @@ const vuetify = createVuetify({
                 dark: true,
                 colors: {
                     'primary': '#c67e48',
-                    'primary-darken-1': '#9a6238',
+                    'primary-darken-1': '#b67443',
                     'on-primary': '#ffffff',
                     'secondary': '#8a8d93',
                     'secondary-darken-1': '#545659',
                     'on-secondary': '#fff',
                     'success': '#4cd964',
-                    'success-darken-1': '#3ba64d',
+                    'success-darken-1': '#40b654',
                     'on-success': '#ffffff',
                     'info': '#2196f3',
-                    'info-darken-1': '#1a74bd',
+                    'info-darken-1': '#1e85d7',
                     'on-info': '#ffffff',
                     'warning': '#ff9500',
-                    'warning-darken-1': '#d07a01',
+                    'warning-darken-1': '#de8201',
                     'on-warning': '#ffffff',
                     'error': '#ff3b30',
-                    'error-darken-1': '#c73027',
+                    'error-darken-1': '#e1342b',
                     'on-error': '#ffffff',
                     'income': '#ff3b30',
                     'expense': '#009688',
@@ -384,7 +391,7 @@ const vuetify = createVuetify({
                 variables: {
                     'code-color': '#ff8000',
                     'overlay-scrim-background': '#1c1c1d',
-                    'tooltip-background': '#F7F4FF',
+                    'tooltip-background': '#212121',
                     'overlay-scrim-opacity': 0.5,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
@@ -395,12 +402,12 @@ const vuetify = createVuetify({
                     'dragged-opacity': 0.1,
                     'border-color': '#edece9',
                     'border-opacity': 0.12,
-                    'table-header-color': '#3D3759',
+                    'table-header-color': '#312f2b',
                     'high-emphasis-opacity': 0.9,
                     'medium-emphasis-opacity': 0.7,
 
                     // 👉 Shadows
-                    'shadow-key-umbra-color': '#131120',
+                    'shadow-key-umbra-color': '#67615d',
                     'shadow-xs-opacity': '0.20',
                     'shadow-sm-opacity': '0.22',
                     'shadow-md-opacity': '0.24',

@@ -22,7 +22,7 @@
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
-                            <h5 class="text-h5 mb-3">{{ $t('Reset Password') }}</h5>
+                            <h4 class="text-h4 mb-2">{{ $t('Reset Password') }}</h4>
                             <p class="mb-0">{{ $t('Please input your email address again, and input the new password.') }}</p>
                         </v-card-text>
 

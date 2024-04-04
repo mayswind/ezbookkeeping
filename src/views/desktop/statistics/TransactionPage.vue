@@ -11,7 +11,7 @@
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
-                            <small>{{ $t('Chart Type') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Chart Type') }}</span>
                             <v-select
                                 item-title="name"
                                 item-value="type"
@@ -31,7 +31,7 @@
                             </v-select>
                         </div>
                         <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
-                            <small>{{ $t('Sort By') }}</small>
+                            <span class="text-subtitle-2">{{ $t('Sort By') }}</span>
                             <v-select
                                 item-title="name"
                                 item-value="type"
@@ -103,13 +103,14 @@
                                                        @click="shiftDateRange(query.startTime, query.endTime, 1)"/>
                                             </v-btn-group>
 
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ml-2" :icon="true" :disabled="loading"
-                                                   v-if="!loading" @click="reload">
+                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                                   class="ml-2" :icon="true" :loading="loading" @click="reload">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20"/>
+                                                </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
                                                 <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                                             </v-btn>
-                                            <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading" :icon="true">
@@ -134,7 +135,7 @@
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
                                                  v-if="initing || (statisticsData && statisticsData.items && statisticsData.items.length)">
-                                        <span class="text-subtitle-1">{{ totalAmountName }}</span>
+                                        <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ml-3"
                                               :class="statisticsTextColor"
                                               v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
@@ -147,7 +148,7 @@
 
                                     <v-card-text class="statistics-overview-title pt-0"
                                                  v-else-if="!initing && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
-                                        <span class="text-subtitle-1 statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
+                                        <span class="statistics-subtitle statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                     </v-card-text>
 
                                     <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allChartTypes.Pie">
@@ -203,7 +204,7 @@
                                                 <v-divider v-if="itemIdx < 3"/>
                                             </template>
                                         </v-list>
-                                        <v-list rounded lines="two" v-else-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
+                                        <v-list class="py-0" rounded lines="two" v-else-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
                                             <template :key="idx"
                                                       v-for="(item, idx) in statisticsData.items">
                                                 <v-list-item class="pl-0" v-if="!item.hidden">
@@ -658,6 +659,11 @@ export default {
     font-size: 1.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.statistics-subtitle {
+    font-size: 1rem;
+    line-height: 1.75rem
 }
 
 .statistics-overview-empty-tip {

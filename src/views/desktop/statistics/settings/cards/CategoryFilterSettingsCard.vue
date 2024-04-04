@@ -3,7 +3,7 @@
         <template #title>
             <div class="d-flex align-center justify-center" v-if="dialogMode">
                 <div class="w-100 text-center">
-                    <h5 class="text-h5">{{ $t(title) }}</h5>
+                    <h4 class="text-h4">{{ $t(title) }}</h4>
                 </div>
                 <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                        :disabled="loading || !hasAnyAvailableCategory" :icon="true">
@@ -326,6 +326,11 @@ export default {
 <style>
 .category-types .v-expansion-panel-text__wrapper {
     padding: 0 0 0 20px;
+}
+
+.category-types .v-expansion-panel--active:not(:first-child),
+.category-types .v-expansion-panel--active + .v-expansion-panel {
+    margin-top: 1rem;
 }
 </style>
 

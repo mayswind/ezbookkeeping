@@ -8,7 +8,7 @@
                   :rules="enableRules ? rules : []" v-model="currentValue"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown">
         <template #prepend-inner v-if="currency && prependText">
-            <div style="margin-top: 2px">{{ prependText }}</div>
+            <div>{{ prependText }}</div>
         </template>
         <template #append-inner v-if="currency && appendText">
             <div class="text-no-wrap">{{ appendText }}</div>
@@ -69,6 +69,10 @@ export default {
 
             if (this.color) {
                 finalClass += ` text-${this.color}`;
+            }
+
+            if (this.currency && this.prependText) {
+                finalClass += ` has-pretend-text`;
             }
 
             return finalClass;
@@ -168,3 +172,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.text-field-with-colored-label.has-pretend-text .v-field__input {
+    padding-left: 0.5rem;
+}
+</style>

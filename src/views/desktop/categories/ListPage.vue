@@ -45,13 +45,14 @@
                                             <v-btn class="ml-3" color="primary" variant="tonal"
                                                    :disabled="loading || updating" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ $t('Save Display Order') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ml-2" :icon="true" :disabled="loading || updating"
-                                                   v-if="!loading" @click="reload">
+                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                                   class="ml-2" :icon="true" :loading="loading || updating" @click="reload">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20"/>
+                                                </template>
                                                 <v-icon :icon="icons.refresh" size="24" />
                                                 <v-tooltip activator="parent">{{ $t('Refresh') }}</v-tooltip>
                                             </v-btn>
-                                            <v-progress-circular indeterminate size="20" class="ml-3" v-if="loading"></v-progress-circular>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ml-2"
                                                    :disabled="loading || updating" :icon="true">
@@ -73,7 +74,7 @@
                                     <v-table class="transaction-category-table table-striped" :hover="!loading">
                                         <thead>
                                         <tr>
-                                            <th class="text-uppercase">
+                                            <th>
                                                 <div class="d-flex align-center">
                                                     <span>{{ $t('Category Name') }}</span>
                                                     <v-spacer/>

@@ -387,6 +387,7 @@ export default {
         Promise.all(promises).then(responses => {
             const profile = responses[1];
             self.setCurrentUserProfile(profile);
+            self.emailVerified = profile.emailVerified;
             self.loading = false;
         }).catch(error => {
             self.oldProfile.nickname = '';
@@ -420,6 +421,7 @@ export default {
 
                 if (response.user) {
                     self.setCurrentUserProfile(response.user);
+                    self.emailVerified = response.user.emailVerified;
 
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
@@ -457,8 +459,6 @@ export default {
             return getNameByKeyValue(src, value, keyField, nameField, defaultName);
         },
         setCurrentUserProfile(profile) {
-            this.emailVerified = profile.emailVerified;
-
             this.oldProfile.username = profile.username;
             this.oldProfile.email = profile.email;
             this.oldProfile.nickname = profile.nickname;

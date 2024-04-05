@@ -154,9 +154,7 @@ export default {
                         }
                     });
             } else {
-                self.$nextTick(() => {
-                    self.timePickerHolder.setValue(self.timeValues);
-                });
+                self.updateTimePicker(true);
             }
 
             self.$refs.datetimepicker.switchView('calendar');
@@ -169,14 +167,15 @@ export default {
                 this.mode = 'date';
             } else {
                 this.mode = 'time';
+                this.updateTimePicker(true);
             }
         },
         setCurrentTime() {
             this.dateTime = getLocalDatetimeFromUnixTime(getCurrentUnixTime());
             this.timeValues = this.getTimeValues(this.dateTime);
 
-            if (this.timePickerHolder) {
-                this.timePickerHolder.setValue(this.timeValues);
+            if (this.mode === 'time') {
+                this.updateTimePicker(false);
             }
         },
         confirm() {
@@ -273,6 +272,21 @@ export default {
             }
 
             return ret;
+        },
+        updateTimePicker(lazy) {
+            const self = this;
+
+            if (lazy) {
+                self.$nextTick(() => {
+                    if (self.timePickerHolder) {
+                        self.timePickerHolder.setValue(self.timeValues);
+                    }
+                });
+            } else {
+                if (self.timePickerHolder) {
+                    self.timePickerHolder.setValue(self.timeValues);
+                }
+            }
         }
     }
 }

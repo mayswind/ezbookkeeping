@@ -391,8 +391,8 @@ const vuetify = createVuetify({
                 variables: {
                     'code-color': '#ff8000',
                     'overlay-scrim-background': '#1c1c1d',
-                    'tooltip-background': '#212121',
-                    'overlay-scrim-opacity': 0.5,
+                    'tooltip-background': '#d7d7d7',
+                    'overlay-scrim-opacity': 0.6,
                     'hover-opacity': 0.04,
                     'focus-opacity': 0.1,
                     'selected-opacity': 0.08,

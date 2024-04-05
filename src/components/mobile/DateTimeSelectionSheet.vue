@@ -4,7 +4,7 @@
         <f7-toolbar>
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link :text="switchButtonTitle" @click="switchMode"></f7-link>
+                <f7-link :text="$t('Now')" @click="setCurrentTime"></f7-link>
             </div>
             <div class="right">
                 <f7-link :text="$t('Done')" @click="confirm"></f7-link>
@@ -41,7 +41,7 @@
             <div class="margin-top text-align-center">
                 <div class="display-flex padding-horizontal justify-content-space-between">
                     <div class="align-self-center">{{ displayTime }}</div>
-                    <f7-button fill :text="$t('Now')" @click="setCurrentTime"></f7-button>
+                    <f7-button outline :text="switchButtonTitle" @click="switchMode"></f7-button>
                 </div>
             </div>
         </f7-page-content>

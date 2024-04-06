@@ -3,14 +3,23 @@ export function isProduction() {
 }
 
 export function getVersion() {
-    let version = __EZBOOKKEEPING_VERSION__ || 'unknown'; // eslint-disable-line
-    let commitHash = __EZBOOKKEEPING_BUILD_COMMIT_HASH__; // eslint-disable-line
+    const isRelease = !getBuildTime();
+    const commitHash = __EZBOOKKEEPING_BUILD_COMMIT_HASH__; // eslint-disable-line
+    let version = __EZBOOKKEEPING_VERSION__; // eslint-disable-line
+
+    if (version && (!isRelease || !isProduction())) {
+        version += '-dev';
+    }
+
+    if (!version) {
+        version = 'unknown';
+    }
 
     if (commitHash) {
-        return `${version} (${commitHash.substring(0, Math.min(7, commitHash.length))})`
-    } else {
-        return version;
+        version += ` (${commitHash.substring(0, Math.min(7, commitHash.length))})`;
     }
+
+    return version;
 }
 
 export function getBuildTime() {

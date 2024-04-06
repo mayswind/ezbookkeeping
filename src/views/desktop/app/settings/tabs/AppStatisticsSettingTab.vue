@@ -49,8 +49,8 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
-                                    :label="$t('Default Sort By')"
-                                    :placeholder="$t('Default Sort By')"
+                                    :label="$t('Default Sort Order')"
+                                    :placeholder="$t('Default Sort Order')"
                                     :items="allSortingTypes"
                                     v-model="defaultSortingType"
                                 />

@@ -57,7 +57,7 @@ export const useRootStore = defineStore('root', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result || !data.result.token) {
-                        reject({ message: 'Unable to login' });
+                        reject({ message: 'Unable to log in' });
                         return;
                     }
 
@@ -93,7 +93,7 @@ export const useRootStore = defineStore('root', {
                     } else if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else {
-                        reject({ message: 'Unable to login' });
+                        reject({ message: 'Unable to log in' });
                     }
                 });
             });
@@ -115,7 +115,7 @@ export const useRootStore = defineStore('root', {
                         token: token
                     });
                 } else {
-                    reject({ message: 'An error has occurred' });
+                    reject({ message: 'An error occurred' });
                     return;
                 }
 
@@ -293,7 +293,7 @@ export const useRootStore = defineStore('root', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to resend verify email' });
+                        reject({ message: 'Unable to resend validation email' });
                         return;
                     }
 
@@ -306,7 +306,7 @@ export const useRootStore = defineStore('root', {
                     } else if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else {
-                        reject({ message: 'Unable to resend verify email' });
+                        reject({ message: 'Unable to resend validation email' });
                     }
                 });
             });
@@ -433,7 +433,7 @@ export const useRootStore = defineStore('root', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to resend verify email' });
+                        reject({ message: 'Unable to resend validation email' });
                         return;
                     }
 
@@ -446,7 +446,7 @@ export const useRootStore = defineStore('root', {
                     } else if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else {
-                        reject({ message: 'Unable to resend verify email' });
+                        reject({ message: 'Unable to resend validation email' });
                     }
                 });
             });

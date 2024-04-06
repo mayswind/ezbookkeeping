@@ -15,7 +15,7 @@ export const useTokensStore = defineStore('tokens', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get session list' });
+                        reject({ message: 'Unable to retrieve session list' });
                         return;
                     }
 
@@ -26,7 +26,7 @@ export const useTokensStore = defineStore('tokens', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get session list' });
+                        reject({ message: 'Unable to retrieve session list' });
                     } else {
                         reject(error);
                     }

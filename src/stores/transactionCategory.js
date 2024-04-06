@@ -161,7 +161,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get category list' });
+                        reject({ message: 'Unable to retrieve category list' });
                         return;
                     }
 
@@ -215,7 +215,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get category list' });
+                        reject({ message: 'Unable to retrieve category list' });
                     } else {
                         reject(error);
                     }
@@ -230,7 +230,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get category' });
+                        reject({ message: 'Unable to retrieve category' });
                         return;
                     }
 
@@ -241,7 +241,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get category' });
+                        reject({ message: 'Unable to retrieve category' });
                     } else {
                         reject(error);
                     }

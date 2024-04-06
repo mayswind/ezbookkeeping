@@ -19,7 +19,7 @@
                 </template>
                 <template #error-content>
                     <div class="padding-horizontal padding-bottom">
-                        <p class="no-margin">{{ $t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.') }}</p>
+                        <p class="no-margin">{{ $t('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}</p>
                         <div class="margin-top text-align-center">
                             <f7-link @click="close" :text="$t('Close')"></f7-link>
                         </div>

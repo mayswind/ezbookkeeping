@@ -31,7 +31,7 @@
         <f7-card v-if="query.chartType === allChartTypes.Pie">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
-                    <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
+                    <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
                     <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                 </div>
             </f7-card-header>
@@ -84,7 +84,7 @@
                         {{ totalAmountName }}
                     </div>
                     <div class="align-self-flex-end">
-                        <span style="margin-right: 4px;">{{ $t('Sort By') }}</span>
+                        <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
                         <f7-link href="#" popover-open=".sorting-type-popover-menu">{{ querySortingTypeName }}</f7-link>
                     </div>
                 </div>

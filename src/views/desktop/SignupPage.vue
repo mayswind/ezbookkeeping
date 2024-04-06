@@ -87,7 +87,7 @@
                                             autocomplete="new-password"
                                             clearable
                                             :disabled="submitting || navigateToHomePage"
-                                            :label="$t('Confirmation Password')"
+                                            :label="$t('Confirm Password')"
                                             :placeholder="$t('Re-enter the password')"
                                             :type="isConfirmPasswordVisible ? 'text' : 'password'"
                                             :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
@@ -146,7 +146,7 @@
 
                             <v-window-item value="presetCategories" class="signup-preset-categories">
                                 <h4 class="text-h4 mb-1">{{ $t('Preset Categories') }}</h4>
-                                <p class="text-sm mt-2 mb-5">{{ $t('Set Whether You Use The Preset Transaction Categories') }}</p>
+                                <p class="text-sm mt-2 mb-5">{{ $t('Set whether to use preset transaction categories') }}</p>
 
                                 <v-row>
                                     <v-col cols="12" sm="6">
@@ -207,7 +207,7 @@
                             </v-window-item>
 
                             <v-window-item value="finalResult" v-if="finalResultMessage">
-                                <h4 class="text-h4 mb-1">{{ $t('Registration Complete') }}</h4>
+                                <h4 class="text-h4 mb-1">{{ $t('Registration Completed') }}</h4>
                                 <p class="my-5">{{ finalResultMessage }}</p>
                             </v-window-item>
                         </v-form>
@@ -357,7 +357,7 @@ export default {
                 allSteps.push({
                     name: 'finalResult',
                     title: this.$t('Complete'),
-                    subTitle: this.$t('Registration Complete')
+                    subTitle: this.$t('Registration Completed')
                 });
             }
 
@@ -371,24 +371,24 @@ export default {
         },
         inputEmptyProblemMessage() {
             if (!this.user.username) {
-                return 'Username cannot be empty';
+                return 'Username cannot be blank';
             } else if (!this.user.nickname) {
-                return 'Nickname cannot be empty';
+                return 'Nickname cannot be blank';
             } else if (!this.user.email) {
-                return 'Email address cannot be empty';
+                return 'Email address cannot be blank';
             } else if (!this.user.password) {
-                return 'Password cannot be empty';
+                return 'Password cannot be blank';
             } else if (!this.user.confirmPassword) {
-                return 'Confirmation password cannot be empty';
+                return 'Password confirmation cannot be blank';
             } else if (!this.user.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }
         },
         inputInvalidProblemMessage() {
             if (this.user.password && this.user.confirmPassword && this.user.password !== this.user.confirmPassword) {
-                return 'Password and confirmation password do not match';
+                return 'Password and password confirmation do not match';
             } else {
                 return null;
             }
@@ -453,10 +453,10 @@ export default {
                     self.submitting = false;
 
                     if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                        self.finalResultMessage = self.$t('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                        self.finalResultMessage = self.$t('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
                         self.currentStep = 'finalResult';
                     } else if (response.needVerifyEmail) {
-                        self.finalResultMessage = self.$t('You have been successfully registered. Account activation link has been sent to your email address, please activate your account first.');
+                        self.finalResultMessage = self.$t('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.');
                         self.currentStep = 'finalResult';
                     } else {
                         self.$refs.snackbar.showMessage('You have been successfully registered');
@@ -478,7 +478,7 @@ export default {
                 self.submitting = false;
 
                 if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                    self.$refs.snackbar.showMessage('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    self.$refs.snackbar.showMessage('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
                 } else {
                     self.$refs.snackbar.showMessage('You have been successfully registered');
                     self.$router.replace('/');

@@ -393,7 +393,7 @@ func (l *UserDataCli) DisableUserTwoFactorAuthorization(c *cli.Context, username
 	enableTwoFactor, err := l.twoFactorAuthorizations.ExistsTwoFactorSetting(nil, uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to check two factor setting, because %s", err.Error())
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to check two-factor setting, because %s", err.Error())
 		return err
 	}
 
@@ -404,14 +404,14 @@ func (l *UserDataCli) DisableUserTwoFactorAuthorization(c *cli.Context, username
 	err = l.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(nil, uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor recovery codes for user \"%s\"", username)
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two-factor recovery codes for user \"%s\"", username)
 		return err
 	}
 
 	err = l.twoFactorAuthorizations.DeleteTwoFactorSetting(nil, uid)
 
 	if err != nil {
-		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two factor setting for user \"%s\"", username)
+		log.BootErrorf("[user_data.DisableUserTwoFactorAuthorization] failed to delete two-factor setting for user \"%s\"", username)
 		return err
 	}
 
@@ -647,7 +647,7 @@ func (l *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *model
 	}
 
 	if account.ParentAccountId == models.LevelOneAccountParentId && accountHasChild[account.AccountId] {
-		log.BootErrorf("[user_data.checkTransactionAccount] the account \"id:%d\" of transaction \"id:%d\" is not a sub account", transaction.AccountId, transaction.TransactionId)
+		log.BootErrorf("[user_data.checkTransactionAccount] the account \"id:%d\" of transaction \"id:%d\" is not a sub-account", transaction.AccountId, transaction.TransactionId)
 		return errs.ErrOperationFailed
 	}
 
@@ -660,7 +660,7 @@ func (l *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *model
 		}
 
 		if relatedAccount.ParentAccountId == models.LevelOneAccountParentId && accountHasChild[relatedAccount.AccountId] {
-			log.BootErrorf("[user_data.checkTransactionAccount] the related account \"id:%d\" of transaction \"id:%d\" is not a sub account", transaction.RelatedAccountId, transaction.TransactionId)
+			log.BootErrorf("[user_data.checkTransactionAccount] the related account \"id:%d\" of transaction \"id:%d\" is not a sub-account", transaction.RelatedAccountId, transaction.TransactionId)
 			return errs.ErrOperationFailed
 		}
 	}

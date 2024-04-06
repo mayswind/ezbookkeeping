@@ -31,7 +31,7 @@
                             </v-select>
                         </div>
                         <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
-                            <span class="text-subtitle-2">{{ $t('Sort By') }}</span>
+                            <span class="text-subtitle-2">{{ $t('Sort Order') }}</span>
                             <v-select
                                 item-title="name"
                                 item-value="type"

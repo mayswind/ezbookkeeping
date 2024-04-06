@@ -121,7 +121,7 @@
                     <v-card-text class="py-0">
                     <span class="text-body-1 text-error">
                         <v-icon :icon="icons.alert"/>
-                        {{ $t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.') }}
+                        {{ $t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
                     </span>
                     </v-card-text>
 
@@ -277,7 +277,7 @@ export default {
             const self = this;
 
             if (!self.currentPasswordForClearData) {
-                self.$refs.snackbar.showMessage('Current password cannot be empty');
+                self.$refs.snackbar.showMessage('Current password cannot be blank');
                 return;
             }
 

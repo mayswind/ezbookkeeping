@@ -23,7 +23,7 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ $t('Reset Password') }}</h4>
-                            <p class="mb-0">{{ $t('Please input your email address again, and input the new password.') }}</p>
+                            <p class="mb-0">{{ $t('Please enter your email address again, and input the new password.') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -65,7 +65,7 @@
                                             ref="confirmPasswordInput"
                                             :type="isConfirmPasswordVisible ? 'text' : 'password'"
                                             :disabled="updating"
-                                            :label="$t('Confirmation Password')"
+                                            :label="$t('Confirm Password')"
                                             :placeholder="$t('Re-enter the password')"
                                             :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="confirmPassword"
@@ -85,7 +85,7 @@
                                         <router-link class="d-flex align-center justify-center" to="/login"
                                                      :class="{ 'disabled': updating }">
                                             <v-icon :icon="icons.left"/>
-                                            <span>{{ $t('Back to log in') }}</span>
+                                            <span>{{ $t('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -176,15 +176,15 @@ export default {
         ...mapStores(useRootStore, useSettingsStore),
         inputProblemMessage() {
             if (!this.email) {
-                return 'Email address cannot be empty';
+                return 'Email address cannot be blank';
             } else if (!this.newPassword && !this.confirmPassword) {
                 return 'Nothing has been modified';
             } else if (!this.newPassword && this.confirmPassword) {
-                return 'New password cannot be empty';
+                return 'New password cannot be blank';
             } else if (this.newPassword && !this.confirmPassword) {
-                return 'Confirmation password cannot be empty';
+                return 'Password confirmation cannot be blank';
             } else if (this.newPassword && this.confirmPassword && this.newPassword !== this.confirmPassword) {
-                return 'Password and confirmation password do not match';
+                return 'Password and password confirmation do not match';
             } else {
                 return null;
             }

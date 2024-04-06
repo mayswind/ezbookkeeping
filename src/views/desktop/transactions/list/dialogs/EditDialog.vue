@@ -185,7 +185,7 @@
                                         persistent-placeholder
                                         :readonly="mode === 'view'"
                                         :disabled="loading || submitting"
-                                        :label="$t('Timezone')"
+                                        :label="$t('Transaction Timezone')"
                                         :placeholder="!transaction.timeZone && transaction.timeZone !== '' ? `(${transactionDisplayTimezone}) ${transactionTimezoneTimeDifference}` : $t('Timezone')"
                                         :items="allTimezones"
                                         :no-data-text="$t('No results')"
@@ -280,7 +280,7 @@
                                     </template>
                                     <template #error-content>
                                         <p class="text-body-1">
-                                            {{ $t('Please refresh the page and try again. If the error is still displayed, make sure that server map settings are set correctly.') }}
+                                            {{ $t('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
                                         </p>
                                     </template>
                                 </map-view>
@@ -650,7 +650,7 @@ export default {
             Promise.all(promises).then(function (responses) {
                 if (self.editTransactionId && !responses[3]) {
                     if (self.reject) {
-                        self.reject('Unable to get transaction');
+                        self.reject('Unable to retrieve transaction');
                     }
 
                     return;
@@ -723,7 +723,7 @@ export default {
             };
 
             if (self.transaction.sourceAmount === 0) {
-                self.$refs.confirmDialog.open('Are you sure you want to save this transaction whose amount is 0?').then(() => {
+                self.$refs.confirmDialog.open('Are you sure you want to save this transaction with a zero amount?').then(() => {
                     doSubmit();
                 });
             } else {
@@ -785,7 +785,7 @@ export default {
                 logger.warn('this browser does not support geo location');
 
                 if (forceUpdate) {
-                    self.$refs.snackbar.showMessage('Unable to get current position');
+                    self.$refs.snackbar.showMessage('Unable to retrieve current position');
                 }
                 return;
             }
@@ -796,7 +796,7 @@ export default {
                     self.geoLocationStatus = 'error';
 
                     if (forceUpdate) {
-                        self.$refs.snackbar.showMessage('Unable to get current position');
+                        self.$refs.snackbar.showMessage('Unable to retrieve current position');
                     }
 
                     return;
@@ -809,11 +809,11 @@ export default {
                     longitude: position.coords.longitude
                 };
             }, function (err) {
-                logger.error('cannot get current position', err);
+                logger.error('cannot retrieve current position', err);
                 self.geoLocationStatus = 'error';
 
                 if (forceUpdate) {
-                    self.$refs.snackbar.showMessage('Unable to get current position');
+                    self.$refs.snackbar.showMessage('Unable to retrieve current position');
                 }
             });
 

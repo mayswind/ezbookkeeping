@@ -265,12 +265,12 @@ export default {
             const self = this;
 
             if (!self.username) {
-                self.$refs.snackbar.showMessage('Username cannot be empty');
+                self.$refs.snackbar.showMessage('Username cannot be blank');
                 return;
             }
 
             if (!self.password) {
-                self.$refs.snackbar.showMessage('Password cannot be empty');
+                self.$refs.snackbar.showMessage('Password cannot be blank');
                 return;
             }
 
@@ -337,10 +337,10 @@ export default {
             }
 
             if (self.twoFAVerifyType === 'passcode' && !self.passcode) {
-                self.$refs.snackbar.showMessage('Passcode cannot be empty');
+                self.$refs.snackbar.showMessage('Passcode cannot be blank');
                 return;
             } else if (self.twoFAVerifyType === 'backupcode' && !self.backupCode) {
-                self.$refs.snackbar.showMessage('Backup code cannot be empty');
+                self.$refs.snackbar.showMessage('Backup code cannot be blank');
                 return;
             }
 

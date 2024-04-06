@@ -45,7 +45,7 @@ const allAccountTypesArray = [
         name: 'Single Account'
     }, {
         id: allAccountTypes.MultiSubAccounts,
-        name: 'Multi Sub Accounts'
+        name: 'Multiple Sub-accounts'
     }
 ];
 

@@ -145,7 +145,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 
 	if accountCreateReq.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 		if len(accountCreateReq.SubAccounts) > 0 {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub accounts")
+			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub-accounts")
 			return nil, errs.ErrAccountCannotHaveSubAccounts
 		}
 
@@ -155,7 +155,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 		}
 	} else if accountCreateReq.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		if len(accountCreateReq.SubAccounts) < 1 {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account does not have any sub accounts")
+			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account does not have any sub-accounts")
 			return nil, errs.ErrAccountHaveNoSubAccount
 		}
 
@@ -173,17 +173,17 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 			subAccount := accountCreateReq.SubAccounts[i]
 
 			if subAccount.Category != accountCreateReq.Category {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] category of sub account not equals to parent")
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] category of sub-account not equals to parent")
 				return nil, errs.ErrSubAccountCategoryNotEqualsToParent
 			}
 
 			if subAccount.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub account type invalid")
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub-account type invalid")
 				return nil, errs.ErrSubAccountTypeInvalid
 			}
 
 			if subAccount.Currency == validators.ParentAccountCurrencyPlaceholder {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub account cannot set currency placeholder")
+				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub-account cannot set currency placeholder")
 				return nil, errs.ErrAccountCurrencyInvalid
 			}
 		}

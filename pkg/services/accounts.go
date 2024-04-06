@@ -54,7 +54,7 @@ func (s *AccountService) GetAllAccountsByUid(c *core.Context, uid int64) ([]*mod
 	return accounts, err
 }
 
-// GetAccountAndSubAccountsByAccountId returns account model and sub account models according to account id
+// GetAccountAndSubAccountsByAccountId returns account model and sub-account models according to account id
 func (s *AccountService) GetAccountAndSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -70,7 +70,7 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(c *core.Context, ui
 	return accounts, err
 }
 
-// GetSubAccountsByAccountId returns sub account models according to account id
+// GetSubAccountsByAccountId returns sub-account models according to account id
 func (s *AccountService) GetSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -127,7 +127,7 @@ func (s *AccountService) GetMaxDisplayOrder(c *core.Context, uid int64, category
 	}
 }
 
-// GetMaxSubAccountDisplayOrder returns the max display order of sub account according to account category and parent account id
+// GetMaxSubAccountDisplayOrder returns the max display order of sub-account according to account category and parent account id
 func (s *AccountService) GetMaxSubAccountDisplayOrder(c *core.Context, uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid

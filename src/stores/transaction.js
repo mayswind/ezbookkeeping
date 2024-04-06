@@ -515,7 +515,7 @@ export const useTransactionsStore = defineStore('transactions', {
                             }
                         }
 
-                        reject({ message: 'Unable to get transaction list' });
+                        reject({ message: 'Unable to retrieve transaction list' });
                         return;
                     }
 
@@ -552,7 +552,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get transaction list' });
+                        reject({ message: 'Unable to retrieve transaction list' });
                     } else {
                         reject(error);
                     }
@@ -587,7 +587,7 @@ export const useTransactionsStore = defineStore('transactions', {
                             self.updateTransactionListInvalidState(true);
                         }
 
-                        reject({ message: 'Unable to get transaction list' });
+                        reject({ message: 'Unable to retrieve transaction list' });
                         return;
                     }
 
@@ -620,7 +620,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get transaction list' });
+                        reject({ message: 'Unable to retrieve transaction list' });
                     } else {
                         reject(error);
                     }
@@ -635,7 +635,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get transaction' });
+                        reject({ message: 'Unable to retrieve transaction' });
                         return;
                     }
 
@@ -646,7 +646,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get transaction' });
+                        reject({ message: 'Unable to retrieve transaction' });
                     } else {
                         reject(error);
                     }
@@ -681,7 +681,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 submitTransaction.destinationAccountId = transaction.destinationAccountId;
                 submitTransaction.destinationAmount = transaction.destinationAmount;
             } else {
-                return Promise.reject('An error has occurred');
+                return Promise.reject('An error occurred');
             }
 
             if (isEdit) {

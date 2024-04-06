@@ -23,8 +23,8 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ $t('Unlock Application') }}</h4>
-                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please input your PIN code or use WebAuthn to unlock application') }}</p>
-                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please input your PIN code to unlock application') }}</p>
+                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ $t('Please enter your PIN code or use WebAuthn to unlock application') }}</p>
+                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ $t('Please enter your PIN code to unlock application') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -39,14 +39,14 @@
                                     <v-col cols="12">
                                         <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
                                                @click="unlockByPin(pinCode)">
-                                            {{ $t('Unlock By PIN Code') }}
+                                            {{ $t('Unlock with PIN Code') }}
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12" v-if="isWebAuthnAvailable">
                                         <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
                                                @click="unlockByWebAuthn">
-                                            {{ $t('Unlock By WebAuthn') }}
+                                            {{ $t('Unlock with WebAuthn') }}
                                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="verifyingByWebAuthn"></v-progress-circular>
                                         </v-btn>
                                     </v-col>
@@ -167,7 +167,7 @@ export default {
             }
 
             if (!webauthn.isSupported()) {
-                self.$refs.snackbar.showMessage('This device does not support WebAuthn');
+                self.$refs.snackbar.showMessage('WebAuth is not supported on this device');
                 return;
             }
 
@@ -197,11 +197,11 @@ export default {
                 logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {
-                    self.$refs.snackbar.showMessage('This device does not support WebAuthn');
+                    self.$refs.snackbar.showMessage('WebAuth is not supported on this device');
                 } else if (error.name === 'NotAllowedError') {
                     self.$refs.snackbar.showMessage('User has canceled authentication');
                 } else if (error.invalid) {
-                    self.$refs.snackbar.showMessage('Failed to authenticate by WebAuthn');
+                    self.$refs.snackbar.showMessage('Failed to authenticate with WebAuthn');
                 } else {
                     self.$refs.snackbar.showMessage('User has canceled or this device does not support WebAuthn');
                 }
@@ -217,7 +217,7 @@ export default {
             const user = self.userStore.currentUserInfo;
 
             if (!user || !user.username) {
-                self.$refs.snackbar.showMessage('An error has occurred');
+                self.$refs.snackbar.showMessage('An error occurred');
                 return;
             }
 
@@ -236,8 +236,8 @@ export default {
 
                 self.$router.replace('/');
             } catch (ex) {
-                logger.error('failed to unlock by pin code', ex);
-                self.$refs.snackbar.showMessage('PIN code is wrong');
+                logger.error('failed to unlock with pin code', ex);
+                self.$refs.snackbar.showMessage('Incorrect PIN code');
             }
         },
         relogin() {

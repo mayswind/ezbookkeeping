@@ -11,14 +11,14 @@
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
-            <f7-list-input label="Confirmation Password" placeholder="Re-enter the password"></f7-list-input>
+            <f7-list-input label="Confirm Password" placeholder="Re-enter the password"></f7-list-input>
             <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
             <f7-list-input label="Nickname" placeholder="Your nickname"></f7-list-input>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Account" title="Not Specified"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Editable Transaction Scope" title="All" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Account" title="Unspecified"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Editable Transaction Range" title="All" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
@@ -45,7 +45,7 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Confirmation Password')"
+                :label="$t('Confirm Password')"
                 :placeholder="$t('Re-enter the password')"
                 v-model:value="newProfile.confirmPassword"
             ></f7-list-input>
@@ -54,7 +54,7 @@
                 type="email"
                 autocomplete="email"
                 clear-button
-                :label="$t('E-mail') + ' ' + (emailVerified ? $t('(Verified)') : $t('(Unverified)'))"
+                :label="$t('E-mail') + ' ' + (emailVerified ? $t('(Verified)') : $t('(Not Verified)'))"
                 :placeholder="$t('Your email address')"
                 v-model:value="newProfile.email"
             ></f7-list-input>
@@ -77,7 +77,7 @@
                 link="#" no-chevron
                 :class="{ 'disabled': !allVisibleAccounts.length }"
                 :header="$t('Default Account')"
-                :title="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Not Specified'))"
+                :title="getNameByKeyValue(allAccounts, newProfile.defaultAccountId, 'id', 'name', $t('Unspecified'))"
                 @click="showAccountSheet = true"
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
@@ -96,9 +96,9 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Editable Transaction Scope')"
+                :header="$t('Editable Transaction Range')"
                 :title="getNameByKeyValue(allTransactionEditScopeTypes, newProfile.transactionEditScope, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Scope'), popupCloseLinkText: $t('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Editable Transaction Range'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.transactionEditScope">
                     <option :value="option.type"
@@ -366,22 +366,22 @@ export default {
                 this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
-                return 'Password cannot be empty';
+                return 'Password cannot be blank';
             } else if (this.newProfile.password && !this.newProfile.confirmPassword) {
-                return 'Confirmation password cannot be empty';
+                return 'Password confirmation cannot be blank';
             } else {
                 return null;
             }
         },
         inputInvalidProblemMessage() {
             if (this.newProfile.password && this.newProfile.confirmPassword && this.newProfile.password !== this.newProfile.confirmPassword) {
-                return 'Password and confirmation password do not match';
+                return 'Password and password confirmation do not match';
             } else if (!this.newProfile.email) {
-                return 'Email address cannot be empty';
+                return 'Email address cannot be blank';
             } else if (!this.newProfile.nickname) {
-                return 'Nickname cannot be empty';
+                return 'Nickname cannot be blank';
             } else if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }
@@ -391,7 +391,7 @@ export default {
         },
         langAndRegionInputInvalidProblemMessage() {
             if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }

@@ -142,7 +142,7 @@
                 </div>
                 <div class="padding-horizontal padding-bottom">
                     <p class="no-margin">
-                        <span>{{ $t('Please input your email address used for registration and we\'ll send you an email with reset password link') }}</span>
+                        <span>{{ $t('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</span>
                     </p>
                     <f7-list strong class="no-margin">
                         <f7-list-input
@@ -249,9 +249,9 @@ export default {
         },
         twoFAVerifyTypeSwitchName() {
             if (this.twoFAVerifyType === 'backupcode') {
-                return 'Use a passcode';
+                return 'Use Passcode';
             } else {
-                return 'Use a backup code';
+                return 'Use Backup Code';
             }
         },
         currentLanguageCode() {
@@ -270,12 +270,12 @@ export default {
             const router = self.f7router;
 
             if (!this.username) {
-                self.$alert('Username cannot be empty');
+                self.$alert('Username cannot be blank');
                 return;
             }
 
             if (!this.password) {
-                self.$alert('Password cannot be empty');
+                self.$alert('Password cannot be blank');
                 return;
             }
 
@@ -346,10 +346,10 @@ export default {
             }
 
             if (this.twoFAVerifyType === 'passcode' && !this.passcode) {
-                self.$alert('Passcode cannot be empty');
+                self.$alert('Passcode cannot be blank');
                 return;
             } else if (this.twoFAVerifyType === 'backupcode' && !this.backupCode) {
-                self.$alert('Backup code cannot be empty');
+                self.$alert('Backup code cannot be blank');
                 return;
             }
 
@@ -388,7 +388,7 @@ export default {
             const self = this;
 
             if (!self.forgetPasswordEmail) {
-                self.$alert('Email address cannot be empty');
+                self.$alert('Email address cannot be blank');
                 return;
             }
 
@@ -416,7 +416,7 @@ export default {
             const self = this;
 
             if (!self.currentPasswordForResendVerifyEmail) {
-                self.$toast('Current password cannot be empty');
+                self.$toast('Current password cannot be blank');
                 return;
             }
 

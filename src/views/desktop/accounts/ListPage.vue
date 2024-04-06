@@ -75,10 +75,10 @@
                                                 <v-menu activator="parent">
                                                     <v-list>
                                                         <v-list-item :prepend-icon="icons.show"
-                                                                     :title="$t('Show Hidden Account')"
+                                                                     :title="$t('Show Hidden Accounts')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                                         <v-list-item :prepend-icon="icons.hide"
-                                                                     :title="$t('Hide Hidden Account')"
+                                                                     :title="$t('Hide Hidden Accounts')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
@@ -165,7 +165,7 @@
                                                                     <span class="align-self-center">
                                                                         <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
                                                                                 :icon="icons.drag"/>
-                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
                                                                     </span>
                                                                 </div>
 

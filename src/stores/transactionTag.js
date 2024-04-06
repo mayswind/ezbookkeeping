@@ -103,7 +103,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get tag list' });
+                        reject({ message: 'Unable to retrieve tag list' });
                         return;
                     }
 
@@ -129,7 +129,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get tag list' });
+                        reject({ message: 'Unable to retrieve tag list' });
                     } else {
                         reject(error);
                     }

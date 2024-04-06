@@ -589,7 +589,7 @@ export const useStatisticsStore = defineStore('statistics', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get transaction statistics' });
+                        reject({ message: 'Unable to retrieve transaction statistics' });
                         return;
                     }
 
@@ -606,12 +606,12 @@ export const useStatisticsStore = defineStore('statistics', {
 
                     resolve(data.result);
                 }).catch(error => {
-                    logger.error('failed to get transaction statistics', error);
+                    logger.error('failed to retrieve transaction statistics', error);
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get transaction statistics' });
+                        reject({ message: 'Unable to retrieve transaction statistics' });
                     } else {
                         reject(error);
                     }

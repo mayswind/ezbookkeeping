@@ -60,10 +60,10 @@
                                                 <v-menu activator="parent">
                                                     <v-list>
                                                         <v-list-item :prepend-icon="icons.show"
-                                                                     :title="$t('Show Hidden Transaction Category')"
+                                                                     :title="$t('Show Hidden Transaction Categories')"
                                                                      v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                                         <v-list-item :prepend-icon="icons.hide"
-                                                                     :title="$t('Hide Hidden Transaction Category')"
+                                                                     :title="$t('Hide Hidden Transaction Categories')"
                                                                      v-if="showHidden" @click="showHidden = false"></v-list-item>
                                                     </v-list>
                                                 </v-menu>
@@ -160,7 +160,7 @@
                                                             <span class="ml-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
                                                                         :icon="icons.drag"/>
-                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ $t('Drag and Drop to Change Order') }}</v-tooltip>
+                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ $t('Drag to Reorder') }}</v-tooltip>
                                                             </span>
                                                         </div>
                                                     </td>

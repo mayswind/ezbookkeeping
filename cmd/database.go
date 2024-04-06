@@ -58,7 +58,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor table maintained successfully")
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] two-factor table maintained successfully")
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactorRecoveryCode))
 
@@ -66,7 +66,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] two factor recovery code table maintained successfully")
+	log.BootInfof("[database.updateAllDatabaseTablesStructure] two-factor recovery code table maintained successfully")
 
 	err = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
 

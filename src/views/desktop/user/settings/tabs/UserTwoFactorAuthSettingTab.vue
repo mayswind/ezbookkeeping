@@ -10,13 +10,13 @@
                 <v-card-text class="pb-0">
                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
                     <p class="text-body-1 font-weight-semibold" v-if="!loading && !new2FAQRCode">
-                        {{ status === true ? $t('Two-factor authentication has been enabled.') : $t('Two-factor authentication is not enabled yet.') }}
+                        {{ status === true ? $t('Two-factor authentication is already enabled.') : $t('Two-factor authentication is not enabled yet.') }}
                     </p>
                     <p class="text-body-1" v-if="!loading && new2FAQRCode">
-                        {{ $t('Please use two factor authentication app scan the below qrcode and input current passcode') }}
+                        {{ $t('Please use a two-factor authentication app to scan the qrcode below and enter the current passcode.') }}
                     </p>
                     <p class="text-body-1" v-if="!loading && status === true">
-                        {{ $t('Please enter your current password when disable two factor authentication or regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.') }}
+                        {{ $t('Your current password is required to disable two-factor authentication or regenerate backup codes for two-factor authentication. If you regenerate backup codes, the previous ones will become invalid.') }}
                     </p>
                 </v-card-text>
 
@@ -58,7 +58,7 @@
                     <v-row>
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
                             <v-btn :disabled="!currentPassword || loading || disabling " v-if="status === true" @click="disable">
-                                {{ $t('Disable two-factor authentication') }}
+                                {{ $t('Disable Two-Factor Authentication') }}
                                 <v-progress-circular indeterminate size="22" class="ml-2" v-if="disabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPassword || loading || regenerating" v-if="status === true" @click="regenerateBackupCode()">
@@ -66,7 +66,7 @@
                                 <v-progress-circular indeterminate size="22" class="ml-2" v-if="regenerating"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="loading || enabling" v-if="status === false && !new2FAQRCode" @click="enable">
-                                {{ $t('Enable two-factor authentication') }}
+                                {{ $t('Enable Two-Factor Authentication') }}
                                 <v-progress-circular indeterminate size="22" class="ml-2" v-if="enabling"></v-progress-circular>
                             </v-btn>
                             <v-btn :disabled="!currentPasscode || loading || enableConfirming" v-if="status === false && new2FAQRCode" @click="enableConfirm">
@@ -93,7 +93,7 @@
 
                 <v-card-text>
                     <p class="text-body-1" v-if="status === true">
-                        {{ $t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.') }}
+                        {{ $t('Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.') }}
                     </p>
                     <v-textarea class="backup-code" readonly="readonly" :rows="10" :value="currentBackupCode"/>
                 </v-card-text>
@@ -207,7 +207,7 @@ export default {
             const self = this;
 
             if (!self.currentPasscode) {
-                self.$refs.snackbar.showMessage('Passcode cannot be empty');
+                self.$refs.snackbar.showMessage('Passcode cannot be blank');
                 return;
             }
 
@@ -252,7 +252,7 @@ export default {
             const self = this;
 
             if (!self.currentPassword) {
-                self.$refs.snackbar.showMessage('Current password cannot be empty');
+                self.$refs.snackbar.showMessage('Current password cannot be blank');
                 return;
             }
 
@@ -273,7 +273,7 @@ export default {
                 self.disabling = false;
 
                 self.status = false;
-                self.$refs.snackbar.showMessage('Two factor authentication has been disabled');
+                self.$refs.snackbar.showMessage('Two-factor authentication has been disabled');
             }).catch(error => {
                 self.disabling = false;
 
@@ -286,7 +286,7 @@ export default {
             const self = this;
 
             if (!self.currentPassword) {
-                self.$refs.snackbar.showMessage('Current password cannot be empty');
+                self.$refs.snackbar.showMessage('Current password cannot be blank');
                 return;
             }
 

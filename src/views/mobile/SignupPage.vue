@@ -31,7 +31,7 @@
                 type="password"
                 autocomplete="new-password"
                 clear-button
-                :label="$t('Confirmation Password')"
+                :label="$t('Confirm Password')"
                 :placeholder="$t('Re-enter the password')"
                 v-model:value="user.confirmPassword"
             ></f7-list-input>
@@ -257,24 +257,24 @@ export default {
         },
         inputEmptyProblemMessage() {
             if (!this.user.username) {
-                return 'Username cannot be empty';
+                return 'Username cannot be blank';
             } else if (!this.user.password) {
-                return 'Password cannot be empty';
+                return 'Password cannot be blank';
             } else if (!this.user.confirmPassword) {
-                return 'Confirmation password cannot be empty';
+                return 'Password confirmation cannot be blank';
             } else if (!this.user.email) {
-                return 'Email address cannot be empty';
+                return 'Email address cannot be blank';
             } else if (!this.user.nickname) {
-                return 'Nickname cannot be empty';
+                return 'Nickname cannot be blank';
             } else if (!this.user.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }
         },
         inputInvalidProblemMessage() {
             if (this.user.password && this.user.confirmPassword && this.user.password !== this.user.confirmPassword) {
-                return 'Password and confirmation password do not match';
+                return 'Password and password confirmation do not match';
             } else {
                 return null;
             }
@@ -310,9 +310,9 @@ export default {
                     self.$hideLoading();
 
                     if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                        self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.', 5000);
+                        self.$toast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.', 5000);
                     } else if (response.needVerifyEmail) {
-                        self.$toast('You have been successfully registered. Account activation link has been sent to your email address, please activate your account first.', 5000);
+                        self.$toast('You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.', 5000);
                     } else {
                         self.$toast('You have been successfully registered');
                     }
@@ -334,7 +334,7 @@ export default {
                 self.$hideLoading();
 
                 if (self.usePresetCategories && !response.presetCategoriesSaved) {
-                    self.$toast('You have been successfully registered, but something wrong with adding preset categories. You can re-add preset categories in settings page anytime.');
+                    self.$toast('You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.');
                 } else {
                     self.$toast('You have been successfully registered');
                 }

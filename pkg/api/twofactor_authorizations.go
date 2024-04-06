@@ -45,7 +45,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorStatusHandler(c *core.Context) (an
 	}
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorStatusHandler] failed to get two factor setting, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorStatusHandler] failed to get two-factor setting, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -63,7 +63,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.Conte
 	enabled, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to check two factor setting, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to check two-factor setting, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -84,14 +84,14 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableRequestHandler(c *core.Conte
 	key, err := a.twoFactorAuthorizations.GenerateTwoFactorSecret(c, user)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to generate two factor secret, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to generate two-factor secret, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	img, err := key.Image(240, 240)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to generate two factor qrcode, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableRequestHandler] failed to generate two-factor qrcode, because %s", err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
@@ -123,7 +123,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.Conte
 	exists, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to check two factor setting, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to check two-factor setting, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -154,25 +154,25 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.Conte
 	recoveryCodes, err := a.twoFactorAuthorizations.GenerateTwoFactorRecoveryCodes()
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to generate two factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to generate two-factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.twoFactorAuthorizations.CreateTwoFactorRecoveryCodes(c, uid, recoveryCodes, user.Salt)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to create two factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to create two-factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.twoFactorAuthorizations.CreateTwoFactorSetting(c, twoFactorSetting)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to create two factor setting for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to create two-factor setting for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" has enabled two factor authorization", uid)
+	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" has enabled two-factor authorization", uid)
 
 	now := time.Now().Unix()
 	err = a.tokens.DeleteTokensBeforeTime(c, uid, now)
@@ -236,7 +236,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorDisableHandler(c *core.Context) (a
 	enableTwoFactor, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to check two factor setting, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to check two-factor setting, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -247,18 +247,18 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorDisableHandler(c *core.Context) (a
 	err = a.twoFactorAuthorizations.DeleteTwoFactorRecoveryCodes(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to delete two factor recovery codes for user \"uid:%d\"", uid)
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to delete two-factor recovery codes for user \"uid:%d\"", uid)
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.twoFactorAuthorizations.DeleteTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to delete two factor setting for user \"uid:%d\"", uid)
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] failed to delete two-factor setting for user \"uid:%d\"", uid)
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] user \"uid:%d\" has disabled two factor authorization", uid)
+	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorDisableHandler] user \"uid:%d\" has disabled two-factor authorization", uid)
 
 	return true, nil
 }
@@ -291,7 +291,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorRecoveryCodeRegenerateHandler(c *c
 	enableTwoFactor, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to check two factor setting, because %s", err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to check two-factor setting, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -302,14 +302,14 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorRecoveryCodeRegenerateHandler(c *c
 	recoveryCodes, err := a.twoFactorAuthorizations.GenerateTwoFactorRecoveryCodes()
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to generate two factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to generate two-factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.twoFactorAuthorizations.CreateTwoFactorRecoveryCodes(c, uid, recoveryCodes, user.Salt)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to create two factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] failed to create two-factor recovery codes for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -317,7 +317,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorRecoveryCodeRegenerateHandler(c *c
 		RecoveryCodes: recoveryCodes,
 	}
 
-	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] user \"uid:%d\" has regenerated two factor recovery codes", uid)
+	log.InfofWithRequestId(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] user \"uid:%d\" has regenerated two-factor recovery codes", uid)
 
 	return recoveryCodesResp, nil
 }

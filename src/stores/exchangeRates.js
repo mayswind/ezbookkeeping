@@ -75,7 +75,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get exchange rates data' });
+                        reject({ message: 'Unable to retrieve exchange rates data' });
                         return;
                     }
 
@@ -94,14 +94,14 @@ export const useExchangeRatesStore = defineStore('exchangeRates', {
 
                     resolve(data.result);
                 }).catch(error => {
-                    logger.error('failed to get latest exchange rates data', error);
+                    logger.error('failed to retrieve latest exchange rates data', error);
 
                     if (error && error.processed) {
                         reject(error);
                     } else if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else {
-                        reject({ message: 'Unable to get exchange rates data' });
+                        reject({ message: 'Unable to retrieve exchange rates data' });
                     }
                 });
             });

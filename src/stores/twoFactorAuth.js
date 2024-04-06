@@ -13,18 +13,18 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result || !isBoolean(data.result.enable)) {
-                        reject({ message: 'Unable to get current two factor authentication status' });
+                        reject({ message: 'Unable to retrieve current two-factor authentication status' });
                         return;
                     }
 
                     resolve(data.result);
                 }).catch(error => {
-                    logger.error('failed to get 2fa status', error);
+                    logger.error('failed to retrieve 2fa status', error);
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get current two factor authentication status' });
+                        reject({ message: 'Unable to retrieve current two-factor authentication status' });
                     } else {
                         reject(error);
                     }
@@ -37,7 +37,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result || !data.result.qrcode || !data.result.secret) {
-                        reject({ message: 'Unable to enable two factor authentication' });
+                        reject({ message: 'Unable to enable two-factor authentication' });
                         return;
                     }
 
@@ -48,7 +48,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to enable two factor authentication' });
+                        reject({ message: 'Unable to enable two-factor authentication' });
                     } else {
                         reject(error);
                     }
@@ -64,7 +64,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result || !data.result.token) {
-                        reject({ message: 'Unable to enable two factor authentication' });
+                        reject({ message: 'Unable to enable two-factor authentication' });
                         return;
                     }
 
@@ -79,7 +79,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to enable two factor authentication' });
+                        reject({ message: 'Unable to enable two-factor authentication' });
                     } else {
                         reject(error);
                     }
@@ -94,7 +94,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to disable two factor authentication' });
+                        reject({ message: 'Unable to disable two-factor authentication' });
                         return;
                     }
 
@@ -105,7 +105,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to disable two factor authentication' });
+                        reject({ message: 'Unable to disable two-factor authentication' });
                     } else {
                         reject(error);
                     }
@@ -120,7 +120,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result || !data.result.recoveryCodes || !data.result.recoveryCodes.length) {
-                        reject({ message: 'Unable to regenerate two factor authentication backup codes' });
+                        reject({ message: 'Unable to regenerate two-factor authentication backup codes' });
                         return;
                     }
 
@@ -131,7 +131,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to regenerate two factor authentication backup codes' });
+                        reject({ message: 'Unable to regenerate two-factor authentication backup codes' });
                     } else {
                         reject(error);
                     }

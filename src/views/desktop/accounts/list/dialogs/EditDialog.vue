@@ -13,7 +13,7 @@
                         <v-menu activator="parent">
                             <v-list>
                                 <v-list-item :prepend-icon="icons.add"
-                                             :title="$t('Add Sub Account')"
+                                             :title="$t('Add Sub-account')"
                                              @click="addSubAccount"></v-list-item>
                             </v-list>
                         </v-menu>
@@ -90,22 +90,22 @@
                                         clearable
                                         persistent-placeholder
                                         :disabled="loading || submitting"
-                                        :label="currentAccountIndex < 0 ? $t('Account Name') : $t('Sub Account Name')"
-                                        :placeholder="currentAccountIndex < 0 ? $t('Your account name') : $t('Your sub account name')"
+                                        :label="currentAccountIndex < 0 ? $t('Account Name') : $t('Sub-account Name')"
+                                        :placeholder="currentAccountIndex < 0 ? $t('Your account name') : $t('Your sub-account name')"
                                         v-model="selectedAccount.name"
                                     />
                                 </v-col>
                                 <v-col cols="12" md="6">
                                     <icon-select icon-type="account"
                                                  :all-icon-infos="allAccountIcons"
-                                                 :label="currentAccountIndex < 0 ? $t('Account Icon') : $t('Sub Account Icon')"
+                                                 :label="currentAccountIndex < 0 ? $t('Account Icon') : $t('Sub-account Icon')"
                                                  :color="selectedAccount.color"
                                                  :disabled="loading || submitting"
                                                  v-model="selectedAccount.icon" />
                                 </v-col>
                                 <v-col cols="12" md="6">
                                     <color-select :all-color-infos="allAccountColors"
-                                                  :label="currentAccountIndex < 0 ? $t('Account Color') : $t('Sub Account Color')"
+                                                  :label="currentAccountIndex < 0 ? $t('Account Color') : $t('Sub-account Color')"
                                                   :disabled="loading || submitting"
                                                   v-model="selectedAccount.color" />
                                 </v-col>
@@ -131,8 +131,8 @@
                                     <amount-input :disabled="loading || submitting || !!editAccountId"
                                                   :persistent-placeholder="true"
                                                   :currency="selectedAccount.currency"
-                                                  :label="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub Account Balance')"
-                                                  :placeholder="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub Account Balance')"
+                                                  :label="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
+                                                  :placeholder="currentAccountIndex < 0 ? $t('Account Balance') : $t('Sub-account Balance')"
                                                   v-model="selectedAccount.balance"/>
                                 </v-col>
                                 <v-col cols="12" md="12">
@@ -142,7 +142,7 @@
                                         rows="3"
                                         :disabled="loading || submitting"
                                         :label="$t('Description')"
-                                        :placeholder="currentAccountIndex < 0 ? $t('Your account description (optional)') : $t('Your sub account description (optional)')"
+                                        :placeholder="currentAccountIndex < 0 ? $t('Your account description (optional)') : $t('Your sub-account description (optional)')"
                                         v-model="selectedAccount.comment"
                                     />
                                 </v-col>
@@ -333,7 +333,7 @@ export default {
         removeSubAccount(subAccount) {
             const self = this;
 
-            self.$refs.confirmDialog.open('Are you sure you want to remove this sub account?').then(() => {
+            self.$refs.confirmDialog.open('Are you sure you want to remove this sub-account?').then(() => {
                 for (let i = 0; i < self.subAccounts.length; i++) {
                     if (self.subAccounts[i] === subAccount) {
                         self.subAccounts.splice(i, 1);
@@ -426,13 +426,13 @@ export default {
         },
         getInputEmptyProblemMessage(account, isSubAccount) {
             if (!isSubAccount && !account.category) {
-                return 'Account category cannot be empty';
+                return 'Account category cannot be blank';
             } else if (!isSubAccount && !account.type) {
-                return 'Account type cannot be empty';
+                return 'Account type cannot be blank';
             } else if (!account.name) {
-                return 'Account name cannot be empty';
+                return 'Account name cannot be blank';
             } else if (account.type === this.allAccountTypes.SingleAccount && !account.currency) {
-                return 'Account currency cannot be empty';
+                return 'Account currency cannot be blank';
             } else {
                 return null;
             }

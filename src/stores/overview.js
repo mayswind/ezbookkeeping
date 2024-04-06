@@ -264,7 +264,7 @@ export const useOverviewStore = defineStore('overview', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get transaction overview' });
+                        reject({ message: 'Unable to retrieve transaction overview' });
                         return;
                     }
 
@@ -291,7 +291,7 @@ export const useOverviewStore = defineStore('overview', {
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get transaction overview' });
+                        reject({ message: 'Unable to retrieve transaction overview' });
                     } else {
                         reject(error);
                     }

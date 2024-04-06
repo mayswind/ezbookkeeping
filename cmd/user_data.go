@@ -475,11 +475,11 @@ func disableUser2FA(c *cli.Context) error {
 	err = clis.UserData.DisableUserTwoFactorAuthorization(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.disableUser2FA] error occurs when disabling user two factor authorization")
+		log.BootErrorf("[user_data.disableUser2FA] error occurs when disabling user two-factor authorization")
 		return err
 	}
 
-	log.BootInfof("[user_data.disableUser2FA] two factor authorization of user \"%s\" has been disabled", username)
+	log.BootInfof("[user_data.disableUser2FA] two-factor authorization of user \"%s\" has been disabled", username)
 
 	return nil
 }
@@ -570,7 +570,7 @@ func exportUserTransaction(c *cli.Context) error {
 	}
 
 	if filePath == "" {
-		log.BootErrorf("[user_data.exportUserTransaction] export file path is not specified")
+		log.BootErrorf("[user_data.exportUserTransaction] export file path is unspecified")
 		return os.ErrNotExist
 	}
 

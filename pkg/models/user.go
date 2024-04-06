@@ -11,7 +11,7 @@ import (
 // TransactionEditScope represents the scope which transaction can be edited
 type TransactionEditScope byte
 
-// Editable Transaction Scopes
+// Editable Transaction Ranges
 const (
 	TRANSACTION_EDIT_SCOPE_NONE                TransactionEditScope = 0
 	TRANSACTION_EDIT_SCOPE_ALL                 TransactionEditScope = 1
@@ -23,7 +23,7 @@ const (
 	TRANSACTION_EDIT_SCOPE_INVALID             TransactionEditScope = 255
 )
 
-// String returns a textual representation of the editable transaction scopes enum
+// String returns a textual representation of the editable transaction ranges enum
 func (s TransactionEditScope) String() string {
 	switch s {
 	case TRANSACTION_EDIT_SCOPE_NONE:

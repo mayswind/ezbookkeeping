@@ -187,7 +187,7 @@ export default {
         },
         inputEmptyProblemMessage() {
             if (!this.category.name) {
-                return 'Category name cannot be empty';
+                return 'Category name cannot be blank';
             } else {
                 return null;
             }

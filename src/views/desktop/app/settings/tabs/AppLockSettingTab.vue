@@ -13,19 +13,19 @@
 
                 <v-card-text v-if="isEnableApplicationLock">
                     <v-switch :disabled="true"
-                              :label="$t('Unlock By PIN Code')"
+                              :label="$t('Unlock with PIN Code')"
                               v-model="isEnableApplicationLock"/>
-                    <v-switch class="mt-2" :label="$t('Unlock By WebAuthn')"
+                    <v-switch class="mt-2" :label="$t('Unlock with WebAuthn')"
                               :loading="enablingWebAuthn"
                               v-model="isEnableApplicationLockWebAuthn"/>
                 </v-card-text>
 
                 <v-card-text class="pb-0">
                     <p class="text-body-1 font-weight-semibold" v-if="!isEnableApplicationLock">
-                        {{ $t('Please input a new 6-digit PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.') }}
+                        {{ $t('Please enter a new 6-digit PIN code. The PIN code would encrypt your local data, so you need to enter it every time you open this app. If this PIN code is lost, you will need to log in again.') }}
                     </p>
                     <p class="text-body-1 font-weight-semibold" v-if="isEnableApplicationLock">
-                        {{ $t('Please enter your current PIN code when disable application lock.') }}
+                        {{ $t('Your current PIN code is required to disable application lock.') }}
                     </p>
                 </v-card-text>
 
@@ -120,7 +120,7 @@ export default {
                     self.enablingWebAuthn = false;
 
                     if (error.notSupported) {
-                        self.$refs.snackbar.showMessage('This device does not support WebAuthn');
+                        self.$refs.snackbar.showMessage('WebAuth is not supported on this device');
                     } else if (error.name === 'NotAllowedError') {
                         self.$refs.snackbar.showMessage('User has canceled authentication');
                     } else if (error.invalid) {
@@ -154,7 +154,7 @@ export default {
 
             if (!this.pinCode || this.pinCode.length !== 6) {
                 this.pinCode = '';
-                this.$refs.snackbar.showMessage('PIN code is invalid');
+                this.$refs.snackbar.showMessage('Invalid PIN code');
                 return;
             }
 
@@ -162,7 +162,7 @@ export default {
 
             if (!user || !user.username) {
                 this.pinCode = '';
-                this.$refs.snackbar.showMessage('An error has occurred');
+                this.$refs.snackbar.showMessage('An error occurred');
                 return;
             }
 
@@ -182,7 +182,7 @@ export default {
 
             if (!this.$user.isCorrectPinCode(this.pinCode)) {
                 this.pinCode = '';
-                this.$refs.snackbar.showMessage('PIN code is wrong');
+                this.$refs.snackbar.showMessage('Incorrect PIN code');
                 return;
             }
 

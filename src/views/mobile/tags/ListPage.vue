@@ -123,8 +123,8 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button @click="setSortable()">{{ $t('Sort') }}</f7-actions-button>
-                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Tag') }}</f7-actions-button>
-                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Tag') }}</f7-actions-button>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Tags') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -392,7 +392,7 @@ export default {
             const self = this;
 
             if (!tag) {
-                self.$alert('An error has occurred');
+                self.$alert('An error occurred');
                 return;
             }
 

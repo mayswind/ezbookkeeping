@@ -33,7 +33,7 @@
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Transaction Time" title="YYYY/MM/DD HH:mm:ss"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Time Zone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Timezone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location"></f7-list-item>
             <f7-list-item header="Tags">
                 <template #footer>
@@ -230,8 +230,8 @@
                 :no-chevron="mode === 'view'"
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                 :class="{ 'readonly': mode === 'view' }"
-                :header="$t('Transaction Time Zone')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Time Zone'), popupCloseLinkText: $t('Done') }">
+                :header="$t('Transaction Timezone')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Timezone'), popupCloseLinkText: $t('Done') }">
                 <select v-model="transaction.timeZone">
                     <option :value="timezone.name" :key="timezone.name"
                             v-for="timezone in allTimezones">{{ timezone.displayNameWithUtcOffset }}</option>
@@ -668,8 +668,8 @@ export default {
 
         Promise.all(promises).then(function (responses) {
             if (query.id && !responses[3]) {
-                self.$toast('Unable to get transaction');
-                self.loadingError = 'Unable to get transaction';
+                self.$toast('Unable to retrieve transaction');
+                self.loadingError = 'Unable to retrieve transaction';
                 return;
             }
 
@@ -749,7 +749,7 @@ export default {
             };
 
             if (self.transaction.sourceAmount === 0) {
-                self.$confirm('Are you sure you want to save this transaction whose amount is 0?', () => {
+                self.$confirm('Are you sure you want to save this transaction with a zero amount?', () => {
                     doSubmit();
                 });
             } else {
@@ -763,7 +763,7 @@ export default {
                 logger.warn('this browser does not support geo location');
 
                 if (forceUpdate) {
-                    self.$toast('Unable to get current position');
+                    self.$toast('Unable to retrieve current position');
                 }
                 return;
             }
@@ -774,7 +774,7 @@ export default {
                     self.geoLocationStatus = 'error';
 
                     if (forceUpdate) {
-                        self.$toast('Unable to get current position');
+                        self.$toast('Unable to retrieve current position');
                     }
 
                     return;
@@ -787,11 +787,11 @@ export default {
                     longitude: position.coords.longitude
                 };
             }, function (err) {
-                logger.error('cannot get current position', err);
+                logger.error('cannot retrieve current position', err);
                 self.geoLocationStatus = 'error';
 
                 if (forceUpdate) {
-                    self.$toast('Unable to get current position');
+                    self.$toast('Unable to retrieve current position');
                 }
             });
 

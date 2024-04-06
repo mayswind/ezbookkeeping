@@ -77,7 +77,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (any, *errs.Error)
 		twoFactorEnable, err = a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, user.Uid)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[authorizations.AuthorizeHandler] failed to check two factor setting for user \"uid:%d\", because %s", user.Uid, err.Error())
+			log.ErrorfWithRequestId(c, "[authorizations.AuthorizeHandler] failed to check two-factor setting for user \"uid:%d\", because %s", user.Uid, err.Error())
 			return nil, errs.Or(err, errs.ErrSystemError)
 		}
 	}
@@ -122,7 +122,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (any, *er
 	twoFactorSetting, err := a.twoFactorAuthorizations.GetUserTwoFactorSettingByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] failed to get two factor setting for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] failed to get two-factor setting for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrSystemError)
 	}
 
@@ -165,7 +165,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (any, *er
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
-	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
+	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two-factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	authResp := a.getAuthResponse(token, false, user)
 	return authResp, nil
@@ -185,7 +185,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	enableTwoFactor, err := a.twoFactorAuthorizations.ExistsTwoFactorSetting(c, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get two factor setting for user \"uid:%d\", because %s", uid, err.Error())
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get two-factor setting for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrSystemError)
 	}
 
@@ -213,7 +213,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	err = a.twoFactorAuthorizations.GetAndUseUserTwoFactorRecoveryCode(c, uid, credential.RecoveryCode, user.Salt)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get two factor recovery code for user \"uid:%d\", because %s", uid, err.Error())
+		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get two-factor recovery code for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrTwoFactorRecoveryCodeNotExist)
 	}
 
@@ -234,7 +234,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 
-	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
+	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two-factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
 
 	authResp := a.getAuthResponse(token, false, user)
 	return authResp, nil

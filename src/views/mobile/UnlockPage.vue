@@ -17,8 +17,8 @@
         </f7-list>
 
         <f7-list>
-            <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="$t('Unlock By PIN Code')" @click="unlockByPin"></f7-list-button>
-            <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock By WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
+            <f7-list-button :class="{ 'disabled': !isPinCodeValid(pinCode) }" :text="$t('Unlock with PIN Code')" @click="unlockByPin"></f7-list-button>
+            <f7-list-button v-if="isWebAuthnAvailable" :text="$t('Unlock with WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
             <f7-block-footer>
                 <f7-link :text="$t('Re-login')" @click="relogin"></f7-link>
             </f7-block-footer>
@@ -120,7 +120,7 @@ export default {
             }
 
             if (!webauthn.isSupported()) {
-                self.$toast('This device does not support WebAuthn');
+                self.$toast('WebAuth is not supported on this device');
                 return;
             }
 
@@ -150,11 +150,11 @@ export default {
                 logger.error('failed to use webauthn to verify', error);
 
                 if (error.notSupported) {
-                    self.$toast('This device does not support WebAuthn');
+                    self.$toast('WebAuth is not supported on this device');
                 } else if (error.name === 'NotAllowedError') {
                     self.$toast('User has canceled authentication');
                 } else if (error.invalid) {
-                    self.$toast('Failed to authenticate by WebAuthn');
+                    self.$toast('Failed to authenticate with WebAuthn');
                 } else {
                     self.$toast('User has canceled or this device does not support WebAuthn');
                 }
@@ -175,7 +175,7 @@ export default {
             const user = self.userStore.currentUserInfo;
 
             if (!user || !user.username) {
-                self.$alert('An error has occurred');
+                self.$alert('An error occurred');
                 return;
             }
 
@@ -194,8 +194,8 @@ export default {
 
                 router.refreshPage();
             } catch (ex) {
-                logger.error('failed to unlock by pin code', ex);
-                self.$toast('PIN code is wrong');
+                logger.error('failed to unlock with pin code', ex);
+                self.$toast('Incorrect PIN code');
             }
         },
         relogin() {

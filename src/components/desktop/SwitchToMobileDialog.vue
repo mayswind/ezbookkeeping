@@ -7,7 +7,7 @@
                 </div>
             </template>
             <template #subtitle>
-                <div class="text-body-1 text-center text-wrap mt-4">{{ $t('You can scan the below QR code on your mobile device.') }}</div>
+                <div class="text-body-1 text-center text-wrap mt-4">{{ $t('You can scan the QR code below on your mobile device.') }}</div>
             </template>
             <v-card-text class="mb-md-4">
                 <v-row>

@@ -47,7 +47,7 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_REQUIRE_2FA {
-		log.WarnfWithRequestId(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two factor authorization", claims.Uid)
+		log.WarnfWithRequestId(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two-factor authorization", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
 		return
 	}

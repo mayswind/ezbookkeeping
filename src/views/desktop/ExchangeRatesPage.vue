@@ -112,7 +112,7 @@
                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                            v-if="exchangeRate.currencyCode !== baseCurrency"
                                                            @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))">
-                                                        {{ $t('Set As Baseline') }}
+                                                        {{ $t('Set as Base') }}
                                                     </v-btn>
                                                     <span>{{ getDisplayConvertedAmount(exchangeRate, isEnableThousandsSeparator) }}</span>
                                                 </div>

@@ -4,7 +4,7 @@
             <v-card :class="{ 'disabled': updatingPassword }" :title="$t('Modify Password')">
                 <v-form>
                     <v-card-text class="pt-0">
-                        <span class="text-body-1">{{ $t('After the password is changed, other devices will be logged out, please log in again on other devices by using the new password.') }}</span>
+                        <span class="text-body-1">{{ $t('After changing the password, other devices will be logged out. Please use the new password to log in on other devices.') }}</span>
                     </v-card-text>
 
                     <v-card-text>
@@ -51,7 +51,7 @@
                                     clearable
                                     :disabled="updatingPassword"
                                     :type="isConfirmPasswordVisible ? 'text' : 'password'"
-                                    :label="$t('Confirmation Password')"
+                                    :label="$t('Confirm Password')"
                                     :placeholder="$t('Re-enter the password')"
                                     :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
                                     v-model="confirmPassword"
@@ -64,7 +64,7 @@
 
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="!currentPassword || !newPassword || !confirmPassword || updatingPassword" @click="updatePassword">
-                            {{ $t('Save changes') }}
+                            {{ $t('Save Changes') }}
                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="updatingPassword"></v-progress-circular>
                         </v-btn>
                     </v-card-text>
@@ -181,15 +181,15 @@ export default {
         ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore),
         inputProblemMessage() {
             if (!this.currentPassword) {
-                return 'Current password cannot be empty';
+                return 'Current password cannot be blank';
             } else if (!this.newPassword && !this.confirmPassword) {
                 return 'Nothing has been modified';
             } else if (!this.newPassword && this.confirmPassword) {
-                return 'New password cannot be empty';
+                return 'New password cannot be blank';
             } else if (this.newPassword && !this.confirmPassword) {
-                return 'Confirmation password cannot be empty';
+                return 'Password confirmation cannot be blank';
             } else if (this.newPassword && this.confirmPassword && this.newPassword !== this.confirmPassword) {
-                return 'Password and confirmation password do not match';
+                return 'Password and password confirmation do not match';
             } else {
                 return null;
             }

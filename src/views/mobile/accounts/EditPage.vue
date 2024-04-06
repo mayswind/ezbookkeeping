@@ -282,7 +282,7 @@
                 <f7-list-item group-title>
                     <small>{{ $t('Sub Account') + ' #' + (idx + 1) }}</small>
                     <f7-button rasied fill class="subaccount-delete-button" color="red" icon-f7="trash" icon-size="16px"
-                               :tooltip="$t('Remove Sub Account')"
+                               :tooltip="$t('Remove Sub-account')"
                                v-if="!editAccountId"
                                @click="removeSubAccount(subAccount, false)">
                     </f7-button>
@@ -291,8 +291,8 @@
                 <f7-list-input
                     type="text"
                     clear-button
-                    :label="$t('Sub Account Name')"
-                    :placeholder="$t('Your sub account name')"
+                    :label="$t('Sub-account Name')"
+                    :placeholder="$t('Your sub-account name')"
                     v-model:value="subAccount.name"
                 ></f7-list-input>
 
@@ -304,7 +304,7 @@
                                     <div class="item-content">
                                         <div class="item-inner">
                                             <div class="item-header">
-                                                <span>{{ $t('Sub Account Icon') }}</span>
+                                                <span>{{ $t('Sub-account Icon') }}</span>
                                             </div>
                                             <div class="item-title">
                                                 <div class="list-item-custom-title no-padding">
@@ -326,7 +326,7 @@
                                     <div class="item-content">
                                         <div class="item-inner">
                                             <div class="item-header">
-                                                <span>{{ $t('Sub Account Color') }}</span>
+                                                <span>{{ $t('Sub-account Color') }}</span>
                                             </div>
                                             <div class="item-title">
                                                 <div class="list-item-custom-title no-padding">
@@ -370,7 +370,7 @@
                     link="#" no-chevron
                     class="list-item-with-header-and-title"
                     :class="{ 'disabled': editAccountId }"
-                    :header="$t('Sub Account Balance')"
+                    :header="$t('Sub-account Balance')"
                     :title="getAccountBalance(subAccount)"
                     @click="subAccount.showBalanceSheet = true"
                 >
@@ -389,7 +389,7 @@
                     type="textarea"
                     style="height: auto"
                     :label="$t('Description')"
-                    :placeholder="$t('Your sub account description (optional)')"
+                    :placeholder="$t('Your sub-account description (optional)')"
                     v-textarea-auto-size
                     v-model:value="subAccount.comment"
                 ></f7-list-input>
@@ -398,7 +398,7 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="addSubAccount">{{ $t('Add Sub Account') }}</f7-actions-button>
+                <f7-actions-button @click="addSubAccount">{{ $t('Add Sub-account') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -407,7 +407,7 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
-                <f7-actions-label>{{ $t('Are you sure you want to remove this sub account?') }}</f7-actions-label>
+                <f7-actions-label>{{ $t('Are you sure you want to remove this sub-account?') }}</f7-actions-label>
                 <f7-actions-button color="red" @click="removeSubAccount(subAccountToDelete, true)">{{ $t('Remove') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -567,7 +567,7 @@ export default {
         },
         removeSubAccount(subAccount, confirm) {
             if (!subAccount) {
-                this.$alert('An error has occurred');
+                this.$alert('An error occurred');
                 return;
             }
 
@@ -676,13 +676,13 @@ export default {
         },
         getInputEmptyProblemMessage(account, isSubAccount) {
             if (!isSubAccount && !account.category) {
-                return 'Account category cannot be empty';
+                return 'Account category cannot be blank';
             } else if (!isSubAccount && !account.type) {
-                return 'Account type cannot be empty';
+                return 'Account type cannot be blank';
             } else if (!account.name) {
-                return 'Account name cannot be empty';
+                return 'Account name cannot be blank';
             } else if (account.type === this.allAccountTypes.SingleAccount && !account.currency) {
-                return 'Account currency cannot be empty';
+                return 'Account currency cannot be blank';
             } else {
                 return null;
             }

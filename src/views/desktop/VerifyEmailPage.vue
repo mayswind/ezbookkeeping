@@ -24,7 +24,7 @@
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ $t('Verify your email') }}</h4>
                             <p class="mb-0" v-if="token && loading">{{ $t('Verifying...') }}</p>
-                            <p class="mb-0" v-if="token && verified">{{ $t('Email has been verified') }}</p>
+                            <p class="mb-0" v-if="token && verified">{{ $t('Email address is verified') }}</p>
                             <p class="mb-0" v-if="token && !verified && errorMessage">{{ errorMessage }}</p>
                             <p class="mb-0" v-if="!token && !email">{{ $t('Parameter Invalid') }}</p>
                             <p class="mb-0" v-if="!token && email">{{ $t(hasValidEmailVerifyToken ? 'format.misc.accountActivationAndResendValidationEmailTip' : 'format.misc.resendValidationEmailTip', { email: email }) }}</p>
@@ -59,8 +59,8 @@
                                         <router-link class="d-flex align-center justify-center" :to="verified ? '/' : '/login'"
                                                      :class="{ 'disabled': loading || resending }">
                                             <v-icon :icon="icons.left"/>
-                                            <span v-if="!verified">{{ $t('Back to log in') }}</span>
-                                            <span v-else-if="verified">{{ $t('Back to home') }}</span>
+                                            <span v-if="!verified">{{ $t('Back to login page') }}</span>
+                                            <span v-else-if="verified">{{ $t('Back to home page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -194,7 +194,7 @@ export default {
         }).then(() => {
             self.loading = false;
             self.verified = true;
-            self.$refs.snackbar.showMessage('Email has been verified');
+            self.$refs.snackbar.showMessage('Email address is verified');
         }).catch(error => {
             self.loading = false;
             self.verified = false;

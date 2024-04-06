@@ -89,18 +89,18 @@ export const useUserStore = defineStore('user', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get user profile' });
+                        reject({ message: 'Unable to retrieve user profile' });
                         return;
                     }
 
                     resolve(data.result);
                 }).catch(error => {
-                    logger.error('failed to get user profile', error);
+                    logger.error('failed to retrieve user profile', error);
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get user profile' });
+                        reject({ message: 'Unable to retrieve user profile' });
                     } else {
                         reject(error);
                     }
@@ -113,18 +113,18 @@ export const useUserStore = defineStore('user', {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to get user statistics data' });
+                        reject({ message: 'Unable to retrieve user statistics data' });
                         return;
                     }
 
                     resolve(data.result);
                 }).catch(error => {
-                    logger.error('failed to get user statistics data', error);
+                    logger.error('failed to retrieve user statistics data', error);
 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get user statistics data' });
+                        reject({ message: 'Unable to retrieve user statistics data' });
                     } else {
                         reject(error);
                     }
@@ -136,10 +136,10 @@ export const useUserStore = defineStore('user', {
                 services.getExportedUserData(fileType).then(response => {
                     if (response && response.headers) {
                         if (fileType === 'csv' && response.headers['content-type'] !== 'text/csv') {
-                            reject({ message: 'Unable to get exported user data' });
+                            reject({ message: 'Unable to retrieve exported user data' });
                             return;
                         } else if (fileType === 'tsv' && response.headers['content-type'] !== 'text/tab-separated-values') {
-                            reject({ message: 'Unable to get exported user data' });
+                            reject({ message: 'Unable to retrieve exported user data' });
                             return;
                         }
                     }
@@ -147,12 +147,12 @@ export const useUserStore = defineStore('user', {
                     const blob = new Blob([response.data], { type: response.headers['content-type'] });
                     resolve(blob);
                 }).catch(error => {
-                    logger.error('failed to get user statistics data', error);
+                    logger.error('failed to retrieve user statistics data', error);
 
                     if (error.response && error.response.headers['content-type'] === 'text/text' && error.response && error.response.data) {
                         reject({ message: 'error.' + error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to get exported user data' });
+                        reject({ message: 'Unable to retrieve exported user data' });
                     } else {
                         reject(error);
                     }

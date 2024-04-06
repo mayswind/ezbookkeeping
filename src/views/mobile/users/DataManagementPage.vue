@@ -56,7 +56,7 @@
         </f7-sheet>
 
         <password-input-sheet :title="$t('Are you sure you want to clear all data?')"
-                              :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please input your current password to confirm.')"
+                              :hint="$t('You CANNOT undo this action. This will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.')"
                               :confirm-disabled="clearingData"
                               :cancel-disabled="clearingData"
                               color="red"

@@ -8,11 +8,11 @@
         <f7-list strong inset dividers class="margin-top">
             <f7-list-item :title="$t('Status')" :after="$t(isEnableApplicationLock ? 'Enabled' : 'Disabled')"></f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock">
-                <span>{{ $t('Unlock By PIN Code') }}</span>
+                <span>{{ $t('Unlock with PIN Code') }}</span>
                 <f7-toggle checked disabled></f7-toggle>
             </f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock && isSupportedWebAuthn">
-                <span>{{ $t('Unlock By WebAuthn') }}</span>
+                <span>{{ $t('Unlock with WebAuthn') }}</span>
                 <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
             </f7-list-item>
             <f7-list-button v-if="isEnableApplicationLock" @click="disable(null)">{{ $t('Disable') }}</f7-list-button>
@@ -20,14 +20,14 @@
         </f7-list>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
-                              :hint="$t('Please input a new 6-digit PIN code. PIN code would encrypt your local data, so you need input this PIN code when you launch this app. If this PIN code is lost, you should re-login.')"
+                              :hint="$t('Please enter a new 6-digit PIN code. The PIN code would encrypt your local data, so you need to enter it every time you open this app. If this PIN code is lost, you will need to log in again.')"
                               v-model:show="showInputPinCodeSheetForEnable"
                               v-model="currentPinCodeForEnable"
                               @pincode:confirm="enable">
         </pin-code-input-sheet>
 
         <pin-code-input-sheet :title="$t('PIN Code')"
-                              :hint="$t('Please enter your current PIN code when disable application lock.')"
+                              :hint="$t('Your current PIN code is required to disable application lock.')"
                               v-model:show="showInputPinCodeSheetForDisable"
                               v-model="currentPinCodeForDisable"
                               @pincode:confirm="disable">
@@ -94,7 +94,7 @@ export default {
                     self.$hideLoading();
 
                     if (error.notSupported) {
-                        self.$toast('This device does not support WebAuthn');
+                        self.$toast('WebAuth is not supported on this device');
                     } else if (error.name === 'NotAllowedError') {
                         self.$toast('User has canceled authentication');
                     } else if (error.invalid) {
@@ -132,14 +132,14 @@ export default {
             }
 
             if (!this.currentPinCodeForEnable || this.currentPinCodeForEnable.length !== 6) {
-                this.$alert('PIN code is invalid');
+                this.$alert('Invalid PIN code');
                 return;
             }
 
             const user = this.userStore.currentUserInfo;
 
             if (!user || !user.username) {
-                this.$alert('An error has occurred');
+                this.$alert('An error occurred');
                 return;
             }
 
@@ -163,7 +163,7 @@ export default {
             }
 
             if (!this.$user.isCorrectPinCode(pinCode)) {
-                this.$alert('PIN code is wrong');
+                this.$alert('Incorrect PIN code');
                 return;
             }
 

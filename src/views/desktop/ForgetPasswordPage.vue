@@ -23,7 +23,7 @@
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
                         <v-card-text>
                             <h4 class="text-h4 mb-2">{{ $t('Forget Password?') }}</h4>
-                            <p class="mb-0">{{ $t('Please input your email address used for registration and we\'ll send you an email with reset password link') }}</p>
+                            <p class="mb-0">{{ $t('Please enter your email address used for registration and we\'ll send you an email with a reset password link') }}</p>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -54,7 +54,7 @@
                                         <router-link class="d-flex align-center justify-center" to="/login"
                                                      :class="{ 'disabled': requesting }">
                                             <v-icon :icon="icons.left"/>
-                                            <span>{{ $t('Back to log in') }}</span>
+                                            <span>{{ $t('Back to login page') }}</span>
                                         </router-link>
                                     </v-col>
                                 </v-row>
@@ -159,7 +159,7 @@ export default {
             const self = this;
 
             if (!self.email) {
-                self.$refs.snackbar.showMessage('Email address cannot be empty');
+                self.$refs.snackbar.showMessage('Email address cannot be blank');
                 return;
             }
 

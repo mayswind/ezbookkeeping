@@ -790,7 +790,7 @@ export default {
             const self = this;
 
             if (!transaction) {
-                self.$alert('An error has occurred');
+                self.$alert('An error occurred');
                 return;
             }
 

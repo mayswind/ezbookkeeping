@@ -15,7 +15,7 @@
         </f7-list>
 
         <passcode-input-sheet :title="$t('Enable Two-Factor Authentication')"
-                              :hint="$t('Please use two factor authentication app scan the below qrcode and input current passcode')"
+                              :hint="$t('Please use a two-factor authentication app to scan the qrcode below and enter the current passcode.')"
                               :confirm-disabled="enableConfirming"
                               :cancel-disabled="enableConfirming"
                               v-model:show="showInputPasscodeSheetForEnable"
@@ -27,7 +27,7 @@
         </passcode-input-sheet>
 
         <password-input-sheet :title="$t('Disable Two-Factor Authentication')"
-                              :hint="$t('Please enter your current password when disable two factor authentication')"
+                              :hint="$t('Your current password is required to disable two-factor authentication.')"
                               :confirm-disabled="disabling"
                               :cancel-disabled="disabling"
                               v-model:show="showInputPasswordSheetForDisable"
@@ -36,7 +36,7 @@
         </password-input-sheet>
 
         <password-input-sheet :title="$t('Regenerate Backup Codes')"
-                              :hint="$t('Please enter your current password when regenerate two factor authentication backup codes. If you regenerate backup codes, the old codes will be invalidated.')"
+                              :hint="$t('Your current password is required to regenerate backup codes for two-factor authentication. If you regenerate backup codes, the previous ones will become invalid.')"
                               :confirm-disabled="regenerating"
                               :cancel-disabled="regenerating"
                               v-model:show="showInputPasswordSheetForRegenerate"
@@ -46,7 +46,7 @@
 
         <information-sheet class="backup-code-sheet"
                            :title="$t('Backup Code')"
-                           :hint="$t('Please copy these backup codes to safe place, the below codes can only be shown once. If these codes were lost, you can regenerate backup codes at any time.')"
+                           :hint="$t('Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.')"
                            :information="currentBackupCode"
                            :row-count="10"
                            :enable-copy="true"
@@ -187,7 +187,7 @@ export default {
 
                 self.status = false;
                 self.showInputPasswordSheetForDisable = false;
-                self.$toast('Two factor authentication has been disabled');
+                self.$toast('Two-factor authentication has been disabled');
             }).catch(error => {
                 self.disabling = false;
                 self.$hideLoading();

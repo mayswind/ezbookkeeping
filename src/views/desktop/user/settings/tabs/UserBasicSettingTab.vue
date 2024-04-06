@@ -25,8 +25,8 @@
                             <span v-if="!loading">{{ oldProfile.username }}</span>
                         </div>
                         <div class="d-flex text-body-1 align-center" style="height: 40px;">
-                            <span v-if="!loading && emailVerified">{{ $t('Email has been verified') }}</span>
-                            <span v-if="!loading && !emailVerified">{{ $t('Email has not been verified') }}</span>
+                            <span v-if="!loading && emailVerified">{{ $t('Email address is verified') }}</span>
+                            <span v-if="!loading && !emailVerified">{{ $t('Email address is not verified') }}</span>
                             <v-btn class="ml-2 px-2" size="small" variant="text" :disabled="loading || resending"
                                    @click="resendVerifyEmail" v-if="isUserVerifyEmailEnabled && !loading && !emailVerified">
                                 {{ $t('Resend Validation Email') }}
@@ -81,7 +81,7 @@
                                                    :label="$t('Default Account')"
                                                    :placeholder="$t('Default Account')"
                                                    :items="allCategorizedAccounts"
-                                                   :no-item-text="$t('Not Specified')"
+                                                   :no-item-text="$t('Unspecified')"
                                                    v-model="newProfile.defaultAccountId">
                                 </two-column-select>
                             </v-col>
@@ -92,8 +92,8 @@
                                     item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
-                                    :label="$t('Editable Transaction Scope')"
-                                    :placeholder="$t('Editable Transaction Scope')"
+                                    :label="$t('Editable Transaction Range')"
+                                    :placeholder="$t('Editable Transaction Range')"
                                     :items="allTransactionEditScopeTypes"
                                     v-model="newProfile.transactionEditScope"
                                 />
@@ -208,7 +208,7 @@
 
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="inputIsNotChanged || inputIsInvalid || saving" @click="save">
-                            {{ $t('Save changes') }}
+                            {{ $t('Save Changes') }}
                             <v-progress-circular indeterminate size="22" class="ml-2" v-if="saving"></v-progress-circular>
                         </v-btn>
 
@@ -354,11 +354,11 @@ export default {
         },
         inputInvalidProblemMessage() {
             if (!this.newProfile.email) {
-                return 'Email address cannot be empty';
+                return 'Email address cannot be blank';
             } else if (!this.newProfile.nickname) {
-                return 'Nickname cannot be empty';
+                return 'Nickname cannot be blank';
             } else if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }
@@ -368,7 +368,7 @@ export default {
         },
         langAndRegionInputInvalidProblemMessage() {
             if (!this.newProfile.defaultCurrency) {
-                return 'Default currency cannot be empty';
+                return 'Default currency cannot be blank';
             } else {
                 return null;
             }

@@ -151,12 +151,6 @@ type TransactionAmountsRequestItem struct {
 	EndTime   int64
 }
 
-// TransactionMonthAmountsRequest represents all parameters of transaction month amounts request
-type TransactionMonthAmountsRequest struct {
-	StartYearMonth string `form:"start_year_month"`
-	EndYearMonth   string `form:"end_year_month"`
-}
-
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
 	Id           int64 `form:"id,string" binding:"required,min=1"`
@@ -170,14 +164,10 @@ type TransactionDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
 }
 
-// TransactionAccountsAmount represents transaction accounts amount map
-type TransactionAccountsAmount map[int64]*TransactionAccountAmount
-
-// TransactionAccountAmount represents transaction account amount
-type TransactionAccountAmount struct {
-	AccountId          int64
-	TotalIncomeAmount  int64
-	TotalExpenseAmount int64
+// YearMonthRangeRequest represents all parameters of a request with year and month range
+type YearMonthRangeRequest struct {
+	StartYearMonth string `form:"start_year_month"`
+	EndYearMonth   string `form:"end_year_month"`
 }
 
 // TransactionGeoLocationResponse represents a view-object of transaction geographic location info
@@ -381,7 +371,7 @@ func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*Tran
 }
 
 // GetStartTimeAndEndTime returns start unix time and end unix time by request parameter
-func (t *TransactionMonthAmountsRequest) GetStartTimeAndEndTime(utcOffset int16) (int64, int64, error) {
+func (t *YearMonthRangeRequest) GetStartTimeAndEndTime(utcOffset int16) (int64, int64, error) {
 	startUnixTime := int64(0)
 	endUnixTime := time.Now().Unix()
 
@@ -429,28 +419,6 @@ func (s TransactionInfoResponseSlice) Less(i, j int) bool {
 	}
 
 	return s[i].Id > s[j].Id
-}
-
-// TransactionMonthAmountsResponseItemSlice represents the slice data structure of TransactionMonthAmountsResponseItem
-type TransactionMonthAmountsResponseItemSlice []*TransactionMonthAmountsResponseItem
-
-// Len returns the count of items
-func (s TransactionMonthAmountsResponseItemSlice) Len() int {
-	return len(s)
-}
-
-// Swap swaps two items
-func (s TransactionMonthAmountsResponseItemSlice) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-// Less reports whether the first item is less than the second one
-func (s TransactionMonthAmountsResponseItemSlice) Less(i, j int) bool {
-	if s[i].Year != s[j].Year {
-		return s[i].Year > s[j].Year
-	}
-
-	return s[i].Month > s[j].Month
 }
 
 // TransactionAmountsResponseItemAmountInfoSlice represents the slice data structure of TransactionAmountsResponseItemAmountInfo

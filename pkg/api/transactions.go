@@ -2,7 +2,6 @@ package api
 
 import (
 	"sort"
-	"strings"
 
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
@@ -13,8 +12,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
-
-const pageCountForLoadTransactionAmounts = 1000
 
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
@@ -377,120 +374,6 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 			Amounts:   allTotalAmounts,
 		})
 	}
-
-	return amountsResp, nil
-}
-
-// TransactionMonthAmountsHandler returns every month transaction amounts of current user
-func (a *TransactionsApi) TransactionMonthAmountsHandler(c *core.Context) (any, *errs.Error) {
-	var transactionAmountsReq models.TransactionMonthAmountsRequest
-	err := c.ShouldBindQuery(&transactionAmountsReq)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] parse request failed, because %s", err.Error())
-		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
-	}
-
-	utcOffset, err := c.GetClientTimezoneOffset()
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get client timezone offset, because %s", err.Error())
-		return nil, errs.ErrClientTimezoneOffsetInvalid
-	}
-
-	startTime, endTime, err := transactionAmountsReq.GetStartTimeAndEndTime(utcOffset)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] parse request start or end date failed, because %s", err.Error())
-		return nil, errs.ErrParameterInvalid
-	}
-
-	uid := c.GetCurrentUid()
-
-	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
-	accountMap := a.accounts.GetAccountMapByList(accounts)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	totalAmounts, err := a.transactions.GetAccountsMonthTotalIncomeAndExpense(c, uid, startTime, endTime, pageCountForLoadTransactionAmounts)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] failed to get accounts month total income and expense for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	amountsMap := make(map[string]map[string]*models.TransactionAmountsResponseItemAmountInfo)
-
-	for yearMonth, monthAccountsAmounts := range totalAmounts {
-		for accountId, monthAccountAmounts := range monthAccountsAmounts {
-			account, exists := accountMap[accountId]
-
-			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
-				continue
-			}
-
-			monthTotalAmounts, exists := amountsMap[yearMonth]
-
-			if !exists {
-				monthTotalAmounts = make(map[string]*models.TransactionAmountsResponseItemAmountInfo)
-				amountsMap[yearMonth] = monthTotalAmounts
-			}
-
-			monthTotalAmount, exists := monthTotalAmounts[account.Currency]
-
-			if !exists {
-				monthTotalAmount = &models.TransactionAmountsResponseItemAmountInfo{
-					Currency:      account.Currency,
-					IncomeAmount:  0,
-					ExpenseAmount: 0,
-				}
-			}
-
-			monthTotalAmount.IncomeAmount += monthAccountAmounts.TotalIncomeAmount
-			monthTotalAmount.ExpenseAmount += monthAccountAmounts.TotalExpenseAmount
-
-			monthTotalAmounts[account.Currency] = monthTotalAmount
-		}
-	}
-
-	amountsResp := make(models.TransactionMonthAmountsResponseItemSlice, 0)
-
-	for yearMonth, monthTotalAmounts := range amountsMap {
-		yearMonthItems := strings.Split(yearMonth, "-")
-		year, err := utils.StringToInt32(yearMonthItems[0])
-
-		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get year from year-month item \"%s\" for user \"uid:%d\"", yearMonth, uid)
-			continue
-		}
-
-		month, err := utils.StringToInt32(yearMonthItems[1])
-
-		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionMonthAmountsHandler] cannot get month from year-month item \"%s\" for user \"uid:%d\"", yearMonth, uid)
-			continue
-		}
-
-		amounts := make(models.TransactionAmountsResponseItemAmountInfoSlice, 0, len(monthTotalAmounts))
-
-		for _, monthTotalAmount := range monthTotalAmounts {
-			amounts = append(amounts, monthTotalAmount)
-		}
-
-		sort.Sort(amounts)
-
-		amountsResp = append(amountsResp, &models.TransactionMonthAmountsResponseItem{
-			Year:    year,
-			Month:   month,
-			Amounts: amounts,
-		})
-	}
-
-	sort.Sort(amountsResp)
 
 	return amountsResp, nil
 }

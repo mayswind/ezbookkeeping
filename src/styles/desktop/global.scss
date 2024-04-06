@@ -302,6 +302,10 @@ body .v-btn-group {
     }
 }
 
+.v-btn {
+    text-transform: none;
+}
+
 /** Replacing the default style of @vuepic/vue-datepicker **/
 .dp__theme_light {
     --dp-primary-color: #c67e48;

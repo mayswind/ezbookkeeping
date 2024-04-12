@@ -17,6 +17,7 @@ export const useSettingsStore = defineStore('settings', {
             thousandsSeparator: settings.isEnableThousandsSeparator(),
             currencyDisplayMode: settings.getCurrencyDisplayMode(),
             showAmountInHomePage: settings.isShowAmountInHomePage(),
+            timezoneUsedForStatisticsInHomePage: settings.getTimezoneUsedForStatisticsInHomePage(),
             itemsCountInTransactionListPage: settings.getItemsCountInTransactionListPage(),
             showTotalAmountInTransactionListPage: settings.isShowTotalAmountInTransactionListPage(),
             showAccountBalance: settings.isShowAccountBalance(),
@@ -24,6 +25,7 @@ export const useSettingsStore = defineStore('settings', {
                 defaultChartType: settings.getStatisticsDefaultChartType(),
                 defaultChartDataType: settings.getStatisticsDefaultChartDataType(),
                 defaultDataRangeType: settings.getStatisticsDefaultDateRange(),
+                defaultTimezoneType: settings.getStatisticsDefaultTimezoneType(),
                 defaultAccountFilter: settings.getStatisticsDefaultAccountFilter(),
                 defaultTransactionCategoryFilter: settings.getStatisticsDefaultTransactionCategoryFilter(),
                 defaultSortingType: settings.getStatisticsSortingType()
@@ -76,6 +78,10 @@ export const useSettingsStore = defineStore('settings', {
             settings.setShowAmountInHomePage(value);
             this.appSettings.showAmountInHomePage = value;
         },
+        setTimezoneUsedForStatisticsInHomePage(value) {
+            settings.setTimezoneUsedForStatisticsInHomePage(value);
+            this.appSettings.timezoneUsedForStatisticsInHomePage = value;
+        },
         setItemsCountInTransactionListPage(value) {
             settings.setItemsCountInTransactionListPage(value);
             this.appSettings.itemsCountInTransactionListPage = value;
@@ -99,6 +105,10 @@ export const useSettingsStore = defineStore('settings', {
         setStatisticsDefaultDateRange(value) {
             settings.setStatisticsDefaultDateRange(value);
             this.appSettings.statistics.defaultDataRangeType = value;
+        },
+        setStatisticsDefaultTimezoneType(value) {
+            settings.setStatisticsDefaultTimezoneType(value);
+            this.appSettings.statistics.defaultTimezoneType = value;
         },
         setStatisticsDefaultAccountFilter(value) {
             settings.setStatisticsDefaultAccountFilter(value);

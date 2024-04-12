@@ -109,6 +109,18 @@
                                     v-model="showAmountInHomePage"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Timezone Used for Statistics')"
+                                    :placeholder="$t('Timezone Used for Statistics')"
+                                    :items="allTimezoneTypesUsedForStatistics"
+                                    v-model="timezoneUsedForStatisticsInHomePage"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -197,6 +209,9 @@ export default {
         allCurrencyDisplayModes() {
             return currencyConstants.allCurrencyDisplayModes;
         },
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics(this.timeZone);
+        },
         theme: {
             get: function () {
                 return this.settingsStore.appSettings.theme;
@@ -263,6 +278,15 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setShowAmountInHomePage(value);
+            }
+        },
+        timezoneUsedForStatisticsInHomePage: {
+            get: function () {
+                return this.settingsStore.appSettings.timezoneUsedForStatisticsInHomePage;
+            },
+            set: function (value) {
+                this.settingsStore.setTimezoneUsedForStatisticsInHomePage(value);
+                this.overviewStore.updateTransactionOverviewInvalidState(true);
             }
         },
         showTotalAmountInTransactionListPage: {

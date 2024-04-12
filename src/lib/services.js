@@ -283,7 +283,7 @@ export default {
         keyword = encodeURIComponent(keyword);
         return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    getTransactionStatistics: ({ startTime, endTime }) => {
+    getTransactionStatistics: ({ startTime, endTime, useTransactionTimezone }) => {
         const queryParams = [];
 
         if (startTime) {
@@ -294,9 +294,9 @@ export default {
             queryParams.push(`end_time=${endTime}`);
         }
 
-        return axios.get('v1/transactions/statistics.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
+        return axios.get(`v1/transactions/statistics.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionAmounts: ({ today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months, monthBeforeLast5Months, monthBeforeLast6Months, monthBeforeLast7Months, monthBeforeLast8Months, monthBeforeLast9Months, monthBeforeLast10Months }) => {
+    getTransactionAmounts: ({ useTransactionTimezone, today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months, monthBeforeLast5Months, monthBeforeLast6Months, monthBeforeLast7Months, monthBeforeLast8Months, monthBeforeLast9Months, monthBeforeLast10Months }) => {
         const queryParams = [];
 
         if (today) {
@@ -359,7 +359,7 @@ export default {
             queryParams.push(`monthBeforeLast10Months_${monthBeforeLast10Months.startTime}_${monthBeforeLast10Months.endTime}`);
         }
 
-        return axios.get('v1/transactions/amounts.json' + (queryParams.length ? '?query=' + queryParams.join('|') : ''));
+        return axios.get(`v1/transactions/amounts.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&query=' + queryParams.join('|') : ''));
     },
     getTransaction: ({ id }) => {
         return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);

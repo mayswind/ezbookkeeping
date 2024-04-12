@@ -580,11 +580,13 @@ export const useStatisticsStore = defineStore('statistics', {
         },
         loadTransactionStatistics({ force }) {
             const self = this;
+            const settingsStore = useSettingsStore();
 
             return new Promise((resolve, reject) => {
                 services.getTransactionStatistics({
                     startTime: self.transactionStatisticsFilter.startTime,
-                    endTime: self.transactionStatisticsFilter.endTime
+                    endTime: self.transactionStatisticsFilter.endTime,
+                    useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType
                 }).then(response => {
                     const data = response.data;
 

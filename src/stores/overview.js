@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from './user.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
@@ -219,6 +220,8 @@ export const useOverviewStore = defineStore('overview', {
             this.transactionOverviewStateInvalid = true;
         },
         loadTransactionOverview({ force, loadLast11Months }) {
+            const settingsStore = useSettingsStore();
+
             const self = this;
             let dateChanged = false;
             let rangeChanged = false;
@@ -239,6 +242,7 @@ export const useOverviewStore = defineStore('overview', {
             }
 
             const requestParams = {
+                useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage,
                 today: self.transactionDataRange.today,
                 thisWeek: self.transactionDataRange.thisWeek,
                 thisMonth: self.transactionDataRange.thisMonth,

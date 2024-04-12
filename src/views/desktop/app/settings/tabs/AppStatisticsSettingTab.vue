@@ -49,6 +49,18 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
+                                    :label="$t('Timezone Used for Date Range')"
+                                    :placeholder="$t('Timezone Used for Date Range')"
+                                    :items="allTimezoneTypesUsedForStatistics"
+                                    v-model="defaultTimezoneType"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
                                     :label="$t('Default Sort Order')"
                                     :placeholder="$t('Default Sort Order')"
                                     :items="allSortingTypes"
@@ -99,6 +111,9 @@ export default {
         allDateRanges() {
             return this.$locale.getAllDateRanges(false);
         },
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        },
         defaultChartType: {
             get: function () {
                 return this.settingsStore.appSettings.statistics.defaultChartType;
@@ -121,6 +136,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultDateRange(value);
+            }
+        },
+        defaultTimezoneType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTimezoneType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTimezoneType(value);
             }
         },
         defaultSortingType: {

@@ -238,8 +238,15 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *e
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	uid := c.GetCurrentUid()
-	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalIncomeAndExpense(c, uid, statisticReq.StartTime, statisticReq.EndTime)
+	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalIncomeAndExpense(c, uid, statisticReq.StartTime, statisticReq.EndTime, utcOffset, statisticReq.UseTransactionTimezone)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionStatisticsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
@@ -292,6 +299,13 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 		return nil, errs.ErrQueryItemsTooMuch
 	}
 
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
 	uid := c.GetCurrentUid()
 
 	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
@@ -307,7 +321,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
 
-		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime)
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, utcOffset, transactionAmountsReq.UseTransactionTimezone)
 
 		if err != nil {
 			log.ErrorfWithRequestId(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())

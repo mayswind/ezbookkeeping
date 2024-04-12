@@ -8,6 +8,16 @@
                 <span>{{ $t('Show Amount') }}</span>
                 <f7-toggle :checked="showAmountInHomePage" @toggle:change="showAmountInHomePage = $event"></f7-toggle>
             </f7-list-item>
+
+            <f7-list-item
+                :title="$t('Timezone Used for Statistics')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="timezoneUsedForStatisticsInHomePage">
+                    <option :value="timezoneType.type"
+                            :key="timezoneType.type"
+                            v-for="timezoneType in allTimezoneTypesUsedForStatistics">{{ timezoneType.displayName }}</option>
+                </select>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ $t('Transaction List Page') }}</f7-block-title>
@@ -31,16 +41,29 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
+import { useOverviewStore } from '@/stores/overview.js';
 
 export default {
     computed: {
-        ...mapStores(useSettingsStore),
+        ...mapStores(useSettingsStore, useOverviewStore),
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        },
         showAmountInHomePage: {
             get: function () {
                 return this.settingsStore.appSettings.showAmountInHomePage;
             },
             set: function (value) {
                 this.settingsStore.setShowAmountInHomePage(value);
+            }
+        },
+        timezoneUsedForStatisticsInHomePage: {
+            get: function () {
+                return this.settingsStore.appSettings.timezoneUsedForStatisticsInHomePage;
+            },
+            set: function (value) {
+                this.settingsStore.setTimezoneUsedForStatisticsInHomePage(value);
+                this.overviewStore.updateTransactionOverviewInvalidState(true);
             }
         },
         showTotalAmountInTransactionListPage: {

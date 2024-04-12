@@ -135,13 +135,15 @@ type TransactionListInMonthByPageRequest struct {
 
 // TransactionStatisticRequest represents all parameters of transaction statistic request
 type TransactionStatisticRequest struct {
-	StartTime int64 `form:"start_time" binding:"min=0"`
-	EndTime   int64 `form:"end_time" binding:"min=0"`
+	StartTime              int64 `form:"start_time" binding:"min=0"`
+	EndTime                int64 `form:"end_time" binding:"min=0"`
+	UseTransactionTimezone bool  `form:"use_transaction_timezone"`
 }
 
 // TransactionAmountsRequest represents all parameters of transaction amounts request
 type TransactionAmountsRequest struct {
-	Query string `form:"query"`
+	Query                  string `form:"query"`
+	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
 }
 
 // TransactionAmountsRequestItem represents an item of transaction amounts request

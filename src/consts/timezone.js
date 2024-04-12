@@ -592,7 +592,16 @@ const allAvailableTimezones = [
     }
 ];
 
+const allTimezoneTypesUsedForStatistics = {
+    ApplicationTimezone: 0,
+    TransactionTimezone: 1
+};
+
+const defaultTimezoneTypesUsedForStatistics = allTimezoneTypesUsedForStatistics.ApplicationTimezone;
+
 export default {
     all: allAvailableTimezones,
-    utcTimezoneName: 'Etc/GMT'
+    utcTimezoneName: 'Etc/GMT',
+    allTimezoneTypesUsedForStatistics: allTimezoneTypesUsedForStatistics,
+    defaultTimezoneTypesUsedForStatistics: defaultTimezoneTypesUsedForStatistics
 };

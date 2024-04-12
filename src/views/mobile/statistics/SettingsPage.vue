@@ -32,6 +32,16 @@
                 </select>
             </f7-list-item>
 
+            <f7-list-item
+                :title="$t('Timezone Used for Date Range')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultTimezoneType">
+                    <option :value="timezoneType.type"
+                            :key="timezoneType.type"
+                            v-for="timezoneType in allTimezoneTypesUsedForStatistics">{{ timezoneType.displayName }}</option>
+                </select>
+            </f7-list-item>
+
             <f7-list-item :title="$t('Default Account Filter')" link="/statistic/filter/account?modifyDefault=1"></f7-list-item>
 
             <f7-list-item :title="$t('Default Transaction Category Filter')" link="/statistic/filter/category?modifyDefault=1"></f7-list-item>
@@ -70,6 +80,9 @@ export default {
         allDateRanges() {
             return this.$locale.getAllDateRanges(false);
         },
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        },
         defaultChartType: {
             get: function () {
                 return this.settingsStore.appSettings.statistics.defaultChartType;
@@ -92,6 +105,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultDateRange(value);
+            }
+        },
+        defaultTimezoneType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTimezoneType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTimezoneType(value);
             }
         },
         defaultSortingType: {

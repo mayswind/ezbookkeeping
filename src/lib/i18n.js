@@ -762,6 +762,21 @@ function getDateRangeDisplayName(userStore, dateType, startTime, endTime, transl
     return `${displayStartTime} ~ ${displayEndTime}`;
 }
 
+function getAllTimezoneTypesUsedForStatistics(currentTimezone, translateFn) {
+    const currentTimezoneOffset = getTimezoneOffset(currentTimezone);
+
+    return [
+        {
+            displayName: translateFn('Application Timezone') + ` (UTC${currentTimezoneOffset})`,
+            type: timezone.allTimezoneTypesUsedForStatistics.ApplicationTimezone
+        },
+        {
+            displayName: translateFn('Transaction Timezone'),
+            type: timezone.allTimezoneTypesUsedForStatistics.TransactionTimezone
+        }
+    ];
+}
+
 function getAllAccountCategories(translateFn) {
     const allAccountCategories = [];
 
@@ -1333,6 +1348,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
+        getAllTimezoneTypesUsedForStatistics: (currentTimezone) => getAllTimezoneTypesUsedForStatistics(currentTimezone, i18nGlobal.t),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),

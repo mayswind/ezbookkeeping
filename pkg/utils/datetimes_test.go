@@ -35,6 +35,38 @@ func TestFormatUnixTimeToYearMonth(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatUnixTimeToNumericLocalDateTime(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := int64(20210331220123)
+	actualValue := FormatUnixTimeToNumericLocalDateTime(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(20210401060123)
+	actualValue = FormatUnixTimeToNumericLocalDateTime(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestGetMinUnixTimeWithSameLocalDateTime(t *testing.T) {
+	expectedValue := int64(1690797600)
+	actualValue := GetMinUnixTimeWithSameLocalDateTime(1690819200, 480)
+	assert.Equal(t, expectedValue, actualValue)
+
+	actualValue = GetMinUnixTimeWithSameLocalDateTime(1690873200, -420)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestGetMaxUnixTimeWithSameLocalDateTime(t *testing.T) {
+	expectedValue := int64(1690891200)
+	actualValue := GetMaxUnixTimeWithSameLocalDateTime(1690819200, 480)
+	assert.Equal(t, expectedValue, actualValue)
+
+	actualValue = GetMaxUnixTimeWithSameLocalDateTime(1690873200, -420)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestParseFromLongDateTimeToMinUnixTime(t *testing.T) {
 	expectedValue := int64(1690797600)
 	actualTime, err := ParseFromLongDateTimeToMinUnixTime("2023-08-01 00:00:00")

@@ -44,6 +44,34 @@ func FormatUnixTimeToYearMonth(unixTime int64, timezone *time.Location) string {
 	return t.Format(yearMonthDateTimeFormat)
 }
 
+// FormatUnixTimeToNumericLocalDateTime returns numeric year, month, day, hour, minute and second of specified unix time
+func FormatUnixTimeToNumericLocalDateTime(unixTime int64, timezone *time.Location) int64 {
+	t := parseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
+	localDateTime := int64(t.Year())
+	localDateTime = localDateTime*100 + int64(t.Month())
+	localDateTime = localDateTime*100 + int64(t.Day())
+	localDateTime = localDateTime*100 + int64(t.Hour())
+	localDateTime = localDateTime*100 + int64(t.Minute())
+	localDateTime = localDateTime*100 + int64(t.Second())
+
+	return localDateTime
+}
+
+// GetMinUnixTimeWithSameLocalDateTime returns the minimum UnixTime for date with the same local date
+func GetMinUnixTimeWithSameLocalDateTime(unixTime int64, currentUtcOffset int16) int64 {
+	return unixTime + int64(currentUtcOffset)*60 - easternmostTimezoneUtcOffset*60
+}
+
+// GetMaxUnixTimeWithSameLocalDateTime returns the maximum UnixTime for date with the same local date
+func GetMaxUnixTimeWithSameLocalDateTime(unixTime int64, currentUtcOffset int16) int64 {
+	return unixTime + int64(currentUtcOffset)*60 - westernmostTimezoneUtcOffset*60
+}
+
 // ParseFromLongDateTimeToMinUnixTime parses a formatted string in long date time format to minimal unix time (the westernmost timezone)
 func ParseFromLongDateTimeToMinUnixTime(t string) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", easternmostTimezoneUtcOffset*60)

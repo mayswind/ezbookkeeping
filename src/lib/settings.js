@@ -1,4 +1,5 @@
 import currencyConstants from '@/consts/currency.js';
+import timezoneConstants from '@/consts/timezone.js';
 import statisticsConstants from '@/consts/statistics.js';
 
 const settingsLocalStorageKey = 'ebk_app_settings';
@@ -15,6 +16,7 @@ const defaultSettings = {
     thousandsSeparator: true,
     currencyDisplayMode: currencyConstants.defaultCurrencyDisplayMode,
     showAmountInHomePage: true,
+    timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
     showAccountBalance: true,
@@ -22,6 +24,7 @@ const defaultSettings = {
         defaultChartType: statisticsConstants.defaultChartType,
         defaultChartDataType: statisticsConstants.defaultChartDataType,
         defaultDataRangeType: statisticsConstants.defaultDataRangeType,
+        defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
         defaultSortingType: statisticsConstants.defaultSortingType
@@ -186,6 +189,14 @@ export function setShowAmountInHomePage(value) {
     setOption('showAmountInHomePage', value);
 }
 
+export function getTimezoneUsedForStatisticsInHomePage() {
+    return getOption('timezoneUsedForStatisticsInHomePage');
+}
+
+export function setTimezoneUsedForStatisticsInHomePage(value) {
+    setOption('timezoneUsedForStatisticsInHomePage', value);
+}
+
 export function getItemsCountInTransactionListPage() {
     return getOption('itemsCountInTransactionListPage');
 }
@@ -228,6 +239,14 @@ export function setStatisticsDefaultChartDataType(value) {
 
 export function getStatisticsDefaultDateRange() {
     return getSubOption('statistics', 'defaultDataRangeType');
+}
+
+export function getStatisticsDefaultTimezoneType() {
+    return getSubOption('statistics', 'defaultTimezoneType');
+}
+
+export function setStatisticsDefaultTimezoneType(value) {
+    setSubOption('statistics', 'defaultTimezoneType', value);
 }
 
 export function setStatisticsDefaultDateRange(value) {

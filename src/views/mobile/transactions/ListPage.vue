@@ -30,7 +30,7 @@
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ queryDateRangeName }}</span>
+                <span :class="{ 'tabbar-item-changed': query.dateType !== allDateRanges.All.type }">{{ queryDateRangeName }}</span>
             </f7-link>
             <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>

@@ -331,8 +331,8 @@
     </v-row>
 
     <date-range-selection-dialog :title="$t('Custom Date Range')"
-                                 :min-time="query.minTime"
-                                 :max-time="query.maxTime"
+                                 :min-time="customMinDatetime"
+                                 :max-time="customMaxDatetime"
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter" />
     <edit-dialog ref="editDialog" :persistent="true" />
@@ -417,6 +417,8 @@ export default {
             temporaryCountPerPage: null,
             totalCount: 1,
             searchKeyword: '',
+            customMinDatetime: 0,
+            customMaxDatetime: 0,
             currentPageTransactions: [],
             categoryMenuState: false,
             alwaysShowNav: mdAndUp.value,
@@ -768,8 +770,11 @@ export default {
             if (recentDateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
                 !recentDateRange.minTime && !recentDateRange.maxTime) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
-                    this.query.maxTime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
-                    this.query.minTime = getSpecifiedDayFirstUnixTime(this.query.maxTime);
+                    this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
+                    this.customMinDatetime = getSpecifiedDayFirstUnixTime(this.customMaxDatetime);
+                } else {
+                    this.customMaxDatetime = this.query.maxTime;
+                    this.customMinDatetime = this.query.minTime;
                 }
 
                 this.showCustomDateRangeDialog = true;

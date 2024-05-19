@@ -274,8 +274,8 @@
         </f7-popover>
 
         <date-range-selection-sheet :title="$t('Custom Date Range')"
-                                    :min-time="query.minTime"
-                                    :max-time="query.maxTime"
+                                    :min-time="customMinDatetime"
+                                    :max-time="customMaxDatetime"
                                     v-model:show="showCustomDateRangeSheet"
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
@@ -454,6 +454,8 @@ export default {
             loading: true,
             loadingError: null,
             loadingMore: false,
+            customMinDatetime: 0,
+            customMaxDatetime: 0,
             transactionToDelete: null,
             showDatePopover: false,
             showTypePopover: false,
@@ -681,8 +683,11 @@ export default {
         changeDateFilter(dateType) {
             if (dateType === this.allDateRanges.Custom.type) { // Custom
                 if (!this.query.minTime || !this.query.maxTime) {
-                    this.query.maxTime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
-                    this.query.minTime = getSpecifiedDayFirstUnixTime(this.query.maxTime);
+                    this.customMaxDatetime = getActualUnixTimeForStore(getCurrentUnixTime(), this.currentTimezoneOffsetMinutes, getBrowserTimezoneOffsetMinutes());
+                    this.customMinDatetime = getSpecifiedDayFirstUnixTime(this.customMaxDatetime);
+                } else {
+                    this.customMaxDatetime = this.query.maxTime;
+                    this.customMinDatetime = this.query.minTime;
                 }
 
                 this.showCustomDateRangeSheet = true;

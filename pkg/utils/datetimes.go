@@ -17,6 +17,29 @@ const (
 	easternmostTimezoneUtcOffset    = 840  // Pacific/Kiritimati (UTC+14:00)
 )
 
+// ParseNumericYearMonth returns numeric year and month from textual content
+func ParseNumericYearMonth(yearMonth string) (int32, int32, error) {
+	yearMonthParts := strings.Split(yearMonth, "-")
+
+	if len(yearMonthParts) != 2 {
+		return 0, 0, errs.ErrParameterInvalid
+	}
+
+	year, err := StringToInt32(yearMonthParts[0])
+
+	if err != nil {
+		return 0, 0, err
+	}
+
+	month, err := StringToInt32(yearMonthParts[1])
+
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return year, month, nil
+}
+
 // FormatUnixTimeToLongDateTimeInServerTimezone returns a textual representation of the unix time formatted by long date time format
 func FormatUnixTimeToLongDateTimeInServerTimezone(unixTime int64) string {
 	return parseFromUnixTime(unixTime).Format(longDateTimeFormat)
@@ -42,6 +65,17 @@ func FormatUnixTimeToYearMonth(unixTime int64, timezone *time.Location) string {
 	}
 
 	return t.Format(yearMonthDateTimeFormat)
+}
+
+// FormatUnixTimeToNumericYearMonth returns numeric year and month of specified unix time
+func FormatUnixTimeToNumericYearMonth(unixTime int64, timezone *time.Location) int32 {
+	t := parseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
+	return int32(t.Year())*100 + int32(t.Month())
 }
 
 // FormatUnixTimeToNumericLocalDateTime returns numeric year, month, day, hour, minute and second of specified unix time

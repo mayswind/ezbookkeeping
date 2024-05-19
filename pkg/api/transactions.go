@@ -272,6 +272,64 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *e
 	return statisticResp, nil
 }
 
+// TransactionStatisticsTrendsHandler returns transaction statistics trends of current user
+func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.Context) (any, *errs.Error) {
+	var statisticTrendsReq models.TransactionStatisticTrendsRequest
+	err := c.ShouldBindQuery(&statisticTrendsReq)
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	startYear, startMonth, endYear, endMonth, err := statisticTrendsReq.GetNumericYearMonthRange()
+
+	if err != nil {
+		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] cannot parse year month, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	uid := c.GetCurrentUid()
+	allMonthlyTotalAmounts, err := a.transactions.GetAccountsAndCategoriesMonthlyIncomeAndExpense(c, uid, startYear, startMonth, endYear, endMonth, utcOffset, statisticTrendsReq.UseTransactionTimezone)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	statisticTrendsResp := make(models.TransactionStatisticTrendsItemSlice, 0, len(allMonthlyTotalAmounts))
+
+	for yearMonth, monthlyTotalAmounts := range allMonthlyTotalAmounts {
+		monthlyStatisticResp := &models.TransactionStatisticTrendsItem{
+			Year:  yearMonth / 100,
+			Month: yearMonth % 100,
+			Items: make([]*models.TransactionStatisticResponseItem, len(monthlyTotalAmounts)),
+		}
+
+		for i := 0; i < len(monthlyTotalAmounts); i++ {
+			totalAmountItem := monthlyTotalAmounts[i]
+			monthlyStatisticResp.Items[i] = &models.TransactionStatisticResponseItem{
+				CategoryId:  totalAmountItem.CategoryId,
+				AccountId:   totalAmountItem.AccountId,
+				TotalAmount: totalAmountItem.Amount,
+			}
+		}
+
+		statisticTrendsResp = append(statisticTrendsResp, monthlyStatisticResp)
+	}
+
+	sort.Sort(statisticTrendsResp)
+
+	return statisticTrendsResp, nil
+}
+
 // TransactionAmountsHandler returns transaction amounts of current user
 func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs.Error) {
 	var transactionAmountsReq models.TransactionAmountsRequest

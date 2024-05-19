@@ -1,9 +1,7 @@
 package models
 
 import (
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
@@ -140,6 +138,12 @@ type TransactionStatisticRequest struct {
 	UseTransactionTimezone bool  `form:"use_transaction_timezone"`
 }
 
+// TransactionStatisticTrendsRequest represents all parameters of transaction statistic trends request
+type TransactionStatisticTrendsRequest struct {
+	YearMonthRangeRequest
+	UseTransactionTimezone bool `form:"use_transaction_timezone"`
+}
+
 // TransactionAmountsRequest represents all parameters of transaction amounts request
 type TransactionAmountsRequest struct {
 	Query                  string `form:"query"`
@@ -219,7 +223,7 @@ type TransactionInfoPageWrapperResponse2 struct {
 	TotalCount int64                        `json:"totalCount"`
 }
 
-// TransactionStatisticResponse represents an item of transaction amounts
+// TransactionStatisticResponse represents transaction statistic response
 type TransactionStatisticResponse struct {
 	StartTime int64                               `json:"startTime"`
 	EndTime   int64                               `json:"endTime"`
@@ -231,6 +235,13 @@ type TransactionStatisticResponseItem struct {
 	CategoryId  int64 `json:"categoryId,string"`
 	AccountId   int64 `json:"accountId,string"`
 	TotalAmount int64 `json:"amount"`
+}
+
+// TransactionStatisticTrendsItem represents the data within each statistic interval
+type TransactionStatisticTrendsItem struct {
+	Year  int32                               `json:"year"`
+	Month int32                               `json:"month"`
+	Items []*TransactionStatisticResponseItem `json:"items"`
 }
 
 // TransactionAmountsResponseItem represents an item of transaction amounts
@@ -372,33 +383,21 @@ func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*Tran
 	return requestItems, nil
 }
 
-// GetStartTimeAndEndTime returns start unix time and end unix time by request parameter
-func (t *YearMonthRangeRequest) GetStartTimeAndEndTime(utcOffset int16) (int64, int64, error) {
-	startUnixTime := int64(0)
-	endUnixTime := time.Now().Unix()
+// GetNumericYearMonthRange returns numeric start year, start month, end year and end month
+func (t *YearMonthRangeRequest) GetNumericYearMonthRange() (int32, int32, int32, int32, error) {
+	startYear, startMonth, err := utils.ParseNumericYearMonth(t.StartYearMonth)
 
-	if t.StartYearMonth != "" {
-		startTime, err := utils.ParseFromShortDateTime(fmt.Sprintf("%s-1 0:0:0", t.StartYearMonth), utcOffset)
-
-		if err != nil {
-			return 0, 0, err
-		}
-
-		startUnixTime = startTime.Unix()
+	if err != nil {
+		return 0, 0, 0, 0, err
 	}
 
-	if t.EndYearMonth != "" {
-		endTime, err := utils.ParseFromShortDateTime(fmt.Sprintf("%s-1 0:0:0", t.EndYearMonth), utcOffset)
+	endYear, endMonth, err := utils.ParseNumericYearMonth(t.EndYearMonth)
 
-		if err != nil {
-			return 0, 0, err
-		}
-
-		endTime = endTime.AddDate(0, 1, 0)
-		endUnixTime = endTime.Unix() - 1
+	if err != nil {
+		return 0, 0, 0, 0, err
 	}
 
-	return startUnixTime, endUnixTime, nil
+	return startYear, startMonth, endYear, endMonth, nil
 }
 
 // TransactionInfoResponseSlice represents the slice data structure of TransactionInfoResponse
@@ -421,6 +420,28 @@ func (s TransactionInfoResponseSlice) Less(i, j int) bool {
 	}
 
 	return s[i].Id > s[j].Id
+}
+
+// TransactionStatisticTrendsItemSlice represents the slice data structure of TransactionStatisticTrendsItem
+type TransactionStatisticTrendsItemSlice []*TransactionStatisticTrendsItem
+
+// Len returns the count of items
+func (s TransactionStatisticTrendsItemSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionStatisticTrendsItemSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s TransactionStatisticTrendsItemSlice) Less(i, j int) bool {
+	if s[i].Year != s[j].Year {
+		return s[i].Year < s[j].Year
+	}
+
+	return s[i].Month < s[j].Month
 }
 
 // TransactionAmountsResponseItemAmountInfoSlice represents the slice data structure of TransactionAmountsResponseItemAmountInfo

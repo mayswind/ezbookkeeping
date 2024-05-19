@@ -1200,6 +1200,109 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 	return transactionTotalAmounts, nil
 }
 
+// GetAccountsAndCategoriesMonthlyIncomeAndExpense returns the every accounts monthly income and expense amount by specific date range
+func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
+	startTransactionTime, _, err := utils.GetTransactionTimeRangeByYearMonth(startYear, startMonth)
+
+	if err != nil {
+		return nil, errs.ErrSystemError
+	}
+
+	_, endTransactionTime, err := utils.GetTransactionTimeRangeByYearMonth(endYear, endMonth)
+
+	if err != nil {
+		return nil, errs.ErrSystemError
+	}
+
+	condition := "uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?"
+	conditionParams := make([]any, 0, 4)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+
+	minTransactionTime := startTransactionTime
+	maxTransactionTime := endTransactionTime
+	var allTransactions []*models.Transaction
+
+	for maxTransactionTime > 0 {
+		var transactions []*models.Transaction
+
+		finalConditionParams := make([]any, 0, 6)
+		finalConditionParams = append(finalConditionParams, conditionParams...)
+		finalConditionParams = append(finalConditionParams, minTransactionTime)
+		finalConditionParams = append(finalConditionParams, maxTransactionTime)
+
+		err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(condition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactions = append(allTransactions, transactions...)
+
+		if len(transactions) < pageCountForLoadTransactionAmounts {
+			maxTransactionTime = 0
+			break
+		}
+
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+	}
+
+	startYearMonth := startYear*100 + startMonth
+	endYearMonth := endYear*100 + endMonth
+	transactionsMonthlyAmountsMap := make(map[string]*models.Transaction)
+	transactionsMonthlyAmounts := make(map[int32][]*models.Transaction)
+
+	for i := 0; i < len(allTransactions); i++ {
+		transaction := allTransactions[i]
+		timeZone := clientLocation
+
+		if useTransactionTimezone {
+			timeZone = time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
+		}
+
+		yearMonth := utils.FormatUnixTimeToNumericYearMonth(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), timeZone)
+
+		if yearMonth < startYearMonth || yearMonth > endYearMonth {
+			continue
+		}
+
+		groupKey := fmt.Sprintf("%d_%d_%d", yearMonth, transaction.CategoryId, transaction.AccountId)
+		transactionAmounts, exists := transactionsMonthlyAmountsMap[groupKey]
+
+		if !exists {
+			transactionAmounts = &models.Transaction{
+				CategoryId: transaction.CategoryId,
+				AccountId:  transaction.AccountId,
+			}
+			transactionsMonthlyAmountsMap[groupKey] = transactionAmounts
+		}
+
+		transactionAmounts.Amount += transaction.Amount
+	}
+
+	for groupKey, transaction := range transactionsMonthlyAmountsMap {
+		groupKeyParts := strings.Split(groupKey, "_")
+		yearMonth, _ := utils.StringToInt32(groupKeyParts[0])
+		monthlyAmounts, exists := transactionsMonthlyAmounts[yearMonth]
+
+		if !exists {
+			monthlyAmounts = make([]*models.Transaction, 0, 0)
+		}
+
+		monthlyAmounts = append(monthlyAmounts, transaction)
+		transactionsMonthlyAmounts[yearMonth] = monthlyAmounts
+	}
+
+	return transactionsMonthlyAmounts, nil
+}
+
 // GetTransactionMapByList returns a transaction map by a list
 func (s *TransactionService) GetTransactionMapByList(transactions []*models.Transaction) map[int64]*models.Transaction {
 	transactionMap := make(map[int64]*models.Transaction)

@@ -274,6 +274,7 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.GET("/transactions/list.json", bindApi(api.Transactions.TransactionListHandler))
 			apiV1Route.GET("/transactions/list/by_month.json", bindApi(api.Transactions.TransactionMonthListHandler))
 			apiV1Route.GET("/transactions/statistics.json", bindApi(api.Transactions.TransactionStatisticsHandler))
+			apiV1Route.GET("/transactions/statistics/trends.json", bindApi(api.Transactions.TransactionStatisticsTrendsHandler))
 			apiV1Route.GET("/transactions/amounts.json", bindApi(api.Transactions.TransactionAmountsHandler))
 			apiV1Route.GET("/transactions/get.json", bindApi(api.Transactions.TransactionGetHandler))
 			apiV1Route.POST("/transactions/add.json", bindApi(api.Transactions.TransactionCreateHandler))

@@ -7,6 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestParseNumericYearMonth(t *testing.T) {
+	expectedYear := int32(2024)
+	expectedMonth := int32(3)
+	actualYear, actualMonth, err := ParseNumericYearMonth("2024-03")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedYear, actualYear)
+	assert.Equal(t, expectedMonth, actualMonth)
+}
+
 func TestFormatUnixTimeToLongDateTimeWithoutSecond(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
@@ -32,6 +41,20 @@ func TestFormatUnixTimeToYearMonth(t *testing.T) {
 
 	expectedValue = "2021-04"
 	actualValue = FormatUnixTimeToYearMonth(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatUnixTimeToNumericYearMonth(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := int32(202103)
+	actualValue := FormatUnixTimeToNumericYearMonth(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int32(202104)
+	actualValue = FormatUnixTimeToNumericYearMonth(unixTime, utc8Timezone)
 	assert.Equal(t, expectedValue, actualValue)
 }
 

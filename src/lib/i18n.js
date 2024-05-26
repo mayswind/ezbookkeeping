@@ -624,7 +624,7 @@ function getAllCurrencies(translateFn) {
 
     for (let currencyCode in allCurrencyCodes) {
         if (!Object.prototype.hasOwnProperty.call(allCurrencyCodes, currencyCode)) {
-            return;
+            continue;
         }
 
         allCurrencies.push({
@@ -828,7 +828,7 @@ function getAllStatisticsChartDataTypes(translateFn) {
 
     for (const dataTypeField in statistics.allChartDataTypes) {
         if (!Object.prototype.hasOwnProperty.call(statistics.allChartDataTypes, dataTypeField)) {
-            return;
+            continue;
         }
 
         const chartDataType = statistics.allChartDataTypes[dataTypeField];
@@ -847,7 +847,7 @@ function getAllStatisticsSortingTypes(translateFn) {
 
     for (const sortingTypeField in statistics.allSortingTypes) {
         if (!Object.prototype.hasOwnProperty.call(statistics.allSortingTypes, sortingTypeField)) {
-            return;
+            continue;
         }
 
         const sortingType = statistics.allSortingTypes[sortingTypeField];

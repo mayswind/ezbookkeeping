@@ -170,6 +170,18 @@ export default {
             return presetRanges;
         }
     },
+    watch: {
+        'minTime': function (newValue) {
+            if (newValue) {
+                this.dateRange[0] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+            }
+        },
+        'maxTime': function (newValue) {
+            if (newValue) {
+                this.dateRange[1] = getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(newValue, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+            }
+        }
+    },
     setup() {
         const theme = useTheme();
 

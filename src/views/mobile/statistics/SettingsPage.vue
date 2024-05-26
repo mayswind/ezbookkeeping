@@ -15,16 +15,6 @@
             </f7-list-item>
 
             <f7-list-item
-                :title="$t('Default Date Range')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                <select v-model="defaultDateRange">
-                    <option :value="dateRange.type"
-                            :key="dateRange.type"
-                            v-for="dateRange in allDateRanges">{{ dateRange.displayName }}</option>
-                </select>
-            </f7-list-item>
-
-            <f7-list-item
                 :title="$t('Timezone Used for Date Range')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultTimezoneType">
@@ -60,6 +50,16 @@
                             v-for="chartType in allCategoricalChartTypes">{{ chartType.displayName }}</option>
                 </select>
             </f7-list-item>
+
+            <f7-list-item
+                :title="$t('Default Date Range')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultCategoricalChartDateRange">
+                    <option :value="dateRange.type"
+                            :key="dateRange.type"
+                            v-for="dateRange in allCategoricalChartDateRanges">{{ dateRange.displayName }}</option>
+                </select>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ $t('Trend Analysis Settings') }}</f7-block-title>
@@ -73,6 +73,16 @@
                             v-for="chartType in allTrendChartTypes">{{ chartType.displayName }}</option>
                 </select>
             </f7-list-item>
+
+            <f7-list-item
+                :title="$t('Default Date Range')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Date Range'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultTrendChartDateRange">
+                    <option :value="dateRange.type"
+                            :key="dateRange.type"
+                            v-for="dateRange in allTrendChartDateRanges">{{ dateRange.displayName }}</option>
+                </select>
+            </f7-list-item>
         </f7-list>
     </f7-page>
 </template>
@@ -81,11 +91,16 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
+import datetimeConstants from '@/consts/datetime.js';
+
 export default {
     computed: {
         ...mapStores(useSettingsStore),
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();
+        },
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics();
         },
         allSortingTypes() {
             return this.$locale.getAllStatisticsSortingTypes();
@@ -93,14 +108,14 @@ export default {
         allCategoricalChartTypes() {
             return this.$locale.getAllCategoricalChartTypes();
         },
+        allCategoricalChartDateRanges() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, false);
+        },
         allTrendChartTypes() {
             return this.$locale.getAllTrendChartTypes();
         },
-        allDateRanges() {
-            return this.$locale.getAllDateRanges(false);
-        },
-        allTimezoneTypesUsedForStatistics() {
-            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        allTrendChartDateRanges() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.TrendAnalysis, false);
         },
         defaultChartDataType: {
             get: function () {
@@ -108,14 +123,6 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultChartDataType(value);
-            }
-        },
-        defaultDateRange: {
-            get: function () {
-                return this.settingsStore.appSettings.statistics.defaultDataRangeType;
-            },
-            set: function (value) {
-                this.settingsStore.setStatisticsDefaultDateRange(value);
             }
         },
         defaultTimezoneType: {
@@ -142,6 +149,14 @@ export default {
                 this.settingsStore.setStatisticsDefaultCategoricalChartType(value);
             }
         },
+        defaultCategoricalChartDateRange: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultCategoricalChartDateRange(value);
+            }
+        },
         defaultTrendChartType: {
             get: function () {
                 return this.settingsStore.appSettings.statistics.defaultTrendChartType;
@@ -149,7 +164,15 @@ export default {
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultTrendChartType(value);
             }
-        }
+        },
+        defaultTrendChartDateRange: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTrendChartDataRangeType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTrendChartDateRange(value);
+            }
+        },
     }
 };
 </script>

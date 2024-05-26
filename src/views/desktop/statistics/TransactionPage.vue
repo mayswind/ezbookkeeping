@@ -58,8 +58,8 @@
                                             <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided
                                                          v-if="analysisType === allAnalysisTypes.CategoricalAnalysis">
                                                 <v-btn :icon="icons.left"
-                                                       :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
-                                                       @click="shiftDateRange(query.startTime, query.endTime, -1)"/>
+                                                       :disabled="loading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
+                                                       @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, -1)"/>
                                                 <v-menu location="bottom">
                                                     <template #activator="{ props }">
                                                         <v-btn :disabled="loading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
@@ -67,13 +67,13 @@
                                                     </template>
                                                     <v-list>
                                                         <v-list-item :key="dateRange.type" :value="dateRange.type"
-                                                                     :append-icon="(query.dateType === dateRange.type ? icons.check : null)"
-                                                                     v-for="dateRange in allDateRanges">
+                                                                     :append-icon="(query.categoricalChartDateType === dateRange.type ? icons.check : null)"
+                                                                     v-for="dateRange in allDateRangesArray">
                                                             <v-list-item-title
                                                                 class="cursor-pointer"
                                                                 @click="setDateFilter(dateRange.type)">
-                                                                {{ $t(dateRange.name) }}
-                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
+                                                                {{ dateRange.displayName }}
+                                                                <div class="statistics-custom-datetime-range" v-if="dateRange.type === allDateRanges.Custom.type && query.categoricalChartDateType === allDateRanges.Custom.type && query.categoricalChartStartTime && query.categoricalChartEndTime">
                                                                     <span>{{ queryStartTime }}</span>
                                                                     <span>&nbsp;-&nbsp;</span>
                                                                     <br/>
@@ -84,8 +84,8 @@
                                                     </v-list>
                                                 </v-menu>
                                                 <v-btn :icon="icons.right"
-                                                       :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
-                                                       @click="shiftDateRange(query.startTime, query.endTime, 1)"/>
+                                                       :disabled="loading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
+                                                       @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, 1)"/>
                                             </v-btn-group>
 
                                             <v-btn density="compact" color="default" variant="text" size="24"
@@ -231,8 +231,8 @@
     </v-row>
 
     <date-range-selection-dialog :title="$t('Custom Date Range')"
-                                  :min-time="query.startTime"
-                                  :max-time="query.endTime"
+                                  :min-time="query.categoricalChartStartTime"
+                                  :max-time="query.categoricalChartEndTime"
                                   v-model:show="showCustomDateRangeDialog"
                                   @dateRange:change="setCustomDateFilter" />
 
@@ -263,7 +263,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { isArray, limitText, formatPercent } from '@/lib/common.js'
+import { limitText, formatPercent } from '@/lib/common.js'
 import {
     getShiftedDateRangeAndDateType,
     getDateRangeByDateType
@@ -360,10 +360,10 @@ export default {
             }
         },
         queryStartTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.startTime);
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
         },
         queryEndTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartEndTime);
         },
         allAnalysisTypes() {
             return statisticsConstants.allAnalysisTypes;
@@ -391,6 +391,9 @@ export default {
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
+        },
+        allDateRangesArray() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
@@ -566,7 +569,7 @@ export default {
             if (dateType === this.allDateRanges.Custom.type) { // Custom
                 this.showCustomDateRangeDialog = true;
                 return;
-            } else if (this.query.dateType === dateType) {
+            } else if (this.query.categoricalChartDateType === dateType) {
                 return;
             }
 
@@ -577,9 +580,9 @@ export default {
             }
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: dateRange.dateType,
-                startTime: dateRange.minTime,
-                endTime: dateRange.maxTime
+                categoricalChartDateType: dateRange.dateType,
+                categoricalChartStartTime: dateRange.minTime,
+                categoricalChartEndTime: dateRange.maxTime
             });
 
             this.reload(null);
@@ -590,9 +593,9 @@ export default {
             }
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: this.allDateRanges.Custom.type,
-                startTime: startTime,
-                endTime: endTime
+                categoricalChartDateType: this.allDateRanges.Custom.type,
+                categoricalChartStartTime: startTime,
+                categoricalChartEndTime: endTime
             });
 
             this.showCustomDateRangeDialog = false;
@@ -600,16 +603,16 @@ export default {
             this.reload(null);
         },
         shiftDateRange(startTime, endTime, scale) {
-            if (this.query.dateType === this.allDateRanges.All.type) {
+            if (this.query.categoricalChartDateType === this.allDateRanges.All.type) {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek);
+            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: newDateRange.dateType,
-                startTime: newDateRange.minTime,
-                endTime: newDateRange.maxTime
+                categoricalChartDateType: newDateRange.dateType,
+                categoricalChartStartTime: newDateRange.minTime,
+                categoricalChartEndTime: newDateRange.maxTime
             });
 
             this.reload(null);
@@ -620,7 +623,7 @@ export default {
                 return this.$t(this.allDateRanges.All.name);
             }
 
-            return this.$locale.getDateRangeDisplayName(this.userStore, query.dateType, query.startTime, query.endTime);
+            return this.$locale.getDateRangeDisplayName(this.userStore, query.categoricalChartDateType, query.categoricalChartStartTime, query.categoricalChartEndTime);
         },
         clickPieChartItem(item) {
             this.$router.push(this.getItemLinkUrl(item));

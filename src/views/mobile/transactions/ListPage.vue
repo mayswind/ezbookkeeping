@@ -253,10 +253,10 @@
                     v-model:opened="showDatePopover"
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
-                <f7-list-item :title="$t(dateRange.name)"
+                <f7-list-item :title="dateRange.displayName"
                               :class="{ 'list-item-selected': query.dateType === dateRange.type }"
                               :key="dateRange.type"
-                              v-for="dateRange in allDateRanges"
+                              v-for="dateRange in allDateRangesArray"
                               @click="changeDateFilter(dateRange.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
@@ -562,6 +562,9 @@ export default {
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
+        allDateRangesArray() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+        },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
         }
@@ -830,7 +833,7 @@ export default {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek);
+            const newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,

@@ -26,6 +26,20 @@ export function isBoolean(val) {
     return typeof(val) === 'boolean';
 }
 
+export function isYearMonth(val) {
+    if (typeof(val) !== 'string') {
+        return false;
+    }
+
+    const items = val.split('-');
+
+    if (items.length !== 2) {
+        return false;
+    }
+
+    return isNumber(items[0]) && isNumber(items[1]);
+}
+
 export function isEquals(obj1, obj2) {
     if (obj1 === obj2) {
         return true;

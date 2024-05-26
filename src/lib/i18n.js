@@ -655,7 +655,7 @@ function getAllWeekDays(translateFn) {
     return allWeekDays;
 }
 
-function getAllDateRanges(includeCustom, translateFn) {
+function getAllDateRanges(scene, includeCustom, translateFn) {
     const allDateRanges = [];
 
     for (let dateRangeField in datetime.allDateRanges) {
@@ -664,6 +664,10 @@ function getAllDateRanges(includeCustom, translateFn) {
         }
 
         const dateRangeType = datetime.allDateRanges[dateRangeField];
+
+        if (!dateRangeType.availableScenes[scene]) {
+            continue;
+        }
 
         if (includeCustom || dateRangeType.type !== datetime.allDateRanges.Custom.type) {
             allDateRanges.push({
@@ -1376,7 +1380,7 @@ export function i18nFunctions(i18nGlobal) {
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
         getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
-        getAllDateRanges: (includeCustom) => getAllDateRanges(includeCustom, i18nGlobal.t),
+        getAllDateRanges: (scene, includeCustom) => getAllDateRanges(scene, includeCustom, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
         getAllTimezoneTypesUsedForStatistics: (currentTimezone) => getAllTimezoneTypesUsedForStatistics(currentTimezone, i18nGlobal.t),

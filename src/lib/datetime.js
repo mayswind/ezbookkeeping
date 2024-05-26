@@ -298,7 +298,7 @@ export function getShiftedDateRange(minTime, maxTime, scale) {
     };
 }
 
-export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek) {
+export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek, scene) {
     const newDateRange = getShiftedDateRange(minTime, maxTime, scale);
     let newDateType = dateTimeConstants.allDateRanges.Custom.type;
 
@@ -308,6 +308,11 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
         }
 
         const dateRangeType = dateTimeConstants.allDateRanges[dateRangeField];
+
+        if (!dateRangeType.availableScenes[scene]) {
+            continue;
+        }
+
         const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek);
 
         if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
@@ -360,6 +365,24 @@ export function getDateRangeByDateType(dateType, firstDayOfWeek) {
     } else if (dateType === dateTimeConstants.allDateRanges.LastYear.type) { // Last year
         maxTime = getUnixTimeBeforeUnixTime(getThisYearLastUnixTime(), 1, 'years');
         minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 1, 'years');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwelveMonths.type) { // Recent 12 months
+        maxTime = getThisMonthLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 11, 'months');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwentyFourMonths.type) { // Recent 24 months
+        maxTime = getThisMonthLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 23, 'months');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentThirtySixMonths.type) { // Recent 36 months
+        maxTime = getThisMonthLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisMonthFirstUnixTime(), 35, 'months');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentTwoYears.type) { // Recent 2 years
+        maxTime = getThisYearLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 1, 'years');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentThreeYears.type) { // Recent 3 years
+        maxTime = getThisYearLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 2, 'years');
+    } else if (dateType === dateTimeConstants.allDateRanges.RecentFiveYears.type) { // Recent 5 years
+        maxTime = getThisYearLastUnixTime();
+        minTime = getUnixTimeBeforeUnixTime(getThisYearFirstUnixTime(), 4, 'years');
     } else {
         return null;
     }

@@ -16,6 +16,7 @@ import logger from '@/lib/logger.js';
 import {
     isEquals,
     isNumber,
+    isYearMonth,
     isObject
 } from '@/lib/common.js';
 import {
@@ -25,12 +26,15 @@ import {
 export const useStatisticsStore = defineStore('statistics', {
     state: () => ({
         transactionStatisticsFilter: {
-            dateType: statisticsConstants.defaultDataRangeType,
-            startTime: 0,
-            endTime: 0,
             chartDataType: statisticsConstants.defaultChartDataType,
             categoricalChartType: statisticsConstants.defaultCategoricalChartType,
+            categoricalChartDateType: statisticsConstants.defaultCategoricalChartDataRangeType,
+            categoricalChartStartTime: 0,
+            categoricalChartEndTime: 0,
             trendChartType: statisticsConstants.defaultTrendChartType,
+            trendChartDateType: statisticsConstants.defaultTrendChartDataRangeType,
+            trendChartStartYearMonth: '',
+            trendChartEndYearMonth: '',
             filterAccountIds: {},
             filterCategoryIds: {}
         },
@@ -408,12 +412,15 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsStateInvalid = invalidState;
         },
         resetTransactionStatistics() {
-            this.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
-            this.transactionStatisticsFilter.startTime = 0;
-            this.transactionStatisticsFilter.endTime = 0;
             this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             this.transactionStatisticsFilter.categoricalChartType = statisticsConstants.defaultCategoricalChartType;
+            this.transactionStatisticsFilter.categoricalChartDateType = statisticsConstants.defaultCategoricalChartDataRangeType;
+            this.transactionStatisticsFilter.categoricalChartStartTime = 0;
+            this.transactionStatisticsFilter.categoricalChartEndTime = 0;
             this.transactionStatisticsFilter.trendChartType = statisticsConstants.defaultTrendChartType;
+            this.transactionStatisticsFilter.trendChartDateType = statisticsConstants.defaultTrendChartDataRangeType;
+            this.transactionStatisticsFilter.trendChartStartYearMonth = '';
+            this.transactionStatisticsFilter.trendChartEndYearMonth = '';
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
             this.transactionCategoryStatisticsData = {};
@@ -430,16 +437,16 @@ export const useStatisticsStore = defineStore('statistics', {
                     defaultChartDataType = statisticsConstants.defaultChartDataType;
                 }
 
-                let defaultDateRange = settingsStore.appSettings.statistics.defaultDataRangeType;
-
-                if (defaultDateRange < datetimeConstants.allDateRanges.All.type || defaultDateRange >= datetimeConstants.allDateRanges.Custom.type) {
-                    defaultDateRange = statisticsConstants.defaultDataRangeType;
-                }
-
                 let defaultCategoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
 
                 if (defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Pie && defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
                     defaultCategoricalChartType = statisticsConstants.defaultCategoricalChartType;
+                }
+
+                let defaultCategoricalChartDateRange = settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType;
+
+                if (defaultCategoricalChartDateRange < datetimeConstants.allDateRanges.All.type || defaultCategoricalChartDateRange >= datetimeConstants.allDateRanges.Custom.type) {
+                    defaultCategoricalChartDateRange = statisticsConstants.defaultCategoricalChartDataRangeType;
                 }
 
                 let defaultTrendChartType = settingsStore.appSettings.statistics.defaultTrendChartType;
@@ -448,43 +455,41 @@ export const useStatisticsStore = defineStore('statistics', {
                     defaultTrendChartType = statisticsConstants.defaultTrendChartType;
                 }
 
+                let defaultTrendChartDateRange = settingsStore.appSettings.statistics.defaultTrendChartDataRangeType;
+
+                if (defaultTrendChartDateRange < datetimeConstants.allDateRanges.All.type || defaultTrendChartDateRange >= datetimeConstants.allDateRanges.Custom.type) {
+                    defaultTrendChartDateRange = statisticsConstants.defaultTrendChartDataRangeType;
+                }
+
                 let defaultSortType = settingsStore.appSettings.statistics.defaultSortingType;
 
                 if (defaultSortType < statisticsConstants.allSortingTypes.Amount.type || defaultSortType > statisticsConstants.allSortingTypes.Name.type) {
                     defaultSortType = statisticsConstants.defaultSortingType;
                 }
 
-                const dateRange = getDateRangeByDateType(defaultDateRange, userStore.currentUserFirstDayOfWeek);
+                const categoricalChartDateRange = getDateRangeByDateType(defaultCategoricalChartDateRange, userStore.currentUserFirstDayOfWeek);
+                const trendChartDateRange = getDateRangeByDateType(defaultTrendChartDateRange, userStore.currentUserFirstDayOfWeek);
 
                 filter = {
-                    dateType: dateRange ? dateRange.dateType : undefined,
-                    startTime: dateRange ? dateRange.minTime : undefined,
-                    endTime: dateRange ? dateRange.maxTime : undefined,
-                    categoricalChartType: defaultCategoricalChartType,
-                    trendChartType: defaultTrendChartType,
                     chartDataType: defaultChartDataType,
+                    categoricalChartType: defaultCategoricalChartType,
+                    categoricalChartDateType: categoricalChartDateRange ? categoricalChartDateRange.dateType : undefined,
+                    categoricalChartStartTime: categoricalChartDateRange ? categoricalChartDateRange.minTime : undefined,
+                    categoricalChartEndTime: categoricalChartDateRange ? categoricalChartDateRange.maxTime : undefined,
+                    trendChartType: defaultTrendChartType,
+                    trendChartDateType: trendChartDateRange ? trendChartDateRange.dateType : undefined,
+                    trendChartStartYearMonth: trendChartDateRange ? trendChartDateRange.minTime : undefined,
+                    trendChartEndYearMonth: trendChartDateRange ? trendChartDateRange.maxTime : undefined,
                     filterAccountIds: settingsStore.appSettings.statistics.defaultAccountFilter || {},
                     filterCategoryIds: settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
                     sortingType: defaultSortType,
                 };
             }
 
-            if (filter && isNumber(filter.dateType)) {
-                this.transactionStatisticsFilter.dateType = filter.dateType;
+            if (filter && isNumber(filter.chartDataType)) {
+                this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             } else {
-                this.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
-            }
-
-            if (filter && isNumber(filter.startTime)) {
-                this.transactionStatisticsFilter.startTime = filter.startTime;
-            } else {
-                this.transactionStatisticsFilter.startTime = 0;
-            }
-
-            if (filter && isNumber(filter.endTime)) {
-                this.transactionStatisticsFilter.endTime = filter.endTime;
-            } else {
-                this.transactionStatisticsFilter.endTime = 0;
+                this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             }
 
             if (filter && isNumber(filter.categoricalChartType)) {
@@ -493,16 +498,46 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.categoricalChartType = statisticsConstants.defaultCategoricalChartType;
             }
 
+            if (filter && isNumber(filter.categoricalChartDateType)) {
+                this.transactionStatisticsFilter.categoricalChartDateType = filter.categoricalChartDateType;
+            } else {
+                this.transactionStatisticsFilter.categoricalChartDateType = statisticsConstants.defaultCategoricalChartDataRangeType;
+            }
+
+            if (filter && isNumber(filter.categoricalChartStartTime)) {
+                this.transactionStatisticsFilter.categoricalChartStartTime = filter.categoricalChartStartTime;
+            } else {
+                this.transactionStatisticsFilter.categoricalChartStartTime = 0;
+            }
+
+            if (filter && isNumber(filter.categoricalChartEndTime)) {
+                this.transactionStatisticsFilter.categoricalChartEndTime = filter.categoricalChartEndTime;
+            } else {
+                this.transactionStatisticsFilter.categoricalChartEndTime = 0;
+            }
+
             if (filter && isNumber(filter.trendChartType)) {
                 this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
             } else {
                 this.transactionStatisticsFilter.trendChartType = statisticsConstants.defaultTrendChartType;
             }
 
-            if (filter && isNumber(filter.chartDataType)) {
-                this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
+            if (filter && isNumber(filter.trendChartDateType)) {
+                this.transactionStatisticsFilter.trendChartDateType = filter.trendChartDateType;
             } else {
-                this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
+                this.transactionStatisticsFilter.trendChartDateType = statisticsConstants.defaultTrendChartDataRangeType;
+            }
+
+            if (filter && isYearMonth(filter.trendChartStartYearMonth)) {
+                this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
+            } else {
+                this.transactionStatisticsFilter.trendChartStartYearMonth = '';
+            }
+
+            if (filter && isYearMonth(filter.trendChartEndYearMonth)) {
+                this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
+            } else {
+                this.transactionStatisticsFilter.trendChartEndYearMonth = '';
             }
 
             if (filter && isObject(filter.filterAccountIds)) {
@@ -524,28 +559,40 @@ export const useStatisticsStore = defineStore('statistics', {
             }
         },
         updateTransactionStatisticsFilter(filter) {
-            if (filter && isNumber(filter.dateType)) {
-                this.transactionStatisticsFilter.dateType = filter.dateType;
-            }
-
-            if (filter && isNumber(filter.startTime)) {
-                this.transactionStatisticsFilter.startTime = filter.startTime;
-            }
-
-            if (filter && isNumber(filter.endTime)) {
-                this.transactionStatisticsFilter.endTime = filter.endTime;
+            if (filter && isNumber(filter.chartDataType)) {
+                this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             }
 
             if (filter && isNumber(filter.categoricalChartType)) {
                 this.transactionStatisticsFilter.categoricalChartType = filter.categoricalChartType;
             }
 
+            if (filter && isNumber(filter.categoricalChartDateType)) {
+                this.transactionStatisticsFilter.categoricalChartDateType = filter.categoricalChartDateType;
+            }
+
+            if (filter && isNumber(filter.categoricalChartStartTime)) {
+                this.transactionStatisticsFilter.categoricalChartStartTime = filter.categoricalChartStartTime;
+            }
+
+            if (filter && isNumber(filter.categoricalChartEndTime)) {
+                this.transactionStatisticsFilter.categoricalChartEndTime = filter.categoricalChartEndTime;
+            }
+
             if (filter && isNumber(filter.trendChartType)) {
                 this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
             }
 
-            if (filter && isNumber(filter.chartDataType)) {
-                this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
+            if (filter && isNumber(filter.trendChartDateType)) {
+                this.transactionStatisticsFilter.trendChartDateType = filter.trendChartDateType;
+            }
+
+            if (filter && isYearMonth(filter.trendChartStartYearMonth)) {
+                this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
+            }
+
+            if (filter && isYearMonth(filter.trendChartEndYearMonth)) {
+                this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
             }
 
             if (filter && isObject(filter.filterAccountIds)) {
@@ -587,11 +634,11 @@ export const useStatisticsStore = defineStore('statistics', {
 
             if (this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('dateType=' + this.transactionStatisticsFilter.dateType);
+                querys.push('dateType=' + this.transactionStatisticsFilter.categoricalChartDateType);
 
                 if (this.transactionStatisticsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
-                    querys.push('minTime=' + this.transactionStatisticsFilter.startTime);
-                    querys.push('maxTime=' + this.transactionStatisticsFilter.endTime);
+                    querys.push('minTime=' + this.transactionStatisticsFilter.categoricalChartStartTime);
+                    querys.push('maxTime=' + this.transactionStatisticsFilter.categoricalChartEndTime);
                 }
             }
 
@@ -603,8 +650,8 @@ export const useStatisticsStore = defineStore('statistics', {
 
             return new Promise((resolve, reject) => {
                 services.getTransactionStatistics({
-                    startTime: self.transactionStatisticsFilter.startTime,
-                    endTime: self.transactionStatisticsFilter.endTime,
+                    startTime: self.transactionStatisticsFilter.categoricalChartStartTime,
+                    endTime: self.transactionStatisticsFilter.categoricalChartEndTime,
                     useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType
                 }).then(response => {
                     const data = response.data;
@@ -639,7 +686,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 });
             });
         },
-        loadTrendAnalysis({ force }) {
+        loadTrendAnalysis() {
             return Promise.resolve(true);
         },
     }

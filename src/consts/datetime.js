@@ -166,54 +166,139 @@ const allShortTimeFormatArray = [
     allShortTimeFormat.HHMMA
 ];
 
+const allDateRangeScenes = {
+    Normal: 0,
+    TrendAnalysis: 1
+};
+
 const allDateRanges = {
     All: {
         type: 0,
-        name: 'All'
+        name: 'All',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true,
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
     },
     Today: {
         type: 1,
-        name: 'Today'
+        name: 'Today',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     Yesterday: {
         type: 2,
-        name: 'Yesterday'
+        name: 'Yesterday',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     LastSevenDays: {
         type: 3,
-        name: 'Recent 7 days'
+        name: 'Recent 7 days',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     LastThirtyDays: {
         type: 4,
-        name: 'Recent 30 days'
+        name: 'Recent 30 days',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     ThisWeek: {
         type: 5,
-        name: 'This week'
+        name: 'This week',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     LastWeek: {
         type: 6,
-        name: 'Last week'
+        name: 'Last week',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     ThisMonth: {
         type: 7,
-        name: 'This month'
+        name: 'This month',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     LastMonth: {
         type: 8,
-        name: 'Last month'
+        name: 'Last month',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     ThisYear: {
         type: 9,
-        name: 'This year'
+        name: 'This year',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
     },
     LastYear: {
         type: 10,
-        name: 'Last year'
+        name: 'Last year',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true
+        }
+    },
+    RecentTwelveMonths: {
+        type: 101,
+        name: 'Recent 12 months',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
+    },
+    RecentTwentyFourMonths: {
+        type: 102,
+        name: 'Recent 24 months',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
+    },
+    RecentThirtySixMonths: {
+        type: 103,
+        name: 'Recent 36 months',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
+    },
+    RecentTwoYears: {
+        type: 104,
+        name: 'Recent 2 years',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
+    },
+    RecentThreeYears: {
+        type: 105,
+        name: 'Recent 3 years',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
+    },
+    RecentFiveYears: {
+        type: 106,
+        name: 'Recent 5 years',
+        availableScenes: {
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
     },
     Custom: {
-        type: 11,
-        name: 'Custom Date'
+        type: 255,
+        name: 'Custom Date',
+        availableScenes: {
+            [allDateRangeScenes.Normal]: true,
+            [allDateRangeScenes.TrendAnalysis]: true
+        }
     }
 };
 
@@ -238,6 +323,7 @@ export default {
     allLongTimeFormatArray: allLongTimeFormatArray,
     allShortTimeFormat: allShortTimeFormat,
     allShortTimeFormatArray: allShortTimeFormatArray,
+    allDateRangeScenes: allDateRangeScenes,
     allDateRanges: allDateRanges,
     defaultFirstDayOfWeek: defaultFirstDayOfWeek,
     defaultLongDateFormat: defaultLongDateFormat,

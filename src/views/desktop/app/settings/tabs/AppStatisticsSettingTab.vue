@@ -22,18 +22,6 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
-                                    :label="$t('Default Date Range')"
-                                    :placeholder="$t('Default Date Range')"
-                                    :items="allDateRanges"
-                                    v-model="defaultDateRange"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
                                     :label="$t('Timezone Used for Date Range')"
                                     :placeholder="$t('Timezone Used for Date Range')"
                                     :items="allTimezoneTypesUsedForStatistics"
@@ -74,6 +62,18 @@
                                     v-model="defaultCategoricalChartType"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Default Date Range')"
+                                    :placeholder="$t('Default Date Range')"
+                                    :items="allCategoricalChartDateRanges"
+                                    v-model="defaultCategoricalChartDateRange"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -96,6 +96,18 @@
                                     v-model="defaultTrendChartType"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Default Date Range')"
+                                    :placeholder="$t('Default Date Range')"
+                                    :items="allTrendChartDateRanges"
+                                    v-model="defaultTrendChartDateRange"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -116,7 +128,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import statisticsConstants from '@/consts/statistics.js';
+import datetimeConstants from '@/consts/datetime.js';
 
 import AccountFilterSettingsCard from '@/views/desktop/statistics/settings/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/statistics/settings/cards/CategoryFilterSettingsCard.vue';
@@ -131,20 +143,23 @@ export default {
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();
         },
+        allTimezoneTypesUsedForStatistics() {
+            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        },
         allSortingTypes() {
             return this.$locale.getAllStatisticsSortingTypes();
         },
         allCategoricalChartTypes() {
             return this.$locale.getAllCategoricalChartTypes();
         },
+        allCategoricalChartDateRanges() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, false);
+        },
         allTrendChartTypes() {
             return this.$locale.getAllTrendChartTypes();
         },
-        allDateRanges() {
-            return this.$locale.getAllDateRanges(false);
-        },
-        allTimezoneTypesUsedForStatistics() {
-            return this.$locale.getAllTimezoneTypesUsedForStatistics();
+        allTrendChartDateRanges() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.TrendAnalysis, false);
         },
         defaultChartDataType: {
             get: function () {
@@ -152,14 +167,6 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultChartDataType(value);
-            }
-        },
-        defaultDateRange: {
-            get: function () {
-                return this.settingsStore.appSettings.statistics.defaultDataRangeType;
-            },
-            set: function (value) {
-                this.settingsStore.setStatisticsDefaultDateRange(value);
             }
         },
         defaultTimezoneType: {
@@ -186,6 +193,14 @@ export default {
                 this.settingsStore.setStatisticsDefaultCategoricalChartType(value);
             }
         },
+        defaultCategoricalChartDateRange: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultCategoricalChartDateRange(value);
+            }
+        },
         defaultTrendChartType: {
             get: function () {
                 return this.settingsStore.appSettings.statistics.defaultTrendChartType;
@@ -193,7 +208,15 @@ export default {
             set: function (value) {
                 this.settingsStore.setStatisticsDefaultTrendChartType(value);
             }
-        }
+        },
+        defaultTrendChartDateRange: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTrendChartDataRangeType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTrendChartDateRange(value);
+            }
+        },
     }
 };
 </script>

@@ -22,13 +22,14 @@ const defaultSettings = {
     showAccountBalance: true,
     statistics: {
         defaultChartDataType: statisticsConstants.defaultChartDataType,
-        defaultDataRangeType: statisticsConstants.defaultDataRangeType,
         defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
         defaultSortingType: statisticsConstants.defaultSortingType,
         defaultCategoricalChartType: statisticsConstants.defaultCategoricalChartType,
+        defaultCategoricalChartDataRangeType: statisticsConstants.defaultCategoricalChartDataRangeType,
         defaultTrendChartType: statisticsConstants.defaultTrendChartType,
+        defaultTrendChartDataRangeType: statisticsConstants.defaultTrendChartDataRangeType,
     },
     animate: true
 };
@@ -230,20 +231,12 @@ export function setStatisticsDefaultChartDataType(value) {
     setSubOption('statistics', 'defaultChartDataType', value);
 }
 
-export function getStatisticsDefaultDateRange() {
-    return getSubOption('statistics', 'defaultDataRangeType');
-}
-
 export function getStatisticsDefaultTimezoneType() {
     return getSubOption('statistics', 'defaultTimezoneType');
 }
 
 export function setStatisticsDefaultTimezoneType(value) {
     setSubOption('statistics', 'defaultTimezoneType', value);
-}
-
-export function setStatisticsDefaultDateRange(value) {
-    setSubOption('statistics', 'defaultDataRangeType', value);
 }
 
 export function getStatisticsDefaultAccountFilter() {
@@ -278,12 +271,28 @@ export function setStatisticsDefaultCategoricalChartType(value) {
     setSubOption('statistics', 'defaultCategoricalChartType', value);
 }
 
+export function getStatisticsDefaultCategoricalChartDataRange() {
+    return getSubOption('statistics', 'defaultCategoricalChartDataRangeType');
+}
+
+export function setStatisticsDefaultCategoricalChartDataRange(value) {
+    setSubOption('statistics', 'defaultCategoricalChartDataRangeType', value);
+}
+
 export function getStatisticsDefaultTrendChartType() {
     return getSubOption('statistics', 'defaultTrendChartType');
 }
 
 export function setStatisticsDefaultTrendChartType(value) {
     setSubOption('statistics', 'defaultTrendChartType', value);
+}
+
+export function getStatisticsDefaultTrendChartDataRange() {
+    return getSubOption('statistics', 'defaultTrendChartDataRangeType');
+}
+
+export function setStatisticsDefaultTrendChartDataRange(value) {
+    setSubOption('statistics', 'defaultTrendChartDataRangeType', value);
 }
 
 export function isEnableAnimate() {

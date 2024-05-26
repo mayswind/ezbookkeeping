@@ -23,13 +23,14 @@ export const useSettingsStore = defineStore('settings', {
             showAccountBalance: settings.isShowAccountBalance(),
             statistics: {
                 defaultChartDataType: settings.getStatisticsDefaultChartDataType(),
-                defaultDataRangeType: settings.getStatisticsDefaultDateRange(),
                 defaultTimezoneType: settings.getStatisticsDefaultTimezoneType(),
                 defaultAccountFilter: settings.getStatisticsDefaultAccountFilter(),
                 defaultTransactionCategoryFilter: settings.getStatisticsDefaultTransactionCategoryFilter(),
                 defaultSortingType: settings.getStatisticsSortingType(),
                 defaultCategoricalChartType: settings.getStatisticsDefaultCategoricalChartType(),
+                defaultCategoricalChartDataRangeType: settings.getStatisticsDefaultCategoricalChartDataRange(),
                 defaultTrendChartType: settings.getStatisticsDefaultTrendChartType(),
+                defaultTrendChartDataRangeType: settings.getStatisticsDefaultTrendChartDataRange(),
             },
             animate: settings.isEnableAnimate()
         },
@@ -99,10 +100,6 @@ export const useSettingsStore = defineStore('settings', {
             settings.setStatisticsDefaultChartDataType(value);
             this.appSettings.statistics.defaultChartDataType = value;
         },
-        setStatisticsDefaultDateRange(value) {
-            settings.setStatisticsDefaultDateRange(value);
-            this.appSettings.statistics.defaultDataRangeType = value;
-        },
         setStatisticsDefaultTimezoneType(value) {
             settings.setStatisticsDefaultTimezoneType(value);
             this.appSettings.statistics.defaultTimezoneType = value;
@@ -123,9 +120,17 @@ export const useSettingsStore = defineStore('settings', {
             settings.setStatisticsDefaultCategoricalChartType(value);
             this.appSettings.statistics.defaultCategoricalChartType = value;
         },
+        setStatisticsDefaultCategoricalChartDateRange(value) {
+            settings.setStatisticsDefaultCategoricalChartDataRange(value);
+            this.appSettings.statistics.defaultCategoricalChartDataRangeType = value;
+        },
         setStatisticsDefaultTrendChartType(value) {
             settings.setStatisticsDefaultTrendChartType(value);
             this.appSettings.statistics.defaultTrendChartType = value;
+        },
+        setStatisticsDefaultTrendChartDateRange(value) {
+            settings.setStatisticsDefaultTrendChartDataRange(value);
+            this.appSettings.statistics.defaultTrendChartDataRangeType = value;
         },
         setEnableAnimate(value) {
             settings.setEnableAnimate(value);

@@ -753,7 +753,7 @@ export default {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek);
+            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,

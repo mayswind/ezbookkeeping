@@ -187,13 +187,13 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': reloading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, -1)">
+            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': reloading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
+            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" :key="chartType.type"
@@ -206,16 +206,16 @@
                     v-model:opened="showDatePopover"
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
-                <f7-list-item :title="$t(dateRange.name)"
-                              :class="{ 'list-item-selected': query.dateType === dateRange.type }"
+                <f7-list-item :title="dateRange.displayName"
+                              :class="{ 'list-item-selected': query.categoricalChartDateType === dateRange.type }"
                               :key="dateRange.type"
-                              v-for="dateRange in allDateRanges"
+                              v-for="dateRange in allDateRangesArray"
                               @click="setDateFilter(dateRange.type)">
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.dateType === dateRange.type"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoricalChartDateType === dateRange.type"></f7-icon>
                     </template>
                     <template #footer>
-                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.dateType === allDateRanges.Custom.type && query.startTime && query.endTime">
+                        <div v-if="dateRange.type === allDateRanges.Custom.type && query.categoricalChartDateType === allDateRanges.Custom.type && query.categoricalChartStartTime && query.categoricalChartEndTime">
                             <span>{{ queryStartTime }}</span>
                             <span>&nbsp;-&nbsp;</span>
                             <br/>
@@ -227,8 +227,8 @@
         </f7-popover>
 
         <date-range-selection-sheet :title="$t('Custom Date Range')"
-                                    :min-time="query.startTime"
-                                    :max-time="query.endTime"
+                                    :min-time="query.categoricalChartStartTime"
+                                    :max-time="query.categoricalChartEndTime"
                                     v-model:show="showCustomDateRangeSheet"
                                     @dateRange:change="setCustomDateFilter">
         </date-range-selection-sheet>
@@ -304,10 +304,10 @@ export default {
             return this.$t(querySortingTypeName);
         },
         queryStartTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.startTime);
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
         },
         queryEndTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
+            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartEndTime);
         },
         allChartTypes() {
             return this.$locale.getAllCategoricalChartTypes();
@@ -323,6 +323,9 @@ export default {
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
+        },
+        allDateRangesArray() {
+            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
@@ -465,7 +468,7 @@ export default {
                 this.showCustomDateRangeSheet = true;
                 this.showDatePopover = false;
                 return;
-            } else if (this.query.dateType === dateType) {
+            } else if (this.query.categoricalChartDateType === dateType) {
                 return;
             }
 
@@ -476,9 +479,9 @@ export default {
             }
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: dateRange.dateType,
-                startTime: dateRange.minTime,
-                endTime: dateRange.maxTime
+                categoricalChartDateType: dateRange.dateType,
+                categoricalChartStartTime: dateRange.minTime,
+                categoricalChartEndTime: dateRange.maxTime
             });
 
             this.showDatePopover = false;
@@ -490,9 +493,9 @@ export default {
             }
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: this.allDateRanges.Custom.type,
-                startTime: startTime,
-                endTime: endTime
+                categoricalChartDateType: this.allDateRanges.Custom.type,
+                categoricalChartStartTime: startTime,
+                categoricalChartEndTime: endTime
             });
 
             this.showCustomDateRangeSheet = false;
@@ -500,16 +503,16 @@ export default {
             this.reload(null);
         },
         shiftDateRange(startTime, endTime, scale) {
-            if (this.query.dateType === this.allDateRanges.All.type) {
+            if (this.query.categoricalChartDateType === this.allDateRanges.All.type) {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek);
+            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
             this.statisticsStore.updateTransactionStatisticsFilter({
-                dateType: newDateRange.dateType,
-                startTime: newDateRange.minTime,
-                endTime: newDateRange.maxTime
+                categoricalChartDateType: newDateRange.dateType,
+                categoricalChartStartTime: newDateRange.minTime,
+                categoricalChartEndTime: newDateRange.maxTime
             });
 
             this.reload(null);
@@ -520,7 +523,7 @@ export default {
                 return this.$t(this.allDateRanges.All.name);
             }
 
-            return this.$locale.getDateRangeDisplayName(this.userStore, query.dateType, query.startTime, query.endTime);
+            return this.$locale.getDateRangeDisplayName(this.userStore, query.categoricalChartDateType, query.categoricalChartStartTime, query.categoricalChartEndTime);
         },
         clickPieChartItem(item) {
             this.f7router.navigate(this.getItemLinkUrl(item));

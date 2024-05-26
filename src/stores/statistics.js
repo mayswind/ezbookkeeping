@@ -28,16 +28,16 @@ export const useStatisticsStore = defineStore('statistics', {
             dateType: statisticsConstants.defaultDataRangeType,
             startTime: 0,
             endTime: 0,
-            chartType: statisticsConstants.defaultChartType,
+            chartType: statisticsConstants.defaultCategoricalChartType,
             chartDataType: statisticsConstants.defaultChartDataType,
             filterAccountIds: {},
             filterCategoryIds: {}
         },
-        transactionStatisticsData: {},
+        transactionCategoryStatisticsData: {},
         transactionStatisticsStateInvalid: true
     }),
     getters: {
-        transactionStatisticsChartDataCategory(state) {
+        categoricalAnalysisChartDataCategory(state) {
             if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type ||
@@ -52,8 +52,8 @@ export const useStatisticsStore = defineStore('statistics', {
                 return '';
             }
         },
-        transactionStatistics(state) {
-            const statistics = state.transactionStatisticsData;
+        transactionCategoryStatisticsDataWithCategoryAndAccountInfo(state) {
+            const statistics = state.transactionCategoryStatisticsData;
             const finalStatistics = {
                 startTime: statistics.startTime,
                 endTime: statistics.endTime,
@@ -114,8 +114,8 @@ export const useStatisticsStore = defineStore('statistics', {
 
             return finalStatistics;
         },
-        statisticsItemsByTransactionStatisticsData(state) {
-            if (!state.transactionStatistics || !state.transactionStatistics.items) {
+        transactionCategoryTotalAmountAnalysisData(state) {
+            if (!state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo || !state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items) {
                 return null;
             }
 
@@ -123,8 +123,8 @@ export const useStatisticsStore = defineStore('statistics', {
             let totalAmount = 0;
             let totalNonNegativeAmount = 0;
 
-            for (let i = 0; i < state.transactionStatistics.items.length; i++) {
-                const item = state.transactionStatistics.items[i];
+            for (let i = 0; i < state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items.length; i++) {
+                const item = state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items[i];
 
                 if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
                     continue;
@@ -247,7 +247,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 items: allDataItems
             }
         },
-        statisticsItemsByAccountsData(state) {
+        accountTotalAmountAnalysisData(state) {
             const userStore = useUserStore();
             const accountsStore = useAccountsStore();
             const exchangeRatesStore = useExchangeRatesStore();
@@ -323,7 +323,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 items: allDataItems
             }
         },
-        statisticsData(state) {
+        categoricalAnalysisData(state) {
             let combinedData = {
                 items: [],
                 totalAmount: 0
@@ -335,10 +335,10 @@ export const useStatisticsStore = defineStore('statistics', {
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                combinedData = state.statisticsItemsByTransactionStatisticsData;
+                combinedData = state.transactionCategoryTotalAmountAnalysisData;
             } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type ||
                 state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
-                combinedData = state.statisticsItemsByAccountsData;
+                combinedData = state.accountTotalAmountAnalysisData;
             }
 
             const allStatisticsItems = [];
@@ -410,11 +410,11 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
             this.transactionStatisticsFilter.startTime = 0;
             this.transactionStatisticsFilter.endTime = 0;
-            this.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
+            this.transactionStatisticsFilter.chartType = statisticsConstants.defaultCategoricalChartType;
             this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
-            this.transactionStatisticsData = {};
+            this.transactionCategoryStatisticsData = {};
             this.transactionStatisticsStateInvalid = true;
         },
         initTransactionStatisticsFilter(filter) {
@@ -424,8 +424,8 @@ export const useStatisticsStore = defineStore('statistics', {
 
                 let defaultChartType = settingsStore.appSettings.statistics.defaultChartType;
 
-                if (defaultChartType !== statisticsConstants.allChartTypes.Pie && defaultChartType !== statisticsConstants.allChartTypes.Bar) {
-                    defaultChartType = statisticsConstants.defaultChartType;
+                if (defaultChartType !== statisticsConstants.allCategoricalChartTypes.Pie && defaultChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
+                    defaultChartType = statisticsConstants.defaultCategoricalChartType;
                 }
 
                 let defaultChartDataType = settingsStore.appSettings.statistics.defaultChartDataType;
@@ -481,7 +481,7 @@ export const useStatisticsStore = defineStore('statistics', {
             if (filter && isNumber(filter.chartType)) {
                 this.transactionStatisticsFilter.chartType = filter.chartType;
             } else {
-                this.transactionStatisticsFilter.chartType = statisticsConstants.defaultChartType;
+                this.transactionStatisticsFilter.chartType = statisticsConstants.defaultCategoricalChartType;
             }
 
             if (filter && isNumber(filter.chartDataType)) {
@@ -578,7 +578,7 @@ export const useStatisticsStore = defineStore('statistics', {
 
             return querys.join('&');
         },
-        loadTransactionStatistics({ force }) {
+        loadCategoricalAnalysis({ force }) {
             const self = this;
             const settingsStore = useSettingsStore();
 
@@ -599,12 +599,12 @@ export const useStatisticsStore = defineStore('statistics', {
                         self.updateTransactionStatisticsInvalidState(false);
                     }
 
-                    if (force && data.result && isEquals(self.transactionStatisticsData, data.result)) {
+                    if (force && data.result && isEquals(self.transactionCategoryStatisticsData, data.result)) {
                         reject({ message: 'Data is up to date' });
                         return;
                     }
 
-                    self.transactionStatisticsData = data.result;
+                    self.transactionCategoryStatisticsData = data.result;
 
                     resolve(data.result);
                 }).catch(error => {

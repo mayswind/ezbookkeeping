@@ -1,11 +1,22 @@
 import datetime from './datetime.js';
 
-const allChartTypes = {
+const allCategoricalChartTypes = {
     Pie: 0,
     Bar: 1
 };
 
-const defaultChartType = allChartTypes.Pie;
+const allCategoricalChartTypesArray = [
+    {
+        name: 'Pie Chart',
+        type: allCategoricalChartTypes.Pie
+    },
+    {
+        name: 'Bar Chart',
+        type: allCategoricalChartTypes.Bar
+    }
+];
+
+const defaultCategoricalChartType = allCategoricalChartTypes.Pie;
 
 const allChartDataTypes = {
     ExpenseByAccount: {
@@ -71,8 +82,9 @@ const allSortingTypesArray = [
 const defaultSortingType = allSortingTypes.Amount.type;
 
 export default {
-    allChartTypes: allChartTypes,
-    defaultChartType: defaultChartType,
+    allCategoricalChartTypes: allCategoricalChartTypes,
+    allCategoricalChartTypesArray: allCategoricalChartTypesArray,
+    defaultCategoricalChartType: defaultCategoricalChartType,
     allChartDataTypes: allChartDataTypes,
     defaultChartDataType: defaultChartDataType,
     defaultDataRangeType: datetime.allDateRanges.ThisMonth.type,

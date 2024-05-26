@@ -13,42 +13,26 @@
                         <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
                             <span class="text-subtitle-2">{{ $t('Chart Type') }}</span>
                             <v-select
-                                item-title="name"
+                                item-title="displayName"
                                 item-value="type"
                                 class="mt-2"
                                 density="compact"
                                 :disabled="loading"
-                                :items="allChartTypesArray"
+                                :items="allChartTypes"
                                 v-model="queryChartType"
-                            >
-                                <template #selection="{ item }">
-                                    <span class="cursor-pointer">{{ $t(item.title) }}</span>
-                                </template>
-
-                                <template #item="{ props, item }">
-                                    <v-list-item v-bind="props" :title="$t(item.title)"></v-list-item>
-                                </template>
-                            </v-select>
+                            />
                         </div>
                         <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
                             <span class="text-subtitle-2">{{ $t('Sort Order') }}</span>
                             <v-select
-                                item-title="name"
+                                item-title="displayName"
                                 item-value="type"
                                 class="mt-2"
                                 density="compact"
                                 :disabled="loading"
                                 :items="allSortingTypesArray"
                                 v-model="querySortingType"
-                            >
-                                <template #selection="{ item }">
-                                    <span class="cursor-pointer">{{ $t(item.title) }}</span>
-                                </template>
-
-                                <template #item="{ props, item }">
-                                    <v-list-item v-bind="props" :title="$t(item.title)"></v-list-item>
-                                </template>
-                            </v-select>
+                            />
                         </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
                                 :disabled="loading" v-model="query.chartDataType"
@@ -134,12 +118,12 @@
                                     </template>
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="initing || (statisticsData && statisticsData.items && statisticsData.items.length)">
+                                                 v-if="initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length)">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ml-3"
                                               :class="statisticsTextColor"
-                                              v-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
-                                            {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
+                                              v-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
+                                            {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
                                         </span>
                                         <v-skeleton-loader class="skeleton-no-margin ml-3 mb-2"
                                                            width="120px" type="text" :loading="true"
@@ -147,11 +131,11 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
+                                                 v-else-if="!initing && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length)">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allChartTypes.Pie">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allCategoricalChartTypes.Pie">
                                         <pie-chart
                                             :items="[
                                                 {id: '1', name: '---', value: 60, color: '7c7c7f'},
@@ -166,7 +150,7 @@
                                             v-if="initing"
                                         ></pie-chart>
                                         <pie-chart
-                                            :items="statisticsData && statisticsData.items && statisticsData.items.length ? statisticsData.items : []"
+                                            :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
                                             :min-valid-percent="0.0001"
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
@@ -182,7 +166,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allChartTypes.Bar">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allCategoricalChartTypes.Bar">
                                         <v-list rounded lines="two" v-if="initing">
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                                                 <v-list-item class="pl-0">
@@ -204,9 +188,9 @@
                                                 <v-divider v-if="itemIdx < 3"/>
                                             </template>
                                         </v-list>
-                                        <v-list class="py-0" rounded lines="two" v-else-if="!initing && statisticsData && statisticsData.items && statisticsData.items.length">
+                                        <v-list class="py-0" rounded lines="two" v-else-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                                             <template :key="idx"
-                                                      v-for="(item, idx) in statisticsData.items">
+                                                      v-for="(item, idx) in categoricalAnalysisData.items">
                                                 <v-list-item class="pl-0" v-if="!item.hidden">
                                                     <template #prepend>
                                                         <router-link class="statistics-list-item" :to="getItemLinkUrl(item)">
@@ -232,7 +216,7 @@
                                                         </div>
                                                     </router-link>
                                                 </v-list-item>
-                                                <v-divider v-if="!item.hidden && idx !== statisticsData.items.length - 1"/>
+                                                <v-divider v-if="!item.hidden && idx !== categoricalAnalysisData.items.length - 1"/>
                                             </template>
                                         </v-list>
                                     </v-card-text>
@@ -348,7 +332,7 @@ export default {
             return this.statisticsStore.transactionStatisticsFilter;
         },
         queryChartDataCategory() {
-            return this.statisticsStore.transactionStatisticsChartDataCategory;
+            return this.statisticsStore.categoricalAnalysisChartDataCategory;
         },
         queryChartType: {
             get: function () {
@@ -373,19 +357,10 @@ export default {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
         },
         allChartTypes() {
-            return statisticsConstants.allChartTypes;
+            return this.$locale.getAllCategoricalChartTypes();
         },
-        allChartTypesArray() {
-            return [
-                {
-                    name: 'Pie Chart',
-                    type: this.allChartTypes.Pie
-                },
-                {
-                    name: 'Bar Chart',
-                    type: this.allChartTypes.Bar
-                }
-            ];
+        allCategoricalChartTypes() {
+            return statisticsConstants.allCategoricalChartTypes;
         },
         allChartDataTypes() {
             return statisticsConstants.allChartDataTypes;
@@ -394,7 +369,7 @@ export default {
             return statisticsConstants.allSortingTypes;
         },
         allSortingTypesArray() {
-            return statisticsConstants.allSortingTypesArray;
+            return this.$locale.getAllStatisticsSortingTypes();
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
@@ -419,8 +394,8 @@ export default {
 
             return this.$t('Total Amount');
         },
-        statisticsData() {
-            return this.statisticsStore.statisticsData;
+        categoricalAnalysisData() {
+            return this.statisticsStore.categoricalAnalysisData;
         },
         statisticsTextColor() {
             if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type ||
@@ -467,7 +442,7 @@ export default {
             self.accountsStore.loadAllAccounts({ force: false }),
             self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
-            return self.statisticsStore.loadTransactionStatistics({
+            return self.statisticsStore.loadCategoricalAnalysis({
                 force: false
             });
         }).then(() => {
@@ -504,7 +479,7 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                dispatchPromise = self.statisticsStore.loadTransactionStatistics({
+                dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
                     force: force
                 });
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||

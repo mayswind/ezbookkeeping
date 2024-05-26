@@ -21,7 +21,7 @@ const defaultSettings = {
     showTotalAmountInTransactionListPage: true,
     showAccountBalance: true,
     statistics: {
-        defaultChartType: statisticsConstants.defaultChartType,
+        defaultChartType: statisticsConstants.defaultCategoricalChartType,
         defaultChartDataType: statisticsConstants.defaultChartDataType,
         defaultDataRangeType: statisticsConstants.defaultDataRangeType,
         defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,

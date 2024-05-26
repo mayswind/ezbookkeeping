@@ -7,8 +7,9 @@
                 :title="$t('Default Chart Type')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
                 <select v-model="defaultChartType">
-                    <option :value="allChartTypes.Pie">{{ $t('Pie Chart') }}</option>
-                    <option :value="allChartTypes.Bar">{{ $t('Bar Chart') }}</option>
+                    <option :value="chartType.type"
+                            :key="chartType.type"
+                            v-for="chartType in allCategoricalChartTypes">{{ chartType.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -68,8 +69,8 @@ import statisticsConstants from '@/consts/statistics.js';
 export default {
     computed: {
         ...mapStores(useSettingsStore),
-        allChartTypes() {
-            return statisticsConstants.allChartTypes;
+        allCategoricalChartTypes() {
+            return this.$locale.getAllCategoricalChartTypes();
         },
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();

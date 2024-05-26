@@ -808,6 +808,21 @@ function getAllAccountTypes(translateFn) {
     return allAccountTypes;
 }
 
+function getAllCategoricalChartTypes(translateFn) {
+    const allChartTypes = [];
+
+    for (let i = 0; i < statistics.allCategoricalChartTypesArray.length; i++) {
+        const chartType = statistics.allCategoricalChartTypesArray[i];
+
+        allChartTypes.push({
+            type: chartType.type,
+            displayName: translateFn(chartType.name)
+        });
+    }
+
+    return allChartTypes;
+}
+
 function getAllStatisticsChartDataTypes(translateFn) {
     const allChartDataTypes = [];
 
@@ -1351,6 +1366,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTimezoneTypesUsedForStatistics: (currentTimezone) => getAllTimezoneTypesUsedForStatistics(currentTimezone, i18nGlobal.t),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
+        getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),

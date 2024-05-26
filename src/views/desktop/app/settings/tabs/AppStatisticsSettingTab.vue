@@ -12,10 +12,7 @@
                                     persistent-placeholder
                                     :label="$t('Default Chart Type')"
                                     :placeholder="$t('Default Chart Type')"
-                                    :items="[
-                                        { type: allChartTypes.Pie, displayName: $t('Pie Chart') },
-                                        { type: allChartTypes.Bar, displayName: $t('Bar Chart') }
-                                    ]"
+                                    :items="allCategoricalChartTypes"
                                     v-model="defaultChartType"
                                 />
                             </v-col>
@@ -99,8 +96,8 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore),
-        allChartTypes() {
-            return statisticsConstants.allChartTypes;
+        allCategoricalChartTypes() {
+            return this.$locale.getAllCategoricalChartTypes();
         },
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();

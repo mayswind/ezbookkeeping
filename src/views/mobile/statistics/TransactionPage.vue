@@ -28,7 +28,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-card v-if="query.chartType === allChartTypes.Pie">
+        <f7-card v-if="query.chartType === allCategoricalChartTypes.Pie">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
@@ -48,7 +48,7 @@
                     v-if="loading"
                 ></pie-chart>
                 <pie-chart
-                    :items="statisticsData.items"
+                    :items="categoricalAnalysisData.items"
                     :min-valid-percent="0.0001"
                     :show-value="showAmountInChart"
                     :show-center-text="true"
@@ -64,20 +64,20 @@
                     v-else-if="!loading"
                     @click="clickPieChartItem"
                 >
-                    <text class="statistics-pie-chart-total-amount-title" v-if="statisticsData.items && statisticsData.items.length">
+                    <text class="statistics-pie-chart-total-amount-title" v-if="categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                         {{ totalAmountName }}
                     </text>
-                    <text class="statistics-pie-chart-total-amount-value" v-if="statisticsData.items && statisticsData.items.length">
-                        {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency, 16) }}
+                    <text class="statistics-pie-chart-total-amount-value" v-if="categoricalAnalysisData.items && categoricalAnalysisData.items.length">
+                        {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency, 16) }}
                     </text>
-                    <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!statisticsData.items || !statisticsData.items.length">
+                    <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!categoricalAnalysisData.items || !categoricalAnalysisData.items.length">
                         {{ $t('No data') }}
                     </text>
                 </pie-chart>
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="query.chartType === allChartTypes.Bar">
+        <f7-card v-else-if="query.chartType === allCategoricalChartTypes.Bar">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
@@ -90,10 +90,10 @@
                 </div>
                 <div class="display-flex full-line">
                     <div :class="{ 'statistics-list-item-overview-amount': true, 'text-color-teal': query.chartDataType === allChartDataTypes.ExpenseByAccount.type || query.chartDataType === allChartDataTypes.ExpenseByPrimaryCategory.type || query.chartDataType === allChartDataTypes.ExpenseBySecondaryCategory.type, 'text-color-red': query.chartDataType === allChartDataTypes.IncomeByAccount.type || query.chartDataType === allChartDataTypes.IncomeByPrimaryCategory.type || query.chartDataType === allChartDataTypes.IncomeBySecondaryCategory.type }">
-                        <span v-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
-                            {{ getDisplayAmount(statisticsData.totalAmount, defaultCurrency) }}
+                        <span v-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
+                            {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
                         </span>
-                        <span :class="{ 'skeleton-text': loading }" v-else-if="loading || !statisticsData || !statisticsData.items || !statisticsData.items.length">
+                        <span :class="{ 'skeleton-text': loading }" v-else-if="loading || !categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length">
                             {{ loading ? '***.**' : '---' }}
                         </span>
                     </div>
@@ -128,15 +128,15 @@
                     </f7-list-item>
                 </f7-list>
 
-                <f7-list v-else-if="!loading && (!statisticsData || !statisticsData.items || !statisticsData.items.length)">
+                <f7-list v-else-if="!loading && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length)">
                     <f7-list-item :title="$t('No transaction data')"></f7-list-item>
                 </f7-list>
 
-                <f7-list v-else-if="!loading && statisticsData && statisticsData.items && statisticsData.items.length">
+                <f7-list v-else-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                     <f7-list-item class="statistics-list-item"
                                   :link="getItemLinkUrl(item)"
                                   :key="idx"
-                                  v-for="(item, idx) in statisticsData.items"
+                                  v-for="(item, idx) in categoricalAnalysisData.items"
                                   v-show="!item.hidden"
                     >
                         <template #media>
@@ -196,11 +196,9 @@
             <f7-link :class="{ 'disabled': reloading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.startTime, query.endTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType(allChartTypes.Pie)">
-                <span :class="{ 'tabbar-item-changed': query.chartType === allChartTypes.Pie }">{{ $t('Pie Chart') }}</span>
-            </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" @click="setChartType(allChartTypes.Bar)">
-                <span :class="{ 'tabbar-item-changed': query.chartType === allChartTypes.Bar }">{{ $t('Bar Chart') }}</span>
+            <f7-link class="tabbar-text-with-ellipsis" :key="chartType.type"
+                     v-for="chartType in allChartTypes" @click="setChartType(chartType.type)">
+                <span :class="{ 'tabbar-item-changed': query.chartType === chartType.type }">{{ chartType.displayName }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -295,7 +293,7 @@ export default {
             return this.statisticsStore.transactionStatisticsFilter;
         },
         queryChartDataCategory() {
-            return this.statisticsStore.transactionStatisticsChartDataCategory;
+            return this.statisticsStore.categoricalAnalysisChartDataCategory;
         },
         queryChartDataTypeName() {
             const queryChartDataTypeName = getNameByKeyValue(this.allChartDataTypes, this.query.chartDataType, 'type', 'name', 'Statistics');
@@ -312,7 +310,10 @@ export default {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
         },
         allChartTypes() {
-            return statisticsConstants.allChartTypes;
+            return this.$locale.getAllCategoricalChartTypes();
+        },
+        allCategoricalChartTypes() {
+            return statisticsConstants.allCategoricalChartTypes;
         },
         allChartDataTypes() {
             return statisticsConstants.allChartDataTypes;
@@ -343,8 +344,8 @@ export default {
 
             return this.$t('Total Amount');
         },
-        statisticsData() {
-            return this.statisticsStore.statisticsData;
+        categoricalAnalysisData() {
+            return this.statisticsStore.categoricalAnalysisData;
         },
         showAmountInChart() {
             if (!this.showAccountBalance
@@ -364,7 +365,7 @@ export default {
             self.accountsStore.loadAllAccounts({ force: false }),
             self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
-            return self.statisticsStore.loadTransactionStatistics({
+            return self.statisticsStore.loadCategoricalAnalysis({
                 force: false
             });
         }).then(() => {
@@ -399,7 +400,7 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                dispatchPromise = self.statisticsStore.loadTransactionStatistics({
+                dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
                     force: force
                 });
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||

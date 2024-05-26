@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
-    "@vuepic/vue-datepicker": "^8.3.2",
+    "@vuepic/vue-datepicker": "^8.7.0",
     "axios": "^1.6.8",
     "cbor-js": "^0.1.0",
     "clipboard": "^2.0.11",

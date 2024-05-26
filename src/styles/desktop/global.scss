@@ -317,15 +317,11 @@ body .v-btn-group {
 
 /** Fix @vuepic/vue-datepicker style issue **/
 .dp__main.dp__flex_display {
-    flex-direction: column
+    flex-direction: column;
 }
 
 .dp__main .dp--tp-wrap {
     max-width: 100%;
-}
-
-.dp__main .dp__preset_range {
-    white-space: inherit;
 }
 
 .dp__main .dp__menu_inner {
@@ -333,21 +329,7 @@ body .v-btn-group {
     padding-bottom: 0;
 }
 
-.dp__main .dp__menu_inner .dp__month_year_row > button {
-    width: inherit;
-}
-
-.dp__main .dp__menu_inner .dp__month_year_row > button.dp__button {
-    width: 100%;
-}
-
-.dp__main .dp__menu_inner .dp__month_year_row .dp__month_year_wrap > button {
-    line-height: inherit;
-}
-
 .dp__main .dp__calendar .dp__calendar_item {
-    display: flex;
-    justify-content: center;
     flex: 1;
 }
 

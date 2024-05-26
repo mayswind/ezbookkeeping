@@ -10,18 +10,6 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
-                                    :label="$t('Default Chart Type')"
-                                    :placeholder="$t('Default Chart Type')"
-                                    :items="allCategoricalChartTypes"
-                                    v-model="defaultChartType"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
                                     :label="$t('Default Chart Data Type')"
                                     :placeholder="$t('Default Chart Data Type')"
                                     :items="allChartDataTypes"
@@ -71,6 +59,50 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="$t('Categorical Analysis Settings')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Default Chart Type')"
+                                    :placeholder="$t('Default Chart Type')"
+                                    :items="allCategoricalChartTypes"
+                                    v-model="defaultCategoricalChartType"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
+            <v-card :title="$t('Trend Analysis Settings')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="$t('Default Chart Type')"
+                                    :placeholder="$t('Default Chart Type')"
+                                    :items="allTrendChartTypes"
+                                    v-model="defaultTrendChartType"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <account-filter-settings-card :auto-save="true" :modify-default="true" />
         </v-col>
 
@@ -96,28 +128,23 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore),
-        allCategoricalChartTypes() {
-            return this.$locale.getAllCategoricalChartTypes();
-        },
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();
         },
         allSortingTypes() {
             return this.$locale.getAllStatisticsSortingTypes();
         },
+        allCategoricalChartTypes() {
+            return this.$locale.getAllCategoricalChartTypes();
+        },
+        allTrendChartTypes() {
+            return this.$locale.getAllTrendChartTypes();
+        },
         allDateRanges() {
             return this.$locale.getAllDateRanges(false);
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();
-        },
-        defaultChartType: {
-            get: function () {
-                return this.settingsStore.appSettings.statistics.defaultChartType;
-            },
-            set: function (value) {
-                this.settingsStore.setStatisticsDefaultChartType(value);
-            }
         },
         defaultChartDataType: {
             get: function () {
@@ -149,6 +176,22 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsSortingType(value);
+            }
+        },
+        defaultCategoricalChartType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultCategoricalChartType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultCategoricalChartType(value);
+            }
+        },
+        defaultTrendChartType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTrendChartType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTrendChartType(value);
             }
         }
     }

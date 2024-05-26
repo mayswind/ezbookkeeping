@@ -6,11 +6,12 @@
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
                             <btn-vertical-group :disabled="loading" :buttons="[
-                                { name: $t('Categorical Analysis'), value: 'categoricalAnalysis' },
-                            ]" v-model="activeTab" />
+                                { name: $t('Categorical Analysis'), value: allAnalysisTypes.CategoricalAnalysis },
+                                { name: $t('Trend Analysis'), value: allAnalysisTypes.TrendAnalysis }
+                            ]" v-model="analysisType" />
                         </div>
                         <v-divider />
-                        <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
+                        <div class="mx-6 mt-4">
                             <span class="text-subtitle-2">{{ $t('Chart Type') }}</span>
                             <v-select
                                 item-title="displayName"
@@ -22,7 +23,7 @@
                                 v-model="queryChartType"
                             />
                         </div>
-                        <div class="mx-6 mt-4" v-if="activeTab === 'categoricalAnalysis'">
+                        <div class="mx-6 mt-4">
                             <span class="text-subtitle-2">{{ $t('Sort Order') }}</span>
                             <v-select
                                 item-title="displayName"
@@ -35,10 +36,9 @@
                             />
                         </div>
                         <v-tabs show-arrows class="my-4" direction="vertical"
-                                :disabled="loading" v-model="query.chartDataType"
-                                v-if="activeTab === 'categoricalAnalysis'">
+                                :disabled="loading" v-model="query.chartDataType">
                             <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
-                                   v-for="dataType in allChartDataTypes">
+                                   v-for="dataType in allChartDataTypes" v-show="dataType.availableAnalysisTypes[analysisType]">
                                 <span class="text-truncate">{{ $t(dataType.name) }}</span>
                                 <v-tooltip activator="parent" location="right">{{ $t(dataType.name) }}</v-tooltip>
                             </v-tab>
@@ -46,7 +46,7 @@
                     </v-navigation-drawer>
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
-                            <v-window-item value="categoricalAnalysis">
+                            <v-window-item value="statisticsPage">
                                 <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
@@ -55,7 +55,8 @@
                                                 <v-icon :icon="icons.menu" size="24" />
                                             </v-btn>
                                             <span>{{ $t('Statistics & Analysis') }}</span>
-                                            <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided>
+                                            <v-btn-group class="ml-4" color="default" density="comfortable" variant="outlined" divided
+                                                         v-if="analysisType === allAnalysisTypes.CategoricalAnalysis">
                                                 <v-btn :icon="icons.left"
                                                        :disabled="loading || query.dateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
                                                        @click="shiftDateRange(query.startTime, query.endTime, -1)"/>
@@ -118,7 +119,7 @@
                                     </template>
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length)">
+                                                 v-if="initing || (analysisType === allAnalysisTypes.CategoricalAnalysis && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length)">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ml-3"
                                               :class="statisticsTextColor"
@@ -131,11 +132,11 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length)">
+                                                 v-else-if="!initing && (analysisType === allAnalysisTypes.CategoricalAnalysis && !categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length)">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allCategoricalChartTypes.Pie">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="analysisType === allAnalysisTypes.CategoricalAnalysis && query.categoricalChartType === allCategoricalChartTypes.Pie">
                                         <pie-chart
                                             :items="[
                                                 {id: '1', name: '---', value: 60, color: '7c7c7f'},
@@ -166,7 +167,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="query.chartType === allCategoricalChartTypes.Bar">
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="analysisType === allAnalysisTypes.CategoricalAnalysis && query.categoricalChartType === allCategoricalChartTypes.Bar">
                                         <v-list rounded lines="two" v-if="initing">
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                                                 <v-list-item class="pl-0">
@@ -262,11 +263,12 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { limitText, formatPercent } from '@/lib/common.js'
+import { isArray, limitText, formatPercent } from '@/lib/common.js'
 import {
     getShiftedDateRangeAndDateType,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
+import { isChartDataTypeAvailableForAnalysisType } from '@/lib/statistics.js';
 
 import {
     mdiCheck,
@@ -294,11 +296,12 @@ export default {
         const { mdAndUp } = useDisplay();
 
         return {
-            activeTab: 'categoricalAnalysis',
+            activeTab: 'statisticsPage',
             initing: true,
             loading: true,
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
+            analysisType: statisticsConstants.allAnalysisTypes.CategoricalAnalysis,
             showCustomDateRangeDialog: false,
             showFilterAccountDialog: false,
             showFilterCategoryDialog: false,
@@ -336,7 +339,13 @@ export default {
         },
         queryChartType: {
             get: function () {
-                return this.query.chartType;
+                if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                    return this.query.categoricalChartType;
+                } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                    return this.query.trendChartType;
+                } else {
+                    return null;
+                }
             },
             set: function(value) {
                 this.setChartType(value);
@@ -356,8 +365,17 @@ export default {
         queryEndTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.endTime);
         },
+        allAnalysisTypes() {
+            return statisticsConstants.allAnalysisTypes;
+        },
         allChartTypes() {
-            return this.$locale.getAllCategoricalChartTypes();
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.getAllCategoricalChartTypes();
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.$locale.getAllTrendChartTypes();
+            } else {
+                return [];
+            }
         },
         allCategoricalChartTypes() {
             return statisticsConstants.allCategoricalChartTypes;
@@ -420,6 +438,11 @@ export default {
         }
     },
     watch: {
+        'analysisType': function (newValue) {
+            if (!isChartDataTypeAvailableForAnalysisType(this.query.chartDataType, newValue)) {
+                this.query.chartDataType = statisticsConstants.defaultChartDataType;
+            }
+        },
         'query.chartDataType': function (newValue) {
             this.statisticsStore.updateTransactionStatisticsFilter({
                 chartDataType: newValue
@@ -442,9 +465,15 @@ export default {
             self.accountsStore.loadAllAccounts({ force: false }),
             self.transactionCategoriesStore.loadAllCategories({ force: false })
         ]).then(() => {
-            return self.statisticsStore.loadCategoricalAnalysis({
-                force: false
-            });
+            if (self.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return self.statisticsStore.loadCategoricalAnalysis({
+                    force: false
+                });
+            } else if (self.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return self.statisticsStore.loadTrendAnalysis({
+                    force: false
+                });
+            }
         }).then(() => {
             self.loading = false;
             self.initing = false;
@@ -479,9 +508,15 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
-                    force: force
-                });
+                if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                    dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
+                        force: force
+                    });
+                } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                    dispatchPromise = self.statisticsStore.loadTrendAnalysis({
+                        force: force
+                    });
+                }
             } else if (self.query.chartDataType === self.allChartDataTypes.AccountTotalAssets.type ||
                 self.query.chartDataType === self.allChartDataTypes.AccountTotalLiabilities.type) {
                 dispatchPromise = self.accountsStore.loadAllAccounts({
@@ -506,9 +541,15 @@ export default {
             }
         },
         setChartType(chartType) {
-            this.statisticsStore.updateTransactionStatisticsFilter({
-                chartType: chartType
-            });
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                this.statisticsStore.updateTransactionStatisticsFilter({
+                    categoricalChartType: chartType
+                });
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                this.statisticsStore.updateTransactionStatisticsFilter({
+                    trendChartType: chartType
+                });
+            }
         },
         setSortingType(sortingType) {
             if (sortingType < this.allSortingTypes.Amount.type || sortingType > this.allSortingTypes.Name.type) {

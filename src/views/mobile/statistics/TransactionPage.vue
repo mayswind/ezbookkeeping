@@ -28,7 +28,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-card v-if="query.chartType === allCategoricalChartTypes.Pie">
+        <f7-card v-if="query.categoricalChartType === allCategoricalChartTypes.Pie">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header full-line text-align-right">
                     <span style="margin-right: 4px;">{{ $t('Sort by') }}</span>
@@ -77,7 +77,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="query.chartType === allCategoricalChartTypes.Bar">
+        <f7-card v-else-if="query.categoricalChartType === allCategoricalChartTypes.Bar">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
@@ -198,7 +198,7 @@
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" :key="chartType.type"
                      v-for="chartType in allChartTypes" @click="setChartType(chartType.type)">
-                <span :class="{ 'tabbar-item-changed': query.chartType === chartType.type }">{{ chartType.displayName }}</span>
+                <span :class="{ 'tabbar-item-changed': query.categoricalChartType === chartType.type }">{{ chartType.displayName }}</span>
             </f7-link>
         </f7-toolbar>
 
@@ -438,7 +438,7 @@ export default {
         },
         setChartType(chartType) {
             this.statisticsStore.updateTransactionStatisticsFilter({
-                chartType: chartType
+                categoricalChartType: chartType
             });
         },
         setChartDataType(chartDataType) {

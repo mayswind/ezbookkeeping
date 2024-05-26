@@ -22,13 +22,14 @@ export const useSettingsStore = defineStore('settings', {
             showTotalAmountInTransactionListPage: settings.isShowTotalAmountInTransactionListPage(),
             showAccountBalance: settings.isShowAccountBalance(),
             statistics: {
-                defaultChartType: settings.getStatisticsDefaultChartType(),
                 defaultChartDataType: settings.getStatisticsDefaultChartDataType(),
                 defaultDataRangeType: settings.getStatisticsDefaultDateRange(),
                 defaultTimezoneType: settings.getStatisticsDefaultTimezoneType(),
                 defaultAccountFilter: settings.getStatisticsDefaultAccountFilter(),
                 defaultTransactionCategoryFilter: settings.getStatisticsDefaultTransactionCategoryFilter(),
-                defaultSortingType: settings.getStatisticsSortingType()
+                defaultSortingType: settings.getStatisticsSortingType(),
+                defaultCategoricalChartType: settings.getStatisticsDefaultCategoricalChartType(),
+                defaultTrendChartType: settings.getStatisticsDefaultTrendChartType(),
             },
             animate: settings.isEnableAnimate()
         },
@@ -94,10 +95,6 @@ export const useSettingsStore = defineStore('settings', {
             settings.setShowAccountBalance(value);
             this.appSettings.showAccountBalance = value;
         },
-        setStatisticsDefaultChartType(value) {
-            settings.setStatisticsDefaultChartType(value);
-            this.appSettings.statistics.defaultChartType = value;
-        },
         setStatisticsDefaultChartDataType(value) {
             settings.setStatisticsDefaultChartDataType(value);
             this.appSettings.statistics.defaultChartDataType = value;
@@ -121,6 +118,14 @@ export const useSettingsStore = defineStore('settings', {
         setStatisticsSortingType(value) {
             settings.setStatisticsSortingType(value);
             this.appSettings.statistics.defaultSortingType = value;
+        },
+        setStatisticsDefaultCategoricalChartType(value) {
+            settings.setStatisticsDefaultCategoricalChartType(value);
+            this.appSettings.statistics.defaultCategoricalChartType = value;
+        },
+        setStatisticsDefaultTrendChartType(value) {
+            settings.setStatisticsDefaultTrendChartType(value);
+            this.appSettings.statistics.defaultTrendChartType = value;
         },
         setEnableAnimate(value) {
             settings.setEnableAnimate(value);

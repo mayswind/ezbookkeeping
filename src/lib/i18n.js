@@ -823,6 +823,21 @@ function getAllCategoricalChartTypes(translateFn) {
     return allChartTypes;
 }
 
+function getAllTrendChartTypes(translateFn) {
+    const allChartTypes = [];
+
+    for (let i = 0; i < statistics.allTrendChartTypesArray.length; i++) {
+        const chartType = statistics.allTrendChartTypesArray[i];
+
+        allChartTypes.push({
+            type: chartType.type,
+            displayName: translateFn(chartType.name)
+        });
+    }
+
+    return allChartTypes;
+}
+
 function getAllStatisticsChartDataTypes(translateFn) {
     const allChartDataTypes = [];
 
@@ -835,7 +850,8 @@ function getAllStatisticsChartDataTypes(translateFn) {
 
         allChartDataTypes.push({
             type: chartDataType.type,
-            displayName: translateFn(chartDataType.name)
+            displayName: translateFn(chartDataType.name),
+            availableAnalysisTypes: chartDataType.availableAnalysisTypes
         });
     }
 
@@ -1367,6 +1383,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
+        getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
         getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),

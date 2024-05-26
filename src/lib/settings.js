@@ -21,13 +21,14 @@ const defaultSettings = {
     showTotalAmountInTransactionListPage: true,
     showAccountBalance: true,
     statistics: {
-        defaultChartType: statisticsConstants.defaultCategoricalChartType,
         defaultChartDataType: statisticsConstants.defaultChartDataType,
         defaultDataRangeType: statisticsConstants.defaultDataRangeType,
         defaultTimezoneType: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
-        defaultSortingType: statisticsConstants.defaultSortingType
+        defaultSortingType: statisticsConstants.defaultSortingType,
+        defaultCategoricalChartType: statisticsConstants.defaultCategoricalChartType,
+        defaultTrendChartType: statisticsConstants.defaultTrendChartType,
     },
     animate: true
 };
@@ -221,14 +222,6 @@ export function setShowAccountBalance(value) {
     setOption('showAccountBalance', value);
 }
 
-export function getStatisticsDefaultChartType() {
-    return getSubOption('statistics', 'defaultChartType');
-}
-
-export function setStatisticsDefaultChartType(value) {
-    setSubOption('statistics', 'defaultChartType', value);
-}
-
 export function getStatisticsDefaultChartDataType() {
     return getSubOption('statistics', 'defaultChartDataType');
 }
@@ -275,6 +268,22 @@ export function getStatisticsSortingType() {
 
 export function setStatisticsSortingType(value) {
     setSubOption('statistics', 'defaultSortingType', value);
+}
+
+export function getStatisticsDefaultCategoricalChartType() {
+    return getSubOption('statistics', 'defaultCategoricalChartType');
+}
+
+export function setStatisticsDefaultCategoricalChartType(value) {
+    setSubOption('statistics', 'defaultCategoricalChartType', value);
+}
+
+export function getStatisticsDefaultTrendChartType() {
+    return getSubOption('statistics', 'defaultTrendChartType');
+}
+
+export function setStatisticsDefaultTrendChartType(value) {
+    setSubOption('statistics', 'defaultTrendChartType', value);
 }
 
 export function isEnableAnimate() {

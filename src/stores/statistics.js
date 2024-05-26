@@ -28,8 +28,9 @@ export const useStatisticsStore = defineStore('statistics', {
             dateType: statisticsConstants.defaultDataRangeType,
             startTime: 0,
             endTime: 0,
-            chartType: statisticsConstants.defaultCategoricalChartType,
             chartDataType: statisticsConstants.defaultChartDataType,
+            categoricalChartType: statisticsConstants.defaultCategoricalChartType,
+            trendChartType: statisticsConstants.defaultTrendChartType,
             filterAccountIds: {},
             filterCategoryIds: {}
         },
@@ -410,8 +411,9 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.dateType = statisticsConstants.defaultDataRangeType;
             this.transactionStatisticsFilter.startTime = 0;
             this.transactionStatisticsFilter.endTime = 0;
-            this.transactionStatisticsFilter.chartType = statisticsConstants.defaultCategoricalChartType;
             this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
+            this.transactionStatisticsFilter.categoricalChartType = statisticsConstants.defaultCategoricalChartType;
+            this.transactionStatisticsFilter.trendChartType = statisticsConstants.defaultTrendChartType;
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
             this.transactionCategoryStatisticsData = {};
@@ -421,12 +423,6 @@ export const useStatisticsStore = defineStore('statistics', {
             if (!filter) {
                 const settingsStore = useSettingsStore();
                 const userStore = useUserStore();
-
-                let defaultChartType = settingsStore.appSettings.statistics.defaultChartType;
-
-                if (defaultChartType !== statisticsConstants.allCategoricalChartTypes.Pie && defaultChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
-                    defaultChartType = statisticsConstants.defaultCategoricalChartType;
-                }
 
                 let defaultChartDataType = settingsStore.appSettings.statistics.defaultChartDataType;
 
@@ -438,6 +434,18 @@ export const useStatisticsStore = defineStore('statistics', {
 
                 if (defaultDateRange < datetimeConstants.allDateRanges.All.type || defaultDateRange >= datetimeConstants.allDateRanges.Custom.type) {
                     defaultDateRange = statisticsConstants.defaultDataRangeType;
+                }
+
+                let defaultCategoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
+
+                if (defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Pie && defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
+                    defaultCategoricalChartType = statisticsConstants.defaultCategoricalChartType;
+                }
+
+                let defaultTrendChartType = settingsStore.appSettings.statistics.defaultTrendChartType;
+
+                if (defaultTrendChartType !== statisticsConstants.allTrendChartTypes.Area && defaultTrendChartType !== statisticsConstants.allTrendChartTypes.Column) {
+                    defaultTrendChartType = statisticsConstants.defaultTrendChartType;
                 }
 
                 let defaultSortType = settingsStore.appSettings.statistics.defaultSortingType;
@@ -452,7 +460,8 @@ export const useStatisticsStore = defineStore('statistics', {
                     dateType: dateRange ? dateRange.dateType : undefined,
                     startTime: dateRange ? dateRange.minTime : undefined,
                     endTime: dateRange ? dateRange.maxTime : undefined,
-                    chartType: defaultChartType,
+                    categoricalChartType: defaultCategoricalChartType,
+                    trendChartType: defaultTrendChartType,
                     chartDataType: defaultChartDataType,
                     filterAccountIds: settingsStore.appSettings.statistics.defaultAccountFilter || {},
                     filterCategoryIds: settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
@@ -478,10 +487,16 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.endTime = 0;
             }
 
-            if (filter && isNumber(filter.chartType)) {
-                this.transactionStatisticsFilter.chartType = filter.chartType;
+            if (filter && isNumber(filter.categoricalChartType)) {
+                this.transactionStatisticsFilter.categoricalChartType = filter.categoricalChartType;
             } else {
-                this.transactionStatisticsFilter.chartType = statisticsConstants.defaultCategoricalChartType;
+                this.transactionStatisticsFilter.categoricalChartType = statisticsConstants.defaultCategoricalChartType;
+            }
+
+            if (filter && isNumber(filter.trendChartType)) {
+                this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
+            } else {
+                this.transactionStatisticsFilter.trendChartType = statisticsConstants.defaultTrendChartType;
             }
 
             if (filter && isNumber(filter.chartDataType)) {
@@ -521,8 +536,12 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.endTime = filter.endTime;
             }
 
-            if (filter && isNumber(filter.chartType)) {
-                this.transactionStatisticsFilter.chartType = filter.chartType;
+            if (filter && isNumber(filter.categoricalChartType)) {
+                this.transactionStatisticsFilter.categoricalChartType = filter.categoricalChartType;
+            }
+
+            if (filter && isNumber(filter.trendChartType)) {
+                this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
             }
 
             if (filter && isNumber(filter.chartDataType)) {
@@ -619,6 +638,9 @@ export const useStatisticsStore = defineStore('statistics', {
                     }
                 });
             });
+        },
+        loadTrendAnalysis({ force }) {
+            return Promise.resolve(true);
         },
     }
 });

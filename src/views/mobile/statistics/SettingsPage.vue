@@ -2,17 +2,8 @@
     <f7-page>
         <f7-navbar :title="$t('Statistics Settings')" :back-link="$t('Back')"></f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top">
-            <f7-list-item
-                :title="$t('Default Chart Type')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                <select v-model="defaultChartType">
-                    <option :value="chartType.type"
-                            :key="chartType.type"
-                            v-for="chartType in allCategoricalChartTypes">{{ chartType.displayName }}</option>
-                </select>
-            </f7-list-item>
-
+        <f7-block-title class="margin-top">{{ $t('Common Settings') }}</f7-block-title>
+        <f7-list strong inset dividers>
             <f7-list-item
                 :title="$t('Default Chart Data Type')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Data Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
@@ -57,6 +48,32 @@
                 </select>
             </f7-list-item>
         </f7-list>
+
+        <f7-block-title>{{ $t('Categorical Analysis Settings') }}</f7-block-title>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                :title="$t('Default Chart Type')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultCategoricalChartType">
+                    <option :value="chartType.type"
+                            :key="chartType.type"
+                            v-for="chartType in allCategoricalChartTypes">{{ chartType.displayName }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-block-title>{{ $t('Trend Analysis Settings') }}</f7-block-title>
+        <f7-list strong inset dividers>
+            <f7-list-item
+                :title="$t('Default Chart Type')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Chart Type'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="defaultTrendChartType">
+                    <option :value="chartType.type"
+                            :key="chartType.type"
+                            v-for="chartType in allTrendChartTypes">{{ chartType.displayName }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
     </f7-page>
 </template>
 
@@ -64,33 +81,26 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import statisticsConstants from '@/consts/statistics.js';
-
 export default {
     computed: {
         ...mapStores(useSettingsStore),
-        allCategoricalChartTypes() {
-            return this.$locale.getAllCategoricalChartTypes();
-        },
         allChartDataTypes() {
             return this.$locale.getAllStatisticsChartDataTypes();
         },
         allSortingTypes() {
             return this.$locale.getAllStatisticsSortingTypes();
         },
+        allCategoricalChartTypes() {
+            return this.$locale.getAllCategoricalChartTypes();
+        },
+        allTrendChartTypes() {
+            return this.$locale.getAllTrendChartTypes();
+        },
         allDateRanges() {
             return this.$locale.getAllDateRanges(false);
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();
-        },
-        defaultChartType: {
-            get: function () {
-                return this.settingsStore.appSettings.statistics.defaultChartType;
-            },
-            set: function (value) {
-                this.settingsStore.setStatisticsDefaultChartType(value);
-            }
         },
         defaultChartDataType: {
             get: function () {
@@ -122,6 +132,22 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setStatisticsSortingType(value);
+            }
+        },
+        defaultCategoricalChartType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultCategoricalChartType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultCategoricalChartType(value);
+            }
+        },
+        defaultTrendChartType: {
+            get: function () {
+                return this.settingsStore.appSettings.statistics.defaultTrendChartType;
+            },
+            set: function (value) {
+                this.settingsStore.setStatisticsDefaultTrendChartType(value);
             }
         }
     }

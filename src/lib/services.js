@@ -296,8 +296,18 @@ export default {
 
         return axios.get(`v1/transactions/statistics.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionStatisticsTrends: ({ startTime, endTime, useTransactionTimezone, rangeType }) => {
-        return axios.get(`v1/transactions/statistics/trends.json?start_time=${startTime}&end_time=${endTime}&use_transaction_timezone=${useTransactionTimezone}&range_type=${rangeType}`);
+    getTransactionStatisticsTrends: ({ startYearMonth, endYearMonth, useTransactionTimezone }) => {
+        const queryParams = [];
+
+        if (startYearMonth) {
+            queryParams.push(`start_year_month=${startYearMonth}`);
+        }
+
+        if (endYearMonth) {
+            queryParams.push(`end_year_month=${endYearMonth}`);
+        }
+
+        return axios.get(`v1/transactions/statistics/trends.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionAmounts: ({ useTransactionTimezone, today, thisWeek, thisMonth, thisYear, lastMonth, monthBeforeLastMonth, monthBeforeLast2Months, monthBeforeLast3Months, monthBeforeLast4Months, monthBeforeLast5Months, monthBeforeLast6Months, monthBeforeLast7Months, monthBeforeLast8Months, monthBeforeLast9Months, monthBeforeLast10Months }) => {
         const queryParams = [];

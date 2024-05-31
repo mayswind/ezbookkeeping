@@ -385,16 +385,23 @@ func (t *TransactionAmountsRequest) GetTransactionAmountsRequestItems() ([]*Tran
 
 // GetNumericYearMonthRange returns numeric start year, start month, end year and end month
 func (t *YearMonthRangeRequest) GetNumericYearMonthRange() (int32, int32, int32, int32, error) {
-	startYear, startMonth, err := utils.ParseNumericYearMonth(t.StartYearMonth)
+	var startYear, startMonth, endYear, endMonth int32
+	var err error
 
-	if err != nil {
-		return 0, 0, 0, 0, err
+	if t.StartYearMonth != "" {
+		startYear, startMonth, err = utils.ParseNumericYearMonth(t.StartYearMonth)
+
+		if err != nil {
+			return 0, 0, 0, 0, err
+		}
 	}
 
-	endYear, endMonth, err := utils.ParseNumericYearMonth(t.EndYearMonth)
+	if t.EndYearMonth != "" {
+		endYear, endMonth, err = utils.ParseNumericYearMonth(t.EndYearMonth)
 
-	if err != nil {
-		return 0, 0, 0, 0, err
+		if err != nil {
+			return 0, 0, 0, 0, err
+		}
 	}
 
 	return startYear, startMonth, endYear, endMonth, nil

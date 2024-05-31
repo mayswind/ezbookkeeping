@@ -1207,19 +1207,26 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *
 	}
 
 	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
-	startTransactionTime, _, err := utils.GetTransactionTimeRangeByYearMonth(startYear, startMonth)
+	var startTransactionTime, endTransactionTime int64
+	var err error
 
-	if err != nil {
-		return nil, errs.ErrSystemError
+	if startYear > 0 && startMonth > 0 {
+		startTransactionTime, _, err = utils.GetTransactionTimeRangeByYearMonth(startYear, startMonth)
+
+		if err != nil {
+			return nil, errs.ErrSystemError
+		}
 	}
 
-	_, endTransactionTime, err := utils.GetTransactionTimeRangeByYearMonth(endYear, endMonth)
+	if endYear > 0 && endMonth > 0 {
+		_, endTransactionTime, err = utils.GetTransactionTimeRangeByYearMonth(endYear, endMonth)
 
-	if err != nil {
-		return nil, errs.ErrSystemError
+		if err != nil {
+			return nil, errs.ErrSystemError
+		}
 	}
 
-	condition := "uid=? AND deleted=? AND (type=? OR type=?) AND transaction_time>=? AND transaction_time<=?"
+	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
 	conditionParams := make([]any, 0, 4)
 	conditionParams = append(conditionParams, uid)
 	conditionParams = append(conditionParams, false)
@@ -1230,15 +1237,24 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *
 	maxTransactionTime := endTransactionTime
 	var allTransactions []*models.Transaction
 
-	for maxTransactionTime > 0 {
+	for maxTransactionTime >= 0 {
 		var transactions []*models.Transaction
 
+		finalCondition := condition
 		finalConditionParams := make([]any, 0, 6)
 		finalConditionParams = append(finalConditionParams, conditionParams...)
-		finalConditionParams = append(finalConditionParams, minTransactionTime)
-		finalConditionParams = append(finalConditionParams, maxTransactionTime)
 
-		err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(condition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
+		if minTransactionTime > 0 {
+			finalCondition = finalCondition + " AND transaction_time>=?"
+			finalConditionParams = append(finalConditionParams, minTransactionTime)
+		}
+
+		if maxTransactionTime > 0 {
+			finalCondition = finalCondition + " AND transaction_time<=?"
+			finalConditionParams = append(finalConditionParams, maxTransactionTime)
+		}
+
+		err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(finalCondition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
 
 		if err != nil {
 			return nil, err
@@ -1247,7 +1263,7 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *
 		allTransactions = append(allTransactions, transactions...)
 
 		if len(transactions) < pageCountForLoadTransactionAmounts {
-			maxTransactionTime = 0
+			maxTransactionTime = -1
 			break
 		}
 
@@ -1269,7 +1285,7 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *
 
 		yearMonth := utils.FormatUnixTimeToNumericYearMonth(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), timeZone)
 
-		if yearMonth < startYearMonth || yearMonth > endYearMonth {
+		if (startYearMonth > 0 && yearMonth < startYearMonth) || (endYearMonth > 0 && yearMonth > endYearMonth) {
 			continue
 		}
 

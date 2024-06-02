@@ -366,6 +366,16 @@ export function getShiftedDateRange(minTime, maxTime, scale) {
 
 export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDayOfWeek, scene) {
     const newDateRange = getShiftedDateRange(minTime, maxTime, scale);
+    const newDateType = getDateTypeByDateRange(newDateRange.minTime, newDateRange.maxTime, firstDayOfWeek, scene);
+
+    return {
+        dateType: newDateType,
+        minTime: newDateRange.minTime,
+        maxTime: newDateRange.maxTime
+    };
+}
+
+export function getDateTypeByDateRange(minTime, maxTime, firstDayOfWeek, scene) {
     let newDateType = dateTimeConstants.allDateRanges.Custom.type;
 
     for (let dateRangeField in dateTimeConstants.allDateRanges) {
@@ -381,17 +391,13 @@ export function getShiftedDateRangeAndDateType(minTime, maxTime, scale, firstDay
 
         const dateRange = getDateRangeByDateType(dateRangeType.type, firstDayOfWeek);
 
-        if (dateRange && dateRange.minTime === newDateRange.minTime && dateRange.maxTime === newDateRange.maxTime) {
+        if (dateRange && dateRange.minTime === minTime && dateRange.maxTime === maxTime) {
             newDateType = dateRangeType.type;
             break;
         }
     }
 
-    return {
-        dateType: newDateType,
-        minTime: newDateRange.minTime,
-        maxTime: newDateRange.maxTime
-    };
+    return newDateType;
 }
 
 export function getDateRangeByDateType(dateType, firstDayOfWeek) {

@@ -439,6 +439,7 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
     getShiftedDateRangeAndDateType,
+    getDateTypeByDateRange,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
@@ -720,8 +721,10 @@ export default {
                 return;
             }
 
+            const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
             this.transactionsStore.updateTransactionListFilter({
-                dateType: this.allDateRanges.Custom.type,
+                dateType: dateType,
                 maxTime: maxTime,
                 minTime: minTime
             });

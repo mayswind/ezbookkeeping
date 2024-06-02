@@ -261,6 +261,7 @@ import statisticsConstants from '@/consts/statistics.js';
 import { getNameByKeyValue, limitText, formatPercent } from '@/lib/common.js'
 import {
     getShiftedDateRangeAndDateType,
+    getDateTypeByDateRange,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
@@ -492,8 +493,10 @@ export default {
                 return;
             }
 
+            const chartDateType = getDateTypeByDateRange(startTime, endTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
             this.statisticsStore.updateTransactionStatisticsFilter({
-                categoricalChartDateType: this.allDateRanges.Custom.type,
+                categoricalChartDateType: chartDateType,
                 categoricalChartStartTime: startTime,
                 categoricalChartEndTime: endTime
             });

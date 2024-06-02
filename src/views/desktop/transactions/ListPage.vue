@@ -371,6 +371,7 @@ import {
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
     getShiftedDateRangeAndDateType,
+    getDateTypeByDateRange,
     getDateRangeByDateType,
     getRecentDateRangeType,
     isDateRangeMatchOneMonth
@@ -797,8 +798,10 @@ export default {
                 return;
             }
 
+            const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
             this.transactionsStore.updateTransactionListFilter({
-                dateType: datetimeConstants.allDateRanges.Custom.type,
+                dateType: dateType,
                 maxTime: maxTime,
                 minTime: minTime
             });

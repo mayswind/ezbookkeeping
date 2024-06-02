@@ -274,6 +274,7 @@ import {
     getYearMonthFirstUnixTime,
     getYearMonthLastUnixTime,
     getShiftedDateRangeAndDateType,
+    getDateTypeByDateRange,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { isChartDataTypeAvailableForAnalysisType } from '@/lib/statistics.js';
@@ -648,16 +649,20 @@ export default {
             }
 
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                const chartDateType = getDateTypeByDateRange(startTime, endTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
                 this.statisticsStore.updateTransactionStatisticsFilter({
-                    categoricalChartDateType: this.allDateRanges.Custom.type,
+                    categoricalChartDateType: chartDateType,
                     categoricalChartStartTime: startTime,
                     categoricalChartEndTime: endTime
                 });
 
                 this.showCustomDateRangeDialog = false;
             } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                const chartDateType = getDateTypeByDateRange(getYearMonthFirstUnixTime(startTime), getYearMonthLastUnixTime(endTime), this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.TrendAnalysis);
+
                 this.statisticsStore.updateTransactionStatisticsFilter({
-                    trendChartDateType: this.allDateRanges.Custom.type,
+                    trendChartDateType: chartDateType,
                     trendChartStartYearMonth: startTime,
                     trendChartEndYearMonth: endTime
                 });

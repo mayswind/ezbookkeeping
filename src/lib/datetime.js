@@ -1,7 +1,47 @@
 import moment from 'moment';
 
 import dateTimeConstants from '@/consts/datetime.js';
-import { isNumber } from './common.js';
+import { isObject, isString, isNumber } from './common.js';
+
+export function isYearMonthValid(year, month) {
+    if (!isNumber(year) || !isNumber(month)) {
+        return false;
+    }
+
+    return year > 0 && month >= 0 && month <= 11;
+}
+
+export function getYearMonthObjectFromString(yearMonth) {
+    if (!isString(yearMonth)) {
+        return null;
+    }
+
+    const items = yearMonth.split('-');
+
+    if (items.length !== 2) {
+        return null;
+    }
+
+    const year = parseInt(items[0]);
+    const month = parseInt(items[1]) - 1;
+
+    if (!isYearMonthValid(year, month)) {
+        return null;
+    }
+
+    return {
+        year: year,
+        month: month
+    };
+}
+
+export function getYearMonthStringFromObject(yearMonth) {
+    if (!yearMonth || !isYearMonthValid(yearMonth.year, yearMonth.month)) {
+        return '';
+    }
+
+    return `${yearMonth.year}-${yearMonth.month + 1}`;
+}
 
 export function getTwoDigitsString(value) {
     if (value < 10) {
@@ -155,6 +195,14 @@ export function getYearAndMonth(date) {
     return `${year}-${month}`;
 }
 
+export function getYearAndMonthFromUnixTime(unixTime) {
+    if (!unixTime) {
+        return '';
+    }
+
+    return getYearAndMonth(parseDateFromUnixTime(unixTime));
+}
+
 export function getDay(date) {
     return moment(date).date();
 }
@@ -260,6 +308,24 @@ export function getThisYearLastUnixTime() {
 
 export function getSpecifiedDayFirstUnixTime(unixTime) {
     return moment.unix(unixTime).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getYearMonthFirstUnixTime(yearMonth) {
+    if (isString(yearMonth)) {
+        yearMonth = getYearMonthObjectFromString(yearMonth);
+    } else if (isObject(yearMonth) && !isYearMonthValid(yearMonth.year, yearMonth.month)) {
+        yearMonth = null;
+    }
+
+    if (!yearMonth) {
+        return 0;
+    }
+
+    return moment().set({ year: yearMonth.year, month: yearMonth.month, date: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
+}
+
+export function getYearMonthLastUnixTime(yearMonth) {
+    return moment.unix(getYearMonthFirstUnixTime(yearMonth)).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
 export function getDateTimeFormatType(allFormatMap, allFormatArray, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {

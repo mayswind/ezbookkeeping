@@ -93,6 +93,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import PieChartComponent from '@/components/desktop/PieChart.vue';
 import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
+import MonthRangeSelectionDialog from '@/components/desktop/MonthRangeSelectionDialog.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
 
 import '@/styles/desktop/template/vuetify/index.scss';
@@ -453,6 +454,7 @@ app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);
 app.component('PieChart', PieChartComponent);
 app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
+app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);
 
 app.config.globalProperties.$version = getVersion();

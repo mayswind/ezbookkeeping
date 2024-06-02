@@ -240,14 +240,16 @@ const allDateRanges = {
         type: 9,
         name: 'This year',
         availableScenes: {
-            [allDateRangeScenes.Normal]: true
+            [allDateRangeScenes.Normal]: true,
+            [allDateRangeScenes.TrendAnalysis]: true
         }
     },
     LastYear: {
         type: 10,
         name: 'Last year',
         availableScenes: {
-            [allDateRangeScenes.Normal]: true
+            [allDateRangeScenes.Normal]: true,
+            [allDateRangeScenes.TrendAnalysis]: true
         }
     },
     RecentTwelveMonths: {

@@ -20,6 +20,7 @@ import {
     isObject
 } from '@/lib/common.js';
 import {
+    getYearAndMonthFromUnixTime,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 
@@ -39,6 +40,7 @@ export const useStatisticsStore = defineStore('statistics', {
             filterCategoryIds: {}
         },
         transactionCategoryStatisticsData: {},
+        transactionCategoryTrendsData: {},
         transactionStatisticsStateInvalid: true
     }),
     getters: {
@@ -424,6 +426,7 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionStatisticsFilter.filterAccountIds = {};
             this.transactionStatisticsFilter.filterCategoryIds = {};
             this.transactionCategoryStatisticsData = {};
+            this.transactionCategoryTrendsData = {};
             this.transactionStatisticsStateInvalid = true;
         },
         initTransactionStatisticsFilter(filter) {
@@ -478,8 +481,8 @@ export const useStatisticsStore = defineStore('statistics', {
                     categoricalChartEndTime: categoricalChartDateRange ? categoricalChartDateRange.maxTime : undefined,
                     trendChartType: defaultTrendChartType,
                     trendChartDateType: trendChartDateRange ? trendChartDateRange.dateType : undefined,
-                    trendChartStartYearMonth: trendChartDateRange ? trendChartDateRange.minTime : undefined,
-                    trendChartEndYearMonth: trendChartDateRange ? trendChartDateRange.maxTime : undefined,
+                    trendChartStartYearMonth: trendChartDateRange ? getYearAndMonthFromUnixTime(trendChartDateRange.minTime) : undefined,
+                    trendChartEndYearMonth: trendChartDateRange ? getYearAndMonthFromUnixTime(trendChartDateRange.maxTime) : undefined,
                     filterAccountIds: settingsStore.appSettings.statistics.defaultAccountFilter || {},
                     filterCategoryIds: settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
                     sortingType: defaultSortType,
@@ -587,11 +590,11 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.trendChartDateType = filter.trendChartDateType;
             }
 
-            if (filter && isYearMonth(filter.trendChartStartYearMonth)) {
+            if (filter && (isYearMonth(filter.trendChartStartYearMonth) || filter.trendChartStartYearMonth === '')) {
                 this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
             }
 
-            if (filter && isYearMonth(filter.trendChartEndYearMonth)) {
+            if (filter && (isYearMonth(filter.trendChartEndYearMonth) || filter.trendChartEndYearMonth === '')) {
                 this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
             }
 
@@ -686,8 +689,49 @@ export const useStatisticsStore = defineStore('statistics', {
                 });
             });
         },
-        loadTrendAnalysis() {
-            return Promise.resolve(true);
+        loadTrendAnalysis({ force }) {
+            const self = this;
+            const settingsStore = useSettingsStore();
+
+            return new Promise((resolve, reject) => {
+                resolve(true);
+
+                services.getTransactionStatisticsTrends({
+                    startYearMonth: self.transactionStatisticsFilter.trendChartStartYearMonth,
+                    endYearMonth: self.transactionStatisticsFilter.trendChartEndYearMonth,
+                    useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to retrieve transaction statistics' });
+                        return;
+                    }
+
+                    if (self.transactionStatisticsStateInvalid) {
+                        self.updateTransactionStatisticsInvalidState(false);
+                    }
+
+                    if (force && data.result && isEquals(self.transactionCategoryTrendsData, data.result)) {
+                        reject({ message: 'Data is up to date' });
+                        return;
+                    }
+
+                    self.transactionCategoryTrendsData = data.result;
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to retrieve transaction statistics', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to retrieve transaction statistics' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
         },
     }
 });

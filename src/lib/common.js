@@ -37,7 +37,7 @@ export function isYearMonth(val) {
         return false;
     }
 
-    return isNumber(items[0]) && isNumber(items[1]);
+    return parseInt(items[0]) && parseInt(items[1]);
 }
 
 export function isEquals(obj1, obj2) {

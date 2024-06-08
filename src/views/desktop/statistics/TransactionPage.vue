@@ -131,7 +131,8 @@
                                     </v-card-text>
 
                                     <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!initing && (analysisType === allAnalysisTypes.CategoricalAnalysis && !categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length)">
+                                                 v-else-if="!initing && ((analysisType === allAnalysisTypes.CategoricalAnalysis && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
+                                                  || (analysisType === allAnalysisTypes.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length)))">
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ $t('No transaction data') }}</span>
                                     </v-card-text>
 
@@ -219,6 +220,37 @@
                                                 <v-divider v-if="!item.hidden && idx !== categoricalAnalysisData.items.length - 1"/>
                                             </template>
                                         </v-list>
+                                    </v-card-text>
+
+                                    <v-card-text :class="{ 'readonly': loading }" v-if="analysisType === allAnalysisTypes.TrendAnalysis">
+                                        <trends-chart
+                                            :type="queryChartType"
+                                            :start-year-month="query.trendChartStartYearMonth"
+                                            :end-year-month="query.trendChartEndYearMonth"
+                                            :items="[]"
+                                            :skeleton="true"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="value"
+                                            color-field="color"
+                                            v-if="initing"
+                                        ></trends-chart>
+                                        <trends-chart
+                                            :type="queryChartType"
+                                            :start-year-month="query.trendChartStartYearMonth"
+                                            :end-year-month="query.trendChartEndYearMonth"
+                                            :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                                            :show-value="showAmountInChart"
+                                            :enable-click-item="true"
+                                            :default-currency="defaultCurrency"
+                                            id-field="id"
+                                            name-field="name"
+                                            value-field="totalAmount"
+                                            currency-field="currency"
+                                            hidden-field="hidden"
+                                            v-else-if="!initing"
+                                            @click="clickTrendChartItem"
+                                        />
                                     </v-card-text>
                                 </v-card>
                             </v-window-item>
@@ -446,6 +478,9 @@ export default {
         categoricalAnalysisData() {
             return this.statisticsStore.categoricalAnalysisData;
         },
+        trendsAnalysisData() {
+            return this.statisticsStore.trendsAnalysisData;
+        },
         statisticsTextColor() {
             if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type ||
                 this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type ||
@@ -470,11 +505,21 @@ export default {
     },
     watch: {
         'analysisType': function (newValue) {
-            if (!isChartDataTypeAvailableForAnalysisType(this.query.chartDataType, newValue)) {
-                this.query.chartDataType = statisticsConstants.defaultChartDataType;
+            const self = this;
+
+            if (!isChartDataTypeAvailableForAnalysisType(self.query.chartDataType, newValue)) {
+                self.query.chartDataType = statisticsConstants.defaultChartDataType;
             }
 
-            this.reload(null);
+            self.initing = true;
+
+            const promise = self.reload(null);
+
+            if (promise) {
+                promise.then(() => {
+                    self.initing = false;
+                });
+            }
         },
         'query.chartDataType': function (newValue) {
             this.statisticsStore.updateTransactionStatisticsFilter({
@@ -572,6 +617,8 @@ export default {
                     }
                 });
             }
+
+            return dispatchPromise;
         },
         setChartType(chartType) {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
@@ -736,6 +783,17 @@ export default {
         clickPieChartItem(item) {
             this.$router.push(this.getItemLinkUrl(item));
         },
+        clickTrendChartItem(item) {
+            const minUnixTime = getYearMonthFirstUnixTime(item.yearMonth);
+            const maxUnixTime = getYearMonthLastUnixTime(item.yearMonth);
+            const dateRangeType = getDateTypeByDateRange(minUnixTime, maxUnixTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
+            this.$router.push(this.getItemLinkUrl(item.item, {
+                minTime: minUnixTime,
+                maxTime: maxUnixTime,
+                type: dateRangeType,
+            }));
+        },
         getDisplayAmount(amount, currency, textLimit) {
             amount = this.getDisplayCurrency(amount, currency);
 
@@ -761,8 +819,8 @@ export default {
         getDisplayPercent(value, precision, lowPrecisionValue) {
             return formatPercent(value, precision, lowPrecisionValue);
         },
-        getItemLinkUrl(item) {
-            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(item)}`;
+        getItemLinkUrl(item, dateRange) {
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(this.analysisType, item, dateRange)}`;
         }
     }
 }

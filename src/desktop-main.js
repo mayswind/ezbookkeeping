@@ -50,7 +50,7 @@ import 'vuetify/styles';
 
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart, PieChart } from 'echarts/charts';
+import { LineChart, BarChart, PieChart } from 'echarts/charts';
 import {
     GridComponent,
     TooltipComponent,
@@ -92,6 +92,7 @@ import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import PieChartComponent from '@/components/desktop/PieChart.vue';
+import TrendsChartComponent from '@/components/desktop/TrendsChart.vue';
 import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
 import MonthRangeSelectionDialog from '@/components/desktop/MonthRangeSelectionDialog.vue';
 import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue';
@@ -422,6 +423,7 @@ const vuetify = createVuetify({
 
 echarts.use([
     CanvasRenderer,
+    LineChart,
     BarChart,
     PieChart,
     GridComponent,
@@ -453,6 +455,7 @@ app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('SnackBar', SnackBar);
 app.component('PieChart', PieChartComponent);
+app.component('TrendsChart', TrendsChartComponent);
 app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthRangeSelectionDialog', MonthRangeSelectionDialog);
 app.component('SwitchToMobileDialog', SwitchToMobileDialog);

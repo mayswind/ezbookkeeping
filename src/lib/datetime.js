@@ -328,6 +328,43 @@ export function getYearMonthLastUnixTime(yearMonth) {
     return moment.unix(getYearMonthFirstUnixTime(yearMonth)).add(1, 'months').subtract(1, 'seconds').unix();
 }
 
+export function getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth(startYearMonth, endYearMonth) {
+    if (isString(startYearMonth)) {
+        startYearMonth = getYearMonthObjectFromString(startYearMonth);
+    }
+
+    if (isString(endYearMonth)) {
+        endYearMonth = getYearMonthObjectFromString(endYearMonth);
+    }
+
+    const allYearMonthTimes = [];
+
+    for (let year = startYearMonth.year, month = startYearMonth.month; year <= endYearMonth.year || month <= endYearMonth.month; ) {
+        const yearMonthTime = {
+            year: year,
+            month: month
+        };
+
+        yearMonthTime.minUnixTime = getYearMonthFirstUnixTime(yearMonthTime);
+        yearMonthTime.maxUnixTime = getYearMonthLastUnixTime(yearMonthTime);
+
+        allYearMonthTimes.push(yearMonthTime);
+
+        if (year === endYearMonth.year && month === endYearMonth.month) {
+            break;
+        }
+
+        if (month >= 11) {
+            year++;
+            month = 0;
+        } else {
+            month++;
+        }
+    }
+
+    return allYearMonthTimes;
+}
+
 export function getDateTimeFormatType(allFormatMap, allFormatArray, localeDefaultFormatTypeName, systemDefaultFormatType, formatTypeValue) {
     if (formatTypeValue > dateTimeConstants.defaultDateTimeFormatValue && allFormatArray[formatTypeValue - 1] && allFormatArray[formatTypeValue - 1].key) {
         return allFormatArray[formatTypeValue - 1];

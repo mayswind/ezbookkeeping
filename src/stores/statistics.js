@@ -422,6 +422,95 @@ export const useStatisticsStore = defineStore('statistics', {
                 totalAmount: combinedData.totalAmount,
                 items: allStatisticsItems
             };
+        },
+        transactionCategoryTrendsDataWithCategoryAndAccountInfo(state) {
+            const trendsData = state.transactionCategoryTrendsData;
+            const finalTrendsData = [];
+
+            if (trendsData && trendsData.length) {
+                const userStore = useUserStore();
+                const accountsStore = useAccountsStore();
+                const transactionCategoriesStore = useTransactionCategoriesStore();
+                const exchangeRatesStore = useExchangeRatesStore();
+
+                for (let i = 0; i < trendsData.length; i++) {
+                    const trendItem = trendsData[i];
+                    const finalTrendItem = {
+                        year: trendItem.year,
+                        month: trendItem.month,
+                        items: []
+                    };
+
+                    if (trendItem && trendItem.items && trendItem.items.length) {
+                        finalTrendItem.items = assembleAccountAndCategoryInfo(userStore, accountsStore, transactionCategoriesStore, exchangeRatesStore, trendItem.items);
+                    }
+
+                    finalTrendsData.push(finalTrendItem);
+                }
+            }
+
+            return finalTrendsData;
+        },
+        trendsAnalysisData(state) {
+            if (!state.transactionCategoryTrendsDataWithCategoryAndAccountInfo || !state.transactionCategoryTrendsDataWithCategoryAndAccountInfo.length) {
+                return null;
+            }
+
+            const combinedDataMap = {};
+
+            for (let i = 0; i < state.transactionCategoryTrendsDataWithCategoryAndAccountInfo.length; i++) {
+                const trendItem = state.transactionCategoryTrendsDataWithCategoryAndAccountInfo[i];
+                const totalAmountItems = getCategoryTotalAmountItems(trendItem.items, state.transactionStatisticsFilter);
+
+                for (let id in totalAmountItems.items) {
+                    if (!Object.prototype.hasOwnProperty.call(totalAmountItems.items, id)) {
+                        continue;
+                    }
+
+                    const item = totalAmountItems.items[id];
+                    let combinedData = combinedDataMap[id];
+
+                    if (!combinedData) {
+                        combinedData = {
+                            name: item.name,
+                            type: item.type,
+                            id: item.id,
+                            icon: item.icon,
+                            color: item.color,
+                            hidden: item.hidden,
+                            displayOrders: item.displayOrders,
+                            totalAmount: 0,
+                            items: []
+                        };
+                    }
+
+                    combinedData.items.push({
+                        year: trendItem.year,
+                        month: trendItem.month,
+                        totalAmount: item.totalAmount
+                    });
+
+                    combinedData.totalAmount += item.totalAmount;
+                    combinedDataMap[id] = combinedData;
+                }
+            }
+
+            const totalAmountsTrends = [];
+
+            for (let id in combinedDataMap) {
+                if (!Object.prototype.hasOwnProperty.call(combinedDataMap, id)) {
+                    continue;
+                }
+
+                const trendData = combinedDataMap[id];
+                totalAmountsTrends.push(trendData);
+            }
+
+            sortCategoryTotalAmountItems(totalAmountsTrends, state.transactionStatisticsFilter);
+
+            return {
+                items: totalAmountsTrends
+            };
         }
     },
     actions: {
@@ -625,7 +714,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
             }
         },
-        getTransactionListPageParams(item) {
+        getTransactionListPageParams(analysisType, item, dateRange) {
             const querys = [];
 
             if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
@@ -650,7 +739,8 @@ export const useStatisticsStore = defineStore('statistics', {
                 querys.push('categoryId=' + item.id);
             }
 
-            if (this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
+            if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis
+                && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('dateType=' + this.transactionStatisticsFilter.categoricalChartDateType);
 
@@ -658,6 +748,10 @@ export const useStatisticsStore = defineStore('statistics', {
                     querys.push('minTime=' + this.transactionStatisticsFilter.categoricalChartStartTime);
                     querys.push('maxTime=' + this.transactionStatisticsFilter.categoricalChartEndTime);
                 }
+            } else if (analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis && dateRange) {
+                querys.push('dateType=' + dateRange.type);
+                querys.push('minTime=' + dateRange.minTime);
+                querys.push('maxTime=' + dateRange.maxTime);
             }
 
             return querys.join('&');
@@ -709,8 +803,6 @@ export const useStatisticsStore = defineStore('statistics', {
             const settingsStore = useSettingsStore();
 
             return new Promise((resolve, reject) => {
-                resolve(true);
-
                 services.getTransactionStatisticsTrends({
                     startYearMonth: self.transactionStatisticsFilter.trendChartStartYearMonth,
                     endYearMonth: self.transactionStatisticsFilter.trendChartEndYearMonth,

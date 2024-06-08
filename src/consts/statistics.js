@@ -39,7 +39,7 @@ const allTrendChartTypesArray = [
     }
 ];
 
-const defaultTrendChartType = allTrendChartTypes.Area;
+const defaultTrendChartType = allTrendChartTypes.Column;
 
 const allChartDataTypes = {
     ExpenseByAccount: {

@@ -569,7 +569,7 @@ export default {
             return formatPercent(value, precision, lowPrecisionValue);
         },
         getItemLinkUrl(item) {
-            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(item)}`;
+            return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(statisticsConstants.allAnalysisTypes.CategoricalAnalysis, item)}`;
         }
     }
 };

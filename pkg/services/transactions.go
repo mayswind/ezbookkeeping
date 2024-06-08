@@ -1101,14 +1101,19 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 	}
 
 	clientLocation := time.FixedZone("Client Timezone", int(utcOffset)*60)
-	startLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientLocation)
-	endLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientLocation)
+	var startLocalDateTime, endLocalDateTime, startTransactionTime, endTransactionTime int64
 
-	startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utcOffset)
-	endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utcOffset)
+	if startUnixTime > 0 {
+		startLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientLocation)
+		startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utcOffset)
+		startTransactionTime = utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
+	}
 
-	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
-	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+	if endUnixTime > 0 {
+		endLocalDateTime = utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientLocation)
+		endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utcOffset)
+		endTransactionTime = utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+	}
 
 	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
 	conditionParams := make([]any, 0, 4)
@@ -1117,33 +1122,28 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
 	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
 
-	if startUnixTime > 0 {
-		condition = condition + " AND transaction_time>=?"
-	}
-
-	if endUnixTime > 0 {
-		condition = condition + " AND transaction_time<=?"
-	}
-
 	minTransactionTime := startTransactionTime
 	maxTransactionTime := endTransactionTime
 	var allTransactions []*models.Transaction
 
-	for maxTransactionTime > 0 {
+	for maxTransactionTime >= 0 {
 		var transactions []*models.Transaction
 
+		finalCondition := condition
 		finalConditionParams := make([]any, 0, 6)
 		finalConditionParams = append(finalConditionParams, conditionParams...)
 
-		if startUnixTime > 0 {
+		if minTransactionTime > 0 {
+			finalCondition = finalCondition + " AND transaction_time>=?"
 			finalConditionParams = append(finalConditionParams, minTransactionTime)
 		}
 
-		if endUnixTime > 0 {
+		if maxTransactionTime > 0 {
+			finalCondition = finalCondition + " AND transaction_time<=?"
 			finalConditionParams = append(finalConditionParams, maxTransactionTime)
 		}
 
-		err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(condition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
+		err := s.UserDataDB(uid).NewSession(c).Select("category_id, account_id, transaction_time, timezone_utc_offset, amount").Where(finalCondition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
 
 		if err != nil {
 			return nil, err
@@ -1152,7 +1152,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 		allTransactions = append(allTransactions, transactions...)
 
 		if len(transactions) < pageCountForLoadTransactionAmounts {
-			maxTransactionTime = 0
+			maxTransactionTime = -1
 			break
 		}
 
@@ -1171,7 +1171,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 
 		localDateTime := utils.FormatUnixTimeToNumericLocalDateTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), timeZone)
 
-		if localDateTime < startLocalDateTime || localDateTime > endLocalDateTime {
+		if (startLocalDateTime > 0 && localDateTime < startLocalDateTime) || (endLocalDateTime > 0 && localDateTime > endLocalDateTime) {
 			continue
 		}
 

@@ -744,7 +744,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 && this.transactionStatisticsFilter.chartDataType !== statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('dateType=' + this.transactionStatisticsFilter.categoricalChartDateType);
 
-                if (this.transactionStatisticsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
+                if (this.transactionStatisticsFilter.categoricalChartDateType === datetimeConstants.allDateRanges.Custom.type) {
                     querys.push('minTime=' + this.transactionStatisticsFilter.categoricalChartStartTime);
                     querys.push('maxTime=' + this.transactionStatisticsFilter.categoricalChartEndTime);
                 }

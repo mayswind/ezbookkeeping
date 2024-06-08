@@ -124,6 +124,14 @@ input[type=number] {
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
 }
 
+.chart-pointer {
+    display: inline-block;
+    margin-right: 5px;
+    border-radius: 10px;
+    width: 10px;
+    height: 10px;
+}
+
 /** Common class for replacing the default style of vuetify **/
 .v-input.v-input--readonly input,
 .v-input.v-input--readonly textarea,

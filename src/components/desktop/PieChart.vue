@@ -167,11 +167,17 @@ export default {
                             percent = params.percent + '%';
                         }
 
+                        let tooltip = `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`;
+
                         if (name) {
-                            return `${name}<br/>${value} (${percent})`;
+                            tooltip += `<span>${name}</span><br/><span>${value} (${percent})</span>`;
                         } else {
-                            return `${value} (${percent})`;
+                            tooltip += `<span>${value} (${percent})</span>`;
                         }
+
+                        tooltip += '</div>';
+
+                        return tooltip;
                     }
                 },
                 legend: {

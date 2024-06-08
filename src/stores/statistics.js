@@ -24,6 +24,221 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 
+function assembleAccountAndCategoryInfo(userStore, accountsStore, transactionCategoriesStore, exchangeRatesStore, items) {
+    const finalItems = [];
+    const defaultCurrency = userStore.currentUserDefaultCurrency;
+
+    for (let i = 0; i < items.length; i++) {
+        const dataItem = items[i];
+        const item = {
+            categoryId: dataItem.categoryId,
+            accountId: dataItem.accountId,
+            amount: dataItem.amount
+        };
+
+        if (item.accountId) {
+            item.account = accountsStore.allAccountsMap[item.accountId];
+        }
+
+        if (item.account && item.account.parentId !== '0') {
+            item.primaryAccount = accountsStore.allAccountsMap[item.account.parentId];
+        } else {
+            item.primaryAccount = item.account;
+        }
+
+        if (item.categoryId) {
+            item.category = transactionCategoriesStore.allTransactionCategoriesMap[item.categoryId];
+        }
+
+        if (item.category && item.category.parentId !== '0') {
+            item.primaryCategory = transactionCategoriesStore.allTransactionCategoriesMap[item.category.parentId];
+        } else {
+            item.primaryCategory = item.category;
+        }
+
+        if (item.account && item.account.currency !== defaultCurrency) {
+            const amount = exchangeRatesStore.getExchangedAmount(item.amount, item.account.currency, defaultCurrency);
+
+            if (isNumber(amount)) {
+                item.amountInDefaultCurrency = Math.floor(amount);
+            }
+        } else if (item.account && item.account.currency === defaultCurrency) {
+            item.amountInDefaultCurrency = item.amount;
+        } else {
+            item.amountInDefaultCurrency = null;
+        }
+
+        finalItems.push(item);
+    }
+
+    return finalItems;
+}
+
+function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
+    const allDataItems = {};
+    let totalAmount = 0;
+    let totalNonNegativeAmount = 0;
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+
+        if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
+            continue;
+        }
+
+        if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+            if (item.category.type !== categoryConstants.allCategoryTypes.Expense) {
+                continue;
+            }
+        } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+            if (item.category.type !== categoryConstants.allCategoryTypes.Income) {
+                continue;
+            }
+        } else {
+            continue;
+        }
+
+        if (transactionStatisticsFilter.filterAccountIds && transactionStatisticsFilter.filterAccountIds[item.account.id]) {
+            continue;
+        }
+
+        if (transactionStatisticsFilter.filterCategoryIds && transactionStatisticsFilter.filterCategoryIds[item.category.id]) {
+            continue;
+        }
+
+        if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type) {
+            if (isNumber(item.amountInDefaultCurrency)) {
+                let data = allDataItems[item.account.id];
+
+                if (data) {
+                    data.totalAmount += item.amountInDefaultCurrency;
+                } else {
+                    data = {
+                        name: item.account.name,
+                        type: 'account',
+                        id: item.account.id,
+                        icon: item.account.icon || iconConstants.defaultAccountIcon.icon,
+                        color: item.account.color || colorConstants.defaultAccountColor,
+                        hidden: item.primaryAccount.hidden || item.account.hidden,
+                        displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
+                        totalAmount: item.amountInDefaultCurrency
+                    }
+                }
+
+                totalAmount += item.amountInDefaultCurrency;
+
+                if (item.amountInDefaultCurrency > 0) {
+                    totalNonNegativeAmount += item.amountInDefaultCurrency;
+                }
+
+                allDataItems[item.account.id] = data;
+            }
+        } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type) {
+            if (isNumber(item.amountInDefaultCurrency)) {
+                let data = allDataItems[item.primaryCategory.id];
+
+                if (data) {
+                    data.totalAmount += item.amountInDefaultCurrency;
+                } else {
+                    data = {
+                        name: item.primaryCategory.name,
+                        type: 'category',
+                        id: item.primaryCategory.id,
+                        icon: item.primaryCategory.icon || iconConstants.defaultCategoryIcon.icon,
+                        color: item.primaryCategory.color || colorConstants.defaultCategoryColor,
+                        hidden: item.primaryCategory.hidden,
+                        displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
+                        totalAmount: item.amountInDefaultCurrency
+                    }
+                }
+
+                totalAmount += item.amountInDefaultCurrency;
+
+                if (item.amountInDefaultCurrency > 0) {
+                    totalNonNegativeAmount += item.amountInDefaultCurrency;
+                }
+
+                allDataItems[item.primaryCategory.id] = data;
+            }
+        } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+            if (isNumber(item.amountInDefaultCurrency)) {
+                let data = allDataItems[item.category.id];
+
+                if (data) {
+                    data.totalAmount += item.amountInDefaultCurrency;
+                } else {
+                    data = {
+                        name: item.category.name,
+                        type: 'category',
+                        id: item.category.id,
+                        icon: item.category.icon || iconConstants.defaultCategoryIcon.icon,
+                        color: item.category.color || colorConstants.defaultCategoryColor,
+                        hidden: item.primaryCategory.hidden || item.category.hidden,
+                        displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
+                        totalAmount: item.amountInDefaultCurrency
+                    }
+                }
+
+                totalAmount += item.amountInDefaultCurrency;
+
+                if (item.amountInDefaultCurrency > 0) {
+                    totalNonNegativeAmount += item.amountInDefaultCurrency;
+                }
+
+                allDataItems[item.category.id] = data;
+            }
+        }
+    }
+
+    return {
+        totalAmount: totalAmount,
+        totalNonNegativeAmount: totalNonNegativeAmount,
+        items: allDataItems
+    };
+}
+
+function sortCategoryTotalAmountItems(items, transactionStatisticsFilter) {
+    if (transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.DisplayOrder.type) {
+        items.sort(function (data1, data2) {
+            for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
+                if (data1.displayOrders[i] !== data2.displayOrders[i]) {
+                    return data1.displayOrders[i] - data2.displayOrders[i]; // asc
+                }
+            }
+
+            return data1.name.localeCompare(data2.name, undefined, { // asc
+                numeric: true,
+                sensitivity: 'base'
+            });
+        });
+    } else if (transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.Name.type) {
+        items.sort(function (data1, data2) {
+            return data1.name.localeCompare(data2.name, undefined, { // asc
+                numeric: true,
+                sensitivity: 'base'
+            });
+        });
+    } else {
+        items.sort(function (data1, data2) {
+            if (data1.totalAmount !== data2.totalAmount) {
+                return data2.totalAmount - data1.totalAmount; // desc
+            }
+
+            return data1.name.localeCompare(data2.name, undefined, { // asc
+                numeric: true,
+                sensitivity: 'base'
+            });
+        });
+    }
+}
+
 export const useStatisticsStore = defineStore('statistics', {
     state: () => ({
         transactionStatisticsFilter: {
@@ -73,50 +288,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 const transactionCategoriesStore = useTransactionCategoriesStore();
                 const exchangeRatesStore = useExchangeRatesStore();
 
-                const defaultCurrency = userStore.currentUserDefaultCurrency;
-
-                for (let i = 0; i < statistics.items.length; i++) {
-                    const dataItem = statistics.items[i];
-                    const item = {
-                        categoryId: dataItem.categoryId,
-                        accountId: dataItem.accountId,
-                        amount: dataItem.amount
-                    };
-
-                    if (item.accountId) {
-                        item.account = accountsStore.allAccountsMap[item.accountId];
-                    }
-
-                    if (item.account && item.account.parentId !== '0') {
-                        item.primaryAccount = accountsStore.allAccountsMap[item.account.parentId];
-                    } else {
-                        item.primaryAccount = item.account;
-                    }
-
-                    if (item.categoryId) {
-                        item.category = transactionCategoriesStore.allTransactionCategoriesMap[item.categoryId];
-                    }
-
-                    if (item.category && item.category.parentId !== '0') {
-                        item.primaryCategory = transactionCategoriesStore.allTransactionCategoriesMap[item.category.parentId];
-                    } else {
-                        item.primaryCategory = item.category;
-                    }
-
-                    if (item.account && item.account.currency !== defaultCurrency) {
-                        const amount = exchangeRatesStore.getExchangedAmount(item.amount, item.account.currency, defaultCurrency);
-
-                        if (isNumber(amount)) {
-                            item.amountInDefaultCurrency = Math.floor(amount);
-                        }
-                    } else if (item.account && item.account.currency === defaultCurrency) {
-                        item.amountInDefaultCurrency = item.amount;
-                    } else {
-                        item.amountInDefaultCurrency = null;
-                    }
-
-                    finalStatistics.items.push(item);
-                }
+                finalStatistics.items = assembleAccountAndCategoryInfo(userStore, accountsStore, transactionCategoriesStore, exchangeRatesStore, statistics.items);
             }
 
             return finalStatistics;
@@ -126,133 +298,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 return null;
             }
 
-            const allDataItems = {};
-            let totalAmount = 0;
-            let totalNonNegativeAmount = 0;
-
-            for (let i = 0; i < state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items.length; i++) {
-                const item = state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items[i];
-
-                if (!item.primaryAccount || !item.account || !item.primaryCategory || !item.category) {
-                    continue;
-                }
-
-                if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                    if (item.category.type !== categoryConstants.allCategoryTypes.Expense) {
-                        continue;
-                    }
-                } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (item.category.type !== categoryConstants.allCategoryTypes.Income) {
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
-
-                if (state.transactionStatisticsFilter.filterAccountIds && state.transactionStatisticsFilter.filterAccountIds[item.account.id]) {
-                    continue;
-                }
-
-                if (state.transactionStatisticsFilter.filterCategoryIds && state.transactionStatisticsFilter.filterCategoryIds[item.category.id]) {
-                    continue;
-                }
-
-                if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type) {
-                    if (isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.account.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.account.name,
-                                type: 'account',
-                                id: item.account.id,
-                                icon: item.account.icon || iconConstants.defaultAccountIcon.icon,
-                                color: item.account.color || colorConstants.defaultAccountColor,
-                                hidden: item.primaryAccount.hidden || item.account.hidden,
-                                displayOrders: [item.primaryAccount.category, item.primaryAccount.displayOrder, item.account.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.account.id] = data;
-                    }
-                } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type) {
-                    if (isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.primaryCategory.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.primaryCategory.name,
-                                type: 'category',
-                                id: item.primaryCategory.id,
-                                icon: item.primaryCategory.icon || iconConstants.defaultCategoryIcon.icon,
-                                color: item.primaryCategory.color || colorConstants.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden,
-                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.primaryCategory.id] = data;
-                    }
-                } else if (state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
-                    state.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
-                    if (isNumber(item.amountInDefaultCurrency)) {
-                        let data = allDataItems[item.category.id];
-
-                        if (data) {
-                            data.totalAmount += item.amountInDefaultCurrency;
-                        } else {
-                            data = {
-                                name: item.category.name,
-                                type: 'category',
-                                id: item.category.id,
-                                icon: item.category.icon || iconConstants.defaultCategoryIcon.icon,
-                                color: item.category.color || colorConstants.defaultCategoryColor,
-                                hidden: item.primaryCategory.hidden || item.category.hidden,
-                                displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
-                                totalAmount: item.amountInDefaultCurrency
-                            }
-                        }
-
-                        totalAmount += item.amountInDefaultCurrency;
-
-                        if (item.amountInDefaultCurrency > 0) {
-                            totalNonNegativeAmount += item.amountInDefaultCurrency;
-                        }
-
-                        allDataItems[item.category.id] = data;
-                    }
-                }
-            }
-
-            return {
-                totalAmount: totalAmount,
-                totalNonNegativeAmount: totalNonNegativeAmount,
-                items: allDataItems
-            }
+            return getCategoryTotalAmountItems(state.transactionCategoryStatisticsDataWithCategoryAndAccountInfo.items, state.transactionStatisticsFilter);
         },
         accountTotalAmountAnalysisData(state) {
             const userStore = useUserStore();
@@ -370,38 +416,7 @@ export const useStatisticsStore = defineStore('statistics', {
                 allStatisticsItems.push(data);
             }
 
-            if (state.transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.DisplayOrder.type) {
-                allStatisticsItems.sort(function (data1, data2) {
-                    for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
-                        if (data1.displayOrders[i] !== data2.displayOrders[i]) {
-                            return data1.displayOrders[i] - data2.displayOrders[i]; // asc
-                        }
-                    }
-
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            } else if (state.transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.Name.type) {
-                allStatisticsItems.sort(function (data1, data2) {
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            } else {
-                allStatisticsItems.sort(function (data1, data2) {
-                    if (data1.totalAmount !== data2.totalAmount) {
-                        return data2.totalAmount - data1.totalAmount; // desc
-                    }
-
-                    return data1.name.localeCompare(data2.name, undefined, { // asc
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            }
+            sortCategoryTotalAmountItems(allStatisticsItems, state.transactionStatisticsFilter);
 
             return {
                 totalAmount: combinedData.totalAmount,

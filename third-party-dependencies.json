@@ -3,19 +3,19 @@
         "name": "Gin",
         "copyright": "Copyright (c) 2014 Manuel Martínez-Almeida",
         "url": "https://github.com/gin-gonic/gin",
-        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.9.1/LICENSE"
+        "licenseUrl": "https://github.com/gin-gonic/gin/blob/v1.10.0/LICENSE"
     },
     {
         "name": "Cache gin's middleware",
         "copyright": "Copyright (c) 2016 Gin-Gonic",
         "url": "https://github.com/gin-contrib/cache",
-        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.2.0/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.3.0/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.0.0/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.0.1/LICENSE"
     },
     {
         "name": "xorm",
@@ -45,7 +45,7 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.19.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.21.0/LICENSE"
     },
     {
         "name": "jwt-go",
@@ -79,7 +79,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.21.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.24.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -108,7 +108,7 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.21/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.27/LICENSE"
     },
     {
         "name": "Pinia",
@@ -120,19 +120,19 @@
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.3.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.3.2/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.11.0/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v9.13.1/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.5.14/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.6.8/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -186,7 +186,7 @@
         "name": "vue-echarts",
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.6.9/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v6.7.3/LICENSE"
     },
     {
         "name": "vue3-perfect-scrollbar",
@@ -204,7 +204,7 @@
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.6.8/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.2/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -258,7 +258,7 @@
         "name": "UAParser.js",
         "copyright": "Copyright (c) 2012-2023 Faisal Salman <f@faisalman.com>",
         "url": "https://github.com/faisalman/ua-parser-js",
-        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.37/license.md"
+        "licenseUrl": "https://github.com/faisalman/ua-parser-js/blob/1.0.38/license.md"
     },
     {
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",

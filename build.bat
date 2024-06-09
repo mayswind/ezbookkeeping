@@ -214,7 +214,16 @@ goto :pre_parse_args
     echo Building package archive "%package_file_name%" (%RELEASE_TYPE%)...
 
     call :build_backend
+
+    if !errorlevel! neq 0 (
+        goto :end
+    )
+
     call :build_frontend
+
+    if !errorlevel! neq 0 (
+        goto :end
+    )
 
     rmdir package /s /q
     mkdir package

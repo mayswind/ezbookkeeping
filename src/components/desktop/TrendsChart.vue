@@ -160,6 +160,48 @@ export default {
 
             return allSeries;
         },
+        yAxisWidth: function () {
+            let maxValue = Number.MIN_SAFE_INTEGER;
+            let minValue = Number.MAX_SAFE_INTEGER;
+            let width = 90;
+
+            if (!this.allSeries || !this.allSeries.length) {
+                return width;
+            }
+
+            for (let i = 0; i < this.allSeries.length; i++) {
+                for (let j = 0; j < this.allSeries[i].data.length; j++) {
+                    const value = this.allSeries[i].data[j];
+
+                    if (value > maxValue) {
+                        maxValue = value;
+                    }
+
+                    if (value < minValue) {
+                        minValue = value;
+                    }
+                }
+            }
+
+            const maxValueText = this.getDisplayCurrency(maxValue, this.defaultCurrency);
+            const minValueText = this.getDisplayCurrency(minValue, this.defaultCurrency);
+            let maxLengthText = maxValueText.length > minValueText.length ? maxValueText : minValueText;
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = '12px Arial';
+
+            const textMetrics = context.measureText(maxLengthText);
+            const actualWidth = Math.round(textMetrics.width) + 20;
+
+            if (actualWidth >= 200) {
+                width = 200;
+            } if (actualWidth > 90) {
+                width = actualWidth;
+            }
+
+            return width;
+        },
         chartOptions: function () {
             const self = this;
 
@@ -211,6 +253,10 @@ export default {
                     formatter: id => {
                         return self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.itemsMap[id][self.nameField] : id;
                     }
+                },
+                grid: {
+                    left: self.yAxisWidth,
+                    right: 20
                 },
                 xAxis: [
                     {
@@ -281,7 +327,7 @@ export default {
 <style scoped>
 .trends-chart-container {
     width: 100%;
-    height: 500px;
+    height: 560px;
     margin-top: 10px;
 }
 

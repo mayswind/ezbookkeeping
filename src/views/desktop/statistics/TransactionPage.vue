@@ -118,7 +118,7 @@
                                     </template>
 
                                     <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="initing || (analysisType === allAnalysisTypes.CategoricalAnalysis && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length)">
+                                                 v-if="analysisType === allAnalysisTypes.CategoricalAnalysis && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
                                         <span class="statistics-subtitle">{{ totalAmountName }}</span>
                                         <span class="statistics-overview-amount ml-3"
                                               :class="statisticsTextColor"

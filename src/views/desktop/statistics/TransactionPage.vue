@@ -243,6 +243,7 @@
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
+                                            :show-total-amount-in-tooltip="true"
                                             id-field="id"
                                             name-field="name"
                                             value-field="totalAmount"

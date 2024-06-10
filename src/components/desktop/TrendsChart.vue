@@ -33,6 +33,7 @@ export default {
         'hiddenField',
         'defaultCurrency',
         'showValue',
+        'showTotalAmountInTooltip',
         'enableClickItem'
     ],
     emits: [
@@ -222,10 +223,7 @@ export default {
                     },
                     formatter: params => {
                         let tooltip = '';
-
-                        if (params.length && params[0].name) {
-                            tooltip += `${params[0].name}<br/>`;
-                        }
+                        let totalAmount = 0;
 
                         for (let i = 0; i < params.length; i++) {
                             const id = params[i].seriesId;
@@ -237,7 +235,20 @@ export default {
                                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + params[i].color + '"></span>';
                                 tooltip += `<span>${name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
                                 tooltip += '</div>';
+                                totalAmount += params[i].data;
                             }
+                        }
+
+                        if (self.showTotalAmountInTooltip) {
+                            const displayTotalAmount = self.getDisplayCurrency(totalAmount, self.defaultCurrency);
+                            tooltip = '<div style="border-bottom: ' + (self.isDarkMode ? '#eee' : '#333') + ' dashed 1px">'
+                                + '<span class="chart-pointer" style="background-color: ' + (self.isDarkMode ? '#eee' : '#333') + '"></span>'
+                                + `<span>${self.$t('Total Amount')}</span><span style="margin-left: 20px; float: right">${displayTotalAmount}</span><br/>`
+                                + '</div>' + tooltip;
+                        }
+
+                        if (params.length && params[0].name) {
+                            tooltip = `${params[0].name}<br/>` + tooltip;
                         }
 
                         return tooltip;

@@ -88,16 +88,20 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
 
         if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type ||
-            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalExpense.type) {
             if (item.category.type !== categoryConstants.allCategoryTypes.Expense) {
                 continue;
             }
         } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type ||
             transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type ||
-            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalIncome.type) {
             if (item.category.type !== categoryConstants.allCategoryTypes.Income) {
                 continue;
             }
+        } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type) {
+            // Do Nothing
         } else {
             continue;
         }
@@ -193,6 +197,51 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
                 }
 
                 allDataItems[item.category.id] = data;
+            }
+        } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalExpense.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalIncome.type ||
+            transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type) {
+            if (isNumber(item.amountInDefaultCurrency)) {
+                let data = allDataItems['total'];
+                let amount = item.amountInDefaultCurrency;
+
+                if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type &&
+                    item.category.type === categoryConstants.allCategoryTypes.Expense) {
+                    amount = -amount;
+                }
+
+                if (data) {
+                    data.totalAmount += amount;
+                } else {
+                    let name = '';
+
+                    if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalExpense.type) {
+                        name = statisticsConstants.allChartDataTypes.TotalExpense.name;
+                    } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalIncome.type) {
+                        name = statisticsConstants.allChartDataTypes.TotalIncome.name;
+                    } else if (transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalBalance.type) {
+                        name = statisticsConstants.allChartDataTypes.TotalBalance.name;
+                    }
+
+                    data = {
+                        name: name,
+                        type: 'total',
+                        id: 'total',
+                        icon: '',
+                        color: '',
+                        hidden: false,
+                        displayOrders: [1],
+                        totalAmount: amount
+                    }
+                }
+
+                totalAmount += amount;
+
+                if (item.amountInDefaultCurrency > 0) {
+                    totalNonNegativeAmount += amount;
+                }
+
+                allDataItems['total'] = data;
             }
         }
     }
@@ -719,11 +768,13 @@ export const useStatisticsStore = defineStore('statistics', {
 
             if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
-                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalIncome.type) {
                 querys.push('type=2');
             } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
-                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type
+                || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.TotalExpense.type) {
                 querys.push('type=3');
             }
 

@@ -1009,6 +1009,7 @@ export default {
     'Total Liabilities': '总负债',
     'Total Expense': '总支出',
     'Total Income': '总收入',
+    'Total Balance': '总结余',
     'Expense By Account': '账户支出',
     'Expense By Primary Category': '一级分类支出',
     'Expense By Secondary Category': '二级分类支出',

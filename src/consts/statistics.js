@@ -103,6 +103,27 @@ const allChartDataTypes = {
         availableAnalysisTypes: {
             [allAnalysisTypes.CategoricalAnalysis]: true
         }
+    },
+    TotalExpense: {
+        type: 8,
+        name: 'Total Expense',
+        availableAnalysisTypes: {
+            [allAnalysisTypes.TrendAnalysis]: true
+        }
+    },
+    TotalIncome: {
+        type: 9,
+        name: 'Total Income',
+        availableAnalysisTypes: {
+            [allAnalysisTypes.TrendAnalysis]: true
+        }
+    },
+    TotalBalance: {
+        type: 10,
+        name: 'Total Balance',
+        availableAnalysisTypes: {
+            [allAnalysisTypes.TrendAnalysis]: true
+        }
     }
 };
 

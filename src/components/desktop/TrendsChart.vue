@@ -30,6 +30,7 @@ export default {
         'valueField',
         'colorField',
         'hiddenField',
+        'translateName',
         'defaultCurrency',
         'showValue',
         'showTotalAmountInTooltip',
@@ -58,7 +59,7 @@ export default {
                 if (this.idField && item[this.idField]) {
                     id = item[this.idField];
                 } else {
-                    id = item[this.nameField];
+                    id = this.getItemName(item[this.nameField]);
                 }
 
                 map[id] = item;
@@ -136,8 +137,8 @@ export default {
                 }
 
                 const finalItem = {
-                    id: (this.idField && item[this.idField]) ? item[this.idField] : item[this.nameField],
-                    name: (this.idField && item[this.idField]) ? item[this.idField] : item[this.nameField],
+                    id: (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]),
+                    name: (this.idField && item[this.idField]) ? item[this.idField] : this.getItemName(item[this.nameField]),
                     itemStyle: {
                         color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
                     },
@@ -225,9 +226,9 @@ export default {
 
                         for (let i = 0; i < params.length; i++) {
                             const id = params[i].seriesId;
-                            const name = self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.itemsMap[id][self.nameField] : id;
+                            const name = self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.getItemName(self.itemsMap[id][self.nameField]) : id;
 
-                            if (params[i].data !== 0) {
+                            if (params.length === 1 || params[i].data !== 0) {
                                 const value = self.getDisplayCurrency(params[i].data, self.defaultCurrency);
                                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + params[i].color + '"></span>';
                                 tooltip += `<span>${name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
@@ -259,7 +260,7 @@ export default {
                         color: self.isDarkMode ? '#eee' : '#333'
                     },
                     formatter: id => {
-                        return self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.itemsMap[id][self.nameField] : id;
+                        return self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.getItemName(self.itemsMap[id][self.nameField]) : id;
                     }
                 },
                 grid: {
@@ -321,6 +322,9 @@ export default {
             }
 
             return color;
+        },
+        getItemName(name) {
+            return this.translateName ? this.$t(name) : name;
         },
         onLegendSelectChanged: function (e) {
             this.selectedLegends = e.selected;

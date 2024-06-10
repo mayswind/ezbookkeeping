@@ -239,10 +239,11 @@
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
                                             :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                                            :translate-name="translateNameInTrendsChart"
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
                                             :default-currency="defaultCurrency"
-                                            :show-total-amount-in-tooltip="true"
+                                            :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
                                             id-field="id"
                                             name-field="name"
                                             value-field="totalAmount"
@@ -480,6 +481,16 @@ export default {
         trendsAnalysisData() {
             return this.statisticsStore.trendsAnalysisData;
         },
+        translateNameInTrendsChart() {
+            return this.query.chartDataType === this.allChartDataTypes.TotalExpense.type ||
+                this.query.chartDataType === this.allChartDataTypes.TotalIncome.type ||
+                this.query.chartDataType === this.allChartDataTypes.TotalBalance.type;
+        },
+        showTotalAmountInTrendsChart() {
+            return this.query.chartDataType !== this.allChartDataTypes.TotalExpense.type &&
+                this.query.chartDataType !== this.allChartDataTypes.TotalIncome.type &&
+                this.query.chartDataType !== this.allChartDataTypes.TotalBalance.type;
+        },
         statisticsTextColor() {
             if (this.query.chartDataType === this.allChartDataTypes.ExpenseByAccount.type ||
                 this.query.chartDataType === this.allChartDataTypes.ExpenseByPrimaryCategory.type ||
@@ -584,7 +595,10 @@ export default {
                 self.query.chartDataType === self.allChartDataTypes.ExpenseBySecondaryCategory.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByAccount.type ||
                 self.query.chartDataType === self.allChartDataTypes.IncomeByPrimaryCategory.type ||
-                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type) {
+                self.query.chartDataType === self.allChartDataTypes.IncomeBySecondaryCategory.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalExpense.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalIncome.type ||
+                self.query.chartDataType === self.allChartDataTypes.TotalBalance.type) {
                 if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                     dispatchPromise = self.statisticsStore.loadCategoricalAnalysis({
                         force: force

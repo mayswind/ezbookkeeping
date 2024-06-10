@@ -166,7 +166,7 @@ export default {
     allChartDataTypes: allChartDataTypes,
     defaultChartDataType: defaultChartDataType,
     defaultCategoricalChartDataRangeType: datetime.allDateRanges.ThisMonth.type,
-    defaultTrendChartDataRangeType: datetime.allDateRanges.RecentTwelveMonths.type,
+    defaultTrendChartDataRangeType: datetime.allDateRanges.ThisYear.type,
     allSortingTypes: allSortingTypes,
     allSortingTypesArray: allSortingTypesArray,
     defaultSortingType: defaultSortingType,

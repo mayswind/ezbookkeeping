@@ -247,7 +247,7 @@
                                             name-field="name"
                                             value-field="totalAmount"
                                             hidden-field="hidden"
-                                            v-else-if="!initing"
+                                            v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
                                             @click="clickTrendChartItem"
                                         />
                                     </v-card-text>

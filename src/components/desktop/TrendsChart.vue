@@ -28,7 +28,6 @@ export default {
         'idField',
         'nameField',
         'valueField',
-        'currencyField',
         'colorField',
         'hiddenField',
         'defaultCurrency',
@@ -139,7 +138,6 @@ export default {
                 const finalItem = {
                     id: (this.idField && item[this.idField]) ? item[this.idField] : item[this.nameField],
                     name: (this.idField && item[this.idField]) ? item[this.idField] : item[this.nameField],
-                    currency: item[this.currencyField],
                     itemStyle: {
                         color: this.getColor(item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[i % colorConstants.defaultChartColors.length]),
                     },
@@ -230,8 +228,7 @@ export default {
                             const name = self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.itemsMap[id][self.nameField] : id;
 
                             if (params[i].data !== 0) {
-                                const currency = self.itemsMap[id] && self.currencyField && self.itemsMap[id][self.currencyField] ? self.itemsMap[id][self.currencyField] : self.defaultCurrency;
-                                const value = self.getDisplayCurrency(params[i].data, currency);
+                                const value = self.getDisplayCurrency(params[i].data, self.defaultCurrency);
                                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + params[i].color + '"></span>';
                                 tooltip += `<span>${name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
                                 tooltip += '</div>';

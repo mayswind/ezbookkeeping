@@ -90,7 +90,6 @@ export default {
         'nameField',
         'valueField',
         'percentField',
-        'currencyField',
         'colorField',
         'hiddenField',
         'minValidPercent',
@@ -139,13 +138,12 @@ export default {
                         value: item[this.valueField],
                         percent: (item[this.percentField] > 0 || item[this.percentField] === 0 || item[this.percentField] === '0') ? item[this.percentField] : (item[this.valueField] / totalValidValue * 100),
                         actualPercent: item[this.valueField] / totalValidValue,
-                        currency: item[this.currencyField],
                         color: item[this.colorField] ? item[this.colorField] : colorConstants.defaultChartColors[validItems.length % colorConstants.defaultChartColors.length],
                         sourceItem: item
                     };
 
                     finalItem.displayPercent = formatPercent(finalItem.percent, 2, '&lt;0.01');
-                    finalItem.displayValue = this.getDisplayCurrency(finalItem.value, (finalItem.currency || this.defaultCurrency));
+                    finalItem.displayValue = this.getDisplayCurrency(finalItem.value, this.defaultCurrency);
 
                     validItems.push(finalItem);
                 }

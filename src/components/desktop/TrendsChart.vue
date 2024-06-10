@@ -1,6 +1,6 @@
 <template>
     <v-chart autoresize class="trends-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
-             @click="clickItem" />
+             @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
 <script>
@@ -321,6 +321,9 @@ export default {
             }
 
             return color;
+        },
+        onLegendSelectChanged: function (e) {
+            this.selectedLegends = e.selected;
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.getDisplayCurrency(value, currencyCode, {

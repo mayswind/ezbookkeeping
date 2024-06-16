@@ -13,8 +13,11 @@ import (
 type EzBookKeepingPlainFileExporter struct {
 }
 
-const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"
-const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+const lineSeparator = "\n"
+const geoLocationSeparator = " "
+const transactionTagSeparator = ";"
+const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description" + lineSeparator
+const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" + lineSeparator
 
 // toExportedContent returns the exported plain data
 func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
@@ -60,7 +63,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		}
 
 		if transaction.GeoLongitude != 0 || transaction.GeoLatitude != 0 {
-			geoLocation = fmt.Sprintf("%f %f", transaction.GeoLongitude, transaction.GeoLatitude)
+			geoLocation = fmt.Sprintf("%f%s%f", transaction.GeoLongitude, geoLocationSeparator, transaction.GeoLatitude)
 		}
 
 		tags := e.replaceDelimiters(e.getTags(transaction.TransactionId, allTagIndexs, tagMap), separator)
@@ -167,7 +170,7 @@ func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagInde
 
 	for i := 0; i < len(tagIndexs); i++ {
 		if i > 0 {
-			ret.WriteString(";")
+			ret.WriteString(transactionTagSeparator)
 		}
 
 		tagIndex := tagIndexs[i]

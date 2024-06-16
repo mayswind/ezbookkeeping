@@ -574,7 +574,7 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string, fileTyp
 		dataExporter = l.ezBookKeepingCsvExporter
 	}
 
-	result, err := dataExporter.ToExportedContent(uid, time.Local, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())

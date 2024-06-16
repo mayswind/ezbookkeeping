@@ -17,7 +17,7 @@ const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Cur
 const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
 
 // toExportedContent returns the exported plain data
-func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, timezone *time.Location, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
+func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
 	var ret strings.Builder
 
 	ret.Grow(len(transactions) * 100)

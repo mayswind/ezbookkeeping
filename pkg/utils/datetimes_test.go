@@ -16,6 +16,20 @@ func TestParseNumericYearMonth(t *testing.T) {
 	assert.Equal(t, expectedMonth, actualMonth)
 }
 
+func TestFormatUnixTimeToLongDateTime(t *testing.T) {
+	unixTime := int64(1617228083)
+	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC
+	utc8Timezone := time.FixedZone("Test Timezone", 28800) // UTC+8
+
+	expectedValue := "2021-03-31 22:01:23"
+	actualValue := FormatUnixTimeToLongDateTime(unixTime, utcTimezone)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2021-04-01 06:01:23"
+	actualValue = FormatUnixTimeToLongDateTime(unixTime, utc8Timezone)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestFormatUnixTimeToLongDateTimeWithoutSecond(t *testing.T) {
 	unixTime := int64(1617228083)
 	utcTimezone := time.FixedZone("Test Timezone", 0)      // UTC

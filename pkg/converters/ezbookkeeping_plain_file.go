@@ -43,7 +43,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		}
 
 		transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
-		transactionTime := utils.FormatUnixTimeToLongDateTimeWithoutSecond(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
+		transactionTime := utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime), transactionTimeZone)
 		transactionTimezone := utils.FormatTimezoneOffset(transactionTimeZone)
 		transactionType := e.getTransactionTypeName(transaction.Type)
 		category := e.replaceDelimiters(e.getTransactionCategoryName(transaction.CategoryId, categoryMap), separator)

@@ -40,6 +40,17 @@ func ParseNumericYearMonth(yearMonth string) (int32, int32, error) {
 	return year, month, nil
 }
 
+// FormatUnixTimeToLongDateTime returns a textual representation of the unix time formatted by long date time format
+func FormatUnixTimeToLongDateTime(unixTime int64, timezone *time.Location) string {
+	t := parseFromUnixTime(unixTime)
+
+	if timezone != nil {
+		t = t.In(timezone)
+	}
+
+	return t.Format(longDateTimeFormat)
+}
+
 // FormatUnixTimeToLongDateTimeInServerTimezone returns a textual representation of the unix time formatted by long date time format
 func FormatUnixTimeToLongDateTimeInServerTimezone(unixTime int64) string {
 	return parseFromUnixTime(unixTime).Format(longDateTimeFormat)

@@ -134,7 +134,7 @@ var AllCurrencyNames = map[string]bool{
 	"SHP": true, //Saint Helena Pound
 	"SLE": true, //Leone (new leone)
 	"SLL": true, //Leone (old leone)
-	"SOS": true, //Somali Shilling
+	"SOS": true, //Somalian shilling
 	"SRD": true, //Surinam Dollar
 	"SSP": true, //South Sudanese Pound
 	"STN": true, //Dobra
@@ -154,7 +154,7 @@ var AllCurrencyNames = map[string]bool{
 	"UGX": true, //Uganda Shilling
 	"USD": true, //US Dollar
 	"UYU": true, //Peso Uruguayo
-	"UZS": true, //Uzbekistan Sum
+	"UZS": true, //Uzbekistani sum
 	"VED": true, //Bolívar Digital
 	"VEF": true, //Bolívar Fuerte
 	"VES": true, //Bolívar Soberano

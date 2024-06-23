@@ -503,7 +503,7 @@ const allCurrencies = {
         code: 'SLL',
         symbol: 'Le'
     },
-    'SOS': { // Somali Shilling
+    'SOS': { // Somalian shilling
         code: 'SOS',
         symbol: 'Sh.So.'
     },
@@ -583,7 +583,7 @@ const allCurrencies = {
         code: 'UYU',
         symbol: '$'
     },
-    'UZS': { // Uzbekistan Sum
+    'UZS': { // Uzbekistani sum
         code: 'UZS'
     },
     'VED': { // Bolívar Digital

@@ -62,6 +62,10 @@ function updateCategoryInTransactionCategoryList(state, category, oldCategory) {
     if (categoryList) {
         for (let i = 0; i < categoryList.length; i++) {
             if (categoryList[i].id === category.id) {
+                if (!category.parentId || category.parentId === '0') {
+                    category.subCategories = categoryList[i].subCategories;
+                }
+
                 categoryList.splice(i, 1, category);
                 break;
             }

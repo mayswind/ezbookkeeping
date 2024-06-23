@@ -23,6 +23,9 @@ import {
     getYearAndMonthFromUnixTime,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
+import {
+    sortStatisticsItems
+} from '@/lib/statistics.js';
 
 function assembleAccountAndCategoryInfo(userStore, accountsStore, transactionCategoriesStore, exchangeRatesStore, items) {
     const finalItems = [];
@@ -254,38 +257,7 @@ function getCategoryTotalAmountItems(items, transactionStatisticsFilter) {
 }
 
 function sortCategoryTotalAmountItems(items, transactionStatisticsFilter) {
-    if (transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.DisplayOrder.type) {
-        items.sort(function (data1, data2) {
-            for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
-                if (data1.displayOrders[i] !== data2.displayOrders[i]) {
-                    return data1.displayOrders[i] - data2.displayOrders[i]; // asc
-                }
-            }
-
-            return data1.name.localeCompare(data2.name, undefined, { // asc
-                numeric: true,
-                sensitivity: 'base'
-            });
-        });
-    } else if (transactionStatisticsFilter.sortingType === statisticsConstants.allSortingTypes.Name.type) {
-        items.sort(function (data1, data2) {
-            return data1.name.localeCompare(data2.name, undefined, { // asc
-                numeric: true,
-                sensitivity: 'base'
-            });
-        });
-    } else {
-        items.sort(function (data1, data2) {
-            if (data1.totalAmount !== data2.totalAmount) {
-                return data2.totalAmount - data1.totalAmount; // desc
-            }
-
-            return data1.name.localeCompare(data2.name, undefined, { // asc
-                numeric: true,
-                sensitivity: 'base'
-            });
-        });
-    }
+    sortStatisticsItems(items, transactionStatisticsFilter.sortingType)
 }
 
 export const useStatisticsStore = defineStore('statistics', {

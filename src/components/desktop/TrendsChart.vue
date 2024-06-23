@@ -17,6 +17,9 @@ import {
     getYearMonthStringFromObject,
     getAllYearMonthUnixTimesBetweenStartYearMonthAndEndYearMonth
 } from '@/lib/datetime.js';
+import {
+    sortStatisticsItems
+} from '@/lib/statistics.js';
 
 export default {
     props: [
@@ -25,11 +28,13 @@ export default {
         'items',
         'startYearMonth',
         'endYearMonth',
+        'sortingType',
         'idField',
         'nameField',
         'valueField',
         'colorField',
         'hiddenField',
+        'displayOrdersField',
         'translateName',
         'defaultCurrency',
         'showValue',
@@ -223,17 +228,35 @@ export default {
                     formatter: params => {
                         let tooltip = '';
                         let totalAmount = 0;
+                        const displayItems = [];
 
                         for (let i = 0; i < params.length; i++) {
                             const id = params[i].seriesId;
                             const name = self.itemsMap[id] && self.nameField && self.itemsMap[id][self.nameField] ? self.getItemName(self.itemsMap[id][self.nameField]) : id;
+                            const color = params[i].color;
+                            const displayOrders = self.itemsMap[id] && self.displayOrdersField && self.itemsMap[id][self.displayOrdersField] ? self.itemsMap[id][self.displayOrdersField] : [0];
+                            const amount = params[i].data;
 
-                            if (params.length === 1 || params[i].data !== 0) {
-                                const value = self.getDisplayCurrency(params[i].data, self.defaultCurrency);
-                                tooltip += '<div><span class="chart-pointer" style="background-color: ' + params[i].color + '"></span>';
-                                tooltip += `<span>${name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
+                            displayItems.push({
+                                name: name,
+                                color: color,
+                                displayOrders:displayOrders,
+                                totalAmount: amount
+                            });
+
+                            totalAmount += amount;
+                        }
+
+                        sortStatisticsItems(displayItems, self.sortingType)
+
+                        for (let i = 0; i < displayItems.length; i++) {
+                            const item = displayItems[i];
+
+                            if (displayItems.length === 1 || item.totalAmount !== 0) {
+                                const value = self.getDisplayCurrency(item.totalAmount, self.defaultCurrency);
+                                tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
+                                tooltip += `<span>${item.name}</span><span style="margin-left: 20px; float: right">${value}</span><br/>`;
                                 tooltip += '</div>';
-                                totalAmount += params[i].data;
                             }
                         }
 

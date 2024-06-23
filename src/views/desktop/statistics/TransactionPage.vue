@@ -238,6 +238,7 @@
                                             :type="queryChartType"
                                             :start-year-month="query.trendChartStartYearMonth"
                                             :end-year-month="query.trendChartEndYearMonth"
+                                            :sorting-type="querySortingType"
                                             :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
                                             :translate-name="translateNameInTrendsChart"
                                             :show-value="showAmountInChart"
@@ -248,6 +249,7 @@
                                             name-field="name"
                                             value-field="totalAmount"
                                             hidden-field="hidden"
+                                            display-orders-field="displayOrders"
                                             v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
                                             @click="clickTrendChartItem"
                                         />

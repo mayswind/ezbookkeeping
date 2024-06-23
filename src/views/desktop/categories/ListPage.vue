@@ -414,6 +414,10 @@ export default {
                     self.$refs.snackbar.showMessage(result.message);
                 }
 
+                if (self.transactionCategoriesStore.transactionCategoryListStateInvalid) {
+                    self.reload(true);
+                }
+
                 self.updateCardMinHeight();
             }).catch(error => {
                 if (error) {

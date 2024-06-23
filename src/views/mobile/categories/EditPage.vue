@@ -10,6 +10,7 @@
 
         <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
             <f7-list-input label="Category Name" placeholder="Your category name"></f7-list-input>
+            <f7-list-item class="list-item-with-header-and-title" header="Primary Category" title="Primary Category"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-with-multi-item">
                 <template #default>
                     <div class="grid grid-cols-2">
@@ -60,6 +61,23 @@
                 :placeholder="$t('Your category name')"
                 v-model:value="category.name"
             ></f7-list-input>
+
+            <f7-list-item
+                link="#" no-chevron
+                class="list-item-with-header-and-title"
+                :header="$t('Primary Category')"
+                :title="getPrimaryCategoryName(category.parentId)"
+                @click="showPrimaryCategorySheet = true"
+                v-if="editCategoryId && category.parentId && category.parentId !== '0'"
+            >
+                <list-item-selection-sheet value-type="item"
+                                           key-field="id" value-field="id" title-field="name"
+                                           icon-field="icon" icon-type="category" color-field="color"
+                                           :items="allAvailableCategories"
+                                           v-model:show="showPrimaryCategorySheet"
+                                           v-model="category.parentId">
+                </list-item-selection-sheet>
+            </f7-list-item>
 
             <f7-list-item class="list-item-with-header-and-title list-item-with-multi-item">
                 <template #default>
@@ -134,7 +152,11 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
-import { setCategoryModelByAnotherCategory } from '@/lib/category.js';
+import {
+    setCategoryModelByAnotherCategory,
+    allVisiblePrimaryTransactionCategoriesByType
+} from '@/lib/category.js';
+import {getNameByKeyValue} from "@/lib/common";
 
 export default {
     props: [
@@ -153,11 +175,15 @@ export default {
             loading: false,
             loadingError: null,
             category: newTransactionCategory,
+            showPrimaryCategorySheet: false,
             submitting: false
         };
     },
     computed: {
         ...mapStores(useTransactionCategoriesStore),
+        allAvailableCategories() {
+            return allVisiblePrimaryTransactionCategoriesByType(this.transactionCategoriesStore.allTransactionCategories, this.category.type);
+        },
         title() {
             if (!this.editCategoryId) {
                 if (this.category.parentId === '0') {
@@ -274,6 +300,9 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        getPrimaryCategoryName(parentId) {
+            return getNameByKeyValue(this.allAvailableCategories, parentId, 'id', 'name');
         }
     }
 }

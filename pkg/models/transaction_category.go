@@ -69,12 +69,13 @@ type TransactionCategoryCreateWithSubCategories struct {
 
 // TransactionCategoryModifyRequest represents all parameters of transaction category modification request
 type TransactionCategoryModifyRequest struct {
-	Id      int64  `json:"id,string" binding:"required,min=1"`
-	Name    string `json:"name" binding:"required,notBlank,max=32"`
-	Icon    int64  `json:"icon,string" binding:"min=1"`
-	Color   string `json:"color" binding:"required,len=6,validHexRGBColor"`
-	Comment string `json:"comment" binding:"max=255"`
-	Hidden  bool   `json:"hidden"`
+	Id       int64  `json:"id,string" binding:"required,min=1"`
+	Name     string `json:"name" binding:"required,notBlank,max=32"`
+	ParentId int64  `json:"parentId,string" binding:"min=0"`
+	Icon     int64  `json:"icon,string" binding:"min=1"`
+	Color    string `json:"color" binding:"required,len=6,validHexRGBColor"`
+	Comment  string `json:"comment" binding:"max=255"`
+	Hidden   bool   `json:"hidden"`
 }
 
 // TransactionCategoryHideRequest represents all parameters of transaction category hiding request

@@ -21,6 +21,31 @@
                                 v-model="category.name"
                             />
                         </v-col>
+                        <v-col cols="12" md="12" v-if="editCategoryId && category.parentId && category.parentId !== '0'">
+                            <v-select
+                                item-title="name"
+                                item-value="id"
+                                persistent-placeholder
+                                :disabled="loading || submitting"
+                                :label="$t('Primary Category')"
+                                :placeholder="$t('Primary Category')"
+                                :items="allAvailableCategories"
+                                :no-data-text="$t('No available primary category')"
+                                v-model="category.parentId"
+                            >
+                                <template #item="{ props, item }">
+                                    <v-list-item v-bind="props">
+                                        <template #prepend>
+                                            <ItemIcon class="mr-2" icon-type="category"
+                                                      :icon-id="item.raw.icon" :color="item.raw.color"></ItemIcon>
+                                        </template>
+                                        <template #title>
+                                            <div class="text-truncate">{{ item.raw.name }}</div>
+                                        </template>
+                                    </v-list-item>
+                                </template>
+                            </v-select>
+                        </v-col>
                         <v-col cols="12" md="6">
                             <icon-select icon-type="category"
                                          :all-icon-infos="allCategoryIcons"
@@ -76,7 +101,10 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
-import { setCategoryModelByAnotherCategory } from '@/lib/category.js';
+import {
+    setCategoryModelByAnotherCategory,
+    allVisiblePrimaryTransactionCategoriesByType
+} from '@/lib/category.js';
 
 export default {
     props: [
@@ -102,6 +130,9 @@ export default {
     },
     computed: {
         ...mapStores(useTransactionCategoriesStore),
+        allAvailableCategories() {
+            return allVisiblePrimaryTransactionCategoriesByType(this.transactionCategoriesStore.allTransactionCategories, this.category.type);
+        },
         title() {
             if (!this.editCategoryId) {
                 if (this.category.parentId === '0') {

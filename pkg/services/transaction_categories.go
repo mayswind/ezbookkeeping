@@ -249,7 +249,7 @@ func (s *TransactionCategoryService) ModifyCategory(c *core.Context, category *m
 	category.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(category.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		updatedRows, err := sess.ID(category.CategoryId).Cols("name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", category.Uid, false).Update(category)
+		updatedRows, err := sess.ID(category.CategoryId).Cols("parent_category_id", "name", "icon", "color", "comment", "hidden", "updated_unix_time").Where("uid=? AND deleted=?", category.Uid, false).Update(category)
 
 		if err != nil {
 			return err

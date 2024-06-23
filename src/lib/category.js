@@ -116,6 +116,20 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
     return ret;
 }
 
+export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCategories, type) {
+    const allVisibleCategories = allVisibleTransactionCategories(allTransactionCategories);
+
+    if (!allVisibleCategories) {
+        return [];
+    }
+
+    if (!allVisibleCategories[type.toString()]) {
+        return [];
+    }
+
+    return allVisibleCategories[type.toString()].visibleCategories;
+}
+
 export function isSubCategoryIdAvailable(categories, categoryId) {
     if (!categories || !categories.length) {
         return false;

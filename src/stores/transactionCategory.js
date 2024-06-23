@@ -46,7 +46,11 @@ function addCategoryToTransactionCategoryList(state, category) {
     state.allTransactionCategoriesMap[category.id] = category;
 }
 
-function updateCategoryInTransactionCategoryList(state, category) {
+function updateCategoryInTransactionCategoryList(state, category, oldCategory) {
+    if (oldCategory && category.parentId !== oldCategory.parentId) {
+        return false;
+    }
+
     let categoryList = null;
 
     if (!category.parentId || category.parentId === '0') {
@@ -65,6 +69,7 @@ function updateCategoryInTransactionCategoryList(state, category) {
     }
 
     state.allTransactionCategoriesMap[category.id] = category;
+    return true;
 }
 
 function updateCategoryDisplayOrderInCategoryList(state, { category, from, to }) {
@@ -293,7 +298,11 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                     if (!submitCategory.id) {
                         addCategoryToTransactionCategoryList(self, data.result);
                     } else {
-                        updateCategoryInTransactionCategoryList(self, data.result);
+                        const result = updateCategoryInTransactionCategoryList(self, data.result, self.allTransactionCategoriesMap[submitCategory.id]);
+
+                        if (!result && !self.transactionCategoryListStateInvalid) {
+                            self.updateTransactionCategoryListInvalidState(true);
+                        }
                     }
 
                     resolve(data.result);

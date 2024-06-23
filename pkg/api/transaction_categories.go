@@ -173,21 +173,55 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 	}
 
 	newCategory := &models.TransactionCategory{
-		CategoryId: category.CategoryId,
-		Uid:        uid,
-		Name:       categoryModifyReq.Name,
-		Icon:       categoryModifyReq.Icon,
-		Color:      categoryModifyReq.Color,
-		Comment:    categoryModifyReq.Comment,
-		Hidden:     categoryModifyReq.Hidden,
+		CategoryId:       category.CategoryId,
+		Uid:              uid,
+		ParentCategoryId: categoryModifyReq.ParentId,
+		Name:             categoryModifyReq.Name,
+		Icon:             categoryModifyReq.Icon,
+		Color:            categoryModifyReq.Color,
+		Comment:          categoryModifyReq.Comment,
+		Hidden:           categoryModifyReq.Hidden,
 	}
 
-	if newCategory.Name == category.Name &&
+	if newCategory.ParentCategoryId == category.ParentCategoryId &&
+		newCategory.Name == category.Name &&
 		newCategory.Icon == category.Icon &&
 		newCategory.Color == category.Color &&
 		newCategory.Comment == category.Comment &&
 		newCategory.Hidden == category.Hidden {
 		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	if category.ParentCategoryId == 0 && newCategory.ParentCategoryId != 0 {
+		return nil, errs.Or(err, errs.ErrNotAllowChangePrimaryTransactionCategoryToSecondary)
+	}
+
+	if category.ParentCategoryId != 0 && newCategory.ParentCategoryId == 0 {
+		return nil, errs.Or(err, errs.ErrNotAllowChangeSecondaryTransactionCategoryToPrimary)
+	}
+
+	if newCategory.ParentCategoryId != category.ParentCategoryId {
+		fromPrimaryCategory, err := a.categories.GetCategoryByCategoryId(c, uid, category.ParentCategoryId)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get old primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", category.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		toPrimaryCategory, err := a.categories.GetCategoryByCategoryId(c, uid, newCategory.ParentCategoryId)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get new primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", newCategory.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if fromPrimaryCategory.Type != toPrimaryCategory.Type {
+			return nil, errs.Or(err, errs.ErrNotAllowChangePrimaryTransactionType)
+		}
+
+		if toPrimaryCategory.ParentCategoryId != 0 {
+			return nil, errs.Or(err, errs.ErrNotAllowUseSecondaryTransactionAsPrimaryCategory)
+		}
 	}
 
 	err = a.categories.ModifyCategory(c, newCategory)
@@ -200,7 +234,6 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryModifyHandler] user \"uid:%d\" has updated category \"id:%d\" successfully", uid, categoryModifyReq.Id)
 
 	newCategory.Type = category.Type
-	newCategory.ParentCategoryId = category.ParentCategoryId
 	newCategory.DisplayOrder = category.DisplayOrder
 	categoryResp := newCategory.ToTransactionCategoryInfoResponse()
 

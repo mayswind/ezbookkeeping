@@ -436,10 +436,11 @@ export default {
             categories
         });
     },
-    modifyTransactionCategory: ({ id, name, icon, color, comment, hidden }) => {
+    modifyTransactionCategory: ({ id, name, parentId, icon, color, comment, hidden }) => {
         return axios.post('v1/transaction/categories/modify.json', {
             id,
             name,
+            parentId,
             icon,
             color,
             comment,

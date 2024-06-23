@@ -269,6 +269,8 @@ input[type=number] {
 
 body .v-tabs:not(.v-tabs-pill) {
     &.v-tabs--vertical {
+        border-right: inherit;
+
         .v-tab__slider {
             inset-inline-end: unset;
             inset-inline-start: 0;

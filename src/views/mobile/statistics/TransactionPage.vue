@@ -20,6 +20,7 @@
                 <f7-list-item :title="$t(dataType.name)"
                               :key="dataType.type"
                               v-for="dataType in allChartDataTypes"
+                              v-show="dataType.availableAnalysisTypes[analysisType]"
                               @click="setChartDataType(dataType.type)">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.chartDataType === dataType.type"></f7-icon>
@@ -274,6 +275,7 @@ export default {
             loading: true,
             loadingError: null,
             reloading: false,
+            analysisType: statisticsConstants.allAnalysisTypes.CategoricalAnalysis,
             showChartDataTypePopover: false,
             showSortingTypePopover: false,
             showDatePopover: false,

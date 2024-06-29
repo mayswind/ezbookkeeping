@@ -96,7 +96,6 @@ import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import transactionConstants from '@/consts/transaction.js';
-import { isNumber } from '@/lib/common.js';
 import { getConvertedAmount } from '@/lib/numeral.js';
 
 export default {

@@ -11,12 +11,15 @@
             <f7-subnavbar>
                 <f7-segmented strong :class="{ 'readonly': mode !== 'add' }">
                     <f7-button :text="$t('Expense')" :active="transaction.type === allTransactionTypes.Expense"
+                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Expense"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === allTransactionTypes.Income"
+                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Income"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Income"></f7-button>
                     <f7-button :text="$t('Transfer')" :active="transaction.type === allTransactionTypes.Transfer"
+                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Transfer"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Transfer"></f7-button>
                     <f7-button :text="$t('Modify Balance')" :active="transaction.type === allTransactionTypes.ModifyBalance"

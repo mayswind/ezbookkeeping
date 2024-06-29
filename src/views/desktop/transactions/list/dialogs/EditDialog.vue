@@ -40,13 +40,13 @@
                 <div class="mb-4">
                     <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': mode !== 'add' }"
                             :disabled="loading || submitting" v-model="transaction.type">
-                        <v-tab :value="allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Expense" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Expense') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Income" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Income') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Transfer" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Transfer') }}</span>
                         </v-tab>
                         <v-tab :value="allTransactionTypes.ModifyBalance" v-if="transaction.type === allTransactionTypes.ModifyBalance">
@@ -54,7 +54,7 @@
                         </v-tab>
                     </v-tabs>
                     <v-divider class="my-2"/>
-                    <v-tabs direction="vertical" :disabled="loading || submitting" v-model="activeTab">
+                    <v-tabs direction="vertical" :disabled="loading || submitting" :class="{ 'readonly': mode !== 'add' }" v-model="activeTab">
                         <v-tab value="basicInfo">
                             <span>{{ $t('Basic Information') }}</span>
                         </v-tab>

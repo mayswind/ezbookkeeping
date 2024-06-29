@@ -48,7 +48,7 @@ import {
 import {
     getCategorizedAccounts,
     getAllFilteredAccountsBalance
-} from '@/lib/account.js';
+} from './account.js';
 
 import logger from './logger.js';
 import services from './services.js';

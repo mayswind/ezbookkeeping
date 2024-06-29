@@ -302,7 +302,8 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { limitText, formatPercent } from '@/lib/common.js'
+import { limitText } from '@/lib/common.js'
+import { formatPercent } from '@/lib/numeral.js';
 import {
     getYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,

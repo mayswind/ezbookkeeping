@@ -66,7 +66,8 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
-import { isString, appendThousandsSeparator } from '@/lib/common.js';
+import { isString } from '@/lib/common.js';
+import { appendThousandsSeparator } from '@/lib/numeral.js';
 import { numericCurrencyToString, stringCurrencyToNumeric } from '@/lib/currency.js';
 
 export default {

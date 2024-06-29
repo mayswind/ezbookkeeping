@@ -81,7 +81,7 @@ import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 
 import colorConstants from '@/consts/color.js';
-import { formatPercent } from '@/lib/common.js';
+import { formatPercent } from '@/lib/numeral.js';
 
 export default {
     props: [

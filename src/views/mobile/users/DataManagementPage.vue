@@ -73,7 +73,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
-import { appendThousandsSeparator } from '@/lib/common.js';
+import { appendThousandsSeparator } from '@/lib/numeral.js';
 import { isDataExportingEnabled } from '@/lib/server_settings.js';
 
 export default {

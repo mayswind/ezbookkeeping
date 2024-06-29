@@ -368,9 +368,6 @@ import {
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
 import {
-    getAdaptiveDisplayAmountRate
-} from '@/lib/currency.js';
-import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
@@ -458,7 +455,7 @@ export default {
 
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
             const toExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[destinationAccount.currency];
-            const amountRate = getAdaptiveDisplayAmountRate(this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate, this.settingsStore.appSettings.thousandsSeparator);
+            const amountRate = this.$locale.getAdaptiveAmountRate(this.userStore, this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate);
 
             if (!amountRate) {
                 return this.$t('Transfer In Amount');
@@ -494,10 +491,7 @@ export default {
             return this.accountsStore.allAccountsMap;
         },
         categorizedAccounts() {
-            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.exchangeRatesStore, this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, {
-                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
-                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
-            });
+            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
         },
         allCategories() {
             return this.transactionCategoriesStore.allTransactionCategories;
@@ -593,10 +587,10 @@ export default {
             }
         },
         allowedMinAmount() {
-            return transactionConstants.minAmount;
+            return transactionConstants.minAmountNumber;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmount;
+            return transactionConstants.maxAmountNumber;
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
@@ -833,11 +827,8 @@ export default {
 
             return this.getDisplayCurrency(amount);
         },
-        getDisplayCurrency(value, currencyCode) {
-            return this.$locale.getDisplayCurrency(value, currencyCode, {
-                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
-                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
-            });
+        getDisplayCurrency(value) {
+            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, false);
         },
         getPrimaryCategoryName(categoryId, allCategories) {
             return getTransactionPrimaryCategoryName(categoryId, allCategories);

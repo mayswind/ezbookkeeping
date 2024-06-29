@@ -43,8 +43,8 @@
                 <f7-button class="numpad-button numpad-button-function no-right-border" @click="setSymbol('+')">
                     <span class="numpad-button-text numpad-button-text-normal">&plus;</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @click="inputDot()">
-                    <span class="numpad-button-text numpad-button-text-normal">.</span>
+                <f7-button class="numpad-button numpad-button-num" @click="inputDecimalSeparator()">
+                    <span class="numpad-button-text numpad-button-text-normal">{{ decimalSeparator }}</span>
                 </f7-button>
                 <f7-button class="numpad-button numpad-button-num" @click="inputNum(0)">
                     <span class="numpad-button-text numpad-button-text-normal">0</span>
@@ -64,11 +64,9 @@
 
 <script>
 import { mapStores } from 'pinia';
-import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
 
-import { isString } from '@/lib/common.js';
-import { appendThousandsSeparator } from '@/lib/numeral.js';
-import { numericCurrencyToString, stringCurrencyToNumeric } from '@/lib/currency.js';
+import { isNumber, removeAll } from '@/lib/common.js';
 
 export default {
     props: [
@@ -83,21 +81,22 @@ export default {
     ],
     data() {
         const self = this;
+        const userStore = useUserStore();
 
         return {
             previousValue: '',
             currentSymbol: '',
-            currentValue: self.getStringValue(self.modelValue)
+            currentValue: self.getStringValue(userStore, self.modelValue)
         }
     },
     computed: {
-        ...mapStores(useSettingsStore),
-        isEnableThousandsSeparator() {
-            return this.settingsStore.appSettings.thousandsSeparator;
+        ...mapStores(useUserStore),
+        decimalSeparator() {
+            return this.$locale.getCurrentDecimalSeparator(this.userStore);
         },
         currentDisplay() {
-            const previousValue = appendThousandsSeparator(this.previousValue, this.isEnableThousandsSeparator);
-            const currentValue = appendThousandsSeparator(this.currentValue, this.isEnableThousandsSeparator);
+            const previousValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.previousValue);
+            const currentValue = this.$locale.appendDigitGroupingSymbol(this.userStore, this.currentValue);
 
             if (this.currentSymbol) {
                 return `${previousValue} ${this.currentSymbol} ${currentValue}`;
@@ -125,16 +124,19 @@ export default {
         }
     },
     methods: {
-        getStringValue(value) {
-            let str = numericCurrencyToString(value, this.isEnableThousandsSeparator);
+        getStringValue(userStore, value) {
+            let str = this.$locale.formatAmount(userStore, value);
 
-            if (str.indexOf(',')) {
-                str = str.replaceAll(/,/g, '');
+            const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(userStore);
+
+            if (str.indexOf(digitGroupingSymbol) >= 0) {
+                str = removeAll(str, digitGroupingSymbol);
             }
 
-            const dotPos = str.indexOf('.');
+            const decimalSeparator = this.$locale.getCurrentDecimalSeparator(userStore);
+            const decimalSeparatorPos = str.indexOf(decimalSeparator);
 
-            if (dotPos < 0) {
+            if (decimalSeparatorPos < 0) {
                 if (str === '0') {
                     return '';
                 }
@@ -142,8 +144,8 @@ export default {
                 return str;
             }
 
-            let integer = str.substring(0, dotPos);
-            let decimals = str.substring(dotPos + 1, str.length);
+            let integer = str.substring(0, decimalSeparatorPos);
+            let decimals = str.substring(decimalSeparatorPos + 1, str.length);
             let newDecimals = '';
 
             for (let i = decimals.length - 1; i >= 0; i--) {
@@ -160,7 +162,7 @@ export default {
                 return integer;
             }
 
-            return `${integer}.${newDecimals}`;
+            return `${integer}${decimalSeparator}${newDecimals}`;
         },
         inputNum(num) {
             if (!this.previousValue && this.currentSymbol === '−') {
@@ -176,36 +178,34 @@ export default {
                 return;
             }
 
-            const dotPos = this.currentValue.indexOf('.');
+            const decimalSeparatorPos = this.currentValue.indexOf(this.decimalSeparator);
 
-            if (dotPos >= 0 && this.currentValue.substring(dotPos + 1, this.currentValue.length).length >= 2) {
+            if (decimalSeparatorPos >= 0 && this.currentValue.substring(decimalSeparatorPos + 1, this.currentValue.length).length >= 2) {
                 return;
             }
 
             const newValue = this.currentValue + num.toString();
 
-            if (isString(this.minValue) && this.minValue !== '') {
-                const min = stringCurrencyToNumeric(this.minValue);
-                const current = stringCurrencyToNumeric(newValue);
+            if (isNumber(this.minValue)) {
+                const current = this.$locale.parseAmount(this.userStore, newValue);
 
-                if (current < min) {
+                if (current < this.minValue) {
                     return;
                 }
             }
 
-            if (isString(this.maxValue) && this.maxValue !== '') {
-                const max = stringCurrencyToNumeric(this.maxValue);
-                const current = stringCurrencyToNumeric(newValue);
+            if (isNumber(this.maxValue)) {
+                const current = this.$locale.parseAmount(this.userStore, newValue);
 
-                if (current > max) {
+                if (current > this.maxValue) {
                     return;
                 }
             }
 
             this.currentValue = newValue;
         },
-        inputDot() {
-            if (this.currentValue.indexOf('.') >= 0) {
+        inputDecimalSeparator() {
+            if (this.currentValue.indexOf(this.decimalSeparator) >= 0) {
                 return;
             }
 
@@ -220,7 +220,7 @@ export default {
                 this.currentValue = '-0';
             }
 
-            this.currentValue = this.currentValue + '.';
+            this.currentValue = this.currentValue + this.decimalSeparator;
         },
         setSymbol(symbol) {
             if (this.currentValue) {
@@ -258,8 +258,8 @@ export default {
         },
         confirm() {
             if (this.currentSymbol && this.currentValue.length >= 1) {
-                const previousValue = stringCurrencyToNumeric(this.previousValue);
-                const currentValue = stringCurrencyToNumeric(this.currentValue);
+                const previousValue = this.$locale.parseAmount(this.userStore, this.previousValue);
+                const currentValue = this.$locale.parseAmount(this.userStore, this.currentValue);
                 let finalValue = 0;
 
                 switch (this.currentSymbol) {
@@ -276,25 +276,21 @@ export default {
                         finalValue = previousValue;
                 }
 
-                if (isString(this.minValue) && this.minValue !== '') {
-                    const min = stringCurrencyToNumeric(this.minValue);
-
-                    if (finalValue < min) {
+                if (isNumber(this.minValue)) {
+                    if (finalValue < this.minValue) {
                         this.$toast('Numeric Overflow');
                         return false;
                     }
                 }
 
-                if (isString(this.maxValue) && this.maxValue !== '') {
-                    const max = stringCurrencyToNumeric(this.maxValue);
-
-                    if (finalValue > max) {
+                if (isNumber(this.maxValue)) {
+                    if (finalValue > this.maxValue) {
                         this.$toast('Numeric Overflow');
                         return false;
                     }
                 }
 
-                this.currentValue = this.getStringValue(finalValue);
+                this.currentValue = this.getStringValue(this.userStore, finalValue);
                 this.previousValue = '';
                 this.currentSymbol = '';
 
@@ -306,7 +302,7 @@ export default {
 
                 return true;
             } else {
-                const value = stringCurrencyToNumeric(this.currentValue);
+                const value = this.$locale.parseAmount(this.userStore, this.currentValue);
 
                 this.$emit('update:modelValue', value);
                 this.close();
@@ -318,7 +314,7 @@ export default {
             this.$emit('update:show', false);
         },
         onSheetOpen() {
-            this.currentValue = this.getStringValue(this.modelValue);
+            this.currentValue = this.getStringValue(this.userStore, this.modelValue);
         },
         onSheetClosed() {
             this.close();

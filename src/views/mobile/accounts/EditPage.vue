@@ -420,6 +420,7 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
+import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 
 import accountConstants from '@/consts/account.js';
@@ -459,7 +460,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useAccountsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore),
         title() {
             if (!this.editAccountId) {
                 return 'Add Account';
@@ -493,10 +494,10 @@ export default {
             return this.$locale.getAllCurrencies();
         },
         allowedMinAmount() {
-            return transactionConstants.minAmount;
+            return transactionConstants.minAmountNumber;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmount;
+            return transactionConstants.maxAmountNumber;
         }
     },
     watch: {
@@ -647,10 +648,7 @@ export default {
             return this.getDisplayCurrency(account.balance, account.currency);
         },
         getDisplayCurrency(value, currencyCode) {
-            return this.$locale.getDisplayCurrency(value, currencyCode, {
-                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
-                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
-            });
+            return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
         },
         chooseSuitableIcon(oldCategory, newCategory) {
             setAccountSuitableIcon(this.account, oldCategory, newCategory);

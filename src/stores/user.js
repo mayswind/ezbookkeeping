@@ -58,6 +58,18 @@ export const useUserStore = defineStore('user', {
             const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
             return isNumber(userInfo.shortTimeFormat) ? userInfo.shortTimeFormat : settingsStore.shortTimeFormat;
+        },
+        currentUserDecimalSeparator(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.decimalSeparator;
+        },
+        currentUserDigitGroupingSymbol(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.digitGroupingSymbol;
+        },
+        currentUserDigitGrouping(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.digitGrouping;
         }
     },
     actions: {

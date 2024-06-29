@@ -52,18 +52,6 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
-                                    :label="$t('Enable Thousands Separator')"
-                                    :placeholder="$t('Enable Thousands Separator')"
-                                    :items="enableDisableOptions"
-                                    v-model="isEnableThousandsSeparator"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
                                     :label="$t('Currency Display Mode')"
                                     :placeholder="$t('Currency Display Mode')"
                                     :items="[
@@ -246,14 +234,6 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setAutoUpdateExchangeRatesData(value);
-            }
-        },
-        isEnableThousandsSeparator: {
-            get: function () {
-                return this.settingsStore.appSettings.thousandsSeparator;
-            },
-            set: function (value) {
-                this.settingsStore.setEnableThousandsSeparator(value);
             }
         },
         currencyDisplayMode: {

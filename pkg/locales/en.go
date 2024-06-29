@@ -1,6 +1,12 @@
 package locales
 
+import "github.com/mayswind/ezbookkeeping/pkg/models"
+
 var en = &LocaleTextItems{
+	DefaultTypes: &DefaultTypes{
+		DecimalSeparator:    models.DECIMAL_SEPARATOR_DOT,
+		DigitGroupingSymbol: models.DIGIT_GROUPING_SYMBOL_COMMA,
+	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "Verify Email",
 		SalutationFormat:          "Hi %s,",

@@ -114,7 +114,7 @@
                                                            @click="setAsBaseline(exchangeRate.currencyCode, getConvertedAmount(exchangeRate))">
                                                         {{ $t('Set as Base') }}
                                                     </v-btn>
-                                                    <span>{{ getDisplayConvertedAmount(exchangeRate, isEnableThousandsSeparator) }}</span>
+                                                    <span>{{ getConvertedAmount(exchangeRate) }}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -140,12 +140,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import { isNumber } from '@/lib/common.js';
-import {
-    stringCurrencyToNumeric,
-    getConvertedAmount,
-    getDisplayExchangeRateAmount
-} from '@/lib/currency.js';
+import logger from '@/lib/logger.js';
+import { getConvertedAmount } from '@/lib/numeral.js';
 
 import {
     mdiRefresh,
@@ -172,9 +168,6 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
-        isEnableThousandsSeparator() {
-            return this.settingsStore.appSettings.thousandsSeparator;
-        },
         exchangeRatesData() {
             return this.exchangeRatesStore.latestExchangeRates.data;
         },
@@ -248,24 +241,20 @@ export default {
             }
 
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
+            let exchangeRateAmount = 0;
 
             try {
-                return getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
+                exchangeRateAmount = getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
             } catch (e) {
-                return 0;
-            }
-        },
-        getDisplayConvertedAmount(toExchangeRate, isEnableThousandsSeparator) {
-            const rateStr = this.getConvertedAmount(toExchangeRate).toString();
-            return getDisplayExchangeRateAmount(rateStr, isEnableThousandsSeparator);
-        },
-        setAsBaseline(currency, amount) {
-            if (!isNumber(amount)) {
-                amount = '';
+                exchangeRateAmount = 0;
+                logger.warn('failed to convert amount by exchange rates, original base amount is ' + this.baseAmount)
             }
 
+            return this.$locale.formatExchangeRateAmount(this.userStore, exchangeRateAmount);
+        },
+        setAsBaseline(currency, amount) {
             this.baseCurrency = currency;
-            this.baseAmount = stringCurrencyToNumeric(amount.toString());
+            this.baseAmount = this.$locale.parseAmount(this.userStore, amount);
         }
     }
 }

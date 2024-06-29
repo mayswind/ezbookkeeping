@@ -10,7 +10,10 @@ export default {
         'longDateFormat': 'MMDDYYYY',
         'shortDateFormat': 'MMDDYYYY',
         'longTimeFormat': 'HHMMSSA',
-        'shortTimeFormat': 'HHMMA'
+        'shortTimeFormat': 'HHMMA',
+        'decimalSeparator': 'Dot',
+        'digitGroupingSymbol': 'Comma',
+        'digitGrouping': 'ThousandsSeparator'
     },
     'format': { // The type of date or time format is moment format, ref: https://momentjs.com/docs/#/displaying/
         'longDate': {
@@ -171,6 +174,14 @@ export default {
             'short': 'Dec',
             'long': 'December'
         }
+    },
+    'numeral': {
+        'Dot': 'Dot',
+        'Comma': 'Comma',
+        'Space': 'Space',
+        'Apostrophe': 'Apostrophe',
+        'None': 'None',
+        'Thousands Separator': 'Thousands Separator',
     },
     'timezone': {
         'International Date Line West': 'International Date Line West',
@@ -604,6 +615,7 @@ export default {
         'email is not verified': 'Email is not verified',
         'email is verified': 'Email is verified',
         'email validation not allowed': 'Email validation is not allowed',
+        'decimal separator and digit grouping symbol cannot be equal': 'Decimal separator and digit grouping symbol cannot be equal',
         'unauthorized access': 'Unauthorized access',
         'current token is invalid': 'Current token is invalid',
         'current token is expired': 'Current token is expired',
@@ -844,6 +856,9 @@ export default {
     'Short Date Format': 'Short Date Format',
     'Long Time Format': 'Long Time Format',
     'Short Time Format': 'Short Time Format',
+    'Decimal Separator': 'Decimal Separator',
+    'Digit Grouping Symbol': 'Digit Grouping Symbol',
+    'Digit Grouping': 'Digit Grouping',
     'Editable Transaction Range': 'Editable Transaction Range',
     'Today or later': 'Today or later',
     'Recent 24 hours or later': 'Recent 24 hours or later',
@@ -1071,7 +1086,6 @@ export default {
     'System Default': 'System Default',
     'Language Default': 'Language Default',
     'Auto-update Exchange Rates Data': 'Auto-update Exchange Rates Data',
-    'Enable Thousands Separator': 'Enable Thousands Separator',
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',

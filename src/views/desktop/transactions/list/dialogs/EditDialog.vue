@@ -339,9 +339,6 @@ import {
     getCurrentUnixTime
 } from '@/lib/datetime.js';
 import {
-    getAdaptiveDisplayAmountRate
-} from '@/lib/currency.js';
-import {
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
@@ -445,7 +442,7 @@ export default {
 
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[sourceAccount.currency];
             const toExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[destinationAccount.currency];
-            const amountRate = getAdaptiveDisplayAmountRate(this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate, this.settingsStore.appSettings.thousandsSeparator);
+            const amountRate = this.$locale.getAdaptiveAmountRate(this.userStore, this.transaction.sourceAmount, this.transaction.destinationAmount, fromExchangeRate, toExchangeRate);
 
             if (!amountRate) {
                 return this.$t('Transfer In Amount');
@@ -475,10 +472,7 @@ export default {
             return this.accountsStore.allVisiblePlainAccounts;
         },
         categorizedAccounts() {
-            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.exchangeRatesStore, this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, {
-                currencyDisplayMode: this.settingsStore.appSettings.currencyDisplayMode,
-                enableThousandsSeparator: this.settingsStore.appSettings.thousandsSeparator
-            });
+            return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
         },
         allAccountsMap() {
             return this.accountsStore.allAccountsMap;

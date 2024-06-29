@@ -206,6 +206,45 @@
                 </select>
             </f7-list-item>
 
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Decimal Separator')"
+                :title="getNameByKeyValue(allDecimalSeparators, newProfile.decimalSeparator, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Decimal Separator'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Decimal Separator'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.decimalSeparator">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allDecimalSeparators">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Digit Grouping Symbol')"
+                :title="getNameByKeyValue(allDigitGroupingSymbols, newProfile.digitGroupingSymbol, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping Symbol'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping Symbol'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.digitGroupingSymbol">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allDigitGroupingSymbols">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Digit Grouping')"
+                :title="getNameByKeyValue(allDigitGroupingTypes, newProfile.digitGrouping, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.digitGrouping">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allDigitGroupingTypes">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
             <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
@@ -261,7 +300,10 @@ export default {
                 longDateFormat: 0,
                 shortDateFormat: 0,
                 longTimeFormat: 0,
-                shortTimeFormat: 0
+                shortTimeFormat: 0,
+                decimalSeparator: 0,
+                digitGroupingSymbol: 0,
+                digitGrouping: 0
             },
             oldProfile: {
                 email: '',
@@ -274,7 +316,10 @@ export default {
                 longDateFormat: 0,
                 shortDateFormat: 0,
                 longTimeFormat: 0,
-                shortTimeFormat: 0
+                shortTimeFormat: 0,
+                decimalSeparator: 0,
+                digitGroupingSymbol: 0,
+                digitGrouping: 0
             },
             emailVerified: false,
             currentPassword: '',
@@ -318,6 +363,15 @@ export default {
         },
         allShortTimeFormats() {
             return this.$locale.getAllShortTimeFormats();
+        },
+        allDecimalSeparators() {
+            return this.$locale.getAllDecimalSeparators();
+        },
+        allDigitGroupingSymbols() {
+            return this.$locale.getAllDigitGroupingSymbols();
+        },
+        allDigitGroupingTypes() {
+            return this.$locale.getAllDigitGroupingTypes();
         },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
@@ -363,7 +417,10 @@ export default {
                 this.newProfile.longDateFormat === this.oldProfile.longDateFormat &&
                 this.newProfile.shortDateFormat === this.oldProfile.shortDateFormat &&
                 this.newProfile.longTimeFormat === this.oldProfile.longTimeFormat &&
-                this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat) {
+                this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat &&
+                this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
+                this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
+                this.newProfile.digitGrouping === this.oldProfile.digitGrouping) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be blank';
@@ -512,6 +569,9 @@ export default {
             this.oldProfile.shortDateFormat = profile.shortDateFormat;
             this.oldProfile.longTimeFormat = profile.longTimeFormat;
             this.oldProfile.shortTimeFormat = profile.shortTimeFormat;
+            this.oldProfile.decimalSeparator = profile.decimalSeparator;
+            this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
+            this.oldProfile.digitGrouping = profile.digitGrouping;
 
             this.newProfile.email = this.oldProfile.email
             this.newProfile.nickname = this.oldProfile.nickname;
@@ -524,6 +584,9 @@ export default {
             this.newProfile.shortDateFormat = this.oldProfile.shortDateFormat;
             this.newProfile.longTimeFormat = this.oldProfile.longTimeFormat;
             this.newProfile.shortTimeFormat = this.oldProfile.shortTimeFormat;
+            this.newProfile.decimalSeparator = this.oldProfile.decimalSeparator;
+            this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
+            this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
         }
     }
 };

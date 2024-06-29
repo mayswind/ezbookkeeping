@@ -47,11 +47,6 @@
                 <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item>
-                <span>{{ $t('Enable Thousands Separator') }}</span>
-                <f7-toggle :checked="isEnableThousandsSeparator" @toggle:change="isEnableThousandsSeparator = $event"></f7-toggle>
-            </f7-list-item>
-
             <f7-list-item
                 :key="currentLocale + '_currency_display'"
                 :title="$t('Currency Display Mode')"
@@ -164,14 +159,6 @@ export default {
         },
         isEnableApplicationLock() {
             return this.settingsStore.appSettings.applicationLock;
-        },
-        isEnableThousandsSeparator: {
-            get: function () {
-                return this.settingsStore.appSettings.thousandsSeparator;
-            },
-            set: function (value) {
-                this.settingsStore.setEnableThousandsSeparator(value);
-            }
         },
         currencyDisplayMode: {
             get: function () {

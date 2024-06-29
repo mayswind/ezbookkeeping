@@ -109,6 +109,14 @@ export function getObjectOwnFieldCount(object) {
     return count;
 }
 
+export function replaceAll(value, originalValue, targetValue) {
+    return value.replaceAll(new RegExp(originalValue, 'g'), targetValue);
+}
+
+export function removeAll(value, originalValue) {
+    return replaceAll(value, originalValue, '');
+}
+
 export function limitText(value, maxLength) {
     let length = 0;
 

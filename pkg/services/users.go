@@ -248,6 +248,18 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 		updateCols = append(updateCols, "short_time_format")
 	}
 
+	if models.DECIMAL_SEPARATOR_DEFAULT <= user.DecimalSeparator && user.DecimalSeparator <= models.DECIMAL_SEPARATOR_SPACE {
+		updateCols = append(updateCols, "decimal_separator")
+	}
+
+	if models.DIGIT_GROUPING_SYMBOL_DEFAULT <= user.DigitGroupingSymbol && user.DigitGroupingSymbol <= models.DIGIT_GROUPING_SYMBOL_APOSTROPHE {
+		updateCols = append(updateCols, "digit_grouping_symbol")
+	}
+
+	if models.DIGIT_GROUPING_TYPE_DEFAULT <= user.DigitGrouping && user.DigitGrouping <= models.DIGIT_GROUPING_TYPE_THOUSANDS_SEPARATOR {
+		updateCols = append(updateCols, "digit_grouping")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

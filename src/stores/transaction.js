@@ -25,9 +25,6 @@ import {
     getDay,
     getDayOfWeekName
 } from '@/lib/datetime.js';
-import {
-    stringCurrencyToNumeric
-} from '@/lib/currency.js';
 
 const emptyTransactionResult = {
     items: [],
@@ -353,8 +350,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 }
 
                 if ((!sourceAccount || !destinationAccount || transaction.destinationAmount === oldValue || transaction.destinationAmount === 0) &&
-                    (stringCurrencyToNumeric(transactionConstants.minAmount) <= newValue &&
-                        newValue <= stringCurrencyToNumeric(transactionConstants.maxAmount))) {
+                    (transactionConstants.minAmountNumber <= newValue && newValue <= transactionConstants.maxAmountNumber)) {
                     transaction.destinationAmount = newValue;
                 }
             }

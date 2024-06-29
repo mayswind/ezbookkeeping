@@ -13,7 +13,6 @@ const defaultSettings = {
     applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
     autoGetCurrentGeoLocation: false,
-    thousandsSeparator: true,
     currencyDisplayMode: currencyConstants.defaultCurrencyDisplayMode,
     showAmountInHomePage: true,
     timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
@@ -165,14 +164,6 @@ export function isAutoGetCurrentGeoLocation() {
 
 export function setAutoGetCurrentGeoLocation(value) {
     setOption('autoGetCurrentGeoLocation', value);
-}
-
-export function isEnableThousandsSeparator() {
-    return getOption('thousandsSeparator');
-}
-
-export function setEnableThousandsSeparator(value) {
-    setOption('thousandsSeparator', value);
 }
 
 export function getCurrencyDisplayMode() {

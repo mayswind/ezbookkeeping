@@ -1,5 +1,7 @@
 package locales
 
+import "github.com/mayswind/ezbookkeeping/pkg/models"
+
 // DefaultLanguage represents the default language
 var DefaultLanguage = en
 
@@ -21,4 +23,26 @@ func GetLocaleTextItems(locale string) *LocaleTextItems {
 	}
 
 	return DefaultLanguage
+}
+
+func IsDecimalSeparatorEqualsDigitGroupingSymbol(decimalSeparator models.DecimalSeparator, digitGroupingSymbol models.DigitGroupingSymbol, locale string) bool {
+	if decimalSeparator == models.DECIMAL_SEPARATOR_DEFAULT && digitGroupingSymbol == models.DIGIT_GROUPING_SYMBOL_DEFAULT {
+		return false
+	}
+
+	if byte(decimalSeparator) == byte(digitGroupingSymbol) {
+		return true
+	}
+
+	localeTextItems := GetLocaleTextItems(locale)
+
+	if decimalSeparator == models.DECIMAL_SEPARATOR_DEFAULT {
+		decimalSeparator = localeTextItems.DefaultTypes.DecimalSeparator
+	}
+
+	if digitGroupingSymbol == models.DIGIT_GROUPING_SYMBOL_DEFAULT {
+		digitGroupingSymbol = localeTextItems.DefaultTypes.DigitGroupingSymbol
+	}
+
+	return byte(decimalSeparator) == byte(digitGroupingSymbol)
 }

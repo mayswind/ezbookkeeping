@@ -48,7 +48,7 @@
 
         <f7-list strong inset dividers class="margin-vertical" v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
             <f7-list-item swipeout
-                          :after="getDisplayConvertedAmount(exchangeRate)"
+                          :after="getConvertedAmount(exchangeRate)"
                           :key="exchangeRate.currencyCode" v-for="exchangeRate in availableExchangeRates">
                 <template #title>
                     <div class="no-padding no-margin">
@@ -97,12 +97,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import transactionConstants from '@/consts/transaction.js';
 import { isNumber } from '@/lib/common.js';
-import {
-    numericCurrencyToString,
-    stringCurrencyToNumeric,
-    getConvertedAmount,
-    getDisplayExchangeRateAmount
-} from '@/lib/currency.js';
+import { getConvertedAmount } from '@/lib/numeral.js';
 
 export default {
     data() {
@@ -118,9 +113,6 @@ export default {
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useExchangeRatesStore),
-        isEnableThousandsSeparator() {
-            return this.settingsStore.appSettings.thousandsSeparator;
-        },
         exchangeRatesData() {
             return this.exchangeRatesStore.latestExchangeRates.data;
         },
@@ -132,7 +124,7 @@ export default {
             return this.$locale.getAllDisplayExchangeRates(this.exchangeRatesData);
         },
         displayBaseAmount() {
-            return numericCurrencyToString(this.baseAmount, this.isEnableThousandsSeparator);
+            return this.$locale.formatAmount(this.userStore, this.baseAmount);
         },
         baseAmountFontSizeClass() {
             if (this.baseAmount >= 100000000 || this.baseAmount <= -100000000) {
@@ -144,10 +136,10 @@ export default {
             }
         },
         allowedMinAmount() {
-            return transactionConstants.minAmount;
+            return transactionConstants.minAmountNumber;
         },
         allowedMaxAmount() {
-            return transactionConstants.maxAmount;
+            return transactionConstants.maxAmountNumber;
         }
     },
     created() {
@@ -212,19 +204,12 @@ export default {
         },
         getConvertedAmount(toExchangeRate) {
             const fromExchangeRate = this.exchangeRatesStore.latestExchangeRateMap[this.baseCurrency];
-            return getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
-        },
-        getDisplayConvertedAmount(toExchangeRate) {
-            const rateStr = this.getConvertedAmount(toExchangeRate).toString();
-            return getDisplayExchangeRateAmount(rateStr, this.isEnableThousandsSeparator);
+            const exchangeRateAmount = getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
+            return this.$locale.formatExchangeRateAmount(this.userStore, exchangeRateAmount);
         },
         setAsBaseline(currency, amount) {
-            if (!isNumber(amount)) {
-                amount = '';
-            }
-
             this.baseCurrency = currency;
-            this.baseAmount = stringCurrencyToNumeric(amount.toString());
+            this.baseAmount = this.$locale.parseAmount(this.userStore, amount);
         }
     }
 }

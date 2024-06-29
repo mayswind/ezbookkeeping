@@ -10,7 +10,10 @@ export default {
         'longDateFormat': 'YYYYMMDD',
         'shortDateFormat': 'YYYYMMDD',
         'longTimeFormat': 'HHMMSS',
-        'shortTimeFormat': 'HHMM'
+        'shortTimeFormat': 'HHMM',
+        'decimalSeparator': 'Dot',
+        'digitGroupingSymbol': 'Comma',
+        'digitGrouping': 'ThousandsSeparator'
     },
     'format': {
         'longDate': {
@@ -171,6 +174,14 @@ export default {
             'short': '12月',
             'long': '十二月'
         }
+    },
+    'numeral': {
+        'Dot': '句点',
+        'Comma': '逗号',
+        'Space': '空格',
+        'Apostrophe': '撇号',
+        'None': '无',
+        'Thousands Separator': '千位分隔符',
     },
     'timezone': {
         'International Date Line West': '国际日期变更线西',
@@ -604,6 +615,7 @@ export default {
         'email is not verified': '邮箱还未验证通过',
         'email is verified': '邮箱已经验证过',
         'email validation not allowed': '不允许邮箱验证',
+        'decimal separator and digit grouping symbol cannot be equal': '小数点和数字分组符号不能相同',
         'unauthorized access': '未授权的登录',
         'current token is invalid': '当前认证令牌无效',
         'current token is expired': '当前认证令牌已过期',
@@ -844,6 +856,9 @@ export default {
     'Short Date Format': '短日期格式',
     'Long Time Format': '长时间格式',
     'Short Time Format': '短时间格式',
+    'Decimal Separator': '小数点',
+    'Digit Grouping Symbol': '数字分组符号',
+    'Digit Grouping': '数字分组',
     'Editable Transaction Range': '可编辑交易范围',
     'Today or later': '今天或更晚',
     'Recent 24 hours or later': '最近24小时或更晚',
@@ -1071,7 +1086,6 @@ export default {
     'System Default': '系统默认',
     'Language Default': '语言默认',
     'Auto-update Exchange Rates Data': '自动更新汇率数据',
-    'Enable Thousands Separator': '启用千位分隔符',
     'Currency Display Mode': '货币显示模式',
     'Currency Code': '货币代码',
     'Currency Name': '货币名称',

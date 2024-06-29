@@ -1,9 +1,17 @@
 package locales
 
+import "github.com/mayswind/ezbookkeeping/pkg/models"
+
 // LocaleTextItems represents all text items need to be translated
 type LocaleTextItems struct {
+	DefaultTypes                *DefaultTypes
 	VerifyEmailTextItems        *VerifyEmailTextItems
 	ForgetPasswordMailTextItems *ForgetPasswordMailTextItems
+}
+
+type DefaultTypes struct {
+	DecimalSeparator    models.DecimalSeparator
+	DigitGroupingSymbol models.DigitGroupingSymbol
 }
 
 // VerifyEmailTextItems represents text items need to be translated in verify mail

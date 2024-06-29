@@ -1,6 +1,12 @@
 package locales
 
+import "github.com/mayswind/ezbookkeeping/pkg/models"
+
 var zhHans = &LocaleTextItems{
+	DefaultTypes: &DefaultTypes{
+		DecimalSeparator:    models.DECIMAL_SEPARATOR_DOT,
+		DigitGroupingSymbol: models.DIGIT_GROUPING_SYMBOL_COMMA,
+	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "验证邮箱",
 		SalutationFormat:          "%s 您好，",

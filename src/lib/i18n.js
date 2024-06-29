@@ -1,6 +1,7 @@
 import moment from 'moment-timezone';
 
 import { defaultLanguage, allLanguages } from '@/locales/index.js';
+import numeral from '@/consts/numeral.js';
 import datetime from '@/consts/datetime.js';
 import timezone from '@/consts/timezone.js';
 import currency from '@/consts/currency.js';
@@ -11,6 +12,7 @@ import statistics from '@/consts/statistics.js';
 import {
     isString,
     isNumber,
+    isBoolean,
     getTextBefore,
     getTextAfter,
     copyObjectTo,
@@ -36,8 +38,12 @@ import {
 } from './datetime.js';
 
 import {
-    numericCurrencyToString
-} from './currency.js';
+    appendDigitGroupingSymbol,
+    parseAmount,
+    formatAmount,
+    formatExchangeRateAmount,
+    getAdaptiveDisplayAmountRate
+} from './numeral.js';
 
 import {
     getCategorizedAccounts,
@@ -781,6 +787,231 @@ function getAllTimezoneTypesUsedForStatistics(currentTimezone, translateFn) {
     ];
 }
 
+function getAllDecimalSeparators(translateFn) {
+    const defaultDecimalSeparatorTypeName = translateFn('default.decimalSeparator');
+    return getNumeralSeparatorFormats(translateFn, numeral.allDecimalSeparator, numeral.allDecimalSeparatorArray, defaultDecimalSeparatorTypeName, numeral.defaultDecimalSeparator);
+}
+
+function getAllDigitGroupingSymbols(translateFn) {
+    const defaultDigitGroupingSymbolTypeName = translateFn('default.digitGroupingSymbol');
+    return getNumeralSeparatorFormats(translateFn, numeral.allDigitGroupingSymbol, numeral.allDigitGroupingSymbolArray, defaultDigitGroupingSymbolTypeName, numeral.defaultDigitGroupingSymbol);
+}
+
+function getNumeralSeparatorFormats(translateFn, allSeparatorMap, allSeparatorArray, localeDefaultTypeName, systemDefaultType) {
+    let defaultSeparatorType = allSeparatorMap[localeDefaultTypeName];
+
+    if (!defaultSeparatorType) {
+        defaultSeparatorType = systemDefaultType;
+    }
+
+    const ret = [];
+
+    ret.push({
+        type: numeral.defaultValue,
+        symbol: defaultSeparatorType.symbol,
+        displayName: `${translateFn('Language Default')} (${defaultSeparatorType.symbol})`
+    });
+
+    for (let i = 0; i < allSeparatorArray.length; i++) {
+        const type = allSeparatorArray[i];
+
+        ret.push({
+            type: type.type,
+            symbol: type.symbol,
+            displayName: `${translateFn('numeral.' + type.name)} (${type.symbol})`
+        });
+    }
+
+    return ret;
+}
+
+function getAllDigitGroupingTypes(translateFn) {
+    const defaultDigitGroupingTypeName = translateFn('default.digitGrouping');
+    let defaultDigitGroupingType = numeral.allDigitGroupingType[defaultDigitGroupingTypeName];
+
+    if (!defaultDigitGroupingType) {
+        defaultDigitGroupingType = numeral.defaultDigitGroupingType;
+    }
+
+    const ret = [];
+
+    ret.push({
+        type: numeral.defaultValue,
+        displayName: `${translateFn('Language Default')} (${translateFn('numeral.' + defaultDigitGroupingType.name)})`
+    });
+
+    for (let i = 0; i < numeral.allDigitGroupingTypeArray.length; i++) {
+        const type = numeral.allDigitGroupingTypeArray[i];
+
+        ret.push({
+            type: type.type,
+            displayName: translateFn('numeral.' + type.name)
+        });
+    }
+
+    return ret;
+}
+
+function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
+    let decimalSeparatorType = numeral.allDecimalSeparatorMap[decimalSeparator];
+
+    if (!decimalSeparatorType) {
+        const defaultDecimalSeparatorTypeName = translateFn('default.decimalSeparator');
+        decimalSeparatorType = numeral.allDecimalSeparator[defaultDecimalSeparatorTypeName];
+
+        if (!decimalSeparatorType) {
+            decimalSeparatorType = numeral.defaultDecimalSeparator;
+        }
+    }
+
+    return decimalSeparatorType.symbol;
+}
+
+function getCurrentDigitGroupingSymbol(translateFn, digitGroupingSymbol) {
+    let digitGroupingSymbolType = numeral.allDigitGroupingSymbolMap[digitGroupingSymbol];
+
+    if (!digitGroupingSymbolType) {
+        const defaultDigitGroupingSymbolTypeName = translateFn('default.digitGroupingSymbol');
+        digitGroupingSymbolType = numeral.allDigitGroupingSymbol[defaultDigitGroupingSymbolTypeName];
+
+        if (!digitGroupingSymbolType) {
+            digitGroupingSymbolType = numeral.defaultDigitGroupingSymbol;
+        }
+    }
+
+    return digitGroupingSymbolType.symbol;
+}
+
+function getCurrentDigitGroupingType(translateFn, digitGrouping) {
+    let digitGroupingType = numeral.allDigitGroupingTypeMap[digitGrouping];
+
+    if (!digitGroupingType) {
+        const defaultDigitGroupingTypeName = translateFn('default.digitGrouping');
+        digitGroupingType = numeral.allDigitGroupingType[defaultDigitGroupingTypeName];
+
+        if (!digitGroupingType) {
+            digitGroupingType = numeral.defaultDigitGroupingType;
+        }
+    }
+
+    return digitGroupingType.type;
+}
+
+function getNumberFormatOptions(translateFn, userStore) {
+    return {
+        decimalSeparator: getCurrentDecimalSeparator(translateFn, userStore.currentUserDecimalSeparator),
+        digitGroupingSymbol: getCurrentDigitGroupingSymbol(translateFn, userStore.currentUserDigitGroupingSymbol),
+        digitGrouping: getCurrentDigitGroupingType(translateFn, userStore.currentUserDigitGrouping),
+    };
+}
+
+function getNumberWithDigitGroupingSymbol(value, translateFn, userStore) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+    return appendDigitGroupingSymbol(value, numberFormatOptions);
+}
+
+function getParsedAmountNumber(value, translateFn, userStore) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+    return parseAmount(value, numberFormatOptions);
+}
+
+function getFormatedAmount(value, translateFn, userStore) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+    return formatAmount(value, numberFormatOptions);
+}
+
+function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue) {
+    if (!isNumber(value) && !isString(value)) {
+        return value;
+    }
+
+    if (isNumber(value)) {
+        value = value.toString();
+    }
+
+    if (!notConvertValue) {
+        const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+        const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
+
+        if (hasIncompleteFlag) {
+            value = value.substring(0, value.length - 1);
+        }
+
+        value = formatAmount(value, numberFormatOptions);
+
+        if (hasIncompleteFlag) {
+            value = value + '+';
+        }
+    }
+
+    if (!isBoolean(currencyCode) && !currencyCode) {
+        currencyCode = userStore.currentUserDefaultCurrency;
+    } else if (isBoolean(currencyCode) && !currencyCode) {
+        currencyCode = '';
+    }
+
+    const currencyDisplayMode = settingsStore.appSettings.currencyDisplayMode;
+
+    if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
+        const currencyInfo = currency.all[currencyCode];
+        let currencySymbol = currency.defaultCurrencySymbol;
+
+        if (currencyInfo && currencyInfo.symbol) {
+            currencySymbol = currencyInfo.symbol;
+        } else if (currencyInfo && currencyInfo.code) {
+            currencySymbol = currencyInfo.code;
+        }
+
+        return translateFn('format.currency.symbol', {
+            amount: value,
+            symbol: currencySymbol
+        });
+    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Code) {
+        return `${value} ${currencyCode}`;
+    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Name) {
+        const currencyName = getCurrencyName(currencyCode, translateFn);
+        return `${value} ${currencyName}`;
+    } else {
+        return value;
+    }
+}
+
+function getFormatedExchangeRateAmount(value, translateFn, userStore) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+    return formatExchangeRateAmount(value, numberFormatOptions);
+}
+
+function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, translateFn, userStore) {
+    const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
+    return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
+}
+
+function getAmountPrependAndAppendText(currencyCode, translateFn, userStore, settingsStore) {
+    const placeholder = '***';
+    const finalText = getFormatedAmountWithCurrency(placeholder, currencyCode, translateFn, userStore, settingsStore, true);
+
+    if (!finalText) {
+        return null;
+    }
+
+    let prependText = getTextBefore(finalText, placeholder);
+
+    if (prependText) {
+        prependText = prependText.trim();
+    }
+
+    let appendText = getTextAfter(finalText, placeholder);
+
+    if (appendText) {
+        appendText = appendText.trim();
+    }
+
+    return {
+        prependText: prependText,
+        appendText: appendText
+    };
+}
+
 function getAllAccountCategories(translateFn) {
     const allAccountCategories = [];
 
@@ -996,91 +1227,7 @@ function getEnableDisableOptions(translateFn) {
     }];
 }
 
-function getDisplayCurrency(value, currencyCode, options, translateFn) {
-    if (!isNumber(value) && !isString(value)) {
-        return value;
-    }
-
-    if (isNumber(value)) {
-        value = value.toString();
-    }
-
-    if (!options) {
-        options = {};
-    }
-
-    if (!options.notConvertValue) {
-        const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
-
-        if (hasIncompleteFlag) {
-            value = value.substring(0, value.length - 1);
-        }
-
-        value = numericCurrencyToString(value, options.enableThousandsSeparator);
-
-        if (hasIncompleteFlag) {
-            value = value + '+';
-        }
-    }
-
-    const currencyDisplayMode = options.currencyDisplayMode;
-
-    if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
-        const currencyInfo = currency.all[currencyCode];
-        let currencySymbol = currency.defaultCurrencySymbol;
-
-        if (currencyInfo && currencyInfo.symbol) {
-            currencySymbol = currencyInfo.symbol;
-        } else if (currencyInfo && currencyInfo.code) {
-            currencySymbol = currencyInfo.code;
-        }
-
-        return translateFn('format.currency.symbol', {
-            amount: value,
-            symbol: currencySymbol
-        });
-    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Code) {
-        return `${value} ${currencyCode}`;
-    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Name) {
-        const currencyName = getCurrencyName(currencyCode, translateFn);
-        return `${value} ${currencyName}`;
-    } else {
-        return value;
-    }
-}
-
-function getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMode, translateFn) {
-    const options = {
-        currencyDisplayMode: currencyDisplayMode,
-        notConvertValue: true
-    };
-
-    const placeholder = '***';
-    const finalText = getDisplayCurrency(placeholder, currencyCode, options, translateFn);
-
-    if (!finalText) {
-        return null;
-    }
-
-    let prependText = getTextBefore(finalText, placeholder);
-
-    if (prependText) {
-        prependText = prependText.trim();
-    }
-
-    let appendText = getTextAfter(finalText, placeholder);
-
-    if (appendText) {
-        appendText = appendText.trim();
-    }
-
-    return {
-        prependText: prependText,
-        appendText: appendText
-    };
-}
-
-function getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options, translateFn) {
+function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, translateFn) {
     const categorizedAccounts = copyObjectTo(getCategorizedAccounts(allVisibleAccounts), {});
 
     for (let category in categorizedAccounts) {
@@ -1095,9 +1242,9 @@ function getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisible
                 const account = accountCategory.accounts[i];
 
                 if (showAccountBalance && account.isAsset) {
-                    account.displayBalance = getDisplayCurrency(account.balance, account.currency, options, translateFn);
+                    account.displayBalance = getFormatedAmountWithCurrency(account.balance, account.currency, translateFn, userStore, settingsStore);
                 } else if (showAccountBalance && account.isLiability) {
-                    account.displayBalance = getDisplayCurrency(-account.balance, account.currency, options, translateFn);
+                    account.displayBalance = getFormatedAmountWithCurrency(-account.balance, account.currency, translateFn, userStore, settingsStore);
                 } else {
                     account.displayBalance = '***';
                 }
@@ -1136,7 +1283,7 @@ function getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisible
                 totalBalance = totalBalance + '+';
             }
 
-            accountCategory.displayBalance = getDisplayCurrency(totalBalance, defaultCurrency, options, translateFn);
+            accountCategory.displayBalance = getFormatedAmountWithCurrency(totalBalance, defaultCurrency, translateFn, userStore, settingsStore);
         } else {
             accountCategory.displayBalance = '***';
         }
@@ -1384,6 +1531,19 @@ export function i18nFunctions(i18nGlobal) {
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
         getAllTimezoneTypesUsedForStatistics: (currentTimezone) => getAllTimezoneTypesUsedForStatistics(currentTimezone, i18nGlobal.t),
+        getAllDecimalSeparators: () => getAllDecimalSeparators(i18nGlobal.t),
+        getAllDigitGroupingSymbols: () => getAllDigitGroupingSymbols(i18nGlobal.t),
+        getAllDigitGroupingTypes: () => getAllDigitGroupingTypes(i18nGlobal.t),
+        getCurrentDecimalSeparator: (userStore) => getCurrentDecimalSeparator(i18nGlobal.t, userStore.currentUserDecimalSeparator),
+        getCurrentDigitGroupingSymbol: (userStore) => getCurrentDigitGroupingSymbol(i18nGlobal.t, userStore.currentUserDigitGroupingSymbol),
+        getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),
+        appendDigitGroupingSymbol: (userStore, value) => getNumberWithDigitGroupingSymbol(value, i18nGlobal.t, userStore),
+        parseAmount: (userStore, value) => getParsedAmountNumber(value, i18nGlobal.t, userStore),
+        formatAmount: (userStore, value) => getFormatedAmount(value, i18nGlobal.t, userStore),
+        formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormatedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
+        formatExchangeRateAmount: (userStore, value) => getFormatedExchangeRateAmount(value, i18nGlobal.t, userStore),
+        getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
+        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode) => getAmountPrependAndAppendText(currencyCode, i18nGlobal.t, userStore, settingsStore),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
@@ -1394,9 +1554,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
-        getDisplayCurrency: (value, currencyCode, options) => getDisplayCurrency(value, currencyCode, options, i18nGlobal.t),
-        getDisplayCurrencyPrependAndAppendText: (currencyCode, currencyDisplayMode) => getDisplayCurrencyPrependAndAppendText(currencyCode, currencyDisplayMode, i18nGlobal.t),
-        getCategorizedAccountsWithDisplayBalance: (exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options) => getCategorizedAccountsWithDisplayBalance(exchangeRatesStore, allVisibleAccounts, showAccountBalance, defaultCurrency, options, i18nGlobal.t),
+        getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),
         setLanguage: (locale, force) => setLanguage(i18nGlobal, locale, force),
         setTimeZone: (timezone) => setTimeZone(timezone),

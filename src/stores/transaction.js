@@ -473,6 +473,10 @@ export const useTransactionsStore = defineStore('transactions', {
                 querys.push('minTime=' + this.transactionsFilter.minTime);
             }
 
+            if (this.transactionsFilter.keyword) {
+                querys.push('keyword=' + encodeURIComponent(this.transactionsFilter.keyword));
+            }
+
             return querys.join('&');
         },
         loadTransactions({ reload, count, page, withCount, autoExpand, defaultCurrency }) {

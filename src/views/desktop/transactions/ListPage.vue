@@ -405,7 +405,8 @@ export default {
         'initMinTime',
         'initType',
         'initCategoryId',
-        'initAccountId'
+        'initAccountId',
+        'initKeyword'
     ],
     data() {
         const { mdAndUp } = useDisplay();
@@ -636,7 +637,8 @@ export default {
             maxTime: this.initMaxTime,
             type: this.initType,
             categoryId: this.initCategoryId,
-            accountId: this.initAccountId
+            accountId: this.initAccountId,
+            keyword: this.initKeyword
         });
     },
     setup() {
@@ -663,7 +665,8 @@ export default {
                 maxTime: to.query.maxTime,
                 type: to.query.type,
                 categoryId: to.query.categoryId,
-                accountId: to.query.accountId
+                accountId: to.query.accountId,
+                keyword: to.query.keyword
             });
         }
     },
@@ -688,8 +691,10 @@ export default {
                 type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
                 categoryId: query.categoryId,
                 accountId: query.accountId,
-                keyword: this.searchKeyword
+                keyword: query.keyword || ''
             });
+
+            this.searchKeyword = query.keyword || '';
 
             this.currentPage = 1;
             this.reload(false);
@@ -874,7 +879,9 @@ export default {
             });
 
             this.currentPage = 1;
-            this.reload(false);
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
+            this.$router.push(this.getFilterLinkUrl());
         },
         add() {
             const self = this;

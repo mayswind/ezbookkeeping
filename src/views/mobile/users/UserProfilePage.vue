@@ -197,7 +197,7 @@
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Short Time Format')"
                 :title="getNameByKeyValue(allShortTimeFormats, newProfile.shortTimeFormat, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Long Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Time Format'), popupCloseLinkText: $t('Done') }"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Short Time Format'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Short Time Format'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="newProfile.shortTimeFormat">
                     <option :value="format.type"

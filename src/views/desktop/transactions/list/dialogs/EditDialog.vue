@@ -611,6 +611,7 @@ export default {
             self.activeTab = 'basicInfo';
             self.loading = true;
             self.submitting = false;
+            self.geoLocationStatus = null;
             self.originalTransactionEditable = false;
 
             const newTransaction = self.transactionsStore.generateNewTransactionModel(options.type);

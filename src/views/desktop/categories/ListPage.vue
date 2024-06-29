@@ -138,6 +138,9 @@
                                                                    :loading="categoryHiding[element.id]"
                                                                    :disabled="loading || updating"
                                                                    @click="hide(element, !element.hidden)">
+                                                                <template #loader>
+                                                                    <v-progress-circular indeterminate size="20" width="2"/>
+                                                                </template>
                                                                 {{ element.hidden ? $t('Show') : $t('Hide') }}
                                                             </v-btn>
                                                             <v-btn class="px-2" color="default"
@@ -155,6 +158,9 @@
                                                                    :loading="categoryRemoving[element.id]"
                                                                    :disabled="loading || updating"
                                                                    @click="remove(element)">
+                                                                <template #loader>
+                                                                    <v-progress-circular indeterminate size="20" width="2"/>
+                                                                </template>
                                                                 {{ $t('Delete') }}
                                                             </v-btn>
                                                             <span class="ml-2">

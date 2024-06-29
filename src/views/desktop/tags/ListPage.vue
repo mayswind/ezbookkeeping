@@ -114,6 +114,9 @@
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
                                                @click="hide(element, !element.hidden)">
+                                            <template #loader>
+                                                <v-progress-circular indeterminate size="20" width="2"/>
+                                            </template>
                                             {{ element.hidden ? $t('Show') : $t('Hide') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
@@ -124,6 +127,9 @@
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
                                                @click="edit(element)">
+                                            <template #loader>
+                                                <v-progress-circular indeterminate size="20" width="2"/>
+                                            </template>
                                             {{ $t('Edit') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
@@ -134,6 +140,9 @@
                                                :disabled="loading || updating"
                                                v-if="editingTag.id !== element.id"
                                                @click="remove(element)">
+                                            <template #loader>
+                                                <v-progress-circular indeterminate size="20" width="2"/>
+                                            </template>
                                             {{ $t('Delete') }}
                                         </v-btn>
                                         <v-btn class="px-2"
@@ -142,6 +151,9 @@
                                                :loading="tagUpdating[element.id]"
                                                :disabled="loading || updating || !isTagModified(element)"
                                                v-if="editingTag.id === element.id" @click="save(editingTag)">
+                                            <template #loader>
+                                                <v-progress-circular indeterminate size="20" width="2"/>
+                                            </template>
                                             {{ $t('Save') }}
                                         </v-btn>
                                         <v-btn class="px-2" color="default"
@@ -182,6 +194,9 @@
                                        :loading="tagUpdating[null]"
                                        :disabled="loading || updating || !isTagModified(newTag)"
                                        @click="save(newTag)">
+                                    <template #loader>
+                                        <v-progress-circular indeterminate size="20" width="2"/>
+                                    </template>
                                     {{ $t('Save') }}
                                 </v-btn>
                                 <v-btn class="px-2" color="default"

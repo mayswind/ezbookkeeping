@@ -1,7 +1,7 @@
 <template>
     <v-row class="match-height">
         <v-col cols="12">
-            <v-card :title="$t('About')">
+            <v-card :title="$t('global.app.title')">
                 <v-card-text>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
@@ -27,6 +27,50 @@
                             <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
                                 https://github.com/mayswind/ezbookkeeping
                             </a>
+                        </v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="12" md="2">
+                            <span class="text-body-1">{{ $t('Report Issue') }}</span>
+                        </v-col>
+                        <v-col cols="12" md="10">
+                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
+                                https://github.com/mayswind/ezbookkeeping/issues
+                            </a>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12" v-if="exchangeRatesData">
+            <v-card :title="$t('Exchange Rates Data')">
+                <v-card-text>
+                    <v-row no-gutters>
+                        <v-col cols="12" md="2">
+                            <span class="text-body-1">{{ $t('Provider') }}</span>
+                        </v-col>
+                        <v-col cols="12" md="10">
+                            <a class="text-body-1" :href="exchangeRatesData.referenceUrl" target="_blank"
+                               v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
+                            <span class="text-body-1" v-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12" v-if="mapProviderName">
+            <v-card :title="$t('Map')">
+                <v-card-text>
+                    <v-row no-gutters>
+                        <v-col cols="12" md="2">
+                            <span class="text-body-1">{{ $t('Provider') }}</span>
+                        </v-col>
+                        <v-col cols="12" md="10">
+                            <a class="text-body-1" :href="mapProviderWebsite" target="_blank"
+                               v-if="mapProviderWebsite">{{ mapProviderName }}</a>
+                            <span class="text-body-1" v-if="!mapProviderWebsite">{{ mapProviderName }}</span>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -68,12 +112,15 @@
 <script>
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import { getMapProvider } from '@/lib/server_settings.js';
+import { getMapWebsite } from '@/lib/map/index.js';
 import licenses from '@/lib/licenses.js';
 
 export default {
     computed: {
-        ...mapStores(useUserStore),
+        ...mapStores(useUserStore, useExchangeRatesStore),
         version() {
             return 'v' + this.$version;
         },
@@ -83,6 +130,16 @@ export default {
             }
 
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.$buildTime);
+        },
+        exchangeRatesData() {
+            return this.exchangeRatesStore.latestExchangeRates.data;
+        },
+        mapProviderName() {
+            const provider = getMapProvider();
+            return provider ? this.$t(`mapprovider.${provider}`) : '';
+        },
+        mapProviderWebsite() {
+            return getMapWebsite();
         },
         licenseLines() {
             return licenses.getLicense().replaceAll(/\r/g, '').split('\n');

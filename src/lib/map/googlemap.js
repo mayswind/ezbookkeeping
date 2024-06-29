@@ -8,6 +8,10 @@ const googleMapHolder = {
     }
 };
 
+export function getGoogleMapWebsite() {
+    return 'https://maps.google.com';
+}
+
 export function loadGoogleMapAssets(language) {
     if (googleMapHolder.googleMap) {
         return;

@@ -11,6 +11,10 @@ const amapHolder = {
     AMap: null
 };
 
+export function getAmapWebsite() {
+    return 'https://www.amap.com';
+}
+
 export function loadAmapAssets() {
     if (amapHolder.AMap) {
         return;

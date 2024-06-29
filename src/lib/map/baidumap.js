@@ -10,6 +10,10 @@ const baiduMapHolder = {
     COORDINATES_BD09: window.COORDINATES_BD09 || 5
 };
 
+export function getBaiduMapWebsite() {
+    return 'https://map.baidu.com';
+}
+
 export function loadBaiduMapAssets() {
     if (baiduMapHolder.BMap) {
         return;

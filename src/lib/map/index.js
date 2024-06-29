@@ -13,6 +13,7 @@ import {
 } from './leaflet.js';
 
 import {
+    getGoogleMapWebsite,
     loadGoogleMapAssets,
     createGoogleMapHolder,
     createGoogleMapInstance,
@@ -22,6 +23,7 @@ import {
 } from './googlemap.js';
 
 import {
+    getBaiduMapWebsite,
     loadBaiduMapAssets,
     createBaiduMapHolder,
     createBaiduMapInstance,
@@ -31,6 +33,7 @@ import {
 } from './baidumap.js';
 
 import {
+    getAmapWebsite,
     loadAmapAssets,
     createAmapHolder,
     createAmapInstance,
@@ -38,6 +41,20 @@ import {
     setAmapCenterMaker,
     removeAmapCenterMaker
 } from './amap.js';
+
+export function getMapWebsite() {
+    if (getMapProvider() === 'custom') {
+        return '';
+    } else if (mapConstants.leafletTileSources[getMapProvider()]) {
+        return mapConstants.leafletTileSources[getMapProvider()].website;
+    } else if (getMapProvider() === 'googlemap') {
+        return getGoogleMapWebsite();
+    } else if (getMapProvider() === 'baidumap') {
+        return getBaiduMapWebsite();
+    } else if (getMapProvider() === 'amap') {
+        return getAmapWebsite();
+    }
+}
 
 export function loadMapAssets(language) {
     if (mapConstants.leafletTileSources[getMapProvider()] || getMapProvider() === 'custom') {

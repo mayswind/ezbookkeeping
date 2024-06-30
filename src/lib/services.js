@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import api from '@/consts/api.js';
+import apiConstants from '@/consts/api.js';
 import userState from './userstate.js';
 import {
     getGoogleMapAPIKey,
@@ -12,8 +12,8 @@ import { getTimezoneOffsetMinutes } from './datetime.js';
 let needBlockRequest = false;
 let blockedRequests = [];
 
-axios.defaults.baseURL = api.baseApiUrlPath;
-axios.defaults.timeout = api.defaultTimeout;
+axios.defaults.baseURL = apiConstants.baseApiUrlPath;
+axios.defaults.timeout = apiConstants.defaultTimeout;
 axios.interceptors.request.use(config => {
     const token = userState.getToken();
 
@@ -508,11 +508,11 @@ export default {
         });
     },
     generateQrCodeUrl: (qrCodeName) => {
-        return `${api.baseQrcodePath}/${qrCodeName}.png`;
+        return `${apiConstants.baseQrcodePath}/${qrCodeName}.png`;
     },
     generateMapProxyTileImageUrl: (mapProvider, language) => {
         const token = userState.getToken();
-        let url = `${api.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+        let url = `${apiConstants.baseProxyUrlPath}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -521,7 +521,7 @@ export default {
         return url;
     },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
-        let url = `${api.googleMapJavascriptUrl}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
+        let url = `${apiConstants.googleMapJavascriptUrl}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
 
         if (language) {
             url = url + `&language=${language}`;
@@ -530,12 +530,12 @@ export default {
         return url;
     },
     generateBaiduMapJavascriptUrl: (callbackFnName) => {
-        return `${api.baiduMapJavascriptUrl}&ak=${getBaiduMapAK()}&callback=${callbackFnName}`;
+        return `${apiConstants.baiduMapJavascriptUrl}&ak=${getBaiduMapAK()}&callback=${callbackFnName}`;
     },
     generateAmapJavascriptUrl: (callbackFnName) => {
-        return `${api.amapJavascriptUrl}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
+        return `${apiConstants.amapJavascriptUrl}&key=${getAmapApplicationKey()}&plugin=AMap.ToolBar&callback=${callbackFnName}`;
     },
     generateAmapApiInternalProxyUrl: () => {
-        return `${window.location.origin}${api.baseAmapApiProxyUrlPath}`;
+        return `${window.location.origin}${apiConstants.baseAmapApiProxyUrlPath}`;
     }
 };

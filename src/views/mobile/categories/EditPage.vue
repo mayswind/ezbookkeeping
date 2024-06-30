@@ -152,11 +152,11 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
+import { getNameByKeyValue } from '@/lib/common.js';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
 } from '@/lib/category.js';
-import {getNameByKeyValue} from "@/lib/common";
 
 export default {
     props: [

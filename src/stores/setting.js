@@ -14,7 +14,6 @@ export const useSettingsStore = defineStore('settings', {
             applicationLockWebAuthn: settings.isEnableApplicationLockWebAuthn(),
             autoUpdateExchangeRatesData: settings.isAutoUpdateExchangeRatesData(),
             autoGetCurrentGeoLocation: settings.isAutoGetCurrentGeoLocation(),
-            currencyDisplayMode: settings.getCurrencyDisplayMode(),
             showAmountInHomePage: settings.isShowAmountInHomePage(),
             timezoneUsedForStatisticsInHomePage: settings.getTimezoneUsedForStatisticsInHomePage(),
             itemsCountInTransactionListPage: settings.getItemsCountInTransactionListPage(),
@@ -66,10 +65,6 @@ export const useSettingsStore = defineStore('settings', {
         setAutoGetCurrentGeoLocation(value) {
             settings.setAutoGetCurrentGeoLocation(value);
             this.appSettings.autoGetCurrentGeoLocation = value;
-        },
-        setCurrencyDisplayMode(value) {
-            settings.setCurrencyDisplayMode(value);
-            this.appSettings.currencyDisplayMode = value;
         },
         setShowAmountInHomePage(value) {
             settings.setShowAmountInHomePage(value);

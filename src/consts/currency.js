@@ -641,21 +641,103 @@ const allCurrencies = {
     }
 };
 
-const allCurrencyDisplayModes = {
+const allCurrencyDisplaySymbol = {
     None: 0,
     Symbol: 1,
     Code: 2,
     Name: 3
 };
 
+const allCurrencyDisplayLocation = {
+    BeforeAmount: 0,
+    AfterAmount: 1
+};
+
+const allCurrencyDisplayType = {
+    None: {
+        type: 1,
+        name: 'None',
+        symbol: allCurrencyDisplaySymbol.None,
+        separator: ''
+    },
+    SymbolBeforeAmount: {
+        type: 2,
+        name: 'Currency Symbol',
+        symbol: allCurrencyDisplaySymbol.Symbol,
+        location: allCurrencyDisplayLocation.BeforeAmount,
+        separator: ' '
+    },
+    SymbolAfterAmount: {
+        type: 3,
+        name: 'Currency Symbol',
+        symbol: allCurrencyDisplaySymbol.Symbol,
+        location: allCurrencyDisplayLocation.AfterAmount,
+        separator: ' '
+    },
+    CodeBeforeAmount: {
+        type: 4,
+        name: 'Currency Code',
+        symbol: allCurrencyDisplaySymbol.Code,
+        location: allCurrencyDisplayLocation.BeforeAmount,
+        separator: ' '
+    },
+    CodeAfterAmount: {
+        type: 5,
+        name: 'Currency Code',
+        symbol: allCurrencyDisplaySymbol.Code,
+        location: allCurrencyDisplayLocation.AfterAmount,
+        separator: ' '
+    },
+    NameBeforeAmount: {
+        type: 6,
+        name: 'Currency Name',
+        symbol: allCurrencyDisplaySymbol.Name,
+        location: allCurrencyDisplayLocation.BeforeAmount,
+        separator: ' '
+    },
+    NameAfterAmount: {
+        type: 7,
+        name: 'Currency Name',
+        symbol: allCurrencyDisplaySymbol.Name,
+        location: allCurrencyDisplayLocation.AfterAmount,
+        separator: ' '
+    }
+};
+
+const allCurrencyDisplayTypeArray = [
+    allCurrencyDisplayType.None,
+    allCurrencyDisplayType.SymbolBeforeAmount,
+    allCurrencyDisplayType.SymbolAfterAmount,
+    allCurrencyDisplayType.CodeBeforeAmount,
+    allCurrencyDisplayType.CodeAfterAmount,
+    allCurrencyDisplayType.NameBeforeAmount,
+    allCurrencyDisplayType.NameAfterAmount
+];
+
+const allCurrencyDisplayTypeMap = {
+    [allCurrencyDisplayType.None.type]: allCurrencyDisplayType.None,
+    [allCurrencyDisplayType.SymbolBeforeAmount.type]: allCurrencyDisplayType.SymbolBeforeAmount,
+    [allCurrencyDisplayType.SymbolAfterAmount.type]: allCurrencyDisplayType.SymbolAfterAmount,
+    [allCurrencyDisplayType.CodeBeforeAmount.type]: allCurrencyDisplayType.CodeBeforeAmount,
+    [allCurrencyDisplayType.CodeAfterAmount.type]: allCurrencyDisplayType.CodeAfterAmount,
+    [allCurrencyDisplayType.NameBeforeAmount.type]: allCurrencyDisplayType.NameBeforeAmount,
+    [allCurrencyDisplayType.NameAfterAmount.type]: allCurrencyDisplayType.NameAfterAmount
+};
+
 const defaultCurrency = allCurrencies.USD.code;
-const defaultCurrencyDisplayMode = allCurrencyDisplayModes.Symbol;
+const defaultCurrencyDisplayType = allCurrencyDisplayType.SymbolBeforeAmount;
+const defaultCurrencyDisplayTypeValue = 0;
 
 export default {
     parentAccountCurrencyPlaceholder: parentAccountCurrencyPlaceholder,
     defaultCurrencySymbol: defaultCurrencySymbol,
     all: allCurrencies,
     defaultCurrency: defaultCurrency,
-    allCurrencyDisplayModes: allCurrencyDisplayModes,
-    defaultCurrencyDisplayMode: defaultCurrencyDisplayMode
+    allCurrencyDisplaySymbol: allCurrencyDisplaySymbol,
+    allCurrencyDisplayLocation: allCurrencyDisplayLocation,
+    allCurrencyDisplayType: allCurrencyDisplayType,
+    allCurrencyDisplayTypeArray: allCurrencyDisplayTypeArray,
+    allCurrencyDisplayTypeMap: allCurrencyDisplayTypeMap,
+    defaultCurrencyDisplayType: defaultCurrencyDisplayType,
+    defaultCurrencyDisplayTypeValue: defaultCurrencyDisplayTypeValue
 };

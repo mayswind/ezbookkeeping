@@ -260,6 +260,10 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 		updateCols = append(updateCols, "digit_grouping")
 	}
 
+	if models.CURRENCY_DISPLAY_TYPE_DEFAULT <= user.CurrencyDisplayType && user.CurrencyDisplayType <= models.CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT {
+		updateCols = append(updateCols, "currency_display_type")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

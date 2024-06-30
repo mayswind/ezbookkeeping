@@ -244,6 +244,19 @@
                                     v-model="newProfile.digitGrouping"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
+                                    :label="$t('Currency Display Mode')"
+                                    :placeholder="$t('Currency Display Mode')"
+                                    :items="allCurrencyDisplayTypes"
+                                    v-model="newProfile.currencyDisplayType"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
 
@@ -303,7 +316,8 @@ export default {
                 shortTimeFormat: 0,
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
-                digitGrouping: 0
+                digitGrouping: 0,
+                currencyDisplayType: 0
             },
             oldProfile: {
                 email: '',
@@ -319,7 +333,8 @@ export default {
                 shortTimeFormat: 0,
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
-                digitGrouping: 0
+                digitGrouping: 0,
+                currencyDisplayType: 0
             },
             emailVerified: false,
             loading: true,
@@ -371,6 +386,9 @@ export default {
         allDigitGroupingTypes() {
             return this.$locale.getAllDigitGroupingTypes();
         },
+        allCurrencyDisplayTypes() {
+            return this.$locale.getAllCurrencyDisplayTypes(this.settingsStore, this.userStore);
+        },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
         },
@@ -405,7 +423,8 @@ export default {
                 this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat &&
                 this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
                 this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
-                this.newProfile.digitGrouping === this.oldProfile.digitGrouping) {
+                this.newProfile.digitGrouping === this.oldProfile.digitGrouping &&
+                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType) {
                 return 'Nothing has been modified';
             } else {
                 return null;
@@ -535,6 +554,7 @@ export default {
             this.oldProfile.decimalSeparator = profile.decimalSeparator;
             this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
             this.oldProfile.digitGrouping = profile.digitGrouping;
+            this.oldProfile.currencyDisplayType = profile.currencyDisplayType;
 
             this.newProfile.email = this.oldProfile.email
             this.newProfile.nickname = this.oldProfile.nickname;
@@ -550,6 +570,7 @@ export default {
             this.newProfile.decimalSeparator = this.oldProfile.decimalSeparator;
             this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
             this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
+            this.newProfile.currencyDisplayType = this.oldProfile.currencyDisplayType;
         }
     }
 };

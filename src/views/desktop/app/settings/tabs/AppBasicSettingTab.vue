@@ -52,23 +52,6 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
-                                    :label="$t('Currency Display Mode')"
-                                    :placeholder="$t('Currency Display Mode')"
-                                    :items="[
-                                        { value: allCurrencyDisplayModes.None, displayName: $t('None') },
-                                        { value: allCurrencyDisplayModes.Symbol, displayName: $t('Currency Symbol') },
-                                        { value: allCurrencyDisplayModes.Code, displayName: $t('Currency Code') },
-                                        { value: allCurrencyDisplayModes.Name, displayName: $t('Currency Name') }
-                                    ]"
-                                    v-model="currencyDisplayMode"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
                                     :label="$t('Show Account Balance')"
                                     :placeholder="$t('Show Account Balance')"
                                     :items="enableDisableOptions"
@@ -182,7 +165,6 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import currencyConstants from '@/consts/currency.js';
 import { getSystemTheme } from '@/lib/ui.js';
 
 export default {
@@ -193,9 +175,6 @@ export default {
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
-        },
-        allCurrencyDisplayModes() {
-            return currencyConstants.allCurrencyDisplayModes;
         },
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics(this.timeZone);
@@ -234,14 +213,6 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setAutoUpdateExchangeRatesData(value);
-            }
-        },
-        currencyDisplayMode: {
-            get: function () {
-                return this.settingsStore.appSettings.currencyDisplayMode;
-            },
-            set: function (value) {
-                this.settingsStore.setCurrencyDisplayMode(value);
             }
         },
         showAccountBalance: {

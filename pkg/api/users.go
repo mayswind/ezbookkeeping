@@ -361,6 +361,14 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) 
 		userNew.DigitGrouping = models.DIGIT_GROUPING_TYPE_INVALID
 	}
 
+	if userUpdateReq.CurrencyDisplayType != nil && *userUpdateReq.CurrencyDisplayType != user.CurrencyDisplayType {
+		user.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
+		userNew.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
+		anythingUpdate = true
+	} else {
+		userNew.CurrencyDisplayType = models.CURRENCY_DISPLAY_TYPE_INVALID
+	}
+
 	if modifyUserLanguage || userNew.DecimalSeparator != models.DECIMAL_SEPARATOR_INVALID || userNew.DigitGroupingSymbol != models.DIGIT_GROUPING_SYMBOL_INVALID {
 		decimalSeparator := userNew.DecimalSeparator
 		digitGroupingSymbol := userNew.DigitGroupingSymbol

@@ -46,6 +46,10 @@ import {
 } from './numeral.js';
 
 import {
+    appendCurrencySymbol
+} from './currency.js';
+
+import {
     getCategorizedAccounts,
     getAllFilteredAccountsBalance
 } from './account.js';
@@ -852,6 +856,42 @@ function getAllDigitGroupingTypes(translateFn) {
     return ret;
 }
 
+function getAllCurrencyDisplayTypes(userStore, settingsStore, translateFn) {
+    const defaultCurrencyDisplayTypeName = translateFn('default.currencyDisplayType');
+    let defaultCurrencyDisplayType = currency.allCurrencyDisplayType[defaultCurrencyDisplayTypeName];
+
+    if (!defaultCurrencyDisplayType) {
+        defaultCurrencyDisplayType = currency.defaultCurrencyDisplayType;
+    }
+
+    const defaultCurrency = userStore.currentUserDefaultCurrency;
+
+    const ret = [];
+    const defaultSampleValue = getFormatedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, defaultCurrencyDisplayType);
+
+    ret.push({
+        type: currency.defaultCurrencyDisplayTypeValue,
+        displayName: `${translateFn('Language Default')} (${defaultSampleValue})`
+    });
+
+    for (let i = 0; i < currency.allCurrencyDisplayTypeArray.length; i++) {
+        const type = currency.allCurrencyDisplayTypeArray[i];
+        let displayName = translateFn(type.name);
+
+        if (type.symbol !== currency.allCurrencyDisplaySymbol.None) {
+            const sampleValue = getFormatedAmountWithCurrency(12345, defaultCurrency, translateFn, userStore, settingsStore, false, type);
+            displayName = `${displayName} (${sampleValue})`
+        }
+
+        ret.push({
+            type: type.type,
+            displayName: displayName
+        });
+    }
+
+    return ret;
+}
+
 function getCurrentDecimalSeparator(translateFn, decimalSeparator) {
     let decimalSeparatorType = numeral.allDecimalSeparatorMap[decimalSeparator];
 
@@ -920,7 +960,7 @@ function getFormatedAmount(value, translateFn, userStore) {
     return formatAmount(value, numberFormatOptions);
 }
 
-function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue) {
+function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue, currencyDisplayType) {
     if (!isNumber(value) && !isString(value)) {
         return value;
     }
@@ -950,30 +990,25 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
         currencyCode = '';
     }
 
-    const currencyDisplayMode = settingsStore.appSettings.currencyDisplayMode;
-
-    if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Symbol) {
-        const currencyInfo = currency.all[currencyCode];
-        let currencySymbol = currency.defaultCurrencySymbol;
-
-        if (currencyInfo && currencyInfo.symbol) {
-            currencySymbol = currencyInfo.symbol;
-        } else if (currencyInfo && currencyInfo.code) {
-            currencySymbol = currencyInfo.code;
-        }
-
-        return translateFn('format.currency.symbol', {
-            amount: value,
-            symbol: currencySymbol
-        });
-    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Code) {
-        return `${value} ${currencyCode}`;
-    } else if (currencyCode && currencyDisplayMode === currency.allCurrencyDisplayModes.Name) {
-        const currencyName = getCurrencyName(currencyCode, translateFn);
-        return `${value} ${currencyName}`;
-    } else {
+    if (!currencyCode) {
         return value;
     }
+
+    if (!currencyDisplayType) {
+        currencyDisplayType = currency.allCurrencyDisplayTypeMap[userStore.currentUserCurrencyDisplayType];
+
+        if (!currencyDisplayType) {
+            const defaultCurrencyDisplayTypeName = translateFn('default.currencyDisplayType');
+            currencyDisplayType = currency.allCurrencyDisplayType[defaultCurrencyDisplayTypeName];
+        }
+
+        if (!currencyDisplayType) {
+            currencyDisplayType = currency.defaultCurrencyDisplayType;
+        }
+    }
+
+    const currencyName = getCurrencyName(currencyCode, translateFn);
+    return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName);
 }
 
 function getFormatedExchangeRateAmount(value, translateFn, userStore) {
@@ -1534,6 +1569,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllDecimalSeparators: () => getAllDecimalSeparators(i18nGlobal.t),
         getAllDigitGroupingSymbols: () => getAllDigitGroupingSymbols(i18nGlobal.t),
         getAllDigitGroupingTypes: () => getAllDigitGroupingTypes(i18nGlobal.t),
+        getAllCurrencyDisplayTypes: (settingsStore, userStore) => getAllCurrencyDisplayTypes(userStore, settingsStore, i18nGlobal.t),
         getCurrentDecimalSeparator: (userStore) => getCurrentDecimalSeparator(i18nGlobal.t, userStore.currentUserDecimalSeparator),
         getCurrentDigitGroupingSymbol: (userStore) => getCurrentDigitGroupingSymbol(i18nGlobal.t, userStore.currentUserDigitGroupingSymbol),
         getCurrentDigitGroupingType: (userStore) => getCurrentDigitGroupingType(i18nGlobal.t, userStore.currentUserDigitGrouping),

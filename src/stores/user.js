@@ -65,6 +65,10 @@ export const useUserStore = defineStore('user', {
         currentUserDigitGrouping(state) {
             const userInfo = state.currentUserInfo || {};
             return userInfo.digitGrouping;
+        },
+        currentUserCurrencyDisplayType(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.currencyDisplayType;
         }
     },
     actions: {

@@ -245,6 +245,19 @@
                 </select>
             </f7-list-item>
 
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Currency Display Mode')"
+                :title="getNameByKeyValue(allCurrencyDisplayTypes, newProfile.currencyDisplayType, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Currency Display Mode'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.currencyDisplayType">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allCurrencyDisplayTypes">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
             <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
@@ -303,7 +316,8 @@ export default {
                 shortTimeFormat: 0,
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
-                digitGrouping: 0
+                digitGrouping: 0,
+                currencyDisplayType: 0
             },
             oldProfile: {
                 email: '',
@@ -319,7 +333,8 @@ export default {
                 shortTimeFormat: 0,
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
-                digitGrouping: 0
+                digitGrouping: 0,
+                currencyDisplayType: 0
             },
             emailVerified: false,
             currentPassword: '',
@@ -373,6 +388,9 @@ export default {
         allDigitGroupingTypes() {
             return this.$locale.getAllDigitGroupingTypes();
         },
+        allCurrencyDisplayTypes() {
+            return this.$locale.getAllCurrencyDisplayTypes(this.settingsStore, this.userStore);
+        },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
         },
@@ -420,7 +438,8 @@ export default {
                 this.newProfile.shortTimeFormat === this.oldProfile.shortTimeFormat &&
                 this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
                 this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
-                this.newProfile.digitGrouping === this.oldProfile.digitGrouping) {
+                this.newProfile.digitGrouping === this.oldProfile.digitGrouping &&
+                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be blank';
@@ -572,6 +591,7 @@ export default {
             this.oldProfile.decimalSeparator = profile.decimalSeparator;
             this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
             this.oldProfile.digitGrouping = profile.digitGrouping;
+            this.oldProfile.currencyDisplayType = profile.currencyDisplayType;
 
             this.newProfile.email = this.oldProfile.email
             this.newProfile.nickname = this.oldProfile.nickname;
@@ -587,6 +607,7 @@ export default {
             this.newProfile.decimalSeparator = this.oldProfile.decimalSeparator;
             this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
             this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
+            this.newProfile.currencyDisplayType = this.oldProfile.currencyDisplayType;
         }
     }
 };

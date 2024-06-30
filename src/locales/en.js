@@ -13,7 +13,8 @@ export default {
         'shortTimeFormat': 'HHMMA',
         'decimalSeparator': 'Dot',
         'digitGroupingSymbol': 'Comma',
-        'digitGrouping': 'ThousandsSeparator'
+        'digitGrouping': 'ThousandsSeparator',
+        'currencyDisplayType': 'SymbolBeforeAmount' // see allCurrencyDisplayType @ currency.js
     },
     'format': { // The type of date or time format is moment format, ref: https://momentjs.com/docs/#/displaying/
         'longDate': {
@@ -65,9 +66,6 @@ export default {
             'hh_mm': 'HH:mm',
             'a_hh_mm': 'A hh:mm',
             'hh_mm_a': 'hh:mm A'
-        },
-        'currency': {
-            'symbol': '{symbol} {amount}'
         },
         'misc': {
             'multiTextJoinSeparator': ', ',

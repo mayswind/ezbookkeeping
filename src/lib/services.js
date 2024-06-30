@@ -169,7 +169,7 @@ export default {
     getProfile: () => {
         return axios.get('v1/users/profile/get.json');
     },
-    updateProfile: ({ email, nickname, password, oldPassword, defaultAccountId, transactionEditScope, language, defaultCurrency, firstDayOfWeek, longDateFormat, shortDateFormat, longTimeFormat, shortTimeFormat, decimalSeparator, digitGroupingSymbol, digitGrouping }) => {
+    updateProfile: ({ email, nickname, password, oldPassword, defaultAccountId, transactionEditScope, language, defaultCurrency, firstDayOfWeek, longDateFormat, shortDateFormat, longTimeFormat, shortTimeFormat, decimalSeparator, digitGroupingSymbol, digitGrouping, currencyDisplayType }) => {
         return axios.post('v1/users/profile/update.json', {
             email,
             nickname,
@@ -186,7 +186,8 @@ export default {
             shortTimeFormat,
             decimalSeparator,
             digitGroupingSymbol,
-            digitGrouping
+            digitGrouping,
+            currencyDisplayType
         });
     },
     resendVerifyEmailByLoginedUser: () => {

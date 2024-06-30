@@ -47,18 +47,6 @@
                 <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
             </f7-list-item>
 
-            <f7-list-item
-                :key="currentLocale + '_currency_display'"
-                :title="$t('Currency Display Mode')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
-                <select v-model="currencyDisplayMode">
-                    <option :value="allCurrencyDisplayModes.None">{{ $t('None') }}</option>
-                    <option :value="allCurrencyDisplayModes.Symbol">{{ $t('Currency Symbol') }}</option>
-                    <option :value="allCurrencyDisplayModes.Code">{{ $t('Currency Code') }}</option>
-                    <option :value="allCurrencyDisplayModes.Name">{{ $t('Currency Name') }}</option>
-                </select>
-            </f7-list-item>
-
             <f7-list-item>
                 <span>{{ $t('Show Account Balance') }}</span>
                 <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
@@ -90,7 +78,6 @@ import { useOverviewStore } from '@/stores/overview.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
-import currencyConstants from '@/consts/currency.js';
 import { getDesktopVersionPath } from '@/lib/version.js';
 
 export default {
@@ -115,9 +102,6 @@ export default {
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
-        },
-        allCurrencyDisplayModes() {
-            return currencyConstants.allCurrencyDisplayModes;
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
@@ -159,14 +143,6 @@ export default {
         },
         isEnableApplicationLock() {
             return this.settingsStore.appSettings.applicationLock;
-        },
-        currencyDisplayMode: {
-            get: function () {
-                return this.settingsStore.appSettings.currencyDisplayMode;
-            },
-            set: function (value) {
-                this.settingsStore.setCurrencyDisplayMode(value);
-            }
         },
         showAccountBalance: {
             get: function () {

@@ -67,6 +67,7 @@ type User struct {
 	DecimalSeparator     DecimalSeparator     `xorm:"TINYINT"`
 	DigitGroupingSymbol  DigitGroupingSymbol  `xorm:"TINYINT"`
 	DigitGrouping        DigitGroupingType    `xorm:"TINYINT"`
+	CurrencyDisplayType  CurrencyDisplayType  `xorm:"TINYINT"`
 	Disabled             bool
 	Deleted              bool `xorm:"NOT NULL"`
 	EmailVerified        bool `xorm:"NOT NULL"`
@@ -95,6 +96,7 @@ type UserBasicInfo struct {
 	DecimalSeparator     DecimalSeparator     `json:"decimalSeparator"`
 	DigitGroupingSymbol  DigitGroupingSymbol  `json:"digitGroupingSymbol"`
 	DigitGrouping        DigitGroupingType    `json:"digitGrouping"`
+	CurrencyDisplayType  CurrencyDisplayType  `json:"currencyDisplayType"`
 	EmailVerified        bool                 `json:"emailVerified"`
 }
 
@@ -151,6 +153,7 @@ type UserProfileUpdateRequest struct {
 	DecimalSeparator     *DecimalSeparator     `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *DigitGroupingSymbol  `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *DigitGroupingType    `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
+	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=7"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile
@@ -178,6 +181,7 @@ type UserProfileResponse struct {
 	DecimalSeparator     DecimalSeparator     `json:"decimalSeparator"`
 	DigitGroupingSymbol  DigitGroupingSymbol  `json:"digitGroupingSymbol"`
 	DigitGrouping        DigitGroupingType    `json:"digitGrouping"`
+	CurrencyDisplayType  CurrencyDisplayType  `json:"currencyDisplayType"`
 	EmailVerified        bool                 `json:"emailVerified"`
 	LastLoginAt          int64                `json:"lastLoginAt"`
 }
@@ -244,6 +248,7 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		DecimalSeparator:     u.DecimalSeparator,
 		DigitGroupingSymbol:  u.DigitGroupingSymbol,
 		DigitGrouping:        u.DigitGrouping,
+		CurrencyDisplayType:  u.CurrencyDisplayType,
 		EmailVerified:        u.EmailVerified,
 	}
 }
@@ -268,6 +273,7 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		DecimalSeparator:     u.DecimalSeparator,
 		DigitGroupingSymbol:  u.DigitGroupingSymbol,
 		DigitGrouping:        u.DigitGrouping,
+		CurrencyDisplayType:  u.CurrencyDisplayType,
 		EmailVerified:        u.EmailVerified,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}

@@ -25,39 +25,34 @@ export const useUserStore = defineStore('user', {
             return userInfo.defaultAccountId || '';
         },
         currentUserLanguage(state) {
-            const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return userInfo.language || settingsStore.language;
+            return userInfo.language;
         },
         currentUserDefaultCurrency(state) {
             const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return userInfo.defaultCurrency || settingsStore.currency;
+            return userInfo.defaultCurrency || settingsStore.localeDefaultSettings.currency;
         },
         currentUserFirstDayOfWeek(state) {
             const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : settingsStore.firstDayOfWeek;
+            return isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : settingsStore.localeDefaultSettings.firstDayOfWeek;
         },
         currentUserLongDateFormat(state) {
-            const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return isNumber(userInfo.longDateFormat) ? userInfo.longDateFormat : settingsStore.longDateFormat;
+            return userInfo.longDateFormat;
         },
         currentUserShortDateFormat(state) {
-            const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return isNumber(userInfo.shortDateFormat) ? userInfo.shortDateFormat : settingsStore.shortDateFormat;
+            return userInfo.shortDateFormat;
         },
         currentUserLongTimeFormat(state) {
-            const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return isNumber(userInfo.longTimeFormat) ? userInfo.longTimeFormat : settingsStore.longTimeFormat;
+            return userInfo.longTimeFormat;
         },
         currentUserShortTimeFormat(state) {
-            const settingsStore = useSettingsStore();
             const userInfo = state.currentUserInfo || {};
-            return isNumber(userInfo.shortTimeFormat) ? userInfo.shortTimeFormat : settingsStore.shortTimeFormat;
+            return userInfo.shortTimeFormat;
         },
         currentUserDecimalSeparator(state) {
             const userInfo = state.currentUserInfo || {};

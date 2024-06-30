@@ -66,7 +66,7 @@
 import { mapStores } from 'pinia';
 import { useUserStore } from '@/stores/user.js';
 
-import { isNumber, removeAll } from '@/lib/common.js';
+import { isString, isNumber, removeAll } from '@/lib/common.js';
 
 export default {
     props: [
@@ -125,6 +125,10 @@ export default {
     },
     methods: {
         getStringValue(userStore, value) {
+            if (!isNumber(value) && !isString(value)) {
+                return '';
+            }
+
             let str = this.$locale.formatAmount(userStore, value);
 
             const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(userStore);

@@ -54,7 +54,7 @@
                         </v-tab>
                     </v-tabs>
                     <v-divider class="my-2"/>
-                    <v-tabs direction="vertical" :disabled="loading || submitting" :class="{ 'readonly': mode !== 'add' }" v-model="activeTab">
+                    <v-tabs direction="vertical" :disabled="loading || submitting" v-model="activeTab">
                         <v-tab value="basicInfo">
                             <span>{{ $t('Basic Information') }}</span>
                         </v-tab>

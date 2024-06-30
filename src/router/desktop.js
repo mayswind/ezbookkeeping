@@ -100,6 +100,7 @@ const router = createRouter({
                         initType: route.query.type,
                         initCategoryId: route.query.categoryId,
                         initAccountId: route.query.accountId,
+                        initAmountFilter: route.query.amountFilter,
                         initKeyword: route.query.keyword
                     })
                 },

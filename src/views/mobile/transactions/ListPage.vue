@@ -42,7 +42,7 @@
                 <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ queryAccountName }}</span>
             </f7-link>
             <f7-link popover-open=".more-popover-menu">
-                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 }"></f7-icon>
+                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter }"></f7-icon>
             </f7-link>
         </f7-toolbar>
 
@@ -403,6 +403,23 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
                     </template>
                 </f7-list-item>
+
+                <f7-list-item group-title :title="$t('Amount')" />
+                <f7-list-item :class="{ 'list-item-selected': !query.amountFilter }" :title="$t('All')" @click="changeAmountFilter('')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.amountFilter"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :key="filterType.type"
+                              :class="{ 'list-item-selected': query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`) }"
+                              :title="$t(filterType.name)"
+                              v-for="filterType in allAmountFilterTypes"
+                              @click="changeAmountFilter(filterType.type)">
+                    <template #after>
+                        <span class="margin-right-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)"></f7-icon>
+                    </template>
+                </f7-list-item>
             </f7-list>
         </f7-popover>
 
@@ -426,6 +443,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
+import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
 import currencyConstants from '@/consts/currency.js';
 import accountConstants from '@/consts/account.js';
@@ -518,6 +536,25 @@ export default {
         queryAccountName() {
             return getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
         },
+        queryAmount() {
+            if (!this.query.amountFilter) {
+                return '';
+            }
+
+            const amountFilterItems = this.query.amountFilter.split(':');
+
+            if (amountFilterItems.length < 2) {
+                return '';
+            }
+
+            const displayAmount = [];
+
+            for (let i = 1; i < amountFilterItems.length; i++) {
+                displayAmount.push(this.getDisplayCurrency(amountFilterItems[i], false));
+            }
+
+            return displayAmount.join(' ~ ');
+        },
         transactions() {
             if (this.loading) {
                 return [];
@@ -530,6 +567,9 @@ export default {
         },
         hasMoreTransaction() {
             return this.transactionsStore.hasMoreTransaction;
+        },
+        allAmountFilterTypes() {
+            return numeralConstants.allAmountFilterTypeArray;
         },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
@@ -777,6 +817,24 @@ export default {
             this.showAccountPopover = false;
             this.reload(null);
         },
+        changeAmountFilter(filterType) {
+            if (this.query.amountFilter === filterType) {
+                return;
+            }
+
+            if (filterType) {
+                this.showMorePopover = false;
+                this.f7router.navigate(`/transaction/filter/amount?type=${filterType}&value=${this.query.amountFilter}`);
+                return;
+            }
+
+            this.transactionsStore.updateTransactionListFilter({
+                amountFilter: filterType
+            });
+
+            this.showMorePopover = false;
+            this.reload(null);
+        },
         changeKeywordFilter(keyword) {
             if (this.query.keyword === keyword) {
                 return;
@@ -1008,7 +1066,10 @@ export default {
     text-overflow: ellipsis;
 }
 
-.date-popover-menu .popover-inner, .category-popover-menu .popover-inner, .account-popover-menu .popover-inner {
+.date-popover-menu .popover-inner,
+.category-popover-menu .popover-inner,
+.account-popover-menu .popover-inner,
+.more-popover-menu .popover-inner{
     max-height: 400px;
     overflow-y: auto;
 }

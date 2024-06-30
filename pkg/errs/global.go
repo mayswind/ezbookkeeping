@@ -82,3 +82,8 @@ func GetParameterInvalidCurrencyMessage(field string) string {
 func GetParameterInvalidHexRGBColorMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid color", field)
 }
+
+// GetParameterInvalidAmountFilterMessage returns specific error message for invalid amount filter parameter error
+func GetParameterInvalidAmountFilterMessage(field string) string {
+	return fmt.Sprintf("parameter \"%s\" is invalid amount filter", field)
+}

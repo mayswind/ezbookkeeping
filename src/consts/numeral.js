@@ -86,6 +86,57 @@ const allDigitGroupingTypeMap = {
     [allDigitGroupingType.ThousandsSeparator.type]: allDigitGroupingType.ThousandsSeparator
 };
 
+const allAmountFilterType = {
+    GreaterThan: {
+        type: 'gt',
+        name: 'Greater than',
+        paramCount: 1
+    },
+    LessThan:{
+        type: 'lt',
+        name: 'Less than',
+        paramCount: 1
+    },
+    EqualTo:{
+        type: 'eq',
+        name: 'Equal to',
+        paramCount: 1
+    },
+    NotEqualTo:{
+        type: 'ne',
+        name: 'Not equal to',
+        paramCount: 1
+    },
+    Between:{
+        type: 'bt',
+        name: 'Between',
+        paramCount: 2
+    },
+    NotBetween:{
+        type: 'nb',
+        name: 'Not between',
+        paramCount: 2
+    }
+};
+
+const allAmountFilterTypeArray = [
+    allAmountFilterType.GreaterThan,
+    allAmountFilterType.LessThan,
+    allAmountFilterType.EqualTo,
+    allAmountFilterType.NotEqualTo,
+    allAmountFilterType.Between,
+    allAmountFilterType.NotBetween,
+];
+
+const allAmountFilterTypeMap = {
+    [allAmountFilterType.GreaterThan.type]: allAmountFilterType.GreaterThan,
+    [allAmountFilterType.LessThan.type]: allAmountFilterType.LessThan,
+    [allAmountFilterType.EqualTo.type]: allAmountFilterType.EqualTo,
+    [allAmountFilterType.NotEqualTo.type]: allAmountFilterType.NotEqualTo,
+    [allAmountFilterType.Between.type]: allAmountFilterType.Between,
+    [allAmountFilterType.NotBetween.type]: allAmountFilterType.NotBetween
+};
+
 const defaultDecimalSeparator = allDecimalSeparator.Dot;
 const defaultDigitGroupingSymbol = allDigitGroupingSymbol.Comma;
 const defaultDigitGroupingType = allDigitGroupingType.ThousandsSeparator;
@@ -101,6 +152,9 @@ export default {
     allDigitGroupingType: allDigitGroupingType,
     allDigitGroupingTypeArray: allDigitGroupingTypeArray,
     allDigitGroupingTypeMap: allDigitGroupingTypeMap,
+    allAmountFilterType: allAmountFilterType,
+    allAmountFilterTypeArray: allAmountFilterTypeArray,
+    allAmountFilterTypeMap: allAmountFilterTypeMap,
     defaultDecimalSeparator: defaultDecimalSeparator,
     defaultDigitGroupingSymbol: defaultDigitGroupingSymbol,
     defaultDigitGroupingType: defaultDigitGroupingType,

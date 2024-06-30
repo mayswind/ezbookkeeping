@@ -73,11 +73,11 @@ func (s *TransactionService) GetAllTransactions(c *core.Context, uid int64, page
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, "", 1, count, false, noDuplicated)
+	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, "", "", 1, count, false, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -101,14 +101,14 @@ func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64
 		actualCount++
 	}
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, noDuplicated)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, amountFilter, keyword, noDuplicated)
 	err = s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).Limit(int(actualCount), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
 
 	return transactions, err
 }
 
 // GetTransactionsInMonthByPage returns all transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -121,7 +121,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid i
 
 	var transactions []*models.Transaction
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, amountFilter, keyword, true)
 	err = s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("transaction_time desc").Find(&transactions)
 
 	transactionsInMonth := make([]*models.Transaction, 0, len(transactions))
@@ -163,11 +163,11 @@ func (s *TransactionService) GetTransactionByTransactionId(c *core.Context, uid 
 
 // GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(c *core.Context, uid int64) (int64, error) {
-	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, "")
+	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, "", "")
 }
 
 // GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, utcOffset int16) (int64, error) {
+func (s *TransactionService) GetMonthTransactionCount(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string, utcOffset int16) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -183,16 +183,16 @@ func (s *TransactionService) GetMonthTransactionCount(c *core.Context, uid int64
 	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
 	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
 
-	return s.GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword)
+	return s.GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, amountFilter, keyword)
 }
 
 // GetTransactionCount returns count of transactions
-func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string) (int64, error) {
+func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, keyword, true)
+	condition, conditionParams := s.getTransactionQueryCondition(uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, amountFilter, keyword, true)
 	return s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).Count(&models.Transaction{})
 }
 
@@ -1331,7 +1331,7 @@ func (s *TransactionService) GetTransactionMapByList(transactions []*models.Tran
 	return transactionMap
 }
 
-func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, keyword string, noDuplicated bool) (string, []any) {
+func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string, noDuplicated bool) (string, []any) {
 	condition := "uid=? AND deleted=?"
 	conditionParams := make([]any, 0, 16)
 	conditionParams = append(conditionParams, uid)
@@ -1397,6 +1397,58 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 		}
 
 		condition = condition + " AND account_id IN (" + conditions.String() + ")"
+	}
+
+	if amountFilter != "" {
+		amountFilterItems := strings.Split(amountFilter, ":")
+
+		if len(amountFilterItems) == 2 && amountFilterItems[0] == "gt" {
+			value, err := utils.StringToInt64(amountFilterItems[1])
+
+			if err == nil {
+				condition = condition + " AND amount > ?"
+				conditionParams = append(conditionParams, value)
+			}
+		} else if len(amountFilterItems) == 2 && amountFilterItems[0] == "lt" {
+			value, err := utils.StringToInt64(amountFilterItems[1])
+
+			if err == nil {
+				condition = condition + " AND amount < ?"
+				conditionParams = append(conditionParams, value)
+			}
+		} else if len(amountFilterItems) == 2 && amountFilterItems[0] == "eq" {
+			value, err := utils.StringToInt64(amountFilterItems[1])
+
+			if err == nil {
+				condition = condition + " AND amount = ?"
+				conditionParams = append(conditionParams, value)
+			}
+		} else if len(amountFilterItems) == 2 && amountFilterItems[0] == "ne" {
+			value, err := utils.StringToInt64(amountFilterItems[1])
+
+			if err == nil {
+				condition = condition + " AND amount <> ?"
+				conditionParams = append(conditionParams, value)
+			}
+		} else if len(amountFilterItems) == 3 && amountFilterItems[0] == "bt" {
+			value1, err := utils.StringToInt64(amountFilterItems[1])
+			value2, err := utils.StringToInt64(amountFilterItems[2])
+
+			if err == nil {
+				condition = condition + " AND amount >= ? AND amount <= ?"
+				conditionParams = append(conditionParams, value1)
+				conditionParams = append(conditionParams, value2)
+			}
+		} else if len(amountFilterItems) == 3 && amountFilterItems[0] == "nb" {
+			value1, err := utils.StringToInt64(amountFilterItems[1])
+			value2, err := utils.StringToInt64(amountFilterItems[2])
+
+			if err == nil {
+				condition = condition + " AND (amount < ? OR amount > ?)"
+				conditionParams = append(conditionParams, value1)
+				conditionParams = append(conditionParams, value2)
+			}
+		}
 	}
 
 	if keyword != "" {

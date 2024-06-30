@@ -279,13 +279,15 @@ export default {
             id
         });
     },
-    getTransactions: ({ maxTime, minTime, count, page, withCount, type, categoryId, accountId, keyword }) => {
+    getTransactions: ({ maxTime, minTime, count, page, withCount, type, categoryId, accountId, amountFilter, keyword }) => {
+        amountFilter = encodeURIComponent(amountFilter);
         keyword = encodeURIComponent(keyword);
-        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&count=${count}&page=${page}&with_count=${withCount}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/list.json?max_time=${maxTime}&min_time=${minTime}&type=${type}&category_id=${categoryId}&account_id=${accountId}&amount_filter=${amountFilter}&keyword=${keyword}&count=${count}&page=${page}&with_count=${withCount}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    getAllTransactionsByMonth: ({ year, month, type, categoryId, accountId, keyword }) => {
+    getAllTransactionsByMonth: ({ year, month, type, categoryId, accountId, amountFilter, keyword }) => {
+        amountFilter = encodeURIComponent(amountFilter);
         keyword = encodeURIComponent(keyword);
-        return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_id=${categoryId}&account_id=${accountId}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/list/by_month.json?year=${year}&month=${month}&type=${type}&category_id=${categoryId}&account_id=${accountId}&amount_filter=${amountFilter}&keyword=${keyword}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     getTransactionStatistics: ({ startTime, endTime, useTransactionTimezone }) => {
         const queryParams = [];

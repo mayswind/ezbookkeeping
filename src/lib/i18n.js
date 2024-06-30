@@ -175,6 +175,14 @@ const parameterizedErrors = [
             field: 'parameter',
             localized: true
         }]
+    },
+    {
+        localeKey: 'parameter invalid amount filter',
+        regex: /^parameter "(\w+)" is invalid amount filter$/,
+        parameters: [{
+            field: 'parameter',
+            localized: true
+        }]
     }
 ];
 

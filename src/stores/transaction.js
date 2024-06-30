@@ -270,6 +270,7 @@ export const useTransactionsStore = defineStore('transactions', {
             type: 0,
             categoryId: '0',
             accountId: '0',
+            amountFilter: '',
             keyword: ''
         },
         transactions: [],
@@ -365,6 +366,7 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionsFilter.type = 0;
             this.transactionsFilter.categoryId = '0';
             this.transactionsFilter.accountId = '0';
+            this.transactionsFilter.amountFilter = '';
             this.transactionsFilter.keyword = '';
             this.transactions = [];
             this.transactionsNextTimeId = 0;
@@ -412,6 +414,12 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.accountId = '0';
             }
 
+            if (filter && isString(filter.amountFilter)) {
+                this.transactionsFilter.amountFilter = filter.amountFilter;
+            } else {
+                this.transactionsFilter.amountFilter = '';
+            }
+
             if (filter && isString(filter.keyword)) {
                 this.transactionsFilter.keyword = filter.keyword;
             } else {
@@ -443,6 +451,10 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.accountId = filter.accountId;
             }
 
+            if (filter && isString(filter.amountFilter)) {
+                this.transactionsFilter.amountFilter = filter.amountFilter;
+            }
+
             if (filter && isString(filter.keyword)) {
                 this.transactionsFilter.keyword = filter.keyword;
             }
@@ -467,6 +479,10 @@ export const useTransactionsStore = defineStore('transactions', {
             if (this.transactionsFilter.dateType === datetimeConstants.allDateRanges.Custom.type) {
                 querys.push('maxTime=' + this.transactionsFilter.maxTime);
                 querys.push('minTime=' + this.transactionsFilter.minTime);
+            }
+
+            if (this.transactionsFilter.amountFilter) {
+                querys.push('amountFilter=' + encodeURIComponent(this.transactionsFilter.amountFilter));
             }
 
             if (this.transactionsFilter.keyword) {
@@ -497,6 +513,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     type: self.transactionsFilter.type,
                     categoryId: self.transactionsFilter.categoryId,
                     accountId: self.transactionsFilter.accountId,
+                    amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {
                     const data = response.data;
@@ -571,6 +588,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     type: self.transactionsFilter.type,
                     categoryId: self.transactionsFilter.categoryId,
                     accountId: self.transactionsFilter.accountId,
+                    amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {
                     const data = response.data;

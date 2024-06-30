@@ -29,6 +29,10 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Time Format" title="HH:mm:ss" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Time Format" title="HH:mm" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Decimal Separator" title="Dot (.)" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping Symbol" title="Comma (,)" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping" title="Thousands Separator" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Currency Display Mode" title="Currency Symbol" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">

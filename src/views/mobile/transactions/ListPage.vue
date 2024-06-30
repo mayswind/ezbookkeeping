@@ -25,7 +25,7 @@
             </f7-subnavbar>
         </f7-navbar>
 
-        <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
+        <f7-toolbar tabbar bottom class="toolbar-item-auto-size transaction-list-toolbar">
             <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
@@ -35,14 +35,14 @@
             <f7-link :class="{ 'disabled': loading || query.dateType === allDateRanges.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
-            <f7-link class="tabbar-text-with-ellipsis" popover-open=".type-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.type > 0 }">{{ queryTransactionTypeName }}</span>
-            </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
                 <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ queryCategoryName }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".account-popover-menu">
                 <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ queryAccountName }}</span>
+            </f7-link>
+            <f7-link popover-open=".more-popover-menu">
+                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 }"></f7-icon>
             </f7-link>
         </f7-toolbar>
 
@@ -280,38 +280,6 @@
                                     @dateRange:change="changeCustomDateFilter">
         </date-range-selection-sheet>
 
-        <f7-popover class="type-popover-menu"
-                    v-model:opened="showTypePopover"
-                    @popover:open="scrollPopoverToSelectedItem">
-            <f7-list dividers>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="$t('All')" @click="changeTypeFilter(0)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
-                    </template>
-                </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 1 }" :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
-                    </template>
-                </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 2 }" :title="$t('Income')" @click="changeTypeFilter(2)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
-                    </template>
-                </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 3 }" :title="$t('Expense')" @click="changeTypeFilter(3)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
-                    </template>
-                </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.type === 4 }" :title="$t('Transfer')" @click="changeTypeFilter(4)">
-                    <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
-                    </template>
-                </f7-list-item>
-            </f7-list>
-        </f7-popover>
-
         <f7-popover class="category-popover-menu"
                     v-model:opened="showCategoryPopover"
                     @popover:open="scrollPopoverToSelectedItem">
@@ -406,6 +374,38 @@
             </f7-list>
         </f7-popover>
 
+        <f7-popover class="more-popover-menu"
+                    v-model:opened="showMorePopover">
+            <f7-list dividers>
+                <f7-list-item group-title :title="$t('Type')" />
+                <f7-list-item :class="{ 'list-item-selected': query.type === 0 }" :title="$t('All')" @click="changeTypeFilter(0)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 0"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.type === 1 }" :title="$t('Modify Balance')" @click="changeTypeFilter(1)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 1"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.type === 2 }" :title="$t('Income')" @click="changeTypeFilter(2)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 2"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.type === 3 }" :title="$t('Expense')" @click="changeTypeFilter(3)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 3"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.type === 4 }" :title="$t('Transfer')" @click="changeTypeFilter(4)">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.type === 4"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
+
         <f7-actions close-by-outside-click close-on-escape :opened="showDeleteActionSheet" @actions:closed="showDeleteActionSheet = false">
             <f7-actions-group>
                 <f7-actions-label>{{ $t('Are you sure you want to delete this transaction?') }}</f7-actions-label>
@@ -459,9 +459,9 @@ export default {
             customMaxDatetime: 0,
             transactionToDelete: null,
             showDatePopover: false,
-            showTypePopover: false,
             showCategoryPopover: false,
             showAccountPopover: false,
+            showMorePopover: false,
             showCustomDateRangeSheet: false,
             showDeleteActionSheet: false
         };
@@ -511,9 +511,6 @@ export default {
         },
         queryMaxTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.maxTime);
-        },
-        queryTransactionTypeName() {
-            return this.getTransactionTypeName(this.query.type, 'Type');
         },
         queryCategoryName() {
             return getNameByKeyValue(this.allCategories, this.query.categoryId, null, 'name', this.$t('Category'));
@@ -753,7 +750,7 @@ export default {
                 categoryId: removeCategoryFilter ? '0' : undefined
             });
 
-            this.showTypePopover = false;
+            this.showMorePopover = false;
             this.reload(null);
         },
         changeCategoryFilter(categoryId) {
@@ -926,6 +923,10 @@ export default {
 </script>
 
 <style>
+.transaction-list-toolbar .toolbar-inner {
+    padding-right: 8px;
+}
+
 .list.transaction-amount-list .transaction-amount-statistics {
     overflow: hidden;
     text-overflow: ellipsis;

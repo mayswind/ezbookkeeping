@@ -8,6 +8,7 @@ import currency from '@/consts/currency.js';
 import account from '@/consts/account.js';
 import category from '@/consts/category.js';
 import statistics from '@/consts/statistics.js';
+import api from '@/consts/api.js';
 
 import {
     isString,
@@ -56,135 +57,6 @@ import {
 
 import logger from './logger.js';
 import services from './services.js';
-
-const apiNotFoundErrorCode = 100001;
-const specifiedApiNotFoundErrors = {
-    '/api/register.json': {
-        message: 'User registration is disabled'
-    }
-};
-const validatorErrorCode = 200000;
-const parameterizedErrors = [
-    {
-        localeKey: 'parameter invalid',
-        regex: /^parameter "(\w+)" is invalid$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter required',
-        regex: /^parameter "(\w+)" is required$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter too large',
-        regex: /^parameter "(\w+)" must be less than (\d+)$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }, {
-            field: 'number',
-            localized: false
-        }]
-    },
-    {
-        localeKey: 'parameter too long',
-        regex: /^parameter "(\w+)" must be less than (\d+) characters$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }, {
-            field: 'length',
-            localized: false
-        }]
-    },
-    {
-        localeKey: 'parameter too small',
-        regex: /^parameter "(\w+)" must be more than (\d+)$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }, {
-            field: 'number',
-            localized: false
-        }]
-    },
-    {
-        localeKey: 'parameter too short',
-        regex: /^parameter "(\w+)" must be more than (\d+) characters$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }, {
-            field: 'length',
-            localized: false
-        }]
-    },
-    {
-        localeKey: 'parameter length not equal',
-        regex: /^parameter "(\w+)" length is not equal to (\d+)$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }, {
-            field: 'length',
-            localized: false
-        }]
-    },
-    {
-        localeKey: 'parameter cannot be blank',
-        regex: /^parameter "(\w+)" cannot be blank$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter invalid username format',
-        regex: /^parameter "(\w+)" is invalid username format$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter invalid email format',
-        regex: /^parameter "(\w+)" is invalid email format$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter invalid currency',
-        regex: /^parameter "(\w+)" is invalid currency$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter invalid color',
-        regex: /^parameter "(\w+)" is invalid color$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    },
-    {
-        localeKey: 'parameter invalid amount filter',
-        regex: /^parameter "(\w+)" is invalid amount filter$/,
-        parameters: [{
-            field: 'parameter',
-            localized: true
-        }]
-    }
-];
 
 function getAllLanguageInfos() {
     return allLanguages;
@@ -1346,20 +1218,20 @@ function joinMultiText(textArray, translateFn) {
 }
 
 function getLocalizedError(error) {
-    if (error.errorCode === apiNotFoundErrorCode && specifiedApiNotFoundErrors[error.path]) {
+    if (error.errorCode === api.apiNotFoundErrorCode && api.specifiedApiNotFoundErrors[error.path]) {
         return {
-            message: `${specifiedApiNotFoundErrors[error.path].message}`
+            message: `${api.specifiedApiNotFoundErrors[error.path].message}`
         };
     }
 
-    if (error.errorCode !== validatorErrorCode) {
+    if (error.errorCode !== api.validatorErrorCode) {
         return {
             message: `error.${error.errorMessage}`
         };
     }
 
-    for (let i = 0; i < parameterizedErrors.length; i++) {
-        const errorInfo = parameterizedErrors[i];
+    for (let i = 0; i < api.parameterizedErrors.length; i++) {
+        const errorInfo = api.parameterizedErrors[i];
         const matches = error.errorMessage.match(errorInfo.regex);
 
         if (matches && matches.length === errorInfo.parameters.length + 1) {

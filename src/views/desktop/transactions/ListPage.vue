@@ -869,6 +869,10 @@ export default {
                 return;
             }
 
+            if (this.query.dateType === recentDateRange.dateType && this.query.maxTime === recentDateRange.maxTime && this.query.minTime === recentDateRange.minTime) {
+                return;
+            }
+
             this.transactionsStore.updateTransactionListFilter({
                 dateType: recentDateRange.dateType,
                 maxTime: recentDateRange.maxTime,
@@ -886,6 +890,11 @@ export default {
             }
 
             const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+
+            if (this.query.dateType === dateType && this.query.maxTime === maxTime && this.query.minTime === minTime) {
+                this.showCustomDateRangeDialog = false;
+                return;
+            }
 
             this.transactionsStore.updateTransactionListFilter({
                 dateType: dateType,

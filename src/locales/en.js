@@ -5,16 +5,16 @@ export default {
         }
     },
     'default': {
-        'currency': 'USD',
-        'firstDayOfWeek': 'Sunday',
-        'longDateFormat': 'MMDDYYYY',
-        'shortDateFormat': 'MMDDYYYY',
-        'longTimeFormat': 'HHMMSSA',
-        'shortTimeFormat': 'HHMMA',
-        'decimalSeparator': 'Dot',
-        'digitGroupingSymbol': 'Comma',
-        'digitGrouping': 'ThousandsSeparator',
-        'currencyDisplayType': 'SymbolBeforeAmount' // see allCurrencyDisplayType @ currency.js
+        'currency': 'USD', // see allCurrencies @ consts/currency.js
+        'firstDayOfWeek': 'Sunday', // see allWeekDays @ consts/datetime.js
+        'longDateFormat': 'MMDDYYYY', // see allLongDateFormat @ consts/datetime.js
+        'shortDateFormat': 'MMDDYYYY', // see allShortDateFormat @ consts/datetime.js
+        'longTimeFormat': 'HHMMSSA', // see allLongTimeFormat @ consts/datetime.js
+        'shortTimeFormat': 'HHMMA', // see allShortTimeFormat @ consts/datetime.js
+        'decimalSeparator': 'Dot', // see allDecimalSeparator @ consts/numeral.js
+        'digitGroupingSymbol': 'Comma', // see allDigitGroupingSymbol @ consts/numeral.js
+        'digitGrouping': 'ThousandsSeparator', // see allDigitGroupingType @ consts/numeral.js
+        'currencyDisplayType': 'SymbolBeforeAmount' // see allCurrencyDisplayType @ consts/currency.js
     },
     'format': { // The type of date or time format is moment format, ref: https://momentjs.com/docs/#/displaying/
         'longDate': {

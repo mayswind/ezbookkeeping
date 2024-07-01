@@ -204,80 +204,69 @@ function getCurrencyName(currencyCode, translateFn) {
 }
 
 function getAllMeridiemIndicatorNames(translateFn) {
-    return [
-        translateFn('datetime.AM.content'),
-        translateFn('datetime.PM.content')
-    ];
+    const allMeridiemIndicatorNames = [];
+
+    for (let i = 0; i < datetimeConstants.allMeridiemIndicatorsArray.length; i++) {
+        const indicatorName = datetimeConstants.allMeridiemIndicatorsArray[i];
+        allMeridiemIndicatorNames.push(translateFn(`datetime.${indicatorName}.content`));
+    }
+
+    return allMeridiemIndicatorNames;
 }
 
 function getAllLongMonthNames(translateFn) {
-    return [
-        translateFn('datetime.January.long'),
-        translateFn('datetime.February.long'),
-        translateFn('datetime.March.long'),
-        translateFn('datetime.April.long'),
-        translateFn('datetime.May.long'),
-        translateFn('datetime.June.long'),
-        translateFn('datetime.July.long'),
-        translateFn('datetime.August.long'),
-        translateFn('datetime.September.long'),
-        translateFn('datetime.October.long'),
-        translateFn('datetime.November.long'),
-        translateFn('datetime.December.long')
-    ];
+    const allMonthNames = [];
+
+    for (let i = 0; i < datetimeConstants.allMonthsArray.length; i++) {
+        const monthName = datetimeConstants.allMonthsArray[i];
+        allMonthNames.push(translateFn(`datetime.${monthName}.long`));
+    }
+
+    return allMonthNames;
 }
 
 function getAllShortMonthNames(translateFn) {
-    return [
-        translateFn('datetime.January.short'),
-        translateFn('datetime.February.short'),
-        translateFn('datetime.March.short'),
-        translateFn('datetime.April.short'),
-        translateFn('datetime.May.short'),
-        translateFn('datetime.June.short'),
-        translateFn('datetime.July.short'),
-        translateFn('datetime.August.short'),
-        translateFn('datetime.September.short'),
-        translateFn('datetime.October.short'),
-        translateFn('datetime.November.short'),
-        translateFn('datetime.December.short')
-    ];
+    const allMonthNames = [];
+
+    for (let i = 0; i < datetimeConstants.allMonthsArray.length; i++) {
+        const monthName = datetimeConstants.allMonthsArray[i];
+        allMonthNames.push(translateFn(`datetime.${monthName}.short`));
+    }
+
+    return allMonthNames;
 }
 
 function getAllLongWeekdayNames(translateFn) {
-    return [
-        translateFn('datetime.Sunday.long'),
-        translateFn('datetime.Monday.long'),
-        translateFn('datetime.Tuesday.long'),
-        translateFn('datetime.Wednesday.long'),
-        translateFn('datetime.Thursday.long'),
-        translateFn('datetime.Friday.long'),
-        translateFn('datetime.Saturday.long')
-    ];
+    const allWeekNames = [];
+
+    for (let i = 0; i < datetimeConstants.allWeekDaysArray.length; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+        allWeekNames.push(translateFn(`datetime.${weekDay.name}.long`));
+    }
+
+    return allWeekNames;
 }
 
 function getAllShortWeekdayNames(translateFn) {
-    return [
-        translateFn('datetime.Sunday.short'),
-        translateFn('datetime.Monday.short'),
-        translateFn('datetime.Tuesday.short'),
-        translateFn('datetime.Wednesday.short'),
-        translateFn('datetime.Thursday.short'),
-        translateFn('datetime.Friday.short'),
-        translateFn('datetime.Saturday.short')
-    ];
+    const allWeekNames = [];
+
+    for (let i = 0; i < datetimeConstants.allWeekDaysArray.length; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+        allWeekNames.push(translateFn(`datetime.${weekDay.name}.short`));
+    }
+
+    return allWeekNames;
 }
 
 function getAllMinWeekdayNames(translateFn) {
-    return [
-        translateFn('datetime.Sunday.min'),
-        translateFn('datetime.Monday.min'),
-        translateFn('datetime.Tuesday.min'),
-        translateFn('datetime.Wednesday.min'),
-        translateFn('datetime.Thursday.min'),
-        translateFn('datetime.Friday.min'),
-        translateFn('datetime.Saturday.min')
-    ];
+    const allWeekNames = [];
+
+    for (let i = 0; i < datetimeConstants.allWeekDaysArray.length; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+        allWeekNames.push(translateFn(`datetime.${weekDay.name}.min`));
+    }
+
+    return allWeekNames;
 }
 
 function getAllLongDateFormats(translateFn) {
@@ -300,20 +289,20 @@ function getAllShortTimeFormats(translateFn) {
     return getDateTimeFormats(translateFn, datetimeConstants.allShortTimeFormat, datetimeConstants.allShortTimeFormatArray, 'format.shortTime', defaultShortTimeFormatTypeName, datetimeConstants.defaultShortTimeFormat);
 }
 
-function getMonthShortName(month, translateFn) {
-    return translateFn(`datetime.${month}.short`);
+function getMonthShortName(monthName, translateFn) {
+    return translateFn(`datetime.${monthName}.short`);
 }
 
-function getMonthLongName(month, translateFn) {
-    return translateFn(`datetime.${month}.long`);
+function getMonthLongName(monthName, translateFn) {
+    return translateFn(`datetime.${monthName}.long`);
 }
 
-function getWeekdayShortName(weekDay, translateFn) {
-    return translateFn(`datetime.${weekDay}.short`);
+function getWeekdayShortName(weekDayName, translateFn) {
+    return translateFn(`datetime.${weekDayName}.short`);
 }
 
-function getWeekdayLongName(weekDay, translateFn) {
-    return translateFn(`datetime.${weekDay}.long`);
+function getWeekdayLongName(weekDayName, translateFn) {
+    return translateFn(`datetime.${weekDayName}.long`);
 }
 
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
@@ -1293,12 +1282,13 @@ function setLanguage(i18nGlobal, locale, force) {
         weekdaysMin : getAllMinWeekdayNames(i18nGlobal.t),
         meridiem: function (hours) {
             if (isPM(hours)) {
-                return i18nGlobal.t('datetime.PM.content');
+                return i18nGlobal.t(`datetime.${datetimeConstants.allMeridiemIndicators.PM}.content`);
             } else {
-                return i18nGlobal.t('datetime.AM.content');
+                return i18nGlobal.t(`datetime.${datetimeConstants.allMeridiemIndicators.AM}.content`);
             }
         }
     });
+
     services.setLocale(locale);
     document.querySelector('html').setAttribute('lang', locale);
 

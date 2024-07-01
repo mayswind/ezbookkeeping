@@ -674,29 +674,43 @@ const allCurrencyDisplayType = {
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '
     },
-    CodeBeforeAmount: {
+    SymbolBeforeAmountWithoutSpace: {
         type: 4,
+        name: 'Currency Symbol',
+        symbol: allCurrencyDisplaySymbol.Symbol,
+        location: allCurrencyDisplayLocation.BeforeAmount,
+        separator: ''
+    },
+    SymbolAfterAmountWithoutSpace: {
+        type: 5,
+        name: 'Currency Symbol',
+        symbol: allCurrencyDisplaySymbol.Symbol,
+        location: allCurrencyDisplayLocation.AfterAmount,
+        separator: ''
+    },
+    CodeBeforeAmount: {
+        type: 6,
         name: 'Currency Code',
         symbol: allCurrencyDisplaySymbol.Code,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
     },
     CodeAfterAmount: {
-        type: 5,
+        type: 7,
         name: 'Currency Code',
         symbol: allCurrencyDisplaySymbol.Code,
         location: allCurrencyDisplayLocation.AfterAmount,
         separator: ' '
     },
     NameBeforeAmount: {
-        type: 6,
+        type: 8,
         name: 'Currency Name',
         symbol: allCurrencyDisplaySymbol.Name,
         location: allCurrencyDisplayLocation.BeforeAmount,
         separator: ' '
     },
     NameAfterAmount: {
-        type: 7,
+        type: 9,
         name: 'Currency Name',
         symbol: allCurrencyDisplaySymbol.Name,
         location: allCurrencyDisplayLocation.AfterAmount,
@@ -708,6 +722,8 @@ const allCurrencyDisplayTypeArray = [
     allCurrencyDisplayType.None,
     allCurrencyDisplayType.SymbolBeforeAmount,
     allCurrencyDisplayType.SymbolAfterAmount,
+    allCurrencyDisplayType.SymbolBeforeAmountWithoutSpace,
+    allCurrencyDisplayType.SymbolAfterAmountWithoutSpace,
     allCurrencyDisplayType.CodeBeforeAmount,
     allCurrencyDisplayType.CodeAfterAmount,
     allCurrencyDisplayType.NameBeforeAmount,
@@ -718,6 +734,8 @@ const allCurrencyDisplayTypeMap = {
     [allCurrencyDisplayType.None.type]: allCurrencyDisplayType.None,
     [allCurrencyDisplayType.SymbolBeforeAmount.type]: allCurrencyDisplayType.SymbolBeforeAmount,
     [allCurrencyDisplayType.SymbolAfterAmount.type]: allCurrencyDisplayType.SymbolAfterAmount,
+    [allCurrencyDisplayType.SymbolBeforeAmountWithoutSpace.type]: allCurrencyDisplayType.SymbolBeforeAmountWithoutSpace,
+    [allCurrencyDisplayType.SymbolAfterAmountWithoutSpace.type]: allCurrencyDisplayType.SymbolAfterAmountWithoutSpace,
     [allCurrencyDisplayType.CodeBeforeAmount.type]: allCurrencyDisplayType.CodeBeforeAmount,
     [allCurrencyDisplayType.CodeAfterAmount.type]: allCurrencyDisplayType.CodeAfterAmount,
     [allCurrencyDisplayType.NameBeforeAmount.type]: allCurrencyDisplayType.NameBeforeAmount,

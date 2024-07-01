@@ -153,7 +153,7 @@ type UserProfileUpdateRequest struct {
 	DecimalSeparator     *DecimalSeparator     `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *DigitGroupingSymbol  `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *DigitGroupingType    `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
-	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=7"`
+	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=9"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile

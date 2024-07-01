@@ -23,8 +23,6 @@ export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, c
 
         if (currencyInfo && currencyInfo.symbol) {
             symbol = currencyInfo.symbol;
-        } else if (currencyInfo && currencyInfo.code) {
-            symbol = currencyInfo.code;
         }
 
         if (!symbol) {

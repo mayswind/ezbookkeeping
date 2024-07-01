@@ -98,18 +98,18 @@ export default {
             if (this.type === numeralConstants.allAmountFilterType.GreaterThan.type
                 || this.type === numeralConstants.allAmountFilterType.Between.type
                 || this.type === numeralConstants.allAmountFilterType.NotBetween.type) {
-                return this.$t('Min Amount');
+                return this.$t('Minimum Amount');
             } else if (this.type === numeralConstants.allAmountFilterType.LessThan.type) {
-                return this.$t('Max Amount');
+                return this.$t('Maximum Amount');
             } else {
                 return this.$t('Amount');
             }
         },
         amount2Header() {
             if (this.type === numeralConstants.allAmountFilterType.Between.type) {
-                return this.$t('Max Amount');
+                return this.$t('Maximum Amount');
             } else if (this.type === numeralConstants.allAmountFilterType.NotBetween.type) {
-                return this.$t('Max Amount');
+                return this.$t('Maximum Amount');
             } else {
                 return this.$t('Amount');
             }

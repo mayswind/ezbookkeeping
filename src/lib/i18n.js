@@ -7,6 +7,7 @@ import timezoneConstants from '@/consts/timezone.js';
 import currencyConstants from '@/consts/currency.js';
 import accountConstants from '@/consts/account.js';
 import categoryConstants from '@/consts/category.js';
+import transactionConstants from '@/consts/transaction.js';
 import statisticsConstants from '@/consts/statistics.js';
 import apiConstants from '@/consts/api.js';
 
@@ -1029,28 +1030,22 @@ function getAllStatisticsSortingTypes(translateFn) {
 }
 
 function getAllTransactionEditScopeTypes(translateFn) {
-    return [{
-        type: 0,
-        displayName: translateFn('None')
-    }, {
-        type: 1,
-        displayName: translateFn('All')
-    }, {
-        type: 2,
-        displayName: translateFn('Today or later')
-    }, {
-        type: 3,
-        displayName: translateFn('Recent 24 hours or later')
-    }, {
-        type: 4,
-        displayName: translateFn('This week or later')
-    }, {
-        type: 5,
-        displayName: translateFn('This month or later')
-    }, {
-        type: 6,
-        displayName: translateFn('This year or later')
-    }];
+    const allEditScopeTypes = [];
+
+    for (const typeName in transactionConstants.allTransactionEditScopeTypes) {
+        if (!Object.prototype.hasOwnProperty.call(transactionConstants.allTransactionEditScopeTypes, typeName)) {
+            continue;
+        }
+
+        const editScopeType = transactionConstants.allTransactionEditScopeTypes[typeName];
+
+        allEditScopeTypes.push({
+            type: editScopeType.type,
+            displayName: translateFn(editScopeType.name)
+        });
+    }
+
+    return allEditScopeTypes;
 }
 
 function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {

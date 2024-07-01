@@ -3,10 +3,6 @@ import currencyConstants from '@/consts/currency.js';
 import { isString, isNumber } from './common.js';
 
 export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName) {
-    if (!currencyDisplayType) {
-        return value;
-    }
-
     if (isNumber(value)) {
         value = value.toString();
     }
@@ -15,8 +11,31 @@ export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, c
         return value;
     }
 
+    const symbol = getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName);
+
+    if (!symbol) {
+        return value;
+    }
+
+    const separator = currencyDisplayType.separator || '';
+
+    if (symbol.prependText) {
+        value = symbol.prependText + separator + value;
+    }
+
+    if (symbol.appendText) {
+        value = value + separator + symbol.appendText;
+    }
+
+    return value;
+}
+
+export function getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName) {
+    if (!currencyDisplayType) {
+        return null;
+    }
+
     let symbol = '';
-    let separator = currencyDisplayType.separator || '';
 
     if (currencyDisplayType.symbol === currencyConstants.allCurrencyDisplaySymbol.Symbol) {
         const currencyInfo = currencyConstants.all[currencyCode];
@@ -35,10 +54,14 @@ export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, c
     }
 
     if (currencyDisplayType.location === currencyConstants.allCurrencyDisplayLocation.BeforeAmount) {
-        return `${symbol}${separator}${value}`;
+        return {
+            prependText: symbol
+        };
     } else if (currencyDisplayType.location === currencyConstants.allCurrencyDisplayLocation.AfterAmount) {
-        return `${value}${separator}${symbol}`;
+        return {
+            appendText: symbol
+        };
     } else {
-        return value;
+        return null;
     }
 }

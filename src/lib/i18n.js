@@ -15,8 +15,6 @@ import {
     isString,
     isNumber,
     isBoolean,
-    getTextBefore,
-    getTextAfter,
     copyObjectTo,
     copyArrayTo
 } from './common.js';
@@ -48,7 +46,8 @@ import {
 } from './numeral.js';
 
 import {
-    appendCurrencySymbol
+    appendCurrencySymbol,
+    getAmountPrependAndAppendCurrencySymbol
 } from './currency.js';
 
 import {
@@ -830,6 +829,21 @@ function getFormatedAmount(value, translateFn, userStore) {
     return formatAmount(value, numberFormatOptions);
 }
 
+function getCurrentCurrencyDisplayType(translateFn, userStore) {
+    let currencyDisplayType = currencyConstants.allCurrencyDisplayTypeMap[userStore.currentUserCurrencyDisplayType];
+
+    if (!currencyDisplayType) {
+        const defaultCurrencyDisplayTypeName = translateFn('default.currencyDisplayType');
+        currencyDisplayType = currencyConstants.allCurrencyDisplayType[defaultCurrencyDisplayTypeName];
+    }
+
+    if (!currencyDisplayType) {
+        currencyDisplayType = currencyConstants.defaultCurrencyDisplayType;
+    }
+
+    return currencyDisplayType;
+}
+
 function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userStore, settingsStore, notConvertValue, currencyDisplayType) {
     if (!isNumber(value) && !isString(value)) {
         return value;
@@ -865,16 +879,7 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
     }
 
     if (!currencyDisplayType) {
-        currencyDisplayType = currencyConstants.allCurrencyDisplayTypeMap[userStore.currentUserCurrencyDisplayType];
-
-        if (!currencyDisplayType) {
-            const defaultCurrencyDisplayTypeName = translateFn('default.currencyDisplayType');
-            currencyDisplayType = currencyConstants.allCurrencyDisplayType[defaultCurrencyDisplayTypeName];
-        }
-
-        if (!currencyDisplayType) {
-            currencyDisplayType = currencyConstants.defaultCurrencyDisplayType;
-        }
+        currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
     }
 
     const currencyName = getCurrencyName(currencyCode, translateFn);
@@ -891,30 +896,10 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAmountPrependAndAppendText(currencyCode, translateFn, userStore, settingsStore) {
-    const placeholder = '***';
-    const finalText = getFormatedAmountWithCurrency(placeholder, currencyCode, translateFn, userStore, settingsStore, true);
-
-    if (!finalText) {
-        return null;
-    }
-
-    let prependText = getTextBefore(finalText, placeholder);
-
-    if (prependText) {
-        prependText = prependText.trim();
-    }
-
-    let appendText = getTextAfter(finalText, placeholder);
-
-    if (appendText) {
-        appendText = appendText.trim();
-    }
-
-    return {
-        prependText: prependText,
-        appendText: appendText
-    };
+function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, translateFn) {
+    const currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
+    const currencyName = getCurrencyName(currencyCode, translateFn);
+    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName);
 }
 
 function getAllAccountCategories(translateFn) {
@@ -1444,7 +1429,7 @@ export function i18nFunctions(i18nGlobal) {
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormatedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         formatExchangeRateAmount: (userStore, value) => getFormatedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode) => getAmountPrependAndAppendText(currencyCode, i18nGlobal.t, userStore, settingsStore),
+        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, i18nGlobal.t),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),

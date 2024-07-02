@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"time"
 
 	"xorm.io/xorm"
@@ -64,6 +65,48 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(c *core.Context, uid 
 
 	var categories []*models.TransactionCategory
 	err := s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("type asc, parent_category_id asc, display_order asc").Find(&categories)
+
+	return categories, err
+}
+
+// GetSubCategoriesByCategoryIds returns sub-category models according to category ids
+func (s *TransactionCategoryService) GetSubCategoriesByCategoryIds(c *core.Context, uid int64, categoryIds []int64) ([]*models.TransactionCategory, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if len(categoryIds) <= 0 {
+		return nil, errs.ErrTransactionCategoryIdInvalid
+	}
+
+	condition := "uid=? AND deleted=?"
+	conditionParams := make([]any, 0, len(categoryIds)+2)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+
+	var categoryIdConditions strings.Builder
+
+	for i := 0; i < len(categoryIds); i++ {
+		if categoryIds[i] <= 0 {
+			return nil, errs.ErrTransactionCategoryIdInvalid
+		}
+
+		if categoryIdConditions.Len() > 0 {
+			categoryIdConditions.WriteString(",")
+		}
+
+		categoryIdConditions.WriteString("?")
+		conditionParams = append(conditionParams, categoryIds[i])
+	}
+
+	if categoryIdConditions.Len() > 1 {
+		condition = condition + " AND parent_category_id IN (" + categoryIdConditions.String() + ")"
+	} else {
+		condition = condition + " AND parent_category_id = " + categoryIdConditions.String()
+	}
+
+	var categories []*models.TransactionCategory
+	err := s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("display_order asc").Find(&categories)
 
 	return categories, err
 }

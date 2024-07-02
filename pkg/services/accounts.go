@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"time"
 
 	"xorm.io/xorm"
@@ -82,6 +83,48 @@ func (s *AccountService) GetSubAccountsByAccountId(c *core.Context, uid int64, a
 
 	var accounts []*models.Account
 	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND parent_account_id=?", uid, false, accountId).OrderBy("display_order asc").Find(&accounts)
+
+	return accounts, err
+}
+
+// GetSubAccountsByAccountIds returns sub-account models according to account ids
+func (s *AccountService) GetSubAccountsByAccountIds(c *core.Context, uid int64, accountIds []int64) ([]*models.Account, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if len(accountIds) <= 0 {
+		return nil, errs.ErrAccountIdInvalid
+	}
+
+	condition := "uid=? AND deleted=?"
+	conditionParams := make([]any, 0, len(accountIds)+2)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+
+	var accountIdConditions strings.Builder
+
+	for i := 0; i < len(accountIds); i++ {
+		if accountIds[i] <= 0 {
+			return nil, errs.ErrAccountIdInvalid
+		}
+
+		if accountIdConditions.Len() > 0 {
+			accountIdConditions.WriteString(",")
+		}
+
+		accountIdConditions.WriteString("?")
+		conditionParams = append(conditionParams, accountIds[i])
+	}
+
+	if accountIdConditions.Len() > 1 {
+		condition = condition + " AND parent_account_id IN (" + accountIdConditions.String() + ")"
+	} else {
+		condition = condition + " AND parent_account_id = " + accountIdConditions.String()
+	}
+
+	var accounts []*models.Account
+	err := s.UserDataDB(uid).NewSession(c).Where(condition, conditionParams...).OrderBy("display_order asc").Find(&accounts)
 
 	return accounts, err
 }

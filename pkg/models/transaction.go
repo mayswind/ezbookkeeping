@@ -95,8 +95,8 @@ type TransactionModifyRequest struct {
 // TransactionCountRequest represents transaction count request
 type TransactionCountRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryId   int64             `form:"category_id" binding:"min=0"`
-	AccountId    int64             `form:"account_id" binding:"min=0"`
+	CategoryIds  string            `form:"category_ids"`
+	AccountIds   string            `form:"account_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
@@ -106,8 +106,8 @@ type TransactionCountRequest struct {
 // TransactionListByMaxTimeRequest represents all parameters of transaction listing by max time request
 type TransactionListByMaxTimeRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryId   int64             `form:"category_id" binding:"min=0"`
-	AccountId    int64             `form:"account_id" binding:"min=0"`
+	CategoryIds  string            `form:"category_ids"`
+	AccountIds   string            `form:"account_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
@@ -125,8 +125,8 @@ type TransactionListInMonthByPageRequest struct {
 	Year         int32             `form:"year" binding:"required,min=1"`
 	Month        int32             `form:"month" binding:"required,min=1"`
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
-	CategoryId   int64             `form:"category_id" binding:"min=0"`
-	AccountId    int64             `form:"account_id" binding:"min=0"`
+	CategoryIds  string            `form:"category_ids"`
+	AccountIds   string            `form:"account_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	TrimAccount  bool              `form:"trim_account"`

@@ -2,6 +2,7 @@ package api
 
 import (
 	"sort"
+	"strings"
 
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
@@ -45,14 +46,14 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.E
 
 	uid := c.GetCurrentUid()
 
-	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionCountReq.AccountId, uid)
+	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionCountReq.AccountIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionCountReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionCountReq.CategoryIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get transaction category error, because %s", err.Error())
@@ -101,14 +102,14 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 		return nil, errs.ErrUserNotFound
 	}
 
-	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountId, uid)
+	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get transaction category error, because %s", err.Error())
@@ -192,14 +193,14 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 		return nil, errs.ErrUserNotFound
 	}
 
-	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountId, uid)
+	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryId, uid)
+	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryIds, uid)
 
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get transaction category error, because %s", err.Error())
@@ -839,44 +840,104 @@ func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transac
 	return finalTransactions
 }
 
-func (a *TransactionsApi) getAccountOrSubAccountIds(c *core.Context, accountId int64, uid int64) ([]int64, error) {
+func (a *TransactionsApi) getAccountOrSubAccountIds(c *core.Context, accountIds string, uid int64) ([]int64, error) {
+	if accountIds == "" || accountIds == "0" {
+		return nil, nil
+	}
+
+	requestAccountIds, err := utils.StringArrayToInt64Array(strings.Split(accountIds, ","))
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrAccountIdInvalid)
+	}
+
 	var allAccountIds []int64
 
-	if accountId > 0 {
-		allSubAccounts, err := a.accounts.GetSubAccountsByAccountId(c, uid, accountId)
+	if len(requestAccountIds) > 0 {
+		allSubAccounts, err := a.accounts.GetSubAccountsByAccountIds(c, uid, requestAccountIds)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if len(allSubAccounts) > 0 {
-			for i := 0; i < len(allSubAccounts); i++ {
-				allAccountIds = append(allAccountIds, allSubAccounts[i].AccountId)
+		accountIdsMap := make(map[int64]int32, len(requestAccountIds))
+
+		for i := 0; i < len(requestAccountIds); i++ {
+			accountIdsMap[requestAccountIds[i]] = 0
+		}
+
+		for i := 0; i < len(allSubAccounts); i++ {
+			subAccount := allSubAccounts[i]
+
+			if refCount, exists := accountIdsMap[subAccount.ParentAccountId]; exists {
+				accountIdsMap[subAccount.ParentAccountId] = refCount + 1
+			} else {
+				accountIdsMap[subAccount.ParentAccountId] = 1
 			}
-		} else {
-			allAccountIds = append(allAccountIds, accountId)
+
+			if _, exists := accountIdsMap[subAccount.AccountId]; exists {
+				delete(accountIdsMap, subAccount.AccountId)
+			}
+
+			allAccountIds = append(allAccountIds, subAccount.AccountId)
+		}
+
+		for accountId, refCount := range accountIdsMap {
+			if refCount < 1 {
+				allAccountIds = append(allAccountIds, accountId)
+			}
 		}
 	}
 
 	return allAccountIds, nil
 }
 
-func (a *TransactionsApi) getCategoryOrSubCategoryIds(c *core.Context, categoryId int64, uid int64) ([]int64, error) {
+func (a *TransactionsApi) getCategoryOrSubCategoryIds(c *core.Context, categoryIds string, uid int64) ([]int64, error) {
+	if categoryIds == "" || categoryIds == "0" {
+		return nil, nil
+	}
+
+	requestCategoryIds, err := utils.StringArrayToInt64Array(strings.Split(categoryIds, ","))
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrTransactionCategoryIdInvalid)
+	}
+
 	var allCategoryIds []int64
 
-	if categoryId > 0 {
-		allSubCategories, err := a.transactionCategories.GetAllCategoriesByUid(c, uid, 0, categoryId)
+	if len(requestCategoryIds) > 0 {
+		allSubCategories, err := a.transactionCategories.GetSubCategoriesByCategoryIds(c, uid, requestCategoryIds)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if len(allSubCategories) > 0 {
-			for i := 0; i < len(allSubCategories); i++ {
-				allCategoryIds = append(allCategoryIds, allSubCategories[i].CategoryId)
+		categoryIdsMap := make(map[int64]int32, len(requestCategoryIds))
+
+		for i := 0; i < len(requestCategoryIds); i++ {
+			categoryIdsMap[requestCategoryIds[i]] = 0
+		}
+
+		for i := 0; i < len(allSubCategories); i++ {
+			subCategory := allSubCategories[i]
+
+			if refCount, exists := categoryIdsMap[subCategory.ParentCategoryId]; exists {
+				categoryIdsMap[subCategory.ParentCategoryId] = refCount + 1
+			} else {
+				categoryIdsMap[subCategory.ParentCategoryId] = 1
 			}
-		} else {
-			allCategoryIds = append(allCategoryIds, categoryId)
+
+			if _, exists := categoryIdsMap[subCategory.CategoryId]; exists {
+				delete(categoryIdsMap, subCategory.CategoryId)
+			}
+
+			allCategoryIds = append(allCategoryIds, subCategory.CategoryId)
+		}
+
+		for accountId, refCount := range categoryIdsMap {
+			if refCount < 1 {
+				allCategoryIds = append(allCategoryIds, accountId)
+			}
 		}
 	}
 

@@ -206,7 +206,7 @@
                                                         </div>
                                                     </template>
                                                     <v-list :selected="[query.amountFilter.split(':')[0]]">
-                                                        <v-list-item key="0" value="0" class="text-sm" density="compact"
+                                                        <v-list-item key="" value="" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': !query.amountFilter }"
                                                                      :append-icon="(!query.amountFilter && !currentAmountFilterType ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"

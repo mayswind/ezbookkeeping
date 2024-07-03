@@ -1347,6 +1347,18 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 		conditionParams = append(conditionParams, minTransactionTime)
 	}
 
+	var accountIdsCondition strings.Builder
+	accountIdConditionParams := make([]any, 0, len(accountIds))
+
+	for i := 0; i < len(accountIds); i++ {
+		if i > 0 {
+			accountIdsCondition.WriteString(",")
+		}
+
+		accountIdsCondition.WriteString("?")
+		accountIdConditionParams = append(accountIdConditionParams, accountIds[i])
+	}
+
 	if models.TRANSACTION_DB_TYPE_MODIFY_BALANCE <= transactionType && transactionType <= models.TRANSACTION_DB_TYPE_EXPENSE {
 		condition = condition + " AND type=?"
 		conditionParams = append(conditionParams, transactionType)
@@ -1354,18 +1366,35 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 		if len(accountIds) == 0 {
 			condition = condition + " AND type=?"
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
-		} else {
+		} else if len(accountIds) == 1 {
 			condition = condition + " AND (type=? OR type=?)"
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
 			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+		} else { // len(accountsIds) > 1
+			condition = condition + " AND (type=? OR (type=? AND related_account_id NOT IN (" + accountIdsCondition.String() + ")))"
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+			conditionParams = append(conditionParams, accountIdConditionParams...)
 		}
 	} else {
-		if noDuplicated && len(accountIds) == 0 {
-			condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-			conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+		if noDuplicated {
+			if len(accountIds) == 0 {
+				condition = condition + " AND (type=? OR type=? OR type=? OR type=?)"
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+			} else if len(accountIds) == 1 {
+				// Do Nothing
+			} else { // len(accountsIds) > 1
+				condition = condition + " AND (type=? OR type=? OR type=? OR type=? OR (type=? AND related_account_id NOT IN (" + accountIdsCondition.String() + ")))"
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_OUT)
+				conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_TRANSFER_IN)
+				conditionParams = append(conditionParams, accountIdConditionParams...)
+			}
 		}
 	}
 
@@ -1389,22 +1418,13 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 	}
 
 	if len(accountIds) > 0 {
-		var conditions strings.Builder
-
-		for i := 0; i < len(accountIds); i++ {
-			if i > 0 {
-				conditions.WriteString(",")
-			}
-
-			conditions.WriteString("?")
-			conditionParams = append(conditionParams, accountIds[i])
-		}
-
-		if conditions.Len() > 1 {
-			condition = condition + " AND account_id IN (" + conditions.String() + ")"
+		if accountIdsCondition.Len() > 1 {
+			condition = condition + " AND account_id IN (" + accountIdsCondition.String() + ")"
 		} else {
-			condition = condition + " AND account_id = " + conditions.String()
+			condition = condition + " AND account_id = " + accountIdsCondition.String()
 		}
+
+		conditionParams = append(conditionParams, accountIdConditionParams...)
 	}
 
 	if amountFilter != "" {

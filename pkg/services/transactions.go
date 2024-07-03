@@ -1381,7 +1381,11 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 			conditionParams = append(conditionParams, categoryIds[i])
 		}
 
-		condition = condition + " AND category_id IN (" + conditions.String() + ")"
+		if conditions.Len() > 1 {
+			condition = condition + " AND category_id IN (" + conditions.String() + ")"
+		} else {
+			condition = condition + " AND category_id = " + conditions.String()
+		}
 	}
 
 	if len(accountIds) > 0 {
@@ -1396,7 +1400,11 @@ func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransact
 			conditionParams = append(conditionParams, accountIds[i])
 		}
 
-		condition = condition + " AND account_id IN (" + conditions.String() + ")"
+		if conditions.Len() > 1 {
+			condition = condition + " AND account_id IN (" + conditions.String() + ")"
+		} else {
+			condition = condition + " AND account_id = " + conditions.String()
+		}
 	}
 
 	if amountFilter != "" {

@@ -467,11 +467,11 @@ export const useTransactionsStore = defineStore('transactions', {
             }
 
             if (this.transactionsFilter.accountId && this.transactionsFilter.accountId !== '0') {
-                querys.push('accountId=' + this.transactionsFilter.accountId);
+                querys.push('accountIds=' + this.transactionsFilter.accountId);
             }
 
             if (this.transactionsFilter.categoryId && this.transactionsFilter.categoryId !== '0') {
-                querys.push('categoryId=' + this.transactionsFilter.categoryId);
+                querys.push('categoryIds=' + this.transactionsFilter.categoryId);
             }
 
             querys.push('dateType=' + this.transactionsFilter.dateType);

@@ -98,8 +98,8 @@ const router = createRouter({
                         initMaxTime: route.query.maxTime,
                         initMinTime: route.query.minTime,
                         initType: route.query.type,
-                        initCategoryId: route.query.categoryId,
-                        initAccountId: route.query.accountId,
+                        initCategoryIds: route.query.categoryIds,
+                        initAccountIds: route.query.accountIds,
                         initAmountFilter: route.query.amountFilter,
                         initKeyword: route.query.keyword
                     })

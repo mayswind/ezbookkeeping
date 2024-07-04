@@ -455,8 +455,8 @@ export default {
         'initMaxTime',
         'initMinTime',
         'initType',
-        'initCategoryId',
-        'initAccountId',
+        'initCategoryIds',
+        'initAccountIds',
         'initAmountFilter',
         'initKeyword'
     ],
@@ -714,8 +714,8 @@ export default {
             minTime: this.initMinTime,
             maxTime: this.initMaxTime,
             type: this.initType,
-            categoryId: this.initCategoryId,
-            accountId: this.initAccountId,
+            categoryIds: this.initCategoryIds,
+            accountIds: this.initAccountIds,
             amountFilter: this.initAmountFilter,
             keyword: this.initKeyword
         });
@@ -743,8 +743,8 @@ export default {
                 minTime: to.query.minTime,
                 maxTime: to.query.maxTime,
                 type: to.query.type,
-                categoryId: to.query.categoryId,
-                accountId: to.query.accountId,
+                categoryIds: to.query.categoryIds,
+                accountIds: to.query.accountIds,
                 amountFilter: to.query.amountFilter,
                 keyword: to.query.keyword
             });
@@ -769,8 +769,8 @@ export default {
                 maxTime: dateRange ? dateRange.maxTime : undefined,
                 minTime: dateRange ? dateRange.minTime : undefined,
                 type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
-                categoryId: query.categoryId,
-                accountId: query.accountId,
+                categoryId: query.categoryIds,
+                accountId: query.accountIds,
                 amountFilter: query.amountFilter || '',
                 keyword: query.keyword || ''
             });

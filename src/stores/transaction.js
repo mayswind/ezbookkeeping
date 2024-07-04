@@ -511,8 +511,8 @@ export const useTransactionsStore = defineStore('transactions', {
                     page: page || 1,
                     withCount: (!!withCount) || false,
                     type: self.transactionsFilter.type,
-                    categoryId: self.transactionsFilter.categoryId,
-                    accountId: self.transactionsFilter.accountId,
+                    categoryIds: self.transactionsFilter.categoryId,
+                    accountIds: self.transactionsFilter.accountId,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {
@@ -586,8 +586,8 @@ export const useTransactionsStore = defineStore('transactions', {
                     year: year,
                     month: month,
                     type: self.transactionsFilter.type,
-                    categoryId: self.transactionsFilter.categoryId,
-                    accountId: self.transactionsFilter.accountId,
+                    categoryIds: self.transactionsFilter.categoryId,
+                    accountIds: self.transactionsFilter.accountId,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {

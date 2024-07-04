@@ -11,7 +11,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryId}&accountId=${query.accountId}`"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryIds}&accountId=${query.accountIds}`"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">
@@ -36,10 +36,10 @@
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".category-popover-menu" :class="{ 'disabled': query.type === 1 }">
-                <span :class="{ 'tabbar-item-changed': query.categoryId > 0 }">{{ queryCategoryName }}</span>
+                <span :class="{ 'tabbar-item-changed': query.categoryIds }">{{ queryCategoryName }}</span>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" popover-open=".account-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.accountId > 0 }">{{ queryAccountName }}</span>
+                <span :class="{ 'tabbar-item-changed': query.accountIds }">{{ queryAccountName }}</span>
             </f7-link>
             <f7-link popover-open=".more-popover-menu">
                 <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter }"></f7-icon>
@@ -200,8 +200,8 @@
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
                                                      :class="{ 'text-color-teal': transaction.type === allTransactionTypes.Expense, 'text-color-red': transaction.type === allTransactionTypes.Income }">
-                                                    <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                    <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
+                                                    <span v-if="!query.accountIds || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountIds || transaction.sourceAccount.parentId === query.accountIds))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
+                                                    <span v-else-if="query.accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountIds || transaction.destinationAccount.parentId === query.accountIds)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
                                                     <span v-else></span>
                                                 </div>
                                             </div>
@@ -284,12 +284,12 @@
                     v-model:opened="showCategoryPopover"
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers accordion-list>
-                <f7-list-item :class="{ 'list-item-selected': query.categoryId === '0' }" :title="$t('All')" @click="changeCategoryFilter('0')">
+                <f7-list-item :class="{ 'list-item-selected': !query.categoryIds }" :title="$t('All')" @click="changeCategoryFilter('')">
                     <template #media>
                         <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
                     </template>
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === '0'"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.categoryIds"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -301,7 +301,7 @@
                 <f7-list-item divider :title="getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
                               :title="category.name"
-                              :class="getCategoryListItemCheckedClass(category, query.categoryId)"
+                              :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                               :key="category.id"
                               v-for="category in categories"
                               v-show="!category.hidden"
@@ -311,16 +311,16 @@
                     </template>
                     <f7-accordion-content>
                         <f7-list dividers class="padding-left">
-                            <f7-list-item :class="{ 'list-item-selected': query.categoryId === category.id }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                            <f7-list-item :class="{ 'list-item-selected': query.categoryIds === category.id }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
                                 <template #media>
                                     <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
                                 </template>
                                 <template #after>
-                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryId === category.id"></f7-icon>
+                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds === category.id"></f7-icon>
                                 </template>
                             </f7-list-item>
                             <f7-list-item :title="subCategory.name"
-                                          :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
+                                          :class="{ 'list-item-selected': query.categoryIds === subCategory.id }"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
                                           v-show="!subCategory.hidden"
@@ -332,7 +332,7 @@
                                 <template #after>
                                     <f7-icon class="list-item-checked-icon"
                                              f7="checkmark_alt"
-                                             v-if="query.categoryId === subCategory.id">
+                                             v-if="query.categoryIds === subCategory.id">
                                     </f7-icon>
                                 </template>
                             </f7-list-item>
@@ -346,16 +346,16 @@
                     v-model:opened="showAccountPopover"
                     @popover:open="scrollPopoverToSelectedItem">
             <f7-list dividers>
-                <f7-list-item :class="{ 'list-item-selected': query.accountId === '0' }" :title="$t('All')" @click="changeAccountFilter('0')">
+                <f7-list-item :class="{ 'list-item-selected': !query.accountIds }" :title="$t('All')" @click="changeAccountFilter('')">
                     <template #media>
                         <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
                     </template>
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.accountId === '0'"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.accountIds"></f7-icon>
                     </template>
                 </f7-list-item>
                 <f7-list-item :title="account.name"
-                              :class="{ 'list-item-selected': query.accountId === account.id }"
+                              :class="{ 'list-item-selected': query.accountIds === account.id }"
                               :key="account.id"
                               v-for="account in allAccounts"
                               v-show="!account.hidden"
@@ -367,7 +367,7 @@
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
                                  f7="checkmark_alt"
-                                 v-if="query.accountId === account.id">
+                                 v-if="query.accountIds === account.id">
                         </f7-icon>
                     </template>
                 </f7-list-item>
@@ -445,7 +445,6 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 
 import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
-import currencyConstants from '@/consts/currency.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
@@ -461,6 +460,7 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
+import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -487,19 +487,15 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
         defaultCurrency() {
-            if (this.query.accountId && this.query.accountId !== '0') {
-                const account = this.allAccounts[this.query.accountId];
-
-                if (account && account.currency && account.currency !== currencyConstants.parentAccountCurrencyPlaceholder) {
-                    return account.currency;
-                }
-            }
-
-            return this.userStore.currentUserDefaultCurrency;
+            return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
         canAddTransaction() {
-            if (this.query.accountId && this.query.accountId !== '0') {
-                const account = this.allAccounts[this.query.accountId];
+            if (this.queryAllFilterCategoryIdsCount > 1 || this.queryAllFilterAccountIdsCount > 1) {
+                return false;
+            }
+
+            if (this.query.accountIds) {
+                const account = this.allAccounts[this.query.accountIds];
 
                 if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
                     return false;
@@ -530,11 +526,31 @@ export default {
         queryMaxTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.maxTime);
         },
+        queryAllFilterCategoryIds() {
+            return this.transactionsStore.allFilterCategoryIds;
+        },
+        queryAllFilterAccountIds() {
+            return this.transactionsStore.allFilterAccountIds;
+        },
+        queryAllFilterCategoryIdsCount() {
+            return this.transactionsStore.allFilterCategoryIdsCount;
+        },
+        queryAllFilterAccountIdsCount() {
+            return this.transactionsStore.allFilterAccountIdsCount;
+        },
         queryCategoryName() {
-            return getNameByKeyValue(this.allCategories, this.query.categoryId, null, 'name', this.$t('Category'));
+            if (this.queryAllFilterCategoryIdsCount > 1) {
+                return this.$t('Multiple Categories');
+            }
+
+            return getNameByKeyValue(this.allCategories, this.query.categoryIds, null, 'name', this.$t('Category'));
         },
         queryAccountName() {
-            return getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
+            if (this.queryAllFilterAccountIdsCount > 1) {
+                return this.$t('Multiple Accounts');
+            }
+
+            return getNameByKeyValue(this.allAccounts, this.query.accountIds, null, 'name', this.$t('Account'));
         },
         queryAmount() {
             if (!this.query.amountFilter) {
@@ -628,8 +644,8 @@ export default {
             maxTime: dateRange ? dateRange.maxTime : undefined,
             minTime: dateRange ? dateRange.minTime : undefined,
             type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
-            categoryId: query.categoryId,
-            accountId: query.accountId
+            categoryIds: query.categoryIds,
+            accountIds: query.accountIds
         });
 
         this.reload(null);
@@ -777,41 +793,48 @@ export default {
 
             let removeCategoryFilter = false;
 
-            if (type && this.query.categoryId) {
-                const category = this.allCategories[this.query.categoryId];
+            if (type && this.query.categoryIds) {
+                for (let categoryId in this.queryAllFilterCategoryIds) {
+                    if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
+                        continue;
+                    }
 
-                if (category && category.type !== transactionTypeToCategoryType(type)) {
-                    removeCategoryFilter = true;
+                    const category = this.allCategories[categoryId];
+
+                    if (category && category.type !== transactionTypeToCategoryType(type)) {
+                        removeCategoryFilter = true;
+                        break;
+                    }
                 }
             }
 
             this.transactionsStore.updateTransactionListFilter({
                 type: type,
-                categoryId: removeCategoryFilter ? '0' : undefined
+                categoryIds: removeCategoryFilter ? '' : undefined
             });
 
             this.showMorePopover = false;
             this.reload(null);
         },
-        changeCategoryFilter(categoryId) {
-            if (this.query.categoryId === categoryId) {
+        changeCategoryFilter(categoryIds) {
+            if (this.query.categoryIds === categoryIds) {
                 return;
             }
 
             this.transactionsStore.updateTransactionListFilter({
-                categoryId: categoryId
+                categoryIds: categoryIds
             });
 
             this.showCategoryPopover = false;
             this.reload(null);
         },
-        changeAccountFilter(accountId) {
-            if (this.query.accountId === accountId) {
+        changeAccountFilter(accountIds) {
+            if (this.query.accountIds === accountIds) {
                 return;
             }
 
             this.transactionsStore.updateTransactionListFilter({
-                accountId: accountId
+                accountIds: accountIds
             });
 
             this.showAccountPopover = false;
@@ -959,15 +982,15 @@ export default {
                 color: 'transparent'
             }
         },
-        getCategoryListItemCheckedClass(category, queryCategoryId) {
-            if (category.id === queryCategoryId) {
+        getCategoryListItemCheckedClass(category, queryCategoryIds) {
+            if (queryCategoryIds && queryCategoryIds[category.id]) {
                 return {
                     'list-item-checked': true
                 };
             }
 
             for (let i = 0; i < category.subCategories.length; i++) {
-                if (category.subCategories[i].id === queryCategoryId) {
+                if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
                     return {
                         'list-item-checked': true
                     };

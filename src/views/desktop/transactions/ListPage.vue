@@ -116,17 +116,17 @@
                                                         @update:model-value="scrollCategoryMenuToSelectedItem">
                                                     <template #activator="{ props }">
                                                         <div class="d-flex align-center"
-                                                            :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryId > 0 }" v-bind="props">
+                                                            :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryIds }" v-bind="props">
                                                             <span>{{ queryCategoryName }}</span>
                                                             <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="[query.categoryId]">
-                                                        <v-list-item key="0" value="0" class="text-sm" density="compact"
-                                                                     :class="{ 'list-item-selected': query.categoryId === '0' }"
-                                                                     :append-icon="(query.categoryId === '0' ? icons.check : null)">
+                                                    <v-list :selected="[query.categoryIds]">
+                                                        <v-list-item key="" value="" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': !query.categoryIds }"
+                                                                     :append-icon="(!query.categoryIds ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="changeCategoryFilter('0')">
+                                                                               @click="changeCategoryFilter('')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="icons.all" />
                                                                     <span class="text-sm ml-3">{{ $t('All') }}</span>
@@ -146,7 +146,7 @@
                                                                 <template #activator="{ props }" v-if="!category.hidden">
                                                                     <v-divider />
                                                                     <v-list-item class="text-sm" density="compact"
-                                                                                 :class="getCategoryListItemCheckedClass(category, query.categoryId)"
+                                                                                 :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                                                                                  v-bind="props">
                                                                         <v-list-item-title>
                                                                             <div class="d-flex align-center">
@@ -160,7 +160,7 @@
                                                                 <v-divider />
                                                                 <v-list-item class="text-sm" density="compact"
                                                                              :value="category.id"
-                                                                             :append-icon="(query.categoryId === category.id ? icons.check : null)">
+                                                                             :append-icon="(query.categoryIds === category.id ? icons.check : null)">
                                                                     <v-list-item-title class="cursor-pointer"
                                                                                        @click="changeCategoryFilter(category.id)">
                                                                         <div class="d-flex align-center">
@@ -175,8 +175,8 @@
                                                                     <v-divider v-if="!subCategory.hidden" />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :value="subCategory.id"
-                                                                                 :class="{ 'list-item-selected': query.categoryId === subCategory.id }"
-                                                                                 :append-icon="(query.categoryId === subCategory.id ? icons.check : null)"
+                                                                                 :class="{ 'list-item-selected': query.categoryIds === subCategory.id }"
+                                                                                 :append-icon="(query.categoryIds === subCategory.id ? icons.check : null)"
                                                                                  v-if="!subCategory.hidden">
                                                                         <v-list-item-title class="cursor-pointer"
                                                                                            @click="changeCategoryFilter(subCategory.id)">
@@ -248,17 +248,17 @@
                                                         @update:model-value="scrollAccountMenuToSelectedItem">
                                                     <template #activator="{ props }">
                                                         <div class="d-flex align-center cursor-pointer"
-                                                             :class="{ 'readonly': loading, 'text-primary': query.accountId > 0 }" v-bind="props">
+                                                             :class="{ 'readonly': loading, 'text-primary': query.accountIds }" v-bind="props">
                                                             <span>{{ queryAccountName }}</span>
                                                             <v-icon :icon="icons.dropdownMenu" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="[query.accountId]">
-                                                        <v-list-item key="0" value="0" class="text-sm" density="compact"
-                                                                     :class="{ 'list-item-selected': query.accountId === '0' }"
-                                                                     :append-icon="(query.accountId === '0' ? icons.check : null)">
+                                                    <v-list :selected="[query.accountIds]">
+                                                        <v-list-item key="" value="" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': !query.accountIds }"
+                                                                     :append-icon="(!query.accountIds ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="changeAccountFilter('0')">
+                                                                               @click="changeAccountFilter('')">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="icons.all" />
                                                                     <span class="text-sm ml-3">{{ $t('All') }}</span>
@@ -270,8 +270,8 @@
                                                             <v-divider v-if="!account.hidden" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
-                                                                         :class="{ 'list-item-selected': query.accountId === account.id }"
-                                                                         :append-icon="(query.accountId === account.id ? icons.check : null)"
+                                                                         :class="{ 'list-item-selected': query.accountIds === account.id }"
+                                                                         :append-icon="(query.accountIds === account.id ? icons.check : null)"
                                                                          v-if="!account.hidden">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
@@ -347,8 +347,8 @@
                                                 </td>
                                                 <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
                                                     <div v-if="transaction.sourceAccount">
-                                                        <span v-if="!query.accountId || query.accountId === '0' || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountId || transaction.sourceAccount.parentId === query.accountId))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                        <span v-else-if="query.accountId && query.accountId !== '0' && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountId || transaction.destinationAccount.parentId === query.accountId)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
+                                                        <span v-if="!query.accountIds || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountIds || transaction.sourceAccount.parentId === query.accountIds))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
+                                                        <span v-else-if="query.accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountIds || transaction.destinationAccount.parentId === query.accountIds)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
                                                         <span v-else></span>
                                                     </div>
                                                 </td>
@@ -404,7 +404,6 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 
 import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
-import currencyConstants from '@/consts/currency.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
 import { isString, getNameByKeyValue } from '@/lib/common.js';
@@ -431,6 +430,7 @@ import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType
 } from '@/lib/category.js';
+import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
@@ -499,19 +499,15 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
         defaultCurrency() {
-            if (this.query.accountId && this.query.accountId !== '0') {
-                const account = this.allAccounts[this.query.accountId];
-
-                if (account && account.currency && account.currency !== currencyConstants.parentAccountCurrencyPlaceholder) {
-                    return account.currency;
-                }
-            }
-
-            return this.userStore.currentUserDefaultCurrency;
+            return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
         canAddTransaction() {
-            if (this.query.accountId && this.query.accountId !== '0') {
-                const account = this.allAccounts[this.query.accountId];
+            if (this.queryAllFilterCategoryIdsCount > 1 || this.queryAllFilterAccountIdsCount > 1) {
+                return false;
+            }
+
+            if (this.query.accountIds) {
+                const account = this.allAccounts[this.query.accountIds];
 
                 if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
                     return false;
@@ -547,11 +543,31 @@ export default {
         queryMaxTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.maxTime);
         },
+        queryAllFilterCategoryIds() {
+            return this.transactionsStore.allFilterCategoryIds;
+        },
+        queryAllFilterAccountIds() {
+            return this.transactionsStore.allFilterAccountIds;
+        },
+        queryAllFilterCategoryIdsCount() {
+            return this.transactionsStore.allFilterCategoryIdsCount;
+        },
+        queryAllFilterAccountIdsCount() {
+            return this.transactionsStore.allFilterAccountIdsCount;
+        },
         queryCategoryName() {
-            return getNameByKeyValue(this.allCategories, this.query.categoryId, null, 'name', this.$t('Category'));
+            if (this.queryAllFilterCategoryIdsCount > 1) {
+                return this.$t('Multiple Categories');
+            }
+
+            return getNameByKeyValue(this.allCategories, this.query.categoryIds, null, 'name', this.$t('Category'));
         },
         queryAccountName() {
-            return getNameByKeyValue(this.allAccounts, this.query.accountId, null, 'name', this.$t('Account'));
+            if (this.queryAllFilterAccountIdsCount > 1) {
+                return this.$t('Multiple Accounts');
+            }
+
+            return getNameByKeyValue(this.allAccounts, this.query.accountIds, null, 'name', this.$t('Account'));
         },
         queryAmount() {
             if (!this.query.amountFilter) {
@@ -769,8 +785,8 @@ export default {
                 maxTime: dateRange ? dateRange.maxTime : undefined,
                 minTime: dateRange ? dateRange.minTime : undefined,
                 type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
-                categoryId: query.categoryIds,
-                accountId: query.accountIds,
+                categoryIds: query.categoryIds,
+                accountIds: query.accountIds,
                 amountFilter: query.amountFilter || '',
                 keyword: query.keyword || ''
             });
@@ -912,17 +928,24 @@ export default {
         changeTypeFilter(type) {
             let removeCategoryFilter = false;
 
-            if (type && this.query.categoryId) {
-                const category = this.allCategories[this.query.categoryId];
+            if (type && this.query.categoryIds) {
+                for (let categoryId in this.queryAllFilterCategoryIds) {
+                    if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
+                        continue;
+                    }
 
-                if (category && category.type !== transactionTypeToCategoryType(type)) {
-                    removeCategoryFilter = true;
+                    const category = this.allCategories[categoryId];
+
+                    if (category && category.type !== transactionTypeToCategoryType(type)) {
+                        removeCategoryFilter = true;
+                        break;
+                    }
                 }
             }
 
             this.transactionsStore.updateTransactionListFilter({
                 type: type,
-                categoryId: removeCategoryFilter ? '0' : undefined
+                categoryIds: removeCategoryFilter ? '' : undefined
             });
 
             this.loading = true;
@@ -930,15 +953,15 @@ export default {
             this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
-        changeCategoryFilter(categoryId) {
+        changeCategoryFilter(categoryIds) {
             this.categoryMenuState = false;
 
-            if (this.query.categoryId === categoryId) {
+            if (this.query.categoryIds === categoryIds) {
                 return;
             }
 
             this.transactionsStore.updateTransactionListFilter({
-                categoryId: categoryId
+                categoryIds: categoryIds
             });
 
             this.loading = true;
@@ -990,13 +1013,13 @@ export default {
             this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
-        changeAccountFilter(accountId) {
-            if (this.query.accountId === accountId) {
+        changeAccountFilter(accountIds) {
+            if (this.query.accountIds === accountIds) {
                 return;
             }
 
             this.transactionsStore.updateTransactionListFilter({
-                accountId: accountId
+                accountIds: accountIds
             });
 
             this.loading = true;
@@ -1023,8 +1046,8 @@ export default {
 
             self.$refs.editDialog.open({
                 type: self.query.type,
-                categoryId: self.query.categoryId,
-                accountId: self.query.accountId
+                categoryId: self.query.categoryIds,
+                accountId: self.query.accountIds
             }).then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
@@ -1149,8 +1172,8 @@ export default {
         getTransactionTypeFromCategoryType(categoryType) {
             return categoryTypeToTransactionType(parseInt(categoryType));
         },
-        getCategoryListItemCheckedClass(category, queryCategoryId) {
-            if (category.id === queryCategoryId) {
+        getCategoryListItemCheckedClass(category, queryCategoryIds) {
+            if (queryCategoryIds && queryCategoryIds[category.id]) {
                 return {
                     'list-item-selected': true,
                     'has-children-item-selected': true
@@ -1158,7 +1181,7 @@ export default {
             }
 
             for (let i = 0; i < category.subCategories.length; i++) {
-                if (category.subCategories[i].id === queryCategoryId) {
+                if (queryCategoryIds && queryCategoryIds[category.subCategories[i].id]) {
                     return {
                         'list-item-selected': true,
                         'has-children-item-selected': true

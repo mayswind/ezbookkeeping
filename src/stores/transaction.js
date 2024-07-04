@@ -64,7 +64,7 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
-                calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountId, false);
+                calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, false);
 
                 state.transactions.push({
                     year: transactionYear,
@@ -79,14 +79,14 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             currentMonthList.items.push(Object.freeze(item));
-            calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountId, true);
+            calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, true);
         }
     }
 
     if (transactions.nextTimeSequenceId) {
         state.transactionsNextTimeId = transactions.nextTimeSequenceId;
     } else {
-        calculateMonthTotalAmount(state, exchangeRatesStore, state.transactions[state.transactions.length - 1], defaultCurrency, state.transactionsFilter.accountId, false);
+        calculateMonthTotalAmount(state, exchangeRatesStore, state.transactions[state.transactions.length - 1], defaultCurrency, state.transactionsFilter.accountIds, false);
         state.transactionsNextTimeId = -1;
     }
 }
@@ -115,12 +115,10 @@ function updateTransactionInTransactionList(state, settingsStore, exchangeRatesS
                     return;
                 }
 
-                if ((state.transactionsFilter.categoryId && state.transactionsFilter.categoryId !== '0' && state.transactionsFilter.categoryId !== transaction.categoryId) ||
-                    (state.transactionsFilter.accountId && state.transactionsFilter.accountId !== '0' &&
-                        state.transactionsFilter.accountId !== transaction.sourceAccountId &&
-                        state.transactionsFilter.accountId !== transaction.destinationAccountId &&
-                        (!transaction.sourceAccount || state.transactionsFilter.accountId !== transaction.sourceAccount.parentId) &&
-                        (!transaction.destinationAccount || state.transactionsFilter.accountId !== transaction.destinationAccount.parentId)
+                if ((state.transactionsFilter.categoryIds && !state.allFilterCategoryIds[transaction.categoryId]) ||
+                    (state.transactionsFilter.accountIds && !state.allFilterAccountIds[transaction.sourceAccountId] && !state.allFilterAccountIds[transaction.destinationAccountId] &&
+                        (!transaction.sourceAccount || !state.allFilterAccountIds[transaction.sourceAccount.parentId]) &&
+                        (!transaction.destinationAccount || !state.allFilterAccountIds[transaction.destinationAccount.parentId])
                     )
                 ) {
                     transactionMonthList.items.splice(j, 1);
@@ -131,7 +129,7 @@ function updateTransactionInTransactionList(state, settingsStore, exchangeRatesS
                 if (transactionMonthList.items.length < 1) {
                     state.transactions.splice(i, 1);
                 } else {
-                    calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                    calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                 }
 
                 return;
@@ -159,12 +157,12 @@ function removeTransactionFromTransactionList(state, exchangeRatesStore, { trans
         if (transactionMonthList.items.length < 1) {
             state.transactions.splice(i, 1);
         } else {
-            calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountId, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+            calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
         }
     }
 }
 
-function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, accountId, incomplete) {
+function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, accountIds, incomplete) {
     if (!transactionMonthList) {
         return;
     }
@@ -180,7 +178,7 @@ function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthLi
         let amount = transaction.sourceAmount;
         let account = transaction.sourceAccount;
 
-        if (accountId && transaction.destinationAccount && (transaction.destinationAccount.id === accountId || transaction.destinationAccount.parentId === accountId)) {
+        if (accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === accountIds || transaction.destinationAccount.parentId === accountIds)) {
             amount = transaction.destinationAmount;
             account = transaction.destinationAccount;
         }
@@ -209,17 +207,17 @@ function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthLi
             totalExpense += amount;
         } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
             totalIncome += amount;
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountId && accountId !== '0') {
-            if (accountId === transaction.sourceAccountId) {
+        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountIds && accountIds !== '0') {
+            if (accountIds === transaction.sourceAccountId) {
                 totalExpense += amount;
-            } else if (accountId === transaction.destinationAccountId) {
+            } else if (accountIds === transaction.destinationAccountId) {
                 totalIncome += amount;
-            } else if (transaction.sourceAccount && accountId === transaction.sourceAccount.parentId &&
-                transaction.destinationAccount && accountId === transaction.destinationAccount.parentId) {
+            } else if (transaction.sourceAccount && accountIds === transaction.sourceAccount.parentId &&
+                transaction.destinationAccount && accountIds === transaction.destinationAccount.parentId) {
                 // Do Nothing
-            } else if (transaction.sourceAccount && accountId === transaction.sourceAccount.parentId) {
+            } else if (transaction.sourceAccount && accountIds === transaction.sourceAccount.parentId) {
                 totalExpense += amount;
-            } else if (transaction.destinationAccount && accountId === transaction.destinationAccount.parentId) {
+            } else if (transaction.destinationAccount && accountIds === transaction.destinationAccount.parentId) {
                 totalIncome += amount;
             }
         }
@@ -268,8 +266,8 @@ export const useTransactionsStore = defineStore('transactions', {
             maxTime: 0,
             minTime: 0,
             type: 0,
-            categoryId: '0',
-            accountId: '0',
+            categoryIds: '',
+            accountIds: '',
             amountFilter: '',
             keyword: ''
         },
@@ -278,6 +276,70 @@ export const useTransactionsStore = defineStore('transactions', {
         transactionListStateInvalid: true,
     }),
     getters: {
+        allFilterCategoryIds(state) {
+            if (!state.transactionsFilter.categoryIds) {
+                return {};
+            }
+
+            const allCategoryIds = state.transactionsFilter.categoryIds.split(',');
+            const ret = {};
+
+            for (let i = 0; i < allCategoryIds.length; i++) {
+                if (allCategoryIds[i]) {
+                    ret[allCategoryIds[i]] = true;
+                }
+            }
+
+            return ret;
+        },
+        allFilterAccountIds(state) {
+            if (!state.transactionsFilter.accountIds) {
+                return {};
+            }
+
+            const allAccountIds = state.transactionsFilter.accountIds.split(',');
+            const ret = {};
+
+            for (let i = 0; i < allAccountIds.length; i++) {
+                if (allAccountIds[i]) {
+                    ret[allAccountIds[i]] = true;
+                }
+            }
+
+            return ret;
+        },
+        allFilterCategoryIdsCount(state) {
+            if (!state.transactionsFilter.categoryIds) {
+                return 0;
+            }
+
+            const allCategoryIds = state.transactionsFilter.categoryIds.split(',');
+            let count = 0;
+
+            for (let i = 0; i < allCategoryIds.length; i++) {
+                if (allCategoryIds[i]) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+        allFilterAccountIdsCount(state) {
+            if (!state.transactionsFilter.accountIds) {
+                return 0;
+            }
+
+            const allAccountIds = state.transactionsFilter.accountIds.split(',');
+            let count = 0;
+
+            for (let i = 0; i < allAccountIds.length; i++) {
+                if (allAccountIds[i]) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
         noTransaction(state) {
             for (let i = 0; i < state.transactions.length; i++) {
                 const transactionMonthList = state.transactions[i];
@@ -364,8 +426,8 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionsFilter.maxTime = 0;
             this.transactionsFilter.minTime = 0;
             this.transactionsFilter.type = 0;
-            this.transactionsFilter.categoryId = '0';
-            this.transactionsFilter.accountId = '0';
+            this.transactionsFilter.categoryIds = '';
+            this.transactionsFilter.accountIds = '';
             this.transactionsFilter.amountFilter = '';
             this.transactionsFilter.keyword = '';
             this.transactions = [];
@@ -402,16 +464,16 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.type = 0;
             }
 
-            if (filter && isString(filter.categoryId)) {
-                this.transactionsFilter.categoryId = filter.categoryId;
+            if (filter && isString(filter.categoryIds)) {
+                this.transactionsFilter.categoryIds = filter.categoryIds;
             } else {
-                this.transactionsFilter.categoryId = '0';
+                this.transactionsFilter.categoryIds = '';
             }
 
-            if (filter && isString(filter.accountId)) {
-                this.transactionsFilter.accountId = filter.accountId;
+            if (filter && isString(filter.accountIds)) {
+                this.transactionsFilter.accountIds = filter.accountIds;
             } else {
-                this.transactionsFilter.accountId = '0';
+                this.transactionsFilter.accountIds = '';
             }
 
             if (filter && isString(filter.amountFilter)) {
@@ -443,12 +505,12 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.type = filter.type;
             }
 
-            if (filter && isString(filter.categoryId)) {
-                this.transactionsFilter.categoryId = filter.categoryId;
+            if (filter && isString(filter.categoryIds)) {
+                this.transactionsFilter.categoryIds = filter.categoryIds;
             }
 
-            if (filter && isString(filter.accountId)) {
-                this.transactionsFilter.accountId = filter.accountId;
+            if (filter && isString(filter.accountIds)) {
+                this.transactionsFilter.accountIds = filter.accountIds;
             }
 
             if (filter && isString(filter.amountFilter)) {
@@ -466,12 +528,12 @@ export const useTransactionsStore = defineStore('transactions', {
                 querys.push('type=' + this.transactionsFilter.type);
             }
 
-            if (this.transactionsFilter.accountId && this.transactionsFilter.accountId !== '0') {
-                querys.push('accountIds=' + this.transactionsFilter.accountId);
+            if (this.transactionsFilter.accountIds) {
+                querys.push('accountIds=' + this.transactionsFilter.accountIds);
             }
 
-            if (this.transactionsFilter.categoryId && this.transactionsFilter.categoryId !== '0') {
-                querys.push('categoryIds=' + this.transactionsFilter.categoryId);
+            if (this.transactionsFilter.categoryIds) {
+                querys.push('categoryIds=' + this.transactionsFilter.categoryIds);
             }
 
             querys.push('dateType=' + this.transactionsFilter.dateType);
@@ -511,8 +573,8 @@ export const useTransactionsStore = defineStore('transactions', {
                     page: page || 1,
                     withCount: (!!withCount) || false,
                     type: self.transactionsFilter.type,
-                    categoryIds: self.transactionsFilter.categoryId,
-                    accountIds: self.transactionsFilter.accountId,
+                    categoryIds: self.transactionsFilter.categoryIds,
+                    accountIds: self.transactionsFilter.accountIds,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {
@@ -586,8 +648,8 @@ export const useTransactionsStore = defineStore('transactions', {
                     year: year,
                     month: month,
                     type: self.transactionsFilter.type,
-                    categoryIds: self.transactionsFilter.categoryId,
-                    accountIds: self.transactionsFilter.accountId,
+                    categoryIds: self.transactionsFilter.categoryIds,
+                    accountIds: self.transactionsFilter.accountIds,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {

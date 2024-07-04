@@ -1,3 +1,4 @@
+import currencyConstants from '@/consts/currency.js';
 import accountConstants from '@/consts/account.js';
 
 export function setAccountModelByAnotherAccount(account, account2) {
@@ -226,6 +227,37 @@ export function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter
     }
 
     return ret;
+}
+export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccounts, selectedAccountIds, defaultCurrency) {
+    if (!selectedAccountIds) {
+        return defaultCurrency;
+    }
+
+    let accountCurrency = '';
+
+    for (let accountId in selectedAccountIds) {
+        if (!Object.prototype.hasOwnProperty.call(selectedAccountIds, accountId)) {
+            continue;
+        }
+
+        const account = allAccounts[accountId];
+
+        if (account.currency === currencyConstants.parentAccountCurrencyPlaceholder) {
+            continue;
+        }
+
+        if (accountCurrency === '') {
+            accountCurrency = account.currency;
+        } else if (accountCurrency !== account.currency) {
+            return defaultCurrency;
+        }
+    }
+
+    if (accountCurrency) {
+        return accountCurrency;
+    }
+
+    return defaultCurrency;
 }
 
 export function selectAccountOrSubAccounts(filterAccountIds, account, value) {

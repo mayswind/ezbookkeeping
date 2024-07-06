@@ -276,14 +276,12 @@
                                   @dateRange:change="setCustomDateFilter" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">
-        <account-filter-settings-card
-            :dialog-mode="true" :modify-default="false"
+        <account-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
             @settings:change="showFilterAccountDialog = false" />
     </v-dialog>
 
     <v-dialog width="800" v-model="showFilterCategoryDialog">
-        <category-filter-settings-card
-            :dialog-mode="true" :modify-default="false"
+        <category-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
             @settings:change="showFilterCategoryDialog = false" />
     </v-dialog>
 

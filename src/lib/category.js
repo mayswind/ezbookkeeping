@@ -262,6 +262,21 @@ export function selectInvert(filterCategoryIds, allTransactionCategoriesMap) {
     }
 }
 
+export function isCategoryOrSubCategoriesAllChecked(category, filterCategoryIds) {
+    if (!category.subCategories) {
+        return !filterCategoryIds[category.id];
+    }
+
+    for (let i = 0; i < category.subCategories.length; i++) {
+        const subCategory = category.subCategories[i];
+        if (filterCategoryIds[subCategory.id]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function isSubCategoriesAllChecked(category, filterCategoryIds) {
     for (let i = 0; i < category.subCategories.length; i++) {
         const subCategory = category.subCategories[i];

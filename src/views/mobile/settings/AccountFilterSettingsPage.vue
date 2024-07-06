@@ -117,6 +117,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useAccountsStore } from '@/stores/account.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
 import accountConstants from '@/consts/account.js';
@@ -142,23 +143,23 @@ export default {
         return {
             loading: true,
             loadingError: null,
-            modifyDefault: false,
+            type: null,
             filterAccountIds: {},
             collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
         }
     },
     computed: {
-        ...mapStores(useSettingsStore, useAccountsStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useAccountsStore, useTransactionsStore, useStatisticsStore),
         title() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Default Account Filter';
             } else {
                 return 'Filter Accounts';
             }
         },
         applyText() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Save';
             } else {
                 return 'Apply';
@@ -178,7 +179,7 @@ export default {
         const self = this;
         const query = self.f7route.query;
 
-        self.modifyDefault = !!query.modifyDefault;
+        self.type = query.type;
 
         self.accountsStore.loadAllAccounts({
             force: false
@@ -193,13 +194,34 @@ export default {
                 }
 
                 const account = self.accountsStore.allAccountsMap[accountId];
-                allAccountIds[account.id] = false;
+
+                if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterAccountIdsCount > 0) {
+                    allAccountIds[account.id] = true;
+                } else {
+                    allAccountIds[account.id] = false;
+                }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.filterAccountIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
+            } else if (this.type === 'transactionListCurrent') {
+                for (let accountId in self.transactionsStore.allFilterAccountIds) {
+                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
+                        continue;
+                    }
+
+                    const account = self.accountsStore.allAccountsMap[accountId];
+
+                    if (account) {
+                        selectAccountOrSubAccounts(allAccountIds, account, false);
+                    }
+                }
+                self.filterAccountIds = allAccountIds;
+            } else {
+                self.$toast('Parameter Invalid');
+                self.loadingError = 'Parameter Invalid';
             }
         }).catch(error => {
             if (error.processed) {
@@ -219,23 +241,37 @@ export default {
             const router = self.f7router;
 
             const filteredAccountIds = {};
+            let finalAccountIds = '';
 
             for (let accountId in self.filterAccountIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterAccountIds, accountId)) {
                     continue;
                 }
 
-                if (self.filterAccountIds[accountId]) {
+                const account = self.accountsStore.allAccountsMap[accountId];
+
+                if (!isAccountOrSubAccountsAllChecked(account, self.filterAccountIds)) {
                     filteredAccountIds[accountId] = true;
+                } else {
+                    if (finalAccountIds.length > 0) {
+                        finalAccountIds += ',';
+                    }
+
+                    finalAccountIds += accountId;
                 }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.settingsStore.setStatisticsDefaultAccountFilter(filteredAccountIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.statisticsStore.updateTransactionStatisticsFilter({
                     filterAccountIds: filteredAccountIds
                 });
+            } else if (this.type === 'transactionListCurrent') {
+                self.transactionsStore.updateTransactionListFilter({
+                    accountIds: finalAccountIds
+                });
+                self.transactionsStore.updateTransactionListInvalidState(true);
             }
 
             router.back();

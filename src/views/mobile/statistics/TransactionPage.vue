@@ -534,10 +534,10 @@ export default {
             this.f7router.navigate(this.getItemLinkUrl(item));
         },
         filterAccounts() {
-            this.f7router.navigate('/settings/filter/account');
+            this.f7router.navigate('/settings/filter/account?type=statisticsCurrent');
         },
         filterCategories() {
-            this.f7router.navigate('/settings/filter/category');
+            this.f7router.navigate('/settings/filter/category?type=statisticsCurrent');
         },
         settings() {
             this.f7router.navigate('/statistic/settings');

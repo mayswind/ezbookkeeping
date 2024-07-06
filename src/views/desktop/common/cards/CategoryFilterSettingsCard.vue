@@ -123,6 +123,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
 import categoryConstants from '@/consts/category.js';
@@ -135,6 +136,7 @@ import {
     selectAll,
     selectNone,
     selectInvert,
+    isCategoryOrSubCategoriesAllChecked,
     isSubCategoriesAllChecked,
     isSubCategoriesHasButNotAllChecked
 } from '@/lib/category.js';
@@ -149,7 +151,7 @@ import {
 export default {
     props: [
         'dialogMode',
-        'modifyDefault',
+        'type',
         'autoSave'
     ],
     emits: [
@@ -173,16 +175,16 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useSettingsStore, useTransactionCategoriesStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useTransactionCategoriesStore, useTransactionsStore, useStatisticsStore),
         title() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Default Transaction Category Filter';
             } else {
                 return 'Filter Transaction Categories';
             }
         },
         applyText() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Save';
             } else {
                 return 'Apply';
@@ -214,13 +216,36 @@ export default {
                 }
 
                 const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
-                allCategoryIds[category.id] = false;
+
+                if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
+                    allCategoryIds[category.id] = true;
+                } else {
+                    allCategoryIds[category.id] = false;
+                }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.filterCategoryIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter, allCategoryIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
+            } else if (this.type === 'transactionListCurrent') {
+                for (let categoryId in self.transactionsStore.allFilterCategoryIds) {
+                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterCategoryIds, categoryId)) {
+                        continue;
+                    }
+
+                    const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+
+                    if (category && (!category.subCategories || !category.subCategories.length)) {
+                        allCategoryIds[category.id] = false;
+                    } else if (category) {
+                        selectSubCategories(allCategoryIds, category, false);
+                    }
+                }
+
+                self.filterCategoryIds = allCategoryIds;
+            } else {
+                self.$refs.snackbar.showError('Parameter Invalid');
             }
         }).catch(error => {
             self.loading = false;
@@ -235,26 +260,40 @@ export default {
             const self = this;
 
             const filteredCategoryIds = {};
+            let finalCategoryIds = '';
 
             for (let categoryId in self.filterCategoryIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterCategoryIds, categoryId)) {
                     continue;
                 }
 
-                if (self.filterCategoryIds[categoryId]) {
+                const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+
+                if (!isCategoryOrSubCategoriesAllChecked(category, self.filterCategoryIds)) {
                     filteredCategoryIds[categoryId] = true;
+                } else {
+                    if (finalCategoryIds.length > 0) {
+                        finalCategoryIds += ',';
+                    }
+
+                    finalCategoryIds += categoryId;
                 }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.settingsStore.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.statisticsStore.updateTransactionStatisticsFilter({
                     filterCategoryIds: filteredCategoryIds
                 });
+            } else if (this.type === 'transactionListCurrent') {
+                self.transactionsStore.updateTransactionListFilter({
+                    categoryIds: finalCategoryIds
+                });
+                self.transactionsStore.updateTransactionListInvalidState(true);
             }
 
-            this.$emit('settings:change', true);
+            self.$emit('settings:change', true);
         },
         cancel() {
             this.$emit('settings:change', false);

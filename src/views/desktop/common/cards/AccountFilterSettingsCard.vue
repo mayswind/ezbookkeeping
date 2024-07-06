@@ -125,6 +125,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useAccountsStore } from '@/stores/account.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
 import accountConstants from '@/consts/account.js';
@@ -149,7 +150,7 @@ import {
 export default {
     props: [
         'dialogMode',
-        'modifyDefault',
+        'type',
         'autoSave'
     ],
     emits: [
@@ -169,16 +170,16 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useSettingsStore, useAccountsStore, useStatisticsStore),
+        ...mapStores(useSettingsStore, useAccountsStore, useTransactionsStore, useStatisticsStore),
         title() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Default Account Filter';
             } else {
                 return 'Filter Accounts';
             }
         },
         applyText() {
-            if (this.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 return 'Save';
             } else {
                 return 'Apply';
@@ -210,13 +211,33 @@ export default {
                 }
 
                 const account = self.accountsStore.allAccountsMap[accountId];
-                allAccountIds[account.id] = false;
+
+                if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterAccountIdsCount > 0) {
+                    allAccountIds[account.id] = true;
+                } else {
+                    allAccountIds[account.id] = false;
+                }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.filterAccountIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
+            } else if (this.type === 'transactionListCurrent') {
+                for (let accountId in self.transactionsStore.allFilterAccountIds) {
+                    if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
+                        continue;
+                    }
+
+                    const account = self.accountsStore.allAccountsMap[accountId];
+
+                    if (account) {
+                        selectAccountOrSubAccounts(allAccountIds, account, false);
+                    }
+                }
+                self.filterAccountIds = allAccountIds;
+            } else {
+                self.$refs.snackbar.showError('Parameter Invalid');
             }
         }).catch(error => {
             self.loading = false;
@@ -231,26 +252,40 @@ export default {
             const self = this;
 
             const filteredAccountIds = {};
+            let finalAccountIds = '';
 
             for (let accountId in self.filterAccountIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterAccountIds, accountId)) {
                     continue;
                 }
 
-                if (self.filterAccountIds[accountId]) {
+                const account = self.accountsStore.allAccountsMap[accountId];
+
+                if (!isAccountOrSubAccountsAllChecked(account, self.filterAccountIds)) {
                     filteredAccountIds[accountId] = true;
+                } else {
+                    if (finalAccountIds.length > 0) {
+                        finalAccountIds += ',';
+                    }
+
+                    finalAccountIds += accountId;
                 }
             }
 
-            if (self.modifyDefault) {
+            if (this.type === 'statisticsDefault') {
                 self.settingsStore.setStatisticsDefaultAccountFilter(filteredAccountIds);
-            } else {
+            } else if (this.type === 'statisticsCurrent') {
                 self.statisticsStore.updateTransactionStatisticsFilter({
                     filterAccountIds: filteredAccountIds
                 });
+            } else if (this.type === 'transactionListCurrent') {
+                self.transactionsStore.updateTransactionListFilter({
+                    accountIds: finalAccountIds
+                });
+                self.transactionsStore.updateTransactionListInvalidState(true);
             }
 
-            this.$emit('settings:change', true);
+            self.$emit('settings:change', true);
         },
         cancel() {
             this.$emit('settings:change', false);

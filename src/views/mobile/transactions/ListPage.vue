@@ -290,7 +290,7 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.categoryIds"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }" :title="$t('Multiple Categories')" @click="showMultipleCategoriesPopup()">
+                <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }" :title="$t('Multiple Categories')" @click="filterMultipleCategories()">
                     <template #media>
                         <f7-icon f7="rectangle_on_rectangle"></f7-icon>
                     </template>
@@ -317,16 +317,17 @@
                     </template>
                     <f7-accordion-content>
                         <f7-list dividers class="padding-left">
-                            <f7-list-item :class="{ 'list-item-selected': queryAllFilterCategoryIds[category.id] }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                            <f7-list-item :class="{ 'list-item-selected': query.categoryIds === category.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
+                                          :title="$t('All')" @click="changeCategoryFilter(category.id)">
                                 <template #media>
                                     <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                                 </template>
                                 <template #after>
-                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="queryAllFilterCategoryIds[category.id]"></f7-icon>
+                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds === category.id"></f7-icon>
                                 </template>
                             </f7-list-item>
                             <f7-list-item :title="subCategory.name"
-                                          :class="{ 'list-item-selected': queryAllFilterCategoryIds[subCategory.id] }"
+                                          :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
                                           v-show="!subCategory.hidden"
@@ -338,7 +339,7 @@
                                 <template #after>
                                     <f7-icon class="list-item-checked-icon"
                                              f7="checkmark_alt"
-                                             v-if="queryAllFilterCategoryIds[subCategory.id]">
+                                             v-if="query.categoryIds === subCategory.id">
                                     </f7-icon>
                                 </template>
                             </f7-list-item>
@@ -360,7 +361,7 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.accountIds"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }" :title="$t('Multiple Accounts')" @click="showMultipleAccountsPopup()">
+                <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }" :title="$t('Multiple Accounts')" @click="filterMultipleAccounts()">
                     <template #media>
                         <f7-icon f7="rectangle_on_rectangle"></f7-icon>
                     </template>
@@ -369,7 +370,7 @@
                     </template>
                 </f7-list-item>
                 <f7-list-item :title="account.name"
-                              :class="{ 'list-item-selected': queryAllFilterAccountIds[account.id] }"
+                              :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                               :key="account.id"
                               v-for="account in allAccounts"
                               v-show="!account.hidden"
@@ -381,7 +382,7 @@
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
                                  f7="checkmark_alt"
-                                 v-if="queryAllFilterAccountIds[account.id]">
+                                 v-if="query.accountIds === account.id">
                         </f7-icon>
                     </template>
                 </f7-list-item>
@@ -802,9 +803,11 @@ export default {
                 return;
             }
 
-            let removeCategoryFilter = false;
+            let newCategoryFilter = undefined;
 
             if (type && this.query.categoryIds) {
+                newCategoryFilter = '';
+
                 for (let categoryId in this.queryAllFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
                         continue;
@@ -812,16 +815,19 @@ export default {
 
                     const category = this.allCategories[categoryId];
 
-                    if (category && category.type !== transactionTypeToCategoryType(type)) {
-                        removeCategoryFilter = true;
-                        break;
+                    if (category && category.type === transactionTypeToCategoryType(type)) {
+                        if (newCategoryFilter.length > 0) {
+                            newCategoryFilter += ',';
+                        }
+
+                        newCategoryFilter += categoryId;
                     }
                 }
             }
 
             this.transactionsStore.updateTransactionListFilter({
                 type: type,
-                categoryIds: removeCategoryFilter ? '' : undefined
+                categoryIds: newCategoryFilter
             });
 
             this.showMorePopover = false;
@@ -880,11 +886,11 @@ export default {
 
             this.reload(null);
         },
-        showMultipleCategoriesPopup() {
-
+        filterMultipleCategories() {
+            this.f7router.navigate('/settings/filter/category?type=transactionListCurrent');
         },
-        showMultipleAccountsPopup() {
-
+        filterMultipleAccounts() {
+            this.f7router.navigate('/settings/filter/account?type=transactionListCurrent');
         },
         duplicate(transaction) {
             this.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);

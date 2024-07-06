@@ -270,6 +270,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     font-weight: bold;
 }
 
+.list > ul > li.item-in-multiple-selection > .item-content > .item-inner > .item-title {
+    font-weight: bold;
+}
+
 .list.list-dividers li.has-child-list-item .item-inner:after {
     content: '';
     position: absolute;

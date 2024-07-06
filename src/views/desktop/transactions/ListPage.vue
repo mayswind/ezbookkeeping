@@ -121,7 +121,7 @@
                                                             <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="[query.categoryIds]">
+                                                    <v-list :selected="queryAllFilterCategoryIdsArray">
                                                         <v-list-item key="" value="" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': !query.categoryIds }"
                                                                      :append-icon="(!query.categoryIds ? icons.check : null)">
@@ -137,7 +137,7 @@
                                                                      :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }"
                                                                      :append-icon="(query.categoryIds && queryAllFilterCategoryIdsCount > 1 ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="showMultipleCategoriesDialog()">
+                                                                               @click="showFilterCategoryDialog = true">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="icons.multiple" />
                                                                     <span class="text-sm ml-3">{{ $t('Multiple Categories') }}</span>
@@ -170,8 +170,9 @@
 
                                                                 <v-divider />
                                                                 <v-list-item class="text-sm" density="compact"
+                                                                             :class="{ 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[category.id] }"
                                                                              :value="category.id"
-                                                                             :append-icon="(queryAllFilterCategoryIds[category.id] ? icons.check : null)">
+                                                                             :append-icon="(query.categoryIds === category.id ? icons.check : null)">
                                                                     <v-list-item-title class="cursor-pointer"
                                                                                        @click="changeCategoryFilter(category.id)">
                                                                         <div class="d-flex align-center">
@@ -186,8 +187,8 @@
                                                                     <v-divider v-if="!subCategory.hidden" />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :value="subCategory.id"
-                                                                                 :class="{ 'list-item-selected': queryAllFilterCategoryIds[subCategory.id] }"
-                                                                                 :append-icon="(queryAllFilterCategoryIds[subCategory.id] ? icons.check : null)"
+                                                                                 :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
+                                                                                 :append-icon="(query.categoryIds === subCategory.id ? icons.check : null)"
                                                                                  v-if="!subCategory.hidden">
                                                                         <v-list-item-title class="cursor-pointer"
                                                                                            @click="changeCategoryFilter(subCategory.id)">
@@ -264,7 +265,7 @@
                                                             <v-icon :icon="icons.dropdownMenu" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="[query.accountIds]">
+                                                    <v-list :selected="queryAllFilterAccountIdsArray">
                                                         <v-list-item key="" value="" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': !query.accountIds }"
                                                                      :append-icon="(!query.accountIds ? icons.check : null)">
@@ -280,7 +281,7 @@
                                                                      :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }"
                                                                      :append-icon="(query.accountIds && queryAllFilterAccountIdsCount > 1 ? icons.check : null)">
                                                             <v-list-item-title class="cursor-pointer"
-                                                                               @click="showMultipleAccountsDialog()">
+                                                                               @click="showFilterAccountDialog = true">
                                                                 <div class="d-flex align-center">
                                                                     <v-icon :icon="icons.multiple" />
                                                                     <span class="text-sm ml-3">{{ $t('Multiple Accounts') }}</span>
@@ -292,8 +293,8 @@
                                                             <v-divider v-if="!account.hidden" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
-                                                                         :class="{ 'list-item-selected': queryAllFilterAccountIds[account.id] }"
-                                                                         :append-icon="(queryAllFilterAccountIds[account.id] ? icons.check : null)"
+                                                                         :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
+                                                                         :append-icon="(query.accountIds === account.id ? icons.check : null)"
                                                                          v-if="!account.hidden">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
@@ -406,12 +407,24 @@
                                  @dateRange:change="changeCustomDateFilter" />
     <edit-dialog ref="editDialog" :persistent="true" />
 
+    <v-dialog width="800" v-model="showFilterAccountDialog">
+        <account-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
+                                      @settings:change="changeMultipleAccountsFilter" />
+    </v-dialog>
+
+    <v-dialog width="800" v-model="showFilterCategoryDialog">
+        <category-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
+                                       @settings:change="changeMultipleCategoriesFilter" />
+    </v-dialog>
+
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
 
 <script>
 import EditDialog from './list/dialogs/EditDialog.vue';
+import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 
 import { useDisplay } from 'vuetify';
 
@@ -426,7 +439,7 @@ import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
-import { isString, getNameByKeyValue } from '@/lib/common.js';
+import { isString, getNameByKeyValue, objectToArray } from '@/lib/common.js';
 import logger from '@/lib/logger.js';
 import {
     getCurrentUnixTime,
@@ -470,7 +483,9 @@ import {
 
 export default {
     components: {
-        EditDialog
+        EditDialog,
+        AccountFilterSettingsCard,
+        CategoryFilterSettingsCard
     },
     props: [
         'initDateType',
@@ -504,6 +519,8 @@ export default {
             alwaysShowNav: mdAndUp.value,
             showNav: mdAndUp.value,
             showCustomDateRangeDialog: false,
+            showFilterAccountDialog: false,
+            showFilterCategoryDialog: false,
             icons: {
                 search: mdiMagnify,
                 check: mdiCheck,
@@ -573,6 +590,24 @@ export default {
         },
         queryAllFilterAccountIdsCount() {
             return this.transactionsStore.allFilterAccountIdsCount;
+        },
+        queryAllFilterCategoryIdsArray() {
+            if (this.queryAllFilterCategoryIdsCount === 0) {
+                return [''];
+            } else if (this.queryAllFilterCategoryIdsCount === 1) {
+                return [this.query.categoryIds];
+            } else { // this.queryAllFilterCategoryIdsCount > 1
+                return ['multiple'];
+            }
+        },
+        queryAllFilterAccountIdsArray() {
+            if (this.queryAllFilterAccountIdsCount === 0) {
+                return [''];
+            } else if (this.queryAllFilterAccountIdsCount === 1) {
+                return [this.query.accountIds];
+            } else { // this.queryAllFilterAccountIdsCount > 1
+                return ['multiple'];
+            }
         },
         queryCategoryName() {
             if (this.queryAllFilterCategoryIdsCount > 1) {
@@ -945,9 +980,11 @@ export default {
             this.$router.push(this.getFilterLinkUrl());
         },
         changeTypeFilter(type) {
-            let removeCategoryFilter = false;
+            let newCategoryFilter = undefined;
 
             if (type && this.query.categoryIds) {
+                newCategoryFilter = '';
+
                 for (let categoryId in this.queryAllFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(this.queryAllFilterCategoryIds, categoryId)) {
                         continue;
@@ -955,16 +992,19 @@ export default {
 
                     const category = this.allCategories[categoryId];
 
-                    if (category && category.type !== transactionTypeToCategoryType(type)) {
-                        removeCategoryFilter = true;
-                        break;
+                    if (category && category.type === transactionTypeToCategoryType(type)) {
+                        if (newCategoryFilter.length > 0) {
+                            newCategoryFilter += ',';
+                        }
+
+                        newCategoryFilter += categoryId;
                     }
                 }
             }
 
             this.transactionsStore.updateTransactionListFilter({
                 type: type,
-                categoryIds: removeCategoryFilter ? '' : undefined
+                categoryIds: newCategoryFilter
             });
 
             this.loading = true;
@@ -982,6 +1022,19 @@ export default {
             this.transactionsStore.updateTransactionListFilter({
                 categoryIds: categoryIds
             });
+
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
+            this.$router.push(this.getFilterLinkUrl());
+        },
+        changeMultipleCategoriesFilter(changed) {
+            this.categoryMenuState = false;
+            this.showFilterCategoryDialog = false;
+
+            if (!changed) {
+                return;
+            }
 
             this.loading = true;
             this.currentPageTransactions = [];
@@ -1046,6 +1099,18 @@ export default {
             this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
+        changeMultipleAccountsFilter(changed) {
+            this.showFilterAccountDialog = false;
+
+            if (!changed) {
+                return;
+            }
+
+            this.loading = true;
+            this.currentPageTransactions = [];
+            this.transactionsStore.clearTransactions();
+            this.$router.push(this.getFilterLinkUrl());
+        },
         changeKeywordFilter(keyword) {
             if (this.query.keyword === keyword) {
                 return;
@@ -1059,12 +1124,6 @@ export default {
             this.currentPageTransactions = [];
             this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
-        },
-        showMultipleCategoriesDialog() {
-
-        },
-        showMultipleAccountsDialog() {
-
         },
         add() {
             const self = this;
@@ -1297,7 +1356,9 @@ export default {
     padding: 0 8px 0 8px;
 }
 
-.transaction-category-menu .has-children-item-selected span {
+.transaction-category-menu .has-children-item-selected span,
+.transaction-category-menu .item-in-multiple-selection span,
+.transaction-account-menu .item-in-multiple-selection span {
     font-weight: bold;
 }
 </style>

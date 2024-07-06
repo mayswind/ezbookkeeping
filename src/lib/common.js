@@ -359,6 +359,20 @@ export function arrayContainsFieldValue(array, fieldName, value) {
     return false;
 }
 
+export function objectToArray(object) {
+    const ret = [];
+
+    for (let field in object) {
+        if (!Object.prototype.hasOwnProperty.call(object, field)) {
+            continue;
+        }
+
+        ret.push(field);
+    }
+
+    return ret;
+}
+
 export function categorizedArrayToPlainArray(object) {
     const ret = [];
 

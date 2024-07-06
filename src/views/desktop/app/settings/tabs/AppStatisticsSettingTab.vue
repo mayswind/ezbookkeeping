@@ -115,11 +115,11 @@
         </v-col>
 
         <v-col cols="12">
-            <account-filter-settings-card :auto-save="true" :modify-default="true" />
+            <account-filter-settings-card type="statisticsDefault" :auto-save="true" />
         </v-col>
 
         <v-col cols="12">
-            <category-filter-settings-card :auto-save="true" :modify-default="true" />
+            <category-filter-settings-card type="statisticsDefault" :auto-save="true" />
         </v-col>
     </v-row>
 </template>

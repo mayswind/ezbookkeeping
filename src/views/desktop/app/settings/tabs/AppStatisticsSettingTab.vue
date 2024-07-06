@@ -130,8 +130,8 @@ import { useSettingsStore } from '@/stores/setting.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 
-import AccountFilterSettingsCard from '@/views/desktop/statistics/settings/cards/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/statistics/settings/cards/CategoryFilterSettingsCard.vue';
+import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 
 export default {
     components: {

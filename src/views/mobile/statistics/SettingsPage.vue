@@ -24,9 +24,9 @@
                 </select>
             </f7-list-item>
 
-            <f7-list-item :title="$t('Default Account Filter')" link="/statistic/filter/account?modifyDefault=1"></f7-list-item>
+            <f7-list-item :title="$t('Default Account Filter')" link="/settings/filter/account?modifyDefault=1"></f7-list-item>
 
-            <f7-list-item :title="$t('Default Transaction Category Filter')" link="/statistic/filter/category?modifyDefault=1"></f7-list-item>
+            <f7-list-item :title="$t('Default Transaction Category Filter')" link="/settings/filter/category?modifyDefault=1"></f7-list-item>
 
             <f7-list-item
                 :title="$t('Default Sort Order')"

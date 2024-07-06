@@ -328,8 +328,8 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-import AccountFilterSettingsCard from './settings/cards/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from './settings/cards/CategoryFilterSettingsCard.vue';
+import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
+import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 
 export default {
     components: {

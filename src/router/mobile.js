@@ -14,11 +14,11 @@ import AccountEditPage from '@/views/mobile/accounts/EditPage.vue';
 
 import StatisticsTransactionPage from '@/views/mobile/statistics/TransactionPage.vue';
 import StatisticsSettingsPage from '@/views/mobile/statistics/SettingsPage.vue';
-import StatisticsAccountFilterSettingsPage from '@/views/mobile/statistics/AccountFilterSettingsPage.vue';
-import StatisticsCategoryFilterSettingsPage from '@/views/mobile/statistics/CategoryFilterSettingsPage.vue';
 
 import TextSizeSettingsPage from '@/views/mobile/settings/TextSizeSettingsPage.vue';
 import PageSettingsPage from '@/views/mobile/settings/PageSettingsPage.vue';
+import AccountFilterSettingsPage from '@/views/mobile/settings/AccountFilterSettingsPage.vue';
+import CategoryFilterSettingsPage from '@/views/mobile/settings/CategoryFilterSettingsPage.vue';
 
 import SettingsPage from '@/views/mobile/SettingsPage.vue';
 import ApplicationLockPage from '@/views/mobile/ApplicationLockPage.vue';
@@ -195,18 +195,18 @@ const routes = [
         beforeEnter: [checkLogin]
     },
     {
-        path: '/statistic/filter/account',
-        async: asyncResolve(StatisticsAccountFilterSettingsPage),
-        beforeEnter: [checkLogin]
-    },
-    {
-        path: '/statistic/filter/category',
-        async: asyncResolve(StatisticsCategoryFilterSettingsPage),
-        beforeEnter: [checkLogin]
-    },
-    {
         path: '/settings/textsize',
         async: asyncResolve(TextSizeSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/filter/account',
+        async: asyncResolve(AccountFilterSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/filter/category',
+        async: asyncResolve(CategoryFilterSettingsPage),
         beforeEnter: [checkLogin]
     },
     {

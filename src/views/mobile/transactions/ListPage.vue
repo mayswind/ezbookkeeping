@@ -11,7 +11,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${query.categoryIds}&accountId=${query.accountIds}`"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${queryAllFilterCategoryIdsCount === 1 ? query.categoryIds : ''}&accountId=${queryAllFilterAccountIdsCount === 1 ? query.accountIds : ''}`"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">
@@ -200,9 +200,7 @@
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
                                                      :class="{ 'text-color-teal': transaction.type === allTransactionTypes.Expense, 'text-color-red': transaction.type === allTransactionTypes.Income }">
-                                                    <span v-if="!query.accountIds || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountIds || transaction.sourceAccount.parentId === query.accountIds))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                    <span v-else-if="query.accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountIds || transaction.destinationAccount.parentId === query.accountIds)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
-                                                    <span v-else></span>
+                                                    <span>{{ getTransactionDisplayAmount(transaction) }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -286,10 +284,18 @@
             <f7-list dividers accordion-list>
                 <f7-list-item :class="{ 'list-item-selected': !query.categoryIds }" :title="$t('All')" @click="changeCategoryFilter('')">
                     <template #media>
-                        <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
+                        <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                     </template>
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.categoryIds"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }" :title="$t('Multiple Categories')" @click="showMultipleCategoriesPopup()">
+                    <template #media>
+                        <f7-icon f7="rectangle_on_rectangle"></f7-icon>
+                    </template>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds && queryAllFilterCategoryIdsCount > 1"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -311,16 +317,16 @@
                     </template>
                     <f7-accordion-content>
                         <f7-list dividers class="padding-left">
-                            <f7-list-item :class="{ 'list-item-selected': query.categoryIds === category.id }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
+                            <f7-list-item :class="{ 'list-item-selected': queryAllFilterCategoryIds[category.id] }" :title="$t('All')" @click="changeCategoryFilter(category.id)">
                                 <template #media>
-                                    <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
+                                    <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                                 </template>
                                 <template #after>
-                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.categoryIds === category.id"></f7-icon>
+                                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="queryAllFilterCategoryIds[category.id]"></f7-icon>
                                 </template>
                             </f7-list-item>
                             <f7-list-item :title="subCategory.name"
-                                          :class="{ 'list-item-selected': query.categoryIds === subCategory.id }"
+                                          :class="{ 'list-item-selected': queryAllFilterCategoryIds[subCategory.id] }"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
                                           v-show="!subCategory.hidden"
@@ -332,7 +338,7 @@
                                 <template #after>
                                     <f7-icon class="list-item-checked-icon"
                                              f7="checkmark_alt"
-                                             v-if="query.categoryIds === subCategory.id">
+                                             v-if="queryAllFilterCategoryIds[subCategory.id]">
                                     </f7-icon>
                                 </template>
                             </f7-list-item>
@@ -348,14 +354,22 @@
             <f7-list dividers>
                 <f7-list-item :class="{ 'list-item-selected': !query.accountIds }" :title="$t('All')" @click="changeAccountFilter('')">
                     <template #media>
-                        <f7-icon f7="rectangle_badge_checkmark"></f7-icon>
+                        <f7-icon f7="rectangle_grid_2x2"></f7-icon>
                     </template>
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.accountIds"></f7-icon>
                     </template>
                 </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }" :title="$t('Multiple Accounts')" @click="showMultipleAccountsPopup()">
+                    <template #media>
+                        <f7-icon f7="rectangle_on_rectangle"></f7-icon>
+                    </template>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.accountIds && queryAllFilterAccountIdsCount > 1"></f7-icon>
+                    </template>
+                </f7-list-item>
                 <f7-list-item :title="account.name"
-                              :class="{ 'list-item-selected': query.accountIds === account.id }"
+                              :class="{ 'list-item-selected': queryAllFilterAccountIds[account.id] }"
                               :key="account.id"
                               v-for="account in allAccounts"
                               v-show="!account.hidden"
@@ -367,7 +381,7 @@
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
                                  f7="checkmark_alt"
-                                 v-if="query.accountIds === account.id">
+                                 v-if="queryAllFilterAccountIds[account.id]">
                         </f7-icon>
                     </template>
                 </f7-list-item>
@@ -461,6 +475,7 @@ import {
 } from '@/lib/datetime.js';
 import { categoryTypeToTransactionType, transactionTypeToCategoryType } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
+import { getTransactionDisplayAmount } from '@/lib/transaction.js';
 import { onSwipeoutDeleted, scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
@@ -490,11 +505,7 @@ export default {
             return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
         canAddTransaction() {
-            if (this.queryAllFilterCategoryIdsCount > 1 || this.queryAllFilterAccountIdsCount > 1) {
-                return false;
-            }
-
-            if (this.query.accountIds) {
+            if (this.query.accountIds && this.queryAllFilterAccountIdsCount === 1) {
                 const account = this.allAccounts[this.query.accountIds];
 
                 if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
@@ -869,6 +880,12 @@ export default {
 
             this.reload(null);
         },
+        showMultipleCategoriesPopup() {
+
+        },
+        showMultipleAccountsPopup() {
+
+        },
         duplicate(transaction) {
             this.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
         },
@@ -936,13 +953,6 @@ export default {
         getDisplayTimezone(transaction) {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
         },
-        getDisplayAmount(amount, currency, hideAmount) {
-            if (hideAmount) {
-                return this.getDisplayCurrency('***', currency);
-            }
-
-            return this.getDisplayCurrency(amount, currency);
-        },
         getDisplayMonthTotalAmount(amount, currency, symbol, incomplete) {
             const displayAmount = this.getDisplayCurrency(amount, currency);
             return symbol + displayAmount + (incomplete ? '+' : '');
@@ -969,6 +979,9 @@ export default {
         },
         getTransactionTypeFromCategoryType(categoryType) {
             return categoryTypeToTransactionType(parseInt(categoryType));
+        },
+        getTransactionDisplayAmount(transaction) {
+            return getTransactionDisplayAmount(transaction, this.queryAllFilterAccountIdsCount, this.queryAllFilterAccountIds, this.getDisplayCurrency);
         },
         getTransactionDomId(transaction) {
             return 'transaction_' + transaction.id;

@@ -14,6 +14,14 @@ import {
     getFirstAvaiableSubCategoryId
 } from './category.js';
 
+function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrencyFunc) {
+    if (hideAmount) {
+        return formatAmountWithCurrencyFunc('***', currency);
+    }
+
+    return formatAmountWithCurrencyFunc(amount, currency);
+}
+
 export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData, convertContextTime) {
     if ((!options.type || options.type === '0') && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
@@ -147,4 +155,34 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
             transaction.geoLocation = transaction2.geoLocation;
         }
     }
+}
+
+export function getTransactionDisplayAmount(transaction, allFilterAccountIdsCount, allFilterAccountIds, formatAmountWithCurrencyFunc) {
+    if (allFilterAccountIdsCount < 1) {
+        if (transaction.sourceAccount) {
+            return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount, formatAmountWithCurrencyFunc);
+        }
+    } else if (allFilterAccountIdsCount === 1) {
+        if (transaction.sourceAccount && (allFilterAccountIds[transaction.sourceAccount.id] || allFilterAccountIds[transaction.sourceAccount.parentId])) {
+            return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
+        } else if (transaction.destinationAccount && (allFilterAccountIds[transaction.destinationAccount.id] || allFilterAccountIds[transaction.destinationAccount.parentId])) {
+            return getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
+        }
+    } else { // allFilterAccountIdsCount > 1
+        if (transaction.sourceAccount && transaction.destinationAccount) {
+            if ((allFilterAccountIds[transaction.sourceAccount.id] || allFilterAccountIds[transaction.sourceAccount.parentId])
+                && !allFilterAccountIds[transaction.destinationAccount.id] && !allFilterAccountIds[transaction.destinationAccount.parentId]) {
+                return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
+            } else if ((allFilterAccountIds[transaction.destinationAccount.id] || allFilterAccountIds[transaction.destinationAccount.parentId])
+                && !allFilterAccountIds[transaction.sourceAccount.id] && !allFilterAccountIds[transaction.sourceAccount.parentId]) {
+                return getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount , formatAmountWithCurrencyFunc);
+            }
+        }
+    }
+
+    if (transaction.sourceAccount) {
+        return getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount, formatAmountWithCurrencyFunc);
+    }
+
+    return '';
 }

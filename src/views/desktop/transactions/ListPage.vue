@@ -133,6 +133,17 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
+                                                        <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }"
+                                                                     :append-icon="(query.categoryIds && queryAllFilterCategoryIdsCount > 1 ? icons.check : null)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="showMultipleCategoriesDialog()">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.multiple" />
+                                                                    <span class="text-sm ml-3">{{ $t('Multiple Categories') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
 
                                                         <template :key="categoryType"
                                                                   v-for="(categories, categoryType) in allPrimaryCategories">
@@ -160,7 +171,7 @@
                                                                 <v-divider />
                                                                 <v-list-item class="text-sm" density="compact"
                                                                              :value="category.id"
-                                                                             :append-icon="(query.categoryIds === category.id ? icons.check : null)">
+                                                                             :append-icon="(queryAllFilterCategoryIds[category.id] ? icons.check : null)">
                                                                     <v-list-item-title class="cursor-pointer"
                                                                                        @click="changeCategoryFilter(category.id)">
                                                                         <div class="d-flex align-center">
@@ -175,8 +186,8 @@
                                                                     <v-divider v-if="!subCategory.hidden" />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :value="subCategory.id"
-                                                                                 :class="{ 'list-item-selected': query.categoryIds === subCategory.id }"
-                                                                                 :append-icon="(query.categoryIds === subCategory.id ? icons.check : null)"
+                                                                                 :class="{ 'list-item-selected': queryAllFilterCategoryIds[subCategory.id] }"
+                                                                                 :append-icon="(queryAllFilterCategoryIds[subCategory.id] ? icons.check : null)"
                                                                                  v-if="!subCategory.hidden">
                                                                         <v-list-item-title class="cursor-pointer"
                                                                                            @click="changeCategoryFilter(subCategory.id)">
@@ -265,13 +276,24 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
+                                                        <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }"
+                                                                     :append-icon="(query.accountIds && queryAllFilterAccountIdsCount > 1 ? icons.check : null)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="showMultipleAccountsDialog()">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.multiple" />
+                                                                    <span class="text-sm ml-3">{{ $t('Multiple Accounts') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
                                                         <template :key="account.id"
                                                                   v-for="account in allAccounts">
                                                             <v-divider v-if="!account.hidden" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
-                                                                         :class="{ 'list-item-selected': query.accountIds === account.id }"
-                                                                         :append-icon="(query.accountIds === account.id ? icons.check : null)"
+                                                                         :class="{ 'list-item-selected': queryAllFilterAccountIds[account.id] }"
+                                                                         :append-icon="(queryAllFilterAccountIds[account.id] ? icons.check : null)"
                                                                          v-if="!account.hidden">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
@@ -347,9 +369,7 @@
                                                 </td>
                                                 <td class="transaction-table-column-amount" :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
                                                     <div v-if="transaction.sourceAccount">
-                                                        <span v-if="!query.accountIds || (transaction.sourceAccount && (transaction.sourceAccount.id === query.accountIds || transaction.sourceAccount.parentId === query.accountIds))">{{ getDisplayAmount(transaction.sourceAmount, transaction.sourceAccount.currency, transaction.hideAmount) }}</span>
-                                                        <span v-else-if="query.accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === query.accountIds || transaction.destinationAccount.parentId === query.accountIds)">{{ getDisplayAmount(transaction.destinationAmount, transaction.destinationAccount.currency, transaction.hideAmount) }}</span>
-                                                        <span v-else></span>
+                                                        <span>{{ getTransactionDisplayAmount(transaction) }}</span>
                                                     </div>
                                                 </td>
                                                 <td class="transaction-table-column-account">
@@ -431,12 +451,14 @@ import {
     transactionTypeToCategoryType
 } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
+import { getTransactionDisplayAmount } from '@/lib/transaction.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
     mdiMagnify,
     mdiCheck,
-    mdiTextBoxCheckOutline,
+    mdiViewGridOutline,
+    mdiVectorArrangeBelow,
     mdiRefresh,
     mdiMenu,
     mdiMenuDown,
@@ -485,7 +507,8 @@ export default {
             icons: {
                 search: mdiMagnify,
                 check: mdiCheck,
-                all: mdiTextBoxCheckOutline,
+                all: mdiViewGridOutline,
+                multiple: mdiVectorArrangeBelow,
                 refresh: mdiRefresh,
                 menu: mdiMenu,
                 dropdownMenu: mdiMenuDown,
@@ -502,11 +525,7 @@ export default {
             return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
         canAddTransaction() {
-            if (this.queryAllFilterCategoryIdsCount > 1 || this.queryAllFilterAccountIdsCount > 1) {
-                return false;
-            }
-
-            if (this.query.accountIds) {
+            if (this.query.accountIds && this.queryAllFilterAccountIdsCount === 1) {
                 const account = this.allAccounts[this.query.accountIds];
 
                 if (account && account.type === accountConstants.allAccountTypes.MultiSubAccounts) {
@@ -1041,13 +1060,19 @@ export default {
             this.transactionsStore.clearTransactions();
             this.$router.push(this.getFilterLinkUrl());
         },
+        showMultipleCategoriesDialog() {
+
+        },
+        showMultipleAccountsDialog() {
+
+        },
         add() {
             const self = this;
 
             self.$refs.editDialog.open({
                 type: self.query.type,
-                categoryId: self.query.categoryIds,
-                accountId: self.query.accountIds
+                categoryId: self.queryAllFilterCategoryIdsCount === 1 ? self.query.categoryIds : '',
+                accountId: self.queryAllFilterAccountIdsCount === 1 ? self.query.accountIds : ''
             }).then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
@@ -1134,13 +1159,6 @@ export default {
         getDisplayTimezone(transaction) {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset)}`;
         },
-        getDisplayAmount(amount, currency, hideAmount) {
-            if (hideAmount) {
-                return this.getDisplayCurrency('***', currency);
-            }
-
-            return this.getDisplayCurrency(amount, currency);
-        },
         getDisplayMonthTotalAmount(amount, currency, symbol, incomplete) {
             const displayAmount = this.getDisplayCurrency(amount, currency);
             return symbol + displayAmount + (incomplete ? '+' : '');
@@ -1171,6 +1189,9 @@ export default {
         },
         getTransactionTypeFromCategoryType(categoryType) {
             return categoryTypeToTransactionType(parseInt(categoryType));
+        },
+        getTransactionDisplayAmount(transaction) {
+            return getTransactionDisplayAmount(transaction, this.queryAllFilterAccountIdsCount, this.queryAllFilterAccountIds, this.getDisplayCurrency);
         },
         getCategoryListItemCheckedClass(category, queryCategoryIds) {
             if (queryCategoryIds && queryCategoryIds[category.id]) {

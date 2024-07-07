@@ -754,12 +754,12 @@ export const useStatisticsStore = defineStore('statistics', {
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByAccount.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
-                querys.push('accountId=' + item.id);
+                querys.push('accountIds=' + item.id);
             } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
-                querys.push('categoryId=' + item.id);
+                querys.push('categoryIds=' + item.id);
             }
 
             if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis

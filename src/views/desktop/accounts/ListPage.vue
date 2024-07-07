@@ -204,7 +204,7 @@
                                                                 <div class="d-flex account-toolbar align-center">
                                                                     <v-btn class="px-2" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="icons.transactions"
-                                                                           :to="`/transaction/list?accountId=${accountOrSubAccountId(element)}`">
+                                                                           :to="`/transaction/list?accountIds=${accountOrSubAccountId(element)}`">
                                                                         {{ $t('Transaction List') }}
                                                                     </v-btn>
                                                                     <v-btn class="px-2 ml-1" density="comfortable" color="default" variant="text"

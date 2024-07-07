@@ -121,7 +121,7 @@
                                                             <v-icon :icon="icons.dropdownMenu" v-show="query.type !== 1" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="queryAllFilterCategoryIdsArray">
+                                                    <v-list :selected="[queryAllSelectedFilterCategoryIds]">
                                                         <v-list-item key="" value="" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': !query.categoryIds }"
                                                                      :append-icon="(!query.categoryIds ? icons.check : null)">
@@ -265,7 +265,7 @@
                                                             <v-icon :icon="icons.dropdownMenu" />
                                                         </div>
                                                     </template>
-                                                    <v-list :selected="queryAllFilterAccountIdsArray">
+                                                    <v-list :selected="[queryAllSelectedFilterAccountIds]">
                                                         <v-list-item key="" value="" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': !query.accountIds }"
                                                                      :append-icon="(!query.accountIds ? icons.check : null)">
@@ -591,22 +591,22 @@ export default {
         queryAllFilterAccountIdsCount() {
             return this.transactionsStore.allFilterAccountIdsCount;
         },
-        queryAllFilterCategoryIdsArray() {
+        queryAllSelectedFilterCategoryIds() {
             if (this.queryAllFilterCategoryIdsCount === 0) {
-                return [''];
+                return '';
             } else if (this.queryAllFilterCategoryIdsCount === 1) {
-                return [this.query.categoryIds];
+                return this.query.categoryIds;
             } else { // this.queryAllFilterCategoryIdsCount > 1
-                return ['multiple'];
+                return 'multiple';
             }
         },
-        queryAllFilterAccountIdsArray() {
+        queryAllSelectedFilterAccountIds() {
             if (this.queryAllFilterAccountIdsCount === 0) {
-                return [''];
+                return '';
             } else if (this.queryAllFilterAccountIdsCount === 1) {
-                return [this.query.accountIds];
+                return this.query.accountIds;
             } else { // this.queryAllFilterAccountIdsCount > 1
-                return ['multiple'];
+                return 'multiple';
             }
         },
         queryCategoryName() {

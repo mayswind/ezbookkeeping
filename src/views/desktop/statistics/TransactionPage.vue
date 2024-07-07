@@ -64,9 +64,9 @@
                                                         <v-btn :disabled="loading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type"
                                                                v-bind="props">{{ dateRangeName(query) }}</v-btn>
                                                     </template>
-                                                    <v-list>
+                                                    <v-list :selected="[queryDateType]">
                                                         <v-list-item :key="dateRange.type" :value="dateRange.type"
-                                                                     :append-icon="(isDateFilterChecked(dateRange.type) ? icons.check : null)"
+                                                                     :append-icon="(queryDateType === dateRange.type ? icons.check : null)"
                                                                      v-for="dateRange in allDateRangesArray">
                                                             <v-list-item-title
                                                                 class="cursor-pointer"
@@ -402,6 +402,15 @@ export default {
                 this.setSortingType(value);
             }
         },
+        queryDateType() {
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.query.categoricalChartDateType;
+            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                return this.query.trendChartDateType;
+            } else {
+                return null;
+            }
+        },
         queryStartTime() {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
                 return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
@@ -655,15 +664,6 @@ export default {
             });
 
             this.reload(null);
-        },
-        isDateFilterChecked(dateType) {
-            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis && this.query.categoricalChartDateType === dateType) {
-                return true;
-            } else if (this.analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis && this.query.trendChartDateType === dateType) {
-                return true;
-            } else {
-                return false;
-            }
         },
         setDateFilter(dateType) {
             if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {

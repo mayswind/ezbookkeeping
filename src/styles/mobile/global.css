@@ -203,6 +203,7 @@ i.icon.la, i.icon.las, i.icon.lab {
 .toolbar-item-auto-size .toolbar-inner {
     padding-left: 16px;
     padding-right: 16px;
+    gap: 4px;
 }
 
 .toolbar-item-auto-size .toolbar-inner > .link {

@@ -16,13 +16,20 @@ import logger from '@/lib/logger.js';
 import {
     isEquals,
     isNumber,
+    isObject,
     isYearMonth,
-    isObject
+    isObjectEmpty
 } from '@/lib/common.js';
 import {
     getYearAndMonthFromUnixTime,
     getDateRangeByDateType
 } from '@/lib/datetime.js';
+import {
+    getFinalAccountIdsByFilteredAccountIds
+} from '@/lib/account.js';
+import {
+    getFinalCategoryIdsByFilteredCategoryIds
+} from '@/lib/category.js';
 import {
     sortStatisticsItems
 } from '@/lib/statistics.js';
@@ -736,6 +743,8 @@ export const useStatisticsStore = defineStore('statistics', {
             }
         },
         getTransactionListPageParams(analysisType, item, dateRange) {
+            const accountsStore = useAccountsStore();
+            const transactionCategoriesStore = useTransactionCategoriesStore();
             const querys = [];
 
             if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByAccount.type
@@ -755,11 +764,19 @@ export const useStatisticsStore = defineStore('statistics', {
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalAssets.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
                 querys.push('accountIds=' + item.id);
+
+                if (!isObjectEmpty(this.transactionStatisticsFilter.filterCategoryIds)) {
+                    querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, this.transactionStatisticsFilter.filterCategoryIds));
+                }
             } else if (this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.IncomeBySecondaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseByPrimaryCategory.type
                 || this.transactionStatisticsFilter.chartDataType === statisticsConstants.allChartDataTypes.ExpenseBySecondaryCategory.type) {
                 querys.push('categoryIds=' + item.id);
+
+                if (!isObjectEmpty(this.transactionStatisticsFilter.filterAccountIds)) {
+                    querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, this.transactionStatisticsFilter.filterAccountIds));
+                }
             }
 
             if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis

@@ -138,6 +138,34 @@ export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCateg
     return allVisibleCategories[type.toString()].visibleCategories;
 }
 
+export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategoriesMap, filteredCategoryIds) {
+    let finalCategoryIds = '';
+
+    if (!allTransactionCategoriesMap) {
+        return finalCategoryIds;
+    }
+
+    for (let categoryId in allTransactionCategoriesMap) {
+        if (!Object.prototype.hasOwnProperty.call(allTransactionCategoriesMap, categoryId)) {
+            continue;
+        }
+
+        const category = allTransactionCategoriesMap[categoryId];
+
+        if (filteredCategoryIds && !isCategoryOrSubCategoriesAllChecked(category, filteredCategoryIds)) {
+            continue;
+        }
+
+        if (finalCategoryIds.length > 0) {
+            finalCategoryIds += ',';
+        }
+
+        finalCategoryIds += category.id;
+    }
+
+    return finalCategoryIds;
+}
+
 export function isSubCategoryIdAvailable(categories, categoryId) {
     if (!categories || !categories.length) {
         return false;

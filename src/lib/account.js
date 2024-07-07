@@ -228,6 +228,35 @@ export function getAllFilteredAccountsBalance(categorizedAccounts, accountFilter
 
     return ret;
 }
+
+export function getFinalAccountIdsByFilteredAccountIds(allAccountsMap, filteredAccountIds) {
+    let finalAccountIds = '';
+
+    if (!allAccountsMap) {
+        return finalAccountIds;
+    }
+
+    for (let accountId in allAccountsMap) {
+        if (!Object.prototype.hasOwnProperty.call(allAccountsMap, accountId)) {
+            continue;
+        }
+
+        const account = allAccountsMap[accountId];
+
+        if (filteredAccountIds && !isAccountOrSubAccountsAllChecked(account, filteredAccountIds)) {
+            continue;
+        }
+
+        if (finalAccountIds.length > 0) {
+            finalAccountIds += ',';
+        }
+
+        finalAccountIds += account.id;
+    }
+
+    return finalAccountIds;
+}
+
 export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccounts, selectedAccountIds, defaultCurrency) {
     if (!selectedAccountIds) {
         return defaultCurrency;

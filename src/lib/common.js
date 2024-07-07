@@ -91,6 +91,22 @@ export function isEquals(obj1, obj2) {
     }
 }
 
+export function isObjectEmpty(obj) {
+    if (!obj) {
+        return true;
+    }
+
+    for (let field in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, field)) {
+            continue;
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
 export function getObjectOwnFieldCount(object) {
     let count = 0;
 

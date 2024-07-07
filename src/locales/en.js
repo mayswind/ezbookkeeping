@@ -48,12 +48,12 @@ export default {
             'dd_mm_yyyy': 'MMM, YYYY'
         },
         'longMonthDay': { // used in home page
-            'yyyy_mm_dd': 'MMMM D',
+            'yyyy_mm_dd': 'MMMM DD',
             'mm_dd_yyyy': 'MMMM D',
             'dd_mm_yyyy': 'D MMMM'
         },
         'shortMonthDay': { // should be similar to the shortDate. it would be next to the shortDate content on the transaction statistics page
-            'yyyy_mm_dd': 'M/D',
+            'yyyy_mm_dd': 'M-D',
             'mm_dd_yyyy': 'M/D',
             'dd_mm_yyyy': 'D/M'
         },

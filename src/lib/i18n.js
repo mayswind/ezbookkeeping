@@ -24,7 +24,7 @@ import {
     parseDateFromUnixTime,
     formatUnixTime,
     formatTime,
-    getCurrentDateTime,
+    formatCurrentTime,
     getYear,
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
@@ -398,7 +398,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
     ret.push({
         type: datetimeConstants.defaultDateTimeFormatValue,
         format: defaultFormat,
-        displayName: `${translateFn('Language Default')} (${formatTime(getCurrentDateTime(), defaultFormat)})`
+        displayName: `${translateFn('Language Default')} (${formatCurrentTime(defaultFormat)})`
     });
 
     for (let i = 0; i < allFormatArray.length; i++) {
@@ -408,7 +408,7 @@ function getDateTimeFormats(translateFn, allFormatMap, allFormatArray, localeFor
         ret.push({
             type: formatType.type,
             format: format,
-            displayName: formatTime(getCurrentDateTime(), format)
+            displayName: formatCurrentTime(format)
         });
     }
 

@@ -56,13 +56,12 @@ import datetimeConstants from '@/consts/datetime.js';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
-    getCurrentDateTime,
+    getCurrentYear,
     getUnixTime,
     getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
     getTimezoneOffsetMinutes,
-    getYear,
     getTimeValues,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.js';
@@ -97,7 +96,7 @@ export default {
             mode: 'time',
             yearRange: [
                 2000,
-                getYear(getCurrentDateTime()) + 1
+                getCurrentYear() + 1
             ],
             dateTime: datetime,
             timeValues: self.getTimeValues(datetime),

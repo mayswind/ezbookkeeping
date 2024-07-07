@@ -60,11 +60,10 @@ import datetimeConstants from '@/consts/datetime.js';
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
 import {
     getCurrentUnixTime,
-    getCurrentDateTime,
+    getCurrentYear,
     getUnixTime,
     getLocalDatetimeFromUnixTime,
     getTodayFirstUnixTime,
-    getYear,
     getDummyUnixTimeForLocalUsage,
     getActualUnixTimeForStore,
     getTimezoneOffsetMinutes,
@@ -100,7 +99,7 @@ export default {
         return {
             yearRange: [
                 2000,
-                getYear(getCurrentDateTime()) + 1
+                getCurrentYear() + 1
             ],
             dateRange: [
                 getLocalDatetimeFromUnixTime(getDummyUnixTimeForLocalUsage(minDate, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes())),

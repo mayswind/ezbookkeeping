@@ -75,11 +75,10 @@ import {
     getYearMonthObjectFromString,
     getYearMonthStringFromObject,
     getCurrentUnixTime,
-    getCurrentDateTime,
+    getCurrentYear,
     getThisYearFirstUnixTime,
     getYearMonthFirstUnixTime,
-    getYearMonthLastUnixTime,
-    getYear
+    getYearMonthLastUnixTime
 } from '@/lib/datetime.js';
 
 export default {
@@ -111,7 +110,7 @@ export default {
         return {
             yearRange: [
                 2000,
-                getYear(getCurrentDateTime()) + 1
+                getCurrentYear() + 1
             ],
             startTime: minDate,
             endTime: maxDate

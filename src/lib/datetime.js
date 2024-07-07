@@ -143,8 +143,8 @@ export function getCurrentUnixTime() {
     return moment().unix();
 }
 
-export function getCurrentDateTime() {
-    return moment();
+export function getCurrentYear() {
+    return moment().year();
 }
 
 export function parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset) {
@@ -165,6 +165,10 @@ export function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
 
 export function formatTime(dateTime, format) {
     return moment(dateTime).format(format);
+}
+
+export function formatCurrentTime(format) {
+    return moment().format(format);
 }
 
 export function getUnixTime(date) {

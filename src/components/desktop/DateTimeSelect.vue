@@ -45,12 +45,12 @@ import { useUserStore } from '@/stores/user.js';
 
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.js';
 import {
-    getCurrentDateTime,
+    getCurrentYear,
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getLocalDatetimeFromUnixTime,
     getActualUnixTimeForStore,
-    getYear, getUnixTime
+    getUnixTime
 } from '@/lib/datetime.js';
 
 export default {
@@ -68,7 +68,7 @@ export default {
         return {
             yearRange: [
                 2000,
-                getYear(getCurrentDateTime()) + 1
+                getCurrentYear() + 1
             ]
         }
     },

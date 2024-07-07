@@ -11,7 +11,7 @@
                                 { name: $t('Income'), value: 2 },
                                 { name: $t('Expense'), value: 3 },
                                 { name: $t('Transfer'), value: 4 }
-                            ]" v-model="query.type" @update:model-value="changeTypeFilter" />
+                            ]" v-model="queryType" />
                         </div>
                         <v-divider />
                         <div class="mx-6 mt-4">
@@ -573,6 +573,14 @@ export default {
         query() {
             return this.transactionsStore.transactionsFilter;
         },
+        queryType: {
+            get: function () {
+                return this.query.type;
+            },
+            set: function(value) {
+                this.changeTypeFilter(value);
+            }
+        },
         queryMinTime() {
             return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.minTime);
         },
@@ -913,16 +921,18 @@ export default {
 
             const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,
                 maxTime: newDateRange.maxTime,
                 minTime: newDateRange.minTime
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeDateFilter(recentDateRange) {
             if (recentDateRange.dateType === datetimeConstants.allDateRanges.Custom.type &&
@@ -943,16 +953,18 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: recentDateRange.dateType,
                 maxTime: recentDateRange.maxTime,
                 minTime: recentDateRange.minTime
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeCustomDateFilter(minTime, maxTime) {
             if (!minTime || !maxTime) {
@@ -966,7 +978,7 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: dateType,
                 maxTime: maxTime,
                 minTime: minTime
@@ -974,10 +986,12 @@ export default {
 
             this.showCustomDateRangeDialog = false;
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeTypeFilter(type) {
             let newCategoryFilter = undefined;
@@ -1002,15 +1016,17 @@ export default {
                 }
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 type: type,
                 categoryIds: newCategoryFilter
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeCategoryFilter(categoryIds) {
             this.categoryMenuState = false;
@@ -1019,27 +1035,27 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 categoryIds: categoryIds
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeMultipleCategoriesFilter(changed) {
             this.categoryMenuState = false;
             this.showFilterCategoryDialog = false;
 
-            if (!changed) {
-                return;
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
             }
-
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
         },
         changeAmountFilter(filterType) {
             this.currentAmountFilterType = '';
@@ -1076,54 +1092,59 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 amountFilter: amountFilter
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeAccountFilter(accountIds) {
             if (this.query.accountIds === accountIds) {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 accountIds: accountIds
             });
 
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         changeMultipleAccountsFilter(changed) {
             this.showFilterAccountDialog = false;
 
-            if (!changed) {
-                return;
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
             }
-
-            this.loading = true;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
         },
         changeKeywordFilter(keyword) {
             if (this.query.keyword === keyword) {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 keyword: keyword
             });
 
-            this.currentPage = 1;
-            this.currentPageTransactions = [];
-            this.transactionsStore.clearTransactions();
-            this.$router.push(this.getFilterLinkUrl());
+            if (changed) {
+                this.loading = true;
+                this.currentPage = 1;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
         },
         add() {
             const self = this;

@@ -260,7 +260,9 @@ export default {
             const self = this;
 
             const filteredCategoryIds = {};
+            let isAllSelected = true;
             let finalCategoryIds = '';
+            let changed = true;
 
             for (let categoryId in self.filterCategoryIds) {
                 if (!Object.prototype.hasOwnProperty.call(self.filterCategoryIds, categoryId)) {
@@ -271,6 +273,7 @@ export default {
 
                 if (!isCategoryOrSubCategoriesAllChecked(category, self.filterCategoryIds)) {
                     filteredCategoryIds[categoryId] = true;
+                    isAllSelected = false;
                 } else {
                     if (finalCategoryIds.length > 0) {
                         finalCategoryIds += ',';
@@ -287,13 +290,16 @@ export default {
                     filterCategoryIds: filteredCategoryIds
                 });
             } else if (this.type === 'transactionListCurrent') {
-                self.transactionsStore.updateTransactionListFilter({
-                    categoryIds: finalCategoryIds
+                changed = self.transactionsStore.updateTransactionListFilter({
+                    categoryIds: isAllSelected ? '' : finalCategoryIds
                 });
-                self.transactionsStore.updateTransactionListInvalidState(true);
+
+                if (changed) {
+                    self.transactionsStore.updateTransactionListInvalidState(true);
+                }
             }
 
-            self.$emit('settings:change', true);
+            self.$emit('settings:change', changed);
         },
         cancel() {
             this.$emit('settings:change', false);

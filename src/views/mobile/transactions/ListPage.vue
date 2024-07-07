@@ -772,14 +772,17 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: dateRange.dateType,
                 maxTime: dateRange.maxTime,
                 minTime: dateRange.minTime
             });
 
             this.showDatePopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeCustomDateFilter(minTime, maxTime) {
             if (!minTime || !maxTime) {
@@ -788,7 +791,7 @@ export default {
 
             const dateType = getDateTypeByDateRange(minTime, maxTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: dateType,
                 maxTime: maxTime,
                 minTime: minTime
@@ -796,7 +799,9 @@ export default {
 
             this.showCustomDateRangeSheet = false;
 
-            this.reload(null);
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeTypeFilter(type) {
             if (this.query.type === type) {
@@ -825,37 +830,46 @@ export default {
                 }
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 type: type,
                 categoryIds: newCategoryFilter
             });
 
             this.showMorePopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeCategoryFilter(categoryIds) {
             if (this.query.categoryIds === categoryIds) {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 categoryIds: categoryIds
             });
 
             this.showCategoryPopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeAccountFilter(accountIds) {
             if (this.query.accountIds === accountIds) {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 accountIds: accountIds
             });
 
             this.showAccountPopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeAmountFilter(filterType) {
             if (this.query.amountFilter === filterType) {
@@ -868,23 +882,28 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 amountFilter: filterType
             });
 
             this.showMorePopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         changeKeywordFilter(keyword) {
             if (this.query.keyword === keyword) {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 keyword: keyword
             });
 
-            this.reload(null);
+            if (changed) {
+                this.reload(null);
+            }
         },
         filterMultipleCategories() {
             this.f7router.navigate('/settings/filter/category?type=transactionListCurrent');
@@ -939,13 +958,15 @@ export default {
 
             const newDateRange = getShiftedDateRangeAndDateType(minTime, maxTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 dateType: newDateRange.dateType,
                 maxTime: newDateRange.maxTime,
                 minTime: newDateRange.minTime
             });
 
-            this.reload(null);
+            if (changed) {
+                this.reload(null);
+            }
         },
         scrollPopoverToSelectedItem(event) {
             scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');

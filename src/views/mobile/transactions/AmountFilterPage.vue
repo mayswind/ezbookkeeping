@@ -162,10 +162,14 @@ export default {
                 return;
             }
 
-            this.transactionsStore.updateTransactionListFilter({
+            const changed = this.transactionsStore.updateTransactionListFilter({
                 amountFilter: amountFilter
             });
-            this.transactionsStore.updateTransactionListInvalidState(true);
+
+            if (changed) {
+                this.transactionsStore.updateTransactionListInvalidState(true);
+            }
+
             router.back();
         },
         getDisplayAmount(value) {

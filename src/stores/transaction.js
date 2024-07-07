@@ -489,37 +489,49 @@ export const useTransactionsStore = defineStore('transactions', {
             }
         },
         updateTransactionListFilter(filter) {
-            if (filter && isNumber(filter.dateType)) {
+            let changed = false;
+
+            if (filter && isNumber(filter.dateType) && this.transactionsFilter.dateType !== filter.dateType) {
                 this.transactionsFilter.dateType = filter.dateType;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.maxTime)) {
+            if (filter && isNumber(filter.maxTime) && this.transactionsFilter.maxTime !== filter.maxTime) {
                 this.transactionsFilter.maxTime = filter.maxTime;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.minTime)) {
+            if (filter && isNumber(filter.minTime) && this.transactionsFilter.minTime !== filter.minTime) {
                 this.transactionsFilter.minTime = filter.minTime;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.type)) {
+            if (filter && isNumber(filter.type) && this.transactionsFilter.type !== filter.type) {
                 this.transactionsFilter.type = filter.type;
+                changed = true;
             }
 
-            if (filter && isString(filter.categoryIds)) {
+            if (filter && isString(filter.categoryIds) && this.transactionsFilter.categoryIds !== filter.categoryIds) {
                 this.transactionsFilter.categoryIds = filter.categoryIds;
+                changed = true;
             }
 
-            if (filter && isString(filter.accountIds)) {
+            if (filter && isString(filter.accountIds) && this.transactionsFilter.accountIds !== filter.accountIds) {
                 this.transactionsFilter.accountIds = filter.accountIds;
+                changed = true;
             }
 
-            if (filter && isString(filter.amountFilter)) {
+            if (filter && isString(filter.amountFilter) && this.transactionsFilter.amountFilter !== filter.amountFilter) {
                 this.transactionsFilter.amountFilter = filter.amountFilter;
+                changed = true;
             }
 
-            if (filter && isString(filter.keyword)) {
+            if (filter && isString(filter.keyword) && this.transactionsFilter.keyword !== filter.keyword) {
                 this.transactionsFilter.keyword = filter.keyword;
+                changed = true;
             }
+
+            return changed;
         },
         getTransactionListPageParams() {
             const querys = [];

@@ -241,6 +241,7 @@ export default {
             const router = self.f7router;
 
             const filteredAccountIds = {};
+            let isAllSelected = true;
             let finalAccountIds = '';
 
             for (let accountId in self.filterAccountIds) {
@@ -252,6 +253,7 @@ export default {
 
                 if (!isAccountOrSubAccountsAllChecked(account, self.filterAccountIds)) {
                     filteredAccountIds[accountId] = true;
+                    isAllSelected = false;
                 } else {
                     if (finalAccountIds.length > 0) {
                         finalAccountIds += ',';
@@ -268,10 +270,13 @@ export default {
                     filterAccountIds: filteredAccountIds
                 });
             } else if (this.type === 'transactionListCurrent') {
-                self.transactionsStore.updateTransactionListFilter({
-                    accountIds: finalAccountIds
+                const changed = self.transactionsStore.updateTransactionListFilter({
+                    accountIds: isAllSelected ? '' : finalAccountIds
                 });
-                self.transactionsStore.updateTransactionListInvalidState(true);
+
+                if (changed) {
+                    self.transactionsStore.updateTransactionListInvalidState(true);
+                }
             }
 
             router.back();

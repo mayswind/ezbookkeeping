@@ -256,6 +256,7 @@ export default {
             const router = self.f7router;
 
             const filteredCategoryIds = {};
+            let isAllSelected = true;
             let finalCategoryIds = '';
 
             for (let categoryId in self.filterCategoryIds) {
@@ -267,6 +268,7 @@ export default {
 
                 if (!isCategoryOrSubCategoriesAllChecked(category, self.filterCategoryIds)) {
                     filteredCategoryIds[categoryId] = true;
+                    isAllSelected = false;
                 } else {
                     if (finalCategoryIds.length > 0) {
                         finalCategoryIds += ',';
@@ -283,10 +285,13 @@ export default {
                     filterCategoryIds: filteredCategoryIds
                 });
             } else if (this.type === 'transactionListCurrent') {
-                self.transactionsStore.updateTransactionListFilter({
-                    categoryIds: finalCategoryIds
+                const changed = self.transactionsStore.updateTransactionListFilter({
+                    categoryIds: isAllSelected ? '' : finalCategoryIds
                 });
-                self.transactionsStore.updateTransactionListInvalidState(true);
+
+                if (changed) {
+                    self.transactionsStore.updateTransactionListInvalidState(true);
+                }
             }
 
             router.back();

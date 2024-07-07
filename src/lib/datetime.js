@@ -84,7 +84,7 @@ export function getUtcOffsetMinutesByUtcOffset(utcOffset) {
 }
 
 export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes) {
-    let offsetHours = parseInt(Math.abs(utcOffsetMinutes) / 60);
+    let offsetHours = Math.trunc(Math.abs(utcOffsetMinutes) / 60);
     let offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
 
     if (offsetHours < 10) {
@@ -242,7 +242,7 @@ export function getUnixTimeAfterUnixTime(unixTime, amount, unit) {
 }
 
 export function getTimeDifferenceHoursAndMinutes(timeDifferenceInMinutes) {
-    let offsetHours = parseInt(Math.abs(timeDifferenceInMinutes) / 60);
+    let offsetHours = Math.trunc(Math.abs(timeDifferenceInMinutes) / 60);
     let offsetMinutes = Math.abs(timeDifferenceInMinutes) - offsetHours * 60;
 
     return {

@@ -439,7 +439,7 @@ import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
-import { isString, getNameByKeyValue, objectToArray } from '@/lib/common.js';
+import { isString, getNameByKeyValue } from '@/lib/common.js';
 import logger from '@/lib/logger.js';
 import {
     getCurrentUnixTime,

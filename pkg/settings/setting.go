@@ -197,6 +197,7 @@ type Config struct {
 	UuidServerId      uint8
 
 	// Secret
+	SecretKeyNoSet                        bool
 	SecretKey                             string
 	EnableTwoFactor                       bool
 	TokenExpiredTime                      uint32
@@ -487,6 +488,7 @@ func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.SecretKeyNoSet = !getConfigItemIsSet(configFile, sectionName, "secret_key")
 	config.SecretKey = getConfigItemStringValue(configFile, sectionName, "secret_key", defaultSecretKey)
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 
@@ -643,6 +645,23 @@ func getFinalPath(workingPath, p string) (string, error) {
 	}
 
 	return p, err
+}
+
+func getConfigItemIsSet(configFile *ini.File, sectionName string, itemName string) bool {
+	environmentKey := getEnvironmentKey(sectionName, itemName)
+	environmentValue := os.Getenv(environmentKey)
+
+	if len(environmentValue) > 0 {
+		return true
+	}
+
+	section := configFile.Section(sectionName)
+
+	if !section.HasKey(itemName) {
+		return false
+	}
+
+	return section.Key(itemName).String() != ""
 }
 
 func getConfigItemStringValue(configFile *ini.File, sectionName string, itemName string, defaultValue ...string) string {

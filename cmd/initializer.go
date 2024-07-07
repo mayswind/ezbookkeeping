@@ -55,6 +55,10 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 		return nil, err
 	}
 
+	if config.SecretKeyNoSet {
+		log.BootWarnf("[initializer.initializeSystem] \"secret_key\" in config file is not set, please change it to keep your user data safe")
+	}
+
 	settings.SetCurrentConfig(config)
 
 	err = datastore.InitializeDataStore(config)

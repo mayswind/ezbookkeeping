@@ -153,6 +153,7 @@ import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
@@ -172,6 +173,7 @@ export default {
 
         return {
             editCategoryId: null,
+            clientSessionId: '',
             loading: false,
             loadingError: null,
             category: newTransactionCategory,
@@ -257,6 +259,7 @@ export default {
                 return;
             }
 
+            self.clientSessionId = generateRandomUUID();
             self.loading = false;
         }
     },
@@ -280,7 +283,8 @@ export default {
 
             self.transactionCategoriesStore.saveCategory({
                 category: self.category,
-                isEdit: !!self.editCategoryId
+                isEdit: !!self.editCategoryId,
+                clientSessionId: self.clientSessionId
             }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();

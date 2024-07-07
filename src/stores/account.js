@@ -736,7 +736,7 @@ export const useAccountsStore = defineStore('accounts', {
                 });
             });
         },
-        saveAccount({ account, subAccounts, isEdit }) {
+        saveAccount({ account, subAccounts, isEdit, clientSessionId }) {
             const self = this;
 
             const submitSubAccounts = [];
@@ -775,6 +775,10 @@ export const useAccountsStore = defineStore('accounts', {
                 comment: account.comment,
                 subAccounts: account.type === accountConstants.allAccountTypes.SingleAccount ? null : submitSubAccounts,
             };
+
+            if (clientSessionId) {
+                submitAccount.clientSessionId = clientSessionId;
+            }
 
             if (isEdit) {
                 submitAccount.id = account.id;

@@ -257,7 +257,7 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 });
             });
         },
-        saveCategory({ category, isEdit }) {
+        saveCategory({ category, isEdit, clientSessionId }) {
             const self = this;
 
             const submitCategory = {
@@ -268,6 +268,10 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 color: category.color,
                 comment: category.comment
             };
+
+            if (clientSessionId) {
+                submitCategory.clientSessionId = clientSessionId;
+            }
 
             if (isEdit) {
                 submitCategory.id = category.id;

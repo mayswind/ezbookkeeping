@@ -62,6 +62,11 @@ const (
 	InternalUuidGeneratorType string = "internal"
 )
 
+// Duplicate checker types
+const (
+	InMemoryDuplicateCheckerType string = "in_memory"
+)
+
 // User avatar provider types
 const (
 	GravatarProvider string = "gravatar"
@@ -114,6 +119,9 @@ const (
 
 	defaultLogMode  string = "console"
 	defaultLoglevel Level  = LOGLEVEL_INFO
+
+	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
+	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
 
 	defaultSecretKey                     string = "ezbookkeeping"
 	defaultTokenExpiredTime              uint32 = 604800 // 7 days
@@ -195,6 +203,14 @@ type Config struct {
 	// Uuid
 	UuidGeneratorType string
 	UuidServerId      uint8
+
+	// Duplicate Checker
+	DuplicateCheckerType                            string
+	InMemoryDuplicateCheckerCleanupInterval         uint32
+	InMemoryDuplicateCheckerCleanupIntervalDuration time.Duration
+	EnableDuplicateSubmissionsCheck                 bool
+	DuplicateSubmissionsInterval                    uint32
+	DuplicateSubmissionsIntervalDuration            time.Duration
 
 	// Secret
 	SecretKeyNoSet                        bool
@@ -292,6 +308,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadUuidConfiguration(config, cfgFile, "uuid")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadDuplicateCheckerConfiguration(config, cfgFile, "duplicate_checker")
 
 	if err != nil {
 		return nil, err
@@ -483,6 +505,30 @@ func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName str
 	}
 
 	config.UuidServerId = getConfigItemUint8Value(configFile, sectionName, "server_id", 0)
+
+	return nil
+}
+
+func loadDuplicateCheckerConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	if getConfigItemStringValue(configFile, sectionName, "checker_type") == InMemoryDuplicateCheckerType {
+		config.DuplicateCheckerType = InMemoryDuplicateCheckerType
+	} else {
+		return errs.ErrInvalidDuplicateCheckerType
+	}
+
+	config.InMemoryDuplicateCheckerCleanupInterval = getConfigItemUint32Value(configFile, sectionName, "cleanup_interval", defaultInMemoryDuplicateCheckerCleanupInterval)
+	config.InMemoryDuplicateCheckerCleanupIntervalDuration = time.Duration(config.InMemoryDuplicateCheckerCleanupInterval) * time.Second
+
+	duplicateSubmissionsInterval := getConfigItemUint32Value(configFile, sectionName, "duplicate_submissions_interval", defaultDuplicateSubmissionsInterval)
+
+	config.EnableDuplicateSubmissionsCheck = duplicateSubmissionsInterval > 0
+
+	if duplicateSubmissionsInterval < 1 {
+		duplicateSubmissionsInterval = defaultDuplicateSubmissionsInterval
+	}
+
+	config.DuplicateSubmissionsInterval = duplicateSubmissionsInterval
+	config.DuplicateSubmissionsIntervalDuration = time.Duration(config.DuplicateSubmissionsInterval) * time.Second
 
 	return nil
 }

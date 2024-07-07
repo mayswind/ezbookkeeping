@@ -7,10 +7,12 @@ import (
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -625,6 +627,28 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 		return nil, errs.ErrCannotCreateTransactionWithThisTransactionTime
 	}
 
+	if settings.Container.Current.EnableDuplicateSubmissionsCheck && transactionCreateReq.ClientSessionId != "" {
+		found, remark := duplicatechecker.Container.Get(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId)
+
+		if found {
+			log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] another transaction \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			transactionId, err := utils.StringToInt64(remark)
+
+			if err == nil {
+				transaction, err = a.transactions.GetTransactionByTransactionId(c, uid, transactionId)
+
+				if err != nil {
+					log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to get existed transaction \"id:%d\" for user \"uid:%d\", because %s", transactionId, uid, err.Error())
+					return nil, errs.Or(err, errs.ErrOperationFailed)
+				}
+
+				transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
+
+				return transactionResp, nil
+			}
+		}
+	}
+
 	err = a.transactions.CreateTransaction(c, transaction, tagIds)
 
 	if err != nil {
@@ -634,6 +658,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 
 	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
+	duplicatechecker.Container.Set(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId, utils.Int64ToString(transaction.TransactionId))
 	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return transactionResp, nil

@@ -745,7 +745,7 @@ export const useTransactionsStore = defineStore('transactions', {
                 });
             });
         },
-        saveTransaction({ transaction, defaultCurrency, isEdit }) {
+        saveTransaction({ transaction, defaultCurrency, isEdit, clientSessionId }) {
             const self = this;
             const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
@@ -763,6 +763,10 @@ export const useTransactionsStore = defineStore('transactions', {
                 geoLocation: transaction.geoLocation,
                 utcOffset: transaction.utcOffset
             };
+
+            if (clientSessionId) {
+                submitTransaction.clientSessionId = clientSessionId;
+            }
 
             if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
                 submitTransaction.categoryId = transaction.expenseCategory;

@@ -428,6 +428,7 @@ import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     setAccountModelByAnotherAccount,
     setAccountSuitableIcon
@@ -447,6 +448,7 @@ export default {
 
         return {
             editAccountId: null,
+            clientSessionId: '',
             loading: false,
             loadingError: null,
             account: newAccount,
@@ -547,6 +549,7 @@ export default {
                 }
             });
         } else {
+            self.clientSessionId = generateRandomUUID();
             self.loading = false;
         }
     },
@@ -614,7 +617,8 @@ export default {
             self.accountsStore.saveAccount({
                 account: self.account,
                 subAccounts: self.subAccounts,
-                isEdit: !!self.editAccountId
+                isEdit: !!self.editAccountId,
+                clientSessionId: self.clientSessionId
             }).then(() => {
                 self.submitting = false;
                 self.$hideLoading();

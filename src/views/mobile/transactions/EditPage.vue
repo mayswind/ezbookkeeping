@@ -367,6 +367,7 @@ import {
     getUtcOffsetByUtcOffsetMinutes,
     getActualUnixTimeForStore
 } from '@/lib/datetime.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName,
@@ -389,6 +390,7 @@ export default {
             mode: 'add',
             editTransactionId: null,
             transaction: newTransaction,
+            clientSessionId: '',
             loading: true,
             loadingError: null,
             geoLocationStatus: null,
@@ -663,6 +665,10 @@ export default {
             self.transaction.type = parseInt(query.type);
         }
 
+        if (self.mode === 'add') {
+            self.clientSessionId = generateRandomUUID();
+        }
+
         Promise.all(promises).then(function (responses) {
             if (query.id && !responses[3]) {
                 self.$toast('Unable to retrieve transaction');
@@ -723,7 +729,8 @@ export default {
                 self.transactionsStore.saveTransaction({
                     transaction: self.transaction,
                     defaultCurrency: self.defaultCurrency,
-                    isEdit: self.mode === 'edit'
+                    isEdit: self.mode === 'edit',
+                    clientSessionId: self.clientSessionId
                 }).then(() => {
                     self.submitting = false;
                     self.$hideLoading();

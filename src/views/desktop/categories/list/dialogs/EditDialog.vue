@@ -101,6 +101,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import categoryConstants from '@/consts/category.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     setCategoryModelByAnotherCategory,
     allVisiblePrimaryTransactionCategoriesByType
@@ -121,6 +122,7 @@ export default {
         return {
             showState: false,
             editCategoryId: null,
+            clientSessionId: '',
             loading: false,
             category: newTransactionCategory,
             submitting: false,
@@ -220,6 +222,7 @@ export default {
                 self.category.type = categoryType;
                 self.category.parentId = options.parentId;
 
+                self.clientSessionId = generateRandomUUID();
                 self.loading = false;
             }
 
@@ -242,7 +245,8 @@ export default {
 
             self.transactionCategoriesStore.saveCategory({
                 category: self.category,
-                isEdit: !!self.editCategoryId
+                isEdit: !!self.editCategoryId,
+                clientSessionId: self.clientSessionId
             }).then(() => {
                 self.submitting = false;
 

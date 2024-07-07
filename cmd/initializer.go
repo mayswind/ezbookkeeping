@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
@@ -84,6 +85,15 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 	if err != nil {
 		if !isDisableBootLog {
 			log.BootErrorf("[initializer.initializeSystem] initializes uuid generator failed, because %s", err.Error())
+		}
+		return nil, err
+	}
+
+	err = duplicatechecker.InitializeDuplicateChecker(config)
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf("[initializer.initializeSystem] initializes duplicate checker failed, because %s", err.Error())
 		}
 		return nil, err
 	}

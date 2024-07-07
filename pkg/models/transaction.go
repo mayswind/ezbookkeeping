@@ -74,6 +74,7 @@ type TransactionCreateRequest struct {
 	TagIds               []string                       `json:"tagIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
+	ClientSessionId      string                         `json:"clientSessionId"`
 }
 
 // TransactionModifyRequest represents all parameters of transaction modification request

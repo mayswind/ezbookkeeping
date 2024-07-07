@@ -238,7 +238,7 @@ export default {
     getAccount: ({ id }) => {
         return axios.get('v1/accounts/get.json?id=' + id);
     },
-    addAccount: ({ category, type, name, icon, color, currency, balance, comment, subAccounts }) => {
+    addAccount: ({ category, type, name, icon, color, currency, balance, comment, subAccounts, clientSessionId }) => {
         return axios.post('v1/accounts/add.json', {
             category,
             type,
@@ -248,7 +248,8 @@ export default {
             currency,
             balance,
             comment,
-            subAccounts
+            subAccounts,
+            clientSessionId
         });
     },
     modifyAccount: ({ id, category, name, icon, color, comment, hidden, subAccounts }) => {
@@ -383,7 +384,7 @@ export default {
     getTransaction: ({ id }) => {
         return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset }) => {
+    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset, clientSessionId }) => {
         return axios.post('v1/transactions/add.json', {
             type,
             categoryId,
@@ -396,7 +397,8 @@ export default {
             tagIds,
             comment,
             geoLocation,
-            utcOffset
+            utcOffset,
+            clientSessionId
         });
     },
     modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset }) => {
@@ -427,14 +429,15 @@ export default {
     getTransactionCategory: ({ id }) => {
         return axios.get('v1/transaction/categories/get.json?id=' + id);
     },
-    addTransactionCategory: ({ name, type, parentId, icon, color, comment }) => {
+    addTransactionCategory: ({ name, type, parentId, icon, color, comment, clientSessionId }) => {
         return axios.post('v1/transaction/categories/add.json', {
             name,
             type,
             parentId,
             icon,
             color,
-            comment
+            comment,
+            clientSessionId
         });
     },
     addTransactionCategoryBatch: ({ categories }) => {

@@ -181,6 +181,7 @@ import accountConstants from '@/consts/account.js';
 import iconConstants from '@/consts/icon.js';
 import colorConstants from '@/consts/color.js';
 import { isNumber } from '@/lib/common.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     setAccountModelByAnotherAccount,
     setAccountSuitableIcon
@@ -208,6 +209,7 @@ export default {
             showState: false,
             activeTab: 'account',
             editAccountId: null,
+            clientSessionId: '',
             loading: false,
             account: newAccount,
             subAccounts: [],
@@ -314,6 +316,7 @@ export default {
                 }
 
                 self.editAccountId = null;
+                self.clientSessionId = generateRandomUUID();
                 self.loading = false;
             }
 
@@ -370,7 +373,8 @@ export default {
             self.accountsStore.saveAccount({
                 account: self.account,
                 subAccounts: self.subAccounts,
-                isEdit: !!self.editAccountId
+                isEdit: !!self.editAccountId,
+                clientSessionId: self.clientSessionId
             }).then(() => {
                 self.submitting = false;
 

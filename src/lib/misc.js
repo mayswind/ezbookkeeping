@@ -2,6 +2,8 @@ import Clipboard from 'clipboard';
 import CryptoJS from 'crypto-js';
 import uaParser from 'ua-parser-js';
 
+import { base64encode } from './common.js';
+
 export function asyncLoadAssets(type, assetUrl) {
     return new Promise(function (resolve, reject) {
         let addElement = false;
@@ -71,8 +73,30 @@ export function asyncLoadAssets(type, assetUrl) {
 }
 
 export function generateRandomString() {
-    const baseString = 'ebk_' + Math.round(new Date().getTime() / 1000) + '_' + Math.random();
+    let baseString = 'ebk_' + new Date().getTime();
+
+    if (crypto && crypto.getRandomValues) {
+        const randoms = new Uint8Array(256);
+        crypto.getRandomValues(randoms);
+        baseString += '_' + base64encode(randoms);
+    } else {
+        baseString += '_' + Math.random();
+    }
+
     return CryptoJS.SHA256(baseString).toString();
+}
+
+export function generateRandomUUID() {
+    const randomString = generateRandomString();
+
+    // convert hash string to UUID Version 8
+    const uuid = randomString.substring(0, 8) + '-'
+        + randomString.substring(8, 12) + '-'
+        + '8' + randomString.substring(13, 16) + '-'
+        + (0x8 | (parseInt(randomString.charAt(16), 16) & 0x3)).toString(16) + randomString.substring(17, 20) + '-'
+        + randomString.substring(20, 32);
+
+    return uuid;
 }
 
 export function parseUserAgent(ua) {

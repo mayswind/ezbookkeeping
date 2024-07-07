@@ -99,6 +99,12 @@
         "licenseUrl": "https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE"
     },
     {
+        "name": "go-cache",
+        "copyright": "Copyright (c) 2012-2017 Patrick Mylund Nielsen and the go-cache contributors",
+        "url": "https://github.com/patrickmn/go-cache",
+        "licenseUrl": "https://github.com/patrickmn/go-cache/blob/v2.1.0/LICENSE"
+    },
+    {
         "name": "Testify",
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",

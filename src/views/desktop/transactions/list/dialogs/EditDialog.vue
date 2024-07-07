@@ -338,6 +338,7 @@ import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
 } from '@/lib/datetime.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import {
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
@@ -370,6 +371,7 @@ export default {
             activeTab: 'basicInfo',
             editTransactionId: null,
             originalTransactionEditable: false,
+            clientSessionId: '',
             loading: true,
             transaction: newTransaction,
             geoLocationStatus: null,
@@ -642,6 +644,10 @@ export default {
                 self.transaction.type = parseInt(options.type);
             }
 
+            if (self.mode === 'add') {
+                self.clientSessionId = generateRandomUUID();
+            }
+
             Promise.all(promises).then(function (responses) {
                 if (self.editTransactionId && !responses[3]) {
                     if (self.reject) {
@@ -691,7 +697,8 @@ export default {
                 self.transactionsStore.saveTransaction({
                     transaction: self.transaction,
                     defaultCurrency: self.defaultCurrency,
-                    isEdit: self.mode === 'edit'
+                    isEdit: self.mode === 'edit',
+                    clientSessionId: self.clientSessionId
                 }).then(() => {
                     self.submitting = false;
 

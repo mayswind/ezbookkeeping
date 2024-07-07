@@ -4,10 +4,13 @@ import (
 	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
@@ -203,6 +206,42 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
 	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
+	if settings.Container.Current.EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
+		found, remark := duplicatechecker.Container.Get(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
+
+		if found {
+			log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] another account \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			accountId, err := utils.StringToInt64(remark)
+
+			if err == nil {
+				accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountId)
+
+				if err != nil {
+					log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get existed account \"id:%d\" for user \"uid:%d\", because %s", accountId, uid, err.Error())
+					return nil, errs.Or(err, errs.ErrOperationFailed)
+				}
+
+				accountMap := a.accounts.GetAccountMapByList(accountAndSubAccounts)
+				mainAccount, exists := accountMap[accountId]
+
+				if !exists {
+					return nil, errs.ErrOperationFailed
+				}
+
+				accountInfoResp := mainAccount.ToAccountInfoResponse()
+
+				for i := 0; i < len(accountAndSubAccounts); i++ {
+					if accountAndSubAccounts[i].ParentAccountId == mainAccount.AccountId {
+						subAccountResp := accountAndSubAccounts[i].ToAccountInfoResponse()
+						accountInfoResp.SubAccounts = append(accountInfoResp.SubAccounts, subAccountResp)
+					}
+				}
+
+				return accountInfoResp, nil
+			}
+		}
+	}
+
 	err = a.accounts.CreateAccounts(c, mainAccount, childrenAccounts, utcOffset)
 
 	if err != nil {
@@ -212,6 +251,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 
 	log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] user \"uid:%d\" has created a new account \"id:%d\" successfully", uid, mainAccount.AccountId)
 
+	duplicatechecker.Container.Set(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
 	accountInfoResp := mainAccount.ToAccountInfoResponse()
 
 	if len(childrenAccounts) > 0 {

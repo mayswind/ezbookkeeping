@@ -11,4 +11,5 @@ var (
 	ErrInvalidExchangeRatesDataSource        = NewSystemError(SystemSubcategorySetting, 4, http.StatusInternalServerError, "invalid exchange rates data source")
 	ErrInvalidMapProvider                    = NewSystemError(SystemSubcategorySetting, 5, http.StatusInternalServerError, "invalid map provider")
 	ErrInvalidAmapSecurityVerificationMethod = NewSystemError(SystemSubcategorySetting, 6, http.StatusInternalServerError, "invalid amap security verification method")
+	ErrInvalidDuplicateCheckerType           = NewSystemError(SystemSubcategorySetting, 7, http.StatusInternalServerError, "invalid duplicate checker type")
 )

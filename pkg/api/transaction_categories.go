@@ -6,10 +6,13 @@ import (
 	"github.com/gin-gonic/gin/binding"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // TransactionCategoriesApi represents transaction category api
@@ -119,6 +122,28 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 
 	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
 
+	if settings.Container.Current.EnableDuplicateSubmissionsCheck && categoryCreateReq.ClientSessionId != "" {
+		found, remark := duplicatechecker.Container.Get(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId)
+
+		if found {
+			log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] another category \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			categoryId, err := utils.StringToInt64(remark)
+
+			if err == nil {
+				category, err = a.categories.GetCategoryByCategoryId(c, uid, categoryId)
+
+				if err != nil {
+					log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get existed category \"id:%d\" for user \"uid:%d\", because %s", categoryId, uid, err.Error())
+					return nil, errs.Or(err, errs.ErrOperationFailed)
+				}
+
+				categoryResp := category.ToTransactionCategoryInfoResponse()
+
+				return categoryResp, nil
+			}
+		}
+	}
+
 	err = a.categories.CreateCategory(c, category)
 
 	if err != nil {
@@ -128,6 +153,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] user \"uid:%d\" has created a new category \"id:%d\" successfully", uid, category.CategoryId)
 
+	duplicatechecker.Container.Set(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
 	categoryResp := category.ToTransactionCategoryInfoResponse()
 
 	return categoryResp, nil

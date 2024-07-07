@@ -45,7 +45,7 @@
         "name": "Package validator",
         "copyright": "Copyright (c) 2015 Dean Karn",
         "url": "https://github.com/go-playground/validator",
-        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.21.0/LICENSE"
+        "licenseUrl": "https://github.com/go-playground/validator/blob/v10.22.0/LICENSE"
     },
     {
         "name": "jwt-go",
@@ -79,7 +79,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.24.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.25.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -91,7 +91,7 @@
         "name": "barcode",
         "copyright": "Copyright (c) 2014 Florian Sundermann",
         "url": "https://github.com/boombuler/barcode",
-        "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.1/LICENSE"
+        "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.2/LICENSE"
     },
     {
         "name": "go-ordered-map",
@@ -108,7 +108,7 @@
         "name": "vuejs/core",
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.27/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.31/LICENSE"
     },
     {
         "name": "Pinia",
@@ -120,7 +120,7 @@
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.3.2/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.4.0/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -132,7 +132,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.6.8/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.6.11/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -180,7 +180,7 @@
         "name": "Apache ECharts",
         "copyright": "Copyright © 2017-2024, The Apache Software Foundation Apache ECharts, ECharts, Apache, the Apache feather, and the Apache ECharts project logo are either registered trademarks or trademarks of the Apache Software Foundation.",
         "url": "https://echarts.apache.org/",
-        "licenseUrl": "https://github.com/apache/echarts/blob/5.5.0/LICENSE"
+        "licenseUrl": "https://github.com/apache/echarts/blob/5.5.1/LICENSE"
     },
     {
         "name": "vue-echarts",
@@ -192,13 +192,13 @@
         "name": "vue3-perfect-scrollbar",
         "copyright": "Copyright (c) 2018 Adam",
         "url": "https://github.com/mercs600/vue3-perfect-scrollbar",
-        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/1.6.1/LICENSE"
+        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/2.0.0/LICENSE"
     },
     {
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v8.7.0/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v8.8.1/LICENSE"
     },
     {
         "name": "axios",

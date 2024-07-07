@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.21.9-alpine3.19 AS be-builder
+FROM golang:1.21.12-alpine3.20 AS be-builder
 ARG RELEASE_BUILD
 ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
@@ -9,7 +9,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:18.20.2-alpine3.19 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:18.20.3-alpine3.20 AS fe-builder
 ARG RELEASE_BUILD
 ENV RELEASE_BUILD=$RELEASE_BUILD
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
@@ -19,7 +19,7 @@ RUN apk add git
 RUN ./build.sh frontend
 
 # Package docker image
-FROM alpine:3.19.1
+FROM alpine:3.20.1
 LABEL maintainer="MaysWind <i@mayswind.net>"
 RUN addgroup -S -g 1000 ezbookkeeping && adduser -S -G ezbookkeeping -u 1000 ezbookkeeping
 RUN apk --no-cache add tzdata

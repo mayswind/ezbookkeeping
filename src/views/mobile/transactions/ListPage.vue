@@ -906,7 +906,13 @@ export default {
             }
         },
         filterMultipleCategories() {
-            this.f7router.navigate('/settings/filter/category?type=transactionListCurrent');
+            let navigateUrl = '/settings/filter/category?type=transactionListCurrent';
+
+            if (this.allTransactionTypes.Income <= this.query.type && this.query.type <= this.allTransactionTypes.Transfer) {
+               navigateUrl += '&allowCategoryTypes=' + transactionTypeToCategoryType(this.query.type);
+            }
+
+            this.f7router.navigate(navigateUrl);
         },
         filterMultipleAccounts() {
             this.f7router.navigate('/settings/filter/account?type=transactionListCurrent');

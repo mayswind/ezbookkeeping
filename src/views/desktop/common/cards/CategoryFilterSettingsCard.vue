@@ -127,7 +127,7 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
 import categoryConstants from '@/consts/category.js';
-import { copyObjectTo } from '@/lib/common.js';
+import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
 import {
     allVisibleTransactionCategories,
     hasAnyAvailableCategory,
@@ -151,6 +151,7 @@ import {
 export default {
     props: [
         'dialogMode',
+        'categoryTypes',
         'type',
         'autoSave'
     ],
@@ -190,8 +191,11 @@ export default {
                 return 'Apply';
             }
         },
+        allowCategoryTypes() {
+            return this.categoryTypes ? arrayItemToObjectField(this.categoryTypes.split(','), true) : null;
+        },
         allVisibleTransactionCategories() {
-            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories);
+            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
         },
         hasAnyAvailableCategory() {
             return hasAnyAvailableCategory(this.allVisibleTransactionCategories);
@@ -216,6 +220,10 @@ export default {
                 }
 
                 const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+
+                if (self.allowCategoryTypes && !self.allowCategoryTypes[category.type]) {
+                    continue;
+                }
 
                 if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
                     allCategoryIds[category.id] = true;

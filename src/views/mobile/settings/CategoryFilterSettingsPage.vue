@@ -130,7 +130,7 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useStatisticsStore } from '@/stores/statistics.js';
 
 import categoryConstants from '@/consts/category.js';
-import { copyObjectTo } from '@/lib/common.js';
+import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
 import {
     allVisibleTransactionCategories,
     hasAnyAvailableCategory,
@@ -156,6 +156,7 @@ export default {
             loading: true,
             loadingError: null,
             type: null,
+            allowCategoryTypes: null,
             filterCategoryIds: {},
             collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
@@ -178,7 +179,7 @@ export default {
             }
         },
         allVisibleTransactionCategories() {
-            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories);
+            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
         },
         hasAnyAvailableCategory() {
             return hasAnyAvailableCategory(this.allVisibleTransactionCategories);
@@ -192,6 +193,7 @@ export default {
         const query = self.f7route.query;
 
         self.type = query.type;
+        self.allowCategoryTypes = query.allowCategoryTypes ? arrayItemToObjectField(query.allowCategoryTypes.split(','), true) : null;
 
         self.transactionCategoriesStore.loadAllCategories({
             force: false
@@ -206,6 +208,10 @@ export default {
                 }
 
                 const category = self.transactionCategoriesStore.allTransactionCategoriesMap[categoryId];
+
+                if (self.allowCategoryTypes && !self.allowCategoryTypes[category.type]) {
+                    continue;
+                }
 
                 if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
                     allCategoryIds[category.id] = true;

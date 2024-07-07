@@ -373,6 +373,16 @@ export function objectToArray(object) {
     return ret;
 }
 
+export function arrayItemToObjectField(array, value) {
+    const ret = {};
+
+    for (let i = 0; i < array.length; i++) {
+        ret[array[i]] = value;
+    }
+
+    return ret;
+}
+
 export function categorizedArrayToPlainArray(object) {
     const ret = [];
 

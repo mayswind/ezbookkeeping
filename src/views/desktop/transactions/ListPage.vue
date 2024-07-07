@@ -413,7 +413,7 @@
     </v-dialog>
 
     <v-dialog width="800" v-model="showFilterCategoryDialog">
-        <category-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
+        <category-filter-settings-card type="transactionListCurrent" :dialog-mode="true" :category-types="allowCategoryTypes"
                                        @settings:change="changeMultipleCategoriesFilter" />
     </v-dialog>
 
@@ -652,6 +652,13 @@ export default {
         },
         queryMonthlyData() {
             return isDateRangeMatchOneMonth(this.query.minTime, this.query.maxTime);
+        },
+        allowCategoryTypes() {
+            if (this.allTransactionTypes.Income <= this.query.type && this.query.type <= this.allTransactionTypes.Transfer) {
+                return transactionTypeToCategoryType(this.query.type).toString();
+            }
+
+            return '';
         },
         countPerPage: {
             get: function () {

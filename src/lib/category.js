@@ -62,8 +62,12 @@ export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
     return '';
 }
 
-export function allVisibleTransactionCategories(allTransactionCategories) {
+export function allVisibleTransactionCategories(allTransactionCategories, allowCategoryTypes) {
     const ret = {};
+    const hasAllowCategoryTypes = allowCategoryTypes
+        && (allowCategoryTypes[categoryConstants.allCategoryTypes.Income.toString()]
+            || allowCategoryTypes[categoryConstants.allCategoryTypes.Expense.toString()]
+            || allowCategoryTypes[categoryConstants.allCategoryTypes.Transfer.toString()]);
 
     for (let key in categoryConstants.allCategoryTypes) {
         if (!Object.prototype.hasOwnProperty.call(categoryConstants.allCategoryTypes, key)) {
@@ -73,6 +77,10 @@ export function allVisibleTransactionCategories(allTransactionCategories) {
         const categoryType = categoryConstants.allCategoryTypes[key];
 
         if (!allTransactionCategories[categoryType]) {
+            continue;
+        }
+
+        if (hasAllowCategoryTypes && !allowCategoryTypes[categoryType]) {
             continue;
         }
 

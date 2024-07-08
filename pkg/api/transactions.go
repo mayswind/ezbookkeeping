@@ -769,7 +769,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.
 		return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
 	}
 
-	err = a.transactions.ModifyTransaction(c, newTransaction, addTransactionTagIds, removeTransactionTagIds)
+	err = a.transactions.ModifyTransaction(c, newTransaction, len(transactionTagIds), addTransactionTagIds, removeTransactionTagIds)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())

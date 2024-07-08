@@ -356,6 +356,8 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 		if len(transactionTagIndexs) > 0 {
 			for i := 0; i < len(transactionTagIndexs); i++ {
 				transactionTagIndex := transactionTagIndexs[i]
+				transactionTagIndex.TransactionTime = transaction.TransactionTime
+
 				_, err := sess.Insert(transactionTagIndex)
 
 				if err != nil {
@@ -419,7 +421,7 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 }
 
 // ModifyTransaction saves an existed transaction to database
-func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *models.Transaction, addTagIds []int64, removeTagIds []int64) error {
+func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *models.Transaction, currentTagIdsCount int, addTagIds []int64, removeTagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -517,6 +519,8 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 			updateCols = append(updateCols, "category_id")
 		}
 
+		modifyTransactionTime := false
+
 		if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(oldTransaction.TransactionTime) {
 			sameSecondLatestTransaction := &models.Transaction{}
 			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
@@ -535,6 +539,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 			}
 
 			updateCols = append(updateCols, "transaction_time")
+			modifyTransactionTime = true
 		}
 
 		if transaction.TimezoneUtcOffset != oldTransaction.TimezoneUtcOffset {
@@ -633,11 +638,23 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 		if len(transactionTagIndexs) > 0 {
 			for i := 0; i < len(transactionTagIndexs); i++ {
 				transactionTagIndex := transactionTagIndexs[i]
+				transactionTagIndex.TransactionTime = transaction.TransactionTime
+
 				_, err := sess.Insert(transactionTagIndex)
 
 				if err != nil {
 					return err
 				}
+			}
+		} else if len(transactionTagIndexs) == 0 && currentTagIdsCount > 0 && modifyTransactionTime {
+			tagIndexUpdateModel := &models.TransactionTagIndex{
+				TransactionTime: transaction.TransactionTime,
+			}
+
+			_, err := sess.Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).Update(tagIndexUpdateModel)
+
+			if err != nil {
+				return err
 			}
 		}
 

@@ -501,7 +501,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			balance = balance + transaction.Amount
 		} else {
-			log.BootErrorf("[user_data.CheckAccountBalance] transaction type of transaction \"id:%d\" is invalid", transaction.TransactionId)
+			log.BootErrorf("[user_data.CheckTransactionAndAccount] transaction type of transaction \"id:%d\" is invalid", transaction.TransactionId)
 			return false, errs.ErrOperationFailed
 		}
 
@@ -516,12 +516,12 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		}
 
 		if !exists && account.Balance != 0 {
-			log.BootErrorf("[user_data.CheckAccountBalance] account \"id:%d\" balance is not correct, expected balance is %d, but there is no transaction actually", account.AccountId, account.Balance)
+			log.BootErrorf("[user_data.CheckTransactionAndAccount] account \"id:%d\" balance is not correct, expected balance is %d, but there is no transaction actually", account.AccountId, account.Balance)
 			return false, errs.ErrOperationFailed
 		}
 
 		if account.Balance != actualBalance {
-			log.BootErrorf("[user_data.CheckAccountBalance] account \"id:%d\" balance is not correct, expected balance is %d, but actual balance is %d", account.AccountId, account.Balance, actualBalance)
+			log.BootErrorf("[user_data.CheckTransactionAndAccount] account \"id:%d\" balance is not correct, expected balance is %d, but actual balance is %d", account.AccountId, account.Balance, actualBalance)
 			return false, errs.ErrOperationFailed
 		}
 	}
@@ -530,7 +530,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		_, exists := accountMap[accountId]
 
 		if !exists {
-			log.BootErrorf("[user_data.CheckAccountBalance] account \"id:%d\" does not exist, but there are some transactions of this account actually, and actual balance is %d", accountId, actualBalance)
+			log.BootErrorf("[user_data.CheckTransactionAndAccount] account \"id:%d\" does not exist, but there are some transactions of this account actually, and actual balance is %d", accountId, actualBalance)
 			return false, errs.ErrOperationFailed
 		}
 	}

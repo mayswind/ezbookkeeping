@@ -547,6 +547,72 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 	return true, nil
 }
 
+// FixTransactionTagIndexWithTransactionTime fixes user transaction tag index data with transaction time
+func (l *UserDataCli) FixTransactionTagIndexWithTransactionTime(c *cli.Context, username string) (bool, error) {
+	if username == "" {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] user name is empty")
+		return false, errs.ErrUsernameIsEmpty
+	}
+
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] error occurs when getting user id by user name")
+		return false, err
+	}
+
+	tagIndexs, err := l.tags.GetAllTagIdsOfAllTransactions(nil, uid)
+
+	if err != nil {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] failed to get tag index for user \"%s\", because %s", username, err.Error())
+		return false, err
+	}
+
+	invalidTagIndexs := make([]*models.TransactionTagIndex, 0, len(tagIndexs))
+
+	for i := 0; i < len(tagIndexs); i++ {
+		tagIndex := tagIndexs[i]
+
+		if tagIndex.TransactionTime < 1 {
+			invalidTagIndexs = append(invalidTagIndexs, tagIndex)
+		}
+	}
+
+	if len(invalidTagIndexs) < 1 {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] all user transaction tag index data has been checked, there is no problem with user data")
+		return false, errs.ErrOperationFailed
+	}
+
+	allTransactions, err := l.transactions.GetAllTransactions(nil, uid, pageCountForGettingTransactions, false)
+
+	if err != nil {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] failed to all transactions for user \"%s\", because %s", username, err.Error())
+		return false, err
+	}
+
+	transactionMap := l.transactions.GetTransactionMapByList(allTransactions)
+
+	for i := 0; i < len(invalidTagIndexs); i++ {
+		tagIndex := invalidTagIndexs[i]
+		transaction, exists := transactionMap[tagIndex.TransactionId]
+
+		if !exists {
+			continue
+		}
+
+		tagIndex.TransactionTime = transaction.TransactionTime
+	}
+
+	err = l.tags.ModifyTagIndexTransactionTime(nil, uid, invalidTagIndexs)
+
+	if err != nil {
+		log.BootErrorf("[user_data.FixTransactionTagIndexWithTransactionTime] failed to update transaction tag index for user \"%s\", because %s", username, err.Error())
+		return false, err
+	}
+
+	return true, nil
+}
+
 // ExportTransaction returns csv file content according user all transactions
 func (l *UserDataCli) ExportTransaction(c *cli.Context, username string, fileType string) ([]byte, error) {
 	if username == "" {

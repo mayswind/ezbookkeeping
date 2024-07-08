@@ -680,6 +680,7 @@ export default {
         'transaction tag name is empty': 'Transaction tag title is empty',
         'transaction tag name already exists': 'Transaction tag title already exists',
         'transaction tag is in use and cannot be deleted': 'Transaction tag is in use and it cannot be deleted',
+        'transaction tag index not found': 'Transaction tag index is not found',
         'data export not allowed': 'User data export is not allowed',
         'query items cannot be blank': 'There are no query items',
         'query items too much': 'There are too many query items',

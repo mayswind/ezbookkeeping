@@ -342,6 +342,32 @@ func (s *TransactionTagService) ExistsTagName(c *core.Context, uid int64, name s
 	return s.UserDataDB(uid).NewSession(c).Cols("name").Where("uid=? AND deleted=? AND name=?", uid, false, name).Exist(&models.TransactionTag{})
 }
 
+// ModifyTagIndexTransactionTime updates transaction time of given transaction tag indexes
+func (s *TransactionTagService) ModifyTagIndexTransactionTime(c *core.Context, uid int64, tagIndexs []*models.TransactionTagIndex) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	for i := 0; i < len(tagIndexs); i++ {
+		tagIndexs[i].UpdatedUnixTime = time.Now().Unix()
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		for i := 0; i < len(tagIndexs); i++ {
+			tagIndex := tagIndexs[i]
+			updatedRows, err := sess.ID(tagIndex.TagIndexId).Cols("transaction_time", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagIndex)
+
+			if err != nil {
+				return err
+			} else if updatedRows < 1 {
+				return errs.ErrTransactionTagIndexNotFound
+			}
+		}
+
+		return nil
+	})
+}
+
 // GetTagMapByList returns a transaction tag map by a list
 func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) map[int64]*models.TransactionTag {
 	tagMap := make(map[int64]*models.TransactionTag)

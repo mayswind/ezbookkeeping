@@ -9,4 +9,5 @@ var (
 	ErrTransactionTagNameIsEmpty          = NewNormalError(NormalSubcategoryTag, 2, http.StatusBadRequest, "transaction tag name is empty")
 	ErrTransactionTagNameAlreadyExists    = NewNormalError(NormalSubcategoryTag, 3, http.StatusBadRequest, "transaction tag name already exists")
 	ErrTransactionTagInUseCannotBeDeleted = NewNormalError(NormalSubcategoryTag, 4, http.StatusBadRequest, "transaction tag is in use and cannot be deleted")
+	ErrTransactionTagIndexNotFound        = NewNormalError(NormalSubcategoryTag, 5, http.StatusBadRequest, "transaction tag index not found")
 )

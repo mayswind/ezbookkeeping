@@ -231,6 +231,19 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "transaction-tag-index-fix-transaction-time",
+			Usage:  "fix the transaction tag index data which does not have transaction time",
+			Action: fixTransactionTagIndexNotHaveTransactionTime,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+			},
+		},
+		{
 			Name:   "transaction-export",
 			Usage:  "Export user all transactions to file",
 			Action: exportUserTransaction,
@@ -549,6 +562,29 @@ func checkUserTransactionAndAccount(c *cli.Context) error {
 	}
 
 	log.BootInfof("[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
+
+	return nil
+}
+
+func fixTransactionTagIndexNotHaveTransactionTime(c *cli.Context) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+
+	log.BootInfof("[user_data.fixTransactionTagIndexNotHaveTransactionTime] starting fixing user \"%s\" transaction tag index data", username)
+
+	_, err = clis.UserData.FixTransactionTagIndexWithTransactionTime(c, username)
+
+	if err != nil {
+		log.BootErrorf("[user_data.fixTransactionTagIndexNotHaveTransactionTime] error occurs when fixing user data")
+		return err
+	}
+
+	log.BootInfof("[user_data.fixTransactionTagIndexNotHaveTransactionTime] user transaction tag index data has been fixed successfully")
 
 	return nil
 }

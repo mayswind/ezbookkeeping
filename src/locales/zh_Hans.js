@@ -680,6 +680,7 @@ export default {
         'transaction tag name is empty': '交易标签标题不能为空',
         'transaction tag name already exists': '交易标签标题已经存在',
         'transaction tag is in use and cannot be deleted': '交易标签正在被使用，无法删除',
+        'transaction tag index not found': '交易标签索引不存在',
         'data export not allowed': '不允许用户数据导出',
         'query items cannot be blank': '请求项目不能为空',
         'query items too much': '请求项目过多',

@@ -190,7 +190,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	tagIndexs, err := a.tags.GetAllTagIdsOfAllTransactions(c, uid)
+	tagIndexs, err := a.tags.GetAllTagIdsMapOfAllTransactions(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())

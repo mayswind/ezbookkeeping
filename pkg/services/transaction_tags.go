@@ -116,8 +116,8 @@ func (s *TransactionTagService) GetMaxDisplayOrder(c *core.Context, uid int64) (
 	}
 }
 
-// GetAllTagIdsOfAllTransactions returns all transaction tag ids
-func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(c *core.Context, uid int64) (map[int64][]int64, error) {
+// GetAllTagIdsMapOfAllTransactions returns all transaction tag ids map
+func (s *TransactionTagService) GetAllTagIdsMapOfAllTransactions(c *core.Context, uid int64) (map[int64][]int64, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}

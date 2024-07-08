@@ -628,7 +628,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	tagMap = l.tags.GetTagMapByList(tags)
 
-	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(nil, uid)
+	tagIndexs, err = l.tags.GetAllTagIdsMapOfAllTransactions(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"%s\", because %s", username, err.Error())

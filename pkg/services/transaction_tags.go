@@ -116,7 +116,19 @@ func (s *TransactionTagService) GetMaxDisplayOrder(c *core.Context, uid int64) (
 	}
 }
 
-// GetAllTagIdsMapOfAllTransactions returns all transaction tag ids map
+// GetAllTagIdsOfAllTransactions returns all transaction tag ids
+func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(c *core.Context, uid int64) ([]*models.TransactionTagIndex, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	var tagIndexs []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexs)
+
+	return tagIndexs, err
+}
+
+// GetAllTagIdsMapOfAllTransactions returns all transaction tag ids map grouped by transaction id
 func (s *TransactionTagService) GetAllTagIdsMapOfAllTransactions(c *core.Context, uid int64) (map[int64][]int64, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
@@ -125,7 +137,7 @@ func (s *TransactionTagService) GetAllTagIdsMapOfAllTransactions(c *core.Context
 	var tagIndexs []*models.TransactionTagIndex
 	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexs)
 
-	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
+	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexs)
 
 	return allTransactionTagIds, err
 }
@@ -139,7 +151,7 @@ func (s *TransactionTagService) GetAllTagIdsOfTransactions(c *core.Context, uid 
 	var tagIndexs []*models.TransactionTagIndex
 	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&tagIndexs)
 
-	allTransactionTagIds := s.getGroupedTransactionTagIds(tagIndexs)
+	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexs)
 
 	return allTransactionTagIds, err
 }
@@ -341,7 +353,7 @@ func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) m
 	return tagMap
 }
 
-func (s *TransactionTagService) getGroupedTransactionTagIds(tagIndexs []*models.TransactionTagIndex) map[int64][]int64 {
+func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexs []*models.TransactionTagIndex) map[int64][]int64 {
 	allTransactionTagIds := make(map[int64][]int64)
 
 	for i := 0; i < len(tagIndexs); i++ {

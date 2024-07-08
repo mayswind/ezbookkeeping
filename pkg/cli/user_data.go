@@ -432,7 +432,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		return false, err
 	}
 
-	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid, username)
+	accountMap, categoryMap, tagMap, tagIndexs, tagIndexsMap, err := l.getUserEssentialData(uid, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.CheckTransactionAndAccount] failed to get essential data for user \"%s\", because %s", username, err.Error())
@@ -472,7 +472,7 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 			return false, err
 		}
 
-		err = l.checkTransactionTag(c, transaction.TransactionId, tagIndexs, tagMap)
+		err = l.checkTransactionTag(c, transaction.TransactionId, tagIndexsMap, tagMap)
 
 		if err != nil {
 			return false, err
@@ -535,6 +535,15 @@ func (l *UserDataCli) CheckTransactionAndAccount(c *cli.Context, username string
 		}
 	}
 
+	for i := 0; i < len(tagIndexs); i++ {
+		tagIndex := tagIndexs[i]
+
+		if tagIndex.TransactionTime < 1 {
+			log.BootErrorf("[user_data.CheckTransactionAndAccount] transaction tag index \"id:%d\" does not have transaction time", tagIndex.TagIndexId)
+			return false, errs.ErrOperationFailed
+		}
+	}
+
 	return true, nil
 }
 
@@ -552,7 +561,7 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string, fileTyp
 		return nil, err
 	}
 
-	accountMap, categoryMap, tagMap, tagIndexs, err := l.getUserEssentialData(uid, username)
+	accountMap, categoryMap, tagMap, _, tagIndexsMap, err := l.getUserEssentialData(uid, username)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get essential data for user \"%s\", because %s", username, err.Error())
@@ -574,7 +583,7 @@ func (l *UserDataCli) ExportTransaction(c *cli.Context, username string, fileTyp
 		dataExporter = l.ezBookKeepingCsvExporter
 	}
 
-	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexsMap)
 
 	if err != nil {
 		log.BootErrorf("[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())
@@ -595,17 +604,17 @@ func (l *UserDataCli) getUserIdByUsername(c *cli.Context, username string) (int6
 	return user.Uid, nil
 }
 
-func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs map[int64][]int64, err error) {
+func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, tagIndexs []*models.TransactionTagIndex, tagIndexsMap map[int64][]int64, err error) {
 	if uid <= 0 {
 		log.BootErrorf("[user_data.getUserEssentialData] user uid \"%d\" is invalid", uid)
-		return nil, nil, nil, nil, errs.ErrUserIdInvalid
+		return nil, nil, nil, nil, nil, errs.ErrUserIdInvalid
 	}
 
 	accounts, err := l.accounts.GetAllAccountsByUid(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get accounts for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	accountMap = l.accounts.GetAccountMapByList(accounts)
@@ -614,7 +623,7 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get categories for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	categoryMap = l.categories.GetCategoryMapByList(categories)
@@ -623,19 +632,21 @@ func (l *UserDataCli) getUserEssentialData(uid int64, username string) (accountM
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tags for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	tagMap = l.tags.GetTagMapByList(tags)
 
-	tagIndexs, err = l.tags.GetAllTagIdsMapOfAllTransactions(nil, uid)
+	tagIndexs, err = l.tags.GetAllTagIdsOfAllTransactions(nil, uid)
 
 	if err != nil {
 		log.BootErrorf("[user_data.getUserEssentialData] failed to get tag index for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
-	return accountMap, categoryMap, tagMap, tagIndexs, nil
+	tagIndexsMap = l.tags.GetGroupedTransactionTagIds(tagIndexs)
+
+	return accountMap, categoryMap, tagMap, tagIndexs, tagIndexsMap, nil
 }
 
 func (l *UserDataCli) checkTransactionAccount(c *cli.Context, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {
@@ -693,8 +704,8 @@ func (l *UserDataCli) checkTransactionCategory(c *cli.Context, transaction *mode
 	return nil
 }
 
-func (l *UserDataCli) checkTransactionTag(c *cli.Context, transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) error {
-	tagIndexs, exists := allTagIndexs[transactionId]
+func (l *UserDataCli) checkTransactionTag(c *cli.Context, transactionId int64, allTagIndexsMap map[int64][]int64, tagMap map[int64]*models.TransactionTag) error {
+	tagIndexs, exists := allTagIndexsMap[transactionId]
 
 	if !exists {
 		return nil

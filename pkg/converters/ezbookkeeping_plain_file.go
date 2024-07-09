@@ -20,7 +20,7 @@ const headerLine = "Time,Timezone,Type,Category,Sub Category,Account,Account Cur
 const dataLineFormat = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" + lineSeparator
 
 // toExportedContent returns the exported plain data
-func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexs map[int64][]int64) ([]byte, error) {
+func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator string, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
 	var ret strings.Builder
 
 	ret.Grow(len(transactions) * 100)
@@ -66,7 +66,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 			geoLocation = fmt.Sprintf("%f%s%f", transaction.GeoLongitude, geoLocationSeparator, transaction.GeoLatitude)
 		}
 
-		tags := e.replaceDelimiters(e.getTags(transaction.TransactionId, allTagIndexs, tagMap), separator)
+		tags := e.replaceDelimiters(e.getTags(transaction.TransactionId, allTagIndexes, tagMap), separator)
 		comment := e.replaceDelimiters(transaction.Comment, separator)
 
 		ret.WriteString(fmt.Sprintf(actualDataLineFormat, transactionTime, transactionTimezone, transactionType, category, subCategory, account, accountCurrency, amount, account2, account2Currency, account2Amount, geoLocation, tags, comment))
@@ -159,8 +159,8 @@ func (e *EzBookKeepingPlainFileExporter) getDisplayAmount(amount int64) string {
 	return integer + "." + decimals
 }
 
-func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagIndexs map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
-	tagIndexs, exists := allTagIndexs[transactionId]
+func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagIndexes map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
+	tagIndexes, exists := allTagIndexes[transactionId]
 
 	if !exists {
 		return ""
@@ -168,12 +168,12 @@ func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagInde
 
 	var ret strings.Builder
 
-	for i := 0; i < len(tagIndexs); i++ {
+	for i := 0; i < len(tagIndexes); i++ {
 		if i > 0 {
 			ret.WriteString(transactionTagSeparator)
 		}
 
-		tagIndex := tagIndexs[i]
+		tagIndex := tagIndexes[i]
 		tag, exists := tagMap[tagIndex]
 
 		if !exists {

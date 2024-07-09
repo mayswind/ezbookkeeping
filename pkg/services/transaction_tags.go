@@ -122,10 +122,10 @@ func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(c *core.Context, u
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	var tagIndexs []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexs)
+	var tagIndexes []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexes)
 
-	return tagIndexs, err
+	return tagIndexes, err
 }
 
 // GetAllTagIdsMapOfAllTransactions returns all transaction tag ids map grouped by transaction id
@@ -134,10 +134,10 @@ func (s *TransactionTagService) GetAllTagIdsMapOfAllTransactions(c *core.Context
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	var tagIndexs []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexs)
+	var tagIndexes []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexes)
 
-	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexs)
+	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexes)
 
 	return allTransactionTagIds, err
 }
@@ -148,10 +148,10 @@ func (s *TransactionTagService) GetAllTagIdsOfTransactions(c *core.Context, uid 
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	var tagIndexs []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&tagIndexs)
+	var tagIndexes []*models.TransactionTagIndex
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&tagIndexes)
 
-	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexs)
+	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexes)
 
 	return allTransactionTagIds, err
 }
@@ -343,18 +343,18 @@ func (s *TransactionTagService) ExistsTagName(c *core.Context, uid int64, name s
 }
 
 // ModifyTagIndexTransactionTime updates transaction time of given transaction tag indexes
-func (s *TransactionTagService) ModifyTagIndexTransactionTime(c *core.Context, uid int64, tagIndexs []*models.TransactionTagIndex) error {
+func (s *TransactionTagService) ModifyTagIndexTransactionTime(c *core.Context, uid int64, tagIndexes []*models.TransactionTagIndex) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	for i := 0; i < len(tagIndexs); i++ {
-		tagIndexs[i].UpdatedUnixTime = time.Now().Unix()
+	for i := 0; i < len(tagIndexes); i++ {
+		tagIndexes[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		for i := 0; i < len(tagIndexs); i++ {
-			tagIndex := tagIndexs[i]
+		for i := 0; i < len(tagIndexes); i++ {
+			tagIndex := tagIndexes[i]
 			updatedRows, err := sess.ID(tagIndex.TagIndexId).Cols("transaction_time", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagIndex)
 
 			if err != nil {
@@ -379,11 +379,11 @@ func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) m
 	return tagMap
 }
 
-func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexs []*models.TransactionTagIndex) map[int64][]int64 {
+func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexes []*models.TransactionTagIndex) map[int64][]int64 {
 	allTransactionTagIds := make(map[int64][]int64)
 
-	for i := 0; i < len(tagIndexs); i++ {
-		tagIndex := tagIndexs[i]
+	for i := 0; i < len(tagIndexes); i++ {
+		tagIndex := tagIndexes[i]
 
 		var transactionTagIds []int64
 

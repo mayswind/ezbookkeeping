@@ -190,7 +190,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	tagIndexs, err := a.tags.GetAllTagIdsMapOfAllTransactions(c, uid)
+	tagIndexes, err := a.tags.GetAllTagIdsMapOfAllTransactions(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
@@ -216,7 +216,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 		dataExporter = a.ezBookKeepingCsvExporter
 	}
 
-	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexs)
+	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())

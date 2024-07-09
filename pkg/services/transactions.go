@@ -235,7 +235,7 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 	transaction.UpdatedUnixTime = now
 
 	tagIds = utils.ToUniqueInt64Slice(tagIds)
-	transactionTagIndexs := make([]*models.TransactionTagIndex, len(tagIds))
+	transactionTagIndexes := make([]*models.TransactionTagIndex, len(tagIds))
 
 	for i := 0; i < len(tagIds); i++ {
 		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
@@ -244,7 +244,7 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 			return errs.ErrSystemIsBusy
 		}
 
-		transactionTagIndexs[i] = &models.TransactionTagIndex{
+		transactionTagIndexes[i] = &models.TransactionTagIndex{
 			TagIndexId:      tagIndexId,
 			Uid:             transaction.Uid,
 			Deleted:         false,
@@ -280,7 +280,7 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 		}
 
 		// Get and verify tags
-		err = s.isTagsValid(sess, transaction, transactionTagIndexs, tagIds)
+		err = s.isTagsValid(sess, transaction, transactionTagIndexes, tagIds)
 
 		if err != nil {
 			return err
@@ -353,9 +353,9 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 		err = nil
 
 		// Insert transaction tag index
-		if len(transactionTagIndexs) > 0 {
-			for i := 0; i < len(transactionTagIndexs); i++ {
-				transactionTagIndex := transactionTagIndexs[i]
+		if len(transactionTagIndexes) > 0 {
+			for i := 0; i < len(transactionTagIndexes); i++ {
+				transactionTagIndex := transactionTagIndexes[i]
 				transactionTagIndex.TransactionTime = transaction.TransactionTime
 
 				_, err := sess.Insert(transactionTagIndex)
@@ -437,7 +437,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 	addTagIds = utils.ToUniqueInt64Slice(addTagIds)
 	removeTagIds = utils.ToUniqueInt64Slice(removeTagIds)
 
-	transactionTagIndexs := make([]*models.TransactionTagIndex, len(addTagIds))
+	transactionTagIndexes := make([]*models.TransactionTagIndex, len(addTagIds))
 
 	for i := 0; i < len(addTagIds); i++ {
 		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
@@ -446,7 +446,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 			return errs.ErrSystemIsBusy
 		}
 
-		transactionTagIndexs[i] = &models.TransactionTagIndex{
+		transactionTagIndexes[i] = &models.TransactionTagIndex{
 			TagIndexId:      tagIndexId,
 			Uid:             transaction.Uid,
 			Deleted:         false,
@@ -587,7 +587,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 		}
 
 		// Get and verify tags
-		err = s.isTagsValid(sess, transaction, transactionTagIndexs, addTagIds)
+		err = s.isTagsValid(sess, transaction, transactionTagIndexes, addTagIds)
 
 		if err != nil {
 			return err
@@ -635,9 +635,9 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 			}
 		}
 
-		if len(transactionTagIndexs) > 0 {
-			for i := 0; i < len(transactionTagIndexs); i++ {
-				transactionTagIndex := transactionTagIndexs[i]
+		if len(transactionTagIndexes) > 0 {
+			for i := 0; i < len(transactionTagIndexes); i++ {
+				transactionTagIndex := transactionTagIndexes[i]
 				transactionTagIndex.TransactionTime = transaction.TransactionTime
 
 				_, err := sess.Insert(transactionTagIndex)
@@ -646,7 +646,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 					return err
 				}
 			}
-		} else if len(transactionTagIndexs) == 0 && currentTagIdsCount > 0 && modifyTransactionTime {
+		} else if len(transactionTagIndexes) == 0 && currentTagIdsCount > 0 && modifyTransactionTime {
 			tagIndexUpdateModel := &models.TransactionTagIndex{
 				TransactionTime: transaction.TransactionTime,
 			}
@@ -1649,8 +1649,8 @@ func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *mo
 	return nil
 }
 
-func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models.Transaction, transactionTagIndexs []*models.TransactionTagIndex, tagIds []int64) error {
-	if len(transactionTagIndexs) > 0 {
+func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64) error {
+	if len(transactionTagIndexes) > 0 {
 		var tags []*models.TransactionTag
 		err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("tag_id", tagIds).Find(&tags)
 
@@ -1664,8 +1664,8 @@ func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models
 			tagMap[tags[i].TagId] = tags[i]
 		}
 
-		for i := 0; i < len(transactionTagIndexs); i++ {
-			if _, exists := tagMap[transactionTagIndexs[i].TagId]; !exists {
+		for i := 0; i < len(transactionTagIndexes); i++ {
+			if _, exists := tagMap[transactionTagIndexes[i].TagId]; !exists {
 				return errs.ErrTransactionTagNotFound
 			}
 		}

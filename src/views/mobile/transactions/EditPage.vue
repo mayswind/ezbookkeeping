@@ -876,9 +876,14 @@ export default {
 }
 
 .transaction-edit-tag {
+    --f7-chip-bg-color: var(--ebk-transaction-tag-chip-bg-color);
     margin-right: 4px;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.transaction-edit-tag > .chip-media {
+    opacity: 0.6;
 }
 </style>

@@ -1113,6 +1113,7 @@ export default {
     'Transaction List Page': 'Transaction List Page',
     'Transactions Per Page': 'Transactions Per Page',
     'Show Monthly Total Amount': 'Show Monthly Total Amount',
+    'Show Transaction Tag': 'Show Transaction Tag',
     'Transaction Edit Page': 'Transaction Edit Page',
     'Automatically Add Geolocation': 'Automatically Add Geolocation',
     'Enable Animation': 'Enable Animation',

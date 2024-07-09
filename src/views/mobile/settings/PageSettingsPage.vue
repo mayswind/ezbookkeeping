@@ -26,6 +26,10 @@
                 <span>{{ $t('Show Monthly Total Amount') }}</span>
                 <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
             </f7-list-item>
+            <f7-list-item>
+                <span>{{ $t('Show Transaction Tag') }}</span>
+                <f7-toggle :checked="showTagInTransactionListPage" @toggle:change="showTagInTransactionListPage = $event"></f7-toggle>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ $t('Transaction Edit Page') }}</f7-block-title>
@@ -72,6 +76,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setShowTotalAmountInTransactionListPage(value);
+            }
+        },
+        showTagInTransactionListPage: {
+            get: function () {
+                return this.settingsStore.appSettings.showTagInTransactionListPage;
+            },
+            set: function (value) {
+                this.settingsStore.setShowTagInTransactionListPage(value);
             }
         },
         isAutoGetCurrentGeoLocation: {

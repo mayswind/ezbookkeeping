@@ -63,6 +63,13 @@
                                                 </div>
                                             </div>
                                             <div class="item-footer">
+                                                <div class="transaction-tags">
+                                                    <f7-chip media-bg-color="black" class="transaction-tag" :text="$t('Tag Title')">
+                                                        <template #media>
+                                                            <f7-icon f7="number"></f7-icon>
+                                                        </template>
+                                                    </f7-chip>
+                                                </div>
                                                 <div class="transaction-footer">
                                                     <span>{{ currentShortTime }}</span>
                                                     <span>·</span>

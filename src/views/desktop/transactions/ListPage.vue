@@ -308,13 +308,14 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
+                                            <th class="transaction-table-column-tags" v-if="showTagInTransactionListPage">{{ $t('Tags') }}</th>
                                             <th class="transaction-table-column-description">{{ $t('Description') }}</th>
                                         </tr>
                                         </thead>
 
                                         <tbody v-if="loading && (!transactions || !transactions.length || transactions.length < 1)">
                                         <tr :key="itemIdx" v-for="itemIdx in skeletonData">
-                                            <td class="px-0" colspan="5">
+                                            <td class="px-0" :colspan="showTagInTransactionListPage ? 6 : 5">
                                                 <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
                                             </td>
                                         </tr>
@@ -322,7 +323,7 @@
 
                                         <tbody v-if="!loading && (!transactions || !transactions.length || transactions.length < 1)">
                                         <tr>
-                                            <td colspan="5">{{ $t('No transaction data') }}</td>
+                                            <td :colspan="showTagInTransactionListPage ? 6 : 5">{{ $t('No transaction data') }}</td>
                                         </tr>
                                         </tbody>
 
@@ -331,7 +332,7 @@
                                                v-for="(transaction, idx) in transactions">
                                             <tr class="transaction-list-row-date no-hover text-sm"
                                                 v-if="idx === 0 || (idx > 0 && (transaction.date !== transactions[idx - 1].date))">
-                                                <td colspan="5" class="font-weight-bold">
+                                                <td :colspan="showTagInTransactionListPage ? 6 : 5" class="font-weight-bold">
                                                     <div class="d-flex align-center">
                                                         <span>{{ getLongDate(transaction) }}</span>
                                                         <v-chip class="ml-1" color="default" size="x-small">
@@ -379,6 +380,15 @@
                                                         <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id"></v-icon>
                                                         <span v-if="transaction.sourceAccount && transaction.type === allTransactionTypes.Transfer && transaction.destinationAccount && transaction.sourceAccount.id !== transaction.destinationAccount.id">{{ transaction.destinationAccount.name }}</span>
                                                     </div>
+                                                </td>
+                                                <td class="transaction-table-column-tags" v-if="showTagInTransactionListPage">
+                                                    <v-chip class="transaction-tag" size="small" :prepend-icon="icons.tag"
+                                                            :text="allTransactionTags[tagId].name"
+                                                            :key="tagId"
+                                                            v-for="tagId in transaction.tagIds"/>
+                                                    <v-chip class="transaction-tag" size="small" :prepend-icon="icons.tag"
+                                                            :text="$t('None')"
+                                                            v-if="!transaction.tagIds || !transaction.tagIds.length"/>
                                                 </td>
                                                 <td class="transaction-table-column-description text-truncate">
                                                     {{ transaction.comment }}
@@ -433,6 +443,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
 import numeralConstants from '@/consts/numeral.js';
@@ -478,6 +489,7 @@ import {
     mdiPencilBoxOutline,
     mdiArrowLeft,
     mdiArrowRight,
+    mdiPound,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -532,12 +544,13 @@ export default {
                 modifyBalance: mdiPencilBoxOutline,
                 arrowLeft: mdiArrowLeft,
                 arrowRight: mdiArrowRight,
+                tag: mdiPound,
                 more: mdiDotsVertical
             }
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore),
         defaultCurrency() {
             return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
@@ -786,11 +799,17 @@ export default {
 
             return primaryCategories;
         },
+        allTransactionTags() {
+            return this.transactionTagsStore.allTransactionTagsMap;
+        },
         recentMonthDateRanges() {
             return this.$locale.getAllRecentMonthDateRanges(this.userStore, true, true);
         },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
+        },
+        showTagInTransactionListPage() {
+            return this.settingsStore.appSettings.showTagInTransactionListPage;
         }
     },
     created() {
@@ -875,7 +894,8 @@ export default {
 
             Promise.all([
                 self.accountsStore.loadAllAccounts({ force: false }),
-                self.transactionCategoriesStore.loadAllCategories({ force: false })
+                self.transactionCategoriesStore.loadAllCategories({ force: false }),
+                self.transactionTagsStore.loadAllTags({ force: false })
             ]).then(() => {
                 if (this.queryMonthlyData) {
                     const currentMonthMinDate = parseDateFromUnixTime(this.query.minTime);
@@ -1354,6 +1374,11 @@ export default {
     white-space: nowrap;
 }
 
+.transaction-table .transaction-table-column-tags {
+    width: 80px;
+    max-width: 300px;
+}
+
 .transaction-table-column-description {
     max-width: 300px;
 }
@@ -1366,6 +1391,19 @@ export default {
 .transaction-table .transaction-table-column-category .v-btn .v-btn__append,
 .transaction-table .transaction-table-column-account .v-btn .v-btn__append {
     margin-left: 0in;
+}
+
+.transaction-table .transaction-table-column-tags .v-chip.transaction-tag {
+    margin-right: 4px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.transaction-table .transaction-table-column-tags .v-chip.transaction-tag > .v-chip__content {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .transaction-category-menu .item-icon,

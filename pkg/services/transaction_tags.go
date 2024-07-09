@@ -184,7 +184,7 @@ func (s *TransactionTagService) GetAllTagIdsOfTransactions(c *core.Context, uid 
 	}
 
 	var tagIndexes []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&tagIndexes)
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).OrderBy("transaction_id asc, tag_index_id asc").Find(&tagIndexes)
 
 	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexes)
 

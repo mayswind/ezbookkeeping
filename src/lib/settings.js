@@ -16,6 +16,7 @@ const defaultSettings = {
     timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
+    showTagInTransactionListPage: false,
     showAccountBalance: true,
     statistics: {
         defaultChartDataType: statisticsConstants.defaultChartDataType,
@@ -194,6 +195,14 @@ export function isShowTotalAmountInTransactionListPage() {
 
 export function setShowTotalAmountInTransactionListPage(value) {
     setOption('showTotalAmountInTransactionListPage', value);
+}
+
+export function isShowTagInTransactionListPage() {
+    return getOption('showTagInTransactionListPage');
+}
+
+export function setShowTagInTransactionListPage(value) {
+    setOption('showTagInTransactionListPage', value);
 }
 
 export function isShowAccountBalance() {

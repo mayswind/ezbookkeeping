@@ -1113,6 +1113,7 @@ export default {
     'Transaction List Page': '交易列表页面',
     'Transactions Per Page': '每页交易数',
     'Show Monthly Total Amount': '显示月度总金额',
+    'Show Transaction Tag': '显示交易标签',
     'Transaction Edit Page': '交易编辑页面',
     'Automatically Add Geolocation': '自动添加地理位置',
     'Enable Animation': '启用动画',

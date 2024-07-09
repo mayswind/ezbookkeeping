@@ -123,6 +123,17 @@
                                     v-model="showTotalAmountInTransactionListPage"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="$t('Show Transaction Tag')"
+                                    :placeholder="$t('Show Transaction Tag')"
+                                    :items="enableDisableOptions"
+                                    v-model="showTagInTransactionListPage"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -246,6 +257,14 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setShowTotalAmountInTransactionListPage(value);
+            }
+        },
+        showTagInTransactionListPage: {
+            get: function () {
+                return this.settingsStore.appSettings.showTagInTransactionListPage;
+            },
+            set: function (value) {
+                this.settingsStore.setShowTagInTransactionListPage(value);
             }
         },
         itemsCountInTransactionListPage: {

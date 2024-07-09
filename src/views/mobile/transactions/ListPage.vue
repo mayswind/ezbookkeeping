@@ -210,6 +210,16 @@
                                             </div>
                                         </div>
                                         <div class="item-footer">
+                                            <div class="transaction-tags" v-if="showTagInTransactionListPage && transaction.tagIds && transaction.tagIds.length">
+                                                <f7-chip media-bg-color="black" class="transaction-tag"
+                                                         :text="allTransactionTags[tagId].name"
+                                                         :key="tagId"
+                                                         v-for="tagId in transaction.tagIds">
+                                                    <template #media>
+                                                        <f7-icon f7="number"></f7-icon>
+                                                    </template>
+                                                </f7-chip>
+                                            </div>
                                             <div class="transaction-footer">
                                                 <span>{{ getDisplayTime(transaction) }}</span>
                                                 <span v-if="transaction.utcOffset !== currentTimezoneOffsetMinutes">{{ `(${getDisplayTimezone(transaction)})` }}</span>
@@ -456,6 +466,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
+import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
 
 import numeralConstants from '@/consts/numeral.js';
@@ -501,7 +512,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore),
         defaultCurrency() {
             return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
@@ -625,6 +636,9 @@ export default {
 
             return primaryCategories;
         },
+        allTransactionTags() {
+            return this.transactionTagsStore.allTransactionTagsMap;
+        },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
@@ -633,6 +647,9 @@ export default {
         },
         showTotalAmountInTransactionListPage() {
             return this.settingsStore.appSettings.showTotalAmountInTransactionListPage;
+        },
+        showTagInTransactionListPage() {
+            return this.settingsStore.appSettings.showTagInTransactionListPage;
         }
     },
     created() {
@@ -680,7 +697,8 @@ export default {
 
             Promise.all([
                 self.accountsStore.loadAllAccounts({ force: false }),
-                self.transactionCategoriesStore.loadAllCategories({ force: false })
+                self.transactionCategoriesStore.loadAllCategories({ force: false }),
+                self.transactionTagsStore.loadAllTags({ force: false })
             ]).then(() => {
                 return self.transactionsStore.loadTransactions({
                     reload: true,
@@ -1100,6 +1118,23 @@ export default {
     line-height: 20px;
     padding-top: 2px;
     padding-bottom: 2px;
+}
+
+.list.transaction-info-list li.transaction-info .chip.transaction-tag {
+    --f7-chip-media-size: var(--ebk-transaction-tag-chip-media-size);
+    --f7-chip-media-font-size: var(--ebk-transaction-tag-chip-font-size);
+    --f7-chip-font-size: var(--ebk-transaction-tag-chip-font-size);
+    --f7-chip-height: var(--ebk-transaction-tag-chip-height);
+    --f7-chip-text-color: var(--f7-list-item-footer-text-color);
+    --f7-chip-bg-color: var(--ebk-transaction-tag-chip-bg-color);
+    margin-right: 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list.transaction-info-list li.transaction-info .chip.transaction-tag > .chip-media {
+    opacity: 0.6;
 }
 
 .list.transaction-info-list li.transaction-info .transaction-footer {

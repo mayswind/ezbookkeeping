@@ -18,6 +18,7 @@ export const useSettingsStore = defineStore('settings', {
             timezoneUsedForStatisticsInHomePage: settings.getTimezoneUsedForStatisticsInHomePage(),
             itemsCountInTransactionListPage: settings.getItemsCountInTransactionListPage(),
             showTotalAmountInTransactionListPage: settings.isShowTotalAmountInTransactionListPage(),
+            showTagInTransactionListPage: settings.isShowTagInTransactionListPage(),
             showAccountBalance: settings.isShowAccountBalance(),
             statistics: {
                 defaultChartDataType: settings.getStatisticsDefaultChartDataType(),
@@ -81,6 +82,10 @@ export const useSettingsStore = defineStore('settings', {
         setShowTotalAmountInTransactionListPage(value) {
             settings.setShowTotalAmountInTransactionListPage(value);
             this.appSettings.showTotalAmountInTransactionListPage = value;
+        },
+        setShowTagInTransactionListPage(value) {
+            settings.setShowTagInTransactionListPage(value);
+            this.appSettings.showTagInTransactionListPage = value;
         },
         setShowAccountBalance(value) {
             settings.setShowAccountBalance(value);

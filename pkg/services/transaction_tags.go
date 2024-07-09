@@ -12,6 +12,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
+const pageCountForLoadAllTransactionTagIndexes = 1000
+
 // TransactionTagService represents transaction tag service
 type TransactionTagService struct {
 	ServiceUsingDB
@@ -122,20 +124,53 @@ func (s *TransactionTagService) GetAllTagIdsOfAllTransactions(c *core.Context, u
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	var tagIndexes []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexes)
+	condition := "uid=? AND deleted=?"
+	conditionParams := make([]any, 0, 2)
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
 
-	return tagIndexes, err
+	var allTransactionTagIndexes []*models.TransactionTagIndex
+
+	maxTransactionTagIndexId := int64(0)
+
+	for maxTransactionTagIndexId >= 0 {
+		var tagIndexes []*models.TransactionTagIndex
+
+		finalCondition := condition
+		finalConditionParams := make([]any, 0, 3)
+		finalConditionParams = append(finalConditionParams, conditionParams...)
+
+		if maxTransactionTagIndexId > 0 {
+			finalCondition = finalCondition + " AND tag_index_id<=?"
+			finalConditionParams = append(finalConditionParams, maxTransactionTagIndexId)
+		}
+
+		err := s.UserDataDB(uid).NewSession(c).Where(finalCondition, finalConditionParams...).Limit(pageCountForLoadAllTransactionTagIndexes, 0).OrderBy("tag_index_id desc").Find(&tagIndexes)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactionTagIndexes = append(allTransactionTagIndexes, tagIndexes...)
+
+		if len(tagIndexes) < pageCountForLoadAllTransactionTagIndexes {
+			maxTransactionTagIndexId = -1
+			break
+		}
+
+		maxTransactionTagIndexId = tagIndexes[len(tagIndexes)-1].TagIndexId - 1
+	}
+
+	return allTransactionTagIndexes, nil
 }
 
 // GetAllTagIdsMapOfAllTransactions returns all transaction tag ids map grouped by transaction id
 func (s *TransactionTagService) GetAllTagIdsMapOfAllTransactions(c *core.Context, uid int64) (map[int64][]int64, error) {
-	if uid <= 0 {
-		return nil, errs.ErrUserIdInvalid
-	}
+	tagIndexes, err := s.GetAllTagIdsOfAllTransactions(c, uid)
 
-	var tagIndexes []*models.TransactionTagIndex
-	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Find(&tagIndexes)
+	if err != nil {
+		return nil, err
+	}
 
 	allTransactionTagIds := s.GetGroupedTransactionTagIds(tagIndexes)
 

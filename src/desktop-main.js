@@ -104,6 +104,7 @@ import '@/styles/desktop/template/layout/component/index.scss';
 import '@/styles/desktop/template/layout/_default-layout.scss';
 import '@/styles/desktop/global.scss';
 import '@/styles/desktop/font-size.scss';
+import '@/styles/desktop/amount-color.scss';
 
 import App from './DesktopApp.vue';
 
@@ -300,8 +301,7 @@ const vuetify = createVuetify({
                     'error': '#ff3b30',
                     'error-darken-1': '#e1342b',
                     'on-error': '#ffffff',
-                    'income': '#ff3b30',
-                    'expense': '#009688',
+                    'teal': '#009688',
                     'background': '#faf8f4',
                     'on-background': '#413935',
                     'surface': '#fff',
@@ -369,8 +369,7 @@ const vuetify = createVuetify({
                     'error': '#ff3b30',
                     'error-darken-1': '#e1342b',
                     'on-error': '#ffffff',
-                    'income': '#ff3b30',
-                    'expense': '#009688',
+                    'teal': '#009688',
                     'background': '#000000',
                     'on-background': '#fcf0e3',
                     'surface': '#1c1c1d',

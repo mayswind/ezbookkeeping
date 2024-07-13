@@ -181,6 +181,14 @@ export default {
         'None': 'None',
         'Thousands Separator': 'Thousands Separator',
     },
+    'color': {
+        'amount': {
+            'Green': 'Green',
+            'Red': 'Red',
+            'Yellow': 'Yellow',
+            'Black or White': 'Black or White'
+        }
+    },
     'timezone': {
         'International Date Line West': 'International Date Line West',
         'Coordinated Universal Time-11': 'Coordinated Universal Time-11',
@@ -775,6 +783,7 @@ export default {
     'Sort': 'Sort',
     'Date': 'Date',
     'Time': 'Time',
+    'Color': 'Color',
     'Type': 'Type',
     'All Types': 'All Types',
     'More': 'More',
@@ -1103,6 +1112,8 @@ export default {
     'Currency Code': 'Currency Code',
     'Currency Name': 'Currency Name',
     'Currency Symbol': 'Currency Symbol',
+    'Expense Amount Color': 'Expense Amount Color',
+    'Income Amount Color': 'Income Amount Color',
     'Show Account Balance': 'Show Account Balance',
     'Hide Account Balance': 'Hide Account Balance',
     'Page Settings': 'Page Settings',

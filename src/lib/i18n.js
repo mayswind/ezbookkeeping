@@ -5,6 +5,7 @@ import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
 import timezoneConstants from '@/consts/timezone.js';
 import currencyConstants from '@/consts/currency.js';
+import colorConstants from '@/consts/color.js';
 import accountConstants from '@/consts/account.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
@@ -902,6 +903,37 @@ function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, t
     return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName);
 }
 
+function getAllExpenseIncomeAmountColors(translateFn, expenseOrIncome) {
+    const allAmountColors = [];
+    let defaultAmountName = '';
+
+    if (expenseOrIncome === 1) { // expense
+        defaultAmountName = colorConstants.defaultExpenseAmountColor.name;
+    } else if (expenseOrIncome === 2) { // income
+        defaultAmountName = colorConstants.defaultIncomeAmountColor.name;
+    }
+
+    if (defaultAmountName) {
+        defaultAmountName = translateFn('color.amount.' + defaultAmountName);
+    }
+
+    allAmountColors.push({
+        type: colorConstants.defaultExpenseIncomeAmountValue,
+        displayName: translateFn('System Default') + (defaultAmountName ? ` (${defaultAmountName})` : '')
+    });
+
+    for (let i = 0; i < colorConstants.allAmountColorsArray.length; i++) {
+        const amountColor = colorConstants.allAmountColorsArray[i];
+
+        allAmountColors.push({
+            type: amountColor.type,
+            displayName: translateFn('color.amount.' + amountColor.name)
+        });
+    }
+
+    return allAmountColors;
+}
+
 function getAllAccountCategories(translateFn) {
     const allAccountCategories = [];
 
@@ -1430,6 +1462,8 @@ export function i18nFunctions(i18nGlobal) {
         formatExchangeRateAmount: (userStore, value) => getFormatedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
         getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, i18nGlobal.t),
+        getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),
+        getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 2),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),

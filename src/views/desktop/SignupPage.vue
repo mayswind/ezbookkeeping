@@ -223,7 +223,7 @@
                                :append-icon="icons.next"
                                @click="switchToNextTab"
                                v-if="currentStep === 'basicSetting'">{{ $t('Next') }}</v-btn>
-                        <v-btn color="expense"
+                        <v-btn color="teal"
                                :disabled="submitting || navigateToHomePage"
                                :append-icon="!submitting ? icons.submit : null"
                                @click="submit"

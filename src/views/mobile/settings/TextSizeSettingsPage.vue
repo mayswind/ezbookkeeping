@@ -19,8 +19,8 @@
                                     <template #title>
                                         <small>{{ currentLongYearMonth }}</small>
                                         <small class="transaction-amount-statistics">
-                                            <span class="text-color-red">{{ `+${getDisplayAmount('12345')}` }}</span>
-                                            <span class="text-color-teal">{{ `-${getDisplayAmount('67890')}` }}</span>
+                                            <span class="text-income">{{ `+${getDisplayAmount('12345')}` }}</span>
+                                            <span class="text-expense">{{ `-${getDisplayAmount('67890')}` }}</span>
                                         </small>
                                         <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
                                     </template>

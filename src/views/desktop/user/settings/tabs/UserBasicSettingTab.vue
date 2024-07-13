@@ -257,6 +257,32 @@
                                     v-model="newProfile.currencyDisplayType"
                                 />
                             </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
+                                    :label="$t('Expense Amount Color')"
+                                    :placeholder="$t('Expense Amount Color')"
+                                    :items="allExpenseAmountColorTypes"
+                                    v-model="newProfile.expenseAmountColor"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
+                                    :label="$t('Income Amount Color')"
+                                    :placeholder="$t('Income Amount Color')"
+                                    :items="allIncomeAmountColorTypes"
+                                    v-model="newProfile.incomeAmountColor"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
 
@@ -290,6 +316,7 @@ import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
     mdiAccount
@@ -317,7 +344,9 @@ export default {
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
                 digitGrouping: 0,
-                currencyDisplayType: 0
+                currencyDisplayType: 0,
+                expenseAmountColor: 0,
+                incomeAmountColor: 0
             },
             oldProfile: {
                 email: '',
@@ -334,7 +363,9 @@ export default {
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
                 digitGrouping: 0,
-                currencyDisplayType: 0
+                currencyDisplayType: 0,
+                expenseAmountColor: 0,
+                incomeAmountColor: 0
             },
             emailVerified: false,
             loading: true,
@@ -389,6 +420,12 @@ export default {
         allCurrencyDisplayTypes() {
             return this.$locale.getAllCurrencyDisplayTypes(this.settingsStore, this.userStore);
         },
+        allExpenseAmountColorTypes() {
+            return this.$locale.getAllExpenseAmountColors();
+        },
+        allIncomeAmountColorTypes() {
+            return this.$locale.getAllIncomeAmountColors();
+        },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
         },
@@ -424,7 +461,9 @@ export default {
                 this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
                 this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
                 this.newProfile.digitGrouping === this.oldProfile.digitGrouping &&
-                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType) {
+                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType &&
+                this.newProfile.expenseAmountColor === this.oldProfile.expenseAmountColor &&
+                this.newProfile.incomeAmountColor === this.oldProfile.incomeAmountColor) {
                 return 'Nothing has been modified';
             } else {
                 return null;
@@ -503,6 +542,8 @@ export default {
 
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                 }
 
                 self.$refs.snackbar.showMessage('Your profile has been successfully updated');
@@ -555,6 +596,8 @@ export default {
             this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
             this.oldProfile.digitGrouping = profile.digitGrouping;
             this.oldProfile.currencyDisplayType = profile.currencyDisplayType;
+            this.oldProfile.expenseAmountColor = profile.expenseAmountColor;
+            this.oldProfile.incomeAmountColor = profile.incomeAmountColor;
 
             this.newProfile.email = this.oldProfile.email
             this.newProfile.nickname = this.oldProfile.nickname;
@@ -571,6 +614,8 @@ export default {
             this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
             this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
             this.newProfile.currencyDisplayType = this.oldProfile.currencyDisplayType;
+            this.newProfile.expenseAmountColor = this.oldProfile.expenseAmountColor;
+            this.newProfile.incomeAmountColor = this.oldProfile.incomeAmountColor;
         }
     }
 };

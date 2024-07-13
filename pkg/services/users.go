@@ -264,6 +264,14 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 		updateCols = append(updateCols, "currency_display_type")
 	}
 
+	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.ExpenseAmountColor && user.ExpenseAmountColor <= models.AMOUNT_COLOR_TYPE_BLACK_OR_WHITE {
+		updateCols = append(updateCols, "expense_amount_color")
+	}
+
+	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.IncomeAmountColor && user.IncomeAmountColor <= models.AMOUNT_COLOR_TYPE_BLACK_OR_WHITE {
+		updateCols = append(updateCols, "income_amount_color")
+	}
+
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 

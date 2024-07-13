@@ -137,10 +137,10 @@
                                         <span>{{ getDisplayYearMonth(transactionMonthList) }}</span>
                                     </small>
                                     <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
-                                        <span class="text-color-red">
+                                        <span class="text-income">
                                             {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.income, defaultCurrency, '+', transactionMonthList.totalAmount.incompleteIncome) }}
                                         </span>
-                                        <span class="text-color-teal">
+                                        <span class="text-expense">
                                             {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.expense, defaultCurrency, '-', transactionMonthList.totalAmount.incompleteExpense) }}
                                         </span>
                                     </small>
@@ -199,7 +199,7 @@
                                             </div>
                                             <div class="item-after">
                                                 <div class="transaction-amount" v-if="transaction.sourceAccount"
-                                                     :class="{ 'text-color-teal': transaction.type === allTransactionTypes.Expense, 'text-color-red': transaction.type === allTransactionTypes.Income }">
+                                                     :class="{ 'text-expense': transaction.type === allTransactionTypes.Expense, 'text-income': transaction.type === allTransactionTypes.Income }">
                                                     <span>{{ getTransactionDisplayAmount(transaction) }}</span>
                                                 </div>
                                             </div>

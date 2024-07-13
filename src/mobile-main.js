@@ -119,6 +119,7 @@ import '@/styles/mobile/font-size-x-large.css';
 import '@/styles/mobile/font-size-xx-large.css';
 import '@/styles/mobile/font-size-xxx-large.css';
 import '@/styles/mobile/font-size-xxxx-large.css';
+import '@/styles/mobile/amount-color.css';
 
 import App from '@/MobileApp.vue';
 

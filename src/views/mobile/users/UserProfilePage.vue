@@ -33,6 +33,8 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping Symbol" title="Comma (,)" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping" title="Thousands Separator" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Currency Display Mode" title="Currency Symbol" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Expense Amount Color" title="Amount Color" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Income Amount Color" title="Amount Color" link="#"></f7-list-item>
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
@@ -262,6 +264,32 @@
                 </select>
             </f7-list-item>
 
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Expense Amount Color')"
+                :title="getNameByKeyValue(allExpenseAmountColorTypes, newProfile.expenseAmountColor, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Color'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Expense Amount Color'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.expenseAmountColor">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allExpenseAmountColorTypes">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Income Amount Color')"
+                :title="getNameByKeyValue(allIncomeAmountColorTypes, newProfile.incomeAmountColor, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Color'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Income Amount Color'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.incomeAmountColor">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allIncomeAmountColorTypes">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+
             <f7-list-item class="ebk-list-item-error-info" v-if="langAndRegionInputIsInvalid" :footer="$t(langAndRegionInputInvalidProblemMessage)"></f7-list-item>
         </f7-list>
 
@@ -297,6 +325,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     props: [
@@ -321,7 +350,9 @@ export default {
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
                 digitGrouping: 0,
-                currencyDisplayType: 0
+                currencyDisplayType: 0,
+                expenseAmountColor: 0,
+                incomeAmountColor: 0
             },
             oldProfile: {
                 email: '',
@@ -338,7 +369,9 @@ export default {
                 decimalSeparator: 0,
                 digitGroupingSymbol: 0,
                 digitGrouping: 0,
-                currencyDisplayType: 0
+                currencyDisplayType: 0,
+                expenseAmountColor: 0,
+                incomeAmountColor: 0
             },
             emailVerified: false,
             currentPassword: '',
@@ -395,6 +428,12 @@ export default {
         allCurrencyDisplayTypes() {
             return this.$locale.getAllCurrencyDisplayTypes(this.settingsStore, this.userStore);
         },
+        allExpenseAmountColorTypes() {
+            return this.$locale.getAllExpenseAmountColors();
+        },
+        allIncomeAmountColorTypes() {
+            return this.$locale.getAllIncomeAmountColors();
+        },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
         },
@@ -443,7 +482,9 @@ export default {
                 this.newProfile.decimalSeparator === this.oldProfile.decimalSeparator &&
                 this.newProfile.digitGroupingSymbol === this.oldProfile.digitGroupingSymbol &&
                 this.newProfile.digitGrouping === this.oldProfile.digitGrouping &&
-                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType) {
+                this.newProfile.currencyDisplayType === this.oldProfile.currencyDisplayType &&
+                this.newProfile.expenseAmountColor === this.oldProfile.expenseAmountColor &&
+                this.newProfile.incomeAmountColor === this.oldProfile.incomeAmountColor) {
                 return 'Nothing has been modified';
             } else if (!this.newProfile.password && this.newProfile.confirmPassword) {
                 return 'Password cannot be blank';
@@ -538,6 +579,8 @@ export default {
 
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                 }
 
                 self.$toast('Your profile has been successfully updated');
@@ -596,6 +639,8 @@ export default {
             this.oldProfile.digitGroupingSymbol = profile.digitGroupingSymbol;
             this.oldProfile.digitGrouping = profile.digitGrouping;
             this.oldProfile.currencyDisplayType = profile.currencyDisplayType;
+            this.oldProfile.expenseAmountColor = profile.expenseAmountColor;
+            this.oldProfile.incomeAmountColor = profile.incomeAmountColor;
 
             this.newProfile.email = this.oldProfile.email
             this.newProfile.nickname = this.oldProfile.nickname;
@@ -612,6 +657,8 @@ export default {
             this.newProfile.digitGroupingSymbol = this.oldProfile.digitGroupingSymbol;
             this.newProfile.digitGrouping = this.oldProfile.digitGrouping;
             this.newProfile.currencyDisplayType = this.oldProfile.currencyDisplayType;
+            this.newProfile.expenseAmountColor = this.oldProfile.expenseAmountColor;
+            this.newProfile.incomeAmountColor = this.oldProfile.incomeAmountColor;
         }
     }
 };

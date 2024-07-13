@@ -384,7 +384,9 @@ export const useRootStore = defineStore('root', {
                     decimalSeparator: profile.decimalSeparator,
                     digitGroupingSymbol: profile.digitGroupingSymbol,
                     digitGrouping: profile.digitGrouping,
-                    currencyDisplayType: profile.currencyDisplayType
+                    currencyDisplayType: profile.currencyDisplayType,
+                    expenseAmountColor: profile.expenseAmountColor,
+                    incomeAmountColor: profile.incomeAmountColor
                 }).then(response => {
                     const data = response.data;
 

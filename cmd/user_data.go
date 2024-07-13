@@ -658,6 +658,8 @@ func printUserInfo(user *models.User) {
 	fmt.Printf("[DigitGroupingSymbol] %s (%d)\n", user.DigitGroupingSymbol, user.DigitGroupingSymbol)
 	fmt.Printf("[DigitGrouping] %s (%d)\n", user.DigitGrouping, user.DigitGrouping)
 	fmt.Printf("[CurrencyDisplayType] %s (%d)\n", user.CurrencyDisplayType, user.CurrencyDisplayType)
+	fmt.Printf("[ExpenseAmountColor] %s (%d)\n", user.ExpenseAmountColor, user.ExpenseAmountColor)
+	fmt.Printf("[IncomeAmountColor] %s (%d)\n", user.IncomeAmountColor, user.IncomeAmountColor)
 	fmt.Printf("[Deleted] %t\n", user.Deleted)
 	fmt.Printf("[EmailVerified] %t\n", user.EmailVerified)
 	fmt.Printf("[CreatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(user.CreatedUnixTime), user.CreatedUnixTime)

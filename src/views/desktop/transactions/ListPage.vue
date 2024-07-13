@@ -93,7 +93,7 @@
                                                     {{ currentMonthTotalAmount.income }}
                                                 </span>
                                                 <span class="text-subtitle-1 ml-3">{{ $t('Total Expense') }}</span>
-                                                <span class="text-income ml-2" v-if="loading">
+                                                <span class="text-expense ml-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
                                                 <span class="text-expense ml-2" v-else-if="!loading">

@@ -369,6 +369,22 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) 
 		userNew.CurrencyDisplayType = models.CURRENCY_DISPLAY_TYPE_INVALID
 	}
 
+	if userUpdateReq.ExpenseAmountColor != nil && *userUpdateReq.ExpenseAmountColor != user.ExpenseAmountColor {
+		user.ExpenseAmountColor = *userUpdateReq.ExpenseAmountColor
+		userNew.ExpenseAmountColor = *userUpdateReq.ExpenseAmountColor
+		anythingUpdate = true
+	} else {
+		userNew.ExpenseAmountColor = models.AMOUNT_COLOR_TYPE_INVALID
+	}
+
+	if userUpdateReq.IncomeAmountColor != nil && *userUpdateReq.IncomeAmountColor != user.IncomeAmountColor {
+		user.IncomeAmountColor = *userUpdateReq.IncomeAmountColor
+		userNew.IncomeAmountColor = *userUpdateReq.IncomeAmountColor
+		anythingUpdate = true
+	} else {
+		userNew.IncomeAmountColor = models.AMOUNT_COLOR_TYPE_INVALID
+	}
+
 	if modifyUserLanguage || userNew.DecimalSeparator != models.DECIMAL_SEPARATOR_INVALID || userNew.DigitGroupingSymbol != models.DIGIT_GROUPING_SYMBOL_INVALID {
 		decimalSeparator := userNew.DecimalSeparator
 		digitGroupingSymbol := userNew.DigitGroupingSymbol

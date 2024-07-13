@@ -1,0 +1,47 @@
+:root {
+    --ebk-amount-color-green: 0, 150, 136;
+    --ebk-amount-color-red: 212, 63, 63;
+    --ebk-amount-color-yellow: 226, 182, 10;
+    --ebk-amount-color-black: 65, 57, 53;
+    --ebk-amount-color-white: 250, 240, 237;
+}
+
+:root.expense-amount-color-green .text-expense {
+    color: rgb(var(--ebk-amount-color-green)) !important;
+}
+
+:root.income-amount-color-green .text-income {
+    color: rgb(var(--ebk-amount-color-green)) !important;
+}
+
+:root.expense-amount-color-red .text-expense {
+    color: rgb(var(--ebk-amount-color-red)) !important;
+}
+
+:root.income-amount-color-red .text-income {
+    color: rgb(var(--ebk-amount-color-red)) !important;
+}
+
+:root.expense-amount-color-yellow .text-expense {
+    color: rgb(var(--ebk-amount-color-yellow)) !important;
+}
+
+:root.income-amount-color-yellow .text-income {
+    color: rgb(var(--ebk-amount-color-yellow)) !important;
+}
+
+:root.expense-amount-color-blackorwhite .text-expense {
+    color: rgb(var(--ebk-amount-color-black)) !important;
+}
+
+:root.dark.expense-amount-color-blackorwhite .text-expense {
+    color: rgb(var(--ebk-amount-color-white)) !important;
+}
+
+:root.income-amount-color-blackorwhite .text-income {
+    color: rgb(var(--ebk-amount-color-black)) !important;
+}
+
+:root.dark.income-amount-color-blackorwhite .text-income {
+    color: rgb(var(--ebk-amount-color-white)) !important;
+}

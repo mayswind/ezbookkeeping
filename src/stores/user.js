@@ -69,6 +69,14 @@ export const useUserStore = defineStore('user', {
         currentUserCurrencyDisplayType(state) {
             const userInfo = state.currentUserInfo || {};
             return userInfo.currencyDisplayType;
+        },
+        currentUserExpenseAmountColor(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.expenseAmountColor;
+        },
+        currentUserIncomeAmountColor(state) {
+            const userInfo = state.currentUserInfo || {};
+            return userInfo.incomeAmountColor;
         }
     },
     actions: {

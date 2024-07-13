@@ -181,6 +181,14 @@ export default {
         'None': '无',
         'Thousands Separator': '千位分隔符',
     },
+    'color': {
+        'amount': {
+            'Green': '绿色',
+            'Red': '红色',
+            'Yellow': '黄色',
+            'Black or White': '黑色或白色'
+        }
+    },
     'timezone': {
         'International Date Line West': '国际日期变更线西',
         'Coordinated Universal Time-11': '协调世界时-11',
@@ -775,6 +783,7 @@ export default {
     'Sort': '排序',
     'Date': '日期',
     'Time': '时间',
+    'Color': '颜色',
     'Type': '类型',
     'All Types': '全部类型',
     'More': '更多',
@@ -1103,6 +1112,8 @@ export default {
     'Currency Code': '货币代码',
     'Currency Name': '货币名称',
     'Currency Symbol': '货币符号',
+    'Expense Amount Color': '支出金额颜色',
+    'Income Amount Color': '收入金额颜色',
     'Show Account Balance': '显示账户余额',
     'Hide Account Balance': '隐藏账户余额',
     'Page Settings': '页面设置',

@@ -18,6 +18,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import { isProduction } from '@/lib/version.js';
 import { getTheme, isEnableAnimate } from '@/lib/settings.js';
 import { loadMapAssets } from '@/lib/map/index.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 import { isModalShowing, setAppFontSize } from '@/lib/ui.mobile.js';
 
 export default {
@@ -108,6 +109,8 @@ export default {
                     if (response.user) {
                         localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                     }
                 });
 

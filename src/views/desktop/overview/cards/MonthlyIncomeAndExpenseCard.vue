@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { useTheme } from 'vuetify';
+
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
@@ -34,6 +36,7 @@ import {
     parseDateFromUnixTime,
     getMonthName
 } from '@/lib/datetime.js';
+import { getExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     props: [
@@ -77,6 +80,8 @@ export default {
             let minAmount = 0;
             let maxAmount = 0;
 
+            const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(this.userStore.currentUserExpenseAmountColor, this.userStore.currentUserIncomeAmountColor, this.isDarkMode);
+
             if (self.data) {
                 for (let i = 0; i < self.data.length; i++) {
                     const item = self.data[i];
@@ -119,9 +124,7 @@ export default {
                     },
                     formatter: params => {
                         let incomeAmount = 0;
-                        let incomeColor = '#cc4a66';
                         let expenseAmount = 0;
-                        let expenseColor = '#4dd291';
 
                         for (let i = 0; i < params.length; i++) {
                             const param = params[i];
@@ -130,10 +133,8 @@ export default {
 
                             if (param.seriesId === 'seriesIncome') {
                                 incomeAmount = self.getDisplayIncomeAmount(data);
-                                incomeColor = param.color;
                             } else if (param.seriesId === 'seriesExpense') {
                                 expenseAmount = self.getDisplayExpenseAmount(data);
-                                expenseColor = param.color;
                             }
                         }
 
@@ -145,11 +146,11 @@ export default {
                             `</thead>` +
                             `<tbody>` +
                                 `<tr>` +
-                                    `<td><span class="overview-monthly-chart-tooltip-indicator mr-1" style="background-color: ${incomeColor}"></span><span class="mr-4">${self.$t('Income')}</span></td>` +
+                                    `<td><span class="overview-monthly-chart-tooltip-indicator bg-income mr-1"></span><span class="mr-4">${self.$t('Income')}</span></td>` +
                                     `<td><strong>${incomeAmount}</strong></td>` +
                                 `</tr>` +
                                 `<tr>` +
-                                    `<td><span class="overview-monthly-chart-tooltip-indicator mr-1" style="background-color: ${expenseColor}"></span><span class="mr-4">${self.$t('Expense')}</span></td>` +
+                                    `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense mr-1"></span><span class="mr-4">${self.$t('Expense')}</span></td>` +
                                     `<td><strong>${expenseAmount}</strong></td>` +
                                 `</tr>` +
                             `</tbody>` +
@@ -221,7 +222,7 @@ export default {
                         yAxisIndex: 0,
                         stack: 'Total',
                         itemStyle: {
-                            color: '#cc4a66',
+                            color: expenseIncomeAmountColor.incomeAmountColor,
                             borderRadius: 16
                         },
                         emphasis: {
@@ -240,7 +241,7 @@ export default {
                         yAxisIndex: 1,
                         stack: 'Total',
                         itemStyle: {
-                            color: '#4dd291',
+                            color: expenseIncomeAmountColor.expenseAmountColor,
                             borderRadius: 16
                         },
                         emphasis: {
@@ -255,6 +256,13 @@ export default {
                 ]
             };
         }
+    },
+    setup() {
+        const theme = useTheme();
+
+        return {
+            globalTheme: theme
+        };
     },
     methods: {
         clickItem: function (e) {

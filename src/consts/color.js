@@ -29,6 +29,59 @@ const defaultChartColors = [
     '8e1d51'
 ];
 
+const allAmountColors = {
+    Green: {
+        type: 1,
+        name: 'Green',
+        lightThemeColor: '#009688',
+        darkThemeColor: '#009688',
+        expenseClassName: 'expense-amount-color-green',
+        incomeClassName: 'income-amount-color-green'
+    },
+    Red: {
+        type: 2,
+        name: 'Red',
+        lightThemeColor: '#d43f3f',
+        darkThemeColor: '#d43f3f',
+        expenseClassName: 'expense-amount-color-red',
+        incomeClassName: 'income-amount-color-red'
+    },
+    Yellow: {
+        type: 3,
+        name: 'Yellow',
+        lightThemeColor: '#e2b60a',
+        darkThemeColor: '#e2b60a',
+        expenseClassName: 'expense-amount-color-yellow',
+        incomeClassName: 'income-amount-color-yellow'
+    },
+    BlackOrWhite: {
+        type: 4,
+        name: 'Black or White',
+        lightThemeColor: '#413935',
+        darkThemeColor: '#fcf0e3',
+        expenseClassName: 'expense-amount-color-blackorwhite',
+        incomeClassName: 'income-amount-color-blackorwhite'
+    }
+}
+
+const allAmountColorsArray = [
+    allAmountColors.Green,
+    allAmountColors.Red,
+    allAmountColors.Yellow,
+    allAmountColors.BlackOrWhite
+];
+
+const allAmountColorTypesMap = {
+    [allAmountColors.Green.type]: allAmountColors.Green,
+    [allAmountColors.Red.type]: allAmountColors.Red,
+    [allAmountColors.Yellow.type]: allAmountColors.Yellow,
+    [allAmountColors.BlackOrWhite.type]: allAmountColors.BlackOrWhite
+};
+
+const defaultExpenseIncomeAmountValue = 0;
+const defaultExpenseAmountColor = allAmountColors.Green;
+const defaultIncomeAmountColor = allAmountColors.Red;
+
 export default {
     defaultColor: defaultColor,
     allAccountColors: allAvailableColors,
@@ -36,4 +89,10 @@ export default {
     allCategoryColors: allAvailableColors,
     defaultCategoryColor: defaultColor,
     defaultChartColors: defaultChartColors,
+    allAmountColors: allAmountColors,
+    allAmountColorsArray: allAmountColorsArray,
+    allAmountColorTypesMap: allAmountColorTypesMap,
+    defaultExpenseIncomeAmountValue: defaultExpenseIncomeAmountValue,
+    defaultExpenseAmountColor: defaultExpenseAmountColor,
+    defaultIncomeAmountColor: defaultIncomeAmountColor,
 };

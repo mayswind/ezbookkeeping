@@ -17,7 +17,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { isProduction } from '@/lib/version.js';
 import { loadMapAssets } from '@/lib/map/index.js';
-import { getSystemTheme } from '@/lib/ui.js';
+import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     data() {
@@ -61,6 +61,8 @@ export default {
                     if (response.user) {
                         localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                     }
                 });
 

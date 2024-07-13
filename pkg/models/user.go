@@ -47,6 +47,39 @@ func (s TransactionEditScope) String() string {
 	}
 }
 
+// AmountColorType represents the type of amount color in frontend
+type AmountColorType byte
+
+// Amount Color Types
+const (
+	AMOUNT_COLOR_TYPE_DEFAULT        AmountColorType = 0
+	AMOUNT_COLOR_TYPE_GREEN          AmountColorType = 1
+	AMOUNT_COLOR_TYPE_RED            AmountColorType = 2
+	AMOUNT_COLOR_TYPE_YELLOW         AmountColorType = 3
+	AMOUNT_COLOR_TYPE_BLACK_OR_WHITE AmountColorType = 4
+	AMOUNT_COLOR_TYPE_INVALID        AmountColorType = 255
+)
+
+// String returns a textual representation of the amount color type enum
+func (s AmountColorType) String() string {
+	switch s {
+	case AMOUNT_COLOR_TYPE_DEFAULT:
+		return "Default"
+	case AMOUNT_COLOR_TYPE_GREEN:
+		return "Green"
+	case AMOUNT_COLOR_TYPE_RED:
+		return "Red"
+	case AMOUNT_COLOR_TYPE_YELLOW:
+		return "Yellow"
+	case AMOUNT_COLOR_TYPE_BLACK_OR_WHITE:
+		return "Black or White"
+	case AMOUNT_COLOR_TYPE_INVALID:
+		return "Invalid"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(s))
+	}
+}
+
 // User represents user data stored in database
 type User struct {
 	Uid                  int64  `xorm:"PK"`
@@ -68,6 +101,8 @@ type User struct {
 	DigitGroupingSymbol  DigitGroupingSymbol  `xorm:"TINYINT"`
 	DigitGrouping        DigitGroupingType    `xorm:"TINYINT"`
 	CurrencyDisplayType  CurrencyDisplayType  `xorm:"TINYINT"`
+	ExpenseAmountColor   AmountColorType      `xorm:"TINYINT"`
+	IncomeAmountColor    AmountColorType      `xorm:"TINYINT"`
 	Disabled             bool
 	Deleted              bool `xorm:"NOT NULL"`
 	EmailVerified        bool `xorm:"NOT NULL"`
@@ -97,6 +132,8 @@ type UserBasicInfo struct {
 	DigitGroupingSymbol  DigitGroupingSymbol  `json:"digitGroupingSymbol"`
 	DigitGrouping        DigitGroupingType    `json:"digitGrouping"`
 	CurrencyDisplayType  CurrencyDisplayType  `json:"currencyDisplayType"`
+	ExpenseAmountColor   AmountColorType      `json:"expenseAmountColor"`
+	IncomeAmountColor    AmountColorType      `json:"incomeAmountColor"`
 	EmailVerified        bool                 `json:"emailVerified"`
 }
 
@@ -154,6 +191,8 @@ type UserProfileUpdateRequest struct {
 	DigitGroupingSymbol  *DigitGroupingSymbol  `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *DigitGroupingType    `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
 	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=9"`
+	ExpenseAmountColor   *AmountColorType      `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
+	IncomeAmountColor    *AmountColorType      `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile
@@ -182,6 +221,8 @@ type UserProfileResponse struct {
 	DigitGroupingSymbol  DigitGroupingSymbol  `json:"digitGroupingSymbol"`
 	DigitGrouping        DigitGroupingType    `json:"digitGrouping"`
 	CurrencyDisplayType  CurrencyDisplayType  `json:"currencyDisplayType"`
+	ExpenseAmountColor   AmountColorType      `json:"expenseAmountColor"`
+	IncomeAmountColor    AmountColorType      `json:"incomeAmountColor"`
 	EmailVerified        bool                 `json:"emailVerified"`
 	LastLoginAt          int64                `json:"lastLoginAt"`
 }
@@ -249,6 +290,8 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 		DigitGroupingSymbol:  u.DigitGroupingSymbol,
 		DigitGrouping:        u.DigitGrouping,
 		CurrencyDisplayType:  u.CurrencyDisplayType,
+		ExpenseAmountColor:   u.ExpenseAmountColor,
+		IncomeAmountColor:    u.IncomeAmountColor,
 		EmailVerified:        u.EmailVerified,
 	}
 }
@@ -274,6 +317,8 @@ func (u *User) ToUserProfileResponse() *UserProfileResponse {
 		DigitGroupingSymbol:  u.DigitGroupingSymbol,
 		DigitGrouping:        u.DigitGrouping,
 		CurrencyDisplayType:  u.CurrencyDisplayType,
+		ExpenseAmountColor:   u.ExpenseAmountColor,
+		IncomeAmountColor:    u.IncomeAmountColor,
 		EmailVerified:        u.EmailVerified,
 		LastLoginAt:          u.LastLoginUnixTime,
 	}

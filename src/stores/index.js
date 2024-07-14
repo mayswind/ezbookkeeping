@@ -43,7 +43,7 @@ export const useRootStore = defineStore('root', {
 
             if (resetUserInfoAndSettings) {
                 const userStore = useUserStore();
-                userStore.resetUserInfo();
+                userStore.resetUserBasicInfo();
             }
         },
         authorize({ loginName, password }) {
@@ -81,7 +81,7 @@ export const useRootStore = defineStore('root', {
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     resolve(data.result);
@@ -142,7 +142,7 @@ export const useRootStore = defineStore('root', {
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     resolve(data.result);
@@ -192,7 +192,7 @@ export const useRootStore = defineStore('root', {
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     resolve(data.result);
@@ -267,7 +267,7 @@ export const useRootStore = defineStore('root', {
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     resolve(data.result);
@@ -401,7 +401,7 @@ export const useRootStore = defineStore('root', {
 
                     if (data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     const accountsStore = useAccountsStore();

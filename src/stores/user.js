@@ -9,73 +9,73 @@ import { isNumber } from '@/lib/common.js';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        currentUserInfo: userState.getUserInfo()
+        currentUserBasicInfo: userState.getUserInfo()
     }),
     getters: {
         currentUserNickname(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.nickname || userInfo.username || null;
         },
         currentUserAvatar(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.avatar || null;
         },
         currentUserDefaultAccountId(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.defaultAccountId || '';
         },
         currentUserLanguage(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.language;
         },
         currentUserDefaultCurrency(state) {
             const settingsStore = useSettingsStore();
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.defaultCurrency || settingsStore.localeDefaultSettings.currency;
         },
         currentUserFirstDayOfWeek(state) {
             const settingsStore = useSettingsStore();
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return isNumber(userInfo.firstDayOfWeek) ? userInfo.firstDayOfWeek : settingsStore.localeDefaultSettings.firstDayOfWeek;
         },
         currentUserLongDateFormat(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.longDateFormat;
         },
         currentUserShortDateFormat(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.shortDateFormat;
         },
         currentUserLongTimeFormat(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.longTimeFormat;
         },
         currentUserShortTimeFormat(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.shortTimeFormat;
         },
         currentUserDecimalSeparator(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.decimalSeparator;
         },
         currentUserDigitGroupingSymbol(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.digitGroupingSymbol;
         },
         currentUserDigitGrouping(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.digitGrouping;
         },
         currentUserCurrencyDisplayType(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.currencyDisplayType;
         },
         currentUserExpenseAmountColor(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.expenseAmountColor;
         },
         currentUserIncomeAmountColor(state) {
-            const userInfo = state.currentUserInfo || {};
+            const userInfo = state.currentUserBasicInfo || {};
             return userInfo.incomeAmountColor;
         }
     },
@@ -94,12 +94,12 @@ export const useUserStore = defineStore('user', {
                 firstDayOfWeek: settingsStore.localeDefaultSettings.firstDayOfWeek,
             };
         },
-        storeUserInfo(userInfo) {
-            this.currentUserInfo = userInfo;
+        storeUserBasicInfo(userInfo) {
+            this.currentUserBasicInfo = userInfo;
             userState.updateUserInfo(userInfo);
         },
-        resetUserInfo() {
-            this.currentUserInfo = null;
+        resetUserBasicInfo() {
+            this.currentUserBasicInfo = null;
             userState.clearUserInfo();
         },
         getCurrentUserProfile() {

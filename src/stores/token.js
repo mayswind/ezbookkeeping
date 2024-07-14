@@ -42,7 +42,7 @@ export const useTokensStore = defineStore('tokens', {
 
                     if (data && data.success && data.result && data.result.user && isObject(data.result.user)) {
                         const userStore = useUserStore();
-                        userStore.storeUserInfo(data.result.user);
+                        userStore.storeUserBasicInfo(data.result.user);
                     }
 
                     if (data && data.success && data.result && data.result.newToken) {

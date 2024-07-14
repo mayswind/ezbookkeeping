@@ -128,7 +128,7 @@ export default {
             self.$showLoading();
 
             webauthn.verifyCredential(
-                self.userStore.currentUserInfo,
+                self.userStore.currentUserBasicInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
                 self.$hideLoading();
@@ -175,7 +175,7 @@ export default {
             }
 
             const router = self.f7router;
-            const user = self.userStore.currentUserInfo;
+            const user = self.userStore.currentUserBasicInfo;
 
             if (!user || !user.username) {
                 self.$alert('An error occurred');

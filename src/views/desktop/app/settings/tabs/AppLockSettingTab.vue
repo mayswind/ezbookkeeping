@@ -107,7 +107,7 @@ export default {
 
                 webauthn.registerCredential(
                     self.$user.getUserAppLockState(),
-                    self.userStore.currentUserInfo,
+                    self.userStore.currentUserBasicInfo,
                 ).then(({ id }) => {
                     self.enablingWebAuthn = false;
 
@@ -158,7 +158,7 @@ export default {
                 return;
             }
 
-            const user = this.userStore.currentUserInfo;
+            const user = this.userStore.currentUserBasicInfo;
 
             if (!user || !user.username) {
                 this.pinCode = '';

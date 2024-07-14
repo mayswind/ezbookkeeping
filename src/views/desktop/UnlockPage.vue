@@ -175,7 +175,7 @@ export default {
             self.verifyingByWebAuthn = true;
 
             webauthn.verifyCredential(
-                self.userStore.currentUserInfo,
+                self.userStore.currentUserBasicInfo,
                 self.$user.getWebAuthnCredentialId()
             ).then(({ id, userName, userSecret }) => {
                 self.verifyingByWebAuthn = false;
@@ -217,7 +217,7 @@ export default {
                 return;
             }
 
-            const user = self.userStore.currentUserInfo;
+            const user = self.userStore.currentUserBasicInfo;
 
             if (!user || !user.username) {
                 self.$refs.snackbar.showMessage('An error occurred');

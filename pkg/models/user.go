@@ -203,28 +203,8 @@ type UserProfileUpdateResponse struct {
 
 // UserProfileResponse represents a view-object of user profile
 type UserProfileResponse struct {
-	Username             string               `json:"username"`
-	Email                string               `json:"email"`
-	Nickname             string               `json:"nickname"`
-	AvatarUrl            string               `json:"avatar"`
-	AvatarProvider       string               `json:"avatarProvider,omitempty"`
-	DefaultAccountId     int64                `json:"defaultAccountId,string"`
-	TransactionEditScope TransactionEditScope `json:"transactionEditScope"`
-	Language             string               `json:"language"`
-	DefaultCurrency      string               `json:"defaultCurrency"`
-	FirstDayOfWeek       WeekDay              `json:"firstDayOfWeek"`
-	LongDateFormat       LongDateFormat       `json:"longDateFormat"`
-	ShortDateFormat      ShortDateFormat      `json:"shortDateFormat"`
-	LongTimeFormat       LongTimeFormat       `json:"longTimeFormat"`
-	ShortTimeFormat      ShortTimeFormat      `json:"shortTimeFormat"`
-	DecimalSeparator     DecimalSeparator     `json:"decimalSeparator"`
-	DigitGroupingSymbol  DigitGroupingSymbol  `json:"digitGroupingSymbol"`
-	DigitGrouping        DigitGroupingType    `json:"digitGrouping"`
-	CurrencyDisplayType  CurrencyDisplayType  `json:"currencyDisplayType"`
-	ExpenseAmountColor   AmountColorType      `json:"expenseAmountColor"`
-	IncomeAmountColor    AmountColorType      `json:"incomeAmountColor"`
-	EmailVerified        bool                 `json:"emailVerified"`
-	LastLoginAt          int64                `json:"lastLoginAt"`
+	UserBasicInfo
+	LastLoginAt int64 `json:"lastLoginAt"`
 }
 
 // CanEditTransactionByTransactionTime returns whether this user can edit transaction with specified transaction time
@@ -299,28 +279,30 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 // ToUserProfileResponse returns a user profile view-object according to database model
 func (u *User) ToUserProfileResponse() *UserProfileResponse {
 	return &UserProfileResponse{
-		Username:             u.Username,
-		Email:                u.Email,
-		Nickname:             u.Nickname,
-		AvatarUrl:            u.getAvatarUrl(),
-		AvatarProvider:       u.getAvatarProvider(),
-		DefaultAccountId:     u.DefaultAccountId,
-		TransactionEditScope: u.TransactionEditScope,
-		Language:             u.Language,
-		DefaultCurrency:      u.DefaultCurrency,
-		FirstDayOfWeek:       u.FirstDayOfWeek,
-		LongDateFormat:       u.LongDateFormat,
-		ShortDateFormat:      u.ShortDateFormat,
-		LongTimeFormat:       u.LongTimeFormat,
-		ShortTimeFormat:      u.ShortTimeFormat,
-		DecimalSeparator:     u.DecimalSeparator,
-		DigitGroupingSymbol:  u.DigitGroupingSymbol,
-		DigitGrouping:        u.DigitGrouping,
-		CurrencyDisplayType:  u.CurrencyDisplayType,
-		ExpenseAmountColor:   u.ExpenseAmountColor,
-		IncomeAmountColor:    u.IncomeAmountColor,
-		EmailVerified:        u.EmailVerified,
-		LastLoginAt:          u.LastLoginUnixTime,
+		UserBasicInfo: UserBasicInfo{
+			Username:             u.Username,
+			Email:                u.Email,
+			Nickname:             u.Nickname,
+			AvatarUrl:            u.getAvatarUrl(),
+			AvatarProvider:       u.getAvatarProvider(),
+			DefaultAccountId:     u.DefaultAccountId,
+			TransactionEditScope: u.TransactionEditScope,
+			Language:             u.Language,
+			DefaultCurrency:      u.DefaultCurrency,
+			FirstDayOfWeek:       u.FirstDayOfWeek,
+			LongDateFormat:       u.LongDateFormat,
+			ShortDateFormat:      u.ShortDateFormat,
+			LongTimeFormat:       u.LongTimeFormat,
+			ShortTimeFormat:      u.ShortTimeFormat,
+			DecimalSeparator:     u.DecimalSeparator,
+			DigitGroupingSymbol:  u.DigitGroupingSymbol,
+			DigitGrouping:        u.DigitGrouping,
+			CurrencyDisplayType:  u.CurrencyDisplayType,
+			ExpenseAmountColor:   u.ExpenseAmountColor,
+			IncomeAmountColor:    u.IncomeAmountColor,
+			EmailVerified:        u.EmailVerified,
+		},
+		LastLoginAt: u.LastLoginUnixTime,
 	}
 }
 

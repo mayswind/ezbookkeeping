@@ -13,6 +13,7 @@ import statisticsConstants from '@/consts/statistics.js';
 import apiConstants from '@/consts/api.js';
 
 import {
+    isDefined,
     isString,
     isNumber,
     isBoolean,
@@ -995,7 +996,7 @@ function getAllTrendChartTypes(translateFn) {
     return allChartTypes;
 }
 
-function getAllStatisticsChartDataTypes(translateFn) {
+function getAllStatisticsChartDataTypes(translateFn, analysisType) {
     const allChartDataTypes = [];
 
     for (const dataTypeField in statisticsConstants.allChartDataTypes) {
@@ -1004,6 +1005,10 @@ function getAllStatisticsChartDataTypes(translateFn) {
         }
 
         const chartDataType = statisticsConstants.allChartDataTypes[dataTypeField];
+
+        if (isDefined(analysisType) && !chartDataType.availableAnalysisTypes[analysisType]) {
+            continue;
+        }
 
         allChartDataTypes.push({
             type: chartDataType.type,
@@ -1468,7 +1473,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllAccountTypes: () => getAllAccountTypes(i18nGlobal.t),
         getAllCategoricalChartTypes: () => getAllCategoricalChartTypes(i18nGlobal.t),
         getAllTrendChartTypes: () => getAllTrendChartTypes(i18nGlobal.t),
-        getAllStatisticsChartDataTypes: () => getAllStatisticsChartDataTypes(i18nGlobal.t),
+        getAllStatisticsChartDataTypes: (analysisType) => getAllStatisticsChartDataTypes(i18nGlobal.t, analysisType),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),

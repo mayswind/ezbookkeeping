@@ -32,7 +32,7 @@
                     <f7-icon :f7="session.icon"></f7-icon>
                 </template>
                 <template #after>
-                    <small>{{ session.createdAt }}</small>
+                    <small>{{ session.lastSeen }}</small>
                 </template>
                 <f7-swipeout-actions right v-if="!session.isCurrent">
                     <f7-swipeout-button color="red" :text="$t('Log Out')" @click="revoke(session)"></f7-swipeout-button>
@@ -82,7 +82,7 @@ export default {
                     deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
                     deviceInfo: parseDeviceInfo(token.userAgent),
                     icon: this.getTokenIcon(token),
-                    createdAt: this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.createdAt)
+                    lastSeen: token.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.lastSeen) : '-'
                 });
             }
 

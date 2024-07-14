@@ -58,7 +58,7 @@ func (s *TokenService) GetAllUnexpiredNormalTokensByUid(c *core.Context, uid int
 	now := time.Now().Unix()
 
 	var tokenRecords []*models.TokenRecord
-	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
+	err := s.TokenDB(uid).NewSession(c).Cols("uid", "user_token_id", "token_type", "user_agent", "created_unix_time", "expired_unix_time", "last_seen_unix_time").Where("uid=? AND token_type=? AND expired_unix_time>?", uid, core.USER_TOKEN_TYPE_NORMAL, now).Find(&tokenRecords)
 
 	return tokenRecords, err
 }
@@ -96,6 +96,31 @@ func (s *TokenService) CreateEmailVerifyToken(c *core.Context, user *models.User
 // CreatePasswordResetToken generates a new password reset token and saves to database
 func (s *TokenService) CreatePasswordResetToken(c *core.Context, user *models.User) (string, *core.UserTokenClaims, error) {
 	return s.createToken(c, user, core.USER_TOKEN_TYPE_PASSWORD_RESET, s.getUserAgent(c), s.CurrentConfig().PasswordResetTokenExpiredTimeDuration)
+}
+
+// UpdateTokenLastSeen updates the last seen time of specified token
+func (s *TokenService) UpdateTokenLastSeen(c *core.Context, tokenRecord *models.TokenRecord) error {
+	if tokenRecord.Uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	if tokenRecord.UserTokenId <= 0 {
+		return errs.ErrInvalidUserTokenId
+	}
+
+	tokenRecord.LastSeenUnixTime = time.Now().Unix()
+
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.Cols("last_seen_unix_time").Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Update(tokenRecord)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrTokenRecordNotFound
+		}
+
+		return nil
+	})
 }
 
 // DeleteToken deletes given token from database
@@ -294,12 +319,13 @@ func (s *TokenService) createToken(c *core.Context, user *models.User, tokenType
 	now := time.Now()
 
 	tokenRecord := &models.TokenRecord{
-		Uid:             user.Uid,
-		UserTokenId:     s.getUserTokenId(),
-		TokenType:       tokenType,
-		UserAgent:       userAgent,
-		CreatedUnixTime: now.Unix(),
-		ExpiredUnixTime: now.Add(expiryDate).Unix(),
+		Uid:              user.Uid,
+		UserTokenId:      s.getUserTokenId(),
+		TokenType:        tokenType,
+		UserAgent:        userAgent,
+		CreatedUnixTime:  now.Unix(),
+		ExpiredUnixTime:  now.Add(expiryDate).Unix(),
+		LastSeenUnixTime: now.Unix(),
 	}
 
 	if tokenRecord.Secret, err = utils.GetRandomString(10); err != nil {

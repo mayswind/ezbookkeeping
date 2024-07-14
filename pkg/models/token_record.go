@@ -7,13 +7,14 @@ const TokenMaxUserAgentLength = 255
 
 // TokenRecord represents token data stored in database
 type TokenRecord struct {
-	Uid             int64          `xorm:"PK INDEX(IDX_token_record_uid_type_expired_time)"`
-	UserTokenId     int64          `xorm:"PK"`
-	TokenType       core.TokenType `xorm:"INDEX(IDX_token_record_uid_type_expired_time) TINYINT NOT NULL"`
-	Secret          string         `xorm:"VARCHAR(10) NOT NULL"`
-	UserAgent       string         `xorm:"VARCHAR(255)"`
-	CreatedUnixTime int64          `xorm:"PK"`
-	ExpiredUnixTime int64          `xorm:"INDEX(IDX_token_record_uid_type_expired_time)"`
+	Uid              int64          `xorm:"PK INDEX(IDX_token_record_uid_type_expired_time)"`
+	UserTokenId      int64          `xorm:"PK"`
+	TokenType        core.TokenType `xorm:"INDEX(IDX_token_record_uid_type_expired_time) TINYINT NOT NULL"`
+	Secret           string         `xorm:"VARCHAR(10) NOT NULL"`
+	UserAgent        string         `xorm:"VARCHAR(255)"`
+	CreatedUnixTime  int64          `xorm:"PK"`
+	ExpiredUnixTime  int64          `xorm:"INDEX(IDX_token_record_uid_type_expired_time)"`
+	LastSeenUnixTime int64
 }
 
 // TokenRevokeRequest represents all parameters of token revoking request
@@ -23,8 +24,8 @@ type TokenRevokeRequest struct {
 
 // TokenRefreshResponse represents all parameters of token refreshing request
 type TokenRefreshResponse struct {
-	NewToken   string         `json:"newToken"`
-	OldTokenId string         `json:"oldTokenId"`
+	NewToken   string         `json:"newToken,omitempty"`
+	OldTokenId string         `json:"oldTokenId,omitempty"`
 	User       *UserBasicInfo `json:"user"`
 }
 
@@ -33,8 +34,7 @@ type TokenInfoResponse struct {
 	TokenId   string         `json:"tokenId"`
 	TokenType core.TokenType `json:"tokenType"`
 	UserAgent string         `json:"userAgent"`
-	CreatedAt int64          `json:"createdAt"`
-	ExpiredAt int64          `json:"expiredAt"`
+	LastSeen  int64          `json:"lastSeen"`
 	IsCurrent bool           `json:"isCurrent"`
 }
 
@@ -53,5 +53,5 @@ func (a TokenInfoResponseSlice) Swap(i, j int) {
 
 // Less reports whether the first item is less than the second one
 func (a TokenInfoResponseSlice) Less(i, j int) bool {
-	return a[i].ExpiredAt > a[j].ExpiredAt
+	return a[i].LastSeen > a[j].LastSeen
 }

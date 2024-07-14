@@ -680,5 +680,6 @@ func printUserInfo(user *models.User) {
 func printTokenInfo(token *models.TokenRecord) {
 	fmt.Printf("[CreatedAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(token.CreatedUnixTime), token.CreatedUnixTime)
 	fmt.Printf("[ExpiredAt] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(token.ExpiredUnixTime), token.ExpiredUnixTime)
+	fmt.Printf("[LastSeen] %s (%d)\n", utils.FormatUnixTimeToLongDateTimeInServerTimezone(token.LastSeenUnixTime), token.LastSeenUnixTime)
 	fmt.Printf("[UserAgent] %s\n", token.UserAgent)
 }

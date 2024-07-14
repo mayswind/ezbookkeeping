@@ -2,12 +2,14 @@ package api
 
 import (
 	"sort"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -44,8 +46,7 @@ func (a *TokensApi) TokenListHandler(c *core.Context) (any, *errs.Error) {
 			TokenId:   a.tokens.GenerateTokenId(token),
 			TokenType: token.TokenType,
 			UserAgent: token.UserAgent,
-			CreatedAt: token.CreatedUnixTime,
-			ExpiredAt: token.ExpiredUnixTime,
+			LastSeen:  token.LastSeenUnixTime,
 		}
 
 		if token.Uid == claims.Uid && utils.Int64ToString(token.UserTokenId) == claims.UserTokenId && token.CreatedUnixTime == claims.IssuedAt {
@@ -176,6 +177,39 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.ErrUserNotFound
 	}
 
+	now := time.Now().Unix()
+	oldTokenClaims := c.GetTokenClaims()
+
+	if now-oldTokenClaims.IssuedAt < int64(settings.Container.Current.TokenMinRefreshInterval) {
+		log.InfofWithRequestId(c, "[token.TokenRefreshHandler] token of user \"uid:%d\" does not need to be refreshed", uid)
+
+		userTokenId, err := utils.StringToInt64(oldTokenClaims.UserTokenId)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[tokens.TokenRefreshHandler] parse user token id failed, because %s", err.Error())
+		} else {
+			tokenRecord := &models.TokenRecord{
+				Uid:             oldTokenClaims.Uid,
+				UserTokenId:     userTokenId,
+				CreatedUnixTime: oldTokenClaims.IssuedAt,
+			}
+
+			tokenId := a.tokens.GenerateTokenId(tokenRecord)
+
+			err = a.tokens.UpdateTokenLastSeen(c, tokenRecord)
+
+			if err != nil {
+				log.WarnfWithRequestId(c, "[token.TokenRefreshHandler] failed to update last seen of token \"id:%s\" for user \"uid:%d\", because %s", tokenId, uid, err.Error())
+			}
+		}
+
+		refreshResp := &models.TokenRefreshResponse{
+			User: user.ToUserBasicInfo(),
+		}
+
+		return refreshResp, nil
+	}
+
 	token, claims, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
@@ -183,7 +217,6 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.Or(err, errs.ErrTokenGenerating)
 	}
 
-	oldTokenClaims := c.GetTokenClaims()
 	oldUserTokenId, _ := utils.StringToInt64(oldTokenClaims.UserTokenId)
 	oldTokenRecord := &models.TokenRecord{
 		Uid:             uid,

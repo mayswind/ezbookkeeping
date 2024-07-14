@@ -118,7 +118,7 @@
                             {{ session.deviceType }}
                         </td>
                         <td class="text-sm">{{ session.deviceInfo }}</td>
-                        <td class="text-sm">{{ session.createdAt }}</td>
+                        <td class="text-sm">{{ session.lastSeen }}</td>
                         <td class="text-sm text-right">
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="session.isCurrent || loadingSession"
@@ -210,7 +210,7 @@ export default {
                     deviceType: this.$t(token.isCurrent ? 'Current' : 'Other Device'),
                     deviceInfo: parseDeviceInfo(token.userAgent),
                     icon: this.getTokenIcon(token),
-                    createdAt: this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.createdAt)
+                    lastSeen: token.lastSeen ? this.$locale.formatUnixTimeToLongDateTime(this.userStore, token.lastSeen) : '-'
                 });
             }
 

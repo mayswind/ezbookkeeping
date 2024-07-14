@@ -40,13 +40,13 @@ export const useTokensStore = defineStore('tokens', {
                 services.refreshToken().then(response => {
                     const data = response.data;
 
+                    if (data && data.success && data.result && data.result.user && isObject(data.result.user)) {
+                        const userStore = useUserStore();
+                        userStore.storeUserInfo(data.result.user);
+                    }
+
                     if (data && data.success && data.result && data.result.newToken) {
                         userState.updateToken(data.result.newToken);
-
-                        if (data.result.user && isObject(data.result.user)) {
-                            const userStore = useUserStore();
-                            userStore.storeUserInfo(data.result.user);
-                        }
 
                         if (data.result.oldTokenId) {
                             self.revokeToken({

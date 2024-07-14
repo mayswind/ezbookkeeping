@@ -124,6 +124,7 @@ const (
 
 	defaultSecretKey                     string = "ezbookkeeping"
 	defaultTokenExpiredTime              uint32 = 2592000 // 30 days
+	defaultTokenMinRefreshInterval       uint32 = 86400   // 1 day
 	defaultTemporaryTokenExpiredTime     uint32 = 300     // 5 minutes
 	defaultEmailVerifyTokenExpiredTime   uint32 = 3600    // 60 minutes
 	defaultPasswordResetTokenExpiredTime uint32 = 3600    // 60 minutes
@@ -217,6 +218,7 @@ type Config struct {
 	EnableTwoFactor                       bool
 	TokenExpiredTime                      uint32
 	TokenExpiredTimeDuration              time.Duration
+	TokenMinRefreshInterval               uint32
 	TemporaryTokenExpiredTime             uint32
 	TemporaryTokenExpiredTimeDuration     time.Duration
 	EmailVerifyTokenExpiredTime           uint32
@@ -571,6 +573,12 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	}
 
 	config.TokenExpiredTimeDuration = time.Duration(config.TokenExpiredTime) * time.Second
+
+	config.TokenMinRefreshInterval = getConfigItemUint32Value(configFile, sectionName, "token_min_refresh_interval", defaultTokenMinRefreshInterval)
+
+	if config.TokenMinRefreshInterval >= config.TokenExpiredTime {
+		return errs.ErrInvalidTokenMinRefreshInterval
+	}
 
 	config.TemporaryTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
 

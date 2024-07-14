@@ -119,6 +119,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import assetConstants from '@/consts/asset.js';
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     data() {
@@ -184,6 +185,8 @@ export default {
                     if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                     }
                 });
 
@@ -227,6 +230,8 @@ export default {
                     if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                        setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                     }
                 });
 
@@ -249,6 +254,8 @@ export default {
 
                 const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                 self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
                 self.$router.replace('/login');
             });

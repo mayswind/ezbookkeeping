@@ -187,7 +187,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import assetConstants from '@/consts/asset.js';
-import { getSystemTheme } from '@/lib/ui.js';
+import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
     mdiMenu,
@@ -305,6 +305,8 @@ export default {
 
                 const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                 self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
                 this.$router.replace('/login');
             }).catch(error => {

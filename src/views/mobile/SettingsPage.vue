@@ -79,6 +79,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { getDesktopVersionPath } from '@/lib/version.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     props: [
@@ -184,6 +185,8 @@ export default {
 
                     const localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
                     router.navigate('/');
                 }).catch(error => {

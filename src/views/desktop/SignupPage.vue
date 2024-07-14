@@ -256,6 +256,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import assetConstants from '@/consts/asset.js';
 import categoryConstants from '@/consts/category.js';
 import { categorizedArrayToPlainArray } from '@/lib/common.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
     mdiArrowLeft,
@@ -469,6 +470,8 @@ export default {
                 if (response.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                 }
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {

@@ -186,6 +186,7 @@ import {
     isUserForgetPasswordEnabled,
     isUserVerifyEmailEnabled
 } from '@/lib/server_settings.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
     mdiEyeOutline,
@@ -309,6 +310,8 @@ export default {
                 if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
                 }
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
@@ -356,6 +359,8 @@ export default {
                 if (authResponse.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(authResponse.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
                 }
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {

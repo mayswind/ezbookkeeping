@@ -54,6 +54,8 @@ export default {
         let localeDefaultSettings = self.$locale.initLocale(self.userStore.currentUserLanguage, self.settingsStore.appSettings.timeZone);
         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
+        setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
+
         if (self.$user.isUserLogined()) {
             if (!self.settingsStore.appSettings.applicationLock) {
                 // refresh token if user is logined

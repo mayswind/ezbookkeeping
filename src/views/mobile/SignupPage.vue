@@ -183,6 +183,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
 import { getNameByKeyValue, categorizedArrayToPlainArray } from '@/lib/common.js';
+import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
     props: [
@@ -324,6 +325,8 @@ export default {
                 if (response.user) {
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
                     self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+
+                    setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                 }
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {

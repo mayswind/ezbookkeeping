@@ -856,7 +856,7 @@ export default {
     },
     methods: {
         init(query) {
-            let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, self.firstDayOfWeek);
+            let dateRange = getDateRangeByDateType(query.dateType ? parseInt(query.dateType) : undefined, this.firstDayOfWeek);
 
             if (!dateRange &&
                 query.dateType === datetimeConstants.allDateRanges.Custom.type.toString() &&

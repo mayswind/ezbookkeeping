@@ -127,6 +127,20 @@ const allChartDataTypes = {
     }
 };
 
+const allChartDataTypesMap = {
+    [allChartDataTypes.ExpenseByAccount.type]: allChartDataTypes.ExpenseByAccount,
+    [allChartDataTypes.ExpenseByPrimaryCategory.type]: allChartDataTypes.ExpenseByPrimaryCategory,
+    [allChartDataTypes.ExpenseBySecondaryCategory.type]: allChartDataTypes.ExpenseBySecondaryCategory,
+    [allChartDataTypes.IncomeByAccount.type]: allChartDataTypes.IncomeByAccount,
+    [allChartDataTypes.IncomeByPrimaryCategory.type]: allChartDataTypes.IncomeByPrimaryCategory,
+    [allChartDataTypes.IncomeBySecondaryCategory.type]: allChartDataTypes.IncomeBySecondaryCategory,
+    [allChartDataTypes.AccountTotalAssets.type]: allChartDataTypes.AccountTotalAssets,
+    [allChartDataTypes.AccountTotalLiabilities.type]: allChartDataTypes.AccountTotalLiabilities,
+    [allChartDataTypes.TotalExpense.type]: allChartDataTypes.TotalExpense,
+    [allChartDataTypes.TotalIncome.type]: allChartDataTypes.TotalIncome,
+    [allChartDataTypes.TotalBalance.type]: allChartDataTypes.TotalBalance
+};
+
 const defaultChartDataType = allChartDataTypes.ExpenseByPrimaryCategory.type;
 
 const allSortingTypes = {
@@ -164,6 +178,7 @@ export default {
     allTrendChartTypesArray: allTrendChartTypesArray,
     defaultTrendChartType: defaultTrendChartType,
     allChartDataTypes: allChartDataTypes,
+    allChartDataTypesMap: allChartDataTypesMap,
     defaultChartDataType: defaultChartDataType,
     defaultCategoricalChartDataRangeType: datetime.allDateRanges.ThisMonth.type,
     defaultTrendChartDataRangeType: datetime.allDateRanges.ThisYear.type,

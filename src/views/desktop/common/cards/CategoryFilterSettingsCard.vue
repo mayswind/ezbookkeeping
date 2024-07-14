@@ -294,9 +294,13 @@ export default {
             if (this.type === 'statisticsDefault') {
                 self.settingsStore.setStatisticsDefaultTransactionCategoryFilter(filteredCategoryIds);
             } else if (this.type === 'statisticsCurrent') {
-                self.statisticsStore.updateTransactionStatisticsFilter({
+                changed = self.statisticsStore.updateTransactionStatisticsFilter({
                     filterCategoryIds: filteredCategoryIds
                 });
+
+                if (changed) {
+                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
             } else if (this.type === 'transactionListCurrent') {
                 changed = self.transactionsStore.updateTransactionListFilter({
                     categoryIds: isAllSelected ? '' : finalCategoryIds

@@ -278,9 +278,13 @@ export default {
             if (this.type === 'statisticsDefault') {
                 self.settingsStore.setStatisticsDefaultAccountFilter(filteredAccountIds);
             } else if (this.type === 'statisticsCurrent') {
-                self.statisticsStore.updateTransactionStatisticsFilter({
+                changed = self.statisticsStore.updateTransactionStatisticsFilter({
                     filterAccountIds: filteredAccountIds
                 });
+
+                if (changed) {
+                    self.statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
             } else if (this.type === 'transactionListCurrent') {
                 changed = self.transactionsStore.updateTransactionListFilter({
                     accountIds: isAllSelected ? '' : finalAccountIds

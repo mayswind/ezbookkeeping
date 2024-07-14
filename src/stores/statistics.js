@@ -17,8 +17,10 @@ import {
     isEquals,
     isNumber,
     isObject,
+    isInteger,
     isYearMonth,
-    isObjectEmpty
+    isObjectEmpty,
+    objectFieldToArrayItem
 } from '@/lib/common.js';
 import {
     getYearAndMonthFromUnixTime,
@@ -561,186 +563,239 @@ export const useStatisticsStore = defineStore('statistics', {
             this.transactionCategoryTrendsData = {};
             this.transactionStatisticsStateInvalid = true;
         },
-        initTransactionStatisticsFilter(filter) {
-            if (!filter) {
-                const settingsStore = useSettingsStore();
-                const userStore = useUserStore();
+        initTransactionStatisticsFilter(analysisType, filter) {
+            const settingsStore = useSettingsStore();
+            const userStore = useUserStore();
 
-                let defaultChartDataType = settingsStore.appSettings.statistics.defaultChartDataType;
-
-                if (defaultChartDataType < statisticsConstants.allChartDataTypes.ExpenseByAccount.type || defaultChartDataType > statisticsConstants.allChartDataTypes.AccountTotalLiabilities.type) {
-                    defaultChartDataType = statisticsConstants.defaultChartDataType;
-                }
-
-                let defaultCategoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
-
-                if (defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Pie && defaultCategoricalChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
-                    defaultCategoricalChartType = statisticsConstants.defaultCategoricalChartType;
-                }
-
-                let defaultCategoricalChartDateRange = settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType;
-
-                if (defaultCategoricalChartDateRange < datetimeConstants.allDateRanges.All.type || defaultCategoricalChartDateRange >= datetimeConstants.allDateRanges.Custom.type) {
-                    defaultCategoricalChartDateRange = statisticsConstants.defaultCategoricalChartDataRangeType;
-                }
-
-                let defaultTrendChartType = settingsStore.appSettings.statistics.defaultTrendChartType;
-
-                if (defaultTrendChartType !== statisticsConstants.allTrendChartTypes.Area && defaultTrendChartType !== statisticsConstants.allTrendChartTypes.Column) {
-                    defaultTrendChartType = statisticsConstants.defaultTrendChartType;
-                }
-
-                let defaultTrendChartDateRange = settingsStore.appSettings.statistics.defaultTrendChartDataRangeType;
-
-                if (defaultTrendChartDateRange < datetimeConstants.allDateRanges.All.type || defaultTrendChartDateRange >= datetimeConstants.allDateRanges.Custom.type) {
-                    defaultTrendChartDateRange = statisticsConstants.defaultTrendChartDataRangeType;
-                }
-
-                let defaultSortType = settingsStore.appSettings.statistics.defaultSortingType;
-
-                if (defaultSortType < statisticsConstants.allSortingTypes.Amount.type || defaultSortType > statisticsConstants.allSortingTypes.Name.type) {
-                    defaultSortType = statisticsConstants.defaultSortingType;
-                }
-
-                const categoricalChartDateRange = getDateRangeByDateType(defaultCategoricalChartDateRange, userStore.currentUserFirstDayOfWeek);
-                const trendChartDateRange = getDateRangeByDateType(defaultTrendChartDateRange, userStore.currentUserFirstDayOfWeek);
-
-                filter = {
-                    chartDataType: defaultChartDataType,
-                    categoricalChartType: defaultCategoricalChartType,
-                    categoricalChartDateType: categoricalChartDateRange ? categoricalChartDateRange.dateType : undefined,
-                    categoricalChartStartTime: categoricalChartDateRange ? categoricalChartDateRange.minTime : undefined,
-                    categoricalChartEndTime: categoricalChartDateRange ? categoricalChartDateRange.maxTime : undefined,
-                    trendChartType: defaultTrendChartType,
-                    trendChartDateType: trendChartDateRange ? trendChartDateRange.dateType : undefined,
-                    trendChartStartYearMonth: trendChartDateRange ? getYearAndMonthFromUnixTime(trendChartDateRange.minTime) : undefined,
-                    trendChartEndYearMonth: trendChartDateRange ? getYearAndMonthFromUnixTime(trendChartDateRange.maxTime) : undefined,
-                    filterAccountIds: settingsStore.appSettings.statistics.defaultAccountFilter || {},
-                    filterCategoryIds: settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {},
-                    sortingType: defaultSortType,
-                };
-            }
-
-            if (filter && isNumber(filter.chartDataType)) {
+            if (filter && isInteger(filter.chartDataType)) {
                 this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
             } else {
-                this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
+                this.transactionStatisticsFilter.chartDataType = settingsStore.appSettings.statistics.defaultChartDataType;
             }
 
-            if (filter && isNumber(filter.categoricalChartType)) {
+            if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis || analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                if (!statisticsConstants.allChartDataTypesMap[this.transactionStatisticsFilter.chartDataType] ||
+                    !statisticsConstants.allChartDataTypesMap[this.transactionStatisticsFilter.chartDataType].availableAnalysisTypes[analysisType]) {
+                    this.transactionStatisticsFilter.chartDataType = statisticsConstants.defaultChartDataType;
+                }
+            }
+
+            if (filter && isInteger(filter.categoricalChartType)) {
                 this.transactionStatisticsFilter.categoricalChartType = filter.categoricalChartType;
             } else {
+                this.transactionStatisticsFilter.categoricalChartType = settingsStore.appSettings.statistics.defaultCategoricalChartType;
+            }
+
+            if (this.transactionStatisticsFilter.categoricalChartType !== statisticsConstants.allCategoricalChartTypes.Pie && this.transactionStatisticsFilter.categoricalChartType !== statisticsConstants.allCategoricalChartTypes.Bar) {
                 this.transactionStatisticsFilter.categoricalChartType = statisticsConstants.defaultCategoricalChartType;
             }
 
-            if (filter && isNumber(filter.categoricalChartDateType)) {
+            if (filter && isInteger(filter.categoricalChartDateType)) {
                 this.transactionStatisticsFilter.categoricalChartDateType = filter.categoricalChartDateType;
             } else {
+                this.transactionStatisticsFilter.categoricalChartDateType = settingsStore.appSettings.statistics.defaultCategoricalChartDataRangeType;
+            }
+
+            let categoricalChartDateTypeValid = true;
+
+            if (!datetimeConstants.allDateRangesMap[this.transactionStatisticsFilter.categoricalChartDateType] ||
+                !datetimeConstants.allDateRangesMap[this.transactionStatisticsFilter.categoricalChartDateType].availableScenes[datetimeConstants.allDateRangeScenes.Normal]) {
                 this.transactionStatisticsFilter.categoricalChartDateType = statisticsConstants.defaultCategoricalChartDataRangeType;
+                categoricalChartDateTypeValid = false;
             }
 
-            if (filter && isNumber(filter.categoricalChartStartTime)) {
-                this.transactionStatisticsFilter.categoricalChartStartTime = filter.categoricalChartStartTime;
+            if (categoricalChartDateTypeValid && this.transactionStatisticsFilter.categoricalChartDateType === datetimeConstants.allDateRanges.Custom.type) {
+                if (filter && isInteger(filter.categoricalChartStartTime)) {
+                    this.transactionStatisticsFilter.categoricalChartStartTime = filter.categoricalChartStartTime;
+                } else {
+                    this.transactionStatisticsFilter.categoricalChartStartTime = 0;
+                }
+
+                if (filter && isInteger(filter.categoricalChartEndTime)) {
+                    this.transactionStatisticsFilter.categoricalChartEndTime = filter.categoricalChartEndTime;
+                } else {
+                    this.transactionStatisticsFilter.categoricalChartEndTime = 0;
+                }
             } else {
-                this.transactionStatisticsFilter.categoricalChartStartTime = 0;
+                const categoricalChartDateRange = getDateRangeByDateType(this.transactionStatisticsFilter.categoricalChartDateType, userStore.currentUserFirstDayOfWeek);
+                this.transactionStatisticsFilter.categoricalChartDateType = categoricalChartDateRange.dateType;
+                this.transactionStatisticsFilter.categoricalChartStartTime = categoricalChartDateRange.minTime;
+                this.transactionStatisticsFilter.categoricalChartEndTime = categoricalChartDateRange.maxTime;
             }
 
-            if (filter && isNumber(filter.categoricalChartEndTime)) {
-                this.transactionStatisticsFilter.categoricalChartEndTime = filter.categoricalChartEndTime;
-            } else {
-                this.transactionStatisticsFilter.categoricalChartEndTime = 0;
-            }
-
-            if (filter && isNumber(filter.trendChartType)) {
+            if (filter && isInteger(filter.trendChartType)) {
                 this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
             } else {
+                this.transactionStatisticsFilter.trendChartType = settingsStore.appSettings.statistics.defaultTrendChartType;
+            }
+
+            if (this.transactionStatisticsFilter.trendChartType !== statisticsConstants.allTrendChartTypes.Area && this.transactionStatisticsFilter.trendChartType !== statisticsConstants.allTrendChartTypes.Column) {
                 this.transactionStatisticsFilter.trendChartType = statisticsConstants.defaultTrendChartType;
             }
 
-            if (filter && isNumber(filter.trendChartDateType)) {
+            if (filter && isInteger(filter.trendChartDateType)) {
                 this.transactionStatisticsFilter.trendChartDateType = filter.trendChartDateType;
             } else {
+                this.transactionStatisticsFilter.trendChartDateType = settingsStore.appSettings.statistics.defaultTrendChartDataRangeType;
+            }
+
+            let trendChartDateTypeValid = true;
+
+            if (!datetimeConstants.allDateRangesMap[this.transactionStatisticsFilter.trendChartDateType] ||
+                !datetimeConstants.allDateRangesMap[this.transactionStatisticsFilter.trendChartDateType].availableScenes[datetimeConstants.allDateRangeScenes.TrendAnalysis]) {
                 this.transactionStatisticsFilter.trendChartDateType = statisticsConstants.defaultTrendChartDataRangeType;
+                trendChartDateTypeValid = false;
             }
 
-            if (filter && isYearMonth(filter.trendChartStartYearMonth)) {
-                this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
-            } else {
-                this.transactionStatisticsFilter.trendChartStartYearMonth = '';
-            }
+            if (trendChartDateTypeValid && this.transactionStatisticsFilter.trendChartDateType === datetimeConstants.allDateRanges.Custom.type) {
+                if (filter && isYearMonth(filter.trendChartStartYearMonth)) {
+                    this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
+                } else {
+                    this.transactionStatisticsFilter.trendChartStartYearMonth = '';
+                }
 
-            if (filter && isYearMonth(filter.trendChartEndYearMonth)) {
-                this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
+                if (filter && isYearMonth(filter.trendChartEndYearMonth)) {
+                    this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
+                } else {
+                    this.transactionStatisticsFilter.trendChartEndYearMonth = '';
+                }
             } else {
-                this.transactionStatisticsFilter.trendChartEndYearMonth = '';
+                const trendChartDateRange = getDateRangeByDateType(this.transactionStatisticsFilter.trendChartDateType, userStore.currentUserFirstDayOfWeek);
+                this.transactionStatisticsFilter.trendChartDateType = trendChartDateRange.dateType;
+                this.transactionStatisticsFilter.trendChartStartYearMonth = getYearAndMonthFromUnixTime(trendChartDateRange.minTime);
+                this.transactionStatisticsFilter.trendChartEndYearMonth = getYearAndMonthFromUnixTime(trendChartDateRange.maxTime);
             }
 
             if (filter && isObject(filter.filterAccountIds)) {
                 this.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
             } else {
-                this.transactionStatisticsFilter.filterAccountIds = {};
+                this.transactionStatisticsFilter.filterAccountIds = settingsStore.appSettings.statistics.defaultAccountFilter || {};
             }
 
             if (filter && isObject(filter.filterCategoryIds)) {
                 this.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
             } else {
-                this.transactionStatisticsFilter.filterCategoryIds = {};
+                this.transactionStatisticsFilter.filterCategoryIds = settingsStore.appSettings.statistics.defaultTransactionCategoryFilter || {};
             }
 
-            if (filter && isNumber(filter.sortingType)) {
+            if (filter && isInteger(filter.sortingType)) {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
             } else {
+                this.transactionStatisticsFilter.sortingType = settingsStore.appSettings.statistics.defaultSortingType;
+            }
+
+            if (this.transactionStatisticsFilter.sortingType < statisticsConstants.allSortingTypes.Amount.type || this.transactionStatisticsFilter.sortingType > statisticsConstants.allSortingTypes.Name.type) {
                 this.transactionStatisticsFilter.sortingType = statisticsConstants.defaultSortingType;
             }
         },
         updateTransactionStatisticsFilter(filter) {
-            if (filter && isNumber(filter.chartDataType)) {
+            let changed = false;
+
+            if (filter && isInteger(filter.chartDataType) && this.transactionStatisticsFilter.chartDataType !== filter.chartDataType) {
                 this.transactionStatisticsFilter.chartDataType = filter.chartDataType;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.categoricalChartType)) {
+            if (filter && isInteger(filter.categoricalChartType) && this.transactionStatisticsFilter.categoricalChartType !== filter.categoricalChartType) {
                 this.transactionStatisticsFilter.categoricalChartType = filter.categoricalChartType;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.categoricalChartDateType)) {
+            if (filter && isInteger(filter.categoricalChartDateType) && this.transactionStatisticsFilter.categoricalChartDateType !== filter.categoricalChartDateType) {
                 this.transactionStatisticsFilter.categoricalChartDateType = filter.categoricalChartDateType;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.categoricalChartStartTime)) {
+            if (filter && isInteger(filter.categoricalChartStartTime) && this.transactionStatisticsFilter.categoricalChartStartTime !== filter.categoricalChartStartTime) {
                 this.transactionStatisticsFilter.categoricalChartStartTime = filter.categoricalChartStartTime;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.categoricalChartEndTime)) {
+            if (filter && isInteger(filter.categoricalChartEndTime) && this.transactionStatisticsFilter.categoricalChartEndTime !== filter.categoricalChartEndTime) {
                 this.transactionStatisticsFilter.categoricalChartEndTime = filter.categoricalChartEndTime;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.trendChartType)) {
+            if (filter && isInteger(filter.trendChartType) && this.transactionStatisticsFilter.trendChartType !== filter.trendChartType) {
                 this.transactionStatisticsFilter.trendChartType = filter.trendChartType;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.trendChartDateType)) {
+            if (filter && isInteger(filter.trendChartDateType) && this.transactionStatisticsFilter.trendChartDateType !== filter.trendChartDateType) {
                 this.transactionStatisticsFilter.trendChartDateType = filter.trendChartDateType;
+                changed = true;
             }
 
-            if (filter && (isYearMonth(filter.trendChartStartYearMonth) || filter.trendChartStartYearMonth === '')) {
+            if (filter && (isYearMonth(filter.trendChartStartYearMonth) || filter.trendChartStartYearMonth === '') && this.transactionStatisticsFilter.trendChartStartYearMonth !== filter.trendChartStartYearMonth) {
                 this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
+                changed = true;
             }
 
-            if (filter && (isYearMonth(filter.trendChartEndYearMonth) || filter.trendChartEndYearMonth === '')) {
+            if (filter && (isYearMonth(filter.trendChartEndYearMonth) || filter.trendChartEndYearMonth === '') && this.transactionStatisticsFilter.trendChartEndYearMonth !== filter.trendChartEndYearMonth) {
                 this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
+                changed = true;
             }
 
-            if (filter && isObject(filter.filterAccountIds)) {
+            if (filter && isObject(filter.filterAccountIds) && !isEquals(this.transactionStatisticsFilter.filterAccountIds, filter.filterAccountIds)) {
                 this.transactionStatisticsFilter.filterAccountIds = filter.filterAccountIds;
+                changed = true;
             }
 
-            if (filter && isObject(filter.filterCategoryIds)) {
+            if (filter && isObject(filter.filterCategoryIds) && !isEquals(this.transactionStatisticsFilter.filterCategoryIds, filter.filterCategoryIds)) {
                 this.transactionStatisticsFilter.filterCategoryIds = filter.filterCategoryIds;
+                changed = true;
             }
 
-            if (filter && isNumber(filter.sortingType)) {
+            if (filter && isInteger(filter.sortingType) && this.transactionStatisticsFilter.sortingType !== filter.sortingType) {
                 this.transactionStatisticsFilter.sortingType = filter.sortingType;
+                changed = true;
             }
+
+            return changed;
+        },
+        getTransactionStatisticsPageParams(analysisType) {
+            const querys = [];
+
+            querys.push('analysisType=' + analysisType);
+            querys.push('chartDataType=' + this.transactionStatisticsFilter.chartDataType);
+
+            if (analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                querys.push('chartType=' + this.transactionStatisticsFilter.categoricalChartType);
+                querys.push('chartDateType=' + this.transactionStatisticsFilter.categoricalChartDateType);
+
+                if (this.transactionStatisticsFilter.categoricalChartDateType === datetimeConstants.allDateRanges.Custom.type) {
+                    querys.push('startTime=' + this.transactionStatisticsFilter.categoricalChartStartTime);
+                    querys.push('endTime=' + this.transactionStatisticsFilter.categoricalChartEndTime);
+                }
+            } else if (analysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
+                querys.push('chartType=' + this.transactionStatisticsFilter.trendChartType);
+                querys.push('chartDateType=' + this.transactionStatisticsFilter.trendChartDateType);
+
+                if (this.transactionStatisticsFilter.trendChartDateType === datetimeConstants.allDateRanges.Custom.type) {
+                    querys.push('startTime=' + this.transactionStatisticsFilter.trendChartStartYearMonth);
+                    querys.push('endTime=' + this.transactionStatisticsFilter.trendChartEndYearMonth);
+                }
+            }
+
+            if (this.transactionStatisticsFilter.filterAccountIds) {
+                const ids = objectFieldToArrayItem(this.transactionStatisticsFilter.filterAccountIds);
+
+                if (ids && ids.length) {
+                    querys.push('filterAccountIds=' + ids.join(','));
+                }
+            }
+
+            if (this.transactionStatisticsFilter.filterCategoryIds) {
+                const ids = objectFieldToArrayItem(this.transactionStatisticsFilter.filterCategoryIds);
+
+                if (ids && ids.length) {
+                    querys.push('filterCategoryIds=' + ids.join(','));
+                }
+            }
+
+            querys.push('sortingType=' + this.transactionStatisticsFilter.sortingType);
+
+            return querys.join('&');
         },
         getTransactionListPageParams(analysisType, item, dateRange) {
             const accountsStore = useAccountsStore();

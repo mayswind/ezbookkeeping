@@ -2,6 +2,10 @@ export function isFunction(val) {
     return typeof(val) === 'function';
 }
 
+export function isDefined(val) {
+    return typeof val !== 'undefined';
+}
+
 export function isObject(val) {
     return val != null && typeof(val) === 'object' && !isArray(val);
 }
@@ -20,6 +24,10 @@ export function isString(val) {
 
 export function isNumber(val) {
     return typeof(val) === 'number';
+}
+
+export function isInteger(val) {
+    return Number.isInteger(val);
 }
 
 export function isBoolean(val) {
@@ -375,7 +383,7 @@ export function arrayContainsFieldValue(array, fieldName, value) {
     return false;
 }
 
-export function objectToArray(object) {
+export function objectFieldToArrayItem(object) {
     const ret = [];
 
     for (let field in object) {

@@ -304,6 +304,27 @@ const allDateRanges = {
     }
 };
 
+const allDateRangesMap = {
+    [allDateRanges.All.type]: allDateRanges.All,
+    [allDateRanges.Today.type]: allDateRanges.Today,
+    [allDateRanges.Yesterday.type]: allDateRanges.Yesterday,
+    [allDateRanges.LastSevenDays.type]: allDateRanges.LastSevenDays,
+    [allDateRanges.LastThirtyDays.type]: allDateRanges.LastThirtyDays,
+    [allDateRanges.ThisWeek.type]: allDateRanges.ThisWeek,
+    [allDateRanges.LastWeek.type]: allDateRanges.LastWeek,
+    [allDateRanges.ThisMonth.type]: allDateRanges.ThisMonth,
+    [allDateRanges.LastMonth.type]: allDateRanges.LastMonth,
+    [allDateRanges.ThisYear.type]: allDateRanges.ThisYear,
+    [allDateRanges.LastYear.type]: allDateRanges.LastYear,
+    [allDateRanges.RecentTwelveMonths.type]: allDateRanges.RecentTwelveMonths,
+    [allDateRanges.RecentTwentyFourMonths.type]: allDateRanges.RecentTwentyFourMonths,
+    [allDateRanges.RecentThirtySixMonths.type]: allDateRanges.RecentThirtySixMonths,
+    [allDateRanges.RecentTwoYears.type]: allDateRanges.RecentTwoYears,
+    [allDateRanges.RecentThreeYears.type]: allDateRanges.RecentThreeYears,
+    [allDateRanges.RecentFiveYears.type]: allDateRanges.RecentFiveYears,
+    [allDateRanges.Custom.type]: allDateRanges.Custom
+};
+
 const defaultFirstDayOfWeek = allWeekDays.Sunday.type;
 const defaultLongDateFormat = allLongDateFormat.YYYYMMDD;
 const defaultShortDateFormat = allShortDateFormat.YYYYMMDD;
@@ -327,6 +348,7 @@ export default {
     allShortTimeFormatArray: allShortTimeFormatArray,
     allDateRangeScenes: allDateRangeScenes,
     allDateRanges: allDateRanges,
+    allDateRangesMap: allDateRangesMap,
     defaultFirstDayOfWeek: defaultFirstDayOfWeek,
     defaultLongDateFormat: defaultLongDateFormat,
     defaultShortDateFormat: defaultShortDateFormat,

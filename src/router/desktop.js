@@ -107,7 +107,18 @@ const router = createRouter({
                 {
                     path: '/statistics/transaction',
                     component: StatisticsTransactionPage,
-                    beforeEnter: checkLogin
+                    beforeEnter: checkLogin,
+                    props: route => ({
+                        initAnalysisType: route.query.analysisType,
+                        initChartDataType: route.query.chartDataType,
+                        initChartType: route.query.chartType,
+                        initChartDateType: route.query.chartDateType,
+                        initStartTime: route.query.startTime,
+                        initEndTime: route.query.endTime,
+                        initFilterAccountIds: route.query.filterAccountIds,
+                        initFilterCategoryIds: route.query.filterCategoryIds,
+                        initSortingType: route.query.sortingType
+                    })
                 },
                 {
                     path: '/account/list',

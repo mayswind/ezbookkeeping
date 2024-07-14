@@ -365,7 +365,7 @@ export default {
     created() {
         const self = this;
 
-        self.statisticsStore.initTransactionStatisticsFilter();
+        self.statisticsStore.initTransactionStatisticsFilter(statisticsConstants.allAnalysisTypes.CategoricalAnalysis);
 
         Promise.all([
             self.accountsStore.loadAllAccounts({ force: false }),

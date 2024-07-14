@@ -311,6 +311,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
+import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import { getNameByKeyValue } from '@/lib/common.js';
@@ -377,7 +378,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
         allLanguages() {
             return this.$locale.getAllLanguageInfoArray(true);
         },
@@ -537,6 +538,10 @@ export default {
                 self.saving = false;
 
                 if (response.user) {
+                    if (response.user.firstDayOfWeek !== self.oldProfile.firstDayOfWeek) {
+                        this.overviewStore.resetTransactionOverview();
+                    }
+
                     self.setCurrentUserProfile(response.user);
                     self.emailVerified = response.user.emailVerified;
 

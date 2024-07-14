@@ -321,6 +321,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useAccountsStore } from '@/stores/account.js';
+import { useOverviewStore } from '@/stores/overview.js';
 
 import { getNameByKeyValue } from '@/lib/common.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
@@ -385,7 +386,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useAccountsStore, useOverviewStore),
         allLanguages() {
             return this.$locale.getAllLanguageInfoArray(true);
         },
@@ -575,6 +576,10 @@ export default {
                 self.currentPassword = '';
 
                 if (response.user) {
+                    if (response.user.firstDayOfWeek !== self.oldProfile.firstDayOfWeek) {
+                        this.overviewStore.resetTransactionOverview();
+                    }
+
                     self.setCurrentUserProfile(response.user);
 
                     const localeDefaultSettings = self.$locale.setLanguage(response.user.language);

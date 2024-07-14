@@ -117,8 +117,7 @@ const (
 	defaultDatabaseMaxOpenConn     uint16 = 0
 	defaultDatabaseConnMaxLifetime uint32 = 14400
 
-	defaultLogMode  string = "console"
-	defaultLoglevel Level  = LOGLEVEL_INFO
+	defaultLogMode string = "console"
 
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
@@ -372,10 +371,13 @@ func GetDefaultConfigFilePath() (string, error) {
 
 func loadGlobalConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.AppName = getConfigItemStringValue(configFile, sectionName, "app_name", defaultAppName)
-	config.Mode = MODE_PRODUCTION
 
-	if getConfigItemStringValue(configFile, sectionName, "mode") == "development" {
+	if getConfigItemStringValue(configFile, sectionName, "mode") == "production" {
+		config.Mode = MODE_PRODUCTION
+	} else if getConfigItemStringValue(configFile, sectionName, "mode") == "development" {
 		config.Mode = MODE_DEVELOPMENT
+	} else {
+		return errs.ErrInvalidServerMode
 	}
 
 	return nil
@@ -429,6 +431,13 @@ func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName
 	dbConfig := &DatabaseConfig{}
 
 	dbConfig.DatabaseType = getConfigItemStringValue(configFile, sectionName, "type", MySqlDbType)
+
+	if dbConfig.DatabaseType != MySqlDbType &&
+		dbConfig.DatabaseType != PostgresDbType &&
+		dbConfig.DatabaseType != Sqlite3DbType {
+		return errs.ErrDatabaseTypeInvalid
+	}
+
 	dbConfig.DatabaseHost = getConfigItemStringValue(configFile, sectionName, "host", defaultDatabaseHost)
 	dbConfig.DatabaseName = getConfigItemStringValue(configFile, sectionName, "name", defaultDatabaseName)
 	dbConfig.DatabaseUser = getConfigItemStringValue(configFile, sectionName, "user")
@@ -486,7 +495,19 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 		}
 	}
 
-	config.LogLevel = getLogLevel(getConfigItemStringValue(configFile, sectionName, "level"), defaultLoglevel)
+	var err error
+	config.LogLevel, err = getLogLevel(getConfigItemStringValue(configFile, sectionName, "level"))
+
+	if err != nil {
+		return err
+	}
+
+	if config.LogLevel != LOGLEVEL_DEBUG &&
+		config.LogLevel != LOGLEVEL_INFO &&
+		config.LogLevel != LOGLEVEL_WARN &&
+		config.LogLevel != LOGLEVEL_ERROR {
+		return errs.ErrInvalidLogLevel
+	}
 
 	if config.EnableFileLog {
 		fileLogPath := getConfigItemStringValue(configFile, sectionName, "log_path")
@@ -517,6 +538,11 @@ func loadDuplicateCheckerConfiguration(config *Config, configFile *ini.File, sec
 	}
 
 	config.InMemoryDuplicateCheckerCleanupInterval = getConfigItemUint32Value(configFile, sectionName, "cleanup_interval", defaultInMemoryDuplicateCheckerCleanupInterval)
+
+	if config.InMemoryDuplicateCheckerCleanupInterval < 1 {
+		return errs.ErrInvalidInMemoryDuplicateCheckerCleanupInterval
+	}
+
 	config.InMemoryDuplicateCheckerCleanupIntervalDuration = time.Duration(config.InMemoryDuplicateCheckerCleanupInterval) * time.Second
 
 	duplicateSubmissionsInterval := getConfigItemUint32Value(configFile, sectionName, "duplicate_submissions_interval", defaultDuplicateSubmissionsInterval)
@@ -539,15 +565,35 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 
 	config.TokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "token_expired_time", defaultTokenExpiredTime)
+
+	if config.TokenExpiredTime < 60 {
+		return errs.ErrInvalidTokenExpiredTime
+	}
+
 	config.TokenExpiredTimeDuration = time.Duration(config.TokenExpiredTime) * time.Second
 
 	config.TemporaryTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "temporary_token_expired_time", defaultTemporaryTokenExpiredTime)
+
+	if config.TemporaryTokenExpiredTime < 60 {
+		return errs.ErrInvalidTemporaryTokenExpiredTime
+	}
+
 	config.TemporaryTokenExpiredTimeDuration = time.Duration(config.TemporaryTokenExpiredTime) * time.Second
 
 	config.EmailVerifyTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "email_verify_token_expired_time", defaultEmailVerifyTokenExpiredTime)
+
+	if config.EmailVerifyTokenExpiredTime < 60 {
+		return errs.ErrInvalidEmailVerifyTokenExpiredTime
+	}
+
 	config.EmailVerifyTokenExpiredTimeDuration = time.Duration(config.EmailVerifyTokenExpiredTime) * time.Second
 
 	config.PasswordResetTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "password_reset_token_expired_time", defaultPasswordResetTokenExpiredTime)
+
+	if config.PasswordResetTokenExpiredTime < 60 {
+		return errs.ErrInvalidPasswordResetTokenExpiredTime
+	}
+
 	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
 
 	config.EnableRequestIdHeader = getConfigItemBoolValue(configFile, sectionName, "request_id_header", true)
@@ -566,6 +612,8 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 		config.AvatarProvider = ""
 	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == GravatarProvider {
 		config.AvatarProvider = GravatarProvider
+	} else {
+		return errs.ErrInvalidAvatarProvider
 	}
 
 	return nil
@@ -813,14 +861,16 @@ func getEnvironmentKey(sectionName string, itemName string) string {
 	return fmt.Sprintf("%s_%s_%s", ebkEnvNamePrefix, strings.ToUpper(sectionName), strings.ToUpper(itemName))
 }
 
-func getLogLevel(logLevelStr string, defaultLogLevel Level) Level {
+func getLogLevel(logLevelStr string) (Level, error) {
 	if logLevelStr == "debug" {
-		return LOGLEVEL_DEBUG
+		return LOGLEVEL_DEBUG, nil
+	} else if logLevelStr == "info" {
+		return LOGLEVEL_INFO, nil
 	} else if logLevelStr == "warn" {
-		return LOGLEVEL_WARN
+		return LOGLEVEL_WARN, nil
 	} else if logLevelStr == "error" {
-		return LOGLEVEL_ERROR
+		return LOGLEVEL_ERROR, nil
 	}
 
-	return defaultLogLevel
+	return "", errs.ErrInvalidLogLevel
 }

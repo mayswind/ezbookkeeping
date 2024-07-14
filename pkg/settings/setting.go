@@ -124,10 +124,10 @@ const (
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
 
 	defaultSecretKey                     string = "ezbookkeeping"
-	defaultTokenExpiredTime              uint32 = 604800 // 7 days
-	defaultTemporaryTokenExpiredTime     uint32 = 300    // 5 minutes
-	defaultEmailVerifyTokenExpiredTime   uint32 = 3600   // 60 minutes
-	defaultPasswordResetTokenExpiredTime uint32 = 3600   // 60 minutes
+	defaultTokenExpiredTime              uint32 = 2592000 // 30 days
+	defaultTemporaryTokenExpiredTime     uint32 = 300     // 5 minutes
+	defaultEmailVerifyTokenExpiredTime   uint32 = 3600    // 60 minutes
+	defaultPasswordResetTokenExpiredTime uint32 = 3600    // 60 minutes
 
 	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
 )

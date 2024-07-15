@@ -44,13 +44,13 @@ func startWebServer(c *cli.Context) error {
 		return err
 	}
 
-	log.BootInfof("[server.startWebServer] static root path is %s", config.StaticRootPath)
+	log.BootInfof("[webserver.startWebServer] static root path is %s", config.StaticRootPath)
 
 	if config.AutoUpdateDatabase {
 		err = updateAllDatabaseTablesStructure()
 
 		if err != nil {
-			log.BootErrorf("[server.startWebServer] update database table structure failed, because %s", err.Error())
+			log.BootErrorf("[webserver.startWebServer] update database table structure failed, because %s", err.Error())
 			return err
 		}
 	}
@@ -58,7 +58,7 @@ func startWebServer(c *cli.Context) error {
 	err = requestid.InitializeRequestIdGenerator(config)
 
 	if err != nil {
-		log.BootErrorf("[server.startWebServer] initializes requestid generator failed, because %s", err.Error())
+		log.BootErrorf("[webserver.startWebServer] initializes requestid generator failed, because %s", err.Error())
 		return err
 	}
 
@@ -68,7 +68,7 @@ func startWebServer(c *cli.Context) error {
 		uuidServerInfo = fmt.Sprintf(", current uuid server id is %d", config.UuidServerId)
 	}
 
-	log.BootInfof("[server.startWebServer] %s%s", serverInfo, uuidServerInfo)
+	log.BootInfof("[webserver.startWebServer] %s%s", serverInfo, uuidServerInfo)
 
 	if config.Mode == settings.MODE_PRODUCTION {
 		gin.SetMode(gin.ReleaseMode)
@@ -309,20 +309,20 @@ func startWebServer(c *cli.Context) error {
 	listenAddr := fmt.Sprintf("%s:%d", config.HttpAddr, config.HttpPort)
 
 	if config.Protocol == settings.SCHEME_SOCKET {
-		log.BootInfof("[server.startWebServer] will run at socks:%s", config.UnixSocketPath)
+		log.BootInfof("[webserver.startWebServer] will run at socks:%s", config.UnixSocketPath)
 		err = router.RunUnix(config.UnixSocketPath)
 	} else if config.Protocol == settings.SCHEME_HTTP {
-		log.BootInfof("[server.startWebServer] will run at http://%s", listenAddr)
+		log.BootInfof("[webserver.startWebServer] will run at http://%s", listenAddr)
 		err = router.Run(listenAddr)
 	} else if config.Protocol == settings.SCHEME_HTTPS {
-		log.BootInfof("[server.startWebServer] will run at https://%s", listenAddr)
+		log.BootInfof("[webserver.startWebServer] will run at https://%s", listenAddr)
 		err = router.RunTLS(listenAddr, config.CertFile, config.CertKeyFile)
 	} else {
 		err = errs.ErrInvalidProtocol
 	}
 
 	if err != nil {
-		log.BootErrorf("[server.startWebServer] cannot start, because %s", err)
+		log.BootErrorf("[webserver.startWebServer] cannot start, because %s", err)
 		return err
 	}
 

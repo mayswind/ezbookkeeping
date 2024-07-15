@@ -232,7 +232,7 @@ var UserData = &cli.Command{
 		},
 		{
 			Name:   "transaction-tag-index-fix-transaction-time",
-			Usage:  "fix the transaction tag index data which does not have transaction time",
+			Usage:  "Fix the transaction tag index data which does not have transaction time",
 			Action: fixTransactionTagIndexNotHaveTransactionTime,
 			Flags: []cli.Flag{
 				&cli.StringFlag{

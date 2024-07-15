@@ -134,7 +134,7 @@
 
                 <f7-list v-else-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                     <f7-list-item class="statistics-list-item"
-                                  :link="getItemLinkUrl(item)"
+                                  :link="getTransactionItemLinkUrl(item)"
                                   :key="idx"
                                   v-for="(item, idx) in categoricalAnalysisData.items"
                                   v-show="!item.hidden"
@@ -187,13 +187,13 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom class="toolbar-item-auto-size">
-            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, -1)">
+            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(-1)">
                 <f7-icon f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" popover-open=".date-popover-menu">
-                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName(query) }}</span>
+                <span :class="{ 'tabbar-item-changed': query.maxTime > 0 || query.minTime > 0 }">{{ dateRangeName() }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(query.categoricalChartStartTime, query.categoricalChartEndTime, 1)">
+            <f7-link :class="{ 'disabled': reloading || query.categoricalChartDateType === allDateRanges.All.type || query.chartDataType === allChartDataTypes.AccountTotalAssets.type || query.chartDataType === allChartDataTypes.AccountTotalLiabilities.type }" @click="shiftDateRange(1)">
                 <f7-icon f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link class="tabbar-text-with-ellipsis" :key="chartType.type"
@@ -258,8 +258,8 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 
 import datetimeConstants from '@/consts/datetime.js';
 import statisticsConstants from '@/consts/statistics.js';
-import { getNameByKeyValue, limitText } from '@/lib/common.js'
-import { formatPercent } from '@/lib/numeral.js'
+import { getNameByKeyValue, limitText } from '@/lib/common.js';
+import { formatPercent } from '@/lib/numeral.js';
 import {
     getShiftedDateRangeAndDateType,
     getDateTypeByDateRange,
@@ -307,13 +307,25 @@ export default {
             return this.$t(querySortingTypeName);
         },
         queryStartTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartStartTime);
+            } else {
+                return '';
+            }
         },
         queryEndTime() {
-            return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartEndTime);
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.formatUnixTimeToLongDateTime(this.userStore, this.query.categoricalChartEndTime);
+            } else {
+                return '';
+            }
         },
         allChartTypes() {
-            return this.$locale.getAllCategoricalChartTypes();
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.getAllCategoricalChartTypes();
+            } else {
+                return [];
+            }
         },
         allCategoricalChartTypes() {
             return statisticsConstants.allCategoricalChartTypes;
@@ -328,7 +340,11 @@ export default {
             return datetimeConstants.allDateRanges;
         },
         allDateRangesArray() {
-            return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.getAllDateRanges(datetimeConstants.allDateRangeScenes.Normal, true);
+            } else {
+                return [];
+            }
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
@@ -365,7 +381,7 @@ export default {
     created() {
         const self = this;
 
-        self.statisticsStore.initTransactionStatisticsFilter(statisticsConstants.allAnalysisTypes.CategoricalAnalysis);
+        self.statisticsStore.initTransactionStatisticsFilter(self.analysisType);
 
         Promise.all([
             self.accountsStore.loadAllAccounts({ force: false }),
@@ -464,15 +480,16 @@ export default {
             });
 
             this.showSortingTypePopover = false;
-            this.reload(null);
         },
         setDateFilter(dateType) {
-            if (dateType === this.allDateRanges.Custom.type) { // Custom
-                this.showCustomDateRangeSheet = true;
-                this.showDatePopover = false;
-                return;
-            } else if (this.query.categoricalChartDateType === dateType) {
-                return;
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                if (dateType === this.allDateRanges.Custom.type) { // Custom
+                    this.showCustomDateRangeSheet = true;
+                    this.showDatePopover = false;
+                    return;
+                } else if (this.query.categoricalChartDateType === dateType) {
+                    return;
+                }
             }
 
             const dateRange = getDateRangeByDateType(dateType, this.firstDayOfWeek);
@@ -481,57 +498,80 @@ export default {
                 return;
             }
 
-            this.statisticsStore.updateTransactionStatisticsFilter({
-                categoricalChartDateType: dateRange.dateType,
-                categoricalChartStartTime: dateRange.minTime,
-                categoricalChartEndTime: dateRange.maxTime
-            });
+            let changed = false;
+
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
+                    categoricalChartDateType: dateRange.dateType,
+                    categoricalChartStartTime: dateRange.minTime,
+                    categoricalChartEndTime: dateRange.maxTime
+                });
+            }
 
             this.showDatePopover = false;
-            this.reload(null);
+
+            if (changed) {
+                this.reload(null);
+            }
         },
         setCustomDateFilter(startTime, endTime) {
             if (!startTime || !endTime) {
                 return;
             }
 
-            const chartDateType = getDateTypeByDateRange(startTime, endTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let changed = false;
 
-            this.statisticsStore.updateTransactionStatisticsFilter({
-                categoricalChartDateType: chartDateType,
-                categoricalChartStartTime: startTime,
-                categoricalChartEndTime: endTime
-            });
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                const chartDateType = getDateTypeByDateRange(startTime, endTime, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
-            this.showCustomDateRangeSheet = false;
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
+                    categoricalChartDateType: chartDateType,
+                    categoricalChartStartTime: startTime,
+                    categoricalChartEndTime: endTime
+                });
 
-            this.reload(null);
+                this.showCustomDateRangeSheet = false;
+            }
+
+            if (changed) {
+                this.reload(null);
+            }
         },
-        shiftDateRange(startTime, endTime, scale) {
+        shiftDateRange(scale) {
             if (this.query.categoricalChartDateType === this.allDateRanges.All.type) {
                 return;
             }
 
-            const newDateRange = getShiftedDateRangeAndDateType(startTime, endTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
+            let changed = false;
 
-            this.statisticsStore.updateTransactionStatisticsFilter({
-                categoricalChartDateType: newDateRange.dateType,
-                categoricalChartStartTime: newDateRange.minTime,
-                categoricalChartEndTime: newDateRange.maxTime
-            });
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                const newDateRange = getShiftedDateRangeAndDateType(this.query.categoricalChartStartTime, this.query.categoricalChartEndTime, scale, this.firstDayOfWeek, datetimeConstants.allDateRangeScenes.Normal);
 
-            this.reload(null);
+                changed = this.statisticsStore.updateTransactionStatisticsFilter({
+                    categoricalChartDateType: newDateRange.dateType,
+                    categoricalChartStartTime: newDateRange.minTime,
+                    categoricalChartEndTime: newDateRange.maxTime
+                });
+            }
+
+            if (changed) {
+                this.reload(null);
+            }
         },
-        dateRangeName(query) {
-            if (query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type ||
-                query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
+        dateRangeName() {
+            if (this.query.chartDataType === this.allChartDataTypes.AccountTotalAssets.type ||
+                this.query.chartDataType === this.allChartDataTypes.AccountTotalLiabilities.type) {
                 return this.$t(this.allDateRanges.All.name);
             }
 
-            return this.$locale.getDateRangeDisplayName(this.userStore, query.categoricalChartDateType, query.categoricalChartStartTime, query.categoricalChartEndTime);
+            if (this.analysisType === statisticsConstants.allAnalysisTypes.CategoricalAnalysis) {
+                return this.$locale.getDateRangeDisplayName(this.userStore, this.query.categoricalChartDateType, this.query.categoricalChartStartTime, this.query.categoricalChartEndTime);
+            } else {
+                return '';
+            }
         },
         clickPieChartItem(item) {
-            this.f7router.navigate(this.getItemLinkUrl(item));
+            this.f7router.navigate(this.getTransactionItemLinkUrl(item));
         },
         filterAccounts() {
             this.f7router.navigate('/settings/filter/account?type=statisticsCurrent');
@@ -567,7 +607,7 @@ export default {
         getDisplayPercent(value, precision, lowPrecisionValue) {
             return formatPercent(value, precision, lowPrecisionValue);
         },
-        getItemLinkUrl(item) {
+        getTransactionItemLinkUrl(item) {
             return `/transaction/list?${this.statisticsStore.getTransactionListPageParams(statisticsConstants.allAnalysisTypes.CategoricalAnalysis, item)}`;
         }
     }

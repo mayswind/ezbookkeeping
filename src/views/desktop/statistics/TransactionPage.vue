@@ -448,7 +448,7 @@ export default {
             } else if (this.queryAnalysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
                 return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(this.query.trendChartStartYearMonth));
             } else {
-                return [];
+                return '';
             }
         },
         queryEndTime() {
@@ -457,7 +457,7 @@ export default {
             } else if (this.queryAnalysisType === statisticsConstants.allAnalysisTypes.TrendAnalysis) {
                 return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthLastUnixTime(this.query.trendChartEndYearMonth));
             } else {
-                return [];
+                return '';
             }
         },
         allAnalysisTypes() {

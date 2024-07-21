@@ -50,8 +50,22 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             const transactionMonth = getMonth(transactionTime);
             const transactionYearMonth = getYearAndMonth(transactionTime);
 
+            if (i === 0 && state.transactions.length > 0) {
+                const lastMonthList = state.transactions[state.transactions.length - 1];
+
+                if (lastMonthList.totalAmount.incompleteExpense || lastMonthList.totalAmount.incompleteIncome) {
+                    // calculate the total amount of last month which has incomplete total amount before starting to process a new request
+                    calculateMonthTotalAmount(exchangeRatesStore, lastMonthList, defaultCurrency, state.transactionsFilter.accountIds, false);
+                }
+            }
+
             if (currentMonthList && currentMonthList.year === transactionYear && currentMonthList.month === transactionMonth) {
                 currentMonthList.items.push(Object.freeze(item));
+
+                if (i === transactions.items.length - 1) {
+                    // calculate the total amount of current month when processing the last transaction item of this request
+                    calculateMonthTotalAmount(exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, true);
+                }
                 continue;
             }
 
@@ -64,6 +78,7 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
+                // calculate the total amount of current month when processing the first transaction item of the next month
                 calculateMonthTotalAmount(exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, false);
 
                 state.transactions.push({
@@ -79,6 +94,7 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             currentMonthList.items.push(Object.freeze(item));
+            // init the total amount struct of current month when processing the first transaction item of current month
             calculateMonthTotalAmount(exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, true);
         }
     }

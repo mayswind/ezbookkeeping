@@ -64,7 +64,7 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             if (!currentMonthList || currentMonthList.year !== transactionYear || currentMonthList.month !== transactionMonth) {
-                calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, false);
+                calculateMonthTotalAmount(exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, false);
 
                 state.transactions.push({
                     year: transactionYear,
@@ -79,14 +79,14 @@ function loadTransactionList(state, settingsStore, exchangeRatesStore, { transac
             }
 
             currentMonthList.items.push(Object.freeze(item));
-            calculateMonthTotalAmount(state, exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, true);
+            calculateMonthTotalAmount(exchangeRatesStore, currentMonthList, defaultCurrency, state.transactionsFilter.accountIds, true);
         }
     }
 
     if (transactions.nextTimeSequenceId) {
         state.transactionsNextTimeId = transactions.nextTimeSequenceId;
     } else {
-        calculateMonthTotalAmount(state, exchangeRatesStore, state.transactions[state.transactions.length - 1], defaultCurrency, state.transactionsFilter.accountIds, false);
+        calculateMonthTotalAmount(exchangeRatesStore, state.transactions[state.transactions.length - 1], defaultCurrency, state.transactionsFilter.accountIds, false);
         state.transactionsNextTimeId = -1;
     }
 }
@@ -129,7 +129,7 @@ function updateTransactionInTransactionList(state, settingsStore, exchangeRatesS
                 if (transactionMonthList.items.length < 1) {
                     state.transactions.splice(i, 1);
                 } else {
-                    calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+                    calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
                 }
 
                 return;
@@ -157,12 +157,12 @@ function removeTransactionFromTransactionList(state, exchangeRatesStore, { trans
         if (transactionMonthList.items.length < 1) {
             state.transactions.splice(i, 1);
         } else {
-            calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
+            calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, defaultCurrency, state.transactionsFilter.accountIds, i >= state.transactions.length - 1 && state.transactionsNextTimeId > 0);
         }
     }
 }
 
-function calculateMonthTotalAmount(state, exchangeRatesStore, transactionMonthList, defaultCurrency, accountIds, incomplete) {
+function calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, defaultCurrency, accountIds, incomplete) {
     if (!transactionMonthList) {
         return;
     }

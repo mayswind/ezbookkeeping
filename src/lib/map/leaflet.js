@@ -71,9 +71,9 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
             const param = mapTileSource.tileUrlExtraParams[i];
 
             if (param.paramValueType === 'tomtom_key') {
-                params.push('key=' + getTomTomMapAPIKey());
+                params.push(param.paramName + '=' + getTomTomMapAPIKey());
             } else if (param.paramValueType === 'language' && options.language) {
-                params.push('language=' + options.language);
+                params.push(param.paramName + '=' + options.language);
             }
         }
 

@@ -320,7 +320,7 @@
                               :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
                               :key="category.id"
                               v-for="category in categories"
-                              v-show="!category.hidden"
+                              v-show="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds].parentId === category.id)"
                 >
                     <template #media>
                         <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -340,7 +340,7 @@
                                           :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
                                           :key="subCategory.id"
                                           v-for="subCategory in category.subCategories"
-                                          v-show="!subCategory.hidden"
+                                          v-show="!subCategory.hidden || query.categoryIds === subCategory.id"
                                           @click="changeCategoryFilter(subCategory.id)"
                             >
                                 <template #media>
@@ -383,7 +383,7 @@
                               :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                               :key="account.id"
                               v-for="account in allAccounts"
-                              v-show="!account.hidden"
+                              v-show="!account.hidden || query.accountIds === account.id"
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>
@@ -462,7 +462,7 @@
                               :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
                               :key="transactionTag.id"
                               v-for="transactionTag in allTransactionTags"
-                              v-show="!transactionTag.hidden"
+                              v-show="!transactionTag.hidden || query.tagIds === transactionTag.id"
                               @click="changeTagFilter(transactionTag.id)"
                 >
                     <template #before-title>

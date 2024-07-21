@@ -154,7 +154,7 @@
                                                             </v-list-item>
 
                                                             <v-list-group :key="category.id" v-for="category in categories">
-                                                                <template #activator="{ props }" v-if="!category.hidden">
+                                                                <template #activator="{ props }" v-if="!category.hidden || query.categoryIds === category.id || (allCategories[query.categoryIds] && allCategories[query.categoryIds].parentId === category.id)">
                                                                     <v-divider />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :class="getCategoryListItemCheckedClass(category, queryAllFilterCategoryIds)"
@@ -184,12 +184,12 @@
 
                                                                 <template :key="subCategory.id"
                                                                           v-for="subCategory in category.subCategories">
-                                                                    <v-divider v-if="!subCategory.hidden" />
+                                                                    <v-divider v-if="!subCategory.hidden || query.categoryIds === subCategory.id" />
                                                                     <v-list-item class="text-sm" density="compact"
                                                                                  :value="subCategory.id"
                                                                                  :class="{ 'list-item-selected': query.categoryIds === subCategory.id, 'item-in-multiple-selection': queryAllFilterCategoryIdsCount > 1 && queryAllFilterCategoryIds[subCategory.id] }"
                                                                                  :append-icon="(query.categoryIds === subCategory.id ? icons.check : null)"
-                                                                                 v-if="!subCategory.hidden">
+                                                                                 v-if="!subCategory.hidden || query.categoryIds === subCategory.id">
                                                                         <v-list-item-title class="cursor-pointer"
                                                                                            @click="changeCategoryFilter(subCategory.id)">
                                                                             <div class="d-flex align-center">
@@ -290,12 +290,12 @@
                                                         </v-list-item>
                                                         <template :key="account.id"
                                                                   v-for="account in allAccounts">
-                                                            <v-divider v-if="!account.hidden" />
+                                                            <v-divider v-if="!account.hidden || query.accountIds === account.id" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="account.id"
                                                                          :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                                                                          :append-icon="(query.accountIds === account.id ? icons.check : null)"
-                                                                         v-if="!account.hidden">
+                                                                         v-if="!account.hidden || query.accountIds === account.id">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
                                                                     <div class="d-flex align-center">
@@ -345,12 +345,12 @@
                                                         </v-list-item>
                                                         <template :key="transactionTag.id"
                                                                   v-for="transactionTag in allTransactionTags">
-                                                            <v-divider v-if="!transactionTag.hidden" />
+                                                            <v-divider v-if="!transactionTag.hidden || query.tagIds === transactionTag.id" />
                                                             <v-list-item class="text-sm" density="compact"
                                                                          :value="transactionTag.id"
                                                                          :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
                                                                          :append-icon="(query.tagIds === transactionTag.id ? icons.check : null)"
-                                                                         v-if="!transactionTag.hidden">
+                                                                         v-if="!transactionTag.hidden || query.tagIds === transactionTag.id">
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeTagFilter(transactionTag.id)">
                                                                     <div class="d-flex align-center">

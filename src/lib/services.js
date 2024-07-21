@@ -525,6 +525,16 @@ export default {
 
         return url;
     },
+    generateMapProxyAnnotationImageUrl: (mapProvider, language) => {
+        const token = userState.getToken();
+        let url = `${apiConstants.baseProxyUrlPath}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
+
+        if (language) {
+            url = url + `&language=${language}`;
+        }
+
+        return url;
+    },
     generateGoogleMapJavascriptUrl: (language, callbackFnName) => {
         let url = `${apiConstants.googleMapJavascriptUrl}?key=${getGoogleMapAPIKey()}&libraries=core,marker&callback=${callbackFnName}`;
 

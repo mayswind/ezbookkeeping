@@ -5,7 +5,8 @@ import {
     getCustomMapMinZoomLevel,
     getCustomMapMaxZoomLevel,
     getCustomMapDefaultZoomLevel,
-    getTomTomMapAPIKey
+    getTomTomMapAPIKey,
+    getTianDiTuMapAPIKey
 } from '@/lib/server_settings.js';
 import services from '@/lib/services.js';
 
@@ -35,6 +36,7 @@ export function createLeafletMapHolder(mapProvider) {
         minZoomLevel: mapProvider !== 'custom' ? mapTileSource.minZoom : getCustomMapMinZoomLevel(),
         leafletInstance: null,
         leafletTileLayer: null,
+        leafletAnnotationLayer: null,
         leafletZoomControl: null,
         leafletAttribution: null,
         leafletCenterMarker: null
@@ -65,21 +67,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
         mapTileSource.tileUrlFormat = services.generateMapProxyTileImageUrl(mapHolder.mapProvider, options.language);
         mapTileSource.tileUrlSubDomains = '';
     } else if (mapTileSource.tileUrlExtraParams) {
-        const params = [];
-
-        for (let i = 0; i < mapTileSource.tileUrlExtraParams.length; i++) {
-            const param = mapTileSource.tileUrlExtraParams[i];
-
-            if (param.paramValueType === 'tomtom_key') {
-                params.push(param.paramName + '=' + getTomTomMapAPIKey());
-            } else if (param.paramValueType === 'language' && options.language) {
-                params.push(param.paramName + '=' + options.language);
-            }
-        }
-
-        if (params.length) {
-            mapTileSource.tileUrlFormat = mapTileSource.tileUrlFormat + '?' + params.join('&');
-        }
+        mapTileSource.tileUrlFormat = getFinalUrlFormat(mapTileSource.tileUrlFormat, mapTileSource.tileUrlExtraParams, options);
     }
 
     const tileLayer = leaflet.tileLayer(mapTileSource.tileUrlFormat, {
@@ -88,6 +76,24 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
         minZoom: mapTileSource.minZoom
     });
     tileLayer.addTo(leafletInstance);
+
+    if (mapTileSource.annotationUrlFormat) {
+        if (isMapDataFetchProxyEnabled()) {
+            mapTileSource.annotationUrlFormat = services.generateMapProxyAnnotationImageUrl(mapHolder.mapProvider, options.language);
+            mapTileSource.annotationUrlSubDomains = '';
+        } else if (mapTileSource.annotationUrlExtraParams) {
+            mapTileSource.annotationUrlFormat = getFinalUrlFormat(mapTileSource.annotationUrlFormat, mapTileSource.annotationUrlExtraParams, options);
+        }
+
+        const annotationLayer = leaflet.tileLayer(mapTileSource.annotationUrlFormat, {
+            subdomains: mapTileSource.annotationUrlSubDomains,
+            maxZoom: mapTileSource.maxZoom,
+            minZoom: mapTileSource.minZoom
+        });
+        annotationLayer.addTo(leafletInstance);
+
+        mapHolder.leafletAnnotationLayer = annotationLayer;
+    }
 
     const zoomControl = leaflet.control.zoom({
         zoomInTitle: options.text.zoomIn,
@@ -160,4 +166,30 @@ function createCustomMapSource() {
         maxZoom: getCustomMapMaxZoomLevel(),
         defaultZoomLevel: getCustomMapDefaultZoomLevel()
     };
+}
+
+function getFinalUrlFormat(urlFormat, urlExtraParams, options) {
+    const params = [];
+
+    for (let i = 0; i < urlExtraParams.length; i++) {
+        const param = urlExtraParams[i];
+
+        if (param.paramValueType === 'tomtom_key') {
+            params.push(param.paramName + '=' + getTomTomMapAPIKey());
+        } else if (param.paramValueType === 'tianditu_key') {
+            params.push(param.paramName + '=' + getTianDiTuMapAPIKey());
+        } else if (param.paramValueType === 'language' && options.language) {
+            params.push(param.paramName + '=' + options.language);
+        }
+    }
+
+    if (params.length) {
+        if (urlFormat.indexOf('?') >= 0) {
+            urlFormat = urlFormat + '&' + params.join('&');
+        } else {
+            urlFormat = urlFormat + '?' + params.join('&');
+        }
+    }
+
+    return urlFormat;
 }

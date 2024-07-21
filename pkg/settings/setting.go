@@ -81,6 +81,7 @@ const (
 	CyclOSMMapProvider                     string = "cyclosm"
 	CartoDBMapProvider                     string = "cartodb"
 	TomTomMapProvider                      string = "tomtom"
+	TianDiTuProvider                       string = "tianditu"
 	GoogleMapProvider                      string = "googlemap"
 	BaiduMapProvider                       string = "baidumap"
 	AmapProvider                           string = "amap"
@@ -243,6 +244,7 @@ type Config struct {
 	EnableMapDataFetchProxy             bool
 	MapProxy                            string
 	TomTomMapAPIKey                     string
+	TianDiTuAPIKey                      string
 	GoogleMapAPIKey                     string
 	BaiduMapAK                          string
 	AmapApplicationKey                  string
@@ -652,6 +654,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 		config.MapProvider = CartoDBMapProvider
 	} else if mapProvider == TomTomMapProvider {
 		config.MapProvider = TomTomMapProvider
+	} else if mapProvider == TianDiTuProvider {
+		config.MapProvider = TianDiTuProvider
 	} else if mapProvider == GoogleMapProvider {
 		config.MapProvider = GoogleMapProvider
 	} else if mapProvider == BaiduMapProvider {
@@ -667,6 +671,7 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
 	config.MapProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	config.TomTomMapAPIKey = getConfigItemStringValue(configFile, sectionName, "tomtom_map_api_key")
+	config.TianDiTuAPIKey = getConfigItemStringValue(configFile, sectionName, "tianditu_map_app_key")
 	config.GoogleMapAPIKey = getConfigItemStringValue(configFile, sectionName, "google_map_api_key")
 	config.BaiduMapAK = getConfigItemStringValue(configFile, sectionName, "baidu_map_ak")
 	config.AmapApplicationKey = getConfigItemStringValue(configFile, sectionName, "amap_application_key")

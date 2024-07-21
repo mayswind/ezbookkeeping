@@ -31,6 +31,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 				config.MapProvider == settings.CyclOSMMapProvider ||
 				config.MapProvider == settings.CartoDBMapProvider ||
 				config.MapProvider == settings.TomTomMapProvider ||
+				config.MapProvider == settings.TianDiTuProvider ||
 				config.MapProvider == settings.CustomProvider) {
 			settingsArr = append(settingsArr, buildBooleanSetting("mp", config.EnableMapDataFetchProxy))
 		}
@@ -45,6 +46,10 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 
 		if config.MapProvider == settings.TomTomMapProvider && config.TomTomMapAPIKey != "" && !config.EnableMapDataFetchProxy {
 			settingsArr = append(settingsArr, buildEncodedStringSetting("tmak", config.TomTomMapAPIKey))
+		}
+
+		if config.MapProvider == settings.TianDiTuProvider && config.TianDiTuAPIKey != "" && !config.EnableMapDataFetchProxy {
+			settingsArr = append(settingsArr, buildEncodedStringSetting("tdak", config.TianDiTuAPIKey))
 		}
 
 		if config.MapProvider == settings.GoogleMapProvider && config.GoogleMapAPIKey != "" {

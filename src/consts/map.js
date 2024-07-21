@@ -71,6 +71,29 @@ const leafletTileSources = {
         defaultZoomLevel: 14,
         website: 'https://tomtom.com',
         attribution : '<a href="https://tomtom.com" class="external" target="_blank">&copy;  1992 - 2023 TomTom.</a>'
+    },
+    'tianditu': {
+        tileUrlFormat: 'https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+        tileUrlSubDomains: '01234567',
+        tileUrlExtraParams: [
+            {
+                paramName: 'tk',
+                paramValueType: 'tianditu_key'
+            }
+        ],
+        annotationUrlFormat: 'https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+        annotationUrlSubDomains: '01234567',
+        annotationUrlExtraParams: [
+            {
+                paramName: 'tk',
+                paramValueType: 'tianditu_key'
+            }
+        ],
+        minZoom: 1,
+        maxZoom: 18,
+        defaultZoomLevel: 14,
+        website: 'https://www.tianditu.gov.cn',
+        attribution : '<a href="https://www.tianditu.gov.cn" class="external" target="_blank">天地图</a>'
     }
 }
 

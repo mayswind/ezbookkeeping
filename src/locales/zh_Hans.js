@@ -580,6 +580,7 @@ export default {
         'cyclosm': 'CyclOSM',
         'cartodb': 'CARTO',
         'tomtom': 'TomTom',
+        'tianditu': '天地图',
         'googlemap': 'Google 地图',
         'baidumap': '百度地图',
         'amap': '高德地图',

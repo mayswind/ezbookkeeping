@@ -12,13 +12,15 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"                          // https://tile.openstreetmap.org/{z}/{x}/{y}.png
-const openStreetMapHumanitarianStyleTileImageUrlFormat = "https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"    // https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png
-const openTopoMapTileImageUrlFormat = "https://tile.opentopomap.org/{z}/{x}/{y}.png"                              // https://tile.opentopomap.org/{z}/{x}/{y}.png
-const opnvKarteMapTileImageUrlFormat = "https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png"                   // https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png
-const cyclOSMMapTileImageUrlFormat = "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png"            // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png
-const cartoDBMapTileImageUrlFormat = "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{scale}.png" // https://{s}.basemaps.cartocdn.com/{style}/{z}/{x}/{y}{scale}.png
-const tomtomMapTileImageUrlFormat = "https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png"                // https://api.tomtom.com/map/{versionNumber}/tile/{layer}/{style}/{z}/{x}/{y}.png?key={key}&language={language}
+const openStreetMapTileImageUrlFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"                                                                                                                              // https://tile.openstreetmap.org/{z}/{x}/{y}.png
+const openStreetMapHumanitarianStyleTileImageUrlFormat = "https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"                                                                                                        // https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png
+const openTopoMapTileImageUrlFormat = "https://tile.opentopomap.org/{z}/{x}/{y}.png"                                                                                                                                  // https://tile.opentopomap.org/{z}/{x}/{y}.png
+const opnvKarteMapTileImageUrlFormat = "https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png"                                                                                                                       // https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png
+const cyclOSMMapTileImageUrlFormat = "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png"                                                                                                                // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png
+const cartoDBMapTileImageUrlFormat = "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{scale}.png"                                                                                                     // https://{s}.basemaps.cartocdn.com/{style}/{z}/{x}/{y}{scale}.png
+const tomtomMapTileImageUrlFormat = "https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png"                                                                                                                    // https://api.tomtom.com/map/{versionNumber}/tile/{layer}/{style}/{z}/{x}/{y}.png?key={key}&language={language}
+const tianDiTuMapTileImageUrlFormat = "https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"  // https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={key}
+const tianDiTuMapAnnotationUrlFormat = "https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}" // https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk={key}
 
 // MapImageProxy represents map image proxy
 type MapImageProxy struct {
@@ -31,6 +33,50 @@ var (
 
 // MapTileImageProxyHandler returns map tile image
 func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
+	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
+		if mapProvider == settings.OpenStreetMapProvider {
+			return openStreetMapTileImageUrlFormat, nil
+		} else if mapProvider == settings.OpenStreetMapHumanitarianStyleProvider {
+			return openStreetMapHumanitarianStyleTileImageUrlFormat, nil
+		} else if mapProvider == settings.OpenTopoMapProvider {
+			return openTopoMapTileImageUrlFormat, nil
+		} else if mapProvider == settings.OPNVKarteMapProvider {
+			return opnvKarteMapTileImageUrlFormat, nil
+		} else if mapProvider == settings.CyclOSMMapProvider {
+			return cyclOSMMapTileImageUrlFormat, nil
+		} else if mapProvider == settings.CartoDBMapProvider {
+			return cartoDBMapTileImageUrlFormat, nil
+		} else if mapProvider == settings.TomTomMapProvider {
+			targetUrl := tomtomMapTileImageUrlFormat + "?key=" + settings.Container.Current.TomTomMapAPIKey
+			language := c.Query("language")
+
+			if language != "" {
+				targetUrl = targetUrl + "&language=" + language
+			}
+
+			return targetUrl, nil
+		} else if mapProvider == settings.TianDiTuProvider {
+			return tianDiTuMapTileImageUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
+		} else if mapProvider == settings.CustomProvider {
+			return settings.Container.Current.CustomMapTileServerUrl, nil
+		}
+
+		return "", errs.ErrParameterInvalid
+	})
+}
+
+// MapAnnotationImageProxyHandler returns map annotation image
+func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
+	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
+		if mapProvider == settings.TianDiTuProvider {
+			return tianDiTuMapAnnotationUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
+		}
+
+		return "", errs.ErrParameterInvalid
+	})
+}
+
+func (p *MapImageProxy) mapImageProxyHandler(c *core.Context, fn func(c *core.Context, mapProvider string) (string, *errs.Error)) (*httputil.ReverseProxy, *errs.Error) {
 	mapProvider := strings.Replace(c.Query("provider"), "-", "_", -1)
 	targetUrl := ""
 
@@ -49,29 +95,11 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		return nil, errs.ErrImageExtensionNotSupported
 	}
 
-	if mapProvider == settings.OpenStreetMapProvider {
-		targetUrl = openStreetMapTileImageUrlFormat
-	} else if mapProvider == settings.OpenStreetMapHumanitarianStyleProvider {
-		targetUrl = openStreetMapHumanitarianStyleTileImageUrlFormat
-	} else if mapProvider == settings.OpenTopoMapProvider {
-		targetUrl = openTopoMapTileImageUrlFormat
-	} else if mapProvider == settings.OPNVKarteMapProvider {
-		targetUrl = opnvKarteMapTileImageUrlFormat
-	} else if mapProvider == settings.CyclOSMMapProvider {
-		targetUrl = cyclOSMMapTileImageUrlFormat
-	} else if mapProvider == settings.CartoDBMapProvider {
-		targetUrl = cartoDBMapTileImageUrlFormat
-	} else if mapProvider == settings.TomTomMapProvider {
-		targetUrl = tomtomMapTileImageUrlFormat + "?key=" + settings.Container.Current.TomTomMapAPIKey
-		language := c.Query("language")
+	var err *errs.Error
+	targetUrl, err = fn(c, mapProvider)
 
-		if language != "" {
-			targetUrl = targetUrl + "&language=" + language
-		}
-	} else if mapProvider == settings.CustomProvider {
-		targetUrl = settings.Container.Current.CustomMapTileServerUrl
-	} else {
-		return nil, errs.ErrParameterInvalid
+	if err != nil {
+		return nil, err
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()

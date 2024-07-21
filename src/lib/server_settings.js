@@ -76,6 +76,10 @@ export function getTomTomMapAPIKey() {
     return getServerDecodedSetting('tmak');
 }
 
+export function getTianDiTuMapAPIKey() {
+    return getServerDecodedSetting('tdak');
+}
+
 export function getGoogleMapAPIKey() {
     return getServerDecodedSetting('gmak');
 }

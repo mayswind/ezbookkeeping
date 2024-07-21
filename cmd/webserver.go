@@ -163,8 +163,13 @@ func startWebServer(c *cli.Context) error {
 				config.MapProvider == settings.CyclOSMMapProvider ||
 				config.MapProvider == settings.CartoDBMapProvider ||
 				config.MapProvider == settings.TomTomMapProvider ||
+				config.MapProvider == settings.TianDiTuProvider ||
 				config.MapProvider == settings.CustomProvider {
 				proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler))
+			}
+
+			if config.MapProvider == settings.TianDiTuProvider {
+				proxyRoute.GET("/map/annotation/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapAnnotationImageProxyHandler))
 			}
 		}
 	}

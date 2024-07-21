@@ -284,6 +284,7 @@ export const useTransactionsStore = defineStore('transactions', {
             type: 0,
             categoryIds: '',
             accountIds: '',
+            tagIds: '',
             amountFilter: '',
             keyword: ''
         },
@@ -324,6 +325,22 @@ export const useTransactionsStore = defineStore('transactions', {
 
             return ret;
         },
+        allFilterTagIds(state) {
+            if (!state.transactionsFilter.tagIds) {
+                return {};
+            }
+
+            const allTagIds = state.transactionsFilter.tagIds.split(',');
+            const ret = {};
+
+            for (let i = 0; i < allTagIds.length; i++) {
+                if (allTagIds[i]) {
+                    ret[allTagIds[i]] = true;
+                }
+            }
+
+            return ret;
+        },
         allFilterCategoryIdsCount(state) {
             if (!state.transactionsFilter.categoryIds) {
                 return 0;
@@ -350,6 +367,22 @@ export const useTransactionsStore = defineStore('transactions', {
 
             for (let i = 0; i < allAccountIds.length; i++) {
                 if (allAccountIds[i]) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+        allFilterTagIdsCount(state) {
+            if (!state.transactionsFilter.tagIds) {
+                return 0;
+            }
+
+            const allTagIds = state.transactionsFilter.tagIds.split(',');
+            let count = 0;
+
+            for (let i = 0; i < allTagIds.length; i++) {
+                if (allTagIds[i]) {
                     count++;
                 }
             }
@@ -444,6 +477,7 @@ export const useTransactionsStore = defineStore('transactions', {
             this.transactionsFilter.type = 0;
             this.transactionsFilter.categoryIds = '';
             this.transactionsFilter.accountIds = '';
+            this.transactionsFilter.tagIds = '';
             this.transactionsFilter.amountFilter = '';
             this.transactionsFilter.keyword = '';
             this.transactions = [];
@@ -492,6 +526,12 @@ export const useTransactionsStore = defineStore('transactions', {
                 this.transactionsFilter.accountIds = '';
             }
 
+            if (filter && isString(filter.tagIds)) {
+                this.transactionsFilter.tagIds = filter.tagIds;
+            } else {
+                this.transactionsFilter.tagIds = '';
+            }
+
             if (filter && isString(filter.amountFilter)) {
                 this.transactionsFilter.amountFilter = filter.amountFilter;
             } else {
@@ -537,6 +577,11 @@ export const useTransactionsStore = defineStore('transactions', {
                 changed = true;
             }
 
+            if (filter && isString(filter.tagIds) && this.transactionsFilter.tagIds !== filter.tagIds) {
+                this.transactionsFilter.tagIds = filter.tagIds;
+                changed = true;
+            }
+
             if (filter && isString(filter.amountFilter) && this.transactionsFilter.amountFilter !== filter.amountFilter) {
                 this.transactionsFilter.amountFilter = filter.amountFilter;
                 changed = true;
@@ -562,6 +607,10 @@ export const useTransactionsStore = defineStore('transactions', {
 
             if (this.transactionsFilter.categoryIds) {
                 querys.push('categoryIds=' + this.transactionsFilter.categoryIds);
+            }
+
+            if (this.transactionsFilter.tagIds) {
+                querys.push('tagIds=' + this.transactionsFilter.tagIds);
             }
 
             querys.push('dateType=' + this.transactionsFilter.dateType);
@@ -603,6 +652,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     type: self.transactionsFilter.type,
                     categoryIds: self.transactionsFilter.categoryIds,
                     accountIds: self.transactionsFilter.accountIds,
+                    tagIds: self.transactionsFilter.tagIds,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {
@@ -678,6 +728,7 @@ export const useTransactionsStore = defineStore('transactions', {
                     type: self.transactionsFilter.type,
                     categoryIds: self.transactionsFilter.categoryIds,
                     accountIds: self.transactionsFilter.accountIds,
+                    tagIds: self.transactionsFilter.tagIds,
                     amountFilter: self.transactionsFilter.amountFilter,
                     keyword: self.transactionsFilter.keyword
                 }).then(response => {

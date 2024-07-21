@@ -22,7 +22,7 @@ function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrency
     return formatAmountWithCurrencyFunc(amount, currency);
 }
 
-export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, defaultAccountId, options, setContextData, convertContextTime) {
+export function setTransactionModelByTransaction(transaction, transaction2, allCategories, allCategoriesMap, allVisibleAccounts, allAccountsMap, allTagsMap, defaultAccountId, options, setContextData, convertContextTime) {
     if ((!options.type || options.type === '0') && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId];
         const type = categoryTypeToTransactionType(category.type);
@@ -103,6 +103,22 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
                 transaction.destinationAccountId = allVisibleAccounts[0].id;
             }
         }
+    }
+
+    if (allTagsMap && options.tagIds) {
+        const tagIds = options.tagIds.split(',');
+        const finalTagIds = [];
+
+        for (let i = 0; i < tagIds.length; i++) {
+            const tagId = tagIds[i];
+            const tag = allTagsMap[tagId];
+
+            if (tag && !tag.hidden) {
+                finalTagIds.push(tag.id);
+            }
+        }
+
+        transaction.tagIds = finalTagIds;
     }
 
     if (transaction2) {

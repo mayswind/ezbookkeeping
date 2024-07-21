@@ -425,6 +425,48 @@ export function categorizedArrayToPlainArray(object) {
     return ret;
 }
 
+export function selectAll(filterItemIds, allItemsMap) {
+    for (let itemId in filterItemIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
+            continue;
+        }
+
+        const item = allItemsMap[itemId];
+
+        if (item) {
+            filterItemIds[item.id] = false;
+        }
+    }
+}
+
+export function selectNone(filterItemIds, allItemsMap) {
+    for (let itemId in filterItemIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
+            continue;
+        }
+
+        const item = allItemsMap[itemId];
+
+        if (item) {
+            filterItemIds[item.id] = true;
+        }
+    }
+}
+
+export function selectInvert(filterItemIds, allItemsMap) {
+    for (let itemId in filterItemIds) {
+        if (!Object.prototype.hasOwnProperty.call(filterItemIds, itemId)) {
+            continue;
+        }
+
+        const item = allItemsMap[itemId];
+
+        if (item) {
+            filterItemIds[item.id] = !filterItemIds[item.id];
+        }
+    }
+}
+
 export function isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue) {
     for (let i = 0; i < primaryItem[primarySubItemsField].length; i++) {
         const secondaryItem = primaryItem[primarySubItemsField][i];

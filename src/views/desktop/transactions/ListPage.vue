@@ -308,7 +308,61 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-tags" v-if="showTagInTransactionListPage">{{ $t('Tags') }}</th>
+                                            <th class="transaction-table-column-tags" v-if="showTagInTransactionListPage">
+                                                <v-menu ref="tagFilterMenu" class="transaction-tag-menu"
+                                                        eager location="bottom" max-height="500"
+                                                        @update:model-value="scrollTagMenuToSelectedItem">
+                                                    <template #activator="{ props }">
+                                                        <div class="d-flex align-center cursor-pointer"
+                                                             :class="{ 'readonly': loading, 'text-primary': query.tagIds }" v-bind="props">
+                                                            <span>{{ queryTagName }}</span>
+                                                            <v-icon :icon="icons.dropdownMenu" />
+                                                        </div>
+                                                    </template>
+                                                    <v-list :selected="[queryAllSelectedFilterTagIds]">
+                                                        <v-list-item key="" value="" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': !query.tagIds }"
+                                                                     :append-icon="(!query.tagIds ? icons.check : null)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="changeTagFilter('')">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.all" />
+                                                                    <span class="text-sm ml-3">{{ $t('All') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
+                                                        <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
+                                                                     :append-icon="(query.tagIds && queryAllFilterTagIdsCount > 1 ? icons.check : null)"
+                                                                     v-if="allVisibleTagsCount > 0">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="showFilterTagDialog = true">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.multiple" />
+                                                                    <span class="text-sm ml-3">{{ $t('Multiple Tags') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
+                                                        <template :key="transactionTag.id"
+                                                                  v-for="transactionTag in allTransactionTags">
+                                                            <v-divider v-if="!transactionTag.hidden" />
+                                                            <v-list-item class="text-sm" density="compact"
+                                                                         :value="transactionTag.id"
+                                                                         :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
+                                                                         :append-icon="(query.tagIds === transactionTag.id ? icons.check : null)"
+                                                                         v-if="!transactionTag.hidden">
+                                                                <v-list-item-title class="cursor-pointer"
+                                                                                   @click="changeTagFilter(transactionTag.id)">
+                                                                    <div class="d-flex align-center">
+                                                                        <v-icon size="24" :icon="icons.tag"/>
+                                                                        <span class="text-sm ml-3">{{ transactionTag.name }}</span>
+                                                                    </div>
+                                                                </v-list-item-title>
+                                                            </v-list-item>
+                                                        </template>
+                                                    </v-list>
+                                                </v-menu>
+                                            </th>
                                             <th class="transaction-table-column-description">{{ $t('Description') }}</th>
                                         </tr>
                                         </thead>
@@ -427,6 +481,11 @@
                                        @settings:change="changeMultipleCategoriesFilter" />
     </v-dialog>
 
+    <v-dialog width="800" v-model="showFilterTagDialog">
+        <transaction-tag-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
+                                       @settings:change="changeMultipleTagsFilter" />
+    </v-dialog>
+
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
 </template>
@@ -435,6 +494,7 @@
 import EditDialog from './list/dialogs/EditDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
+import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
 
 import { useDisplay } from 'vuetify';
 
@@ -495,6 +555,7 @@ import {
 
 export default {
     components: {
+        TransactionTagFilterSettingsCard,
         EditDialog,
         AccountFilterSettingsCard,
         CategoryFilterSettingsCard
@@ -506,6 +567,7 @@ export default {
         'initType',
         'initCategoryIds',
         'initAccountIds',
+        'initTagIds',
         'initAmountFilter',
         'initKeyword'
     ],
@@ -533,6 +595,7 @@ export default {
             showCustomDateRangeDialog: false,
             showFilterAccountDialog: false,
             showFilterCategoryDialog: false,
+            showFilterTagDialog: false,
             icons: {
                 search: mdiMagnify,
                 check: mdiCheck,
@@ -606,11 +669,17 @@ export default {
         queryAllFilterAccountIds() {
             return this.transactionsStore.allFilterAccountIds;
         },
+        queryAllFilterTagIds() {
+            return this.transactionsStore.allFilterTagIds;
+        },
         queryAllFilterCategoryIdsCount() {
             return this.transactionsStore.allFilterCategoryIdsCount;
         },
         queryAllFilterAccountIdsCount() {
             return this.transactionsStore.allFilterAccountIdsCount;
+        },
+        queryAllFilterTagIdsCount() {
+            return this.transactionsStore.allFilterTagIdsCount;
         },
         queryAllSelectedFilterCategoryIds() {
             if (this.queryAllFilterCategoryIdsCount === 0) {
@@ -630,6 +699,15 @@ export default {
                 return 'multiple';
             }
         },
+        queryAllSelectedFilterTagIds() {
+            if (this.queryAllFilterTagIdsCount === 0) {
+                return '';
+            } else if (this.queryAllFilterTagIdsCount === 1) {
+                return this.query.tagIds;
+            } else { // this.queryAllFilterTagIdsCount > 1
+                return 'multiple';
+            }
+        },
         queryCategoryName() {
             if (this.queryAllFilterCategoryIdsCount > 1) {
                 return this.$t('Multiple Categories');
@@ -643,6 +721,13 @@ export default {
             }
 
             return getNameByKeyValue(this.allAccounts, this.query.accountIds, null, 'name', this.$t('Account'));
+        },
+        queryTagName() {
+            if (this.queryAllFilterTagIdsCount > 1) {
+                return this.$t('Multiple Tags');
+            }
+
+            return getNameByKeyValue(this.allTransactionTags, this.query.tagIds, null, 'name', this.$t('Tags'));
         },
         queryAmount() {
             if (!this.query.amountFilter) {
@@ -802,6 +887,9 @@ export default {
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
+        allVisibleTagsCount() {
+            return this.transactionTagsStore.allVisibleTagsCount;
+        },
         recentMonthDateRanges() {
             return this.$locale.getAllRecentMonthDateRanges(this.userStore, true, true);
         },
@@ -820,6 +908,7 @@ export default {
             type: this.initType,
             categoryIds: this.initCategoryIds,
             accountIds: this.initAccountIds,
+            tagIds: this.initTagIds,
             amountFilter: this.initAmountFilter,
             keyword: this.initKeyword
         });
@@ -849,6 +938,7 @@ export default {
                 type: to.query.type,
                 categoryIds: to.query.categoryIds,
                 accountIds: to.query.accountIds,
+                tagIds: to.query.tagIds,
                 amountFilter: to.query.amountFilter,
                 keyword: to.query.keyword
             });
@@ -875,6 +965,7 @@ export default {
                 type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
                 categoryIds: query.categoryIds,
                 accountIds: query.accountIds,
+                tagIds: query.tagIds,
                 amountFilter: query.amountFilter || '',
                 keyword: query.keyword || ''
             });
@@ -1156,6 +1247,32 @@ export default {
                 this.$router.push(this.getFilterLinkUrl());
             }
         },
+        changeTagFilter(tagIds) {
+            if (this.query.tagIds === tagIds) {
+                return;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter({
+                tagIds: tagIds
+            });
+
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
+        },
+        changeMultipleTagsFilter(changed) {
+            this.showFilterTagDialog = false;
+
+            if (changed) {
+                this.loading = true;
+                this.currentPageTransactions = [];
+                this.transactionsStore.clearTransactions();
+                this.$router.push(this.getFilterLinkUrl());
+            }
+        },
         changeKeywordFilter(keyword) {
             if (this.query.keyword === keyword) {
                 return;
@@ -1179,7 +1296,8 @@ export default {
             self.$refs.editDialog.open({
                 type: self.query.type,
                 categoryId: self.queryAllFilterCategoryIdsCount === 1 ? self.query.categoryIds : '',
-                accountId: self.queryAllFilterAccountIdsCount === 1 ? self.query.accountIds : ''
+                accountId: self.queryAllFilterAccountIdsCount === 1 ? self.query.accountIds : '',
+                tagIds: self.query.tagIds || ''
             }).then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
@@ -1250,6 +1368,11 @@ export default {
         scrollAccountMenuToSelectedItem(opened) {
             if (opened) {
                 this.scrollMenuToSelectedItem(this.$refs.accountFilterMenu);
+            }
+        },
+        scrollTagMenuToSelectedItem(opened) {
+            if (opened) {
+                this.scrollMenuToSelectedItem(this.$refs.tagFilterMenu);
             }
         },
         scrollMenuToSelectedItem(menu) {
@@ -1375,7 +1498,7 @@ export default {
 }
 
 .transaction-table .transaction-table-column-tags {
-    width: 80px;
+    width: 90px;
     max-width: 300px;
 }
 
@@ -1409,6 +1532,7 @@ export default {
 .transaction-category-menu .item-icon,
 .transaction-amount-menu .item-icon,
 .transaction-account-menu .item-icon,
+.transaction-tag-menu .item-icon,
 .transaction-table .item-icon {
     padding-bottom: 3px;
 }
@@ -1424,7 +1548,8 @@ export default {
 
 .transaction-category-menu .has-children-item-selected span,
 .transaction-category-menu .item-in-multiple-selection span,
-.transaction-account-menu .item-in-multiple-selection span {
+.transaction-account-menu .item-in-multiple-selection span,
+.transaction-tag-menu .item-in-multiple-selection span {
     font-weight: bold;
 }
 </style>

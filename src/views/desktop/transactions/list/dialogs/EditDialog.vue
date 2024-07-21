@@ -488,6 +488,9 @@ export default {
         allTags() {
             return this.transactionTagsStore.allVisibleTags;
         },
+        allTagsMap() {
+            return this.transactionTagsStore.allTransactionTagsMap;
+        },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
                 return false;
@@ -847,11 +850,13 @@ export default {
                 this.allCategoriesMap,
                 this.allVisibleAccounts,
                 this.allAccountsMap,
+                this.allTagsMap,
                 this.defaultAccountId,
                 {
                     type: options.type,
                     categoryId: options.categoryId,
-                    accountId: options.accountId
+                    accountId: options.accountId,
+                    tagIds: options.tagIds
                 },
                 setContextData,
                 convertContextTime

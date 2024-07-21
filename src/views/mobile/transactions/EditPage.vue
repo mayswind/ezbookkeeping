@@ -504,6 +504,9 @@ export default {
         allTags() {
             return this.transactionTagsStore.allTransactionTags;
         },
+        allTagsMap() {
+            return this.transactionTagsStore.allTransactionTagsMap;
+        },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
                 return false;
@@ -683,11 +686,13 @@ export default {
                 self.allCategoriesMap,
                 self.allVisibleAccounts,
                 self.allAccountsMap,
+                self.allTagsMap,
                 self.defaultAccountId,
                 {
                     type: query.type,
                     categoryId: query.categoryId,
-                    accountId: query.accountId
+                    accountId: query.accountId,
+                    tagIds: query.tagIds
                 },
                 (self.mode === 'edit' || self.mode === 'view'),
                 (self.mode === 'edit' || self.mode === 'view')

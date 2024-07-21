@@ -72,6 +72,9 @@ export const useTransactionTagsStore = defineStore('transactionTags', {
             }
 
             return allVisibleTags;
+        },
+        allVisibleTagsCount(state) {
+            return state.allTransactionTags.length;
         }
     },
     actions: {

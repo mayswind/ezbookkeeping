@@ -19,6 +19,7 @@ import TextSizeSettingsPage from '@/views/mobile/settings/TextSizeSettingsPage.v
 import PageSettingsPage from '@/views/mobile/settings/PageSettingsPage.vue';
 import AccountFilterSettingsPage from '@/views/mobile/settings/AccountFilterSettingsPage.vue';
 import CategoryFilterSettingsPage from '@/views/mobile/settings/CategoryFilterSettingsPage.vue';
+import TransactionTagFilterSettingsPage from '@/views/mobile/settings/TransactionTagFilterSettingsPage.vue';
 
 import SettingsPage from '@/views/mobile/SettingsPage.vue';
 import ApplicationLockPage from '@/views/mobile/ApplicationLockPage.vue';
@@ -207,6 +208,11 @@ const routes = [
     {
         path: '/settings/filter/category',
         async: asyncResolve(CategoryFilterSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/filter/tag',
+        async: asyncResolve(TransactionTagFilterSettingsPage),
         beforeEnter: [checkLogin]
     },
     {

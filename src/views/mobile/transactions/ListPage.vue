@@ -11,7 +11,7 @@
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t('Transaction List')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${queryAllFilterCategoryIdsCount === 1 ? query.categoryIds : ''}&accountId=${queryAllFilterAccountIdsCount === 1 ? query.accountIds : ''}`"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :href="`/transaction/add?type=${query.type}&categoryId=${queryAllFilterCategoryIdsCount === 1 ? query.categoryIds : ''}&accountId=${queryAllFilterAccountIdsCount === 1 ? query.accountIds : ''}&tagIds=${query.tagIds || ''}`"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">
@@ -42,7 +42,7 @@
                 <span :class="{ 'tabbar-item-changed': query.accountIds }">{{ queryAccountName }}</span>
             </f7-link>
             <f7-link popover-open=".more-popover-menu">
-                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter }"></f7-icon>
+                <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter || query.tagIds }"></f7-icon>
             </f7-link>
         </f7-toolbar>
 
@@ -445,6 +445,36 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)"></f7-icon>
                     </template>
                 </f7-list-item>
+
+                <f7-list-item group-title :title="$t('Tags')" />
+                <f7-list-item :class="{ 'list-item-selected': !query.tagIds }" :title="$t('All')" @click="changeTagFilter('')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
+                              :title="$t('Multiple Tags')" @click="filterMultipleTags()" v-if="allVisibleTagsCount > 0">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
+                    </template>
+                </f7-list-item>
+                <f7-list-item :title="transactionTag.name"
+                              :class="{ 'list-item-selected': query.tagIds === transactionTag.id, 'item-in-multiple-selection': queryAllFilterTagIdsCount > 1 && queryAllFilterTagIds[transactionTag.id] }"
+                              :key="transactionTag.id"
+                              v-for="transactionTag in allTransactionTags"
+                              v-show="!transactionTag.hidden"
+                              @click="changeTagFilter(transactionTag.id)"
+                >
+                    <template #before-title>
+                        <f7-icon f7="number" class="transaction-tag-name"></f7-icon>
+                    </template>
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon"
+                                 f7="checkmark_alt"
+                                 v-if="query.tagIds === transactionTag.id">
+                        </f7-icon>
+                    </template>
+                </f7-list-item>
             </f7-list>
         </f7-popover>
 
@@ -555,11 +585,17 @@ export default {
         queryAllFilterAccountIds() {
             return this.transactionsStore.allFilterAccountIds;
         },
+        queryAllFilterTagIds() {
+            return this.transactionsStore.allFilterTagIds;
+        },
         queryAllFilterCategoryIdsCount() {
             return this.transactionsStore.allFilterCategoryIdsCount;
         },
         queryAllFilterAccountIdsCount() {
             return this.transactionsStore.allFilterAccountIdsCount;
+        },
+        queryAllFilterTagIdsCount() {
+            return this.transactionsStore.allFilterTagIdsCount;
         },
         queryCategoryName() {
             if (this.queryAllFilterCategoryIdsCount > 1) {
@@ -639,6 +675,9 @@ export default {
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
+        allVisibleTagsCount() {
+            return this.transactionTagsStore.allVisibleTagsCount;
+        },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
         },
@@ -674,7 +713,8 @@ export default {
             minTime: dateRange ? dateRange.minTime : undefined,
             type: parseInt(query.type) > 0 ? parseInt(query.type) : undefined,
             categoryIds: query.categoryIds,
-            accountIds: query.accountIds
+            accountIds: query.accountIds,
+            tagIds: query.tagIds
         });
 
         this.reload(null);
@@ -889,6 +929,21 @@ export default {
                 this.reload(null);
             }
         },
+        changeTagFilter(tagIds) {
+            if (this.query.tagIds === tagIds) {
+                return;
+            }
+
+            const changed = this.transactionsStore.updateTransactionListFilter({
+                tagIds: tagIds
+            });
+
+            this.showMorePopover = false;
+
+            if (changed) {
+                this.reload(null);
+            }
+        },
         changeAmountFilter(filterType) {
             if (this.query.amountFilter === filterType) {
                 return;
@@ -934,6 +989,9 @@ export default {
         },
         filterMultipleAccounts() {
             this.f7router.navigate('/settings/filter/account?type=transactionListCurrent');
+        },
+        filterMultipleTags() {
+            this.f7router.navigate('/settings/filter/tag?type=transactionListCurrent');
         },
         duplicate(transaction) {
             this.f7router.navigate(`/transaction/add?id=${transaction.id}&type=${transaction.type}`);
@@ -1168,6 +1226,11 @@ export default {
 .list.transaction-info-list li.transaction-info .transaction-category-name {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.more-popover-menu .transaction-tag-name {
+    padding-right: 4px;
+    font-size: var(--f7-list-item-title-font-size);
 }
 
 .date-popover-menu .popover-inner,

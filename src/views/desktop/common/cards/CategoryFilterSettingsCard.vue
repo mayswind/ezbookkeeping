@@ -225,18 +225,18 @@ export default {
                     continue;
                 }
 
-                if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
+                if (self.type === 'transactionListCurrent' && self.transactionsStore.allFilterCategoryIdsCount > 0) {
                     allCategoryIds[category.id] = true;
                 } else {
                     allCategoryIds[category.id] = false;
                 }
             }
 
-            if (this.type === 'statisticsDefault') {
+            if (self.type === 'statisticsDefault') {
                 self.filterCategoryIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultTransactionCategoryFilter, allCategoryIds);
-            } else if (this.type === 'statisticsCurrent') {
+            } else if (self.type === 'statisticsCurrent') {
                 self.filterCategoryIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterCategoryIds, allCategoryIds);
-            } else if (this.type === 'transactionListCurrent') {
+            } else if (self.type === 'transactionListCurrent') {
                 for (let categoryId in self.transactionsStore.allFilterCategoryIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterCategoryIds, categoryId)) {
                         continue;

@@ -212,18 +212,18 @@ export default {
 
                 const account = self.accountsStore.allAccountsMap[accountId];
 
-                if (this.type === 'transactionListCurrent' && self.transactionsStore.allFilterAccountIdsCount > 0) {
+                if (self.type === 'transactionListCurrent' && self.transactionsStore.allFilterAccountIdsCount > 0) {
                     allAccountIds[account.id] = true;
                 } else {
                     allAccountIds[account.id] = false;
                 }
             }
 
-            if (this.type === 'statisticsDefault') {
+            if (self.type === 'statisticsDefault') {
                 self.filterAccountIds = copyObjectTo(self.settingsStore.appSettings.statistics.defaultAccountFilter, allAccountIds);
-            } else if (this.type === 'statisticsCurrent') {
+            } else if (self.type === 'statisticsCurrent') {
                 self.filterAccountIds = copyObjectTo(self.statisticsStore.transactionStatisticsFilter.filterAccountIds, allAccountIds);
-            } else if (this.type === 'transactionListCurrent') {
+            } else if (self.type === 'transactionListCurrent') {
                 for (let accountId in self.transactionsStore.allFilterAccountIds) {
                     if (!Object.prototype.hasOwnProperty.call(self.transactionsStore.allFilterAccountIds, accountId)) {
                         continue;

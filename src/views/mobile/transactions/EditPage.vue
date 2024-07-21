@@ -502,7 +502,7 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allTags() {
-            return this.transactionTagsStore.allTransactionTags;
+            return this.transactionTagsStore.allVisibleTags;
         },
         allTagsMap() {
             return this.transactionTagsStore.allTransactionTagsMap;

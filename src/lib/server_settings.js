@@ -53,8 +53,16 @@ export function isMapDataFetchProxyEnabled() {
     return getServerSetting('mp') === '1';
 }
 
-export function getCustomMapTileServerUrl() {
+export function getCustomMapTileLayerUrl() {
     return getServerDecodedSetting('cmsu');
+}
+
+export function getCustomMapAnnotationLayerUrl() {
+    return getServerDecodedSetting('cmau');
+}
+
+export function isCustomMapAnnotationLayerDataFetchProxyEnabled() {
+    return getServerSetting('cmap') === '1';
 }
 
 export function getCustomMapMinZoomLevel() {

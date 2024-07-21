@@ -58,7 +58,7 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		} else if mapProvider == settings.TianDiTuProvider {
 			return tianDiTuMapTileImageUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
 		} else if mapProvider == settings.CustomProvider {
-			return settings.Container.Current.CustomMapTileServerUrl, nil
+			return settings.Container.Current.CustomMapTileServerTileLayerUrl, nil
 		}
 
 		return "", errs.ErrParameterInvalid
@@ -70,6 +70,8 @@ func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.Context) (*httput
 	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
 		if mapProvider == settings.TianDiTuProvider {
 			return tianDiTuMapAnnotationUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
+		} else if mapProvider == settings.CustomProvider {
+			return settings.Container.Current.CustomMapTileServerAnnotationLayerUrl, nil
 		}
 
 		return "", errs.ErrParameterInvalid

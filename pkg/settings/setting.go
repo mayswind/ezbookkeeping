@@ -240,21 +240,22 @@ type Config struct {
 	EnableDataExport bool
 
 	// Map
-	MapProvider                         string
-	EnableMapDataFetchProxy             bool
-	MapProxy                            string
-	TomTomMapAPIKey                     string
-	TianDiTuAPIKey                      string
-	GoogleMapAPIKey                     string
-	BaiduMapAK                          string
-	AmapApplicationKey                  string
-	AmapSecurityVerificationMethod      string
-	AmapApplicationSecret               string
-	AmapApiExternalProxyUrl             string
-	CustomMapTileServerUrl              string
-	CustomMapTileServerMinZoomLevel     uint8
-	CustomMapTileServerMaxZoomLevel     uint8
-	CustomMapTileServerDefaultZoomLevel uint8
+	MapProvider                           string
+	EnableMapDataFetchProxy               bool
+	MapProxy                              string
+	TomTomMapAPIKey                       string
+	TianDiTuAPIKey                        string
+	GoogleMapAPIKey                       string
+	BaiduMapAK                            string
+	AmapApplicationKey                    string
+	AmapSecurityVerificationMethod        string
+	AmapApplicationSecret                 string
+	AmapApiExternalProxyUrl               string
+	CustomMapTileServerTileLayerUrl       string
+	CustomMapTileServerAnnotationLayerUrl string
+	CustomMapTileServerMinZoomLevel       uint8
+	CustomMapTileServerMaxZoomLevel       uint8
+	CustomMapTileServerDefaultZoomLevel   uint8
 
 	// Exchange Rates
 	ExchangeRatesDataSource     string
@@ -691,7 +692,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	config.AmapApplicationSecret = getConfigItemStringValue(configFile, sectionName, "amap_application_secret")
 	config.AmapApiExternalProxyUrl = getConfigItemStringValue(configFile, sectionName, "amap_api_external_proxy_url")
 
-	config.CustomMapTileServerUrl = getConfigItemStringValue(configFile, sectionName, "custom_map_tile_server_url")
+	config.CustomMapTileServerTileLayerUrl = getConfigItemStringValue(configFile, sectionName, "custom_map_tile_server_url")
+	config.CustomMapTileServerAnnotationLayerUrl = getConfigItemStringValue(configFile, sectionName, "custom_map_tile_server_annotation_url")
 	config.CustomMapTileServerMinZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_min_zoom_level", 1)
 	config.CustomMapTileServerMaxZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_max_zoom_level", 18)
 	config.CustomMapTileServerDefaultZoomLevel = getConfigItemUint8Value(configFile, sectionName, "custom_map_tile_server_default_zoom_level", 14)

@@ -168,7 +168,8 @@ func startWebServer(c *cli.Context) error {
 				proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler))
 			}
 
-			if config.MapProvider == settings.TianDiTuProvider {
+			if config.MapProvider == settings.TianDiTuProvider ||
+				(config.MapProvider == settings.CustomProvider && config.CustomMapTileServerAnnotationLayerUrl != "") {
 				proxyRoute.GET("/map/annotation/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapAnnotationImageProxyHandler))
 			}
 		}

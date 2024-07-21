@@ -1,7 +1,9 @@
 import mapConstants from '@/consts/map.js';
 import {
     isMapDataFetchProxyEnabled,
-    getCustomMapTileServerUrl,
+    getCustomMapTileLayerUrl,
+    getCustomMapAnnotationLayerUrl,
+    isCustomMapAnnotationLayerDataFetchProxyEnabled,
     getCustomMapMinZoomLevel,
     getCustomMapMaxZoomLevel,
     getCustomMapDefaultZoomLevel,
@@ -77,7 +79,7 @@ export function createLeafletMapInstance(mapHolder, mapContainer, options) {
     });
     tileLayer.addTo(leafletInstance);
 
-    if (mapTileSource.annotationUrlFormat) {
+    if (mapTileSource.annotationUrlFormat || (mapHolder.mapProvider === 'custom' && isCustomMapAnnotationLayerDataFetchProxyEnabled())) {
         if (isMapDataFetchProxyEnabled()) {
             mapTileSource.annotationUrlFormat = services.generateMapProxyAnnotationImageUrl(mapHolder.mapProvider, options.language);
             mapTileSource.annotationUrlSubDomains = '';
@@ -160,8 +162,10 @@ export function removeLeafletMapCenterMaker(mapHolder) {
 
 function createCustomMapSource() {
     return {
-        tileUrlFormat: getCustomMapTileServerUrl(),
+        tileUrlFormat: getCustomMapTileLayerUrl(),
         tileUrlSubDomains: '',
+        annotationUrlFormat: getCustomMapAnnotationLayerUrl(),
+        annotationUrlSubDomains: '',
         minZoom: getCustomMapMinZoomLevel(),
         maxZoom: getCustomMapMaxZoomLevel(),
         defaultZoomLevel: getCustomMapDefaultZoomLevel()

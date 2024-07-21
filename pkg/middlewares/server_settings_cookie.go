@@ -40,7 +40,15 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			settingsArr = append(settingsArr, buildStringSetting("cmzl", fmt.Sprintf("%d-%d-%d", config.CustomMapTileServerMinZoomLevel, config.CustomMapTileServerMaxZoomLevel, config.CustomMapTileServerDefaultZoomLevel)))
 
 			if !config.EnableMapDataFetchProxy {
-				settingsArr = append(settingsArr, buildEncodedStringSetting("cmsu", config.CustomMapTileServerUrl))
+				settingsArr = append(settingsArr, buildEncodedStringSetting("cmsu", config.CustomMapTileServerTileLayerUrl))
+
+				if config.CustomMapTileServerAnnotationLayerUrl != "" {
+					settingsArr = append(settingsArr, buildEncodedStringSetting("cmau", config.CustomMapTileServerAnnotationLayerUrl))
+				}
+			} else {
+				if config.CustomMapTileServerAnnotationLayerUrl != "" {
+					settingsArr = append(settingsArr, buildBooleanSetting("cmap", config.EnableMapDataFetchProxy))
+				}
 			}
 		}
 

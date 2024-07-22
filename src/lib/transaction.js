@@ -11,7 +11,7 @@ import {
     categoryTypeToTransactionType,
     isSubCategoryIdAvailable,
     getFirstAvailableCategoryId,
-    getFirstAvaiableSubCategoryId
+    getFirstAvailableSubCategoryId
 } from './category.js';
 
 function getDisplayAmount(amount, currency, hideAmount, formatAmountWithCurrencyFunc) {
@@ -38,7 +38,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
             if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId)) {
                 transaction.expenseCategory = options.categoryId;
             } else {
-                transaction.expenseCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId);
+                transaction.expenseCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense], options.categoryId);
             }
         }
 
@@ -53,7 +53,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
             if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId)) {
                 transaction.incomeCategory = options.categoryId;
             } else {
-                transaction.incomeCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId);
+                transaction.incomeCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Income], options.categoryId);
             }
         }
 
@@ -68,7 +68,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
             if (isSubCategoryIdAvailable(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId)) {
                 transaction.transferCategory = options.categoryId;
             } else {
-                transaction.transferCategory = getFirstAvaiableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId);
+                transaction.transferCategory = getFirstAvailableSubCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer], options.categoryId);
             }
         }
 

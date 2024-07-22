@@ -172,8 +172,20 @@ export function isSubCategoryIdAvailable(categories, categoryId) {
     }
 
     for (let i = 0; i < categories.length; i++) {
-        for (let j = 0; j < categories[i].subCategories.length; j++) {
-            if (categories[i].subCategories[j].id === categoryId) {
+        const primaryCategory = categories[i];
+
+        if (primaryCategory.hidden) {
+            continue;
+        }
+
+        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
+            const secondaryCategory = primaryCategory.subCategories[j];
+
+            if (secondaryCategory.hidden) {
+                continue;
+            }
+
+            if (secondaryCategory.id === categoryId) {
                 return true;
             }
         }
@@ -188,27 +200,49 @@ export function getFirstAvailableCategoryId(categories) {
     }
 
     for (let i = 0; i < categories.length; i++) {
-        for (let j = 0; j < categories[i].subCategories.length; j++) {
-            return categories[i].subCategories[j].id;
+        const primaryCategory = categories[i];
+
+        if (primaryCategory.hidden) {
+            continue;
+        }
+
+        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
+            const secondaryCategory = primaryCategory.subCategories[j];
+
+            if (secondaryCategory.hidden) {
+                continue;
+            }
+
+            return secondaryCategory.id;
         }
     }
+
+    return '';
 }
 
-export function getFirstAvaiableSubCategoryId(categories, categoryId) {
+export function getFirstAvailableSubCategoryId(categories, categoryId) {
     if (!categories || !categories.length) {
         return '';
     }
 
     for (let i = 0; i < categories.length; i++) {
-        if (categories[i].id !== categoryId) {
+        const primaryCategory = categories[i];
+
+        if (primaryCategory.hidden || primaryCategory.id !== categoryId) {
             continue;
         }
 
-        if (categories[i].subCategories.length <= 0) {
-            return '';
+        for (let j = 0; j < primaryCategory.subCategories.length; j++) {
+            const secondaryCategory = primaryCategory.subCategories[j];
+
+            if (secondaryCategory.hidden) {
+                continue;
+            }
+
+            return secondaryCategory.id;
         }
 
-        return categories[i].subCategories[0].id;
+        return '';
     }
 
     return '';

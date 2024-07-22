@@ -102,9 +102,10 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Expense]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.expenseCategory">
@@ -132,9 +133,10 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Income]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.incomeCategory">
@@ -162,9 +164,10 @@
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                            primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                           primary-sub-items-field="subCategories"
+                                           primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
                                            secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-hidden-field="hidden"
                                            :items="allCategories[allCategoryTypes.Transfer]"
                                            v-model:show="showCategorySheet"
                                            v-model="transaction.transferCategory">

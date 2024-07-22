@@ -223,7 +223,7 @@ export function getFirstVisibleItem(items, hiddenField) {
 
             return items[i];
         }
-    } else {
+    } else if (isObject(items)) {
         for (let field in items) {
             if (!Object.prototype.hasOwnProperty.call(items, field)) {
                 continue;
@@ -249,7 +249,7 @@ export function getItemByKeyValue(src, value, keyField) {
                 return item;
             }
         }
-    } else {
+    } else if (isObject(src)) {
         for (let field in src) {
             if (!Object.prototype.hasOwnProperty.call(src, field)) {
                 continue;

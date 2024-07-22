@@ -623,6 +623,7 @@ export default {
         'email is verified': 'Email is verified',
         'email validation not allowed': 'Email validation is not allowed',
         'decimal separator and digit grouping symbol cannot be equal': 'Decimal separator and digit grouping symbol cannot be equal',
+        'user default account is hidden': 'Cannot set hidden account as default account',
         'unauthorized access': 'Unauthorized access',
         'current token is invalid': 'Current token is invalid',
         'current token is expired': 'Current token is expired',

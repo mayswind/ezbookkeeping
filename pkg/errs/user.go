@@ -30,4 +30,5 @@ var (
 	ErrEmailIsVerified                                     = NewNormalError(NormalSubcategoryUser, 21, http.StatusBadRequest, "email is verified")
 	ErrEmailValidationNotAllowed                           = NewNormalError(NormalSubcategoryUser, 22, http.StatusBadRequest, "email validation not allowed")
 	ErrDecimalSeparatorAndDigitGroupingSymbolCannotBeEqual = NewNormalError(NormalSubcategoryUser, 23, http.StatusBadRequest, "decimal separator and digit grouping symbol cannot be equal")
+	ErrUserDefaultAccountIsHidden                          = NewNormalError(NormalSubcategoryUser, 24, http.StatusBadRequest, "user default account is hidden")
 )

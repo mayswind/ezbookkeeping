@@ -623,6 +623,7 @@ export default {
         'email is verified': '邮箱已经验证过',
         'email validation not allowed': '不允许邮箱验证',
         'decimal separator and digit grouping symbol cannot be equal': '小数点和数字分组符号不能相同',
+        'user default account is hidden': '不能把隐藏账户设置为默认账户',
         'unauthorized access': '未授权的登录',
         'current token is invalid': '当前认证令牌无效',
         'current token is expired': '当前认证令牌已过期',

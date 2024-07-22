@@ -263,10 +263,20 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) 
 	}
 
 	if userUpdateReq.DefaultAccountId > 0 && userUpdateReq.DefaultAccountId != user.DefaultAccountId {
-		accounts, err := a.accounts.GetAccountsByAccountIds(c, uid, []int64{userUpdateReq.DefaultAccountId})
+		accountMap, err := a.accounts.GetAccountsByAccountIds(c, uid, []int64{userUpdateReq.DefaultAccountId})
 
-		if err != nil || len(accounts) < 1 {
+		if err != nil || len(accountMap) < 1 {
 			return nil, errs.Or(err, errs.ErrUserDefaultAccountIsInvalid)
+		}
+
+		if _, exists := accountMap[userUpdateReq.DefaultAccountId]; !exists {
+			log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] account \"id:%d\" does not exist for user \"uid:%d\"", userUpdateReq.DefaultAccountId, uid)
+			return nil, errs.ErrUserDefaultAccountIsInvalid
+		}
+
+		if accountMap[userUpdateReq.DefaultAccountId].Hidden {
+			log.WarnfWithRequestId(c, "[users.UserUpdateProfileHandler] account \"id:%d\" is hidden of user \"uid:%d\"", userUpdateReq.DefaultAccountId, uid)
+			return nil, errs.ErrUserDefaultAccountIsHidden
 		}
 
 		user.DefaultAccountId = userUpdateReq.DefaultAccountId

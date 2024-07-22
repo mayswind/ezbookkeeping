@@ -30,6 +30,7 @@
                         <v-list-item :class="{ 'primary-list-item-selected v-list-item--active text-primary': item === selectedPrimaryItem }"
                                      :key="primaryKeyField ? item[primaryKeyField] : item"
                                      v-for="item in items"
+                                     v-show="item && (!primaryHiddenField || !item[primaryHiddenField])"
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
                                 <ItemIcon class="mr-2" :icon-type="primaryIconType"
@@ -49,6 +50,7 @@
                         <v-list-item :class="{ 'secondary-list-item-selected v-list-item--active text-primary': isSecondarySelected(subItem) }"
                                      :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                      v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
+                                     v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
                                 <ItemIcon class="mr-2" :icon-type="secondaryIconType"
@@ -69,7 +71,7 @@
 
 <script>
 import {
-    getFirstItem,
+    getFirstVisibleItem,
     getItemByKeyValue,
     getNameByKeyValue,
     getPrimaryValueBySecondaryValue
@@ -100,6 +102,7 @@ export default {
         'primaryIconField',
         'primaryIconType',
         'primaryColorField',
+        'primaryHiddenField',
         'primarySubItemsField',
         'secondaryKeyField',
         'secondaryValueField',
@@ -112,6 +115,7 @@ export default {
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',
+        'secondaryHiddenField',
         'noItemText',
         'items'
     ],
@@ -133,7 +137,7 @@ export default {
             },
             set: function (value) {
                 const primaryItem = getItemByKeyValue(this.items, value, this.primaryValueField);
-                const secondaryItem = getFirstItem(primaryItem[this.primarySubItemsField]);
+                const secondaryItem = getFirstVisibleItem(primaryItem[this.primarySubItemsField], this.primaryHiddenField);
 
                 if (secondaryItem) {
                     if (this.secondaryValueField) {
@@ -214,7 +218,7 @@ export default {
             }
         },
         getPrimaryValueBySecondaryValue(secondaryValue) {
-            return getPrimaryValueBySecondaryValue(this.items, this.primarySubItemsField, this.primaryValueField, this.secondaryValueField, secondaryValue);
+            return getPrimaryValueBySecondaryValue(this.items, this.primarySubItemsField, this.primaryValueField, this.primaryHiddenField, this.secondaryValueField, this.secondaryHiddenField, secondaryValue);
         },
         onMenuStateChanged(state) {
             const self = this;

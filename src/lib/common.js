@@ -214,14 +214,22 @@ export function stringToArrayBuffer(str){
     return Uint8Array.from(str, c => c.charCodeAt(0)).buffer;
 }
 
-export function getFirstItem(items) {
-    if (isArray(items)) {
-        if (items.length > 0) {
-            return items[0];
+export function getFirstVisibleItem(items, hiddenField) {
+    if (isArray(items) && items.length > 0) {
+        for (let i = 0; i < items.length; i++) {
+            if (hiddenField && items[i][hiddenField]) {
+                continue;
+            }
+
+            return items[i];
         }
     } else {
         for (let field in items) {
             if (!Object.prototype.hasOwnProperty.call(items, field)) {
+                continue;
+            }
+
+            if (hiddenField && items[field][hiddenField]) {
                 continue;
             }
 
@@ -467,9 +475,13 @@ export function selectInvert(filterItemIds, allItemsMap) {
     }
 }
 
-export function isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue) {
+export function isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryHiddenField, secondaryValue) {
     for (let i = 0; i < primaryItem[primarySubItemsField].length; i++) {
         const secondaryItem = primaryItem[primarySubItemsField][i];
+
+        if (secondaryHiddenField && secondaryItem[secondaryHiddenField]) {
+            continue;
+        }
 
         if (secondaryValueField && secondaryItem[secondaryValueField] === secondaryValue) {
             return true;
@@ -481,13 +493,17 @@ export function isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField
     return false;
 }
 
-export function getPrimaryValueBySecondaryValue(items, primarySubItemsField, primaryValueField, secondaryValueField, secondaryValue) {
+export function getPrimaryValueBySecondaryValue(items, primarySubItemsField, primaryValueField, primaryHiddenField, secondaryValueField, secondaryHiddenField, secondaryValue) {
     if (primarySubItemsField) {
         if (isArray(items)) {
             for (let i = 0; i < items.length; i++) {
                 const primaryItem = items[i];
 
-                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue)) {
+                if (primaryHiddenField && primaryItem[primaryHiddenField]) {
+                    continue;
+                }
+
+                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryHiddenField, secondaryValue)) {
                     if (primaryValueField) {
                         return primaryItem[primaryValueField];
                     } else {
@@ -503,7 +519,11 @@ export function getPrimaryValueBySecondaryValue(items, primarySubItemsField, pri
 
                 const primaryItem = items[field];
 
-                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryValue)) {
+                if (primaryHiddenField && primaryItem[primaryHiddenField]) {
+                    continue;
+                }
+
+                if (isPrimaryItemHasSecondaryValue(primaryItem, primarySubItemsField, secondaryValueField, secondaryHiddenField, secondaryValue)) {
                     if (primaryValueField) {
                         return primaryItem[primaryValueField];
                     } else {

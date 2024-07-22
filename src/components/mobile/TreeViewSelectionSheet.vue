@@ -15,7 +15,8 @@
                                   :opened="isPrimaryItemHasSecondaryValue(item)"
                                   :label="$tIf((primaryTitleField ? item[primaryTitleField] : item), primaryTitleI18n)"
                                   :key="primaryKeyField ? item[primaryKeyField] : item"
-                                  v-for="item in items">
+                                  v-for="item in items"
+                                  v-show="item && (!primaryHiddenField || !item[primaryHiddenField])">
                     <template #media>
                         <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]"
                                   :color="item[primaryColorField]" v-if="primaryIconField"></ItemIcon>
@@ -26,6 +27,7 @@
                                       :label="$tIf((secondaryTitleField ? subItem[secondaryTitleField] : subItem), secondaryTitleI18n)"
                                       :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                       v-for="subItem in item[primarySubItemsField]"
+                                      v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
                                       @click="onSecondaryItemClicked(subItem)">
                         <template #media>
                             <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]"
@@ -52,6 +54,7 @@ export default {
         'primaryIconField',
         'primaryIconType',
         'primaryColorField',
+        'primaryHiddenField',
         'primarySubItemsField',
         'secondaryKeyField',
         'secondaryValueField',
@@ -60,6 +63,7 @@ export default {
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',
+        'secondaryHiddenField',
         'items',
         'show'
     ],
@@ -120,6 +124,10 @@ export default {
         isPrimaryItemHasSecondaryValue(primaryItem) {
             for (let i = 0; i < primaryItem[this.primarySubItemsField].length; i++) {
                 const secondaryItem = primaryItem[this.primarySubItemsField][i];
+
+                if (this.secondaryHiddenField && secondaryItem[this.secondaryHiddenField]) {
+                    continue;
+                }
 
                 if (this.secondaryValueField && secondaryItem[this.secondaryValueField] === this.currentValue) {
                     return true;

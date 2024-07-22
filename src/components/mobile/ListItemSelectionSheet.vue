@@ -17,6 +17,7 @@
                               :class="{ 'list-item-selected': isSelected(item, index) }"
                               :key="getItemValue(item, index, keyField, valueType)"
                               v-for="(item, index) in items"
+                              v-show="item && (!hiddenField || !item[hiddenField])"
                               @click="onItemClicked(item, index)">
                     <template #content-start>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>
@@ -44,6 +45,7 @@ export default {
         'iconField',
         'iconType',
         'colorField',
+        'hiddenField',
         'items',
         'show'
     ],

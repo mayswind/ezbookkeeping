@@ -21,6 +21,7 @@
                                           :footer="$tIf(item[primaryFooterField], primaryFooterI18n)"
                                           :key="primaryKeyField ? item[primaryKeyField] : item"
                                           v-for="item in items"
+                                          v-show="item && (!primaryHiddenField || !item[primaryHiddenField])"
                                           @click="onPrimaryItemClicked(item)">
                                 <template #media>
                                     <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]" :color="item[primaryColorField]"></ItemIcon>
@@ -43,6 +44,7 @@
                                           :footer="$tIf(subItem[secondaryFooterField], secondaryFooterI18n)"
                                           :key="secondaryKeyField ? subItem[secondaryKeyField] : subItem"
                                           v-for="subItem in selectedPrimaryItem[primarySubItemsField]"
+                                          v-show="subItem && (!secondaryHiddenField || !subItem[secondaryHiddenField])"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <template #media>
                                     <ItemIcon :icon-type="secondaryIconType" :icon-id="subItem[secondaryIconField]" :color="subItem[secondaryColorField]"></ItemIcon>
@@ -80,6 +82,7 @@ export default {
         'primaryIconField',
         'primaryIconType',
         'primaryColorField',
+        'primaryHiddenField',
         'primarySubItemsField',
         'secondaryKeyField',
         'secondaryValueField',
@@ -92,6 +95,7 @@ export default {
         'secondaryIconField',
         'secondaryIconType',
         'secondaryColorField',
+        'secondaryHiddenField',
         'items',
         'show'
     ],
@@ -151,7 +155,7 @@ export default {
             }
         },
         getPrimaryValueBySecondaryValue(secondaryValue) {
-            return getPrimaryValueBySecondaryValue(this.items, this.primarySubItemsField, this.primaryValueField, this.secondaryValueField, secondaryValue);
+            return getPrimaryValueBySecondaryValue(this.items, this.primarySubItemsField, this.primaryValueField, this.primaryHiddenField, this.secondaryValueField, this.secondaryHiddenField, secondaryValue);
         },
         close() {
             this.$emit('update:show', false);

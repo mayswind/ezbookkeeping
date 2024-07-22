@@ -505,7 +505,7 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allTags() {
-            return this.transactionTagsStore.allVisibleTags;
+            return this.transactionTagsStore.allTransactionTags;
         },
         allTagsMap() {
             return this.transactionTagsStore.allTransactionTagsMap;

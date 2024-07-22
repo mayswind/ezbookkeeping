@@ -22,7 +22,7 @@
                               :checked="isChecked(item.id)"
                               :key="item.id"
                               v-for="item in items"
-                              v-show="!item.hidden"
+                              v-show="!item.hidden || isChecked(item.id)"
                               @change="changeItemSelection">
                     <template #title>
                         <f7-block class="no-padding no-margin">

@@ -245,7 +245,7 @@
                                         </template>
 
                                         <template #item="{ props, item }">
-                                            <v-list-item :value="item.value" v-bind="props">
+                                            <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
                                                 <template #title>
                                                     <v-list-item-title>
                                                         <div class="d-flex align-center">
@@ -489,7 +489,7 @@ export default {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
         allTags() {
-            return this.transactionTagsStore.allVisibleTags;
+            return this.transactionTagsStore.allTransactionTags;
         },
         allTagsMap() {
             return this.transactionTagsStore.allTransactionTagsMap;

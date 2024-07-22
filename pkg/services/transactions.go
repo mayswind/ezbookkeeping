@@ -1635,6 +1635,10 @@ func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *mo
 			return errs.ErrTransactionCategoryNotFound
 		}
 
+		if category.Hidden {
+			return errs.ErrCannotUseHiddenTransactionCategory
+		}
+
 		if category.ParentCategoryId < 1 {
 			return errs.ErrCannotUsePrimaryCategoryForTransaction
 		}
@@ -1643,6 +1647,19 @@ func (s *TransactionService) isCategoryValid(sess *xorm.Session, transaction *mo
 			(transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE && category.Type != models.CATEGORY_TYPE_EXPENSE) ||
 			((transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) && category.Type != models.CATEGORY_TYPE_TRANSFER) {
 			return errs.ErrTransactionCategoryTypeInvalid
+		}
+
+		parentCategory := &models.TransactionCategory{}
+		has, err = sess.ID(category.ParentCategoryId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(parentCategory)
+
+		if err != nil {
+			return err
+		} else if !has {
+			return errs.ErrTransactionCategoryNotFound
+		}
+
+		if parentCategory.Hidden {
+			return errs.ErrCannotUseHiddenTransactionCategory
 		}
 	}
 

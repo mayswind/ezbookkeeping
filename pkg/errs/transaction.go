@@ -22,4 +22,5 @@ var (
 	ErrCannotModifyTransactionWithThisTransactionTime      = NewNormalError(NormalSubcategoryTransaction, 15, http.StatusBadRequest, "cannot modify transaction with this transaction time")
 	ErrCannotDeleteTransactionWithThisTransactionTime      = NewNormalError(NormalSubcategoryTransaction, 16, http.StatusBadRequest, "cannot delete transaction with this transaction time")
 	ErrCannotUseHiddenTransactionCategory                  = NewNormalError(NormalSubcategoryTransaction, 17, http.StatusBadRequest, "cannot use hidden transaction category")
+	ErrCannotUseHiddenTransactionTag                       = NewNormalError(NormalSubcategoryTransaction, 18, http.StatusBadRequest, "cannot use hidden transaction tag")
 )

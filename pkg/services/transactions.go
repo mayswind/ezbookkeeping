@@ -1678,6 +1678,10 @@ func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models
 		tagMap := make(map[int64]*models.TransactionTag)
 
 		for i := 0; i < len(tags); i++ {
+			if tags[i].Hidden {
+				return errs.ErrCannotUseHiddenTransactionTag
+			}
+
 			tagMap[tags[i].TagId] = tags[i]
 		}
 

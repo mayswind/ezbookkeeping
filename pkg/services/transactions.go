@@ -1553,6 +1553,7 @@ func (s *TransactionService) getAccountModels(sess *xorm.Session, transaction *m
 		return nil, nil, errs.ErrSourceAccountNotFound
 	}
 
+	// check whether the related account is valid
 	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		if transaction.RelatedAccountId != 0 && transaction.RelatedAccountId != transaction.AccountId {
 			return nil, nil, errs.ErrAccountIdInvalid

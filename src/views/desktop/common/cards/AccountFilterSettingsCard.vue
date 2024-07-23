@@ -19,6 +19,13 @@
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Accounts')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Accounts')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -40,6 +47,13 @@
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Accounts')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Accounts')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -60,51 +74,53 @@
                 <v-expansion-panel :key="accountCategory.category"
                                    :value="accountCategory.category"
                                    class="border"
-                                   v-for="accountCategory in allVisibleCategorizedAccounts">
+                                   v-for="accountCategory in allCategorizedAccounts"
+                                   v-show="showHidden || accountCategory.allVisibleAccountCount > 0">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
                         <span class="ml-3">{{ $t(accountCategory.name) }}</span>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
                             <template :key="account.id"
-                                      v-for="(account, idx) in accountCategory.visibleAccounts">
-                                <v-list-item>
+                                      v-for="(account, idx) in accountCategory.allAccounts">
+                                <v-divider v-if="showHidden ? idx > 0 : (!account.hidden ? idx > accountCategory.firstVisibleAccountIndex : false)"/>
+
+                                <v-list-item v-if="showHidden || !account.hidden">
                                     <template #prepend>
                                         <v-checkbox :model-value="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                                     :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                                     @update:model-value="selectAccountOrSubAccounts(account, $event)">
                                             <template #label>
-                                                <ItemIcon class="d-flex" icon-type="account"
-                                                          :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                                <ItemIcon class="d-flex" icon-type="account" :icon-id="account.icon"
+                                                          :color="account.color" :hidden-status="account.hidden"></ItemIcon>
                                                 <span class="ml-3">{{ account.name }}</span>
                                             </template>
                                         </v-checkbox>
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]"/>
+                                <v-divider v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ml-4"
-                                        v-if="account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]">
+                                        v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
-                                              v-for="(subAccount, subIdx) in accountCategory.visibleSubAccounts[account.id]">
-                                        <v-list-item>
+                                              v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
+                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > accountCategory.allFirstVisibleSubAccountIndexes[account.id] : false)"/>
+
+                                        <v-list-item v-if="showHidden || !subAccount.hidden">
                                             <template #prepend>
                                                 <v-checkbox :model-value="isAccountChecked(subAccount, filterAccountIds)"
                                                             @update:model-value="selectAccount(subAccount, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex" icon-type="account"
-                                                                  :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
+                                                        <ItemIcon class="d-flex" icon-type="account" :icon-id="subAccount.icon"
+                                                                  :color="subAccount.color" :hidden-status="subAccount.hidden"></ItemIcon>
                                                         <span class="ml-3">{{ subAccount.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>
                                         </v-list-item>
-                                        <v-divider v-if="subIdx !== accountCategory.visibleSubAccounts[account.id].length - 1"/>
                                     </template>
                                 </v-list>
-
-                                <v-divider v-if="idx !== accountCategory.visibleAccounts.length - 1"/>
                             </template>
                         </v-list>
                     </v-expansion-panel-text>
@@ -131,7 +147,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import accountConstants from '@/consts/account.js';
 import { copyObjectTo } from '@/lib/common.js';
 import {
-    getVisibleCategorizedAccounts,
+    getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
     selectAll,
     selectNone,
@@ -144,6 +160,8 @@ import {
     mdiSelectAll,
     mdiSelect,
     mdiSelectInverse,
+    mdiEyeOutline,
+    mdiEyeOffOutline,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -161,10 +179,13 @@ export default {
             loading: true,
             expandAccountCategories: accountConstants.allCategories.map(category => category.id),
             filterAccountIds: {},
+            showHidden: false,
             icons: {
                 selectAll: mdiSelectAll,
                 selectNone: mdiSelect,
                 selectInverse: mdiSelectInverse,
+                show: mdiEyeOutline,
+                hide: mdiEyeOffOutline,
                 more: mdiDotsVertical
             }
         }
@@ -188,11 +209,11 @@ export default {
         allAccountTypes() {
             return accountConstants.allAccountTypes;
         },
-        allVisibleCategorizedAccounts() {
-            return getVisibleCategorizedAccounts(this.accountsStore.allCategorizedAccounts);
+        allCategorizedAccounts() {
+            return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccounts);
         },
         hasAnyAvailableAccount() {
-            return this.accountsStore.allVisibleAccountsCount > 0;
+            return this.accountsStore.allAvailableAccountsCount > 0;
         }
     },
     created() {

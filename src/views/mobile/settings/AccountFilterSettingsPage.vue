@@ -44,7 +44,8 @@
 
         <f7-block class="combination-list-wrapper margin-vertical"
                   :key="accountCategory.category"
-                  v-for="accountCategory in allVisibleCategorizedAccounts"
+                  v-for="accountCategory in allCategorizedAccounts"
+                  v-show="showHidden || accountCategory.allVisibleAccountCount > 0"
                   v-else-if="!loading && hasAnyAvailableAccount">
             <f7-accordion-item :opened="collapseStates[accountCategory.category].opened"
                                @accordion:open="collapseStates[accountCategory.category].opened = true"
@@ -66,30 +67,40 @@
                 <f7-accordion-content :style="{ height: collapseStates[accountCategory.category].opened ? 'auto' : '' }">
                     <f7-list strong inset dividers accordion-list class="combination-list-content">
                         <f7-list-item checkbox
-                                      :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id] }"
+                                      :class="{ 'has-child-list-item': account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id]) }"
                                       :title="account.name"
                                       :value="account.id"
                                       :checked="isAccountOrSubAccountsAllChecked(account, filterAccountIds)"
                                       :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                       :key="account.id"
-                                      v-for="account in accountCategory.visibleAccounts"
+                                      v-for="account in accountCategory.allAccounts"
+                                      v-show="showHidden || !account.hidden"
                                       @change="selectAccountOrSubAccounts">
                             <template #media>
-                                <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                                    <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
+                                        <f7-icon f7="eye_slash_fill"></f7-icon>
+                                    </f7-badge>
+                                </ItemIcon>
                             </template>
 
                             <template #root>
                                 <ul class="padding-left"
-                                    v-if="account.type === allAccountTypes.MultiSubAccounts && accountCategory.visibleSubAccounts[account.id]">
+                                    v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <f7-list-item checkbox
                                                   :title="subAccount.name"
                                                   :value="subAccount.id"
                                                   :checked="isAccountChecked(subAccount, filterAccountIds)"
                                                   :key="subAccount.id"
-                                                  v-for="subAccount in accountCategory.visibleSubAccounts[account.id]"
+                                                  v-for="subAccount in accountCategory.allSubAccounts[account.id]"
+                                                  v-show="showHidden || !subAccount.hidden"
                                                   @change="selectAccount">
                                         <template #media>
-                                            <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
+                                            <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
+                                                <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
+                                                    <f7-icon f7="eye_slash_fill"></f7-icon>
+                                                </f7-badge>
+                                            </ItemIcon>
                                         </template>
                                     </f7-list-item>
                                 </ul>
@@ -105,6 +116,10 @@
                 <f7-actions-button @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
                 <f7-actions-button @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
                 <f7-actions-button @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Accounts') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Accounts') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -123,7 +138,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import accountConstants from '@/consts/account.js';
 import { copyObjectTo } from '@/lib/common.js';
 import {
-    getVisibleCategorizedAccounts,
+    getCategorizedAccountsWithVisibleCount,
     selectAccountOrSubAccounts,
     selectAll,
     selectNone,
@@ -145,6 +160,7 @@ export default {
             loadingError: null,
             type: null,
             filterAccountIds: {},
+            showHidden: false,
             collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
         }
@@ -168,11 +184,11 @@ export default {
         allAccountTypes() {
             return accountConstants.allAccountTypes;
         },
-        allVisibleCategorizedAccounts() {
-            return getVisibleCategorizedAccounts(this.accountsStore.allCategorizedAccounts);
+        allCategorizedAccounts() {
+            return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccounts);
         },
         hasAnyAvailableAccount() {
-            return this.accountsStore.allVisibleAccountsCount > 0;
+            return this.accountsStore.allAvailableAccountsCount > 0;
         }
     },
     created() {

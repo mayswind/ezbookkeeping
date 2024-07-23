@@ -128,7 +128,7 @@ export function getCategorizedAccounts(allAccounts) {
     return ret;
 }
 
-export function getVisibleCategorizedAccounts(categorizedAccounts) {
+export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
     const ret = {};
 
     for (let i = 0; i < accountConstants.allCategories.length; i++) {
@@ -139,8 +139,11 @@ export function getVisibleCategorizedAccounts(categorizedAccounts) {
         }
 
         const allAccounts = categorizedAccounts[accountCategory.id].accounts;
-        const visibleAccounts = [];
-        const allVisibleSubAccounts = {};
+        const allSubAccounts = {};
+        const allVisibleSubAccountCounts = {};
+        const allFirstVisibleSubAccountIndexes = {};
+        let allVisibleAccountCount = 0;
+        let firstVisibleAccountIndex = -1;
 
         for (let j = 0; j < allAccounts.length; j++) {
             const account = allAccounts[j];
@@ -149,35 +152,54 @@ export function getVisibleCategorizedAccounts(categorizedAccounts) {
                 continue;
             }
 
-            visibleAccounts.push(account);
+            allVisibleAccountCount++;
+
+            if (firstVisibleAccountIndex === -1) {
+                firstVisibleAccountIndex = j;
+            }
 
             if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
-                const visibleSubAccounts = [];
+                const subAccounts = [];
+                let visibleSubAccountCount = 0;
+                let firstVisibleSubAccountIndex = -1;
 
                 for (let k = 0; k < account.subAccounts.length; k++) {
                     const subAccount = account.subAccounts[k];
+                    subAccounts.push(subAccount);
 
                     if (!subAccount.hidden) {
-                        visibleSubAccounts.push(subAccount);
+                        visibleSubAccountCount++;
+
+                        if (firstVisibleSubAccountIndex === -1) {
+                            firstVisibleSubAccountIndex = k;
+                        }
                     }
                 }
 
-                if (visibleSubAccounts.length > 0) {
-                    allVisibleSubAccounts[account.id] = visibleSubAccounts;
+                if (subAccounts.length > 0) {
+                    allSubAccounts[account.id] = subAccounts;
+                    allVisibleSubAccountCounts[account.id] = visibleSubAccountCount;
+                    allFirstVisibleSubAccountIndexes[account.id] = firstVisibleSubAccountIndex;
                 }
             }
         }
 
-        if (visibleAccounts.length > 0) {
+        if (allAccounts.length > 0) {
             ret[accountCategory.id] = {
                 category: accountCategory.id,
                 name: accountCategory.name,
                 icon: accountCategory.defaultAccountIconId,
-                visibleAccounts: visibleAccounts,
-                visibleSubAccounts: allVisibleSubAccounts
+                allAccounts: allAccounts,
+                allVisibleAccountCount: allVisibleAccountCount,
+                firstVisibleAccountIndex: firstVisibleAccountIndex,
+                allSubAccounts: allSubAccounts,
+                allVisibleSubAccountCounts: allVisibleSubAccountCounts,
+                allFirstVisibleSubAccountIndexes: allFirstVisibleSubAccountIndexes
             };
         }
     }
+
+    console.log(ret)
 
     return ret;
 }

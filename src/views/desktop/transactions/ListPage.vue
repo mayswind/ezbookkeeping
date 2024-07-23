@@ -334,7 +334,7 @@
                                                         <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
                                                                      :append-icon="(query.tagIds && queryAllFilterTagIdsCount > 1 ? icons.check : null)"
-                                                                     v-if="allVisibleTagsCount > 0">
+                                                                     v-if="allAvailableTagsCount > 0">
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="showFilterTagDialog = true">
                                                                 <div class="d-flex align-center">
@@ -887,8 +887,8 @@ export default {
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
-        allVisibleTagsCount() {
-            return this.transactionTagsStore.allVisibleTagsCount;
+        allAvailableTagsCount() {
+            return this.transactionTagsStore.allAvailableTagsCount;
         },
         recentMonthDateRanges() {
             return this.$locale.getAllRecentMonthDateRanges(this.userStore, true, true);

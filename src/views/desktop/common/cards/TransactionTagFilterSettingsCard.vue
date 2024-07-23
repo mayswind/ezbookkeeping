@@ -19,6 +19,13 @@
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Transaction Tags')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Transaction Tags')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -40,6 +47,13 @@
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Transaction Tags')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Transaction Tags')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -64,13 +78,18 @@
                     <v-expansion-panel-text>
                         <v-list rounded density="comfortable" class="pa-0">
                             <template :key="transactionTag.id"
-                                      v-for="transactionTag in allVisibleTags">
-                                <v-list-item>
+                                      v-for="transactionTag in allTags">
+                                <v-list-item v-if="showHidden || !transactionTag.hidden">
                                     <template #prepend>
                                         <v-checkbox :model-value="!filterTagIds[transactionTag.id]"
                                                     @update:model-value="selectTransactionTag(transactionTag, $event)">
                                             <template #label>
-                                                <v-icon size="24" :icon="icons.tag"/>
+                                                <v-badge class="right-bottom-icon" color="secondary"
+                                                         location="bottom right" offset-x="2" offset-y="2" :icon="icons.hide"
+                                                         v-if="transactionTag.hidden">
+                                                    <v-icon size="24" :icon="icons.tag"/>
+                                                </v-badge>
+                                                <v-icon size="24" :icon="icons.tag" v-else-if="!transactionTag.hidden"/>
                                                 <span class="ml-3">{{ transactionTag.name }}</span>
                                             </template>
                                         </v-checkbox>
@@ -107,6 +126,8 @@ import {
     mdiSelectAll,
     mdiSelect,
     mdiSelectInverse,
+    mdiEyeOutline,
+    mdiEyeOffOutline,
     mdiDotsVertical,
     mdiPound
 } from '@mdi/js';
@@ -125,10 +146,13 @@ export default {
             loading: true,
             expandTagCategories: [ 'default' ],
             filterTagIds: {},
+            showHidden: false,
             icons: {
                 selectAll: mdiSelectAll,
                 selectNone: mdiSelect,
                 selectInverse: mdiSelectInverse,
+                show: mdiEyeOutline,
+                hide: mdiEyeOffOutline,
                 more: mdiDotsVertical,
                 tag: mdiPound
             }
@@ -142,11 +166,11 @@ export default {
         applyText() {
             return 'Apply';
         },
-        allVisibleTags() {
-            return this.transactionTagsStore.allVisibleTags;
+        allTags() {
+            return this.transactionTagsStore.allTransactionTags;
         },
         hasAnyAvailableTag() {
-            return this.transactionTagsStore.allVisibleTagsCount > 0;
+            return this.transactionTagsStore.allAvailableTagsCount > 0;
         }
     },
     created() {

@@ -66,10 +66,15 @@
                                       :value="transactionTag.id"
                                       :checked="!filterTagIds[transactionTag.id]"
                                       :key="transactionTag.id"
-                                      v-for="transactionTag in allVisibleTags"
+                                      v-for="transactionTag in allTags"
+                                      v-show="showHidden || !transactionTag.hidden"
                                       @change="selectTransactionTag">
                             <template #media>
-                                <f7-icon f7="number"></f7-icon>
+                                <f7-icon f7="number">
+                                    <f7-badge color="gray" class="right-bottom-icon" v-if="transactionTag.hidden">
+                                        <f7-icon f7="eye_slash_fill"></f7-icon>
+                                    </f7-badge>
+                                </f7-icon>
                             </template>
                         </f7-list-item>
                     </f7-list>
@@ -82,6 +87,10 @@
                 <f7-actions-button @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
                 <f7-actions-button @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
                 <f7-actions-button @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Tags') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Tags') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -112,6 +121,7 @@ export default {
             loadingError: null,
             type: null,
             filterTagIds: {},
+            showHidden: false,
             collapseStates: {
                 'default': {
                     opened: true
@@ -128,11 +138,11 @@ export default {
         applyText() {
             return 'Apply';
         },
-        allVisibleTags() {
-            return this.transactionTagsStore.allVisibleTags;
+        allTags() {
+            return this.transactionTagsStore.allTransactionTags;
         },
         hasAnyAvailableTag() {
-            return this.transactionTagsStore.allVisibleTagsCount > 0;
+            return this.transactionTagsStore.allAvailableTagsCount > 0;
         }
     },
     created() {

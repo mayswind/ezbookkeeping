@@ -453,7 +453,7 @@
                     </template>
                 </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
-                              :title="$t('Multiple Tags')" @click="filterMultipleTags()" v-if="allVisibleTagsCount > 0">
+                              :title="$t('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds && queryAllFilterTagIdsCount > 1"></f7-icon>
                     </template>
@@ -675,8 +675,8 @@ export default {
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
-        allVisibleTagsCount() {
-            return this.transactionTagsStore.allVisibleTagsCount;
+        allAvailableTagsCount() {
+            return this.transactionTagsStore.allAvailableTagsCount;
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;

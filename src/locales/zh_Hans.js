@@ -677,6 +677,7 @@ export default {
         'cannot add transaction with this transaction time': '您不能添加该交易时间的交易',
         'cannot modify transaction with this transaction time': '您不能修改该交易时间的交易',
         'cannot delete transaction with this transaction time': '您不能删除该交易时间的交易',
+        'cannot use hidden account': '您不能使用隐藏的账户',
         'cannot use hidden transaction category': '您不能使用隐藏的交易分类',
         'cannot use hidden transaction tag': '您不能使用隐藏的交易标签',
         'transaction category id is invalid': '交易分类ID无效',

@@ -677,6 +677,7 @@ export default {
         'cannot add transaction with this transaction time': 'You cannot add transaction with this transaction time',
         'cannot modify transaction with this transaction time': 'You cannot modify this transaction with this transaction time',
         'cannot delete transaction with this transaction time': 'You cannot delete this transaction with this transaction time',
+        'cannot use hidden account': 'You cannot use hidden account',
         'cannot use hidden transaction category': 'You cannot use hidden transaction category',
         'cannot use hidden transaction tag': 'You cannot use hidden transaction tag',
         'transaction category id is invalid': 'Transaction category ID is invalid',

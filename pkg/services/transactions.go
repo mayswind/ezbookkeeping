@@ -1579,6 +1579,54 @@ func (s *TransactionService) getAccountModels(sess *xorm.Session, transaction *m
 		}
 	}
 
+	// check whether the parent accounts are valid
+	if sourceAccount.ParentAccountId > 0 && destinationAccount != nil && sourceAccount.ParentAccountId != destinationAccount.ParentAccountId && destinationAccount.ParentAccountId > 0 {
+		var accounts []*models.Account
+		err := sess.Where("uid=? AND deleted=? and (account_id=? or account_id=?)", transaction.Uid, false, sourceAccount.ParentAccountId, destinationAccount.ParentAccountId).Find(&accounts)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if len(accounts) < 2 {
+			return nil, nil, errs.ErrAccountNotFound
+		}
+
+		for i := 0; i < len(accounts); i++ {
+			account := accounts[i]
+
+			if account.Hidden {
+				return nil, nil, errs.ErrCannotUseHiddenAccount
+			}
+		}
+	} else if sourceAccount.ParentAccountId > 0 && (destinationAccount == nil || sourceAccount.ParentAccountId == destinationAccount.ParentAccountId || destinationAccount.ParentAccountId == 0) {
+		sourceParentAccount := &models.Account{}
+		has, err = sess.ID(sourceAccount.ParentAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(sourceParentAccount)
+
+		if err != nil {
+			return nil, nil, err
+		} else if !has {
+			return nil, nil, errs.ErrSourceAccountNotFound
+		}
+
+		if sourceParentAccount.Hidden {
+			return nil, nil, errs.ErrCannotUseHiddenAccount
+		}
+	} else if sourceAccount.ParentAccountId == 0 && destinationAccount != nil && destinationAccount.ParentAccountId > 0 {
+		destinationParentAccount := &models.Account{}
+		has, err = sess.ID(destinationAccount.ParentAccountId).Where("uid=? AND deleted=?", transaction.Uid, false).Get(destinationParentAccount)
+
+		if err != nil {
+			return nil, nil, err
+		} else if !has {
+			return nil, nil, errs.ErrDestinationAccountNotFound
+		}
+
+		if destinationParentAccount.Hidden {
+			return nil, nil, errs.ErrCannotUseHiddenAccount
+		}
+	}
+
 	return sourceAccount, destinationAccount, nil
 }
 

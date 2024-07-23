@@ -267,6 +267,10 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 			return errs.ErrCannotAddTransactionToHiddenAccount
 		}
 
+		if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
+			return errs.ErrCannotAddTransactionToParentAccount
+		}
+
 		if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
 			sourceAccount.Currency == destinationAccount.Currency && transaction.Amount != transaction.RelatedAccountAmount {
 			return errs.ErrTransactionSourceAndDestinationAmountNotEqual
@@ -490,6 +494,10 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 
 		if sourceAccount.Hidden || (destinationAccount != nil && destinationAccount.Hidden) {
 			return errs.ErrCannotModifyTransactionInHiddenAccount
+		}
+
+		if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
+			return errs.ErrCannotModifyTransactionInParentAccount
 		}
 
 		if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
@@ -850,6 +858,10 @@ func (s *TransactionService) DeleteTransaction(c *core.Context, uid int64, trans
 
 		if sourceAccount.Hidden || (destinationAccount != nil && destinationAccount.Hidden) {
 			return errs.ErrCannotDeleteTransactionInHiddenAccount
+		}
+
+		if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
+			return errs.ErrCannotDeleteTransactionInParentAccount
 		}
 
 		// Update transaction row to deleted

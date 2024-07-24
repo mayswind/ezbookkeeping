@@ -148,14 +148,12 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
         for (let j = 0; j < allAccounts.length; j++) {
             const account = allAccounts[j];
 
-            if (account.hidden) {
-                continue;
-            }
+            if (!account.hidden) {
+                allVisibleAccountCount++;
 
-            allVisibleAccountCount++;
-
-            if (firstVisibleAccountIndex === -1) {
-                firstVisibleAccountIndex = j;
+                if (firstVisibleAccountIndex === -1) {
+                    firstVisibleAccountIndex = j;
+                }
             }
 
             if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
@@ -198,8 +196,6 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
             };
         }
     }
-
-    console.log(ret)
 
     return ret;
 }

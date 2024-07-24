@@ -65,11 +65,11 @@
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
         </div>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyAvailableAccount">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleAccount">
             <span class="text-body-1">{{ $t('No available account') }}</span>
         </v-card-text>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyAvailableAccount">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleAccount">
             <v-expansion-panels class="account-categories" multiple v-model="expandAccountCategories">
                 <v-expansion-panel :key="accountCategory.category"
                                    :value="accountCategory.category"
@@ -99,10 +99,10 @@
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
+                                <v-divider v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ml-4"
-                                        v-if="account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
+                                        v-if="(showHidden || !account.hidden) && account.type === allAccountTypes.MultiSubAccounts && ((showHidden && accountCategory.allSubAccounts[account.id]) || accountCategory.allVisibleSubAccountCounts[account.id])">
                                     <template :key="subAccount.id"
                                               v-for="(subAccount, subIdx) in accountCategory.allSubAccounts[account.id]">
                                         <v-divider v-if="showHidden ? subIdx > 0 : (!subAccount.hidden ? subIdx > accountCategory.allFirstVisibleSubAccountIndexes[account.id] : false)"/>
@@ -130,7 +130,7 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyAvailableAccount" @click="save">{{ $t(applyText) }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleAccount" @click="save">{{ $t(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
             </div>
         </v-card-text>
@@ -214,6 +214,13 @@ export default {
         },
         hasAnyAvailableAccount() {
             return this.accountsStore.allAvailableAccountsCount > 0;
+        },
+        hasAnyVisibleAccount() {
+            if (this.showHidden) {
+                return this.accountsStore.allAvailableAccountsCount > 0;
+            } else {
+                return this.accountsStore.allVisibleAccountsCount > 0;
+            }
         }
     },
     created() {

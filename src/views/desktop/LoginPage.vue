@@ -34,7 +34,6 @@
                                             type="text"
                                             autocomplete="username"
                                             autofocus="autofocus"
-                                            clearable
                                             :disabled="show2faInput || logining || verifying"
                                             :label="$t('Username')"
                                             :placeholder="$t('Your username or email')"
@@ -62,7 +61,6 @@
                                         <v-text-field
                                             type="number"
                                             autocomplete="one-time-code"
-                                            clearable
                                             ref="passcodeInput"
                                             :disabled="logining || verifying"
                                             :label="$t('Passcode')"
@@ -75,7 +73,6 @@
                                         />
                                         <v-text-field
                                             type="text"
-                                            clearable
                                             :disabled="logining || verifying"
                                             :label="$t('Backup Code')"
                                             :placeholder="$t('Backup Code')"

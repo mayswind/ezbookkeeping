@@ -87,7 +87,6 @@
                                 <v-col cols="12" md="12">
                                     <v-text-field
                                         type="text"
-                                        clearable
                                         persistent-placeholder
                                         :disabled="loading || submitting"
                                         :label="currentAccountIndex < 0 ? $t('Account Name') : $t('Sub-account Name')"

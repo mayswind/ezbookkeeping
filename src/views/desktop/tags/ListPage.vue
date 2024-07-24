@@ -87,7 +87,7 @@
                                         </div>
 
                                         <v-text-field class="w-100 mr-2" type="text"
-                                            clearable density="compact" variant="underlined"
+                                            density="compact" variant="underlined"
                                             :disabled="loading || updating"
                                             :placeholder="$t('Tag Title')"
                                             v-model="editingTag.name"
@@ -178,7 +178,7 @@
                     <tr class="text-sm" :class="{ 'even-row': availableTagCount & 1 === 1}">
                         <td>
                             <div class="d-flex align-center">
-                                <v-text-field class="w-100 mr-2" type="text" color="primary" clearable
+                                <v-text-field class="w-100 mr-2" type="text" color="primary"
                                               density="compact" variant="underlined"
                                               :disabled="loading || updating" :placeholder="$t('Tag Title')"
                                               v-model="newTag.name" @keyup.enter="save(newTag)">
@@ -527,9 +527,5 @@ export default {
 
 .transaction-tags-table tr .v-text-field .v-field__input {
     padding-bottom: 1px;
-}
-
-.transaction-tags-table .v-text-field .v-field__clearable {
-    padding-top: var(--v-input-padding-top);
 }
 </style>

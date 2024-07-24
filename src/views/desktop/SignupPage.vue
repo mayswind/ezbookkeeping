@@ -35,7 +35,6 @@
                                         <v-text-field
                                             type="text"
                                             autocomplete="username"
-                                            clearable
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('Username')"
                                             :placeholder="$t('Your username')"
@@ -47,7 +46,6 @@
                                         <v-text-field
                                             type="text"
                                             autocomplete="nickname"
-                                            clearable
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('Nickname')"
                                             :placeholder="$t('Your nickname')"
@@ -60,7 +58,6 @@
                                         <v-text-field
                                             type="email"
                                             autocomplete="email"
-                                            clearable
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('E-mail')"
                                             :placeholder="$t('Your email address')"

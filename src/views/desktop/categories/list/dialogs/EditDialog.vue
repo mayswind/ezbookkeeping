@@ -13,7 +13,6 @@
                         <v-col cols="12" md="12">
                             <v-text-field
                                 type="text"
-                                clearable
                                 persistent-placeholder
                                 :disabled="loading || submitting"
                                 :label="$t('Category Name')"

@@ -34,7 +34,6 @@
                                             type="email"
                                             autocomplete="email"
                                             autofocus="autofocus"
-                                            clearable
                                             :disabled="requesting"
                                             :label="$t('E-mail')"
                                             :placeholder="$t('Your email address')"

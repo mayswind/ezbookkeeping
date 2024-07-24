@@ -46,7 +46,6 @@
                                 <v-text-field
                                     type="text"
                                     autocomplete="nickname"
-                                    clearable
                                     persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Nickname')"
@@ -59,7 +58,6 @@
                                 <v-text-field
                                     type="email"
                                     autocomplete="email"
-                                    clearable
                                     persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('E-mail')"

@@ -27,7 +27,7 @@
                             <v-text-field
                                 type="number"
                                 autocomplete="one-time-code"
-                                clearable variant="underlined"
+                                variant="underlined"
                                 :disabled="loading || enabling || enableConfirming || disabling"
                                 :placeholder="$t('Passcode')"
                                 v-model="currentPasscode"

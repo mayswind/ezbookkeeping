@@ -383,7 +383,7 @@
                               :class="{ 'list-item-selected': query.accountIds === account.id, 'item-in-multiple-selection': queryAllFilterAccountIdsCount > 1 && queryAllFilterAccountIds[account.id] }"
                               :key="account.id"
                               v-for="account in allAccounts"
-                              v-show="!account.hidden || query.accountIds === account.id"
+                              v-show="(!account.hidden && (!allAccounts[account.parentId] || !allAccounts[account.parentId].hidden)) || query.accountIds === account.id"
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>

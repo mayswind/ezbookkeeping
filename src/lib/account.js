@@ -157,13 +157,11 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
             }
 
             if (account.type === accountConstants.allAccountTypes.MultiSubAccounts && account.subAccounts) {
-                const subAccounts = [];
                 let visibleSubAccountCount = 0;
                 let firstVisibleSubAccountIndex = -1;
 
                 for (let k = 0; k < account.subAccounts.length; k++) {
                     const subAccount = account.subAccounts[k];
-                    subAccounts.push(subAccount);
 
                     if (!subAccount.hidden) {
                         visibleSubAccountCount++;
@@ -174,8 +172,8 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
                     }
                 }
 
-                if (subAccounts.length > 0) {
-                    allSubAccounts[account.id] = subAccounts;
+                if (account.subAccounts.length > 0) {
+                    allSubAccounts[account.id] = account.subAccounts;
                     allVisibleSubAccountCounts[account.id] = visibleSubAccountCount;
                     allFirstVisibleSubAccountIndexes[account.id] = firstVisibleSubAccountIndex;
                 }

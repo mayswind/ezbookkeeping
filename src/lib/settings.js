@@ -16,7 +16,7 @@ const defaultSettings = {
     timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
-    showTagInTransactionListPage: false,
+    showTagInTransactionListPage: true,
     showAccountBalance: true,
     statistics: {
         defaultChartDataType: statisticsConstants.defaultChartDataType,

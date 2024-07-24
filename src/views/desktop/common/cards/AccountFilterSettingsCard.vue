@@ -12,12 +12,15 @@
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
                                          :title="$t('Select All')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectAll"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
                                          :title="$t('Select None')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectNone"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvert"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"
@@ -40,12 +43,15 @@
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
                                          :title="$t('Select All')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectAll"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
                                          :title="$t('Select None')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectNone"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
+                                         :disabled="!hasAnyVisibleAccount"
                                          @click="selectInvert"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="icons.show"

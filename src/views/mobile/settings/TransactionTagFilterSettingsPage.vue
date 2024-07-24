@@ -84,9 +84,9 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
-                <f7-actions-button @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
-                <f7-actions-button @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleTag }" @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Tags') }}</f7-actions-button>

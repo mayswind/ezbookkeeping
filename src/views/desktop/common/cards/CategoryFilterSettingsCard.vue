@@ -12,13 +12,23 @@
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
                                          :title="$t('Select All')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectAll"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
                                          :title="$t('Select None')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectNone"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Transaction Categories')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Transaction Categories')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -33,13 +43,23 @@
                         <v-list>
                             <v-list-item :prepend-icon="icons.selectAll"
                                          :title="$t('Select All')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectAll"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectNone"
                                          :title="$t('Select None')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectNone"></v-list-item>
                             <v-list-item :prepend-icon="icons.selectInverse"
                                          :title="$t('Invert Selection')"
+                                         :disabled="!hasAnyVisibleCategory"
                                          @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="icons.show"
+                                         :title="$t('Show Hidden Transaction Categories')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="icons.hide"
+                                         :title="$t('Hide Hidden Transaction Categories')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -56,7 +76,7 @@
                 <v-expansion-panel :key="transactionType.type"
                                    :value="transactionType.type"
                                    class="border"
-                                   v-for="transactionType in allVisibleTransactionCategories">
+                                   v-for="transactionType in allTransactionCategories">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
                         <span class="ml-3">{{ getCategoryTypeName(transactionType.type) }}</span>
                     </v-expansion-panel-title>
@@ -65,44 +85,45 @@
                             <div class="py-3" v-if="!hasAvailableCategory[transactionType.type]">{{ $t('No available category') }}</div>
 
                             <template :key="category.id"
-                                      v-for="(category, idx) in transactionType.visibleCategories">
-                                <v-list-item>
+                                      v-for="(category, idx) in transactionType.allCategories">
+                                <v-divider v-if="showHidden ? idx > 0 : (!category.hidden ? idx > transactionType.firstVisibleCategoryIndex : false)"/>
+
+                                <v-list-item v-if="showHidden || !category.hidden">
                                     <template #prepend>
                                         <v-checkbox :model-value="isSubCategoriesAllChecked(category, filterCategoryIds)"
                                                     :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                                     @update:model-value="selectSubCategories(category, $event)">
                                             <template #label>
-                                                <ItemIcon class="d-flex" icon-type="category"
-                                                          :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                <ItemIcon class="d-flex" icon-type="category" :icon-id="category.icon"
+                                                          :color="category.color" :hidden-status="category.hidden"></ItemIcon>
                                                 <span class="ml-3">{{ category.name }}</span>
                                             </template>
                                         </v-checkbox>
                                     </template>
                                 </v-list-item>
 
-                                <v-divider v-if="transactionType.visibleSubCategories[category.id]"/>
+                                <v-divider v-if="(showHidden || !category.hidden) && ((showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id])"/>
 
                                 <v-list rounded density="comfortable" class="pa-0 ml-4"
-                                        v-if="transactionType.visibleSubCategories[category.id]">
+                                        v-if="(showHidden || !category.hidden) && ((showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id])">
                                     <template :key="subCategory.id"
-                                              v-for="(subCategory, subIdx) in transactionType.visibleSubCategories[category.id]">
-                                        <v-list-item>
+                                              v-for="(subCategory, subIdx) in transactionType.allSubCategories[category.id]">
+                                        <v-divider v-if="showHidden ? subIdx > 0 : (!subCategory.hidden ? subIdx > transactionType.allFirstVisibleSubCategoryIndexes[category.id] : false)"/>
+
+                                        <v-list-item v-if="showHidden || !subCategory.hidden">
                                             <template #prepend>
                                                 <v-checkbox :model-value="isCategoryChecked(subCategory, filterCategoryIds)"
                                                             @update:model-value="selectCategory(subCategory, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex" icon-type="category"
-                                                                  :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                        <ItemIcon class="d-flex" icon-type="category" :icon-id="subCategory.icon"
+                                                                  :color="subCategory.color" :hidden-status="subCategory.hidden"></ItemIcon>
                                                         <span class="ml-3">{{ subCategory.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>
                                         </v-list-item>
-                                        <v-divider v-if="subIdx !== transactionType.visibleSubCategories[category.id].length - 1"/>
                                     </template>
                                 </v-list>
-
-                                <v-divider v-if="idx !== transactionType.visibleCategories - 1"/>
                             </template>
                         </v-list>
                     </v-expansion-panel-text>
@@ -112,7 +133,7 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyAvailableCategory" @click="save">{{ $t(applyText) }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleCategory" @click="save">{{ $t(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
             </div>
         </v-card-text>
@@ -129,7 +150,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import categoryConstants from '@/consts/category.js';
 import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
 import {
-    allVisibleTransactionCategories,
+    allTransactionCategoriesWithVisibleCount,
     hasAnyAvailableCategory,
     hasAvailableCategory,
     selectSubCategories,
@@ -145,6 +166,8 @@ import {
     mdiSelectAll,
     mdiSelect,
     mdiSelectInverse,
+    mdiEyeOutline,
+    mdiEyeOffOutline,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -167,10 +190,13 @@ export default {
                 categoryConstants.allCategoryTypes.Transfer.toString()
             ],
             filterCategoryIds: {},
+            showHidden: false,
             icons: {
                 selectAll: mdiSelectAll,
                 selectNone: mdiSelect,
                 selectInverse: mdiSelectInverse,
+                show: mdiEyeOutline,
+                hide: mdiEyeOffOutline,
                 more: mdiDotsVertical
             }
         }
@@ -194,14 +220,17 @@ export default {
         allowCategoryTypes() {
             return this.categoryTypes ? arrayItemToObjectField(this.categoryTypes.split(','), true) : null;
         },
-        allVisibleTransactionCategories() {
-            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
+        allTransactionCategories() {
+            return allTransactionCategoriesWithVisibleCount(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
         },
         hasAnyAvailableCategory() {
-            return hasAnyAvailableCategory(this.allVisibleTransactionCategories);
+            return hasAnyAvailableCategory(this.allTransactionCategories, true);
+        },
+        hasAnyVisibleCategory() {
+            return hasAnyAvailableCategory(this.allTransactionCategories, this.showHidden);
         },
         hasAvailableCategory() {
-            return hasAvailableCategory(this.allVisibleTransactionCategories);
+            return hasAvailableCategory(this.allTransactionCategories, this.showHidden);
         }
     },
     created() {

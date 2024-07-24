@@ -5,7 +5,7 @@
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="save"></f7-link>
+                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyVisibleCategory }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -50,7 +50,7 @@
 
         <f7-block class="combination-list-wrapper margin-vertical"
                   :key="transactionType.type"
-                  v-for="transactionType in allVisibleTransactionCategories"
+                  v-for="transactionType in allTransactionCategories"
                   v-else-if="!loading">
             <f7-accordion-item :opened="collapseStates[transactionType.type].opened"
                                @accordion:open="collapseStates[transactionType.type].opened = true"
@@ -75,30 +75,40 @@
                     </f7-list>
                     <f7-list strong inset dividers accordion-list class="combination-list-content" v-else-if="hasAvailableCategory[transactionType.type]">
                         <f7-list-item checkbox
-                                      :class="{ 'has-child-list-item': transactionType.visibleSubCategories[category.id] }"
+                                      :class="{ 'has-child-list-item': (showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id] }"
                                       :title="category.name"
                                       :value="category.id"
                                       :checked="isSubCategoriesAllChecked(category, filterCategoryIds)"
                                       :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                       :key="category.id"
-                                      v-for="category in transactionType.visibleCategories"
+                                      v-for="category in transactionType.allCategories"
+                                      v-show="showHidden || !category.hidden"
                                       @change="selectSubCategories">
                             <template #media>
-                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
+                                    <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
+                                        <f7-icon f7="eye_slash_fill"></f7-icon>
+                                    </f7-badge>
+                                </ItemIcon>
                             </template>
 
                             <template #root>
                                 <ul class="padding-left"
-                                    v-if="transactionType.visibleSubCategories[category.id]">
+                                    v-if="(showHidden && transactionType.allSubCategories[category.id]) || transactionType.allVisibleSubCategoryCounts[category.id]">
                                     <f7-list-item checkbox
                                                   :title="subCategory.name"
                                                   :value="subCategory.id"
                                                   :checked="isCategoryChecked(subCategory, filterCategoryIds)"
                                                   :key="subCategory.id"
-                                                  v-for="subCategory in transactionType.visibleSubCategories[category.id]"
+                                                  v-for="subCategory in transactionType.allSubCategories[category.id]"
+                                                  v-show="showHidden || !subCategory.hidden"
                                                   @change="selectCategory">
                                         <template #media>
-                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color">
+                                                <f7-badge color="gray" class="right-bottom-icon" v-if="subCategory.hidden">
+                                                    <f7-icon f7="eye_slash_fill"></f7-icon>
+                                                </f7-badge>
+                                            </ItemIcon>
                                         </template>
                                     </f7-list-item>
                                 </ul>
@@ -111,9 +121,13 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
-                <f7-actions-button @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
-                <f7-actions-button @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectAll">{{ $t('Select All') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectNone">{{ $t('Select None') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': !hasAnyVisibleCategory }" @click="selectInvert">{{ $t('Invert Selection') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button v-if="!showHidden" @click="showHidden = true">{{ $t('Show Hidden Transaction Categories') }}</f7-actions-button>
+                <f7-actions-button v-if="showHidden" @click="showHidden = false">{{ $t('Hide Hidden Transaction Categories') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
@@ -132,7 +146,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import categoryConstants from '@/consts/category.js';
 import { copyObjectTo, arrayItemToObjectField } from '@/lib/common.js';
 import {
-    allVisibleTransactionCategories,
+    allTransactionCategoriesWithVisibleCount,
     hasAnyAvailableCategory,
     hasAvailableCategory,
     selectSubCategories,
@@ -158,6 +172,7 @@ export default {
             type: null,
             allowCategoryTypes: null,
             filterCategoryIds: {},
+            showHidden: false,
             collapseStates: self.getCollapseStates(),
             showMoreActionSheet: false
         }
@@ -178,14 +193,17 @@ export default {
                 return 'Apply';
             }
         },
-        allVisibleTransactionCategories() {
-            return allVisibleTransactionCategories(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
+        allTransactionCategories() {
+            return allTransactionCategoriesWithVisibleCount(this.transactionCategoriesStore.allTransactionCategories, this.allowCategoryTypes);
         },
         hasAnyAvailableCategory() {
-            return hasAnyAvailableCategory(this.allVisibleTransactionCategories);
+            return hasAnyAvailableCategory(this.allTransactionCategories, true);
+        },
+        hasAnyVisibleCategory() {
+            return hasAnyAvailableCategory(this.allTransactionCategories, this.showHidden);
         },
         hasAvailableCategory() {
-            return hasAvailableCategory(this.allVisibleTransactionCategories);
+            return hasAvailableCategory(this.allTransactionCategories, this.showHidden);
         }
     },
     created() {

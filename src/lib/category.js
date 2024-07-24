@@ -62,7 +62,7 @@ export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
     return '';
 }
 
-export function allVisibleTransactionCategories(allTransactionCategories, allowCategoryTypes) {
+export function allTransactionCategoriesWithVisibleCount(allTransactionCategories, allowCategoryTypes) {
     const ret = {};
     const hasAllowCategoryTypes = allowCategoryTypes
         && (allowCategoryTypes[categoryConstants.allCategoryTypes.Income.toString()]
@@ -85,57 +85,80 @@ export function allVisibleTransactionCategories(allTransactionCategories, allowC
         }
 
         const allCategories = allTransactionCategories[categoryType];
-        const visibleCategories = [];
-        const allVisibleSubCategories = {};
+        const allSubCategories = {};
+        const allVisibleSubCategoryCounts = {};
+        const allFirstVisibleSubCategoryIndexes = {};
+        let allVisibleCategoryCount = 0;
+        let firstVisibleCategoryIndex = -1;
 
         for (let j = 0; j < allCategories.length; j++) {
             const category = allCategories[j];
 
-            if (category.hidden) {
-                continue;
+            if (!category.hidden) {
+                allVisibleCategoryCount++;
+
+                if (firstVisibleCategoryIndex === -1) {
+                    firstVisibleCategoryIndex = j;
+                }
             }
 
-            visibleCategories.push(category);
-
             if (category.subCategories) {
-                const visibleSubCategories = [];
+                let visibleSubCategoryCount = 0;
+                let firstVisibleSubCategoryIndex = -1;
 
                 for (let k = 0; k < category.subCategories.length; k++) {
                     const subCategory = category.subCategories[k];
 
                     if (!subCategory.hidden) {
-                        visibleSubCategories.push(subCategory);
+                        visibleSubCategoryCount++;
+
+                        if (firstVisibleSubCategoryIndex === -1) {
+                            firstVisibleSubCategoryIndex = k;
+                        }
                     }
                 }
 
-                if (visibleSubCategories.length > 0) {
-                    allVisibleSubCategories[category.id] = visibleSubCategories;
+                if (category.subCategories.length > 0) {
+                    allSubCategories[category.id] = category.subCategories;
+                    allVisibleSubCategoryCounts[category.id] = visibleSubCategoryCount;
+                    allFirstVisibleSubCategoryIndexes[category.id] = firstVisibleSubCategoryIndex;
                 }
             }
         }
 
         ret[categoryType.toString()] = {
             type: categoryType.toString(),
-            visibleCategories: visibleCategories,
-            visibleSubCategories: allVisibleSubCategories
+            allCategories: allCategories,
+            allVisibleCategoryCount: allVisibleCategoryCount,
+            firstVisibleCategoryIndex: firstVisibleCategoryIndex,
+            allSubCategories: allSubCategories,
+            allVisibleSubCategoryCounts: allVisibleSubCategoryCounts,
+            allFirstVisibleSubCategoryIndexes: allFirstVisibleSubCategoryIndexes
         };
     }
 
     return ret;
 }
 
-export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCategories, type) {
-    const allVisibleCategories = allVisibleTransactionCategories(allTransactionCategories);
+export function allVisiblePrimaryTransactionCategoriesByType(allTransactionCategories, categoryType) {
+    const allCategories = allTransactionCategories[categoryType];
+    const visibleCategories = [];
 
-    if (!allVisibleCategories) {
-        return [];
+    if (!allCategories) {
+        return visibleCategories;
     }
 
-    if (!allVisibleCategories[type.toString()]) {
-        return [];
+    for (let i = 0; i < allCategories.length; i++) {
+        const category = allCategories[i];
+
+        if (category.hidden) {
+            continue;
+        }
+
+        visibleCategories.push(category);
     }
 
-    return allVisibleCategories[type.toString()].visibleCategories;
+    return visibleCategories;
 }
 
 export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategoriesMap, filteredCategoryIds) {
@@ -248,32 +271,43 @@ export function getFirstAvailableSubCategoryId(categories, categoryId) {
     return '';
 }
 
-export function hasAnyAvailableCategory(allVisibleTransactionCategories) {
-    for (let type in allVisibleTransactionCategories) {
-        if (!Object.prototype.hasOwnProperty.call(allVisibleTransactionCategories, type)) {
+export function hasAnyAvailableCategory(allTransactionCategories, showHidden) {
+    for (let type in allTransactionCategories) {
+        if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {
             continue;
         }
 
-        const categoryType = allVisibleTransactionCategories[type];
+        const categoryType = allTransactionCategories[type];
 
-        if (categoryType.visibleCategories && categoryType.visibleCategories.length > 0) {
-            return true;
+        if (showHidden) {
+            if (categoryType.allCategories && categoryType.allCategories.length > 0) {
+                return true;
+            }
+        } else {
+            if (categoryType.allVisibleCategoryCount > 0) {
+                return true;
+            }
         }
     }
 
     return false;
 }
 
-export function hasAvailableCategory(allVisibleTransactionCategories) {
+export function hasAvailableCategory(allTransactionCategories, showHidden) {
     const result = {};
 
-    for (let type in allVisibleTransactionCategories) {
-        if (!Object.prototype.hasOwnProperty.call(allVisibleTransactionCategories, type)) {
+    for (let type in allTransactionCategories) {
+        if (!Object.prototype.hasOwnProperty.call(allTransactionCategories, type)) {
             continue;
         }
 
-        const categoryType = allVisibleTransactionCategories[type];
-        result[type] = categoryType.visibleCategories && categoryType.visibleCategories.length > 0;
+        const categoryType = allTransactionCategories[type];
+
+        if (showHidden) {
+            result[type] = categoryType.allCategories && categoryType.allCategories.length > 0;
+        } else {
+            result[type] = categoryType.allVisibleCategoryCount > 0;
+        }
     }
 
     return result;

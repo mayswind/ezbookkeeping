@@ -47,16 +47,13 @@
                                     <v-col cols="12">
                                         <v-text-field
                                             autocomplete="current-password"
-                                            clearable
                                             ref="passwordInput"
-                                            :type="isPasswordVisible ? 'text' : 'password'"
+                                            type="password"
                                             :disabled="show2faInput || logining || verifying"
                                             :label="$t('Password')"
                                             :placeholder="$t('Your password')"
-                                            :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="password"
                                             @input="tempToken = ''"
-                                            @click:append-inner="isPasswordVisible = !isPasswordVisible"
                                             @keyup.enter="login"
                                         />
                                     </v-col>
@@ -189,8 +186,6 @@ import {
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
-    mdiEyeOutline,
-    mdiEyeOffOutline,
     mdiOnepassword,
     mdiHelpCircleOutline
 } from '@mdi/js';
@@ -203,15 +198,12 @@ export default {
             passcode: '',
             backupCode: '',
             tempToken: '',
-            isPasswordVisible: false,
             logining: false,
             verifying: false,
             show2faInput: false,
             twoFAVerifyType: 'passcode',
             showMobileQrCode: false,
             icons: {
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline,
                 passcode: mdiOnepassword,
                 backupCode: mdiHelpCircleOutline
             }
@@ -284,7 +276,6 @@ export default {
                 return;
             }
 
-            self.isPasswordVisible = false;
             self.logining = true;
 
             self.rootStore.authorize({

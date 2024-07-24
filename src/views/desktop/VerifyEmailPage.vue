@@ -36,14 +36,11 @@
                                     <v-col cols="12" v-if="!loading && !token && email && isUserVerifyEmailEnabled">
                                         <v-text-field
                                             autocomplete="password"
-                                            clearable
-                                            :type="isPasswordVisible ? 'text' : 'password'"
+                                            type="password"
                                             :disabled="loading || resending"
                                             :label="$t('Password')"
                                             :placeholder="$t('Your password')"
-                                            :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="password"
-                                            @click:append-inner="isPasswordVisible = !isPasswordVisible"
                                             @keyup.enter="resendEmail"
                                         />
                                     </v-col>
@@ -123,9 +120,7 @@ import assetConstants from '@/consts/asset.js';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
 
 import {
-    mdiChevronLeft,
-    mdiEyeOffOutline,
-    mdiEyeOutline
+    mdiChevronLeft
 } from '@mdi/js';
 
 export default {
@@ -137,15 +132,12 @@ export default {
     data() {
         return {
             password: '',
-            isPasswordVisible: false,
             loading: true,
             resending: false,
             verified: false,
             errorMessage: '',
             icons: {
-                left: mdiChevronLeft,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline
+                left: mdiChevronLeft
             }
         };
     },

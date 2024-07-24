@@ -46,30 +46,24 @@
                                     <v-col cols="12">
                                         <v-text-field
                                             autocomplete="new-password"
-                                            clearable
                                             ref="passwordInput"
-                                            :type="isNewPasswordVisible ? 'text' : 'password'"
+                                            type="password"
                                             :disabled="updating"
                                             :label="$t('Password')"
                                             :placeholder="$t('Your password')"
-                                            :append-inner-icon="isNewPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="newPassword"
-                                            @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
                                             @keyup.enter="$refs.confirmPasswordInput.focus()"
                                         />
                                     </v-col>
 
                                     <v-col cols="12">
                                         <v-text-field
-                                            clearable
                                             ref="confirmPasswordInput"
-                                            :type="isConfirmPasswordVisible ? 'text' : 'password'"
+                                            type="password"
                                             :disabled="updating"
                                             :label="$t('Confirm Password')"
                                             :placeholder="$t('Re-enter the password')"
-                                            :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="confirmPassword"
-                                            @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                                             @keyup.enter="resetPassword"
                                         />
                                     </v-col>
@@ -147,9 +141,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import assetConstants from '@/consts/asset.js';
 
 import {
-    mdiChevronLeft,
-    mdiEyeOffOutline,
-    mdiEyeOutline
+    mdiChevronLeft
 } from '@mdi/js';
 
 export default {
@@ -161,14 +153,10 @@ export default {
             email: '',
             newPassword: '',
             confirmPassword: '',
-            isNewPasswordVisible: false,
-            isConfirmPasswordVisible: false,
             updating: false,
             passwordChanged: false,
             icons: {
-                left: mdiChevronLeft,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline
+                left: mdiChevronLeft
             }
         };
     },

@@ -42,13 +42,11 @@
                         <v-col cols="12" md="6">
                             <v-text-field
                                 autocomplete="current-password"
-                                clearable variant="underlined"
+                                type="password"
+                                variant="underlined"
                                 :disabled="loading || enabling || enableConfirming || disabling"
                                 :placeholder="$t('Current Password')"
-                                :type="isCurrentPasswordVisible ? 'text' : 'password'"
-                                :append-inner-icon="isCurrentPasswordVisible ? icons.eyeSlash : icons.eye"
                                 v-model="currentPassword"
-                                @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
                             />
                         </v-col>
                     </v-row>
@@ -111,8 +109,6 @@ import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.js';
 import { makeButtonCopyToClipboard, changeClipboardObjectText } from '@/lib/misc.js';
 
 import {
-    mdiEyeOutline,
-    mdiEyeOffOutline,
     mdiContentCopy
 } from '@mdi/js';
 
@@ -127,7 +123,6 @@ export default {
             new2FASecret: '',
             new2FAQRCode: '',
             currentPassword: '',
-            isCurrentPasswordVisible: false,
             currentPasscode: '',
             currentBackupCode: '',
             enabling: false,
@@ -136,8 +131,6 @@ export default {
             regenerating: false,
             clipboardHolder: null,
             icons: {
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline,
                 copy: mdiContentCopy
             }
         };
@@ -173,7 +166,6 @@ export default {
             this.new2FASecret = '';
             this.new2FAQRCode = '';
             this.currentPassword = '';
-            this.isCurrentPasswordVisible = false;
             this.currentPasscode = '';
             this.currentBackupCode = '';
             this.enabling = false;

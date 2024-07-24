@@ -72,27 +72,21 @@
                                     <v-col cols="12" md="6">
                                         <v-text-field
                                             autocomplete="new-password"
-                                            clearable
+                                            type="password"
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('Password')"
                                             :placeholder="$t('Your password, at least 6 characters')"
-                                            :type="isPasswordVisible ? 'text' : 'password'"
-                                            :append-inner-icon="isPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="user.password"
-                                            @click:append-inner="isPasswordVisible = !isPasswordVisible"
                                         />
                                     </v-col>
                                     <v-col cols="12" md="6">
                                         <v-text-field
                                             autocomplete="new-password"
-                                            clearable
+                                            type="password"
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('Confirm Password')"
                                             :placeholder="$t('Re-enter the password')"
-                                            :type="isConfirmPasswordVisible ? 'text' : 'password'"
-                                            :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
                                             v-model="user.confirmPassword"
-                                            @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                                         />
                                     </v-col>
                                 </v-row>
@@ -261,9 +255,7 @@ import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 import {
     mdiArrowLeft,
     mdiArrowRight,
-    mdiCheck,
-    mdiEyeOffOutline,
-    mdiEyeOutline
+    mdiCheck
 } from '@mdi/js';
 
 export default {
@@ -274,8 +266,6 @@ export default {
         return {
             user: newUser,
             currentStep: 'basicSetting',
-            isPasswordVisible: false,
-            isConfirmPasswordVisible: false,
             submitting: false,
             usePresetCategories: false,
             finalResultMessage: null,
@@ -283,9 +273,7 @@ export default {
             icons: {
                 previous: mdiArrowLeft,
                 next: mdiArrowRight,
-                submit: mdiCheck,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline
+                submit: mdiCheck
             }
         };
     },

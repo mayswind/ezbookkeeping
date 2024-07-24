@@ -11,16 +11,13 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
-                                    ref="currentPasswordInput"
                                     autocomplete="current-password"
-                                    clearable
+                                    ref="currentPasswordInput"
+                                    type="password"
                                     :disabled="updatingPassword"
                                     :label="$t('Current Password')"
                                     :placeholder="$t('Current Password')"
-                                    :type="isCurrentPasswordVisible ? 'text' : 'password'"
-                                    :append-inner-icon="isCurrentPasswordVisible ? icons.eyeSlash : icons.eye"
                                     v-model="currentPassword"
-                                    @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
                                     @keyup.enter="$refs.newPasswordInput.focus()"
                                 />
                             </v-col>
@@ -29,16 +26,13 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
-                                    ref="newPasswordInput"
                                     autocomplete="new-password"
-                                    clearable
+                                    ref="newPasswordInput"
+                                    type="password"
                                     :disabled="updatingPassword"
                                     :label="$t('New Password')"
                                     :placeholder="$t('New Password')"
-                                    :type="isNewPasswordVisible ? 'text' : 'password'"
-                                    :append-inner-icon="isNewPasswordVisible ? icons.eyeSlash : icons.eye"
                                     v-model="newPassword"
-                                    @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
                                     @keyup.enter="$refs.confirmPasswordInput.focus()"
                                 />
                             </v-col>
@@ -48,14 +42,11 @@
                             <v-col cols="12" md="6">
                                 <v-text-field
                                     ref="confirmPasswordInput"
-                                    clearable
+                                    type="password"
                                     :disabled="updatingPassword"
-                                    :type="isConfirmPasswordVisible ? 'text' : 'password'"
                                     :label="$t('Confirm Password')"
                                     :placeholder="$t('Re-enter the password')"
-                                    :append-inner-icon="isConfirmPasswordVisible ? icons.eyeSlash : icons.eye"
                                     v-model="confirmPassword"
-                                    @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                                     @keyup.enter="updatePassword"
                                 />
                             </v-col>
@@ -149,8 +140,6 @@ import { parseDeviceInfo, parseUserAgent } from '@/lib/misc.js';
 
 import {
     mdiRefresh,
-    mdiEyeOffOutline,
-    mdiEyeOutline,
     mdiCellphone,
     mdiTablet,
     mdiWatch,
@@ -165,15 +154,10 @@ export default {
             currentPassword: '',
             newPassword: '',
             confirmPassword: '',
-            isCurrentPasswordVisible: false,
-            isNewPasswordVisible: false,
-            isConfirmPasswordVisible: false,
             updatingPassword: false,
             loadingSession: true,
             icons: {
-                refresh: mdiRefresh,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline
+                refresh: mdiRefresh
             }
         };
     },
@@ -245,9 +229,6 @@ export default {
             }
 
             self.updatingPassword = true;
-            self.isCurrentPasswordVisible = false;
-            self.isNewPasswordVisible = false;
-            self.isConfirmPasswordVisible = false;
 
             self.rootStore.updateUserProfile({
                 profile: {

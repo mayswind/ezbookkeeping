@@ -129,16 +129,14 @@
                         <v-row class="mb-3">
                             <v-col cols="12" md="6">
                                 <v-text-field
-                                    ref="currentPasswordInput"
                                     autocomplete="current-password"
-                                    clearable variant="underlined"
+                                    ref="currentPasswordInput"
+                                    type="password"
+                                    variant="underlined"
                                     color="error"
                                     :disabled="loadingDataStatistics || clearingData"
                                     :placeholder="$t('Current Password')"
-                                    :type="isCurrentPasswordVisible ? 'text' : 'password'"
-                                    :append-inner-icon="isCurrentPasswordVisible ? icons.eyeSlash : icons.eye"
                                     v-model="currentPasswordForClearData"
-                                    @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
                                     @keyup.enter="clearData"
                                 />
                             </v-col>
@@ -176,9 +174,7 @@ import {
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
     mdiTagOutline,
-    mdiAlert,
-    mdiEyeOutline,
-    mdiEyeOffOutline
+    mdiAlert
 } from '@mdi/js';
 
 export default {
@@ -188,7 +184,6 @@ export default {
             dataStatistics: null,
             exportingData: false,
             currentPasswordForClearData: '',
-            isCurrentPasswordVisible: false,
             clearingData: false,
             icons: {
                 refresh: mdiRefresh,
@@ -196,9 +191,7 @@ export default {
                 accounts: mdiCreditCardOutline,
                 categories: mdiViewDashboardOutline,
                 tags: mdiTagOutline,
-                alert: mdiAlert,
-                eye: mdiEyeOutline,
-                eyeSlash: mdiEyeOffOutline
+                alert: mdiAlert
             }
         }
     },
@@ -284,7 +277,6 @@ export default {
 
             self.$refs.confirmDialog.open('Are you sure you want to clear all data?', { color: 'error' }).then(() => {
                 self.clearingData = true;
-                self.isCurrentPasswordVisible = false;
 
                 self.rootStore.clearUserData({
                     password: self.currentPasswordForClearData

@@ -440,7 +440,7 @@
                                                             :text="allTransactionTags[tagId].name"
                                                             :key="tagId"
                                                             v-for="tagId in transaction.tagIds"/>
-                                                    <v-chip class="transaction-tag" size="small" :prepend-icon="icons.tag"
+                                                    <v-chip class="transaction-tag" size="small"
                                                             :text="$t('None')"
                                                             v-if="!transaction.tagIds || !transaction.tagIds.length"/>
                                                 </td>

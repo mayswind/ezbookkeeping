@@ -163,6 +163,10 @@ export default {
             }
         },
         onKeydown(index, event) {
+            if (event.altKey || (event.code.indexOf('F') === 0 && (event.code.length === 2 || event.code.length === 3))) {
+                return;
+            }
+
             if (event.code === 'Enter' && this.finalPinCode.length === this.length) {
                 this.$emit('pincode:confirm', this.finalPinCode);
                 event.preventDefault();
@@ -177,6 +181,18 @@ export default {
 
             if (event.code === 'ArrowRight' || (!event.shiftKey && event.code === 'Tab')) {
                 this.setNextFocus(index);
+                event.preventDefault();
+                return;
+            }
+
+            if (event.code === 'Home') {
+                this.setFocus(0);
+                event.preventDefault();
+                return;
+            }
+
+            if (event.code === 'End') {
+                this.setFocus(this.length - 1);
                 event.preventDefault();
                 return;
             }

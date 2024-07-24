@@ -5,7 +5,7 @@
             <f7-nav-title :title="$t(title)"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableTag }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyAvailableTag }" @click="save"></f7-link>
+                <f7-link :text="$t(applyText)" :class="{ 'disabled': !hasAnyVisibleTag }" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -37,11 +37,11 @@
             </f7-accordion-item>
         </f7-block>
 
-        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!loading && !hasAnyAvailableTag">
+        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!loading && !hasAnyVisibleTag">
             <f7-list-item :title="$t('No available tag')"></f7-list-item>
         </f7-list>
 
-        <f7-block class="combination-list-wrapper margin-vertical" key="default" v-if="!loading">
+        <f7-block class="combination-list-wrapper margin-vertical" key="default" v-show="!loading && hasAnyVisibleTag">
             <f7-accordion-item :opened="collapseStates['default'].opened"
                                @accordion:open="collapseStates['default'].opened = true"
                                @accordion:close="collapseStates['default'].opened = false">
@@ -143,6 +143,13 @@ export default {
         },
         hasAnyAvailableTag() {
             return this.transactionTagsStore.allAvailableTagsCount > 0;
+        },
+        hasAnyVisibleTag() {
+            if (this.showHidden) {
+                return this.transactionTagsStore.allAvailableTagsCount > 0;
+            } else {
+                return this.transactionTagsStore.allVisibleTagsCount > 0;
+            }
         }
     },
     created() {

@@ -65,11 +65,11 @@
                                :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
         </div>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyAvailableTag">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-if="!loading && !hasAnyVisibleTag">
             <span class="text-body-1">{{ $t('No available tag') }}</span>
         </v-card-text>
 
-        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyAvailableTag">
+        <v-card-text :class="{ 'mt-0 mt-sm-2 mt-md-4': dialogMode }" v-else-if="!loading && hasAnyVisibleTag">
             <v-expansion-panels class="tag-categories" multiple v-model="expandTagCategories">
                 <v-expansion-panel class="border" key="default" value="default">
                     <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
@@ -104,7 +104,7 @@
 
         <v-card-text class="overflow-y-visible" v-if="dialogMode">
             <div class="w-100 d-flex justify-center mt-2 mt-sm-4 mt-md-6 gap-4">
-                <v-btn :disabled="!hasAnyAvailableTag" @click="save">{{ $t(applyText) }}</v-btn>
+                <v-btn :disabled="!hasAnyVisibleTag" @click="save">{{ $t(applyText) }}</v-btn>
                 <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
             </div>
         </v-card-text>
@@ -171,6 +171,13 @@ export default {
         },
         hasAnyAvailableTag() {
             return this.transactionTagsStore.allAvailableTagsCount > 0;
+        },
+        hasAnyVisibleTag() {
+            if (this.showHidden) {
+                return this.transactionTagsStore.allAvailableTagsCount > 0;
+            } else {
+                return this.transactionTagsStore.allVisibleTagsCount > 0;
+            }
         }
     },
     created() {

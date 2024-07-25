@@ -98,6 +98,7 @@ type TransactionCountRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryIds  string            `form:"category_ids"`
 	AccountIds   string            `form:"account_ids"`
+	TagIds       string            `form:"tag_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
@@ -109,6 +110,7 @@ type TransactionListByMaxTimeRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryIds  string            `form:"category_ids"`
 	AccountIds   string            `form:"account_ids"`
+	TagIds       string            `form:"tag_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	MaxTime      int64             `form:"max_time" binding:"min=0"`
@@ -128,6 +130,7 @@ type TransactionListInMonthByPageRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`
 	CategoryIds  string            `form:"category_ids"`
 	AccountIds   string            `form:"account_ids"`
+	TagIds       string            `form:"tag_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
 	TrimAccount  bool              `form:"trim_account"`

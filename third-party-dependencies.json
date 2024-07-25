@@ -24,6 +24,12 @@
         "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.9/LICENSE"
     },
     {
+        "name": "SQL builder",
+        "copyright": "Copyright (c) 2016 The Xorm Authors",
+        "url": "https://gitea.com/xorm/builder",
+        "licenseUrl": "https://gitea.com/xorm/builder/src/tag/v0.3.13/LICENSE"
+    },
+    {
         "name": "Logrus",
         "copyright": "Copyright (c) 2014 Simon Eskildsen",
         "url": "https://github.com/sirupsen/logrus",

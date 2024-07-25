@@ -21,6 +21,7 @@ require (
 	golang.org/x/crypto v0.25.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/mail.v2 v2.3.1
+	xorm.io/builder v0.3.13
 	xorm.io/xorm v1.3.9
 )
 
@@ -67,5 +68,4 @@ require (
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	xorm.io/builder v0.3.12 // indirect
 )

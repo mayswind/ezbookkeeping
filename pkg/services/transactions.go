@@ -166,26 +166,6 @@ func (s *TransactionService) GetAllTransactionCount(c *core.Context, uid int64) 
 	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, "", "")
 }
 
-// GetMonthTransactionCount returns total count of transactions in given year and month
-func (s *TransactionService) GetMonthTransactionCount(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string, utcOffset int16) (int64, error) {
-	if uid <= 0 {
-		return 0, errs.ErrUserIdInvalid
-	}
-
-	startTime, err := utils.ParseFromLongDateTime(fmt.Sprintf("%d-%02d-01 00:00:00", year, month), utcOffset)
-
-	if err != nil {
-		return 0, errs.ErrSystemError
-	}
-
-	endTime := startTime.AddDate(0, 1, 0)
-
-	minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startTime.Unix())
-	maxTransactionTime := utils.GetMinTransactionTimeFromUnixTime(endTime.Unix()) - 1
-
-	return s.GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, categoryIds, accountIds, amountFilter, keyword)
-}
-
 // GetTransactionCount returns count of transactions
 func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, amountFilter string, keyword string) (int64, error) {
 	if uid <= 0 {

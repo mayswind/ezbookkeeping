@@ -106,8 +106,8 @@
                                     <v-table class="transaction-table" :hover="!loading">
                                         <thead>
                                         <tr>
-                                            <th class="transaction-table-column-time">{{ $t('Time') }}</th>
-                                            <th class="transaction-table-column-category">
+                                            <th class="transaction-table-column-time text-no-wrap">{{ $t('Time') }}</th>
+                                            <th class="transaction-table-column-category text-no-wrap">
                                                 <v-menu ref="categoryFilterMenu" class="transaction-category-menu"
                                                         eager location="bottom" max-height="500"
                                                         :disabled="query.type === 1"
@@ -204,7 +204,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-amount">
+                                            <th class="transaction-table-column-amount text-no-wrap">
                                                 <v-menu ref="amountFilterMenu" class="transaction-amount-menu"
                                                         eager location="bottom" max-height="500"
                                                         :close-on-content-click="false"
@@ -254,7 +254,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-account">
+                                            <th class="transaction-table-column-account text-no-wrap">
                                                 <v-menu ref="accountFilterMenu" class="transaction-account-menu"
                                                         eager location="bottom" max-height="500"
                                                         @update:model-value="scrollAccountMenuToSelectedItem">
@@ -308,7 +308,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-tags" v-if="showTagInTransactionListPage">
+                                            <th class="transaction-table-column-tags text-no-wrap" v-if="showTagInTransactionListPage">
                                                 <v-menu ref="tagFilterMenu" class="transaction-tag-menu"
                                                         eager location="bottom" max-height="500"
                                                         @update:model-value="scrollTagMenuToSelectedItem">
@@ -374,7 +374,7 @@
                                                     </v-list>
                                                 </v-menu>
                                             </th>
-                                            <th class="transaction-table-column-description">{{ $t('Description') }}</th>
+                                            <th class="transaction-table-column-description text-no-wrap">{{ $t('Description') }}</th>
                                         </tr>
                                         </thead>
 

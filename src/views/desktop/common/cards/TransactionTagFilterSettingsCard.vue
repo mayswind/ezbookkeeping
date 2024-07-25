@@ -239,7 +239,6 @@ export default {
             const self = this;
 
             const filteredTagIds = {};
-            let isAllSelected = true;
             let finalTagIds = '';
             let changed = true;
 
@@ -252,7 +251,6 @@ export default {
 
                 if (self.filterTagIds[transactionTag.id]) {
                     filteredTagIds[transactionTag.id] = true;
-                    isAllSelected = false;
                 } else {
                     if (finalTagIds.length > 0) {
                         finalTagIds += ',';
@@ -264,7 +262,7 @@ export default {
 
             if (this.type === 'transactionListCurrent') {
                 changed = self.transactionsStore.updateTransactionListFilter({
-                    tagIds: isAllSelected ? '' : finalTagIds
+                    tagIds: finalTagIds
                 });
 
                 if (changed) {

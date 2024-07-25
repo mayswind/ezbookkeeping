@@ -214,7 +214,6 @@ export default {
             const router = self.f7router;
 
             const filteredTagIds = {};
-            let isAllSelected = true;
             let finalTagIds = '';
 
             for (let transactionTagId in self.filterTagIds) {
@@ -226,7 +225,6 @@ export default {
 
                 if (self.filterTagIds[transactionTag.id]) {
                     filteredTagIds[transactionTag.id] = true;
-                    isAllSelected = false;
                 } else {
                     if (finalTagIds.length > 0) {
                         finalTagIds += ',';
@@ -238,7 +236,7 @@ export default {
 
             if (this.type === 'transactionListCurrent') {
                 const changed = self.transactionsStore.updateTransactionListFilter({
-                    tagIds: isAllSelected ? '' : finalTagIds
+                    tagIds: finalTagIds
                 });
 
                 if (changed) {

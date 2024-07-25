@@ -100,6 +100,8 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableExpenseCategories"
                                                        :show-selection-primary-text="true"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.expenseCategory, allCategories[allCategoryTypes.Expense])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Expense]"
                                                        v-model="transaction.expenseCategory">
@@ -115,6 +117,8 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableIncomeCategories"
                                                        :show-selection-primary-text="true"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.incomeCategory, allCategories[allCategoryTypes.Income])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Income]"
                                                        v-model="transaction.incomeCategory">
@@ -130,6 +134,8 @@
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !hasAvailableTransferCategories"
                                                        :show-selection-primary-text="true"
+                                                       :custom-selection-primary-text="getPrimaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer])"
+                                                       :custom-selection-secondary-text="getSecondaryCategoryName(transaction.transferCategory, allCategories[allCategoryTypes.Transfer])"
                                                        :label="$t('Category')" :placeholder="$t('Category')"
                                                        :items="allCategories[allCategoryTypes.Transfer]"
                                                        v-model="transaction.transferCategory">
@@ -146,7 +152,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :selection-text="sourceAccountName"
+                                                       :custom-selection-primary-text="sourceAccountName"
                                                        :label="$t(sourceAccountTitle)"
                                                        :placeholder="$t(sourceAccountTitle)"
                                                        :items="categorizedAccounts"
@@ -164,7 +170,7 @@
                                                        secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
                                                        :readonly="mode === 'view'"
                                                        :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                       :selection-text="destinationAccountName"
+                                                       :custom-selection-primary-text="destinationAccountName"
                                                        :label="$t('Destination Account')"
                                                        :placeholder="$t('Destination Account')"
                                                        :items="categorizedAccounts"
@@ -343,6 +349,8 @@ import {
 } from '@/lib/datetime.js';
 import { generateRandomUUID } from '@/lib/misc.js';
 import {
+    getTransactionPrimaryCategoryName,
+    getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
@@ -844,6 +852,12 @@ export default {
                 this.transaction.sourceAmount = this.transaction.destinationAmount;
                 this.transaction.destinationAmount = oldSourceAmount;
             }
+        },
+        getPrimaryCategoryName(categoryId, allCategories) {
+            return getTransactionPrimaryCategoryName(categoryId, allCategories);
+        },
+        getSecondaryCategoryName(categoryId, allCategories) {
+            return getTransactionSecondaryCategoryName(categoryId, allCategories);
         },
         setTransaction(transaction, options, setContextData, convertContextTime) {
             setTransactionModelByTransaction(

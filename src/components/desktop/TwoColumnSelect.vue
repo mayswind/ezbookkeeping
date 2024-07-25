@@ -11,15 +11,17 @@
     >
         <template #selection>
             <div class="d-flex align-center text-truncate cursor-pointer">
-                <span class="text-truncate" v-if="selectionText">{{ selectionText }}</span>
-                <span class="text-truncate" v-if="!selectionText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
-                <span class="text-truncate" v-if="!selectionText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
-                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!selectionText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
+                <span class="text-truncate" v-if="customSelectionPrimaryText">{{ customSelectionPrimaryText }}</span>
+                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="customSelectionPrimaryText && customSelectionSecondaryText" />
+                <span class="text-truncate" v-if="customSelectionPrimaryText && customSelectionSecondaryText">{{ customSelectionSecondaryText }}</span>
+                <span class="text-truncate" v-if="!customSelectionPrimaryText && !selectedPrimaryItem && !selectedSecondaryItem">{{ noSelectionText }}</span>
+                <span class="text-truncate" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
+                <v-icon class="disabled" :icon="icons.chevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="mr-2" icon-type="account" size="21.5px"
                           :icon-id="selectedSecondaryItem ? selectedSecondaryItem[secondaryIconField] : null"
                           :color="selectedSecondaryItem ? selectedSecondaryItem[secondaryColorField] : null"
-                          v-if="!selectionText && selectedSecondaryItem && showSelectionSecondaryIcon" />
-                <span class="text-truncate" v-if="!selectionText && selectedSecondaryItem">{{ selectionSecondaryItemText }}</span>
+                          v-if="!customSelectionPrimaryText && selectedSecondaryItem && showSelectionSecondaryIcon" />
+                <span class="text-truncate" v-if="!customSelectionPrimaryText && selectedSecondaryItem">{{ selectionSecondaryItemText }}</span>
             </div>
         </template>
 
@@ -88,9 +90,10 @@ export default {
         'disabled',
         'readonly',
         'label',
-        'selectionText',
         'showSelectionPrimaryText',
         'showSelectionSecondaryIcon',
+        'customSelectionPrimaryText',
+        'customSelectionSecondaryText',
         'primaryKeyField',
         'primaryValueField',
         'primaryTitleField',

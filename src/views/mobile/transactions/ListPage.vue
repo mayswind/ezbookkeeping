@@ -452,6 +452,11 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.tagIds"></f7-icon>
                     </template>
                 </f7-list-item>
+                <f7-list-item :class="{ 'list-item-selected': query.tagIds === 'none' }" :title="$t('Without Tags')" @click="changeTagFilter('none')">
+                    <template #after>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.tagIds === 'none'"></f7-icon>
+                    </template>
+                </f7-list-item>
                 <f7-list-item :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
                               :title="$t('Multiple Tags')" @click="filterMultipleTags()" v-if="allAvailableTagsCount > 0">
                     <template #after>

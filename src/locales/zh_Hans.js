@@ -1032,6 +1032,7 @@ export default {
     'Multiple Accounts': '多个账户',
     'Source Account': '来源账户',
     'Destination Account': '目标账户',
+    'Without Tags': '没有标签',
     'Multiple Tags': '多个标签',
     'Transaction Time': '交易时间',
     'Transaction Timezone': '交易时区',

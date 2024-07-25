@@ -74,11 +74,11 @@ func (s *TransactionService) GetAllTransactions(c *core.Context, uid int64, page
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
 func (s *TransactionService) GetAllTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, "", "", 1, count, false, noDuplicated)
+	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, false, "", "", 1, count, false, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -107,6 +107,8 @@ func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64
 
 	if len(tagIds) > 0 {
 		sess.In("transaction_id", s.getTransactionQueryByTagIdsCondition(uid, maxTransactionTime, minTransactionTime, tagIds))
+	} else if noTags {
+		sess.NotIn("transaction_id", s.getTransactionQueryByAllTagIdsCondition(uid, maxTransactionTime, minTransactionTime))
 	}
 
 	err = sess.Limit(int(actualCount), int(count*(page-1))).OrderBy("transaction_time desc").Find(&transactions)
@@ -115,7 +117,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64
 }
 
 // GetTransactionsInMonthByPage returns all transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, amountFilter string, keyword string) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -133,6 +135,8 @@ func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid i
 
 	if len(tagIds) > 0 {
 		sess.In("transaction_id", s.getTransactionQueryByTagIdsCondition(uid, maxTransactionTime, minTransactionTime, tagIds))
+	} else if noTags {
+		sess.NotIn("transaction_id", s.getTransactionQueryByAllTagIdsCondition(uid, maxTransactionTime, minTransactionTime))
 	}
 
 	err = sess.OrderBy("transaction_time desc").Find(&transactions)
@@ -176,11 +180,11 @@ func (s *TransactionService) GetTransactionByTransactionId(c *core.Context, uid 
 
 // GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(c *core.Context, uid int64) (int64, error) {
-	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, nil, "", "")
+	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, nil, false, "", "")
 }
 
 // GetTransactionCount returns count of transactions
-func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, amountFilter string, keyword string) (int64, error) {
+func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -190,6 +194,8 @@ func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, max
 
 	if len(tagIds) > 0 {
 		sess.In("transaction_id", s.getTransactionQueryByTagIdsCondition(uid, maxTransactionTime, minTransactionTime, tagIds))
+	} else if noTags {
+		sess.NotIn("transaction_id", s.getTransactionQueryByAllTagIdsCondition(uid, maxTransactionTime, minTransactionTime))
 	}
 
 	return sess.Count(&models.Transaction{})
@@ -1533,6 +1539,20 @@ func (s *TransactionService) getTransactionQueryByTagIdsCondition(uid int64, max
 	}
 
 	return nil
+}
+
+func (s *TransactionService) getTransactionQueryByAllTagIdsCondition(uid int64, maxTransactionTime int64, minTransactionTime int64) *builder.Builder {
+	condition := builder.And(builder.Eq{"uid": uid}, builder.Eq{"deleted": false})
+
+	if maxTransactionTime > 0 {
+		condition = condition.And(builder.Lte{"transaction_time": maxTransactionTime})
+	}
+
+	if minTransactionTime > 0 {
+		condition = condition.And(builder.Gte{"transaction_time": minTransactionTime})
+	}
+
+	return builder.Select("transaction_id").From("transaction_tag_index").Where(condition)
 }
 
 func (s *TransactionService) isAccountIdValid(transaction *models.Transaction) error {

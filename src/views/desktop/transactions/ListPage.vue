@@ -331,6 +331,17 @@
                                                                 </div>
                                                             </v-list-item-title>
                                                         </v-list-item>
+                                                        <v-list-item key="none" value="none" class="text-sm" density="compact"
+                                                                     :class="{ 'list-item-selected': query.tagIds === 'none' }"
+                                                                     :append-icon="(query.tagIds === 'none' ? icons.check : null)">
+                                                            <v-list-item-title class="cursor-pointer"
+                                                                               @click="changeTagFilter('none')">
+                                                                <div class="d-flex align-center">
+                                                                    <v-icon :icon="icons.none" />
+                                                                    <span class="text-sm ml-3">{{ $t('Without Tags') }}</span>
+                                                                </div>
+                                                            </v-list-item-title>
+                                                        </v-list-item>
                                                         <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': query.tagIds && queryAllFilterTagIdsCount > 1 }"
                                                                      :append-icon="(query.tagIds && queryAllFilterTagIdsCount > 1 ? icons.check : null)"
@@ -542,6 +553,7 @@ import {
     mdiMagnify,
     mdiCheck,
     mdiViewGridOutline,
+    mdiBorderNoneVariant,
     mdiVectorArrangeBelow,
     mdiRefresh,
     mdiMenu,
@@ -600,6 +612,7 @@ export default {
                 search: mdiMagnify,
                 check: mdiCheck,
                 all: mdiViewGridOutline,
+                none: mdiBorderNoneVariant,
                 multiple: mdiVectorArrangeBelow,
                 refresh: mdiRefresh,
                 menu: mdiMenu,

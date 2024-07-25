@@ -1032,6 +1032,7 @@ export default {
     'Multiple Accounts': 'Multiple Accounts',
     'Source Account': 'Source Account',
     'Destination Account': 'Destination Account',
+    'Without Tags': 'Without Tags',
     'Multiple Tags': 'Multiple Tags',
     'Transaction Time': 'Transaction Time',
     'Transaction Timezone': 'Transaction Timezone',

@@ -736,6 +736,10 @@ export default {
             return getNameByKeyValue(this.allAccounts, this.query.accountIds, null, 'name', this.$t('Account'));
         },
         queryTagName() {
+            if (this.query.tagIds === 'none') {
+                return this.$t('Without Tags');
+            }
+
             if (this.queryAllFilterTagIdsCount > 1) {
                 return this.$t('Multiple Tags');
             }

@@ -294,6 +294,25 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 	return keyProfileUpdated, emailSetToUnverified, nil
 }
 
+// UpdateUserAvatar updated the custom avatar type of specified user
+func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, customAvatarType string) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		CustomAvatarType: customAvatarType,
+		UpdatedUnixTime:  now,
+	}
+
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.ID(uid).Cols("custom_avatar_type", "updated_unix_time").Where("deleted=?", false).Update(updateModel)
+		return err
+	})
+}
+
 // UpdateUserLastLoginTime updates the last login time field
 func (s *UserService) UpdateUserLastLoginTime(c *core.Context, uid int64) error {
 	if uid <= 0 {

@@ -2,12 +2,14 @@ import axios from 'axios';
 
 import apiConstants from '@/consts/api.js';
 import userState from './userstate.js';
+import { isBoolean } from './common.js';
 import {
     getGoogleMapAPIKey,
     getBaiduMapAK,
     getAmapApplicationKey
 } from './server_settings.js';
 import { getTimezoneOffsetMinutes } from './datetime.js';
+import { generateRandomUUID } from './misc.js';
 
 let needBlockRequest = false;
 let blockedRequests = [];
@@ -191,6 +193,14 @@ export default {
             expenseAmountColor,
             incomeAmountColor
         });
+    },
+    updateAvatar: ({ avatarFile }) => {
+        return axios.postForm('v1/users/avatar/update.json', {
+            avatar: avatarFile
+        });
+    },
+    removeAvatar: () => {
+        return axios.post('v1/users/avatar/remove.json');
     },
     resendVerifyEmailByLoginedUser: () => {
         return axios.post('v1/users/verify_email/resend.json');
@@ -552,5 +562,27 @@ export default {
     },
     generateAmapApiInternalProxyUrl: () => {
         return `${window.location.origin}${apiConstants.baseAmapApiProxyUrlPath}`;
+    },
+    getInternalAvatarUrlWithToken(avatarUrl, disableBrowserCache) {
+        if (!avatarUrl) {
+            return avatarUrl;
+        }
+
+        const params = [];
+        params.push('token=' + userState.getToken());
+
+        if (disableBrowserCache) {
+            if (isBoolean(disableBrowserCache)) {
+                params.push('_nocache=' + generateRandomUUID());
+            } else {
+                params.push('_nocache=' + disableBrowserCache);
+            }
+        }
+
+        if (avatarUrl.indexOf('?') >= 0) {
+            return avatarUrl + '&' + params.join('&');
+        } else {
+            return avatarUrl + '?' + params.join('&');
+        }
     }
 };

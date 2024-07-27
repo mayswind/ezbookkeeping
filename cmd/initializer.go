@@ -12,6 +12,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/storage"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
@@ -76,6 +77,15 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 	if err != nil {
 		if !isDisableBootLog {
 			log.BootErrorf("[initializer.initializeSystem] sets logger configuration failed, because %s", err.Error())
+		}
+		return nil, err
+	}
+
+	err = storage.InitializeStorageContainer(config)
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf("[initializer.initializeSystem] initializes object storage failed, because %s", err.Error())
 		}
 		return nil, err
 	}

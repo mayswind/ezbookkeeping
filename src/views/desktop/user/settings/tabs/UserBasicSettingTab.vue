@@ -8,15 +8,21 @@
                 </template>
 
                 <v-card-text class="d-flex">
-                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4">
-                        <v-img :src="oldProfile.avatar" v-if="oldProfile.avatar">
+                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4" :class="{ 'cursor-pointer': oldProfile.avatarProvider === 'internal' }">
+                        <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                             <template #placeholder>
                                 <div class="d-flex align-center justify-center fill-height">
                                     <v-icon size="48" :icon="icons.user"/>
                                 </div>
                             </template>
                         </v-img>
-                        <v-icon size="48" :icon="icons.user" v-else-if="!oldProfile.avatar"/>
+                        <v-icon size="48" :icon="icons.user" v-else-if="!currentUserAvatar"/>
+                        <v-menu activator="parent" width="200" location="bottom" offset="14px" v-if="oldProfile.avatarProvider === 'internal'">
+                            <v-list>
+                                <v-list-item :disabled="saving" :title="$t('Update Avatar')" @click="showOpenAvatarDialog"></v-list-item>
+                                <v-list-item :disabled="!currentUserAvatar || saving" :title="$t('Remove Avatar')" @click="removeAvatar"></v-list-item>
+                            </v-list>
+                        </v-menu>
                     </v-avatar>
                     <div class="d-flex flex-column justify-center gap-3">
                         <div class="d-flex text-body-1">
@@ -301,6 +307,7 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
+    <input ref="avatarInput" type="file" style="display: none" :accept="supportedImageExtensions" @change="updateAvatar($event)" />
 </template>
 
 <script>
@@ -312,7 +319,9 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
+import fileConstants from '@/consts/file.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import { generateRandomUUID } from '@/lib/misc.js';
 import { getCategorizedAccounts } from '@/lib/account.js';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
@@ -366,6 +375,7 @@ export default {
                 expenseAmountColor: 0,
                 incomeAmountColor: 0
             },
+            avatarNoCacheId: '',
             emailVerified: false,
             loading: true,
             resending: false,
@@ -427,6 +437,12 @@ export default {
         },
         allTransactionEditScopeTypes() {
             return this.$locale.getAllTransactionEditScopeTypes();
+        },
+        supportedImageExtensions() {
+            return fileConstants.supportedImageExtensions;
+        },
+        currentUserAvatar() {
+            return this.userStore.getUserAvatarUrl(this.oldProfile, this.avatarNoCacheId);
         },
         isUserVerifyEmailEnabled() {
             return isUserVerifyEmailEnabled();
@@ -556,6 +572,61 @@ export default {
                 if (!error.processed) {
                     self.$refs.snackbar.showError(error);
                 }
+            });
+        },
+        showOpenAvatarDialog() {
+            this.$refs.avatarInput.click();
+        },
+        updateAvatar(event) {
+            if (!event || !event.target || !event.target.files || !event.target.files.length) {
+                return;
+            }
+
+            const self = this;
+            const avatarFile = event.target.files[0];
+
+            event.target.value = null;
+
+            self.saving = true;
+
+            self.userStore.updateUserAvatar({ avatarFile }).then(response => {
+                self.saving = false;
+
+                if (response) {
+                    self.avatarNoCacheId = generateRandomUUID();
+                    self.setCurrentUserProfile(response);
+                }
+
+                self.$refs.snackbar.showMessage('Your avatar has been successfully updated');
+            }).catch(error => {
+                self.saving = false;
+
+                if (!error.processed) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
+        },
+        removeAvatar() {
+            const self = this;
+
+            self.$refs.confirmDialog.open('Are you sure you want to remove avatar?').then(() => {
+                self.saving = true;
+
+                self.userStore.removeUserAvatar().then(response => {
+                    self.saving = false;
+
+                    if (response) {
+                        self.setCurrentUserProfile(response);
+                    }
+
+                    self.$refs.snackbar.showMessage('Your profile has been successfully updated');
+                }).catch(error => {
+                    self.saving = false;
+
+                    if (!error.processed) {
+                        self.$refs.snackbar.showError(error);
+                    }
+                });
             });
         },
         reset() {

@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', {
         },
         currentUserAvatar(state) {
             const userInfo = state.currentUserBasicInfo || {};
-            return userInfo.avatar || null;
+            return state.getUserAvatarUrl(userInfo, false);
         },
         currentUserDefaultAccountId(state) {
             const userInfo = state.currentUserBasicInfo || {};
@@ -126,6 +126,54 @@ export const useUserStore = defineStore('user', {
                 });
             });
         },
+        updateUserAvatar({ avatarFile }) {
+            return new Promise((resolve, reject) => {
+                services.updateAvatar({ avatarFile }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to update user avatar' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to update user avatar', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to update user avatar' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        removeUserAvatar() {
+            return new Promise((resolve, reject) => {
+                services.removeAvatar().then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to remove user avatar' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to remove user avatar', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to remove user avatar' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
         getUserDataStatistics() {
             return new Promise((resolve, reject) => {
                 services.getUserDataStatistics().then(response => {
@@ -178,5 +226,12 @@ export const useUserStore = defineStore('user', {
                 });
             });
         },
+        getUserAvatarUrl(userInfo, disableBrowserCache) {
+            if (!userInfo || !userInfo.avatar) {
+                return null;
+            }
+
+            return services.getInternalAvatarUrlWithToken(userInfo.avatar, disableBrowserCache);
+        }
     }
 });

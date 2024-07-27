@@ -3,8 +3,28 @@ package utils
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 )
+
+var imageFileExtensionContentTypeMap = map[string]string{
+	"jpg":  "image/jpeg",
+	"jpeg": "image/jpeg",
+	"png":  "image/png",
+	"gif":  "image/gif",
+	"webp": "image/webp",
+}
+
+// GetImageContentType returns the content type of specified image file extension or returns empty when the file extension is not image or not supported
+func GetImageContentType(fileExtension string) string {
+	contentType, exists := imageFileExtensionContentTypeMap[fileExtension]
+
+	if !exists {
+		return ""
+	}
+
+	return contentType
+}
 
 // ListFileNamesWithPrefixAndSuffix returns file name list which has specified prefix and suffix
 func ListFileNamesWithPrefixAndSuffix(path string, prefix string, suffix string) []string {
@@ -67,6 +87,29 @@ func WriteFile(path string, data []byte) error {
 	}
 
 	return err
+}
+
+// GetFileNameWithoutExtension returns the file name without extension
+func GetFileNameWithoutExtension(path string) string {
+	fileName := filepath.Base(path)
+	extension := filepath.Ext(fileName)
+
+	if len(extension) < 1 {
+		return fileName
+	}
+
+	return fileName[0 : len(fileName)-len(extension)]
+}
+
+// GetFileNameExtension returns the file extension without dot
+func GetFileNameExtension(path string) string {
+	extension := filepath.Ext(path)
+
+	if len(extension) < 1 || extension[0] != '.' {
+		return extension
+	}
+
+	return extension[1:]
 }
 
 // IdentReader returns the original io reader

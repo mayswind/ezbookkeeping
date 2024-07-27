@@ -1,6 +1,8 @@
 package api
 
 import (
+	"io"
+	"os"
 	"strings"
 	"time"
 
@@ -13,6 +15,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/storage"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
@@ -494,6 +498,128 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) 
 	return resp, nil
 }
 
+// UserUpdateAvatarHandler saves user avatar by request parameters for current user
+func (a *UsersApi) UserUpdateAvatarHandler(c *core.Context) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	form, err := c.MultipartForm()
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to get multi-part form data for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.ErrParameterInvalid
+	}
+
+	avatars := form.File["avatar"]
+
+	if len(avatars) < 1 {
+		log.WarnfWithRequestId(c, "[users.UserUpdateAvatarHandler] there is no user avatar in request for user \"uid:%d\"", user.Uid)
+		return nil, errs.ErrNoUserAvatar
+	}
+
+	if avatars[0].Size < 1 {
+		log.WarnfWithRequestId(c, "[users.UserUpdateAvatarHandler] the size of user avatar in request is zero for user \"uid:%d\"", user.Uid)
+		return nil, errs.ErrUserAvatarIsEmpty
+	}
+
+	fileExtension := utils.GetFileNameExtension(avatars[0].Filename)
+
+	if utils.GetImageContentType(fileExtension) == "" {
+		log.WarnfWithRequestId(c, "[users.UserUpdateAvatarHandler] the file extension \"%s\" of user avatar in request is not supported for user \"uid:%d\"", fileExtension, user.Uid)
+		return nil, errs.ErrImageTypeNotSupported
+	}
+
+	avatarFile, err := avatars[0].Open()
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to get avatar file from request for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	defer avatarFile.Close()
+
+	err = storage.Container.SaveAvatar(user.Uid, avatarFile, fileExtension)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to save avatar file for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	err = a.users.UpdateUserAvatar(c, user.Uid, fileExtension)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if fileExtension != user.CustomAvatarType {
+		err = storage.Container.DeleteAvatar(user.Uid, user.CustomAvatarType)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", user.CustomAvatarType, user.Uid, err.Error())
+		}
+	}
+
+	user.CustomAvatarType = fileExtension
+	userResp := user.ToUserProfileResponse()
+	return userResp, nil
+}
+
+// UserRemoveAvatarHandler removes user avatar by request parameters for current user
+func (a *UsersApi) UserRemoveAvatarHandler(c *core.Context) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.CustomAvatarType == "" {
+		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	err = storage.Container.DeleteAvatar(user.Uid, user.CustomAvatarType)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to delete avatar file for user \"uid:%d\", because %s", user.Uid, err.Error())
+
+		exists, err := storage.Container.ExistsAvatar(user.Uid, user.CustomAvatarType)
+
+		if err != nil {
+			log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to check whether avatar file exist for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.ErrOperationFailed
+		}
+
+		if exists {
+			log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to delete whether avatar file exist for user \"uid:%d\", the avatar file still exist", user.Uid)
+			return nil, errs.ErrOperationFailed
+		}
+	}
+
+	err = a.users.UpdateUserAvatar(c, user.Uid, "")
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	user.CustomAvatarType = ""
+	userResp := user.ToUserProfileResponse()
+	return userResp, nil
+}
+
 // UserSendVerifyEmailByUnloginUserHandler sends unlogin user verify email
 func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (any, *errs.Error) {
 	if !settings.Container.Current.EnableUserVerifyEmail {
@@ -592,4 +718,61 @@ func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (any
 	}()
 
 	return true, nil
+}
+
+// UserGetAvatarHandler returns user avatar data for current user
+func (a *UsersApi) UserGetAvatarHandler(c *core.Context) ([]byte, string, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, "", errs.ErrUserNotFound
+	}
+
+	if user.CustomAvatarType == "" {
+		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user does not have avatar for user \"uid:%d\"", user.Uid)
+		return nil, "", errs.ErrUserAvatarNoExists
+	}
+
+	fileName := c.Param("fileName")
+	fileBaseName := utils.GetFileNameWithoutExtension(fileName)
+
+	if utils.Int64ToString(user.Uid) != fileBaseName {
+		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] cannot get other user avatar \"uid:%s\" for user \"uid:%d\"", fileBaseName, user.Uid)
+		return nil, "", errs.ErrUserIdInvalid
+	}
+
+	fileExtension := utils.GetFileNameExtension(fileName)
+
+	if user.CustomAvatarType != fileExtension {
+		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user avatar extension is invalid \"%s\" for user \"uid:%d\"", fileExtension, user.Uid)
+		return nil, "", errs.ErrUserAvatarNoExists
+	}
+
+	avatarFile, err := storage.Container.ReadAvatar(user.Uid, fileExtension)
+
+	if os.IsNotExist(err) {
+		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user avatar file not exist for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, "", errs.ErrUserAvatarNoExists
+	}
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to get user avatar object for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	defer avatarFile.Close()
+
+	avatarData, err := io.ReadAll(avatarFile)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to read user avatar object data for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, "", errs.ErrOperationFailed
+	}
+
+	return avatarData, utils.GetImageContentType(fileExtension), nil
 }

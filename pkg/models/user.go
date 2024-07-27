@@ -88,6 +88,7 @@ type User struct {
 	Nickname             string `xorm:"VARCHAR(64) NOT NULL"`
 	Password             string `xorm:"VARCHAR(64) NOT NULL"`
 	Salt                 string `xorm:"VARCHAR(10) NOT NULL"`
+	CustomAvatarType     string `xorm:"VARCHAR(10)"`
 	DefaultAccountId     int64
 	TransactionEditScope TransactionEditScope `xorm:"TINYINT NOT NULL"`
 	Language             string               `xorm:"VARCHAR(10)"`
@@ -313,7 +314,9 @@ func (u *User) getAvatarProvider() string {
 func (u *User) getAvatarUrl() string {
 	avatarProvider := settings.Container.Current.AvatarProvider
 
-	if avatarProvider == settings.GravatarProvider {
+	if avatarProvider == settings.InternalAvatarProvider {
+		return utils.GetInternalAvatarUrl(u.Uid, u.CustomAvatarType, settings.Container.Current.RootUrl)
+	} else if avatarProvider == settings.GravatarProvider {
 		return utils.GetGravatarUrl(u.Email)
 	}
 

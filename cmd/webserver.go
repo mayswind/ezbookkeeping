@@ -145,6 +145,14 @@ func startWebServer(c *cli.Context) error {
 		router.StaticFile("/desktop/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
 	}
 
+	if config.AvatarProvider == settings.InternalAvatarProvider {
+		avatarRoute := router.Group("/avatar")
+		avatarRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
+		{
+			avatarRoute.GET("/:fileName", bindImage(api.Users.UserGetAvatarHandler))
+		}
+	}
+
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
 
 	if config.Mode == settings.MODE_DEVELOPMENT {
@@ -244,6 +252,11 @@ func startWebServer(c *cli.Context) error {
 			// Users
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler))
 			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))
+
+			if config.AvatarProvider == settings.InternalAvatarProvider {
+				apiV1Route.POST("/users/avatar/update.json", bindApi(api.Users.UserUpdateAvatarHandler))
+				apiV1Route.POST("/users/avatar/remove.json", bindApi(api.Users.UserRemoveAvatarHandler))
+			}
 
 			if config.EnableUserVerifyEmail {
 				apiV1Route.POST("/users/verify_email/resend.json", bindApi(api.Users.UserSendVerifyEmailByLoginedUserHandler))
@@ -393,6 +406,19 @@ func bindTsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
 			utils.PrintDataSuccessResult(c, "text/tab-separated-values", fileName, result)
+		}
+	}
+}
+
+func bindImage(fn core.ImageHandlerFunc) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		c := core.WrapContext(ginCtx)
+		result, contentType, err := fn(c)
+
+		if err != nil {
+			utils.PrintDataErrorResult(c, "text/text", err)
+		} else {
+			utils.PrintDataSuccessResult(c, contentType, "", result)
 		}
 	}
 }

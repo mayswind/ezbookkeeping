@@ -57,6 +57,11 @@ const (
 	Sqlite3DbType  string = "sqlite3"
 )
 
+// Object Storage types
+const (
+	LocalFileSystemObjectStorageType string = "local_filesystem"
+)
+
 // Uuid generator types
 const (
 	InternalUuidGeneratorType string = "internal"
@@ -69,7 +74,8 @@ const (
 
 // User avatar provider types
 const (
-	GravatarProvider string = "gravatar"
+	InternalAvatarProvider string = "internal"
+	GravatarProvider       string = "gravatar"
 )
 
 // Map provider types
@@ -201,6 +207,10 @@ type Config struct {
 	LogLevel    Level
 	FileLogPath string
 
+	// Storage
+	StorageType         string
+	LocalFileSystemPath string
+
 	// Uuid
 	UuidGeneratorType string
 	UuidServerId      uint8
@@ -306,6 +316,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadLogConfiguration(config, cfgFile, "log")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadStorageConfiguration(config, cfgFile, "storage")
 
 	if err != nil {
 		return nil, err
@@ -523,6 +539,24 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 	return nil
 }
 
+func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	if getConfigItemStringValue(configFile, sectionName, "storage_type") == LocalFileSystemObjectStorageType {
+		config.StorageType = LocalFileSystemObjectStorageType
+	} else {
+		return errs.ErrInvalidStorageType
+	}
+
+	localFileSystemRootPath := getConfigItemStringValue(configFile, sectionName, "local_filesystem_path")
+	finalLocalFileSystemRootPath, err := getFinalPath(config.WorkingPath, localFileSystemRootPath)
+	config.LocalFileSystemPath = finalLocalFileSystemRootPath
+
+	if config.StorageType == LocalFileSystemObjectStorageType && err != nil {
+		return errs.ErrInvalidLocalFileSystemStoragePath
+	}
+
+	return nil
+}
+
 func loadUuidConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	if getConfigItemStringValue(configFile, sectionName, "generator_type") == InternalUuidGeneratorType {
 		config.UuidGeneratorType = InternalUuidGeneratorType
@@ -619,10 +653,12 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
 
-	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == "" {
-		config.AvatarProvider = ""
+	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == InternalAvatarProvider {
+		config.AvatarProvider = InternalAvatarProvider
 	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == GravatarProvider {
 		config.AvatarProvider = GravatarProvider
+	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == "" {
+		config.AvatarProvider = ""
 	} else {
 		return errs.ErrInvalidAvatarProvider
 	}

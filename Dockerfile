@@ -27,7 +27,8 @@ COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 RUN mkdir -p /ezbookkeeping && chown 1000:1000 /ezbookkeeping \
   && mkdir -p /ezbookkeeping/data && chown 1000:1000 /ezbookkeeping/data \
-  && mkdir -p /ezbookkeeping/log && chown 1000:1000 /ezbookkeeping/log
+  && mkdir -p /ezbookkeeping/log && chown 1000:1000 /ezbookkeeping/log \
+  && mkdir -p /ezbookkeeping/storage && chown 1000:1000 /ezbookkeeping/storage
 WORKDIR /ezbookkeeping
 COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping /ezbookkeeping/ezbookkeeping
 COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/dist /ezbookkeeping/public

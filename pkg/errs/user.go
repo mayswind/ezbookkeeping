@@ -31,4 +31,7 @@ var (
 	ErrEmailValidationNotAllowed                           = NewNormalError(NormalSubcategoryUser, 22, http.StatusBadRequest, "email validation not allowed")
 	ErrDecimalSeparatorAndDigitGroupingSymbolCannotBeEqual = NewNormalError(NormalSubcategoryUser, 23, http.StatusBadRequest, "decimal separator and digit grouping symbol cannot be equal")
 	ErrUserDefaultAccountIsHidden                          = NewNormalError(NormalSubcategoryUser, 24, http.StatusBadRequest, "user default account is hidden")
+	ErrNoUserAvatar                                        = NewNormalError(NormalSubcategoryUser, 25, http.StatusBadRequest, "no user avatar")
+	ErrUserAvatarIsEmpty                                   = NewNormalError(NormalSubcategoryUser, 26, http.StatusBadRequest, "user avatar is empty")
+	ErrUserAvatarNoExists                                  = NewNormalError(NormalSubcategoryUser, 27, http.StatusNotFound, "user avatar not exists")
 )

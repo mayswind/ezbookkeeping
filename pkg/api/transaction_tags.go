@@ -150,7 +150,7 @@ func (a *TransactionTagsApi) TagHideHandler(c *core.Context) (any, *errs.Error) 
 	err := c.ShouldBindJSON(&tagHideReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_tags.CategoryHideHandler] parse request failed, because %s", err.Error())
+		log.WarnfWithRequestId(c, "[transaction_tags.TagHideHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -158,11 +158,11 @@ func (a *TransactionTagsApi) TagHideHandler(c *core.Context) (any, *errs.Error) 
 	err = a.tags.HideTag(c, uid, []int64{tagHideReq.Id}, tagHideReq.Hidden)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_tags.CategoryHideHandler] failed to hide tag \"id:%d\" for user \"uid:%d\", because %s", tagHideReq.Id, uid, err.Error())
+		log.ErrorfWithRequestId(c, "[transaction_tags.TagHideHandler] failed to hide tag \"id:%d\" for user \"uid:%d\", because %s", tagHideReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_tags.CategoryHideHandler] user \"uid:%d\" has hidden category \"id:%d\"", uid, tagHideReq.Id)
+	log.InfofWithRequestId(c, "[transaction_tags.TagHideHandler] user \"uid:%d\" has hidden tag \"id:%d\"", uid, tagHideReq.Id)
 	return true, nil
 }
 
@@ -172,7 +172,7 @@ func (a *TransactionTagsApi) TagMoveHandler(c *core.Context) (any, *errs.Error) 
 	err := c.ShouldBindJSON(&tagMoveReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_tags.CategoryMoveHandler] parse request failed, because %s", err.Error())
+		log.WarnfWithRequestId(c, "[transaction_tags.TagMoveHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -193,11 +193,11 @@ func (a *TransactionTagsApi) TagMoveHandler(c *core.Context) (any, *errs.Error) 
 	err = a.tags.ModifyTagDisplayOrders(c, uid, tags)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_tags.CategoryMoveHandler] failed to move tags for user \"uid:%d\", because %s", uid, err.Error())
+		log.ErrorfWithRequestId(c, "[transaction_tags.TagMoveHandler] failed to move tags for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_tags.CategoryMoveHandler] user \"uid:%d\" has moved categories", uid)
+	log.InfofWithRequestId(c, "[transaction_tags.TagMoveHandler] user \"uid:%d\" has moved tags", uid)
 	return true, nil
 }
 

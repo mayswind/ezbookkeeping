@@ -5,6 +5,7 @@ import { useUserStore } from './user.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useTransactionTagsStore } from './transactionTag.js';
+import { useTransactionTemplatesStore } from './transactionTemplate.js';
 import { useTransactionsStore } from './transaction.js';
 import { useOverviewStore } from './overview.js';
 import { useStatisticsStore } from './statistics.js';
@@ -37,6 +38,9 @@ export const useRootStore = defineStore('root', {
 
             const transactionCategoriesStore = useTransactionCategoriesStore();
             transactionCategoriesStore.resetTransactionCategories();
+
+            const transactionTemplatesStore = useTransactionTemplatesStore();
+            transactionTemplatesStore.resetTransactionTemplates();
 
             const accountsStore = useAccountsStore();
             accountsStore.resetAccounts();

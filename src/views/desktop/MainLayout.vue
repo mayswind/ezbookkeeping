@@ -61,6 +61,12 @@
                         <span class="nav-item-title">{{ $t('Transaction Tags') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link">
+                    <router-link to="/template/list">
+                        <v-icon class="nav-item-icon" :icon="icons.templates"/>
+                        <span class="nav-item-title">{{ $t('Transaction Templates') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
                         <span class="title-text">{{ $t('Miscellaneous') }}</span>
@@ -196,6 +202,7 @@ import {
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
     mdiTagOutline,
+    mdiClipboardTextOutline,
     mdiChartPieOutline,
     mdiSwapHorizontal,
     mdiCogOutline,
@@ -225,6 +232,7 @@ export default {
                 accounts: mdiCreditCardOutline,
                 categories: mdiViewDashboardOutline,
                 tags: mdiTagOutline,
+                templates: mdiClipboardTextOutline,
                 statistics: mdiChartPieOutline,
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,

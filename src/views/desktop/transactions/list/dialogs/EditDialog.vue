@@ -8,7 +8,7 @@
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting" v-if="mode !== 'view'">
+                           :disabled="loading || submitting" v-if="mode !== 'view' && (mode !== 'editTemplate' || transaction.type === allTransactionTypes.Transfer)">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
@@ -24,13 +24,13 @@
                                              :title="$t('Swap Account and Amount')"
                                              v-if="transaction.type === allTransactionTypes.Transfer"
                                              @click="swapTransactionData(true, true)"></v-list-item>
-                                <v-divider v-if="transaction.type === allTransactionTypes.Transfer" />
+                                <v-divider v-if="mode !== 'editTemplate' && transaction.type === allTransactionTypes.Transfer" />
                                 <v-list-item :prepend-icon="icons.show"
                                              :title="$t('Show Amount')"
-                                             v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
+                                             v-if="mode !== 'editTemplate' && transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
                                 <v-list-item :prepend-icon="icons.hide"
                                              :title="$t('Hide Amount')"
-                                             v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
+                                             v-if="mode !== 'editTemplate' && !transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -38,18 +38,18 @@
             </template>
             <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
                 <div class="mb-4">
-                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': mode !== 'add' }"
+                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': mode !== 'add' && mode !== 'editTemplate' }"
                             :disabled="loading || submitting" v-model="transaction.type">
-                        <v-tab :value="allTransactionTypes.Expense" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Expense" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Expense') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Income" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Income" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Income') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Transfer" :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Transfer" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Transfer') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="transaction.type === allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="mode !== 'editTemplate' && transaction.type === allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Modify Balance') }}</span>
                         </v-tab>
                     </v-tabs>
@@ -58,7 +58,7 @@
                         <v-tab value="basicInfo">
                             <span>{{ $t('Basic Information') }}</span>
                         </v-tab>
-                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="mapProvider">
+                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="mode !== 'editTemplate' && mapProvider">
                             <span>{{ $t('Location on Map') }}</span>
                         </v-tab>
                     </v-tabs>
@@ -177,7 +177,7 @@
                                                        v-model="transaction.destinationAccountId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="6" v-if="mode !== 'editTemplate'">
                                     <date-time-select
                                         :readonly="mode === 'view'"
                                         :disabled="loading || submitting"
@@ -185,7 +185,7 @@
                                         v-model="transaction.time"
                                         @error="showDateTimeError" />
                                 </v-col>
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="6" v-if="mode !== 'editTemplate'">
                                     <v-autocomplete
                                         class="transaction-edit-timezone"
                                         item-title="displayNameWithUtcOffset"
@@ -207,7 +207,7 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" md="12">
+                                <v-col cols="12" md="12" v-if="mode !== 'editTemplate'">
                                     <v-select
                                         persistent-placeholder
                                         :readonly="mode === 'view'"
@@ -334,6 +334,7 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
@@ -401,12 +402,14 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
         title() {
             if (this.mode === 'add') {
                 return 'Add Transaction';
             } else if (this.mode === 'edit') {
                 return 'Edit Transaction';
+            } else if (this.mode === 'editTemplate') {
+                return 'Edit Transaction Template';
             } else {
                 return 'Transaction Detail';
             }
@@ -590,14 +593,14 @@ export default {
             }
         },
         'transaction.sourceAmount': function (newValue, oldValue) {
-            if (this.mode === 'view') {
+            if (this.mode === 'view' || this.loading) {
                 return;
             }
 
             this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
         },
         'transaction.destinationAmount': function (newValue) {
-            if (this.mode === 'view') {
+            if (this.mode === 'view' || this.loading) {
                 return;
             }
 
@@ -642,6 +645,15 @@ export default {
                 self.editTransactionId = options.id;
 
                 promises.push(self.transactionsStore.getTransaction({ transactionId: self.editTransactionId }));
+            } else if (options && options.editTemplateId) {
+                if (options.currentTemplate) {
+                    self.setTransaction(options.currentTemplate, options, false, false);
+                }
+
+                self.mode = 'editTemplate';
+                self.transaction.id = options.editTemplateId;
+
+                promises.push(self.transactionTemplatesStore.getTemplate({ templateId: options.editTemplateId }));
             } else {
                 self.mode = 'add';
                 self.editTransactionId = null;
@@ -671,10 +683,13 @@ export default {
                     return;
                 }
 
-                if (options.id && responses[3]) {
+                if (options && options.id && responses[3]) {
                     const transaction = responses[3];
                     self.setTransaction(transaction, options, true, true);
                     self.originalTransactionEditable = transaction.editable;
+                } else if (options && options.editTemplateId && responses[3]) {
+                    const template = responses[3];
+                    self.setTransaction(template, options, false, false);
                 } else {
                     self.setTransaction(null, options, true, true);
                 }
@@ -701,31 +716,59 @@ export default {
         save() {
             const self = this;
 
-            if (self.mode === 'view') {
-                return;
-            }
+            if (self.mode === 'add' || self.mode === 'edit') {
+                const doSubmit = function () {
+                    self.submitting = true;
 
-            const doSubmit = function () {
+                    self.transactionsStore.saveTransaction({
+                        transaction: self.transaction,
+                        defaultCurrency: self.defaultCurrency,
+                        isEdit: self.mode === 'edit',
+                        clientSessionId: self.clientSessionId
+                    }).then(() => {
+                        self.submitting = false;
+
+                        if (self.resolve) {
+                            if (self.mode === 'add') {
+                                self.resolve({
+                                    message: 'You have added a new transaction'
+                                });
+                            } else if (self.mode === 'edit') {
+                                self.resolve({
+                                    message: 'You have saved this transaction'
+                                });
+                            }
+                        }
+
+                        self.showState = false;
+                    }).catch(error => {
+                        self.submitting = false;
+
+                        if (!error.processed) {
+                            self.$refs.snackbar.showError(error);
+                        }
+                    });
+                };
+
+                if (self.transaction.sourceAmount === 0) {
+                    self.$refs.confirmDialog.open('Are you sure you want to save this transaction with a zero amount?').then(() => {
+                        doSubmit();
+                    });
+                } else {
+                    doSubmit();
+                }
+            } else if (self.mode === 'editTemplate') {
                 self.submitting = true;
 
-                self.transactionsStore.saveTransaction({
-                    transaction: self.transaction,
-                    defaultCurrency: self.defaultCurrency,
-                    isEdit: self.mode === 'edit',
-                    clientSessionId: self.clientSessionId
+                self.transactionTemplatesStore.modifyTemplateContent({
+                    template: self.transaction
                 }).then(() => {
                     self.submitting = false;
 
                     if (self.resolve) {
-                        if (self.mode === 'add') {
-                            self.resolve({
-                                message: 'You have added a new transaction'
-                            });
-                        } else if (self.mode === 'edit') {
-                            self.resolve({
-                                message: 'You have saved this transaction'
-                            });
-                        }
+                        self.resolve({
+                            message: 'You have saved this template'
+                        });
                     }
 
                     self.showState = false;
@@ -736,17 +779,13 @@ export default {
                         self.$refs.snackbar.showError(error);
                     }
                 });
-            };
-
-            if (self.transaction.sourceAmount === 0) {
-                self.$refs.confirmDialog.open('Are you sure you want to save this transaction with a zero amount?').then(() => {
-                    doSubmit();
-                });
-            } else {
-                doSubmit();
             }
         },
         duplicate() {
+            if (this.mode !== 'view') {
+                return;
+            }
+
             this.editTransactionId = null;
             this.transaction.id = null;
             this.transaction.time = getCurrentUnixTime();
@@ -756,10 +795,18 @@ export default {
             this.mode = 'add';
         },
         edit() {
+            if (this.mode !== 'view') {
+                return;
+            }
+
             this.mode = 'edit';
         },
         remove() {
             const self = this;
+
+            if (self.mode !== 'view') {
+                return;
+            }
 
             self.$refs.confirmDialog.open('Are you sure you want to delete this transaction?').then(() => {
                 self.submitting = true;
@@ -873,7 +920,11 @@ export default {
                     type: options.type,
                     categoryId: options.categoryId,
                     accountId: options.accountId,
-                    tagIds: options.tagIds
+                    destinationAccountId: options.destinationAccountId,
+                    amount: options.amount,
+                    destinationAmount: options.destinationAmount,
+                    tagIds: options.tagIds,
+                    comment: options.comment
                 },
                 setContextData,
                 convertContextTime

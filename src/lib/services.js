@@ -517,6 +517,54 @@ export default {
             id
         });
     },
+    getAllTransactionTemplates: ({ templateType }) => {
+        return axios.get('v1/transaction/templates/list.json?templateType=' + templateType);
+    },
+    getTransactionTemplate: ({ id }) => {
+        return axios.get('v1/transaction/templates/get.json?id=' + id);
+    },
+    addTransactionTemplate: ({ templateType, name, clientSessionId }) => {
+        return axios.post('v1/transaction/templates/add.json', {
+            templateType,
+            name,
+            clientSessionId
+        });
+    },
+    modifyTransactionNameTemplate: ({ id, name }) => {
+        return axios.post('v1/transaction/templates/modify_name.json', {
+            id,
+            name
+        });
+    },
+    modifyTransactionTemplate: ({ id, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+        return axios.post('v1/transaction/templates/modify.json', {
+            id,
+            type,
+            categoryId,
+            sourceAccountId,
+            destinationAccountId,
+            sourceAmount,
+            destinationAmount,
+            tagIds,
+            comment
+        });
+    },
+    hideTransactionTemplate: ({ id, hidden }) => {
+        return axios.post('v1/transaction/templates/hide.json', {
+            id,
+            hidden
+        });
+    },
+    moveTransactionTemplate: ({ newDisplayOrders }) => {
+        return axios.post('v1/transaction/templates/move.json', {
+            newDisplayOrders,
+        });
+    },
+    deleteTransactionTemplate: ({ id }) => {
+        return axios.post('v1/transaction/templates/delete.json', {
+            id
+        });
+    },
     getLatestExchangeRates: ({ ignoreError }) => {
         return axios.get('v1/exchange_rates/latest.json', {
             ignoreError: !!ignoreError

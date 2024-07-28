@@ -27,6 +27,7 @@ type DataManagementsApi struct {
 	transactions             *services.TransactionService
 	categories               *services.TransactionCategoryService
 	tags                     *services.TransactionTagService
+	templates                *services.TransactionTemplateService
 }
 
 // Initialize a data management api singleton instance
@@ -40,6 +41,7 @@ var (
 		transactions:             services.Transactions,
 		categories:               services.TransactionCategories,
 		tags:                     services.TransactionTags,
+		templates:                services.TransactionTemplates,
 	}
 )
 
@@ -84,11 +86,19 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (any, *errs.
 		return nil, errs.ErrOperationFailed
 	}
 
+	totalTransactionTemplateCount, err := a.templates.GetTotalTemplateCountByUid(c, uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction template count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	dataStatisticsResp := &models.DataStatisticsResponse{
 		TotalAccountCount:             totalAccountCount,
 		TotalTransactionCategoryCount: totalTransactionCategoryCount,
 		TotalTransactionTagCount:      totalTransactionTagCount,
 		TotalTransactionCount:         totalTransactionCount,
+		TotalTransactionTemplateCount: totalTransactionTemplateCount,
 	}
 
 	return dataStatisticsResp, nil
@@ -137,6 +147,13 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	err = a.templates.DeleteAllTemplates(c, uid)
+
+	if err != nil {
+		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

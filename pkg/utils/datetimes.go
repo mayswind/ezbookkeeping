@@ -178,6 +178,14 @@ func GetTimezoneOffsetMinutes(timezone *time.Location) int16 {
 	return tzMinuteOffset
 }
 
+// GetServerTimezoneOffsetMinutes returns offset minutes of current server timezone
+func GetServerTimezoneOffsetMinutes() int16 {
+	_, tzOffset := time.Now().Zone()
+	tzMinuteOffset := int16(tzOffset / 60)
+
+	return tzMinuteOffset
+}
+
 // FormatTimezoneOffset returns "+/-HH:MM" format of timezone
 func FormatTimezoneOffset(timezone *time.Location) string {
 	tzMinutesOffset := GetTimezoneOffsetMinutes(timezone)

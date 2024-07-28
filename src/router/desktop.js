@@ -22,6 +22,8 @@ import TransactionCategoryListPage from '@/views/desktop/categories/ListPage.vue
 
 import TransactionTagListPage from '@/views/desktop/tags/ListPage.vue';
 
+import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue';
+
 import UserSettingsPage from '@/views/desktop/user/UserSettingsPage.vue';
 import AppSettingsPage from '@/views/desktop/app/AppSettingsPage.vue';
 
@@ -134,6 +136,11 @@ const router = createRouter({
                 {
                     path: '/tag/list',
                     component: TransactionTagListPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    path: '/template/list',
+                    component: TransactionTemplateListPage,
                     beforeEnter: checkLogin
                 },
                 {

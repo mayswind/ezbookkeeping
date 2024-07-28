@@ -37,6 +37,10 @@ export function categoryTypeToTransactionType(categoryType) {
 }
 
 export function getTransactionPrimaryCategoryName(categoryId, allCategories) {
+    if (!allCategories) {
+        return '';
+    }
+
     for (let i = 0; i < allCategories.length; i++) {
         for (let j = 0; j < allCategories[i].subCategories.length; j++) {
             const subCategory = allCategories[i].subCategories[j];
@@ -50,6 +54,10 @@ export function getTransactionPrimaryCategoryName(categoryId, allCategories) {
 }
 
 export function getTransactionSecondaryCategoryName(categoryId, allCategories) {
+    if (!allCategories) {
+        return '';
+    }
+
     for (let i = 0; i < allCategories.length; i++) {
         for (let j = 0; j < allCategories[i].subCategories.length; j++) {
             const subCategory = allCategories[i].subCategories[j];

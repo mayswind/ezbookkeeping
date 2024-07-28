@@ -29,6 +29,7 @@ const (
 	NormalSubcategoryTag            = 7
 	NormalSubcategoryDataManagement = 8
 	NormalSubcategoryMapProxy       = 9
+	NormalSubcategoryTemplate       = 10
 )
 
 // Error represents the specific error returned to user

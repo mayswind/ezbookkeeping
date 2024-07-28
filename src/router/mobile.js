@@ -38,6 +38,8 @@ import CategoryPresetPage from '@/views/mobile/categories/PresetPage.vue';
 
 import TagListPage from '@/views/mobile/tags/ListPage.vue';
 
+import TemplateListPage from '@/views/mobile/templates/ListPage.vue';
+
 function asyncResolve(component) {
     return function({ resolve }) {
         return resolve({
@@ -288,6 +290,11 @@ const routes = [
     {
         path: '/tag/list',
         async: asyncResolve(TagListPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/template/list',
+        async: asyncResolve(TemplateListPage),
         beforeEnter: [checkLogin]
     },
     {

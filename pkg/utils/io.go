@@ -91,14 +91,28 @@ func WriteFile(path string, data []byte) error {
 
 // GetFileNameWithoutExtension returns the file name without extension
 func GetFileNameWithoutExtension(path string) string {
-	fileName := filepath.Base(path)
-	extension := filepath.Ext(fileName)
-
-	if len(extension) < 1 {
-		return fileName
+	if path == "" {
+		return ""
 	}
 
-	return fileName[0 : len(fileName)-len(extension)]
+	for i := len(path) - 1; i >= 0; i-- {
+		if path[i] == '/' || path[i] == '\\' {
+			path = path[i+1:]
+			break
+		}
+	}
+
+	if path == "" {
+		return ""
+	}
+
+	extension := filepath.Ext(path)
+
+	if len(extension) < 1 {
+		return path
+	}
+
+	return path[0 : len(path)-len(extension)]
 }
 
 // GetFileNameExtension returns the file extension without dot

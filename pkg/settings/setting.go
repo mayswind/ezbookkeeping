@@ -60,6 +60,7 @@ const (
 // Object Storage types
 const (
 	LocalFileSystemObjectStorageType string = "local_filesystem"
+	MinIOStorageType                 string = "minio"
 )
 
 // Uuid generator types
@@ -165,6 +166,17 @@ type SMTPConfig struct {
 	FromAddress       string
 }
 
+type MinIOConfig struct {
+	Endpoint        string
+	Location        string
+	AccessKeyID     string
+	SecretAccessKey string
+	UseSSL          bool
+	SkipTLSVerify   bool
+	Bucket          string
+	RootPath        string
+}
+
 // Config represents the global setting config
 type Config struct {
 	// Global
@@ -210,6 +222,7 @@ type Config struct {
 	// Storage
 	StorageType         string
 	LocalFileSystemPath string
+	MinIOConfig         *MinIOConfig
 
 	// Uuid
 	UuidGeneratorType string
@@ -542,6 +555,8 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	if getConfigItemStringValue(configFile, sectionName, "storage_type") == LocalFileSystemObjectStorageType {
 		config.StorageType = LocalFileSystemObjectStorageType
+	} else if getConfigItemStringValue(configFile, sectionName, "storage_type") == MinIOStorageType {
+		config.StorageType = MinIOStorageType
 	} else {
 		return errs.ErrInvalidStorageType
 	}
@@ -553,6 +568,18 @@ func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName 
 	if config.StorageType == LocalFileSystemObjectStorageType && err != nil {
 		return errs.ErrInvalidLocalFileSystemStoragePath
 	}
+
+	minIOConfig := &MinIOConfig{}
+	minIOConfig.Endpoint = getConfigItemStringValue(configFile, sectionName, "minio_endpoint")
+	minIOConfig.Location = getConfigItemStringValue(configFile, sectionName, "minio_location")
+	minIOConfig.AccessKeyID = getConfigItemStringValue(configFile, sectionName, "minio_access_key_id")
+	minIOConfig.SecretAccessKey = getConfigItemStringValue(configFile, sectionName, "minio_secret_access_key")
+	minIOConfig.UseSSL = getConfigItemBoolValue(configFile, sectionName, "minio_use_ssl", false)
+	minIOConfig.SkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "minio_skip_tls_verify", false)
+	minIOConfig.Bucket = getConfigItemStringValue(configFile, sectionName, "minio_bucket")
+	minIOConfig.RootPath = getConfigItemStringValue(configFile, sectionName, "minio_root_path")
+
+	config.MinIOConfig = minIOConfig
 
 	return nil
 }

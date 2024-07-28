@@ -22,8 +22,13 @@ var (
 // InitializeStorageContainer initializes the current object storage according to the config
 func InitializeStorageContainer(config *settings.Config) error {
 	if config.StorageType == settings.LocalFileSystemObjectStorageType {
-		storage, err := NewLocalFileSystemObjectStorage(config, avatarPathPrefix)
-		Container.AvatarCurrentStorage = storage
+		avatarStorage, err := NewLocalFileSystemObjectStorage(config, avatarPathPrefix)
+		Container.AvatarCurrentStorage = avatarStorage
+
+		return err
+	} else if config.StorageType == settings.MinIOStorageType {
+		avatarStorage, err := NewMinIOObjectStorage(config, avatarPathPrefix)
+		Container.AvatarCurrentStorage = avatarStorage
 
 		return err
 	}

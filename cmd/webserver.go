@@ -195,7 +195,7 @@ func startWebServer(c *cli.Context) error {
 	qrCodeRoute.Use(bindMiddleware(middlewares.RequestId(config)))
 	{
 		qrCodeCacheStore := persistence.NewInMemoryStore(time.Minute)
-		qrCodeRoute.GET("/mobile_url.png", bindCachedPngImage(api.QrCodes.MobileUrlQrCodeHandler, qrCodeCacheStore))
+		qrCodeRoute.GET("/mobile_url.png", bindCachedImage(api.QrCodes.MobileUrlQrCodeHandler, qrCodeCacheStore))
 	}
 
 	apiRoute := router.Group("/api")
@@ -423,15 +423,15 @@ func bindImage(fn core.ImageHandlerFunc) gin.HandlerFunc {
 	}
 }
 
-func bindCachedPngImage(fn core.DataHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
+func bindCachedImage(fn core.ImageHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
 	return cache.CachePage(store, time.Minute, func(ginCtx *gin.Context) {
 		c := core.WrapContext(ginCtx)
-		result, _, err := fn(c)
+		result, contentType, err := fn(c)
 
 		if err != nil {
 			utils.PrintDataErrorResult(c, "text/text", err)
 		} else {
-			utils.PrintDataSuccessResult(c, "img/png", "", result)
+			utils.PrintDataSuccessResult(c, contentType, "", result)
 		}
 	})
 }

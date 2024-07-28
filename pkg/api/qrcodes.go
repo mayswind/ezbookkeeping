@@ -35,7 +35,7 @@ func (a *QrCodesApi) MobileUrlQrCodeHandler(c *core.Context) ([]byte, string, *e
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	return data, "", nil
+	return data, "image/png", nil
 }
 
 func (a *QrCodesApi) generateUrlQrCode(c *core.Context, url string) ([]byte, *errs.Error) {

@@ -3,10 +3,10 @@ package models
 // TransactionTag represents transaction tag data stored in database
 type TransactionTag struct {
 	TagId           int64  `xorm:"PK"`
-	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_name) NOT NULL"`
-	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_name) NOT NULL"`
-	Name            string `xorm:"INDEX(IDX_tag_uid_deleted_name) VARCHAR(32) NOT NULL"`
-	DisplayOrder    int32  `xorm:"NOT NULL"`
+	Uid             int64  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
+	Deleted         bool   `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
+	Name            string `xorm:"VARCHAR(32) NOT NULL"`
+	DisplayOrder    int32  `xorm:"INDEX(IDX_tag_uid_deleted_order) NOT NULL"`
 	Hidden          bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64
 	UpdatedUnixTime int64

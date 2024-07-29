@@ -8,15 +8,20 @@
                 </template>
 
                 <v-card-text class="d-flex">
-                    <v-avatar rounded="lg" color="primary" variant="tonal" size="100" class="me-4" :class="{ 'cursor-pointer': oldProfile.avatarProvider === 'internal' }">
+                    <v-avatar rounded="lg" variant="tonal" size="100" class="me-4 user-profile-avatar-icon"
+                              :class="{ 'cursor-pointer': oldProfile.avatarProvider === 'internal' }"
+                              :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                         <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                             <template #placeholder>
                                 <div class="d-flex align-center justify-center fill-height">
-                                    <v-icon size="48" :icon="icons.user"/>
+                                    <v-icon size="48" class="user-profile-avatar-placeholder" :icon="icons.user"/>
                                 </div>
                             </template>
                         </v-img>
-                        <v-icon size="48" :icon="icons.user" v-else-if="!currentUserAvatar"/>
+                        <v-icon size="48" class="user-profile-avatar-placeholder" :icon="icons.user" v-else-if="!currentUserAvatar"/>
+                        <div class="avatar-edit-icon">
+                            <v-icon size="48" :icon="icons.pencil"/>
+                        </div>
                         <v-menu activator="parent" width="200" location="bottom" offset="14px" v-if="oldProfile.avatarProvider === 'internal'">
                             <v-list>
                                 <v-list-item :disabled="saving" :title="$t('Update Avatar')" @click="showOpenAvatarDialog"></v-list-item>
@@ -327,7 +332,8 @@ import { isUserVerifyEmailEnabled } from '@/lib/server_settings.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
-    mdiAccount
+    mdiAccount,
+    mdiAccountEditOutline
 } from '@mdi/js';
 
 export default {
@@ -381,7 +387,8 @@ export default {
             resending: false,
             saving: false,
             icons: {
-                user: mdiAccount
+                user: mdiAccount,
+                pencil: mdiAccountEditOutline,
             }
         };
     },
@@ -694,3 +701,29 @@ export default {
     }
 };
 </script>
+
+<style>
+.user-profile-avatar-icon .avatar-edit-icon {
+    display: none;
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.user-profile-avatar-icon .avatar-edit-icon > i.v-icon {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.user-profile-avatar-icon:hover .avatar-edit-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.user-profile-avatar-icon:hover .user-profile-avatar-placeholder {
+    display: none;
+}
+</style>

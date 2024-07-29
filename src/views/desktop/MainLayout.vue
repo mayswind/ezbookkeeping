@@ -112,7 +112,8 @@
                                :icon="true" @click="(theme === 'light' ? theme = 'dark' : (theme === 'dark' ? theme = 'auto' : theme = 'light'))">
                             <v-icon :icon="(theme === 'light' ? icons.themeLight : (theme === 'dark' ? icons.themeDark : icons.themeAuto))" size="24" />
                         </v-btn>
-                        <v-avatar class="cursor-pointer" color="primary" variant="tonal">
+                        <v-avatar class="cursor-pointer" variant="tonal"
+                                  :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                             <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                 <template #placeholder>
                                     <div class="d-flex align-center justify-center fill-height">
@@ -126,7 +127,8 @@
                                     <v-list-item>
                                         <template #prepend>
                                             <v-list-item-action>
-                                                <v-avatar color="primary" variant="tonal">
+                                                <v-avatar variant="tonal"
+                                                          :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                                         <template #placeholder>
                                                             <div class="d-flex align-center justify-center fill-height">

@@ -204,7 +204,7 @@ type UserProfileUpdateResponse struct {
 
 // UserProfileResponse represents a view-object of user profile
 type UserProfileResponse struct {
-	UserBasicInfo
+	*UserBasicInfo
 	LastLoginAt int64 `json:"lastLoginAt"`
 }
 
@@ -280,30 +280,8 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 // ToUserProfileResponse returns a user profile view-object according to database model
 func (u *User) ToUserProfileResponse() *UserProfileResponse {
 	return &UserProfileResponse{
-		UserBasicInfo: UserBasicInfo{
-			Username:             u.Username,
-			Email:                u.Email,
-			Nickname:             u.Nickname,
-			AvatarUrl:            u.getAvatarUrl(),
-			AvatarProvider:       u.getAvatarProvider(),
-			DefaultAccountId:     u.DefaultAccountId,
-			TransactionEditScope: u.TransactionEditScope,
-			Language:             u.Language,
-			DefaultCurrency:      u.DefaultCurrency,
-			FirstDayOfWeek:       u.FirstDayOfWeek,
-			LongDateFormat:       u.LongDateFormat,
-			ShortDateFormat:      u.ShortDateFormat,
-			LongTimeFormat:       u.LongTimeFormat,
-			ShortTimeFormat:      u.ShortTimeFormat,
-			DecimalSeparator:     u.DecimalSeparator,
-			DigitGroupingSymbol:  u.DigitGroupingSymbol,
-			DigitGrouping:        u.DigitGrouping,
-			CurrencyDisplayType:  u.CurrencyDisplayType,
-			ExpenseAmountColor:   u.ExpenseAmountColor,
-			IncomeAmountColor:    u.IncomeAmountColor,
-			EmailVerified:        u.EmailVerified,
-		},
-		LastLoginAt: u.LastLoginUnixTime,
+		UserBasicInfo: u.ToUserBasicInfo(),
+		LastLoginAt:   u.LastLoginUnixTime,
 	}
 }
 

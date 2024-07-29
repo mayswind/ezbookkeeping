@@ -8,7 +8,7 @@
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
                     <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
-                           :disabled="loading || submitting" v-if="mode !== 'view' && (mode !== 'editTemplate' || transaction.type === allTransactionTypes.Transfer)">
+                           :disabled="loading || submitting" v-if="mode !== 'view'">
                         <v-icon :icon="icons.more" />
                         <v-menu activator="parent">
                             <v-list>
@@ -24,13 +24,13 @@
                                              :title="$t('Swap Account and Amount')"
                                              v-if="transaction.type === allTransactionTypes.Transfer"
                                              @click="swapTransactionData(true, true)"></v-list-item>
-                                <v-divider v-if="mode !== 'editTemplate' && transaction.type === allTransactionTypes.Transfer" />
+                                <v-divider v-if="transaction.type === allTransactionTypes.Transfer" />
                                 <v-list-item :prepend-icon="icons.show"
                                              :title="$t('Show Amount')"
-                                             v-if="mode !== 'editTemplate' && transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
+                                             v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
                                 <v-list-item :prepend-icon="icons.hide"
                                              :title="$t('Hide Amount')"
-                                             v-if="mode !== 'editTemplate' && !transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
+                                             v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>

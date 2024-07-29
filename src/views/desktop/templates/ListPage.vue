@@ -466,6 +466,7 @@ export default {
                     destinationAccountId: template.destinationAccountId,
                     sourceAmount: template.sourceAmount,
                     destinationAmount: template.destinationAmount,
+                    hideAmount: template.hideAmount,
                     tagIds: template.tagIds,
                     comment: template.comment
                 }

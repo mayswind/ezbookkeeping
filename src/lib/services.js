@@ -536,7 +536,7 @@ export default {
             name
         });
     },
-    modifyTransactionTemplate: ({ id, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, tagIds, comment }) => {
+    modifyTransactionTemplate: ({ id, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment }) => {
         return axios.post('v1/transaction/templates/modify.json', {
             id,
             type,
@@ -545,6 +545,7 @@ export default {
             destinationAccountId,
             sourceAmount,
             destinationAmount,
+            hideAmount,
             tagIds,
             comment
         });

@@ -275,6 +275,7 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                 sourceAmount: template.sourceAmount,
                 destinationAccountId: '0',
                 destinationAmount: 0,
+                hideAmount: template.hideAmount,
                 tagIds: template.tagIds,
                 comment: template.comment
             };

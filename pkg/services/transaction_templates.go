@@ -125,7 +125,7 @@ func (s *TransactionTemplateService) ModifyTemplate(c *core.Context, template *m
 	template.UpdatedUnixTime = time.Now().Unix()
 
 	return s.UserDataDB(template.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		updatedRows, err := sess.ID(template.TemplateId).Cols("type", "category_id", "account_id", "tag_ids", "amount", "related_account_id", "related_account_amount", "comment", "updated_unix_time").Where("uid=? AND deleted=?", template.Uid, false).Update(template)
+		updatedRows, err := sess.ID(template.TemplateId).Cols("type", "category_id", "account_id", "tag_ids", "amount", "related_account_id", "related_account_amount", "hide_amount", "comment", "updated_unix_time").Where("uid=? AND deleted=?", template.Uid, false).Update(template)
 
 		if err != nil {
 			return err

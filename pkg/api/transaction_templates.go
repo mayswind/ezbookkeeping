@@ -211,6 +211,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 		Amount:               templateModifyReq.SourceAmount,
 		RelatedAccountId:     templateModifyReq.DestinationAccountId,
 		RelatedAccountAmount: templateModifyReq.DestinationAmount,
+		HideAmount:           templateModifyReq.HideAmount,
 		Comment:              templateModifyReq.Comment,
 	}
 
@@ -221,6 +222,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 		newTemplate.Amount == template.Amount &&
 		newTemplate.RelatedAccountId == template.RelatedAccountId &&
 		newTemplate.RelatedAccountAmount == template.RelatedAccountAmount &&
+		newTemplate.HideAmount == template.HideAmount &&
 		newTemplate.Comment == template.Comment {
 		return nil, errs.ErrNothingWillBeUpdated
 	}

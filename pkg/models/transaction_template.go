@@ -28,6 +28,7 @@ type TransactionTemplate struct {
 	Amount               int64                   `xorm:"NOT NULL"`
 	RelatedAccountId     int64                   `xorm:"NOT NULL"`
 	RelatedAccountAmount int64                   `xorm:"NOT NULL"`
+	HideAmount           bool                    `xorm:"NOT NULL"`
 	Comment              string                  `xorm:"VARCHAR(255) NOT NULL"`
 	DisplayOrder         int32                   `xorm:"INDEX(IDX_transaction_uid_deleted_template_type_order) NOT NULL"`
 	Hidden               bool                    `xorm:"NOT NULL"`
@@ -68,6 +69,7 @@ type TransactionTemplateModifyRequest struct {
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
 	DestinationAmount    int64           `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool            `json:"hideAmount"`
 	TagIds               []string        `json:"tagIds"`
 	Comment              string          `json:"comment" binding:"max=255"`
 }
@@ -121,7 +123,7 @@ func (t *TransactionTemplate) ToTransactionInfoResponse(utcOffset int16) *Transa
 		DestinationAccountId: t.RelatedAccountId,
 		SourceAmount:         t.Amount,
 		DestinationAmount:    t.RelatedAccountAmount,
-		HideAmount:           false,
+		HideAmount:           t.HideAmount,
 		TagIds:               tagIds,
 		Comment:              t.Comment,
 		GeoLocation:          nil,

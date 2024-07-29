@@ -553,9 +553,9 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 }
 
 func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName string) error {
-	if getConfigItemStringValue(configFile, sectionName, "storage_type") == LocalFileSystemObjectStorageType {
+	if getConfigItemStringValue(configFile, sectionName, "type") == LocalFileSystemObjectStorageType {
 		config.StorageType = LocalFileSystemObjectStorageType
-	} else if getConfigItemStringValue(configFile, sectionName, "storage_type") == MinIOStorageType {
+	} else if getConfigItemStringValue(configFile, sectionName, "type") == MinIOStorageType {
 		config.StorageType = MinIOStorageType
 	} else {
 		return errs.ErrInvalidStorageType

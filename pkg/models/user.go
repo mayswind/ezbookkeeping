@@ -180,7 +180,7 @@ type UserProfileUpdateRequest struct {
 	Password             string                `json:"password" binding:"omitempty,min=6,max=128"`
 	OldPassword          string                `json:"oldPassword" binding:"omitempty,min=6,max=128"`
 	DefaultAccountId     int64                 `json:"defaultAccountId,string" binding:"omitempty,min=1"`
-	TransactionEditScope *TransactionEditScope `json:"transactionEditScope" binding:"omitempty,min=0,max=7"`
+	TransactionEditScope *TransactionEditScope `json:"transactionEditScope" binding:"omitempty,min=0,max=6"`
 	Language             string                `json:"language" binding:"omitempty,min=2,max=16"`
 	DefaultCurrency      string                `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
 	FirstDayOfWeek       *WeekDay              `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`

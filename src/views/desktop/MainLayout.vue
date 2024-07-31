@@ -116,8 +116,8 @@
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                             <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                 <template #placeholder>
-                                    <div class="d-flex align-center justify-center fill-height">
-                                        <v-icon :icon="icons.user"/>
+                                    <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                        <v-icon color="primary" :icon="icons.user"/>
                                     </div>
                                 </template>
                             </v-img>
@@ -131,8 +131,8 @@
                                                           :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                                         <template #placeholder>
-                                                            <div class="d-flex align-center justify-center fill-height">
-                                                                <v-icon :icon="icons.user"/>
+                                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                                                <v-icon color="primary" :icon="icons.user"/>
                                                             </div>
                                                         </template>
                                                     </v-img>

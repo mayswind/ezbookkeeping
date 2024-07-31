@@ -1,11 +1,24 @@
 <template>
-    <v-text-field class="text-field-with-colored-label"
-                  :type="hide ? 'password' : 'text'" :class="extraClass"
+    <v-text-field type="text" class="text-field-with-colored-label" :class="extraClass"
                   :color="color" :base-color="color"
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
-                  :rules="enableRules ? rules : []" v-model="currentValue"
+                  :rules="enableRules ? rules : []" v-model="currentValue" v-if="!hide"
+                  @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste">
+        <template #prepend-inner v-if="currency && prependText">
+            <div>{{ prependText }}</div>
+        </template>
+        <template #append-inner v-if="currency && appendText">
+            <div class="text-no-wrap">{{ appendText }}</div>
+        </template>
+    </v-text-field>
+    <v-text-field type="password" class="text-field-with-colored-label" :class="extraClass"
+                  :color="color" :base-color="color"
+                  :density="density" :readonly="!!readonly" :disabled="!!disabled"
+                  :label="label" :placeholder="placeholder"
+                  :persistent-placeholder="!!persistentPlaceholder"
+                  :rules="enableRules ? rules : []" v-model="currentValue" v-if="hide"
                   @keydown="onKeyUpDown" @keyup="onKeyUpDown" @paste="onPaste">
         <template #prepend-inner v-if="currency && prependText">
             <div>{{ prependText }}</div>

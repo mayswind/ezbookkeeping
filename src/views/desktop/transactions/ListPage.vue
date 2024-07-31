@@ -480,7 +480,7 @@
                                  :max-time="customMaxDatetime"
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter" />
-    <edit-dialog ref="editDialog" :persistent="true" />
+    <edit-dialog ref="editDialog" type="transaction" :persistent="true" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">
         <account-filter-settings-card type="transactionListCurrent" :dialog-mode="true"

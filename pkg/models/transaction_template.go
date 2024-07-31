@@ -39,7 +39,7 @@ type TransactionTemplate struct {
 
 // TransactionTemplateListRequest represents all parameters of transaction template list request
 type TransactionTemplateListRequest struct {
-	TemplateType TransactionTemplateType `form:"templateType" binding:"required,min=1,max=1"`
+	TemplateType TransactionTemplateType `form:"templateType"`
 }
 
 // TransactionTemplateGetRequest represents all parameters of transaction template getting request
@@ -49,9 +49,18 @@ type TransactionTemplateGetRequest struct {
 
 // TransactionTemplateCreateRequest represents all parameters of transaction template creation request
 type TransactionTemplateCreateRequest struct {
-	TemplateType    TransactionTemplateType `json:"templateType" binding:"required,min=1,max=1"`
-	Name            string                  `json:"name" binding:"required,notBlank,max=32"`
-	ClientSessionId string                  `json:"clientSessionId"`
+	TemplateType         TransactionTemplateType `json:"templateType"`
+	Name                 string                  `json:"name" binding:"required,notBlank,max=32"`
+	Type                 TransactionType         `json:"type" binding:"required"`
+	CategoryId           int64                   `json:"categoryId,string" binding:"required,min=1"`
+	SourceAccountId      int64                   `json:"sourceAccountId,string" binding:"required,min=1"`
+	DestinationAccountId int64                   `json:"destinationAccountId,string" binding:"min=0"`
+	SourceAmount         int64                   `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
+	DestinationAmount    int64                   `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	HideAmount           bool                    `json:"hideAmount"`
+	TagIds               []string                `json:"tagIds"`
+	Comment              string                  `json:"comment" binding:"max=255"`
+	ClientSessionId      string                  `json:"clientSessionId"`
 }
 
 // TransactionTemplateModifyNameRequest represents all parameters of transaction template name modification request
@@ -63,8 +72,9 @@ type TransactionTemplateModifyNameRequest struct {
 // TransactionTemplateModifyRequest represents all parameters of transaction template modification request
 type TransactionTemplateModifyRequest struct {
 	Id                   int64           `json:"id,string" binding:"required,min=1"`
+	Name                 string          `json:"name" binding:"required,notBlank,max=32"`
 	Type                 TransactionType `json:"type" binding:"required"`
-	CategoryId           int64           `json:"categoryId,string"`
+	CategoryId           int64           `json:"categoryId,string" binding:"required,min=1"`
 	SourceAccountId      int64           `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64           `json:"destinationAccountId,string" binding:"min=0"`
 	SourceAmount         int64           `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`

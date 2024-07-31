@@ -129,13 +129,6 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         }
     },
     actions: {
-        generateNewTransactionTemplateModel(templateType) {
-            return {
-                id: '',
-                templateType: templateType,
-                name: ''
-            };
-        },
         updateTransactionTemplateListInvalidState(templateType, invalidState) {
             this.transactionTemplateListStatesInvalid[templateType] = invalidState;
         },
@@ -217,59 +210,12 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                 });
             });
         },
-        saveTemplateName({ template }) {
-            const self = this;
-
-            return new Promise((resolve, reject) => {
-                let promise = null;
-
-                if (!template.id) {
-                    promise = services.addTransactionTemplate(template);
-                } else {
-                    promise = services.modifyTransactionNameTemplate(template);
-                }
-
-                promise.then(response => {
-                    const data = response.data;
-
-                    if (!data || !data.success || !data.result) {
-                        if (!template.id) {
-                            reject({ message: 'Unable to add template' });
-                        } else {
-                            reject({ message: 'Unable to save template' });
-                        }
-                        return;
-                    }
-
-                    if (!template.id) {
-                        addTemplateToTransactionTemplateList(self, template.templateType, data.result);
-                    } else {
-                        updateTemplateInTransactionTemplateList(self, template.templateType, data.result);
-                    }
-
-                    resolve(data.result);
-                }).catch(error => {
-                    logger.error('failed to save template', error);
-
-                    if (error.response && error.response.data && error.response.data.errorMessage) {
-                        reject({ error: error.response.data });
-                    } else if (!error.processed) {
-                        if (!template.id) {
-                            reject({ message: 'Unable to add template' });
-                        } else {
-                            reject({ message: 'Unable to save template' });
-                        }
-                    } else {
-                        reject(error);
-                    }
-                });
-            });
-        },
-        modifyTemplateContent({ template }) {
+        saveTemplateContent({ template, isEdit, clientSessionId }) {
             const self = this;
 
             const submitTemplate = {
-                id: template.id,
+                templateType: template.templateType,
+                name: template.name,
                 type: template.type,
                 sourceAccountId: template.sourceAccountId,
                 sourceAmount: template.sourceAmount,
@@ -279,6 +225,10 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                 tagIds: template.tagIds,
                 comment: template.comment
             };
+
+            if (clientSessionId) {
+                submitTemplate.clientSessionId = clientSessionId;
+            }
 
             if (template.type === transactionConstants.allTransactionTypes.Expense) {
                 submitTemplate.categoryId = template.expenseCategory;
@@ -292,16 +242,36 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                 return Promise.reject('An error occurred');
             }
 
+            if (isEdit) {
+                submitTemplate.id = template.id;
+            }
+
             return new Promise((resolve, reject) => {
-                services.modifyTransactionTemplate(submitTemplate).then(response => {
+                let promise = null;
+
+                if (!submitTemplate.id) {
+                    promise = services.addTransactionTemplate(submitTemplate);
+                } else {
+                    promise = services.modifyTransactionTemplate(submitTemplate);
+                }
+
+                promise.then(response => {
                     const data = response.data;
 
                     if (!data || !data.success || !data.result) {
-                        reject({ message: 'Unable to save template' });
+                        if (!submitTemplate.id) {
+                            reject({ message: 'Unable to add template' });
+                        } else {
+                            reject({ message: 'Unable to save template' });
+                        }
                         return;
                     }
 
-                    updateTemplateInTransactionTemplateList(self, template.templateType, data.result);
+                    if (!submitTemplate.id) {
+                        addTemplateToTransactionTemplateList(self, template.templateType, data.result);
+                    } else {
+                        updateTemplateInTransactionTemplateList(self, template.templateType, data.result);
+                    }
 
                     resolve(data.result);
                 }).catch(error => {
@@ -310,7 +280,11 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     if (error.response && error.response.data && error.response.data.errorMessage) {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
-                        reject({ message: 'Unable to save template' });
+                        if (!submitTemplate.id) {
+                            reject({ message: 'Unable to add template' });
+                        } else {
+                            reject({ message: 'Unable to save template' });
+                        }
                     } else {
                         reject(error);
                     }

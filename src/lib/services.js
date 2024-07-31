@@ -523,22 +523,26 @@ export default {
     getTransactionTemplate: ({ id }) => {
         return axios.get('v1/transaction/templates/get.json?id=' + id);
     },
-    addTransactionTemplate: ({ templateType, name, clientSessionId }) => {
+    addTransactionTemplate: ({ templateType, name, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, clientSessionId }) => {
         return axios.post('v1/transaction/templates/add.json', {
             templateType,
             name,
+            type,
+            categoryId,
+            sourceAccountId,
+            destinationAccountId,
+            sourceAmount,
+            destinationAmount,
+            hideAmount,
+            tagIds,
+            comment,
             clientSessionId
         });
     },
-    modifyTransactionNameTemplate: ({ id, name }) => {
-        return axios.post('v1/transaction/templates/modify_name.json', {
-            id,
-            name
-        });
-    },
-    modifyTransactionTemplate: ({ id, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment }) => {
+    modifyTransactionTemplate: ({ id, name, type, categoryId, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment }) => {
         return axios.post('v1/transaction/templates/modify.json', {
             id,
+            name,
             type,
             categoryId,
             sourceAccountId,

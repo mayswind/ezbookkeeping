@@ -38,18 +38,18 @@
             </template>
             <v-card-text class="d-flex flex-column flex-md-row mt-md-4 pt-0">
                 <div class="mb-4">
-                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': mode !== 'add' && mode !== 'editTemplate' }"
+                    <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': type === 'transaction' && mode !== 'add' }"
                             :disabled="loading || submitting" v-model="transaction.type">
-                        <v-tab :value="allTransactionTypes.Expense" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Expense" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Expense" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Expense') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Income" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Income" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Income" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Income') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.Transfer" :disabled="mode !== 'add' && mode !== 'editTemplate' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.Transfer" :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Transfer" v-if="transaction.type !== allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Transfer') }}</span>
                         </v-tab>
-                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="mode !== 'editTemplate' && transaction.type === allTransactionTypes.ModifyBalance">
+                        <v-tab :value="allTransactionTypes.ModifyBalance" v-if="type === 'transaction' && transaction.type === allTransactionTypes.ModifyBalance">
                             <span>{{ $t('Modify Balance') }}</span>
                         </v-tab>
                     </v-tabs>
@@ -58,7 +58,7 @@
                         <v-tab value="basicInfo">
                             <span>{{ $t('Basic Information') }}</span>
                         </v-tab>
-                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="mode !== 'editTemplate' && mapProvider">
+                        <v-tab value="map" :disabled="!transaction.geoLocation" v-if="type === 'transaction' && mapProvider">
                             <span>{{ $t('Location on Map') }}</span>
                         </v-tab>
                     </v-tabs>
@@ -69,6 +69,16 @@
                     <v-window-item value="basicInfo">
                         <v-form class="mt-2">
                             <v-row>
+                                <v-col cols="12" v-if="type === 'template'">
+                                    <v-text-field
+                                        type="text"
+                                        persistent-placeholder
+                                        :disabled="loading || submitting"
+                                        :label="$t('Template Name')"
+                                        :placeholder="$t('Template Name')"
+                                        v-model="transaction.name"
+                                    />
+                                </v-col>
                                 <v-col cols="12" :md="transaction.type === allTransactionTypes.Transfer ? 6 : 12">
                                     <amount-input class="transaction-edit-amount font-weight-bold"
                                                   :color="sourceAmountColor"
@@ -177,7 +187,7 @@
                                                        v-model="transaction.destinationAccountId">
                                     </two-column-select>
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="mode !== 'editTemplate'">
+                                <v-col cols="12" md="6" v-if="type === 'transaction'">
                                     <date-time-select
                                         :readonly="mode === 'view'"
                                         :disabled="loading || submitting"
@@ -185,7 +195,7 @@
                                         v-model="transaction.time"
                                         @error="showDateTimeError" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="mode !== 'editTemplate'">
+                                <v-col cols="12" md="6" v-if="type === 'transaction'">
                                     <v-autocomplete
                                         class="transaction-edit-timezone"
                                         item-title="displayNameWithUtcOffset"
@@ -207,7 +217,7 @@
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
-                                <v-col cols="12" md="12" v-if="mode !== 'editTemplate'">
+                                <v-col cols="12" md="12" v-if="type === 'transaction'">
                                     <v-select
                                         persistent-placeholder
                                         :readonly="mode === 'view'"
@@ -368,6 +378,7 @@ import {
 export default {
     props: [
         'persistent',
+        'type',
         'show'
     ],
     expose: [
@@ -381,7 +392,7 @@ export default {
             showState: false,
             mode: 'add',
             activeTab: 'basicInfo',
-            editTransactionId: null,
+            editId: null,
             originalTransactionEditable: false,
             clientSessionId: '',
             loading: true,
@@ -404,15 +415,23 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
         title() {
-            if (this.mode === 'add') {
-                return 'Add Transaction';
-            } else if (this.mode === 'edit') {
-                return 'Edit Transaction';
-            } else if (this.mode === 'editTemplate') {
-                return 'Edit Transaction Template';
-            } else {
-                return 'Transaction Detail';
+            if (this.type === 'transaction') {
+                if (this.mode === 'add') {
+                    return 'Add Transaction';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Transaction';
+                } else {
+                    return 'Transaction Detail';
+                }
+            } else if (this.type === 'template') {
+                if (this.mode === 'add') {
+                    return 'Add Transaction Template';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Transaction Template';
+                }
             }
+
+            return '';
         },
         saveButtonTitle() {
             if (this.mode === 'add') {
@@ -636,31 +655,48 @@ export default {
                 self.transactionTagsStore.loadAllTags({ force: false })
             ];
 
-            if (options && options.id) {
-                if (options.currentTransaction) {
-                    self.setTransaction(options.currentTransaction, options, true, true);
+            if (self.type === 'transaction') {
+                if (options && options.id) {
+                    if (options.currentTransaction) {
+                        self.setTransaction(options.currentTransaction, options, true, true);
+                    }
+
+                    self.mode = 'view';
+                    self.editId = options.id;
+
+                    promises.push(self.transactionsStore.getTransaction({ transactionId: self.editId }));
+                } else {
+                    self.mode = 'add';
+                    self.editId = null;
+
+                    if (self.settingsStore.appSettings.autoGetCurrentGeoLocation
+                        && !self.geoLocationStatus && !self.transaction.geoLocation) {
+                        self.updateGeoLocation(false);
+                    }
+                }
+            } else if (self.type === 'template') {
+                self.transaction.name = '';
+
+                if (options && options.templateType) {
+                    self.transaction.templateType = options.templateType;
                 }
 
-                self.mode = 'view';
-                self.editTransactionId = options.id;
+                if (options && options.id) {
+                    if (options.currentTemplate) {
+                        self.setTransaction(options.currentTemplate, options, false, false);
+                        self.transaction.templateType = options.currentTemplate.templateType;
+                        self.transaction.name = options.currentTemplate.name;
+                    }
 
-                promises.push(self.transactionsStore.getTransaction({ transactionId: self.editTransactionId }));
-            } else if (options && options.editTemplateId) {
-                if (options.currentTemplate) {
-                    self.setTransaction(options.currentTemplate, options, false, false);
-                }
+                    self.mode = 'edit';
+                    self.editId = options.id;
+                    self.transaction.id = options.id;
 
-                self.mode = 'editTemplate';
-                self.transaction.id = options.editTemplateId;
-
-                promises.push(self.transactionTemplatesStore.getTemplate({ templateId: options.editTemplateId }));
-            } else {
-                self.mode = 'add';
-                self.editTransactionId = null;
-
-                if (self.settingsStore.appSettings.autoGetCurrentGeoLocation
-                    && !self.geoLocationStatus && !self.transaction.geoLocation) {
-                    self.updateGeoLocation(false);
+                    promises.push(self.transactionTemplatesStore.getTemplate({ templateId: self.editId }));
+                } else {
+                    self.mode = 'add';
+                    self.editId = null;
+                    self.transaction.id = null;
                 }
             }
 
@@ -675,21 +711,27 @@ export default {
             }
 
             Promise.all(promises).then(function (responses) {
-                if (self.editTransactionId && !responses[3]) {
+                if (self.editId && !responses[3]) {
                     if (self.reject) {
-                        self.reject('Unable to retrieve transaction');
+                        if (self.type === 'transaction') {
+                            self.reject('Unable to retrieve transaction');
+                        } else if (self.type === 'template') {
+                            self.reject('Unable to retrieve template');
+                        }
                     }
 
                     return;
                 }
 
-                if (options && options.id && responses[3]) {
+                if (self.type === 'transaction' && options && options.id && responses[3]) {
                     const transaction = responses[3];
                     self.setTransaction(transaction, options, true, true);
                     self.originalTransactionEditable = transaction.editable;
-                } else if (options && options.editTemplateId && responses[3]) {
+                } else if (self.type === 'template' && options && options.id && responses[3]) {
                     const template = responses[3];
                     self.setTransaction(template, options, false, false);
+                    self.transaction.templateType = template.templateType;
+                    self.transaction.name = template.name;
                 } else {
                     self.setTransaction(null, options, true, true);
                 }
@@ -716,7 +758,7 @@ export default {
         save() {
             const self = this;
 
-            if (self.mode === 'add' || self.mode === 'edit') {
+            if (self.type === 'transaction' && (self.mode === 'add' || self.mode === 'edit')) {
                 const doSubmit = function () {
                     self.submitting = true;
 
@@ -757,18 +799,26 @@ export default {
                 } else {
                     doSubmit();
                 }
-            } else if (self.mode === 'editTemplate') {
+            } else if (self.type === 'template' && (self.mode === 'add' || self.mode === 'edit')) {
                 self.submitting = true;
 
-                self.transactionTemplatesStore.modifyTemplateContent({
-                    template: self.transaction
+                self.transactionTemplatesStore.saveTemplateContent({
+                    template: self.transaction,
+                    isEdit: self.mode === 'edit',
+                    clientSessionId: self.clientSessionId
                 }).then(() => {
                     self.submitting = false;
 
                     if (self.resolve) {
-                        self.resolve({
-                            message: 'You have saved this template'
-                        });
+                        if (self.mode === 'add') {
+                            self.resolve({
+                                message: 'You have added a new template'
+                            });
+                        } else if (self.mode === 'edit') {
+                            self.resolve({
+                                message: 'You have saved this template'
+                            });
+                        }
                     }
 
                     self.showState = false;
@@ -782,11 +832,11 @@ export default {
             }
         },
         duplicate() {
-            if (this.mode !== 'view') {
+            if (this.type !== 'transaction' || this.mode !== 'view') {
                 return;
             }
 
-            this.editTransactionId = null;
+            this.editId = null;
             this.transaction.id = null;
             this.transaction.time = getCurrentUnixTime();
             this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
@@ -795,7 +845,7 @@ export default {
             this.mode = 'add';
         },
         edit() {
-            if (this.mode !== 'view') {
+            if (this.type !== 'transaction' || this.mode !== 'view') {
                 return;
             }
 
@@ -804,7 +854,7 @@ export default {
         remove() {
             const self = this;
 
-            if (self.mode !== 'view') {
+            if (this.type !== 'transaction' || self.mode !== 'view') {
                 return;
             }
 

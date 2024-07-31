@@ -36,6 +36,11 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.Context) (any, *er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	if templateListReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateListReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
+		log.WarnfWithRequestId(c, "[transaction_templates.TemplateListHandler] template type invalid, type is %d", templateListReq.TemplateType)
+		return nil, errs.ErrTransactionTemplateTypeInvalid
+	}
+
 	uid := c.GetCurrentUid()
 	templates, err := a.templates.GetAllTemplatesByUid(c, uid, templateListReq.TemplateType)
 
@@ -90,6 +95,16 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	if templateCreateReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateCreateReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
+		log.WarnfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] template type invalid, type is %d", templateCreateReq.TemplateType)
+		return nil, errs.ErrTransactionTemplateTypeInvalid
+	}
+
+	if templateCreateReq.Type <= models.TRANSACTION_TYPE_MODIFY_BALANCE || templateCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
+		log.WarnfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] transaction type invalid, type is %d", templateCreateReq.Type)
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
 	uid := c.GetCurrentUid()
 
 	maxOrderId, err := a.templates.GetMaxDisplayOrder(c, uid, templateCreateReq.TemplateType)
@@ -139,50 +154,6 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 	return templateResp, nil
 }
 
-// TemplateModifyNameHandler updates the name of an existed transaction template by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateModifyNameHandler(c *core.Context) (any, *errs.Error) {
-	var templateModifyReq models.TransactionTemplateModifyNameRequest
-	err := c.ShouldBindJSON(&templateModifyReq)
-
-	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateModifyNameHandler] parse request failed, because %s", err.Error())
-		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
-	}
-
-	uid := c.GetCurrentUid()
-	template, err := a.templates.GetTemplateByTemplateId(c, uid, templateModifyReq.Id)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateModifyNameHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	if templateModifyReq.Name == template.Name {
-		return nil, errs.ErrNothingWillBeUpdated
-	}
-
-	newTemplate := &models.TransactionTemplate{
-		TemplateId: template.TemplateId,
-		Uid:        template.Uid,
-		Name:       templateModifyReq.Name,
-	}
-
-	err = a.templates.ModifyTemplateName(c, newTemplate)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateModifyNameHandler] failed to update template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateModifyNameHandler] user \"uid:%d\" has updated template \"id:%d\" successfully", uid, templateModifyReq.Id)
-
-	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
-	template.Name = newTemplate.Name
-	templateResp := template.ToTransactionTemplateInfoResponse(serverUtcOffset)
-
-	return templateResp, nil
-}
-
 // TemplateModifyHandler saves an existed transaction template by request parameters for current user
 func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *errs.Error) {
 	var templateModifyReq models.TransactionTemplateModifyRequest
@@ -191,6 +162,11 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 	if err != nil {
 		log.WarnfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	if templateModifyReq.Type <= models.TRANSACTION_TYPE_MODIFY_BALANCE || templateModifyReq.Type > models.TRANSACTION_TYPE_TRANSFER {
+		log.WarnfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] transaction type invalid, type is %d", templateModifyReq.Type)
+		return nil, errs.ErrTransactionTypeInvalid
 	}
 
 	uid := c.GetCurrentUid()
@@ -204,6 +180,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 	newTemplate := &models.TransactionTemplate{
 		TemplateId:           template.TemplateId,
 		Uid:                  uid,
+		Name:                 templateModifyReq.Name,
 		Type:                 templateModifyReq.Type,
 		CategoryId:           templateModifyReq.CategoryId,
 		AccountId:            templateModifyReq.SourceAccountId,
@@ -215,7 +192,8 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 		Comment:              templateModifyReq.Comment,
 	}
 
-	if newTemplate.Type == template.Type &&
+	if newTemplate.Name == template.Name &&
+		newTemplate.Type == template.Type &&
 		newTemplate.CategoryId == template.CategoryId &&
 		newTemplate.AccountId == template.AccountId &&
 		newTemplate.TagIds == template.TagIds &&
@@ -237,7 +215,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 	log.InfofWithRequestId(c, "[transaction_templates.TemplateModifyHandler] user \"uid:%d\" has updated template \"id:%d\" successfully", uid, templateModifyReq.Id)
 
 	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
-	newTemplate.Name = template.Name
+	newTemplate.TemplateType = template.TemplateType
 	newTemplate.DisplayOrder = template.DisplayOrder
 	newTemplate.Hidden = template.Hidden
 	templateResp := newTemplate.ToTransactionTemplateInfoResponse(serverUtcOffset)
@@ -326,10 +304,18 @@ func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.Context) (any, *
 
 func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCreateReq *models.TransactionTemplateCreateRequest, order int32) *models.TransactionTemplate {
 	return &models.TransactionTemplate{
-		Uid:          uid,
-		TemplateType: templateCreateReq.TemplateType,
-		Name:         templateCreateReq.Name,
-		Type:         models.TRANSACTION_TYPE_EXPENSE,
-		DisplayOrder: order,
+		Uid:                  uid,
+		TemplateType:         templateCreateReq.TemplateType,
+		Name:                 templateCreateReq.Name,
+		Type:                 templateCreateReq.Type,
+		CategoryId:           templateCreateReq.CategoryId,
+		AccountId:            templateCreateReq.SourceAccountId,
+		TagIds:               strings.Join(templateCreateReq.TagIds, ","),
+		Amount:               templateCreateReq.SourceAmount,
+		RelatedAccountId:     templateCreateReq.DestinationAccountId,
+		RelatedAccountAmount: templateCreateReq.DestinationAmount,
+		HideAmount:           templateCreateReq.HideAmount,
+		Comment:              templateCreateReq.Comment,
+		DisplayOrder:         order,
 	}
 }

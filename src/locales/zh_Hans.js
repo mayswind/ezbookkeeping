@@ -661,6 +661,7 @@ export default {
         'source account not found': '来源账户不存在',
         'destination account not found': '目标账户不存在',
         'account is in use and cannot be deleted': '账户正在被使用，无法删除',
+        'account category is invalid': '账户分类无效',
         'transaction id is invalid': '交易ID无效',
         'transaction not found': '交易不存在',
         'transaction type is invalid': '交易类型无效',

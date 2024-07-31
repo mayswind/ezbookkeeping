@@ -146,6 +146,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
+	if accountCreateReq.Category < models.ACCOUNT_CATEGORY_CASH || accountCreateReq.Category > models.ACCOUNT_CATEGORY_INVESTMENT {
+		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account category invalid, category is %d", accountCreateReq.Category)
+		return nil, errs.ErrAccountCategoryInvalid
+	}
+
 	if accountCreateReq.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 		if len(accountCreateReq.SubAccounts) > 0 {
 			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub-accounts")
@@ -273,6 +278,11 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
 	if err != nil {
 		log.WarnfWithRequestId(c, "[accounts.AccountModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	if accountModifyReq.Category < models.ACCOUNT_CATEGORY_CASH || accountModifyReq.Category > models.ACCOUNT_CATEGORY_INVESTMENT {
+		log.WarnfWithRequestId(c, "[accounts.AccountModifyHandler] account category invalid, category is %d", accountModifyReq.Category)
+		return nil, errs.ErrAccountCategoryInvalid
 	}
 
 	uid := c.GetCurrentUid()

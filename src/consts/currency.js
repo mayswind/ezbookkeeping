@@ -2,6 +2,7 @@ const parentAccountCurrencyPlaceholder = '---';
 const defaultCurrencySymbol = '¤';
 
 // ISO 4217
+// Reference: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
 const allCurrencies = {
     'AED': { // UAE Dirham
         code: 'AED',
@@ -226,10 +227,6 @@ const allCurrencies = {
     'HNL': { // Lempira
         code: 'HNL',
         symbol: 'L'
-    },
-    'HRK': { // Kuna
-        code: 'HRK',
-        symbol: 'kn'
     },
     'HTG': { // Gourde
         code: 'HTG',
@@ -495,15 +492,11 @@ const allCurrencies = {
         code: 'SHP',
         symbol: '£'
     },
-    'SLE': { // Leone (new leone)
+    'SLE': { // Leone
         code: 'SLE',
         symbol: 'Le'
     },
-    'SLL': { // Leone (old leone)
-        code: 'SLL',
-        symbol: 'Le'
-    },
-    'SOS': { // Somalian shilling
+    'SOS': { // Somali Shilling
         code: 'SOS',
         symbol: 'Sh.So.'
     },
@@ -583,16 +576,12 @@ const allCurrencies = {
         code: 'UYU',
         symbol: '$'
     },
-    'UZS': { // Uzbekistani sum
+    'UZS': { // Uzbekistan Sum
         code: 'UZS'
     },
-    'VED': { // Bolívar Digital
+    'VED': { // Bolívar Soberano
         code: 'VED',
         symbol: 'Bs.D'
-    },
-    'VEF': { // Bolívar Fuerte
-        code: 'VEF',
-        symbol: 'Bs.F'
     },
     'VES': { // Bolívar Soberano
         code: 'VES',
@@ -623,6 +612,10 @@ const allCurrencies = {
     'XPF': { // CFP Franc
         code: 'XPF'
     },
+    'XSU': { // Sucre
+        code: 'XSU',
+        symbol: 'S/.'
+    },
     'YER': { // Yemeni Rial
         code: 'YER',
         symbol: 'ر.ي'
@@ -634,6 +627,10 @@ const allCurrencies = {
     'ZMW': { // Zambian Kwacha
         code: 'ZMW',
         symbol: 'K'
+    },
+    'ZWG': { // Zimbabwe Gold
+        code: 'ZWG',
+        symbol: 'ZiG'
     },
     'ZWL': { // Zimbabwe Dollar
         code: 'ZWL',

@@ -8,6 +8,7 @@ import (
 const ParentAccountCurrencyPlaceholder = "---"
 
 // AllCurrencyNames represents all currency name in ISO 4217
+// Reference: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
 var AllCurrencyNames = map[string]bool{
 	"AED": true, //UAE Dirham
 	"AFN": true, //Afghani
@@ -65,7 +66,6 @@ var AllCurrencyNames = map[string]bool{
 	"GYD": true, //Guyana Dollar
 	"HKD": true, //Hong Kong Dollar
 	"HNL": true, //Lempira
-	"HRK": true, //Kuna
 	"HTG": true, //Gourde
 	"HUF": true, //Forint
 	"IDR": true, //Rupiah
@@ -132,9 +132,8 @@ var AllCurrencyNames = map[string]bool{
 	"SEK": true, //Swedish Krona
 	"SGD": true, //Singapore Dollar
 	"SHP": true, //Saint Helena Pound
-	"SLE": true, //Leone (new leone)
-	"SLL": true, //Leone (old leone)
-	"SOS": true, //Somalian shilling
+	"SLE": true, //Leone
+	"SOS": true, //Somali Shilling
 	"SRD": true, //Surinam Dollar
 	"SSP": true, //South Sudanese Pound
 	"STN": true, //Dobra
@@ -154,9 +153,8 @@ var AllCurrencyNames = map[string]bool{
 	"UGX": true, //Uganda Shilling
 	"USD": true, //US Dollar
 	"UYU": true, //Peso Uruguayo
-	"UZS": true, //Uzbekistani sum
-	"VED": true, //Bolívar Digital
-	"VEF": true, //Bolívar Fuerte
+	"UZS": true, //Uzbekistan Sum
+	"VED": true, //Bolívar Soberano
 	"VES": true, //Bolívar Soberano
 	"VND": true, //Dong
 	"VUV": true, //Vatu
@@ -165,9 +163,11 @@ var AllCurrencyNames = map[string]bool{
 	"XCD": true, //East Caribbean Dollar
 	"XOF": true, //CFA Franc BCEAO
 	"XPF": true, //CFP Franc
+	"XSU": true, //Sucre
 	"YER": true, //Yemeni Rial
 	"ZAR": true, //Rand
 	"ZMW": true, //Zambian Kwacha
+	"ZWG": true, //Zimbabwe Gold
 	"ZWL": true, //Zimbabwe Dollar
 }
 

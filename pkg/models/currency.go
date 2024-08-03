@@ -15,8 +15,10 @@ const (
 	CURRENCY_DISPLAY_TYPE_SYMBOL_AFTER_AMOUNT_WITHOUT_SPACE  CurrencyDisplayType = 5
 	CURRENCY_DISPLAY_TYPE_CODE_BEFORE_AMOUNT                 CurrencyDisplayType = 6
 	CURRENCY_DISPLAY_TYPE_CODE_AFTER_AMOUNT                  CurrencyDisplayType = 7
-	CURRENCY_DISPLAY_TYPE_NAME_BEFORE_AMOUNT                 CurrencyDisplayType = 8
-	CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT                  CurrencyDisplayType = 9
+	CURRENCY_DISPLAY_TYPE_UNIT_BEFORE_AMOUNT                 CurrencyDisplayType = 8
+	CURRENCY_DISPLAY_TYPE_UNIT_AFTER_AMOUNT                  CurrencyDisplayType = 9
+	CURRENCY_DISPLAY_TYPE_NAME_BEFORE_AMOUNT                 CurrencyDisplayType = 10
+	CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT                  CurrencyDisplayType = 11
 	CURRENCY_DISPLAY_TYPE_INVALID                            CurrencyDisplayType = 255
 )
 
@@ -39,6 +41,10 @@ func (d CurrencyDisplayType) String() string {
 		return "Code Before Amount"
 	case CURRENCY_DISPLAY_TYPE_CODE_AFTER_AMOUNT:
 		return "Code After Amount"
+	case CURRENCY_DISPLAY_TYPE_UNIT_BEFORE_AMOUNT:
+		return "Unit Before Amount"
+	case CURRENCY_DISPLAY_TYPE_UNIT_AFTER_AMOUNT:
+		return "Unit After Amount"
 	case CURRENCY_DISPLAY_TYPE_NAME_BEFORE_AMOUNT:
 		return "Name Before Amount"
 	case CURRENCY_DISPLAY_TYPE_NAME_AFTER_AMOUNT:

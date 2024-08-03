@@ -191,7 +191,7 @@ type UserProfileUpdateRequest struct {
 	DecimalSeparator     *DecimalSeparator     `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *DigitGroupingSymbol  `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *DigitGroupingType    `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
-	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=9"`
+	CurrencyDisplayType  *CurrencyDisplayType  `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
 	ExpenseAmountColor   *AmountColorType      `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
 	IncomeAmountColor    *AmountColorType      `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
 }

@@ -330,165 +330,505 @@ export default {
         'Kiritimati Island': 'Kiritimati Island',
     },
     'currency': {
-        'AED': 'United Arab Emirates Dirham',
-        'AFN': 'Afghan Afghani',
-        'ALL': 'Albanian Lek',
-        'AMD': 'Armenian Dram',
-        'ANG': 'Netherlands Antillean Guilder',
-        'AOA': 'Angolan Kwanza',
-        'ARS': 'Argentine Peso',
-        'AUD': 'Australian Dollar',
-        'AWG': 'Aruban Florin',
-        'AZN': 'Azerbaijan Manat',
-        'BAM': 'Bosnia and Herzegovina Convertible Mark',
-        'BBD': 'Barbadian Dollar',
-        'BDT': 'Bangladeshi Taka',
-        'BGN': 'Bulgarian Lev',
-        'BHD': 'Bahraini Dinar',
-        'BIF': 'Burundian Franc',
-        'BMD': 'Bermudian Dollar',
-        'BND': 'Brunei Dollar',
-        'BOB': 'Bolivian Boliviano',
-        'BRL': 'Brazilian Real',
-        'BSD': 'Bahamian Dollar',
-        'BTN': 'Bhutanese Ngultrum',
-        'BWP': 'Botswana Pula',
-        'BYN': 'Belarusian Ruble',
-        'BZD': 'Belize Dollar',
-        'CAD': 'Canadian Dollar',
-        'CDF': 'Congolese Franc',
-        'CHF': 'Swiss Franc',
-        'CLP': 'Chilean Peso',
-        'CNY': 'Chinese Yuan',
-        'COP': 'Colombian Peso',
-        'CRC': 'Costa Rican Colon',
-        'CUC': 'Cuban Convertible Peso',
-        'CUP': 'Cuban Peso',
-        'CVE': 'Cape Verdean Escudo',
-        'CZK': 'Czech Koruna',
-        'DJF': 'Djiboutian Franc',
-        'DKK': 'Danish Krone',
-        'DOP': 'Dominican Peso',
-        'DZD': 'Algerian Dinar',
-        'EGP': 'Egyptian Pound',
-        'ERN': 'Eritrean Nakfa',
-        'ETB': 'Ethiopian Birr',
-        'EUR': 'Euro',
-        'FJD': 'Fijian Dollar',
-        'FKP': 'Falkland Islands Pound',
-        'GBP': 'British Pound',
-        'GEL': 'Georgian Lari',
-        'GHS': 'Ghanaian Cedi',
-        'GIP': 'Gibraltar Pound',
-        'GMD': 'Gambian Dalasi',
-        'GNF': 'Guinean Franc',
-        'GTQ': 'Guatemalan Quetzal',
-        'GYD': 'Guyanese Dollar',
-        'HKD': 'Hong Kong Dollar',
-        'HNL': 'Honduran Lempira',
-        'HTG': 'Haitian Gourde',
-        'HUF': 'Hungarian Forint',
-        'IDR': 'Indonesian Rupiah',
-        'ILS': 'Israeli New Shekel',
-        'INR': 'Indian Rupee',
-        'IQD': 'Iraqi Dinar',
-        'IRR': 'Iranian Rial',
-        'ISK': 'Icelandic Krona',
-        'JMD': 'Jamaican Dollar',
-        'JOD': 'Jordanian Dinar',
-        'JPY': 'Japanese Yen',
-        'KES': 'Kenyan Shilling',
-        'KGS': 'Kyrgyzstani Som',
-        'KHR': 'Cambodian Riel',
-        'KMF': 'Comorian Franc',
-        'KPW': 'North Korean Won',
-        'KRW': 'South Korean Won',
-        'KWD': 'Kuwaiti Dinar',
-        'KYD': 'Cayman Islands Dollar',
-        'KZT': 'Kazakhstani Tenge',
-        'LAK': 'Lao Kip',
-        'LBP': 'Lebanese Pound',
-        'LKR': 'Sri Lankan Rupee',
-        'LRD': 'Liberian Dollar',
-        'LSL': 'Lesotho Loti',
-        'LYD': 'Libyan Dinar',
-        'MAD': 'Moroccan Dirham',
-        'MDL': 'Moldovan Leu',
-        'MGA': 'Malagasy Ariary',
-        'MKD': 'Macedonian Denar',
-        'MMK': 'Myanmar Kyat',
-        'MNT': 'Mongolian Tugrik',
-        'MOP': 'Macanese Pataca',
-        'MRU': 'Mauritanian Ouguiya',
-        'MUR': 'Mauritian Rupee',
-        'MVR': 'Maldivian Rufiyaa',
-        'MWK': 'Malawian Kwacha',
-        'MXN': 'Mexican Peso',
-        'MYR': 'Malaysian Ringgit',
-        'MZN': 'Mozambican Metical',
-        'NAD': 'Namibian Dollar',
-        'NGN': 'Nigerian Naira',
-        'NIO': 'Nicaraguan Cordoba',
-        'NOK': 'Norwegian Krone',
-        'NPR': 'Nepalese Rupee',
-        'NZD': 'New Zealand Dollar',
-        'OMR': 'Omani Rial',
-        'PAB': 'Panamanian Balboa',
-        'PEN': 'Peruvian Sol',
-        'PGK': 'Papua New Guinean Kina',
-        'PHP': 'Philippine Peso',
-        'PKR': 'Pakistani Rupee',
-        'PLN': 'Polish Zloty',
-        'PYG': 'Paraguayan Guarani',
-        'QAR': 'Qatari Riyal',
-        'RON': 'Romanian Leu',
-        'RSD': 'Serbian Dinar',
-        'RUB': 'Russian Ruble',
-        'RWF': 'Rwandan Franc',
-        'SAR': 'Saudi Riyal',
-        'SBD': 'Solomon Islands Dollar',
-        'SCR': 'Seychelles Rupee',
-        'SDG': 'Sudanese Pound',
-        'SEK': 'Swedish Krona',
-        'SGD': 'Singapore Dollar',
-        'SHP': 'Saint Helena Pound',
-        'SLE': 'Sierra Leonean Leone',
-        'SOS': 'Somali Shilling',
-        'SRD': 'Surinamese Dollar',
-        'SSP': 'South Sudanese Pound',
-        'STN': 'Sao Tome Principe Dobra',
-        'SVC': 'Salvadoran Colon',
-        'SYP': 'Syrian Pound',
-        'SZL': 'Swazi Lilangeni',
-        'THB': 'Thai Baht',
-        'TJS': 'Tajikistani Somoni',
-        'TMT': 'Turkmenistani Manat',
-        'TND': 'Tunisian Dinar',
-        'TOP': 'Tongan Pa\'anga',
-        'TRY': 'Turkish Lira',
-        'TTD': 'Trinidad and Tobago Dollar',
-        'TWD': 'New Taiwan Dollar',
-        'TZS': 'Tanzanian Shilling',
-        'UAH': 'Ukrainian Hryvnia',
-        'UGX': 'Ugandan Shilling',
-        'USD': 'United States Dollar',
-        'UYU': 'Uruguayan Peso',
-        'UZS': 'Uzbekistani Sum',
-        'VED': 'Venezuelan Bolívar Digital',
-        'VES': 'Venezuelan Bolívar Soberano',
-        'VND': 'Vietnamese Dong',
-        'VUV': 'Vanuatu Vatu',
-        'WST': 'Samoan Tala',
-        'XAF': 'Central African CFA Franc',
-        'XCD': 'East Caribbean Dollar',
-        'XOF': 'West African CFA Franc',
-        'XPF': 'CFP Franc',
-        'XSU': 'Ecuadorian Sucre',
-        'YER': 'Yemeni Rial',
-        'ZAR': 'South African Rand',
-        'ZMW': 'Zambian Kwacha',
-        'ZWG': 'Zimbabwe Gold',
-        'ZWL': 'Zimbabwean Dollar',
+        'name': {
+            'AED': 'United Arab Emirates Dirham',
+            'AFN': 'Afghan Afghani',
+            'ALL': 'Albanian Lek',
+            'AMD': 'Armenian Dram',
+            'ANG': 'Netherlands Antillean Guilder',
+            'AOA': 'Angolan Kwanza',
+            'ARS': 'Argentine Peso',
+            'AUD': 'Australian Dollar',
+            'AWG': 'Aruban Florin',
+            'AZN': 'Azerbaijan Manat',
+            'BAM': 'Bosnia and Herzegovina Convertible Mark',
+            'BBD': 'Barbadian Dollar',
+            'BDT': 'Bangladeshi Taka',
+            'BGN': 'Bulgarian Lev',
+            'BHD': 'Bahraini Dinar',
+            'BIF': 'Burundian Franc',
+            'BMD': 'Bermudian Dollar',
+            'BND': 'Brunei Dollar',
+            'BOB': 'Bolivian Boliviano',
+            'BRL': 'Brazilian Real',
+            'BSD': 'Bahamian Dollar',
+            'BTN': 'Bhutanese Ngultrum',
+            'BWP': 'Botswana Pula',
+            'BYN': 'Belarusian Ruble',
+            'BZD': 'Belize Dollar',
+            'CAD': 'Canadian Dollar',
+            'CDF': 'Congolese Franc',
+            'CHF': 'Swiss Franc',
+            'CLP': 'Chilean Peso',
+            'CNY': 'Chinese Yuan',
+            'COP': 'Colombian Peso',
+            'CRC': 'Costa Rican Colon',
+            'CUC': 'Cuban Convertible Peso',
+            'CUP': 'Cuban Peso',
+            'CVE': 'Cape Verdean Escudo',
+            'CZK': 'Czech Koruna',
+            'DJF': 'Djiboutian Franc',
+            'DKK': 'Danish Krone',
+            'DOP': 'Dominican Peso',
+            'DZD': 'Algerian Dinar',
+            'EGP': 'Egyptian Pound',
+            'ERN': 'Eritrean Nakfa',
+            'ETB': 'Ethiopian Birr',
+            'EUR': 'Euro',
+            'FJD': 'Fijian Dollar',
+            'FKP': 'Falkland Islands Pound',
+            'GBP': 'British Pound',
+            'GEL': 'Georgian Lari',
+            'GHS': 'Ghanaian Cedi',
+            'GIP': 'Gibraltar Pound',
+            'GMD': 'Gambian Dalasi',
+            'GNF': 'Guinean Franc',
+            'GTQ': 'Guatemalan Quetzal',
+            'GYD': 'Guyanese Dollar',
+            'HKD': 'Hong Kong Dollar',
+            'HNL': 'Honduran Lempira',
+            'HTG': 'Haitian Gourde',
+            'HUF': 'Hungarian Forint',
+            'IDR': 'Indonesian Rupiah',
+            'ILS': 'Israeli New Shekel',
+            'INR': 'Indian Rupee',
+            'IQD': 'Iraqi Dinar',
+            'IRR': 'Iranian Rial',
+            'ISK': 'Icelandic Krona',
+            'JMD': 'Jamaican Dollar',
+            'JOD': 'Jordanian Dinar',
+            'JPY': 'Japanese Yen',
+            'KES': 'Kenyan Shilling',
+            'KGS': 'Kyrgyzstani Som',
+            'KHR': 'Cambodian Riel',
+            'KMF': 'Comorian Franc',
+            'KPW': 'North Korean Won',
+            'KRW': 'South Korean Won',
+            'KWD': 'Kuwaiti Dinar',
+            'KYD': 'Cayman Islands Dollar',
+            'KZT': 'Kazakhstani Tenge',
+            'LAK': 'Lao Kip',
+            'LBP': 'Lebanese Pound',
+            'LKR': 'Sri Lankan Rupee',
+            'LRD': 'Liberian Dollar',
+            'LSL': 'Lesotho Loti',
+            'LYD': 'Libyan Dinar',
+            'MAD': 'Moroccan Dirham',
+            'MDL': 'Moldovan Leu',
+            'MGA': 'Malagasy Ariary',
+            'MKD': 'Macedonian Denar',
+            'MMK': 'Myanmar Kyat',
+            'MNT': 'Mongolian Tugrik',
+            'MOP': 'Macanese Pataca',
+            'MRU': 'Mauritanian Ouguiya',
+            'MUR': 'Mauritian Rupee',
+            'MVR': 'Maldivian Rufiyaa',
+            'MWK': 'Malawian Kwacha',
+            'MXN': 'Mexican Peso',
+            'MYR': 'Malaysian Ringgit',
+            'MZN': 'Mozambican Metical',
+            'NAD': 'Namibian Dollar',
+            'NGN': 'Nigerian Naira',
+            'NIO': 'Nicaraguan Cordoba',
+            'NOK': 'Norwegian Krone',
+            'NPR': 'Nepalese Rupee',
+            'NZD': 'New Zealand Dollar',
+            'OMR': 'Omani Rial',
+            'PAB': 'Panamanian Balboa',
+            'PEN': 'Peruvian Sol',
+            'PGK': 'Papua New Guinean Kina',
+            'PHP': 'Philippine Peso',
+            'PKR': 'Pakistani Rupee',
+            'PLN': 'Polish Zloty',
+            'PYG': 'Paraguayan Guarani',
+            'QAR': 'Qatari Riyal',
+            'RON': 'Romanian Leu',
+            'RSD': 'Serbian Dinar',
+            'RUB': 'Russian Ruble',
+            'RWF': 'Rwandan Franc',
+            'SAR': 'Saudi Riyal',
+            'SBD': 'Solomon Islands Dollar',
+            'SCR': 'Seychelles Rupee',
+            'SDG': 'Sudanese Pound',
+            'SEK': 'Swedish Krona',
+            'SGD': 'Singapore Dollar',
+            'SHP': 'Saint Helena Pound',
+            'SLE': 'Sierra Leonean Leone',
+            'SOS': 'Somali Shilling',
+            'SRD': 'Surinamese Dollar',
+            'SSP': 'South Sudanese Pound',
+            'STN': 'Sao Tome Principe Dobra',
+            'SVC': 'Salvadoran Colon',
+            'SYP': 'Syrian Pound',
+            'SZL': 'Swazi Lilangeni',
+            'THB': 'Thai Baht',
+            'TJS': 'Tajikistani Somoni',
+            'TMT': 'Turkmenistani Manat',
+            'TND': 'Tunisian Dinar',
+            'TOP': 'Tongan Pa\'anga',
+            'TRY': 'Turkish Lira',
+            'TTD': 'Trinidad and Tobago Dollar',
+            'TWD': 'New Taiwan Dollar',
+            'TZS': 'Tanzanian Shilling',
+            'UAH': 'Ukrainian Hryvnia',
+            'UGX': 'Ugandan Shilling',
+            'USD': 'United States Dollar',
+            'UYU': 'Uruguayan Peso',
+            'UZS': 'Uzbekistani Sum',
+            'VED': 'Venezuelan Bolívar Digital',
+            'VES': 'Venezuelan Bolívar Soberano',
+            'VND': 'Vietnamese Dong',
+            'VUV': 'Vanuatu Vatu',
+            'WST': 'Samoan Tala',
+            'XAF': 'Central African CFA Franc',
+            'XCD': 'East Caribbean Dollar',
+            'XOF': 'West African CFA Franc',
+            'XPF': 'CFP Franc',
+            'XSU': 'Ecuadorian Sucre',
+            'YER': 'Yemeni Rial',
+            'ZAR': 'South African Rand',
+            'ZMW': 'Zambian Kwacha',
+            'ZWG': 'Zimbabwe Gold',
+            'ZWL': 'Zimbabwean Dollar',
+        },
+        'unit': {
+            'Afghani': {
+                'normal': 'Afghani',
+                'plural': 'Afghanis'
+            },
+            'Ariary': {
+                'normal': 'Ariary',
+                'plural': 'Ariary'
+            },
+            'Baht': {
+                'normal': 'Baht',
+                'plural': 'Baht'
+            },
+            'Balboa': {
+                'normal': 'Balboa',
+                'plural': 'Balboas'
+            },
+            'Birr': {
+                'normal': 'Birr',
+                'plural': 'Birrs'
+            },
+            'Bolivar': {
+                'normal': 'Bolívar',
+                'plural': 'Bolívares'
+            },
+            'Boliviano': {
+                'normal': 'Boliviano',
+                'plural': 'Bolivianos'
+            },
+            'Cedi': {
+                'normal': 'Cedi',
+                'plural': 'Cedis'
+            },
+            'Colon': {
+                'normal': 'Colon',
+                'plural': 'Colones'
+            },
+            'Cordoba': {
+                'normal': 'Córdoba',
+                'plural': 'Córdobas'
+            },
+            'Dalasi': {
+                'normal': 'Dalasi',
+                'plural': 'Dalasis'
+            },
+            'Denar': {
+                'normal': 'Denar',
+                'plural': 'Denari'
+            },
+            'Dinar': {
+                'normal': 'Dinar',
+                'plural': 'Dinars'
+            },
+            'Dirham': {
+                'normal': 'Dirham',
+                'plural': 'Dirhams'
+            },
+            'Dobra': {
+                'normal': 'Dobra',
+                'plural': 'Dobras'
+            },
+            'Dollar': {
+                'normal': 'Dollar',
+                'plural': 'Dollars'
+            },
+            'Dong': {
+                'normal': 'Dong',
+                'plural': 'Dong'
+            },
+            'Dram': {
+                'normal': 'Dram',
+                'plural': 'Drams'
+            },
+            'Escudo': {
+                'normal': 'Escudo',
+                'plural': 'Escudos'
+            },
+            'Euro': {
+                'normal': 'Euro',
+                'plural': 'Euros'
+            },
+            'Florin': {
+                'normal': 'Florin',
+                'plural': 'Florin'
+            },
+            'Forint': {
+                'normal': 'Forint',
+                'plural': 'Forint'
+            },
+            'Franc': {
+                'normal': 'Franc',
+                'plural': 'Francs'
+            },
+            'Gourde': {
+                'normal': 'Gourde',
+                'plural': 'Gourdes'
+            },
+            'Guarani': {
+                'normal': 'Guaraní',
+                'plural': 'Guaraníes'
+            },
+            'Guilder': {
+                'normal': 'Guilder',
+                'plural': 'Guilders'
+            },
+            'Hryvnia': {
+                'normal': 'Hryvnia',
+                'plural': 'Hryvni'
+            },
+            'Kina': {
+                'normal': 'Kina',
+                'plural': 'Kina'
+            },
+            'Kip': {
+                'normal': 'Kip',
+                'plural': 'Kip'
+            },
+            'Koruna': {
+                'normal': 'Koruna',
+                'plural': 'Korunas'
+            },
+            'Krona': {
+                'normal': 'Krona',
+                'plural': 'Kronor'
+            },
+            'Krone': {
+                'normal': 'Krone',
+                'plural': 'Kroner'
+            },
+            'Kwacha': {
+                'normal': 'Kwacha',
+                'plural': 'Kwachas'
+            },
+            'Kwanza': {
+                'normal': 'Kwanza',
+                'plural': 'Kwanzas'
+            },
+            'Kyat': {
+                'normal': 'Kyat',
+                'plural': 'Kyats'
+            },
+            'Lari': {
+                'normal': 'Lari',
+                'plural': 'Lari'
+            },
+            'Lek': {
+                'normal': 'Lek',
+                'plural': 'Lekë'
+            },
+            'Lempira': {
+                'normal': 'Lempira',
+                'plural': 'Lempiras'
+            },
+            'Leone': {
+                'normal': 'Leone',
+                'plural': 'Leones'
+            },
+            'Leu': {
+                'normal': 'Leu',
+                'plural': 'Lei'
+            },
+            'Lev': {
+                'normal': 'Lev',
+                'plural': 'Leva'
+            },
+            'Lilangeni': {
+                'normal': 'Lilangeni',
+                'plural': 'Emalangeni'
+            },
+            'Lira': {
+                'normal': 'Lira',
+                'plural': 'Liralar'
+            },
+            'Loti': {
+                'normal': 'Loti',
+                'plural': 'Maloti'
+            },
+            'Manat': {
+                'normal': 'Manat',
+                'plural': 'Manats'
+            },
+            'Mark': {
+                'normal': 'Mark',
+                'plural': 'Marks'
+            },
+            'Metical': {
+                'normal': 'Metical',
+                'plural': 'Meticais'
+            },
+            'Naira': {
+                'normal': 'Naira',
+                'plural': 'Naira'
+            },
+            'Nakfa': {
+                'normal': 'Nakfa',
+                'plural': 'Nakfas'
+            },
+            'Ngultrum': {
+                'normal': 'Ngultrum',
+                'plural': 'Ngultrums'
+            },
+            'Ouguiya': {
+                'normal': 'Ouguiya',
+                'plural': 'Ouguiya'
+            },
+            'Paanga': {
+                'normal': 'Paʻanga',
+                'plural': 'Paʻanga'
+            },
+            'Pataca': {
+                'normal': 'Pataca',
+                'plural': 'Patacas'
+            },
+            'Peso': {
+                'normal': 'Peso',
+                'plural': 'Pesos'
+            },
+            'Pound': {
+                'normal': 'Pound',
+                'plural': 'Pounds'
+            },
+            'Pula': {
+                'normal': 'Pula',
+                'plural': 'Pula'
+            },
+            'Quetzal': {
+                'normal': 'Quetzal',
+                'plural': 'Quetzales'
+            },
+            'Rand': {
+                'normal': 'Rand',
+                'plural': 'Rand'
+            },
+            'Real': {
+                'normal': 'Real',
+                'plural': 'Reais'
+            },
+            'Rial': {
+                'normal': 'Rial',
+                'plural': 'Rials'
+            },
+            'Riel': {
+                'normal': 'Riel',
+                'plural': 'Riels'
+            },
+            'Ringgit': {
+                'normal': 'Ringgit',
+                'plural': 'Ringgit'
+            },
+            'Riyal': {
+                'normal': 'Riyal',
+                'plural': 'Riyals'
+            },
+            'Ruble': {
+                'normal': 'Ruble',
+                'plural': 'Rubles'
+            },
+            'Rufiyaa': {
+                'normal': 'Rufiyaa',
+                'plural': 'Rufiyaa'
+            },
+            'Rupee': {
+                'normal': 'Rupee',
+                'plural': 'Rupees'
+            },
+            'Rupiah': {
+                'normal': 'Rupiah',
+                'plural': 'Rupiah'
+            },
+            'Shekel': {
+                'normal': 'Shekel',
+                'plural': 'Shekels'
+            },
+            'Shilling': {
+                'normal': 'Shilling',
+                'plural': 'Shillings'
+            },
+            'Sol': {
+                'normal': 'Sol',
+                'plural': 'Soles'
+            },
+            'Som': {
+                'normal': 'Som',
+                'plural': 'Som'
+            },
+            'Somoni': {
+                'normal': 'Somoni',
+                'plural': 'Somoni'
+            },
+            'Sucre': {
+                'normal': 'Sucre',
+                'plural': 'Sucre'
+            },
+            'Sum': {
+                'normal': 'Sum',
+                'plural': 'Sum'
+            },
+            'Taka': {
+                'normal': 'Taka',
+                'plural': 'Takas'
+            },
+            'Tala': {
+                'normal': 'Tālā',
+                'plural': 'Tālā'
+            },
+            'Tenge': {
+                'normal': 'Tenge',
+                'plural': 'Tenge'
+            },
+            'Tugrik': {
+                'normal': 'Tögrög',
+                'plural': 'Tögrög'
+            },
+            'Vatu': {
+                'normal': 'Vatu',
+                'plural': 'Vatu'
+            },
+            'Won': {
+                'normal': 'Won',
+                'plural': 'Won'
+            },
+            'Yen': {
+                'normal': 'Yen',
+                'plural': 'Yen'
+            },
+            'Yuan': {
+                'normal': 'Yuan',
+                'plural': 'Yuan'
+            },
+            'ZiG': {
+                'normal': 'ZiG',
+                'plural': 'ZiG'
+            },
+            'Zloty': {
+                'normal': 'Złoty',
+                'plural': 'Złoty'
+            }
+        }
     },
     'category': {
         'Food & Drink': 'Food & Drink',
@@ -1131,6 +1471,7 @@ export default {
     'Auto-update Exchange Rates Data': 'Auto-update Exchange Rates Data',
     'Currency Display Mode': 'Currency Display Mode',
     'Currency Code': 'Currency Code',
+    'Currency Unit': 'Currency Unit',
     'Currency Name': 'Currency Name',
     'Currency Symbol': 'Currency Symbol',
     'Expense Amount Color': 'Expense Amount Color',

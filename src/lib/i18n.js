@@ -201,7 +201,21 @@ function getDefaultFirstDayOfWeek(translateFn) {
 }
 
 function getCurrencyName(currencyCode, translateFn) {
-    return translateFn(`currency.${currencyCode}`);
+    return translateFn(`currency.name.${currencyCode}`);
+}
+
+function getCurrencyUnitName(currencyCode, isPlural, translateFn) {
+    const currencyInfo = currencyConstants.all[currencyCode];
+
+    if (currencyInfo && currencyInfo.unit) {
+        if (isPlural) {
+            return translateFn(`currency.unit.${currencyInfo.unit}.plural`);
+        } else {
+            return translateFn(`currency.unit.${currencyInfo.unit}.normal`);
+        }
+    }
+
+    return '';
 }
 
 function getAllMeridiemIndicatorNames(translateFn) {
@@ -886,8 +900,9 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
         currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
     }
 
+    const currencyUnit = getCurrencyUnitName(currencyCode, isPlural, translateFn);
     const currencyName = getCurrencyName(currencyCode, translateFn);
-    return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName, isPlural);
+    return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 }
 
 function getFormatedExchangeRateAmount(value, translateFn, userStore) {
@@ -902,8 +917,9 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
 
 function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, translateFn) {
     const currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
+    const currencyUnit = getCurrencyUnitName(currencyCode, isPlural, translateFn);
     const currencyName = getCurrencyName(currencyCode, translateFn);
-    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName, isPlural);
+    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyUnit, currencyName, isPlural);
 }
 
 function getAllExpenseIncomeAmountColors(translateFn, expenseOrIncome) {

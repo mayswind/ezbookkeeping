@@ -1,5 +1,5 @@
-import en from './en.js'
-import zhHans from './zh_Hans.js'
+import en from './en.json'
+import zhHans from './zh_Hans.json'
 
 export const defaultLanguage = 'en';
 

@@ -286,7 +286,10 @@ export default {
             return '0';
         },
         getDisplayCurrencyPrependAndAppendText() {
-            return this.$locale.getAmountPrependAndAppendText(this.settingsStore, this.userStore, this.currency);
+            const numericCurrentValue = this.$locale.parseAmount(this.userStore, this.currentValue);
+            const isPlural = numericCurrentValue !== 100 && numericCurrentValue !== -100;
+
+            return this.$locale.getAmountPrependAndAppendText(this.settingsStore, this.userStore, this.currency, isPlural);
         }
     }
 }

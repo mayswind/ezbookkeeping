@@ -2,7 +2,7 @@ import currencyConstants from '@/consts/currency.js';
 
 import { isString, isNumber } from './common.js';
 
-export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName) {
+export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName, isPlural) {
     if (isNumber(value)) {
         value = value.toString();
     }
@@ -11,7 +11,7 @@ export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, c
         return value;
     }
 
-    const symbol = getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName);
+    const symbol = getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName, isPlural);
 
     if (!symbol) {
         return value;
@@ -30,7 +30,7 @@ export function appendCurrencySymbol(value, currencyDisplayType, currencyCode, c
     return value;
 }
 
-export function getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName) {
+export function getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName, isPlural) {
     if (!currencyDisplayType) {
         return null;
     }
@@ -40,8 +40,12 @@ export function getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, cur
     if (currencyDisplayType.symbol === currencyConstants.allCurrencyDisplaySymbol.Symbol) {
         const currencyInfo = currencyConstants.all[currencyCode];
 
-        if (currencyInfo && currencyInfo.symbol) {
-            symbol = currencyInfo.symbol;
+        if (currencyInfo && currencyInfo.symbol && currencyInfo.symbol.normal) {
+            symbol = currencyInfo.symbol.normal;
+
+            if (isPlural && currencyInfo.symbol.plural) {
+                symbol = currencyInfo.symbol.plural;
+            }
         }
 
         if (!symbol) {

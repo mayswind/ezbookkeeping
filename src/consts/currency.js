@@ -6,635 +6,964 @@ const defaultCurrencySymbol = '¤';
 const allCurrencies = {
     'AED': { // UAE Dirham
         code: 'AED',
-        symbol: 'د.إ'
+        symbol: {
+            normal: 'Dh',
+            plural: 'Dhs'
+        }
     },
     'AFN': { // Afghani
         code: 'AFN',
-        symbol: '؋'
+        symbol: {
+            normal: 'Af.',
+            plural: 'Afs.'
+        }
     },
     'ALL': { // Lek
         code: 'ALL',
-        symbol: 'L'
+        symbol: {
+            normal: 'L'
+        }
     },
     'AMD': { // Armenian Dram
         code: 'AMD',
-        symbol: '֏'
+        symbol: {
+            normal: '֏'
+        }
     },
     'ANG': { // Netherlands Antillean Guilder
         code: 'ANG',
-        symbol: 'NAƒ'
+        symbol: {
+            normal: 'ƒ'
+        }
     },
     'AOA': { // Kwanza
         code: 'AOA',
-        symbol: 'Kz'
+        symbol: {
+            normal: 'Kz'
+        }
     },
     'ARS': { // Argentine Peso
         code: 'ARS',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'AUD': { // Australian Dollar
         code: 'AUD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'AWG': { // Aruban Florin
         code: 'AWG',
-        symbol: 'Afl.'
+        symbol: {
+            normal: 'Afl.'
+        }
     },
     'AZN': { // Azerbaijan Manat
         code: 'AZN',
-        symbol: '₼'
+        symbol: {
+            normal: '₼'
+        }
     },
     'BAM': { // Convertible Mark
         code: 'BAM',
-        symbol: 'KM'
+        symbol: {
+            normal: 'KM'
+        }
     },
     'BBD': { // Barbados Dollar
         code: 'BBD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'BDT': { // Taka
         code: 'BDT',
-        symbol: '৳'
+        symbol: {
+            normal: '৳'
+        }
     },
     'BGN': { // Bulgarian Lev
         code: 'BGN',
-        symbol: 'лв.'
+        symbol: {
+            normal: 'лв'
+        }
     },
     'BHD': { // Bahraini Dinar
         code: 'BHD',
-        symbol: '.د.ب'
+        symbol: {
+            normal: 'BD'
+        }
     },
     'BIF': { // Burundi Franc
         code: 'BIF',
-        symbol: 'FBu'
+        symbol: {
+            normal: 'FBu'
+        }
     },
     'BMD': { // Bermudian Dollar
         code: 'BMD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'BND': { // Brunei Dollar
         code: 'BND',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'BOB': { // Boliviano
         code: 'BOB',
-        symbol: 'Bs'
+        symbol: {
+            normal: 'Bs'
+        }
     },
     'BRL': { // Brazilian Real
         code: 'BRL',
-        symbol: 'R$'
+        symbol: {
+            normal: 'R$'
+        }
     },
     'BSD': { // Bahamian Dollar
         code: 'BSD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'BTN': { // Ngultrum
         code: 'BTN',
-        symbol: 'Nu.'
+        symbol: {
+            normal: 'Nu.'
+        }
     },
     'BWP': { // Pula
         code: 'BWP',
-        symbol: 'P'
+        symbol: {
+            normal: 'P'
+        }
     },
     'BYN': { // Belarusian Ruble
         code: 'BYN',
-        symbol: 'Br'
+        symbol: {
+            normal: 'Rbl',
+            plural: 'Rbls'
+        }
     },
     'BZD': { // Belize Dollar
         code: 'BZD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CAD': { // Canadian Dollar
         code: 'CAD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CDF': { // Congolese Franc
         code: 'CDF',
-        symbol: 'FC'
+        symbol: {
+            normal: 'FC'
+        }
     },
     'CHF': { // Swiss Franc
         code: 'CHF',
-        symbol: 'Fr.'
+        symbol: {
+            normal: 'CHF'
+        }
     },
     'CLP': { // Chilean Peso
         code: 'CLP',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CNY': { // Yuan Renminbi
         code: 'CNY',
-        symbol: '¥'
+        symbol: {
+            normal: '¥'
+        }
     },
     'COP': { // Colombian Peso
         code: 'COP',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CRC': { // Costa Rican Colon
         code: 'CRC',
-        symbol: '₡'
+        symbol: {
+            normal: '₡'
+        }
     },
     'CUC': { // Peso Convertible
         code: 'CUC',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CUP': { // Cuban Peso
         code: 'CUP',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CVE': { // Cabo Verde Escudo
         code: 'CVE',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'CZK': { // Czech Koruna
         code: 'CZK',
-        symbol: 'Kč'
+        symbol: {
+            normal: 'Kč'
+        }
     },
     'DJF': { // Djibouti Franc
         code: 'DJF',
-        symbol: 'Fdj'
+        symbol: {
+            normal: 'Fdj'
+        }
     },
     'DKK': { // Danish Krone
         code: 'DKK',
-        symbol: 'kr.'
+        symbol: {
+            normal: 'kr.'
+        }
     },
     'DOP': { // Dominican Peso
         code: 'DOP',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'DZD': { // Algerian Dinar
         code: 'DZD',
-        symbol: 'دج'
+        symbol: {
+            normal: 'DA'
+        }
     },
     'EGP': { // Egyptian Pound
         code: 'EGP',
-        symbol: 'E£'
+        symbol: {
+            normal: '£'
+        }
     },
     'ERN': { // Nakfa
         code: 'ERN',
-        symbol: 'Nkf'
+        symbol: {
+            normal: 'Nkf'
+        }
     },
     'ETB': { // Ethiopian Birr
         code: 'ETB',
-        symbol: 'Br'
+        symbol: {
+            normal: 'Br'
+        }
     },
     'EUR': { // Euro
         code: 'EUR',
-        symbol: '€'
+        symbol: {
+            normal: '€'
+        }
     },
     'FJD': { // Fiji Dollar
         code: 'FJD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'FKP': { // Falkland Islands Pound
         code: 'FKP',
-        symbol: '£'
+        symbol: {
+            normal: '£'
+        }
     },
     'GBP': { // Pound Sterling
         code: 'GBP',
-        symbol: '£'
+        symbol: {
+            normal: '£'
+        }
     },
     'GEL': { // Lari
         code: 'GEL',
-        symbol: 'ლ'
+        symbol: {
+            normal: 'ლ'
+        }
     },
     'GHS': { // Ghana Cedi
         code: 'GHS',
-        symbol: 'GH₵'
+        symbol: {
+            normal: 'GH₵'
+        }
     },
     'GIP': { // Gibraltar Pound
         code: 'GIP',
-        symbol: '£'
+        symbol: {
+            normal: '£'
+        }
     },
     'GMD': { // Dalasi
         code: 'GMD',
-        symbol: 'D'
+        symbol: {
+            normal: 'D'
+        }
     },
     'GNF': { // Guinean Franc
         code: 'GNF',
-        symbol: 'FG'
+        symbol: {
+            normal: 'FG'
+        }
     },
     'GTQ': { // Quetzal
         code: 'GTQ',
-        symbol: 'Q'
+        symbol: {
+            normal: 'Q'
+        }
     },
     'GYD': { // Guyana Dollar
         code: 'GYD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'HKD': { // Hong Kong Dollar
         code: 'HKD',
-        symbol: 'HK$'
+        symbol: {
+            normal: 'HK$'
+        }
     },
     'HNL': { // Lempira
         code: 'HNL',
-        symbol: 'L'
+        symbol: {
+            normal: 'L'
+        }
     },
     'HTG': { // Gourde
         code: 'HTG',
-        symbol: 'G'
+        symbol: {
+            normal: 'G'
+        }
     },
     'HUF': { // Forint
         code: 'HUF',
-        symbol: 'Ft'
+        symbol: {
+            normal: 'Ft'
+        }
     },
     'IDR': { // Rupiah
         code: 'IDR',
-        symbol: 'Rp'
+        symbol: {
+            normal: 'Rp'
+        }
     },
     'ILS': { // New Israeli Sheqel
         code: 'ILS',
-        symbol: '₪'
+        symbol: {
+            normal: '₪'
+        }
     },
     'INR': { // Indian Rupee
         code: 'INR',
-        symbol: '₹'
+        symbol: {
+            normal: '₹'
+        }
     },
     'IQD': { // Iraqi Dinar
         code: 'IQD',
-        symbol: 'د.ع'
+        symbol: {
+            normal: 'ID'
+        }
     },
     'IRR': { // Iranian Rial
         code: 'IRR',
-        symbol: '﷼'
+        symbol: {
+            normal: 'Rl',
+            plural: 'Rls'
+        }
     },
     'ISK': { // Iceland Krona
         code: 'ISK',
-        symbol: 'kr'
+        symbol: {
+            normal: 'kr'
+        }
     },
     'JMD': { // Jamaican Dollar
         code: 'JMD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'JOD': { // Jordanian Dinar
         code: 'JOD',
-        symbol: 'د.أ'
+        symbol: {
+            normal: 'د.أ'
+        }
     },
     'JPY': { // Yen
         code: 'JPY',
-        symbol: '¥'
+        symbol: {
+            normal: '¥'
+        }
     },
     'KES': { // Kenyan Shilling
         code: 'KES',
-        symbol: 'Ksh'
+        symbol: {
+            normal: '/='
+        }
     },
     'KGS': { // Som
         code: 'KGS',
-        symbol: 'С̲'
+        symbol: {
+            normal: '⃀'
+        }
     },
     'KHR': { // Riel
         code: 'KHR',
-        symbol: '៛'
+        symbol: {
+            normal: '៛'
+        }
     },
     'KMF': { // Comorian Franc
         code: 'KMF',
-        symbol: 'CF'
+        symbol: {
+            normal: 'CF'
+        }
     },
     'KPW': { // North Korean Won
         code: 'KPW',
-        symbol: '₩'
+        symbol: {
+            normal: '₩'
+        }
     },
     'KRW': { // Won
         code: 'KRW',
-        symbol: '₩'
+        symbol: {
+            normal: '₩'
+        }
     },
     'KWD': { // Kuwaiti Dinar
         code: 'KWD',
-        symbol: 'د.ك'
+        symbol: {
+            normal: 'KD'
+        }
     },
     'KYD': { // Cayman Islands Dollar
         code: 'KYD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'KZT': { // Tenge
         code: 'KZT',
-        symbol: '₸'
+        symbol: {
+            normal: '₸'
+        }
     },
     'LAK': { // Lao Kip
         code: 'LAK',
-        symbol: '₭'
+        symbol: {
+            normal: '₭'
+        }
     },
     'LBP': { // Lebanese Pound
         code: 'LBP',
-        symbol: 'ل.ل.'
+        symbol: {
+            normal: 'LL'
+        }
     },
     'LKR': { // Sri Lanka Rupee
         code: 'LKR',
-        symbol: '₨'
+        symbol: {
+            normal: 'රු'
+        }
     },
     'LRD': { // Liberian Dollar
         code: 'LRD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'LSL': { // Loti
         code: 'LSL',
-        symbol: 'M'
+        symbol: {
+            normal: 'L',
+            plural: 'M'
+        }
     },
     'LYD': { // Libyan Dinar
         code: 'LYD',
-        symbol: 'ل.د'
+        symbol: {
+            normal: 'LD'
+        }
     },
     'MAD': { // Moroccan Dirham
         code: 'MAD',
-        symbol: 'DH'
+        symbol: {
+            normal: 'DH'
+        }
     },
     'MDL': { // Moldovan Leu
         code: 'MDL',
-        symbol: 'L'
+        symbol: {
+            normal: 'L'
+        }
     },
     'MGA': { // Malagasy Ariary
         code: 'MGA',
-        symbol: 'Ar'
+        symbol: {
+            normal: 'Ar'
+        }
     },
     'MKD': { // Denar
         code: 'MKD',
-        symbol: 'ден'
+        symbol: {
+            normal: 'DEN'
+        }
     },
     'MMK': { // Kyat
         code: 'MMK',
-        symbol: 'K'
+        symbol: {
+            normal: 'K',
+            plural: 'Ks.'
+        }
     },
     'MNT': { // Tugrik
         code: 'MNT',
-        symbol: '₮'
+        symbol: {
+            normal: '₮'
+        }
     },
     'MOP': { // Pataca
         code: 'MOP',
-        symbol: 'MOP$'
+        symbol: {
+            normal: '$'
+        }
     },
     'MRU': { // Ouguiya
         code: 'MRU',
-        symbol: 'UM'
+        symbol: {
+            normal: 'UM'
+        }
     },
     'MUR': { // Mauritius Rupee
         code: 'MUR',
-        symbol: '₨'
+        symbol: {
+            normal: 'Re.',
+            plural: 'Rs.'
+        }
     },
     'MVR': { // Rufiyaa
         code: 'MVR',
-        symbol: 'Rf.'
+        symbol: {
+            normal: 'Rf.'
+        }
     },
     'MWK': { // Malawi Kwacha
         code: 'MWK',
-        symbol: 'K'
+        symbol: {
+            normal: 'K'
+        }
     },
     'MXN': { // Mexican Peso
         code: 'MXN',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'MYR': { // Malaysian Ringgit
         code: 'MYR',
-        symbol: 'RM'
+        symbol: {
+            normal: 'RM'
+        }
     },
     'MZN': { // Mozambique Metical
         code: 'MZN',
-        symbol: 'MT'
+        symbol: {
+            normal: 'MT'
+        }
     },
     'NAD': { // Namibia Dollar
         code: 'NAD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'NGN': { // Naira
         code: 'NGN',
-        symbol: '₦'
+        symbol: {
+            normal: '₦'
+        }
     },
     'NIO': { // Cordoba Oro
         code: 'NIO',
-        symbol: 'C$'
+        symbol: {
+            normal: 'C$'
+        }
     },
     'NOK': { // Norwegian Krone
         code: 'NOK',
-        symbol: 'kr'
+        symbol: {
+            normal: 'kr'
+        }
     },
     'NPR': { // Nepalese Rupee
         code: 'NPR',
-        symbol: 'रु'
+        symbol: {
+            normal: 'रु'
+        }
     },
     'NZD': { // New Zealand Dollar
         code: 'NZD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'OMR': { // Rial Omani
         code: 'OMR',
-        symbol: 'ر.ع.'
+        symbol: {
+            normal: 'R.O'
+        }
     },
     'PAB': { // Balboa
         code: 'PAB',
-        symbol: 'B/.'
+        symbol: {
+            normal: 'B/.'
+        }
     },
     'PEN': { // Sol
         code: 'PEN',
-        symbol: 'S/'
+        symbol: {
+            normal: 'S/'
+        }
     },
     'PGK': { // Kina
         code: 'PGK',
-        symbol: 'K'
+        symbol: {
+            normal: 'K'
+        }
     },
     'PHP': { // Philippine Peso
         code: 'PHP',
-        symbol: '₱'
+        symbol: {
+            normal: '₱'
+        }
     },
     'PKR': { // Pakistan Rupee
         code: 'PKR',
-        symbol: '₨'
+        symbol: {
+            normal: 'Re.',
+            plural: 'Rs.'
+        }
     },
     'PLN': { // Zloty
         code: 'PLN',
-        symbol: 'zł'
+        symbol: {
+            normal: 'zł'
+        }
     },
     'PYG': { // Guarani
         code: 'PYG',
-        symbol: '₲'
+        symbol: {
+            normal: '₲'
+        }
     },
     'QAR': { // Qatari Rial
         code: 'QAR',
-        symbol: 'ر.ق'
+        symbol: {
+            normal: 'QR'
+        }
     },
     'RON': { // Romanian Leu
         code: 'RON',
-        symbol: 'L'
+        symbol: {
+            normal: 'L'
+        }
     },
     'RSD': { // Serbian Dinar
         code: 'RSD',
-        symbol: 'дин'
+        symbol: {
+            normal: 'din.'
+        }
     },
     'RUB': { // Russian Ruble
         code: 'RUB',
-        symbol: '₽'
+        symbol: {
+            normal: '₽'
+        }
     },
     'RWF': { // Rwanda Franc
         code: 'RWF',
-        symbol: 'FRw'
+        symbol: {
+            normal: 'FRw'
+        }
     },
     'SAR': { // Saudi Riyal
         code: 'SAR',
-        symbol: 'ر.س'
+        symbol: {
+            normal: 'SAR'
+        }
     },
     'SBD': { // Solomon Islands Dollar
         code: 'SBD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'SCR': { // Seychelles Rupee
         code: 'SCR',
-        symbol: 'SR'
+        symbol: {
+            normal: 'Re.',
+            plural: 'Rs.'
+        }
     },
     'SDG': { // Sudanese Pound
         code: 'SDG',
-        symbol: 'ج.س'
+        symbol: {
+            normal: 'LS'
+        }
     },
     'SEK': { // Swedish Krona
         code: 'SEK',
-        symbol: 'kr'
+        symbol: {
+            normal: 'kr'
+        }
     },
     'SGD': { // Singapore Dollar
         code: 'SGD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'SHP': { // Saint Helena Pound
         code: 'SHP',
-        symbol: '£'
+        symbol: {
+            normal: '£'
+        }
     },
     'SLE': { // Leone
         code: 'SLE',
-        symbol: 'Le'
+        symbol: {
+            normal: 'Le'
+        }
     },
     'SOS': { // Somali Shilling
         code: 'SOS',
-        symbol: 'Sh.So.'
+        symbol: {
+            normal: 'Sh.So.'
+        }
     },
     'SRD': { // Surinam Dollar
         code: 'SRD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'SSP': { // South Sudanese Pound
         code: 'SSP',
-        symbol: 'SS£'
+        symbol: {
+            normal: 'SS£'
+        }
     },
     'STN': { // Dobra
         code: 'STN',
-        symbol: 'Db'
+        symbol: {
+            normal: 'Db'
+        }
     },
     'SVC': { // El Salvador Colon
         code: 'SVC',
-        symbol: '₡'
+        symbol: {
+            normal: '₡'
+        }
     },
     'SYP': { // Syrian Pound
         code: 'SYP',
-        symbol: 'LS'
+        symbol: {
+            normal: 'LS'
+        }
     },
     'SZL': { // Lilangeni
         code: 'SZL',
-        symbol: 'E'
+        symbol: {
+            normal: 'E'
+        }
     },
     'THB': { // Baht
         code: 'THB',
-        symbol: '฿'
+        symbol: {
+            normal: '฿'
+        }
     },
     'TJS': { // Somoni
         code: 'TJS',
-        symbol: 'SM'
+        symbol: {
+            normal: 'SM'
+        }
     },
     'TMT': { // Turkmenistan New Manat
         code: 'TMT',
-        symbol: 'T'
+        symbol: {
+            normal: 'm'
+        }
     },
     'TND': { // Tunisian Dinar
         code: 'TND',
-        symbol: 'د.ت'
+        symbol: {
+            normal: 'DT'
+        }
     },
     'TOP': { // Pa’anga
         code: 'TOP',
-        symbol: 'T$'
+        symbol: {
+            normal: 'T$'
+        }
     },
     'TRY': { // Turkish Lira
         code: 'TRY',
-        symbol: '₺'
+        symbol: {
+            normal: '₺'
+        }
     },
     'TTD': { // Trinidad and Tobago Dollar
         code: 'TTD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'TWD': { // New Taiwan Dollar
         code: 'TWD',
-        symbol: 'NT$'
+        symbol: {
+            normal: 'NT$'
+        }
     },
     'TZS': { // Tanzanian Shilling
         code: 'TZS',
-        symbol: 'TSh'
+        symbol: {
+            normal: '/='
+        }
     },
     'UAH': { // Hryvnia
         code: 'UAH',
-        symbol: '₴'
+        symbol: {
+            normal: '₴'
+        }
     },
     'UGX': { // Uganda Shilling
         code: 'UGX',
-        symbol: 'USh'
+        symbol: {
+            normal: '/='
+        }
     },
     'USD': { // US Dollar
         code: 'USD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'UYU': { // Peso Uruguayo
         code: 'UYU',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'UZS': { // Uzbekistan Sum
         code: 'UZS'
     },
     'VED': { // Bolívar Soberano
         code: 'VED',
-        symbol: 'Bs.D'
+        symbol: {
+            normal: 'Bs.D'
+        }
     },
     'VES': { // Bolívar Soberano
         code: 'VES',
-        symbol: 'Bs.S'
+        symbol: {
+            normal: 'Bs.S'
+        }
     },
     'VND': { // Dong
         code: 'VND',
-        symbol: '₫'
+        symbol: {
+            normal: '₫'
+        }
     },
     'VUV': { // Vatu
         code: 'VUV',
-        symbol: 'VT'
+        symbol: {
+            normal: 'VT'
+        }
     },
     'WST': { // Tala
         code: 'WST',
-        symbol: 'WS$'
+        symbol: {
+            normal: '$'
+        }
     },
     'XAF': { // CFA Franc BEAC
-        code: 'XAF'
+        code: 'XAF',
+        symbol: {
+            normal: 'F.CFA'
+        }
     },
     'XCD': { // East Caribbean Dollar
         code: 'XCD',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     },
     'XOF': { // CFA Franc BCEAO
-        code: 'XOF'
+        code: 'XOF',
+        symbol: {
+            normal: 'F.CFA'
+        }
     },
     'XPF': { // CFP Franc
-        code: 'XPF'
+        code: 'XPF',
+        symbol: {
+            normal: 'F'
+        }
     },
     'XSU': { // Sucre
         code: 'XSU',
-        symbol: 'S/.'
+        symbol: {
+            normal: 'S/.'
+        }
     },
     'YER': { // Yemeni Rial
         code: 'YER',
-        symbol: 'ر.ي'
+        symbol: {
+            normal: 'YRl',
+            plural: 'YRls'
+        }
     },
     'ZAR': { // Rand
         code: 'ZAR',
-        symbol: 'R'
+        symbol: {
+            normal: 'R'
+        }
     },
     'ZMW': { // Zambian Kwacha
         code: 'ZMW',
-        symbol: 'K'
+        symbol: {
+            normal: 'K'
+        }
     },
     'ZWG': { // Zimbabwe Gold
         code: 'ZWG',
-        symbol: 'ZiG'
+        symbol: {
+            normal: 'ZiG'
+        }
     },
     'ZWL': { // Zimbabwe Dollar
         code: 'ZWL',
-        symbol: '$'
+        symbol: {
+            normal: '$'
+        }
     }
 };
 

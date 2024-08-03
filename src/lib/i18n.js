@@ -855,6 +855,8 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
         value = value.toString();
     }
 
+    const isPlural = value !== '100' && value !== '-100';
+
     if (!notConvertValue) {
         const numberFormatOptions = getNumberFormatOptions(translateFn, userStore);
         const hasIncompleteFlag = isString(value) && value.charAt(value.length - 1) === '+';
@@ -885,7 +887,7 @@ function getFormatedAmountWithCurrency(value, currencyCode, translateFn, userSto
     }
 
     const currencyName = getCurrencyName(currencyCode, translateFn);
-    return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName);
+    return appendCurrencySymbol(value, currencyDisplayType, currencyCode, currencyName, isPlural);
 }
 
 function getFormatedExchangeRateAmount(value, translateFn, userStore) {
@@ -898,10 +900,10 @@ function getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRat
     return getAdaptiveDisplayAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, numberFormatOptions);
 }
 
-function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, translateFn) {
+function getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, translateFn) {
     const currencyDisplayType = getCurrentCurrencyDisplayType(translateFn, userStore);
     const currencyName = getCurrencyName(currencyCode, translateFn);
-    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName);
+    return getAmountPrependAndAppendCurrencySymbol(currencyDisplayType, currencyCode, currencyName, isPlural);
 }
 
 function getAllExpenseIncomeAmountColors(translateFn, expenseOrIncome) {
@@ -1466,7 +1468,7 @@ export function i18nFunctions(i18nGlobal) {
         formatAmountWithCurrency: (settingsStore, userStore, value, currencyCode) => getFormatedAmountWithCurrency(value, currencyCode, i18nGlobal.t, userStore, settingsStore),
         formatExchangeRateAmount: (userStore, value) => getFormatedExchangeRateAmount(value, i18nGlobal.t, userStore),
         getAdaptiveAmountRate: (userStore, amount1, amount2, fromExchangeRate, toExchangeRate) => getAdaptiveAmountRate(amount1, amount2, fromExchangeRate, toExchangeRate, i18nGlobal.t, userStore),
-        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, i18nGlobal.t),
+        getAmountPrependAndAppendText: (settingsStore, userStore, currencyCode, isPlural) => getAmountPrependAndAppendText(currencyCode, userStore, settingsStore, isPlural, i18nGlobal.t),
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 1),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(i18nGlobal.t, 2),
         getAllAccountCategories: () => getAllAccountCategories(i18nGlobal.t),

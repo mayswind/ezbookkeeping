@@ -41,7 +41,18 @@
                                             </v-btn>
                                             <span>{{ $t('Transaction List') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
-                                                   :disabled="loading || !canAddTransaction" @click="add">{{ $t('Add') }}</v-btn>
+                                                   :disabled="loading || !canAddTransaction" @click="add">
+                                                {{ $t('Add') }}
+                                                <v-menu activator="parent" :open-on-hover="true" v-if="allTransactionTemplates && allTransactionTemplates.length">
+                                                    <v-list>
+                                                        <v-list-item :title="template.name"
+                                                                     :prepend-icon="icons.templates"
+                                                                     :key="template.id"
+                                                                     v-for="template in allTransactionTemplates"
+                                                                     @click="add(template)"></v-list-item>
+                                                    </v-list>
+                                                </v-menu>
+                                            </v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload">
                                                 <template #loader>
@@ -516,11 +527,13 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 
 import numeralConstants from '@/consts/numeral.js';
 import datetimeConstants from '@/consts/datetime.js';
 import accountConstants from '@/consts/account.js';
 import transactionConstants from '@/consts/transaction.js';
+import templateConstants from '@/consts/template.js';
 import { isString, getNameByKeyValue } from '@/lib/common.js';
 import logger from '@/lib/logger.js';
 import {
@@ -562,6 +575,7 @@ import {
     mdiArrowLeft,
     mdiArrowRight,
     mdiPound,
+    mdiTextBoxOutline,
     mdiDotsVertical
 } from '@mdi/js';
 
@@ -621,12 +635,13 @@ export default {
                 arrowLeft: mdiArrowLeft,
                 arrowRight: mdiArrowRight,
                 tag: mdiPound,
+                templates: mdiTextBoxOutline,
                 more: mdiDotsVertical
             }
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore),
         defaultCurrency() {
             return getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(this.allAccounts, this.queryAllFilterAccountIds, this.userStore.currentUserDefaultCurrency);
         },
@@ -907,6 +922,10 @@ export default {
         allAvailableTagsCount() {
             return this.transactionTagsStore.allAvailableTagsCount;
         },
+        allTransactionTemplates() {
+            const allVisibleTemplates = this.transactionTemplatesStore.allVisibleTemplates;
+            return allVisibleTemplates[templateConstants.allTemplateTypes.Normal] || [];
+        },
         recentMonthDateRanges() {
             return this.$locale.getAllRecentMonthDateRanges(this.userStore, true, true);
         },
@@ -992,6 +1011,11 @@ export default {
 
             this.currentPage = 1;
             this.reload(false);
+
+            this.transactionTemplatesStore.loadAllTemplates({
+                templateType: templateConstants.allTemplateTypes.Normal,
+                force: false
+            });
         },
         reload(force) {
             const self = this;
@@ -1307,14 +1331,15 @@ export default {
                 this.$router.push(this.getFilterLinkUrl());
             }
         },
-        add() {
+        add(template) {
             const self = this;
 
             self.$refs.editDialog.open({
                 type: self.query.type,
                 categoryId: self.queryAllFilterCategoryIdsCount === 1 ? self.query.categoryIds : '',
                 accountId: self.queryAllFilterAccountIdsCount === 1 ? self.query.accountIds : '',
-                tagIds: self.query.tagIds || ''
+                tagIds: self.query.tagIds || '',
+                template: template
             }).then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);

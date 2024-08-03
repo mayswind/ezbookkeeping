@@ -355,10 +355,12 @@ import { useAccountsStore } from '@/stores/account.js';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.js';
 import { useTransactionTagsStore } from '@/stores/transactionTag.js';
 import { useTransactionsStore } from '@/stores/transaction.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
+import templateConstants from '@/consts/template.js';
 import logger from '@/lib/logger.js';
 import {
     getNameByKeyValue
@@ -413,7 +415,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useExchangeRatesStore),
+        ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
         title() {
             if (this.mode === 'add') {
                 return 'Add Transaction';
@@ -654,7 +656,8 @@ export default {
         const promises = [
             self.accountsStore.loadAllAccounts({ force: false }),
             self.transactionCategoriesStore.loadAllCategories({ force: false }),
-            self.transactionTagsStore.loadAllTags({ force: false })
+            self.transactionTagsStore.loadAllTags({ force: false }),
+            self.transactionTemplatesStore.loadAllTemplates({ force: false, templateType: templateConstants.allTemplateTypes.Normal })
         ];
 
         if (query.id) {
@@ -676,15 +679,23 @@ export default {
         }
 
         Promise.all(promises).then(function (responses) {
-            if (query.id && !responses[3]) {
+            if (query.id && !responses[4]) {
                 self.$toast('Unable to retrieve transaction');
                 self.loadingError = 'Unable to retrieve transaction';
                 return;
             }
 
+            let fromTransaction = null;
+
+            if (query.id) {
+                fromTransaction = responses[4];
+            } else if (query.templateId && self.transactionTemplatesStore.allTransactionTemplatesMap && self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal]) {
+                fromTransaction = self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal][query.templateId];
+            }
+
             setTransactionModelByTransaction(
                 self.transaction,
-                query.id ? responses[3] : null,
+                fromTransaction,
                 self.allCategories,
                 self.allCategoriesMap,
                 self.allVisibleAccounts,

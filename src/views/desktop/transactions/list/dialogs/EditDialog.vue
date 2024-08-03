@@ -669,6 +669,10 @@ export default {
                     self.mode = 'add';
                     self.editId = null;
 
+                    if (options.template) {
+                        self.setTransaction(options.template, options, false, false);
+                    }
+
                     if (self.settingsStore.appSettings.autoGetCurrentGeoLocation
                         && !self.geoLocationStatus && !self.transaction.geoLocation) {
                         self.updateGeoLocation(false);

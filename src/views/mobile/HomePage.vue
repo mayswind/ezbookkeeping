@@ -172,7 +172,7 @@
                 <f7-icon f7="creditcard"></f7-icon>
                 <span class="tabbar-label">{{ $t('Accounts') }}</span>
             </f7-link>
-            <f7-link class="link" href="/transaction/add">
+            <f7-link id="homepage-add-button" class="link" href="/transaction/add" @taphold="openTransactionTemplatePopover">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
             </f7-link>
             <f7-link class="link" href="/statistic/transaction">
@@ -184,6 +184,19 @@
                 <span class="tabbar-label">{{ $t('Settings') }}</span>
             </f7-link>
         </f7-toolbar>
+
+        <f7-popover class="template-popover-menu" target-el="#homepage-add-button"
+                    v-model:opened="showTransactionTemplatePopover">
+            <f7-list dividers v-if="allTransactionTemplates">
+                <f7-list-item :title="template.name" :key="template.id"
+                              v-for="template in allTransactionTemplates"
+                              @click="addTransaction(template)">
+                    <template #media>
+                        <f7-icon f7="doc_plaintext"></f7-icon>
+                    </template>
+                </f7-list-item>
+            </f7-list>
+        </f7-popover>
     </f7-page>
 </template>
 
@@ -191,19 +204,25 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
+import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 import datetimeConstants from '@/consts/datetime.js';
+import templateConstants from '@/consts/template.js';
 import { formatUnixTime } from '@/lib/datetime.js';
 
 export default {
+    props: [
+        'f7router'
+    ],
     data() {
         return {
-            loading: true
+            loading: true,
+            showTransactionTemplatePopover: false
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useOverviewStore),
+        ...mapStores(useSettingsStore, useUserStore, useTransactionTemplatesStore, useOverviewStore),
         showAmountInHomePage: {
             get: function() {
                 return this.settingsStore.appSettings.showAmountInHomePage;
@@ -214,6 +233,10 @@ export default {
         },
         defaultCurrency() {
             return this.userStore.currentUserDefaultCurrency;
+        },
+        allTransactionTemplates() {
+            const allTemplates = this.transactionTemplatesStore.allVisibleTemplates;
+            return allTemplates[templateConstants.allTemplateTypes.Normal] || [];
         },
         allDateRanges() {
             return datetimeConstants.allDateRanges;
@@ -260,6 +283,11 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+
+            self.transactionTemplatesStore.loadAllTemplates({
+                templateType: templateConstants.allTemplateTypes.Normal,
+                force: false
+            });
         }
     },
     methods: {
@@ -291,6 +319,16 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
+        },
+        addTransaction(template) {
+            if (template && template.id) {
+                this.f7router.navigate('/transaction/add?templateId=' + template.id);
+            }
+        },
+        openTransactionTemplatePopover() {
+            if (this.allTransactionTemplates && this.allTransactionTemplates.length) {
+                this.showTransactionTemplatePopover = true;
+            }
         },
         getDisplayCurrency(value, currencyCode) {
             return this.$locale.formatAmountWithCurrency(this.settingsStore, this.userStore, value, currencyCode);
@@ -386,5 +424,10 @@ export default {
     width: var(--ebk-big-icon-button-size);
     height: var(--ebk-big-icon-button-size);
     line-height: var(--ebk-big-icon-button-size);
+}
+
+.template-popover-menu .popover-inner{
+    max-height: 400px;
+    overflow-y: auto;
 }
 </style>

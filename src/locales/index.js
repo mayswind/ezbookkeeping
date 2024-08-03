@@ -3,6 +3,7 @@ import zhHans from './zh_Hans.json'
 
 export const defaultLanguage = 'en';
 
+// To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
 export const allLanguages = {
     'en': {
         name: 'English',

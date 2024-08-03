@@ -6,6 +6,7 @@ import "github.com/mayswind/ezbookkeeping/pkg/models"
 var DefaultLanguage = en
 
 // AllLanguages represents all the supported language
+// To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
 var AllLanguages = map[string]*LocaleInfo{
 	"en": {
 		Content: en,

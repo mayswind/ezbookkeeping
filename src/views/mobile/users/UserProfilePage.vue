@@ -141,8 +141,8 @@
                     </f7-block>
                 </template>
                 <select autocomplete="transaction-currency" v-model="newProfile.defaultCurrency">
-                    <option :value="currency.code"
-                            :key="currency.code"
+                    <option :value="currency.currencyCode"
+                            :key="currency.currencyCode"
                             v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                 </select>
             </f7-list-item>

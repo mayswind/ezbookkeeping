@@ -111,7 +111,7 @@
                                 <v-col cols="12" md="12" v-if="account.type === allAccountTypes.SingleAccount || currentAccountIndex >= 0">
                                     <v-autocomplete
                                         item-title="displayName"
-                                        item-value="code"
+                                        item-value="currencyCode"
                                         auto-select-first
                                         persistent-placeholder
                                         :disabled="loading || submitting || !!editAccountId"

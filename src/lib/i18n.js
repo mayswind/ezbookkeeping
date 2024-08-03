@@ -523,7 +523,7 @@ function getAllCurrencies(translateFn) {
         }
 
         allCurrencies.push({
-            code: currencyCode,
+            currencyCode: currencyCode,
             displayName: getCurrencyName(currencyCode, translateFn)
         });
     }

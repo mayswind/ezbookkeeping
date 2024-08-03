@@ -130,7 +130,7 @@
                             <v-col cols="12" md="6">
                                 <v-autocomplete
                                     item-title="displayName"
-                                    item-value="code"
+                                    item-value="currencyCode"
                                     auto-select-first
                                     persistent-placeholder
                                     :disabled="loading || saving"

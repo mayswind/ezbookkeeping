@@ -167,8 +167,8 @@
                     </div>
                 </template>
                 <select autocomplete="transaction-currency" v-model="account.currency">
-                    <option :value="currency.code"
-                            :key="currency.code"
+                    <option :value="currency.currencyCode"
+                            :key="currency.currencyCode"
                             v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                 </select>
             </f7-list-item>
@@ -360,8 +360,8 @@
                         </div>
                     </template>
                     <select autocomplete="transaction-currency" v-model="subAccount.currency">
-                        <option :value="currency.code"
-                                :key="currency.code"
+                        <option :value="currency.currencyCode"
+                                :key="currency.currencyCode"
                                 v-for="currency in allCurrencies">{{ currency.displayName }}</option>
                     </select>
                 </f7-list-item>

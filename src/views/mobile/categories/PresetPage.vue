@@ -71,7 +71,7 @@ export default {
 
         return {
             loadingError: null,
-            currentLocale: self.$locale.getCurrentLanguageCode(),
+            currentLocale: self.$locale.getCurrentLanguageTag(),
             categoryType: 0,
             submitting: false,
             showMoreActionSheet: false,

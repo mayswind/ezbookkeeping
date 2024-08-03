@@ -256,7 +256,7 @@ export default {
             }
         },
         currentLanguageCode() {
-            return this.$locale.getCurrentLanguageCode();
+            return this.$locale.getCurrentLanguageTag();
         },
         currentLanguageName() {
             return this.$locale.getCurrentLanguageDisplayName();

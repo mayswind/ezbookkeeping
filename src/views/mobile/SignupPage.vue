@@ -66,9 +66,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="currentLocale">
-                    <option :value="locale"
-                            :key="locale"
-                            v-for="(lang, locale) in allLanguages">{{ lang.displayName }}</option>
+                    <option :value="languageTag"
+                            :key="languageTag"
+                            v-for="(lang, languageTag) in allLanguages">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -191,7 +191,7 @@ export default {
     ],
     data() {
         const userStore = useUserStore();
-        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageCode());
+        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageTag());
 
         return {
             user: newUser,
@@ -218,7 +218,7 @@ export default {
         },
         currentLocale: {
             get: function () {
-                return this.$locale.getCurrentLanguageCode();
+                return this.$locale.getCurrentLanguageTag();
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;

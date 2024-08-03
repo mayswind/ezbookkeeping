@@ -117,7 +117,7 @@
                             <v-col cols="12" md="6">
                                 <v-select
                                     item-title="displayName"
-                                    item-value="code"
+                                    item-value="languageTag"
                                     persistent-placeholder
                                     :disabled="loading || saving"
                                     :label="$t('Language')"

@@ -89,7 +89,7 @@ export default {
         const self = this;
 
         return {
-            currentLocale: self.$locale.getCurrentLanguageCode(),
+            currentLocale: self.$locale.getCurrentLanguageTag(),
             logouting: false
         };
     },
@@ -167,7 +167,7 @@ export default {
     },
     methods: {
         onPageAfterIn() {
-            this.currentLocale = this.$locale.getCurrentLanguageCode();
+            this.currentLocale = this.$locale.getCurrentLanguageTag();
         },
         logout() {
             const self = this;

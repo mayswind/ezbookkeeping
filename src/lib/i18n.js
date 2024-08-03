@@ -67,26 +67,26 @@ function getAllLanguageInfos() {
 function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
     const ret = [];
 
-    for (const code in allLanguages) {
-        if (!Object.prototype.hasOwnProperty.call(allLanguages, code)) {
+    for (const languageTag in allLanguages) {
+        if (!Object.prototype.hasOwnProperty.call(allLanguages, languageTag)) {
             continue;
         }
 
-        const languageInfo = allLanguages[code];
+        const languageInfo = allLanguages[languageTag];
 
         ret.push({
-            code: code,
+            languageTag: languageTag,
             displayName: languageInfo.displayName
         });
     }
 
     ret.sort(function (lang1, lang2) {
-        return lang1.code.localeCompare(lang2.code);
+        return lang1.languageTag.localeCompare(lang2.languageTag);
     });
 
     if (includeSystemDefault) {
         ret.splice(0, 0, {
-            code: '',
+            languageTag: '',
             displayName: translateFn('System Default')
         });
     }
@@ -173,7 +173,7 @@ function getLocaleFromLanguageAlias(alias) {
     return null;
 }
 
-function getCurrentLanguageCode(i18nGlobal) {
+function getCurrentLanguageTag(i18nGlobal) {
     return i18nGlobal.locale;
 }
 
@@ -1423,7 +1423,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getLanguageInfo: getLanguageInfo,
         getDefaultLanguage: getDefaultLanguage,
-        getCurrentLanguageCode: () => getCurrentLanguageCode(i18nGlobal),
+        getCurrentLanguageTag: () => getCurrentLanguageTag(i18nGlobal),
         getCurrentLanguageInfo: () => getCurrentLanguageInfo(i18nGlobal),
         getCurrentLanguageDisplayName: () => getCurrentLanguageDisplayName(i18nGlobal),
         getDefaultCurrency: () => getDefaultCurrency(i18nGlobal.t),

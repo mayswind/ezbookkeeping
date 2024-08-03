@@ -91,7 +91,7 @@ export default {
         const self = this;
 
         return {
-            currentLocale: self.$locale.getCurrentLanguageCode(),
+            currentLocale: self.$locale.getCurrentLanguageTag(),
             allCategoryTypes: [],
             submitting: false,
             icons: {

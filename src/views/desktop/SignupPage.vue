@@ -92,7 +92,7 @@
                                     <v-col cols="12" md="12">
                                         <v-select
                                             item-title="displayName"
-                                            item-value="code"
+                                            item-value="languageTag"
                                             :disabled="submitting || navigateToHomePage"
                                             :label="$t('Language')"
                                             :placeholder="$t('Language')"
@@ -153,10 +153,10 @@
                                                        v-bind="props">{{ currentLanguageName }}</v-btn>
                                             </template>
                                             <v-list>
-                                                <v-list-item v-for="lang in allLanguages" :key="lang.code">
+                                                <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
                                                     <v-list-item-title
                                                         class="cursor-pointer"
-                                                        @click="currentLocale = lang.code">
+                                                        @click="currentLocale = lang.languageTag">
                                                         {{ lang.displayName }}
                                                     </v-list-item-title>
                                                 </v-list-item>
@@ -258,7 +258,7 @@ import {
 export default {
     data() {
         const userStore = useUserStore();
-        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageCode());
+        const newUser = userStore.generateNewUserModel(this.$locale.getCurrentLanguageTag());
 
         return {
             user: newUser,
@@ -293,7 +293,7 @@ export default {
         },
         currentLocale: {
             get: function () {
-                return this.$locale.getCurrentLanguageCode();
+                return this.$locale.getCurrentLanguageTag();
             },
             set: function (value) {
                 const isCurrencyDefault = this.user.defaultCurrency === this.settingsStore.localeDefaultSettings.currency;

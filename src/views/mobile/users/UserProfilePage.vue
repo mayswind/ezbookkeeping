@@ -123,8 +123,8 @@
                 :title="currentLanguageName"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }">
                 <select v-model="newProfile.language">
-                    <option :value="language.code"
-                            :key="language.code"
+                    <option :value="language.languageTag"
+                            :key="language.languageTag"
                             v-for="language in allLanguages">{{ language.displayName }}</option>
                 </select>
             </f7-list-item>
@@ -440,7 +440,7 @@ export default {
         },
         currentLanguageName() {
             for (let i = 0; i < this.allLanguages.length; i++) {
-                if (this.allLanguages[i].code === this.newProfile.language) {
+                if (this.allLanguages[i].languageTag === this.newProfile.language) {
                     return this.allLanguages[i].displayName;
                 }
             }

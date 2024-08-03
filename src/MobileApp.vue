@@ -159,7 +159,7 @@ export default {
 
         document.addEventListener('DOMContentLoaded', () => {
             const languageInfo = this.$locale.getCurrentLanguageInfo();
-            loadMapAssets(languageInfo ? languageInfo.code : null);
+            loadMapAssets(languageInfo ? languageInfo.alternativeLanguageTag : null);
         });
     },
     methods: {

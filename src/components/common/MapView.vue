@@ -90,7 +90,7 @@ export default {
                 const languageInfo = this.$locale.getCurrentLanguageInfo();
 
                 initMapInstance(this.mapHolder, this.$refs.mapContainer, {
-                    language: languageInfo ? languageInfo.code : null,
+                    language: languageInfo ? languageInfo.alternativeLanguageTag : null,
                     initCenter: this.initCenter,
                     zoomLevel: this.zoomLevel,
                     text: {

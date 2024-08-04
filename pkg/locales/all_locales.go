@@ -1,6 +1,8 @@
 package locales
 
-import "github.com/mayswind/ezbookkeeping/pkg/models"
+import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+)
 
 // DefaultLanguage represents the default language
 var DefaultLanguage = en
@@ -26,8 +28,8 @@ func GetLocaleTextItems(locale string) *LocaleTextItems {
 	return DefaultLanguage
 }
 
-func IsDecimalSeparatorEqualsDigitGroupingSymbol(decimalSeparator models.DecimalSeparator, digitGroupingSymbol models.DigitGroupingSymbol, locale string) bool {
-	if decimalSeparator == models.DECIMAL_SEPARATOR_DEFAULT && digitGroupingSymbol == models.DIGIT_GROUPING_SYMBOL_DEFAULT {
+func IsDecimalSeparatorEqualsDigitGroupingSymbol(decimalSeparator core.DecimalSeparator, digitGroupingSymbol core.DigitGroupingSymbol, locale string) bool {
+	if decimalSeparator == core.DECIMAL_SEPARATOR_DEFAULT && digitGroupingSymbol == core.DIGIT_GROUPING_SYMBOL_DEFAULT {
 		return false
 	}
 
@@ -37,11 +39,11 @@ func IsDecimalSeparatorEqualsDigitGroupingSymbol(decimalSeparator models.Decimal
 
 	localeTextItems := GetLocaleTextItems(locale)
 
-	if decimalSeparator == models.DECIMAL_SEPARATOR_DEFAULT {
+	if decimalSeparator == core.DECIMAL_SEPARATOR_DEFAULT {
 		decimalSeparator = localeTextItems.DefaultTypes.DecimalSeparator
 	}
 
-	if digitGroupingSymbol == models.DIGIT_GROUPING_SYMBOL_DEFAULT {
+	if digitGroupingSymbol == core.DIGIT_GROUPING_SYMBOL_DEFAULT {
 		digitGroupingSymbol = localeTextItems.DefaultTypes.DigitGroupingSymbol
 	}
 

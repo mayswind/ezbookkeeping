@@ -1,6 +1,8 @@
 package locales
 
-import "github.com/mayswind/ezbookkeeping/pkg/models"
+import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+)
 
 // LocaleTextItems represents all text items need to be translated
 type LocaleTextItems struct {
@@ -10,8 +12,8 @@ type LocaleTextItems struct {
 }
 
 type DefaultTypes struct {
-	DecimalSeparator    models.DecimalSeparator
-	DigitGroupingSymbol models.DigitGroupingSymbol
+	DecimalSeparator    core.DecimalSeparator
+	DigitGroupingSymbol core.DigitGroupingSymbol
 }
 
 // VerifyEmailTextItems represents text items need to be translated in verify mail

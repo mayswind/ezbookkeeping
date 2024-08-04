@@ -1,11 +1,13 @@
 package locales
 
-import "github.com/mayswind/ezbookkeeping/pkg/models"
+import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+)
 
 var zhHans = &LocaleTextItems{
 	DefaultTypes: &DefaultTypes{
-		DecimalSeparator:    models.DECIMAL_SEPARATOR_DOT,
-		DigitGroupingSymbol: models.DIGIT_GROUPING_SYMBOL_COMMA,
+		DecimalSeparator:    core.DECIMAL_SEPARATOR_DOT,
+		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
 	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "验证邮箱",

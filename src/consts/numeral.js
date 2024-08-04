@@ -68,10 +68,12 @@ const allDigitGroupingSymbolMap = {
 const allDigitGroupingType = {
     None: {
         type: 1,
+        enabled: false,
         name: 'None'
     },
     ThousandsSeparator: {
         type: 2,
+        enabled: true,
         name: 'Thousands Separator'
     }
 };

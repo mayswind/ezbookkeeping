@@ -726,6 +726,7 @@ function getAllDigitGroupingTypes(translateFn) {
 
     ret.push({
         type: numeralConstants.defaultValue,
+        enabled: defaultDigitGroupingType.enabled,
         displayName: `${translateFn('Language Default')} (${translateFn('numeral.' + defaultDigitGroupingType.name)})`
     });
 
@@ -734,6 +735,7 @@ function getAllDigitGroupingTypes(translateFn) {
 
         ret.push({
             type: type.type,
+            enabled: type.enabled,
             displayName: translateFn('numeral.' + type.name)
         });
     }

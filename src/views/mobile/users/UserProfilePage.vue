@@ -25,14 +25,23 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Language" title="Language" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Currency" title="Currency" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="First Day of Week" title="Week Day" link="#"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Date Format" title="YYYY-MM-DD" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Long Time Format" title="HH:mm:ss" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Short Time Format" title="HH:mm" link="#"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Decimal Separator" title="Dot (.)" link="#"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping Symbol" title="Comma (,)" link="#"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping" title="Thousands Separator" link="#"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Currency Display Mode" title="Currency Symbol" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping" title="Thousands Separator" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Digit Grouping Symbol" title="Comma (,)" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Decimal Separator" title="Dot (.)" link="#"></f7-list-item>
+        </f7-list>
+
+        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Expense Amount Color" title="Amount Color" link="#"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Income Amount Color" title="Amount Color" link="#"></f7-list-item>
         </f7-list>
@@ -159,7 +168,9 @@
                             v-for="weekDay in allWeekDays">{{ weekDay.displayName }}</option>
                 </select>
             </f7-list-item>
+        </f7-list>
 
+        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Long Date Format')"
@@ -211,30 +222,19 @@
                             v-for="format in allShortTimeFormats">{{ format.displayName }}</option>
                 </select>
             </f7-list-item>
+        </f7-list>
 
+        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Decimal Separator')"
-                :title="getNameByKeyValue(allDecimalSeparators, newProfile.decimalSeparator, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Decimal Separator'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Decimal Separator'), popupCloseLinkText: $t('Done') }"
+                :header="$t('Currency Display Mode')"
+                :title="getNameByKeyValue(allCurrencyDisplayTypes, newProfile.currencyDisplayType, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Currency Display Mode'), popupCloseLinkText: $t('Done') }"
             >
-                <select v-model="newProfile.decimalSeparator">
+                <select v-model="newProfile.currencyDisplayType">
                     <option :value="format.type"
                             :key="format.type"
-                            v-for="format in allDecimalSeparators">{{ format.displayName }}</option>
-                </select>
-            </f7-list-item>
-
-            <f7-list-item
-                class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Digit Grouping Symbol')"
-                :title="getNameByKeyValue(allDigitGroupingSymbols, newProfile.digitGroupingSymbol, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping Symbol'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping Symbol'), popupCloseLinkText: $t('Done') }"
-            >
-                <select v-model="newProfile.digitGroupingSymbol">
-                    <option :value="format.type"
-                            :key="format.type"
-                            v-for="format in allDigitGroupingSymbols">{{ format.displayName }}</option>
+                            v-for="format in allCurrencyDisplayTypes">{{ format.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -253,17 +253,33 @@
 
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
-                :header="$t('Currency Display Mode')"
-                :title="getNameByKeyValue(allCurrencyDisplayTypes, newProfile.currencyDisplayType, 'type', 'displayName')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Currency Display Mode'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Currency Display Mode'), popupCloseLinkText: $t('Done') }"
+                :disabled="!getNameByKeyValue(allDigitGroupingTypes, newProfile.digitGrouping, 'type', 'enabled')"
+                :header="$t('Digit Grouping Symbol')"
+                :title="getNameByKeyValue(allDigitGroupingSymbols, newProfile.digitGroupingSymbol, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Digit Grouping Symbol'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Digit Grouping Symbol'), popupCloseLinkText: $t('Done') }"
             >
-                <select v-model="newProfile.currencyDisplayType">
+                <select v-model="newProfile.digitGroupingSymbol">
                     <option :value="format.type"
                             :key="format.type"
-                            v-for="format in allCurrencyDisplayTypes">{{ format.displayName }}</option>
+                            v-for="format in allDigitGroupingSymbols">{{ format.displayName }}</option>
                 </select>
             </f7-list-item>
 
+            <f7-list-item
+                class="list-item-with-header-and-title list-item-no-item-after"
+                :header="$t('Decimal Separator')"
+                :title="getNameByKeyValue(allDecimalSeparators, newProfile.decimalSeparator, 'type', 'displayName')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Decimal Separator'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Decimal Separator'), popupCloseLinkText: $t('Done') }"
+            >
+                <select v-model="newProfile.decimalSeparator">
+                    <option :value="format.type"
+                            :key="format.type"
+                            v-for="format in allDecimalSeparators">{{ format.displayName }}</option>
+                </select>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
             <f7-list-item
                 class="list-item-with-header-and-title list-item-no-item-after"
                 :header="$t('Expense Amount Color')"

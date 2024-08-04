@@ -159,7 +159,11 @@
                                 />
                             </v-col>
                         </v-row>
+                    </v-card-text>
 
+                    <v-divider />
+
+                    <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -213,7 +217,11 @@
                                 />
                             </v-col>
                         </v-row>
+                    </v-card-text>
 
+                    <v-divider />
+
+                    <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -221,23 +229,10 @@
                                     item-value="type"
                                     persistent-placeholder
                                     :disabled="loading || saving"
-                                    :label="$t('Decimal Separator')"
-                                    :placeholder="$t('Decimal Separator')"
-                                    :items="allDecimalSeparators"
-                                    v-model="newProfile.decimalSeparator"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="$t('Digit Grouping Symbol')"
-                                    :placeholder="$t('Digit Grouping Symbol')"
-                                    :items="allDigitGroupingSymbols"
-                                    v-model="newProfile.digitGroupingSymbol"
+                                    :label="$t('Currency Display Mode')"
+                                    :placeholder="$t('Currency Display Mode')"
+                                    :items="allCurrencyDisplayTypes"
+                                    v-model="newProfile.currencyDisplayType"
                                 />
                             </v-col>
 
@@ -259,14 +254,33 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="$t('Currency Display Mode')"
-                                    :placeholder="$t('Currency Display Mode')"
-                                    :items="allCurrencyDisplayTypes"
-                                    v-model="newProfile.currencyDisplayType"
+                                    :disabled="loading || saving || !getNameByKeyValue(allDigitGroupingTypes, newProfile.digitGrouping, 'type', 'enabled')"
+                                    :label="$t('Digit Grouping Symbol')"
+                                    :placeholder="$t('Digit Grouping Symbol')"
+                                    :items="allDigitGroupingSymbols"
+                                    v-model="newProfile.digitGroupingSymbol"
                                 />
                             </v-col>
 
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :disabled="loading || saving"
+                                    :label="$t('Decimal Separator')"
+                                    :placeholder="$t('Decimal Separator')"
+                                    :items="allDecimalSeparators"
+                                    v-model="newProfile.decimalSeparator"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+
+                    <v-divider />
+
+                    <v-card-text>
+                        <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
                                     item-title="displayName"

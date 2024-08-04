@@ -26,10 +26,10 @@
                             <v-menu activator="parent">
                                 <v-list>
                                     <v-list-item :prepend-icon="icons.show"
-                                                 :title="$t('Show Hidden Templates')"
+                                                 :title="$t('Show Hidden Transaction Templates')"
                                                  v-if="!showHidden" @click="showHidden = true"></v-list-item>
                                     <v-list-item :prepend-icon="icons.hide"
-                                                 :title="$t('Hide Hidden Templates')"
+                                                 :title="$t('Hide Hidden Transaction Templates')"
                                                  v-if="showHidden" @click="showHidden = false"></v-list-item>
                                 </v-list>
                             </v-menu>

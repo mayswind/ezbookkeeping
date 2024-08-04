@@ -7,6 +7,7 @@
             <f7-list-item :title="$t('User Profile')" link="/user/profile"></f7-list-item>
             <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" link="/tag/list"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Templates')" link="/template/list"></f7-list-item>
             <f7-list-item :title="$t('Data Management')" link="/user/data/management"></f7-list-item>
             <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
             <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>

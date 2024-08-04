@@ -298,6 +298,16 @@ const routes = [
         beforeEnter: [checkLogin]
     },
     {
+        path: '/template/add',
+        async: asyncResolve(TransactionEditPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/template/edit',
+        async: asyncResolve(TransactionEditPage),
+        beforeEnter: [checkLogin]
+    },
+    {
         path: '(.*)',
         redirect: '/'
     }

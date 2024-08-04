@@ -9,35 +9,36 @@
             </f7-nav-right>
 
             <f7-subnavbar>
-                <f7-segmented strong :class="{ 'readonly': mode !== 'add' }">
+                <f7-segmented strong :class="{ 'readonly': type === 'transaction' && mode !== 'add' }">
                     <f7-button :text="$t('Expense')" :active="transaction.type === allTransactionTypes.Expense"
-                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Expense"
+                               :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Expense"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Expense"></f7-button>
                     <f7-button :text="$t('Income')" :active="transaction.type === allTransactionTypes.Income"
-                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Income"
+                               :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Income"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Income"></f7-button>
                     <f7-button :text="$t('Transfer')" :active="transaction.type === allTransactionTypes.Transfer"
-                               :disabled="mode !== 'add' && transaction.type !== allTransactionTypes.Transfer"
+                               :disabled="type === 'transaction' && mode !== 'add' && transaction.type !== allTransactionTypes.Transfer"
                                v-if="transaction.type !== allTransactionTypes.ModifyBalance"
                                @click="transaction.type = allTransactionTypes.Transfer"></f7-button>
                     <f7-button :text="$t('Modify Balance')" :active="transaction.type === allTransactionTypes.ModifyBalance"
-                               v-if="transaction.type === allTransactionTypes.ModifyBalance"></f7-button>
+                               v-if="type === 'transaction' && transaction.type === allTransactionTypes.ModifyBalance"></f7-button>
                 </f7-segmented>
             </f7-subnavbar>
         </f7-navbar>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-input label="Template Name" placeholder="Template Name" v-if="type === 'template'"></f7-list-input>
             <f7-list-item
                 class="transaction-edit-amount ebk-large-amount"
                 header="Expense Amount" title="0.00">
             </f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title" header="Transaction Time" title="YYYY/MM/DD HH:mm:ss"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Timezone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title" header="Transaction Time" title="YYYY/MM/DD HH:mm:ss" v-if="type === 'transaction'"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Timezone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'" v-if="type === 'transaction'"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location" v-if="type === 'transaction'"></f7-list-item>
             <f7-list-item header="Tags">
                 <template #footer>
                     <f7-block class="margin-top-half no-padding no-margin">
@@ -48,8 +49,16 @@
             <f7-list-input type="textarea" label="Description" placeholder="Your transaction description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical"
-                 v-else-if="!loading">
+        <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading">
+            <f7-list-input
+                type="text"
+                clear-button
+                :label="$t('Template Name')"
+                :placeholder="$t('Template Name')"
+                v-model:value="transaction.name"
+                v-if="type === 'template'"
+            ></f7-list-input>
+
             <f7-list-item
                 class="transaction-edit-amount"
                 link="#" no-chevron
@@ -226,6 +235,7 @@
                 :header="$t('Transaction Time')"
                 :title="transactionDisplayTime"
                 @click="mode !== 'view' ? showTransactionDateTimeSheet = true : showTimeInDefaultTimezone = !showTimeInDefaultTimezone"
+                v-if="type === 'transaction'"
             >
                 <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"
                                            v-model="transaction.time">
@@ -237,7 +247,9 @@
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                 :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Timezone')"
-                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Timezone'), popupCloseLinkText: $t('Done') }">
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Timezone'), popupCloseLinkText: $t('Done') }"
+                v-if="type === 'transaction'"
+            >
                 <select v-model="transaction.timeZone">
                     <option :value="timezone.name" :key="timezone.name"
                             v-for="timezone in allTimezones">{{ timezone.displayNameWithUtcOffset }}</option>
@@ -257,6 +269,7 @@
                 :class="{ 'readonly': mode === 'view' && !transaction.geoLocation }"
                 :header="$t('Geographic Location')"
                 @click="showGeoLocationActionSheet = true"
+                v-if="type === 'transaction'"
             >
                 <template #title>
                     <f7-block class="list-item-custom-title no-padding no-margin">
@@ -392,8 +405,9 @@ export default {
         const newTransaction = transactionsStore.generateNewTransactionModel(query.type);
 
         return {
+            type: 'transaction',
             mode: 'add',
-            editTransactionId: null,
+            editId: null,
             transaction: newTransaction,
             clientSessionId: '',
             loading: true,
@@ -417,13 +431,23 @@ export default {
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
         title() {
-            if (this.mode === 'add') {
-                return 'Add Transaction';
-            } else if (this.mode === 'edit') {
-                return 'Edit Transaction';
-            } else {
-                return 'Transaction Detail';
+            if (this.type === 'transaction') {
+                if (this.mode === 'add') {
+                    return 'Add Transaction';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Transaction';
+                } else {
+                    return 'Transaction Detail';
+                }
+            } else if (this.type === 'template') {
+                if (this.mode === 'add') {
+                    return 'Add Transaction Template';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Transaction Template';
+                }
             }
+
+            return '';
         },
         saveButtonTitle() {
             if (this.mode === 'add') {
@@ -612,19 +636,25 @@ export default {
             return !!this.inputEmptyProblemMessage;
         },
         inputEmptyProblemMessage() {
+            if (this.type === 'template') {
+                if (!this.transaction.name) {
+                    return 'Template name cannot be blank';
+                }
+            }
+
             return null;
         }
     },
     watch: {
         'transaction.sourceAmount': function (newValue, oldValue) {
-            if (this.mode === 'view') {
+            if (this.mode === 'view' || this.loading) {
                 return;
             }
 
             this.transactionsStore.setTransactionSuitableDestinationAmount(this.transaction, oldValue, newValue);
         },
         'transaction.destinationAmount': function (newValue) {
-            if (this.mode === 'view') {
+            if (this.mode === 'view' || this.loading) {
                 return;
             }
 
@@ -645,10 +675,25 @@ export default {
         const self = this;
         const query = self.f7route.query;
 
-        if (self.f7route.path === '/transaction/edit') {
+        if (self.f7route.path === '/transaction/add') {
+            self.type = 'transaction';
+            self.mode = 'add';
+        } else if (self.f7route.path === '/transaction/edit') {
+            self.type = 'transaction';
             self.mode = 'edit';
         } else if (self.f7route.path === '/transaction/detail') {
+            self.type = 'transaction';
             self.mode = 'view';
+        } else if (self.f7route.path === '/template/add') {
+            self.type = 'template';
+            self.mode = 'add';
+        } else if (self.f7route.path === '/template/edit') {
+            self.type = 'template';
+            self.mode = 'edit';
+        } else {
+            self.$toast('Parameter Invalid');
+            self.loadingError = 'Parameter Invalid';
+            return;
         }
 
         self.loading = true;
@@ -660,12 +705,28 @@ export default {
             self.transactionTemplatesStore.loadAllTemplates({ force: false, templateType: templateConstants.allTemplateTypes.Normal })
         ];
 
-        if (query.id) {
-            if (self.mode === 'edit') {
-                self.editTransactionId = query.id;
+        if (self.type === 'transaction') {
+            if (query.id) {
+                if (self.mode === 'edit') {
+                    self.editId = query.id;
+                }
+
+                promises.push(self.transactionsStore.getTransaction({ transactionId: query.id }));
+            }
+        } else if (self.type === 'template') {
+            self.transaction.name = '';
+
+            if (query.templateType) {
+                self.transaction.templateType = parseInt(query.templateType);
             }
 
-            promises.push(self.transactionsStore.getTransaction({ transactionId: query.id }));
+            if (query.id) {
+                if (self.mode === 'edit') {
+                    self.editId = query.id;
+                }
+
+                promises.push(self.transactionTemplatesStore.getTemplate({ templateId: query.id }));
+            }
         }
 
         if (query.type && query.type !== '0' &&
@@ -680,17 +741,25 @@ export default {
 
         Promise.all(promises).then(function (responses) {
             if (query.id && !responses[4]) {
-                self.$toast('Unable to retrieve transaction');
-                self.loadingError = 'Unable to retrieve transaction';
+                if (self.type === 'transaction') {
+                    self.$toast('Unable to retrieve transaction');
+                    self.loadingError = 'Unable to retrieve transaction';
+                } else if (self.type === 'template') {
+                    self.$toast('Unable to retrieve template');
+                    self.loadingError = 'Unable to retrieve template';
+                }
+
                 return;
             }
 
             let fromTransaction = null;
 
-            if (query.id) {
+            if (self.type === 'transaction' && query.id) {
                 fromTransaction = responses[4];
-            } else if (query.templateId && self.transactionTemplatesStore.allTransactionTemplatesMap && self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal]) {
+            } else if (self.type === 'transaction' && self.transactionTemplatesStore.allTransactionTemplatesMap && self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal]) {
                 fromTransaction = self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal][query.templateId];
+            } else if (self.type === 'template' && query.id) {
+                fromTransaction = responses[4];
             }
 
             setTransactionModelByTransaction(
@@ -706,11 +775,22 @@ export default {
                     type: query.type,
                     categoryId: query.categoryId,
                     accountId: query.accountId,
-                    tagIds: query.tagIds
+                    destinationAccountId: query.destinationAccountId,
+                    amount: query.amount,
+                    destinationAmount: query.destinationAmount,
+                    tagIds: query.tagIds,
+                    comment: query.comment
                 },
-                (self.mode === 'edit' || self.mode === 'view'),
-                (self.mode === 'edit' || self.mode === 'view')
+                self.type === 'transaction' && (self.mode === 'edit' || self.mode === 'view'),
+                self.type === 'transaction' && (self.mode === 'edit' || self.mode === 'view')
             );
+
+            if (self.type === 'template' && query.id) {
+                const template = responses[4];
+                self.transaction.id = template.id;
+                self.transaction.templateType = template.templateType;
+                self.transaction.name = template.name;
+            }
 
             self.loading = false;
         }).catch(error => {
@@ -741,13 +821,57 @@ export default {
                 return;
             }
 
-            const doSubmit = function () {
+            const problemMessage = self.inputEmptyProblemMessage;
+
+            if (problemMessage) {
+                self.$alert(problemMessage);
+                return;
+            }
+
+            if (self.type === 'transaction' && (self.mode === 'add' || self.mode === 'edit')) {
+                const doSubmit = function () {
+                    self.submitting = true;
+                    self.$showLoading(() => self.submitting);
+
+                    self.transactionsStore.saveTransaction({
+                        transaction: self.transaction,
+                        defaultCurrency: self.defaultCurrency,
+                        isEdit: self.mode === 'edit',
+                        clientSessionId: self.clientSessionId
+                    }).then(() => {
+                        self.submitting = false;
+                        self.$hideLoading();
+
+                        if (self.mode === 'add') {
+                            self.$toast('You have added a new transaction');
+                        } else if (self.mode === 'edit') {
+                            self.$toast('You have saved this transaction');
+                        }
+
+                        router.back();
+                    }).catch(error => {
+                        self.submitting = false;
+                        self.$hideLoading();
+
+                        if (!error.processed) {
+                            self.$toast(error.message || error);
+                        }
+                    });
+                };
+
+                if (self.transaction.sourceAmount === 0) {
+                    self.$confirm('Are you sure you want to save this transaction with a zero amount?', () => {
+                        doSubmit();
+                    });
+                } else {
+                    doSubmit();
+                }
+            } else if (self.type === 'template' && (self.mode === 'add' || self.mode === 'edit')) {
                 self.submitting = true;
                 self.$showLoading(() => self.submitting);
 
-                self.transactionsStore.saveTransaction({
-                    transaction: self.transaction,
-                    defaultCurrency: self.defaultCurrency,
+                self.transactionTemplatesStore.saveTemplateContent({
+                    template: self.transaction,
                     isEdit: self.mode === 'edit',
                     clientSessionId: self.clientSessionId
                 }).then(() => {
@@ -755,9 +879,9 @@ export default {
                     self.$hideLoading();
 
                     if (self.mode === 'add') {
-                        self.$toast('You have added a new transaction');
+                        self.$toast('You have added a new template');
                     } else if (self.mode === 'edit') {
-                        self.$toast('You have saved this transaction');
+                        self.$toast('You have saved this template');
                     }
 
                     router.back();
@@ -769,14 +893,6 @@ export default {
                         self.$toast(error.message || error);
                     }
                 });
-            };
-
-            if (self.transaction.sourceAmount === 0) {
-                self.$confirm('Are you sure you want to save this transaction with a zero amount?', () => {
-                    doSubmit();
-                });
-            } else {
-                doSubmit();
             }
         },
         updateGeoLocation(forceUpdate) {

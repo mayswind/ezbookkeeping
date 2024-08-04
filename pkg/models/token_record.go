@@ -24,9 +24,10 @@ type TokenRevokeRequest struct {
 
 // TokenRefreshResponse represents all parameters of token refreshing request
 type TokenRefreshResponse struct {
-	NewToken   string         `json:"newToken,omitempty"`
-	OldTokenId string         `json:"oldTokenId,omitempty"`
-	User       *UserBasicInfo `json:"user"`
+	NewToken            string         `json:"newToken,omitempty"`
+	OldTokenId          string         `json:"oldTokenId,omitempty"`
+	User                *UserBasicInfo `json:"user"`
+	NotificationContent string         `json:"notificationContent,omitempty"`
 }
 
 // TokenInfoResponse represents a view-object of token

@@ -242,8 +242,9 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 
 func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) *models.AuthResponse {
 	return &models.AuthResponse{
-		Token:   token,
-		Need2FA: need2FA,
-		User:    user.ToUserBasicInfo(),
+		Token:               token,
+		Need2FA:             need2FA,
+		User:                user.ToUserBasicInfo(),
+		NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language),
 	}
 }

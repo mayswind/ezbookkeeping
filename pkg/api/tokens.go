@@ -204,7 +204,8 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 		}
 
 		refreshResp := &models.TokenRefreshResponse{
-			User: user.ToUserBasicInfo(),
+			User:                user.ToUserBasicInfo(),
+			NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language),
 		}
 
 		return refreshResp, nil
@@ -230,9 +231,10 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 	log.InfofWithRequestId(c, "[token.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 	refreshResp := &models.TokenRefreshResponse{
-		NewToken:   token,
-		OldTokenId: a.tokens.GenerateTokenId(oldTokenRecord),
-		User:       user.ToUserBasicInfo(),
+		NewToken:            token,
+		OldTokenId:          a.tokens.GenerateTokenId(oldTokenRecord),
+		User:                user.ToUserBasicInfo(),
+		NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language),
 	}
 
 	return refreshResp, nil

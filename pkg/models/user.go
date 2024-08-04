@@ -164,8 +164,9 @@ type UserVerifyEmailRequest struct {
 
 // UserVerifyEmailResponse represents all response parameters after user have verified email
 type UserVerifyEmailResponse struct {
-	NewToken string         `json:"newToken,omitempty"`
-	User     *UserBasicInfo `json:"user"`
+	NewToken            string         `json:"newToken,omitempty"`
+	User                *UserBasicInfo `json:"user"`
+	NotificationContent string         `json:"notificationContent,omitempty"`
 }
 
 // UserResendVerifyEmailRequest represents all parameters of user resend verify email request

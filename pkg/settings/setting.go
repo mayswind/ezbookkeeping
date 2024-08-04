@@ -11,6 +11,7 @@ import (
 	"gopkg.in/ini.v1"
 
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/locales"
 )
 
 const (
@@ -178,6 +179,13 @@ type MinIOConfig struct {
 	RootPath        string
 }
 
+// NotificationConfig represents a notification setting config
+type NotificationConfig struct {
+	Enabled              bool
+	DefaultContent       string
+	MultiLanguageContent map[string]string
+}
+
 // Config represents the global setting config
 type Config struct {
 	// Global
@@ -262,6 +270,10 @@ type Config struct {
 
 	// Data
 	EnableDataExport bool
+
+	// Notification
+	AfterLoginNotification NotificationConfig
+	AfterOpenNotification  NotificationConfig
 
 	// Map
 	MapProvider                           string
@@ -366,6 +378,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadDataConfiguration(config, cfgFile, "data")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadNotificationConfiguration(config, cfgFile, "notification")
 
 	if err != nil {
 		return nil, err
@@ -700,6 +718,13 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 	return nil
 }
 
+func loadNotificationConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.AfterLoginNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_login", "after_login_notification_content")
+	config.AfterOpenNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_open", "after_open_notification_content")
+
+	return nil
+}
+
 func loadMapConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	mapProvider := getConfigItemStringValue(configFile, sectionName, "map_provider")
 
@@ -818,6 +843,27 @@ func getFinalPath(workingPath, p string) (string, error) {
 	}
 
 	return p, err
+}
+
+func getNotificationConfiguration(configFile *ini.File, sectionName string, enableKey string, contentKey string) NotificationConfig {
+	config := NotificationConfig{
+		Enabled:              getConfigItemBoolValue(configFile, sectionName, enableKey, false),
+		DefaultContent:       getConfigItemStringValue(configFile, sectionName, contentKey, ""),
+		MultiLanguageContent: make(map[string]string),
+	}
+
+	for languageTag := range locales.AllLanguages {
+		multiLanguageContentKey := strings.ToLower(languageTag)
+		multiLanguageContentKey = strings.Replace(multiLanguageContentKey, "-", "_", -1)
+		multiLanguageContentKey = contentKey + "_" + multiLanguageContentKey
+		content := getConfigItemStringValue(configFile, sectionName, multiLanguageContentKey, "")
+
+		if content != "" {
+			config.MultiLanguageContent[languageTag] = content
+		}
+	}
+
+	return config
 }
 
 func getConfigItemIsSet(configFile *ini.File, sectionName string, itemName string) bool {

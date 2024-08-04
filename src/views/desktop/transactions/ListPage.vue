@@ -41,7 +41,7 @@
                                             </v-btn>
                                             <span>{{ $t('Transaction List') }}</span>
                                             <v-btn class="ml-3" color="default" variant="outlined"
-                                                   :disabled="loading || !canAddTransaction" @click="add">
+                                                   :disabled="loading || !canAddTransaction" @click="add(null)">
                                                 {{ $t('Add') }}
                                                 <v-menu activator="parent" :open-on-hover="true" v-if="allTransactionTemplates && allTransactionTemplates.length">
                                                     <v-list>

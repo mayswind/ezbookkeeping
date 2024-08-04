@@ -60,7 +60,7 @@
 
                     <tbody v-if="!loading && noAvailableTemplate">
                     <tr>
-                        <td>{{ $t('No available template') }}</td>
+                        <td>{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
                     </tr>
                     </tbody>
 

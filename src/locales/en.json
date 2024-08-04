@@ -1618,6 +1618,8 @@
     "Transaction Templates": "Transaction Templates",
     "Template Name": "Template Name",
     "No available template": "No available template",
+    "Once you add templates, you can long press the Add button on the home page to quickly add a new transaction": "Once you add templates, you can long press the Add button on the home page to quickly add a new transaction",
+    "No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page": "No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page",
     "Unable to retrieve template list": "Unable to retrieve template list",
     "Template list is up to date": "Template list is up to date",
     "Template list has been updated": "Template list has been updated",

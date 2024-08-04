@@ -1618,6 +1618,8 @@
     "Transaction Templates": "交易模板",
     "Template Name": "模板名称",
     "No available template": "没有可用的模板",
+    "Once you add templates, you can long press the Add button on the home page to quickly add a new transaction": "当添加模板后，您可以在主界面长按添加按钮快速添加新的交易",
+    "No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page": "没有可用的模板。当添加模板后，您可以通过交易列表添加按钮的下拉菜单快速添加新的交易",
     "Unable to retrieve template list": "无法获取模板列表",
     "Template list is up to date": "模板列表已是最新",
     "Template list has been updated": "模板列表已更新",

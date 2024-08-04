@@ -20,7 +20,8 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
-            <f7-list-item :title="$t('No available template')"></f7-list-item>
+            <f7-list-item :title="$t('No available template')"
+                          :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers sortable class="margin-top template-list"

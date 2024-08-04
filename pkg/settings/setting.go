@@ -166,6 +166,7 @@ type SMTPConfig struct {
 	FromAddress       string
 }
 
+// MinIOConfig represents the MinIO setting config
 type MinIOConfig struct {
 	Endpoint        string
 	Location        string

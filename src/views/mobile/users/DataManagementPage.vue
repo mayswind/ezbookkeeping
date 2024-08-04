@@ -3,17 +3,19 @@
         <f7-navbar :title="$t('Data Management')" :back-link="$t('Back')"></f7-navbar>
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+            <f7-list-item title="Transactions" after="Count"></f7-list-item>
             <f7-list-item title="Accounts" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
-            <f7-list-item title="Transactions" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Templates" after="Count"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
+            <f7-list-item :title="$t('Transactions')" :after="displayDataStatistics.totalTransactionCount"></f7-list-item>
             <f7-list-item :title="$t('Accounts')" :after="displayDataStatistics.totalAccountCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Categories')" :after="displayDataStatistics.totalTransactionCategoryCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" :after="displayDataStatistics.totalTransactionTagCount"></f7-list-item>
-            <f7-list-item :title="$t('Transactions')" :after="displayDataStatistics.totalTransactionCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Templates')" :after="displayDataStatistics.totalTransactionTemplateCount"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
@@ -103,10 +105,11 @@ export default {
             }
 
             return {
+                totalTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCount),
                 totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
                 totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
                 totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
-                totalTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCount)
+                totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount)
             };
         },
         isDataExportingEnabled() {

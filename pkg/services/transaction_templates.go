@@ -29,13 +29,13 @@ var (
 	}
 )
 
-// GetTotalTemplateCountByUid returns total template count of user
-func (s *TransactionTemplateService) GetTotalTemplateCountByUid(c *core.Context, uid int64) (int64, error) {
+// GetTotalNormalTemplateCountByUid returns total template count of user
+func (s *TransactionTemplateService) GetTotalNormalTemplateCountByUid(c *core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionTemplate{})
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND template_type=?", uid, false, models.TRANSACTION_TEMPLATE_TYPE_NORMAL).Count(&models.TransactionTemplate{})
 
 	return count, err
 }

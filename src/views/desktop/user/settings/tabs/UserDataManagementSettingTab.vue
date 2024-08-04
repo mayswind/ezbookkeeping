@@ -18,63 +18,49 @@
 
                 <v-card-text>
                     <v-row>
-                        <v-col cols="6" sm="3">
+                        <v-col cols="6" sm="3" v-for="item in [
+                            {
+                                title: 'Transactions',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-',
+                                icon: icons.transactions,
+                                color: 'info-darken-1'
+                            },
+                            {
+                                title: 'Accounts',
+                                count: displayDataStatistics ? displayDataStatistics.totalAccountCount : '-',
+                                icon: icons.accounts,
+                                color: 'primary'
+                            },
+                            {
+                                title: 'Transaction Categories',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-',
+                                icon: icons.categories,
+                                color: 'teal'
+                            },
+                            {
+                                title: 'Transaction Tags',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
+                                icon: icons.tags,
+                                color: 'secondary'
+                            },
+                            {
+                                title: 'Transaction Templates',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionTemplateCount : '-',
+                                icon: icons.templates,
+                                color: 'secondary-darken-1'
+                            }
+                        ]">
                             <div class="d-flex align-center">
                                 <div class="me-3">
-                                    <v-avatar rounded color="info" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.transactions"/>
+                                    <v-avatar rounded :color="item.color" size="42" class="elevation-1">
+                                        <v-icon size="24" :icon="item.icon"/>
                                     </v-avatar>
                                 </div>
 
                                 <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Transaction') }}</span>
+                                    <span class="text-caption">{{ $t(item.title) }}</span>
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-' }}</span>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="6" sm="3">
-                            <div class="d-flex align-center">
-                                <div class="me-3">
-                                    <v-avatar rounded color="primary" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.accounts"/>
-                                    </v-avatar>
-                                </div>
-
-                                <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Accounts') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalAccountCount : '-' }}</span>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="6" sm="3">
-                            <div class="d-flex align-center">
-                                <div class="me-3">
-                                    <v-avatar rounded color="success" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.categories"/>
-                                    </v-avatar>
-                                </div>
-
-                                <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Transaction Categories') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-' }}</span>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="6" sm="3">
-                            <div class="d-flex align-center">
-                                <div class="me-3">
-                                    <v-avatar rounded color="secondary" size="42" class="elevation-1">
-                                        <v-icon size="24" :icon="icons.tags"/>
-                                    </v-avatar>
-                                </div>
-
-                                <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ $t('Transaction Tags') }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-' }}</span>
+                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ item.count }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -174,6 +160,7 @@ import {
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
     mdiTagOutline,
+    mdiClipboardTextOutline,
     mdiAlert
 } from '@mdi/js';
 
@@ -191,6 +178,7 @@ export default {
                 accounts: mdiCreditCardOutline,
                 categories: mdiViewDashboardOutline,
                 tags: mdiTagOutline,
+                templates: mdiClipboardTextOutline,
                 alert: mdiAlert
             }
         }
@@ -205,10 +193,11 @@ export default {
             }
 
             return {
+                totalTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCount),
                 totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
                 totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
                 totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
-                totalTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCount)
+                totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount)
             };
         },
         isDataExportingEnabled() {

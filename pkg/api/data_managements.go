@@ -86,7 +86,7 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (any, *errs.
 		return nil, errs.ErrOperationFailed
 	}
 
-	totalTransactionTemplateCount, err := a.templates.GetTotalTemplateCountByUid(c, uid)
+	totalTransactionTemplateCount, err := a.templates.GetTotalNormalTemplateCountByUid(c, uid)
 
 	if err != nil {
 		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction template count for user \"uid:%d\", because %s", uid, err.Error())

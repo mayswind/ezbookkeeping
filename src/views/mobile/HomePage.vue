@@ -189,8 +189,8 @@
                     v-model:opened="showTransactionTemplatePopover">
             <f7-list dividers v-if="allTransactionTemplates">
                 <f7-list-item :title="template.name" :key="template.id"
-                              v-for="template in allTransactionTemplates"
-                              @click="addTransaction(template)">
+                              :link="'/transaction/add?templateId=' + template.id"
+                              v-for="template in allTransactionTemplates">
                     <template #media>
                         <f7-icon f7="doc_plaintext"></f7-icon>
                     </template>
@@ -319,11 +319,6 @@ export default {
                     self.$toast(error.message || error);
                 }
             });
-        },
-        addTransaction(template) {
-            if (template && template.id) {
-                this.f7router.navigate('/transaction/add?templateId=' + template.id);
-            }
         },
         openTransactionTemplatePopover() {
             if (this.allTransactionTemplates && this.allTransactionTemplates.length) {

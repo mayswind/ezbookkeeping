@@ -18,7 +18,7 @@
 
                 <v-card-text>
                     <v-row>
-                        <v-col cols="6" sm="3" v-for="item in [
+                        <v-col cols="6" sm="3" :key="idx" v-for="(item, idx) in [
                             {
                                 title: 'Transactions',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionCount : '-',

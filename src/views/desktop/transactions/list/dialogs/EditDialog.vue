@@ -598,6 +598,12 @@ export default {
             return !!this.inputEmptyProblemMessage;
         },
         inputEmptyProblemMessage() {
+            if (this.type === 'template') {
+                if (!this.transaction.name) {
+                    return 'Template name cannot be blank';
+                }
+            }
+
             return null;
         }
     },
@@ -761,6 +767,13 @@ export default {
         },
         save() {
             const self = this;
+
+            const problemMessage = self.inputEmptyProblemMessage;
+
+            if (problemMessage) {
+                self.$refs.snackbar.showMessage(problemMessage);
+                return;
+            }
 
             if (self.type === 'transaction' && (self.mode === 'add' || self.mode === 'edit')) {
                 const doSubmit = function () {

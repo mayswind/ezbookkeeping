@@ -1633,6 +1633,7 @@
     "You have saved this template": "You have saved this template",
     "Show Hidden Templates": "Show Hidden Transaction Templates",
     "Hide Hidden Templates": "Hide Hidden Transaction Templates",
+    "Template name cannot be blank": "Template name cannot be blank",
     "Are you sure you want to logout from this session?": "Are you sure you want to logout from this session?",
     "Unable to logout from this session": "Unable to logout from this session",
     "Are you sure you want to logout all other sessions?": "Are you sure you want to logout all other sessions?",

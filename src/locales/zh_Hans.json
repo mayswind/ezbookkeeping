@@ -1633,6 +1633,7 @@
     "You have saved this template": "您已经保存该模板",
     "Show Hidden Templates": "显示隐藏的模板",
     "Hide Hidden Templates": "不显示隐藏的模板",
+    "Template name cannot be blank": "模板名不能为空",
     "Are you sure you want to logout from this session?": "您确定要退出该会话？",
     "Unable to logout from this session": "无法退出该会话",
     "Are you sure you want to logout all other sessions?": "您确定要退出其他所有会话？",

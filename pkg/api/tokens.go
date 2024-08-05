@@ -205,7 +205,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 
 		refreshResp := &models.TokenRefreshResponse{
 			User:                user.ToUserBasicInfo(),
-			NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language),
+			NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 		}
 
 		return refreshResp, nil
@@ -234,7 +234,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 		NewToken:            token,
 		OldTokenId:          a.tokens.GenerateTokenId(oldTokenRecord),
 		User:                user.ToUserBasicInfo(),
-		NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language),
+		NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 	}
 
 	return refreshResp, nil

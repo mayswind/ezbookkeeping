@@ -104,7 +104,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (any, *errs.Error)
 
 	log.InfofWithRequestId(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logined, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(token, twoFactorEnable, user)
+	authResp := a.getAuthResponse(c, token, twoFactorEnable, user)
 	return authResp, nil
 }
 
@@ -167,7 +167,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (any, *er
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two-factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(token, false, user)
+	authResp := a.getAuthResponse(c, token, false, user)
 	return authResp, nil
 }
 
@@ -236,15 +236,15 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 
 	log.InfofWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two-factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(token, false, user)
+	authResp := a.getAuthResponse(c, token, false, user)
 	return authResp, nil
 }
 
-func (a *AuthorizationsApi) getAuthResponse(token string, need2FA bool, user *models.User) *models.AuthResponse {
+func (a *AuthorizationsApi) getAuthResponse(c *core.Context, token string, need2FA bool, user *models.User) *models.AuthResponse {
 	return &models.AuthResponse{
 		Token:               token,
 		Need2FA:             need2FA,
 		User:                user.ToUserBasicInfo(),
-		NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language),
+		NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
 	}
 }

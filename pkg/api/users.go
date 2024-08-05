@@ -93,7 +93,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (any, *errs.Error) {
 		AuthResponse: models.AuthResponse{
 			Need2FA:             false,
 			User:                user.ToUserBasicInfo(),
-			NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language),
+			NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
 		},
 		NeedVerifyEmail:       settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableUserForceVerifyEmail,
 		PresetCategoriesSaved: presetCategoriesSaved,
@@ -188,7 +188,7 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (any, *errs.Error) {
 
 		resp.NewToken = token
 		resp.User = user.ToUserBasicInfo()
-		resp.NotificationContent = settings.Container.GetAfterLoginNotificationContent(user.Language)
+		resp.NotificationContent = settings.Container.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
 
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)

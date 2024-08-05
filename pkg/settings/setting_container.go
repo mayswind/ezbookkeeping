@@ -18,7 +18,13 @@ func SetCurrentConfig(config *Config) {
 }
 
 // GetAfterLoginNotificationContent returns the notification content displayed each time users log in
-func (c *ConfigContainer) GetAfterLoginNotificationContent(language string) string {
+func (c *ConfigContainer) GetAfterLoginNotificationContent(userLanguage string, clientLanguage string) string {
+	language := userLanguage
+
+	if language == "" {
+		language = clientLanguage
+	}
+
 	if !c.Current.AfterLoginNotification.Enabled {
 		return ""
 	}
@@ -31,7 +37,13 @@ func (c *ConfigContainer) GetAfterLoginNotificationContent(language string) stri
 }
 
 // GetAfterOpenNotificationContent returns the notification content displayed each time users open the app
-func (c *ConfigContainer) GetAfterOpenNotificationContent(language string) string {
+func (c *ConfigContainer) GetAfterOpenNotificationContent(userLanguage string, clientLanguage string) string {
+	language := userLanguage
+
+	if language == "" {
+		language = clientLanguage
+	}
+
 	if !c.Current.AfterOpenNotification.Enabled {
 		return ""
 	}

@@ -9,6 +9,7 @@ import Framework7LoginScreen from 'framework7/components/login-screen';
 import Framework7Popover from 'framework7/components/popover';
 import Framework7Actions from 'framework7/components/actions';
 import Framework7Sheet from 'framework7/components/sheet';
+import Framework7Notification from 'framework7/components/notification';
 import Framework7Toast from 'framework7/components/toast';
 import Framework7Preloader from 'framework7/components/preloader';
 import Framework7Progressbar from 'framework7/components/progressbar';
@@ -42,6 +43,7 @@ import 'framework7/components/login-screen/css';
 import 'framework7/components/popover/css';
 import 'framework7/components/actions/css';
 import 'framework7/components/sheet/css';
+import 'framework7/components/notification/css';
 import 'framework7/components/toast/css';
 import 'framework7/components/preloader/css';
 import 'framework7/components/progressbar/css';
@@ -130,6 +132,7 @@ Framework7.use([
     Framework7Popover,
     Framework7Actions,
     Framework7Sheet,
+    Framework7Notification,
     Framework7Toast,
     Framework7Preloader,
     Framework7Progressbar,

@@ -3,6 +3,16 @@
     <v-app>
         <router-view />
     </v-app>
+    <v-snackbar color="notification-background" location="top"
+                :multi-line="true" :timeout="-1" :close-on-content-click="true" v-model="showNotification">
+        <div class="d-inline-flex">
+            <img alt="logo" class="notification-logo" :src="ezBookkeepingLogoPath" />
+            <span class="ml-2">{{ $t('global.app.title') }}</span>
+        </div>
+        <div>
+            {{ currentNotificationContent }}
+        </div>
+    </v-snackbar>
 </template>
 
 <script>
@@ -10,11 +20,13 @@ import { useTheme } from 'vuetify';
 import { register } from 'register-service-worker';
 
 import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import assetConstants from '@/consts/asset.js';
 import { isProduction } from '@/lib/version.js';
 import { loadMapAssets } from '@/lib/map/index.js';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
@@ -23,11 +35,23 @@ export default {
     data() {
         return {
             isProduction: isProduction(),
-            devCookiePath: isProduction() ? '' : '/dev/cookies'
+            devCookiePath: isProduction() ? '' : '/dev/cookies',
+            showNotification: false
         }
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ezBookkeepingLogoPath() {
+            return assetConstants.ezBookkeepingLogoPath;
+        },
+        currentNotificationContent() {
+            return this.rootStore.currentNotification;
+        }
+    },
+    watch: {
+        currentNotificationContent: function (newValue) {
+            this.showNotification = !!newValue;
+        }
     },
     created() {
         const self = this;
@@ -57,7 +81,7 @@ export default {
         setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
         if (self.$user.isUserLogined()) {
-            if (!self.settingsStore.appSettings.applicationLock) {
+            if (!self.settingsStore.appSettings.applicationLock || self.$user.isUserUnlocked()) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {
@@ -65,6 +89,10 @@ export default {
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                         setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
+
+                        if (response.notificationContent) {
+                            self.rootStore.setNotificationContent(response.notificationContent);
+                        }
                     }
                 });
 
@@ -91,3 +119,10 @@ export default {
     }
 }
 </script>
+
+<style>
+.notification-logo {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+</style>

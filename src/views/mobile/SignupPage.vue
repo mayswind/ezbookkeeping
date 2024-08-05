@@ -333,6 +333,10 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
+                if (response.notificationContent) {
+                    self.rootStore.setNotificationContent(response.notificationContent);
+                }
+
                 self.submitting = false;
                 self.$hideLoading();
 

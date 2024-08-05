@@ -188,6 +188,10 @@ export default {
 
                         setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
                     }
+
+                    if (response.notificationContent) {
+                        self.rootStore.setNotificationContent(response.notificationContent);
+                    }
                 });
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
@@ -232,6 +236,10 @@ export default {
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                         setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
+                    }
+
+                    if (response.notificationContent) {
+                        self.rootStore.setNotificationContent(response.notificationContent);
                     }
                 });
 

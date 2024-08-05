@@ -315,6 +315,10 @@ export default {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
                 }
 
+                if (authResponse.notificationContent) {
+                    self.rootStore.setNotificationContent(authResponse.notificationContent);
+                }
+
                 router.refreshPage();
             }).catch(error => {
                 self.logining = false;
@@ -376,6 +380,10 @@ export default {
 
                 if (self.settingsStore.appSettings.autoUpdateExchangeRatesData) {
                     self.exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
+                }
+
+                if (authResponse.notificationContent) {
+                    self.rootStore.setNotificationContent(authResponse.notificationContent);
                 }
 
                 self.show2faSheet = false;

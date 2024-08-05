@@ -17,12 +17,17 @@ import logger from '@/lib/logger.js';
 import { isObject, isString } from '@/lib/common.js';
 
 export const useRootStore = defineStore('root', {
+    state: () => ({
+        currentNotification: null
+    }),
     actions: {
         resetAllStates(resetUserInfoAndSettings) {
             if (resetUserInfoAndSettings) {
                 const exchangeRatesStore = useExchangeRatesStore();
                 exchangeRatesStore.resetLatestExchangeRates();
             }
+
+            this.setNotificationContent(null);
 
             const statisticsStore = useStatisticsStore();
             statisticsStore.resetTransactionStatistics();
@@ -511,6 +516,9 @@ export const useRootStore = defineStore('root', {
                     }
                 });
             });
+        },
+        setNotificationContent(content) {
+            this.currentNotification = content;
         }
     }
 });

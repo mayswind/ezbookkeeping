@@ -10,11 +10,13 @@ import { f7ready } from 'framework7-vue';
 import routes from './router/mobile.js';
 
 import { mapStores } from 'pinia';
+import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import assetConstants from '@/consts/asset.js';
 import { isProduction } from '@/lib/version.js';
 import { getTheme, isEnableAnimate } from '@/lib/settings.js';
 import { loadMapAssets } from '@/lib/map/index.js';
@@ -35,6 +37,7 @@ export default {
         return {
             isProduction: isProduction(),
             devCookiePath: isProduction() ? '' : '/dev/cookies',
+            notification: null,
             f7params: {
                 name: 'ezBookkeeping',
                 theme: 'ios',
@@ -94,7 +97,37 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        currentNotificationContent() {
+            return this.rootStore.currentNotification;
+        }
+    },
+    watch: {
+        currentNotificationContent: function (newValue) {
+            const self = this;
+
+            if (self.notification) {
+                self.notification.close();
+                self.notification.destroy();
+                self.notification = null;
+            }
+
+            if (newValue) {
+                f7ready((f7) => {
+                    self.notification = f7.notification.create({
+                        icon: `<img alt="logo" src="${assetConstants.ezBookkeepingLogoPath}" />`,
+                        title: self.$t('global.app.title'),
+                        text: newValue,
+                        closeOnClick: true,
+                        on: {
+                            close() {
+                                self.rootStore.setNotificationContent(null);
+                            }
+                        }
+                    }).open();
+                });
+            }
+        }
     },
     created() {
         const self = this;
@@ -105,7 +138,7 @@ export default {
         setExpenseAndIncomeAmountColor(self.userStore.currentUserExpenseAmountColor, self.userStore.currentUserIncomeAmountColor);
 
         if (self.$user.isUserLogined()) {
-            if (!self.settingsStore.appSettings.applicationLock) {
+            if (!self.settingsStore.appSettings.applicationLock || self.$user.isUserUnlocked()) {
                 // refresh token if user is logined
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {
@@ -113,6 +146,10 @@ export default {
                         self.settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
                         setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
+
+                        if (response.notificationContent) {
+                            self.rootStore.setNotificationContent(response.notificationContent);
+                        }
                     }
                 });
 

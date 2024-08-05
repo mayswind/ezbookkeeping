@@ -62,6 +62,7 @@ input[type=number] {
     --f7-color-gray-rgb: 142, 142, 147;
     --f7-color-gray-shade: #79797f;
     --f7-color-gray-tint: #a3a3a7;
+    --f7-notification-title-text-transform: unset;
 }
 
 .color-gray {

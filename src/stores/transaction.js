@@ -188,13 +188,29 @@ function calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, def
     let hasUnCalculatedTotalExpense = false;
     let hasUnCalculatedTotalIncome = false;
 
+    const allAccountIdsMap = {};
+    let totalAccountIdsCount = 0;
+
+    if (accountIds && accountIds !== '0') {
+        const allAccountIdsArray = accountIds.split(',');
+
+        for (let i = 0; i < allAccountIdsArray.length; i++) {
+            if (allAccountIdsArray[i]) {
+                allAccountIdsMap[allAccountIdsArray[i]] = true;
+                totalAccountIdsCount++;
+            }
+        }
+    }
+
     for (let i = 0; i < transactionMonthList.items.length; i++) {
         const transaction = transactionMonthList.items[i];
 
         let amount = transaction.sourceAmount;
         let account = transaction.sourceAccount;
 
-        if (accountIds && transaction.destinationAccount && (transaction.destinationAccount.id === accountIds || transaction.destinationAccount.parentId === accountIds)) {
+        if (totalAccountIdsCount > 0 && transaction.destinationAccount
+            && (!allAccountIdsMap[transaction.sourceAccount.id] && !allAccountIdsMap[transaction.sourceAccount.parentId])
+            && (allAccountIdsMap[transaction.destinationAccount.id] || allAccountIdsMap[transaction.destinationAccount.parentId])) {
             amount = transaction.destinationAmount;
             account = transaction.destinationAccount;
         }
@@ -223,17 +239,18 @@ function calculateMonthTotalAmount(exchangeRatesStore, transactionMonthList, def
             totalExpense += amount;
         } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
             totalIncome += amount;
-        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && accountIds && accountIds !== '0') {
-            if (accountIds === transaction.sourceAccountId) {
-                totalExpense += amount;
-            } else if (accountIds === transaction.destinationAccountId) {
-                totalIncome += amount;
-            } else if (transaction.sourceAccount && accountIds === transaction.sourceAccount.parentId &&
-                transaction.destinationAccount && accountIds === transaction.destinationAccount.parentId) {
+        } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer && totalAccountIdsCount > 0) {
+            if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
                 // Do Nothing
-            } else if (transaction.sourceAccount && accountIds === transaction.sourceAccount.parentId) {
+            } else if (transaction.sourceAccount && transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccount.parentId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
+                // Do Nothing
+            } else if (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId] && allAccountIdsMap[transaction.destinationAccountId]) {
+                // Do Nothing
+            } else if (transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
+                // Do Nothing
+            } else if (allAccountIdsMap[transaction.sourceAccountId] || (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId])) {
                 totalExpense += amount;
-            } else if (transaction.destinationAccount && accountIds === transaction.destinationAccount.parentId) {
+            } else if (allAccountIdsMap[transaction.destinationAccountId] || (transaction.destinationAccount && allAccountIdsMap[transaction.destinationAccount.parentId])) {
                 totalIncome += amount;
             }
         }

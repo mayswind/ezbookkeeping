@@ -33,7 +33,7 @@ func (c *XOrmContextAdapter) Err() error {
 // if no value is associated with key.
 func (c *XOrmContextAdapter) Value(key any) any {
 	if key == log.SessionIDKey && c.requestId != "" {
-		return fmt.Sprintf("r=%s", c.requestId)
+		return fmt.Sprintf("%s", c.requestId)
 	}
 
 	return nil

@@ -126,7 +126,9 @@ const (
 	defaultDatabaseMaxOpenConn     uint16 = 0
 	defaultDatabaseConnMaxLifetime uint32 = 14400
 
-	defaultLogMode string = "console"
+	defaultLogMode        string = "console"
+	defaultLogFileMaxSize uint32 = 104857600 // 100 MB
+	defaultLogFileMaxDays uint32 = 7         // days
 
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
@@ -225,8 +227,13 @@ type Config struct {
 	EnableConsoleLog bool
 	EnableFileLog    bool
 
-	LogLevel    Level
-	FileLogPath string
+	LogLevel           Level
+	FileLogPath        string
+	RequestFileLogPath string
+	QueryFileLogPath   string
+	LogFileRotate      bool
+	LogFileMaxSize     uint32
+	LogFileMaxDays     uint32
 
 	// Storage
 	StorageType         string
@@ -566,6 +573,28 @@ func loadLogConfiguration(config *Config, configFile *ini.File, sectionName stri
 		fileLogPath := getConfigItemStringValue(configFile, sectionName, "log_path")
 		finalFileLogPath, _ := getFinalPath(config.WorkingPath, fileLogPath)
 		config.FileLogPath = finalFileLogPath
+
+		requestFileLogPath := getConfigItemStringValue(configFile, sectionName, "request_log_path")
+
+		if requestFileLogPath != "" {
+			finalRequestFileLogPath, _ := getFinalPath(config.WorkingPath, requestFileLogPath)
+			config.RequestFileLogPath = finalRequestFileLogPath
+		} else {
+			config.RequestFileLogPath = ""
+		}
+
+		queryFileLogPath := getConfigItemStringValue(configFile, sectionName, "query_log_path")
+
+		if queryFileLogPath != "" {
+			finalQueryFileLogPath, _ := getFinalPath(config.WorkingPath, queryFileLogPath)
+			config.QueryFileLogPath = finalQueryFileLogPath
+		} else {
+			config.QueryFileLogPath = ""
+		}
+
+		config.LogFileRotate = getConfigItemBoolValue(configFile, sectionName, "log_file_rotate", false)
+		config.LogFileMaxSize = getConfigItemUint32Value(configFile, sectionName, "log_file_max_size", defaultLogFileMaxSize)
+		config.LogFileMaxDays = getConfigItemUint32Value(configFile, sectionName, "log_file_max_days", defaultLogFileMaxDays)
 	}
 
 	return nil

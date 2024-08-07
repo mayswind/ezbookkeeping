@@ -41,37 +41,67 @@ func init() {
 // SetLoggerConfiguration sets the logger according to the config
 func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) error {
 	var bootWriters []io.Writer
-	var writers []io.Writer
+	var defaultWriters []io.Writer
+	var requestWriters []io.Writer
+	var queryWriters []io.Writer
 
 	if !isDisableBootLog {
 		bootWriters = append(bootWriters, os.Stdout)
 	}
 
 	if config.EnableConsoleLog {
-		writers = append(writers, os.Stdout)
+		defaultWriters = append(defaultWriters, os.Stdout)
+		requestWriters = append(requestWriters, os.Stdout)
+		queryWriters = append(queryWriters, os.Stdout)
 	}
 
 	if config.EnableFileLog {
-		logFile, err := os.OpenFile(config.FileLogPath, os.O_CREATE|os.O_WRONLY, 0666)
+		defaultWriter, err := NewRotateFileWriter(config.FileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
 
 		if err != nil {
 			return err
 		}
 
 		if !isDisableBootLog {
-			bootWriters = append(bootWriters, logFile)
+			bootWriters = append(bootWriters, defaultWriter)
 		}
 
-		writers = append(writers, logFile)
+		defaultWriters = append(defaultWriters, defaultWriter)
+
+		if config.RequestFileLogPath != "" && config.RequestFileLogPath != config.FileLogPath {
+			requestWriter, err := NewRotateFileWriter(config.RequestFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
+
+			if err != nil {
+				return err
+			}
+
+			requestWriters = append(requestWriters, requestWriter)
+		} else {
+			requestWriters = append(requestWriters, defaultWriter)
+		}
+
+		if config.QueryFileLogPath != "" && config.QueryFileLogPath != config.FileLogPath {
+			queryWriter, err := NewRotateFileWriter(config.QueryFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
+
+			if err != nil {
+				return err
+			}
+
+			queryWriters = append(queryWriters, queryWriter)
+		} else {
+			queryWriters = append(queryWriters, defaultWriter)
+		}
 	}
 
 	bootMultipleWriter := io.MultiWriter(bootWriters...)
-	multipleWriter := io.MultiWriter(writers...)
+	defaultMultipleWriter := io.MultiWriter(defaultWriters...)
+	requestMultipleWriter := io.MultiWriter(requestWriters...)
+	queryMultipleWriter := io.MultiWriter(queryWriters...)
 
 	bootLogger.SetOutput(bootMultipleWriter)
-	defaultLogger.SetOutput(multipleWriter)
-	requestLogger.SetOutput(multipleWriter)
-	sqlQueryLogger.SetOutput(multipleWriter)
+	defaultLogger.SetOutput(defaultMultipleWriter)
+	requestLogger.SetOutput(requestMultipleWriter)
+	sqlQueryLogger.SetOutput(queryMultipleWriter)
 
 	if config.LogLevel == settings.LOGLEVEL_DEBUG {
 		bootLogger.SetLevel(logrus.DebugLevel)

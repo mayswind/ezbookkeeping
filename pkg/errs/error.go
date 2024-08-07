@@ -15,6 +15,7 @@ const (
 	SystemSubcategorySetting  = 1
 	SystemSubcategoryDatabase = 2
 	SystemSubcategoryMail     = 3
+	SystemSubcategoryLogging  = 4
 )
 
 // Sub categories of normal error
@@ -73,6 +74,15 @@ func NewSystemError(subCategory int32, index int32, httpStatusCode int, message 
 // NewNormalError returns a new normal error instance
 func NewNormalError(subCategory int32, index int32, httpStatusCode int, message string) *Error {
 	return New(CATEGORY_NORMAL, subCategory, index, httpStatusCode, message)
+}
+
+// NewLoggingError returns a new logging error instance
+func NewLoggingError(message string, err ...error) *Error {
+	return New(ErrLoggingError.Category,
+		ErrLoggingError.SubCategory,
+		ErrLoggingError.Index,
+		ErrLoggingError.HttpStatusCode,
+		message, err...)
 }
 
 // NewIncompleteOrIncorrectSubmissionError returns a new incomplete or incorrect submission error instance

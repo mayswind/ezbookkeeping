@@ -68,28 +68,32 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 
 		defaultWriters = append(defaultWriters, defaultWriter)
 
-		if config.RequestFileLogPath != "" && config.RequestFileLogPath != config.FileLogPath {
-			requestWriter, err := NewRotateFileWriter(config.RequestFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
+		if config.EnableRequestLog {
+			if config.RequestFileLogPath != "" && config.RequestFileLogPath != config.FileLogPath {
+				requestWriter, err := NewRotateFileWriter(config.RequestFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
+
+				requestWriters = append(requestWriters, requestWriter)
+			} else {
+				requestWriters = append(requestWriters, defaultWriter)
 			}
-
-			requestWriters = append(requestWriters, requestWriter)
-		} else {
-			requestWriters = append(requestWriters, defaultWriter)
 		}
 
-		if config.QueryFileLogPath != "" && config.QueryFileLogPath != config.FileLogPath {
-			queryWriter, err := NewRotateFileWriter(config.QueryFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
+		if config.EnableQueryLog {
+			if config.QueryFileLogPath != "" && config.QueryFileLogPath != config.FileLogPath {
+				queryWriter, err := NewRotateFileWriter(config.QueryFileLogPath, config.LogFileRotate, int64(config.LogFileMaxSize), config.LogFileMaxDays)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
+
+				queryWriters = append(queryWriters, queryWriter)
+			} else {
+				queryWriters = append(queryWriters, defaultWriter)
 			}
-
-			queryWriters = append(queryWriters, queryWriter)
-		} else {
-			queryWriters = append(queryWriters, defaultWriter)
 		}
 	}
 

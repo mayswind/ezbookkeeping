@@ -598,6 +598,36 @@ export default {
             return !!this.inputEmptyProblemMessage;
         },
         inputEmptyProblemMessage() {
+            if (this.transaction.type === this.allTransactionTypes.Expense) {
+                if (!this.transaction.expenseCategory || this.transaction.expenseCategory === '') {
+                    return 'Transaction category cannot be blank';
+                }
+
+                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
+                    return 'Transaction account cannot be blank';
+                }
+            } else if (this.transaction.type === this.allTransactionTypes.Income) {
+                if (!this.transaction.incomeCategory || this.transaction.incomeCategory === '') {
+                    return 'Transaction category cannot be blank';
+                }
+
+                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
+                    return 'Transaction account cannot be blank';
+                }
+            } else if (this.transaction.type === this.allTransactionTypes.Transfer) {
+                if (!this.transaction.transferCategory || this.transaction.transferCategory === '') {
+                    return 'Transaction category cannot be blank';
+                }
+
+                if (!this.transaction.sourceAccountId || this.transaction.sourceAccountId === '') {
+                    return 'Source account cannot be blank';
+                }
+
+                if (!this.transaction.destinationAccountId || this.transaction.destinationAccountId === '') {
+                    return 'Destination account cannot be blank';
+                }
+            }
+
             if (this.type === 'template') {
                 if (!this.transaction.name) {
                     return 'Template name cannot be blank';

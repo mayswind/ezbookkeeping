@@ -17,6 +17,25 @@ func SetCurrentConfig(config *Config) {
 	Container.Current = config
 }
 
+// GetAfterRegisterNotificationContent returns the notification content displayed each time users register
+func (c *ConfigContainer) GetAfterRegisterNotificationContent(userLanguage string, clientLanguage string) string {
+	language := userLanguage
+
+	if language == "" {
+		language = clientLanguage
+	}
+
+	if !c.Current.AfterRegisterNotification.Enabled {
+		return ""
+	}
+
+	if multiLanguageContent, exists := c.Current.AfterRegisterNotification.MultiLanguageContent[language]; exists {
+		return multiLanguageContent
+	}
+
+	return c.Current.AfterRegisterNotification.DefaultContent
+}
+
 // GetAfterLoginNotificationContent returns the notification content displayed each time users log in
 func (c *ConfigContainer) GetAfterLoginNotificationContent(userLanguage string, clientLanguage string) string {
 	language := userLanguage

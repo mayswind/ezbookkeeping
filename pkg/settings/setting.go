@@ -279,8 +279,9 @@ type Config struct {
 	EnableDataExport bool
 
 	// Notification
-	AfterLoginNotification NotificationConfig
-	AfterOpenNotification  NotificationConfig
+	AfterRegisterNotification NotificationConfig
+	AfterLoginNotification    NotificationConfig
+	AfterOpenNotification     NotificationConfig
 
 	// Map
 	MapProvider                           string
@@ -748,6 +749,7 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 }
 
 func loadNotificationConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.AfterRegisterNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_register", "after_register_notification_content")
 	config.AfterLoginNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_login", "after_login_notification_content")
 	config.AfterOpenNotification = getNotificationConfiguration(configFile, sectionName, "enable_notification_after_open", "after_open_notification_content")
 

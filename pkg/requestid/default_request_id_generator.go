@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash/crc32"
-	"math"
 	"net"
 	"sync/atomic"
 	"time"
@@ -19,15 +18,18 @@ import (
 
 // Length and mask of all information in request id
 const (
-	requestIdLength      = 36
-	secondsTodayBits     = 17
-	secondsTodayBitsMask = (1 << secondsTodayBits) - 1
-	randomNumberBits     = 15
-	randomNumberBitsMask = (1 << randomNumberBits) - 1
-	reqSeqNumberBits     = 31
-	reqSeqNumberBitsMask = (1 << reqSeqNumberBits) - 1
-	clientIpv6Bit        = 1
-	clientIpv6BitMask    = 1
+	requestIdLength               = 36
+	secondsTodayBits              = 17
+	secondsTodayBitsMask          = (1 << secondsTodayBits) - 1
+	clientPortNumberAllBits       = 16
+	clientPortNumberHigh1Bit      = 1
+	clientPortNumberLow15Bits     = clientPortNumberAllBits - clientPortNumberHigh1Bit
+	clientPortNumberHigh1BitMask  = 1 << clientPortNumberLow15Bits
+	clientPortNumberLow15BitsMask = clientPortNumberHigh1BitMask - 1
+	reqSeqNumberBits              = 30
+	reqSeqNumberBitsMask          = (1 << reqSeqNumberBits) - 1
+	clientIpv6Bit                 = 1
+	clientIpv6BitMask             = 1
 )
 
 // RequestIdInfo represents a struct which has all information in request id
@@ -35,10 +37,10 @@ type RequestIdInfo struct {
 	ServerUniqId        uint16
 	InstanceUniqId      uint16
 	SecondsElapsedToday uint32
-	RandomNumber        uint32
 	RequestSeqId        uint32
 	IsClientIpv6        bool
 	ClientIp            uint32
+	ClientPort          uint16
 }
 
 // DefaultRequestIdGenerator represents default request id generator
@@ -121,7 +123,7 @@ func (r *DefaultRequestIdGenerator) GetCurrentInstanceUniqId() uint16 {
 }
 
 // GenerateRequestId returns a new request id
-func (r *DefaultRequestIdGenerator) GenerateRequestId(clientIpAddr string) string {
+func (r *DefaultRequestIdGenerator) GenerateRequestId(clientIpAddr string, clientPort uint16) string {
 	ip := net.ParseIP(clientIpAddr)
 	isClientIpv6 := ip.To4() == nil
 	var clientIp uint32
@@ -132,38 +134,38 @@ func (r *DefaultRequestIdGenerator) GenerateRequestId(clientIpAddr string) strin
 		clientIp = binary.BigEndian.Uint32(ip.To4())
 	}
 
-	requestId := r.getRequestId(r.serverUniqId, r.instanceUniqId, isClientIpv6, clientIp)
+	requestId := r.getRequestId(r.serverUniqId, r.instanceUniqId, isClientIpv6, clientIp, clientPort)
 
 	return requestId
 }
 
-func (r *DefaultRequestIdGenerator) getRequestId(serverUniqId uint16, instanceUniqId uint16, clientIpV6 bool, clientIp uint32) string {
+func (r *DefaultRequestIdGenerator) getRequestId(serverUniqId uint16, instanceUniqId uint16, clientIpV6 bool, clientIp uint32, clientPort uint16) string {
 	clientIpv6Flag := uint32(0)
 
 	if clientIpV6 {
 		clientIpv6Flag = uint32(1)
 	}
 
-	// 128bits = serverUniqId(16bits) + instanceUniqId(16bits) + secondsElapsedToday(17bits) + randomNumber(15bits) + sequentialNumber(31bits) + clientIpv6Flag(1bit) + clientIp(32bits)
+	// 128bits = serverUniqId(16bits) + instanceUniqId(16bits) + secondsElapsedToday(17bits) + clientPortLow15Bits(15bits) + sequentialNumber(30bits) + clientPortHigh1Bit(1bit) + clientIpv6Flag(1bit) + clientIp(32bits)
 
 	secondsElapsedToday := r.getSecondsElapsedToday()
 	secondsLow17bits := uint32(secondsElapsedToday & secondsTodayBitsMask)
 
-	randomNumber, _ := utils.GetRandomInteger(math.MaxInt16)
-	randomNumberLow15bits := uint32(randomNumber & randomNumberBitsMask)
+	clientPortHigh1bit := uint32((clientPort & clientPortNumberHigh1BitMask) >> clientPortNumberLow15Bits)
+	clientPortLow15bits := uint32(clientPort & clientPortNumberLow15BitsMask)
 
-	secondsAndRandomNumber := (secondsLow17bits << randomNumberBits) | randomNumberLow15bits
+	secondsAndClientPortLowBits := (secondsLow17bits << clientPortNumberLow15Bits) | clientPortLow15bits
 
 	seqId := r.requestSeqId.Add(1)
-	seqIdLow31bits := seqId & reqSeqNumberBitsMask
+	seqIdLow30bits := seqId & reqSeqNumberBitsMask
 
-	seqIdAndClientIpv6Flag := (seqIdLow31bits << clientIpv6Bit) | (clientIpv6Flag & clientIpv6BitMask)
+	seqIdAndClientPortHighBitAndClientIpv6Flag := (seqIdLow30bits << (clientPortNumberHigh1Bit + clientIpv6Bit)) | (clientPortHigh1bit << clientPortNumberHigh1Bit) | (clientIpv6Flag & clientIpv6BitMask)
 
 	buf := &bytes.Buffer{}
 	_ = binary.Write(buf, binary.BigEndian, serverUniqId)
 	_ = binary.Write(buf, binary.BigEndian, instanceUniqId)
-	_ = binary.Write(buf, binary.BigEndian, secondsAndRandomNumber)
-	_ = binary.Write(buf, binary.BigEndian, seqIdAndClientIpv6Flag)
+	_ = binary.Write(buf, binary.BigEndian, secondsAndClientPortLowBits)
+	_ = binary.Write(buf, binary.BigEndian, seqIdAndClientPortHighBitAndClientIpv6Flag)
 	_ = binary.Write(buf, binary.BigEndian, clientIp)
 
 	return r.getUuidFromRequestId(buf)
@@ -198,22 +200,24 @@ func (r *DefaultRequestIdGenerator) parseRequestIdInfo(data []byte) *RequestIdIn
 
 	var serverUniqId uint16
 	var instanceUniqId uint16
-	var secondsAndRandomNumber uint32
-	var seqIdAndClientIpv6Flag uint32
+	var secondsAndClientPortLowBits uint32
+	var seqIdAndClientPortHighBitAndClientIpv6Flag uint32
 	var clientIp uint32
 
 	_ = binary.Read(buf, binary.BigEndian, &serverUniqId)
 	_ = binary.Read(buf, binary.BigEndian, &instanceUniqId)
-	_ = binary.Read(buf, binary.BigEndian, &secondsAndRandomNumber)
-	_ = binary.Read(buf, binary.BigEndian, &seqIdAndClientIpv6Flag)
+	_ = binary.Read(buf, binary.BigEndian, &secondsAndClientPortLowBits)
+	_ = binary.Read(buf, binary.BigEndian, &seqIdAndClientPortHighBitAndClientIpv6Flag)
 	_ = binary.Read(buf, binary.BigEndian, &clientIp)
 
-	secondsElapsedToday := (secondsAndRandomNumber >> randomNumberBits) & secondsTodayBitsMask
-	randomNumber := (secondsAndRandomNumber & randomNumberBitsMask)
+	secondsElapsedToday := (secondsAndClientPortLowBits >> clientPortNumberLow15Bits) & secondsTodayBitsMask
 
-	seqId := (seqIdAndClientIpv6Flag >> clientIpv6Bit) & reqSeqNumberBitsMask
-	isClientIpv6Flag := (seqIdAndClientIpv6Flag & clientIpv6BitMask)
+	seqId := (seqIdAndClientPortHighBitAndClientIpv6Flag >> (clientPortNumberHigh1Bit + clientIpv6Bit)) & reqSeqNumberBitsMask
+	clientPortHigh1Bit := ((seqIdAndClientPortHighBitAndClientIpv6Flag >> clientIpv6Bit) << clientPortNumberLow15Bits) & clientPortNumberHigh1BitMask
+	isClientIpv6Flag := seqIdAndClientPortHighBitAndClientIpv6Flag & clientIpv6BitMask
 	isClientIpv6 := false
+
+	clientPort := uint16(clientPortHigh1Bit | (secondsAndClientPortLowBits & clientPortNumberLow15BitsMask))
 
 	if isClientIpv6Flag == 1 {
 		isClientIpv6 = true
@@ -224,9 +228,9 @@ func (r *DefaultRequestIdGenerator) parseRequestIdInfo(data []byte) *RequestIdIn
 		InstanceUniqId:      instanceUniqId,
 		SecondsElapsedToday: secondsElapsedToday,
 		RequestSeqId:        seqId,
-		RandomNumber:        randomNumber,
 		IsClientIpv6:        isClientIpv6,
 		ClientIp:            clientIp,
+		ClientPort:          clientPort,
 	}
 }
 

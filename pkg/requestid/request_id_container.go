@@ -27,6 +27,6 @@ func InitializeRequestIdGenerator(config *settings.Config) error {
 }
 
 // GenerateRequestId returns a new request id by the current request id generator
-func (u *RequestIdContainer) GenerateRequestId(clientIpAddr string) string {
-	return u.Current.GenerateRequestId(clientIpAddr)
+func (u *RequestIdContainer) GenerateRequestId(clientIpAddr string, clientPort uint16) string {
+	return u.Current.GenerateRequestId(clientIpAddr, clientPort)
 }

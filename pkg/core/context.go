@@ -1,6 +1,7 @@
 package core
 
 import (
+	"net"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,9 @@ const responseErrorFieldKey = "RESPONSE_ERROR"
 // AcceptLanguageHeaderName represents the header name of accept language
 const AcceptLanguageHeaderName = "Accept-Language"
 
+// RemoteClientPortHeader represents the header name of remote client source port
+const RemoteClientPortHeader = "X-Real-Port"
+
 // ClientTimezoneOffsetHeaderName represents the header name of client timezone offset
 const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
 
@@ -23,6 +27,36 @@ const ClientTimezoneOffsetHeaderName = "X-Timezone-Offset"
 type Context struct {
 	*gin.Context
 	// DO NOT ADD ANY FIELD IN THIS CONTEXT, THIS CONTEXT IS JUST A WRAPPER
+}
+
+func (c *Context) ClientPort() uint16 {
+	remotePort := c.GetHeader(RemoteClientPortHeader)
+
+	if remotePort != "" {
+		remotePortNum, err := strconv.ParseInt(remotePort, 10, 32)
+
+		if err == nil {
+			return uint16(remotePortNum)
+		}
+	}
+
+	if c.Request == nil {
+		return 0
+	}
+
+	_, remotePort, err := net.SplitHostPort(c.Request.RemoteAddr)
+
+	if err != nil {
+		return 0
+	}
+
+	remotePortNum, err := strconv.ParseInt(remotePort, 10, 32)
+
+	if err != nil {
+		return 0
+	}
+
+	return uint16(remotePortNum)
 }
 
 // SetRequestId sets the given request id to context

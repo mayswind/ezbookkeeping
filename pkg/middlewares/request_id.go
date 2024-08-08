@@ -16,7 +16,7 @@ func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
 			return
 		}
 
-		requestId := requestid.Container.Current.GenerateRequestId(c.ClientIP())
+		requestId := requestid.Container.Current.GenerateRequestId(c.ClientIP(), c.ClientPort())
 		c.SetRequestId(requestId)
 
 		if config.EnableRequestIdHeader {

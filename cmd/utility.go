@@ -66,7 +66,7 @@ func parseRequestId(c *cli.Context) error {
 		return err
 	}
 
-	newRequestId := defaultGenerator.GenerateRequestId(net.IPv4zero.String())
+	newRequestId := defaultGenerator.GenerateRequestId(net.IPv4zero.String(), 0)
 	newRequestIdInfo, err := defaultGenerator.ParseRequestIdInfo(newRequestId)
 	printRequestIdInfo(requestId, requestIdInfo, newRequestIdInfo)
 
@@ -114,7 +114,6 @@ func printRequestIdInfo(requestId string, requestIdInfo *requestid.RequestIdInfo
 		fmt.Printf("[SecondsElapsedToday] %d\n", requestIdInfo.SecondsElapsedToday)
 	}
 
-	fmt.Printf("[RandomNumber] %d\n", requestIdInfo.RandomNumber)
 	fmt.Printf("[RequestSeqId] %d\n", requestIdInfo.RequestSeqId)
 	fmt.Printf("[IsClientIpv6] %t\n", requestIdInfo.IsClientIpv6)
 
@@ -125,4 +124,6 @@ func printRequestIdInfo(requestId string, requestIdInfo *requestid.RequestIdInfo
 		binary.BigEndian.PutUint32(ip, requestIdInfo.ClientIp)
 		fmt.Printf("[ClientIpv4] %s\n", ip.String())
 	}
+
+	fmt.Printf("[ClientPort] %d\n", requestIdInfo.ClientPort)
 }

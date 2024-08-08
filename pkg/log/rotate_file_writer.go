@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
@@ -26,6 +28,14 @@ type RotateFileWriter struct {
 
 	mutex                 sync.Mutex
 	lastRemoveOldFilesDay int
+}
+
+var logFallbackLogger = logrus.New()
+
+func init() {
+	logFallbackLogger.SetFormatter(&LogFormatter{})
+	logFallbackLogger.SetOutput(os.Stdout)
+	logFallbackLogger.SetLevel(logrus.InfoLevel)
 }
 
 // NewRotateFileWriter returns a new rotate file writer
@@ -59,7 +69,7 @@ func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
 			err := w.rotateFile()
 
 			if err != nil {
-				BootErrorf("[rotate_file_writer.Write] cannot rotate log file \"%s\", because %s", w.file.Name(), err.Error())
+				logFallbackLogger.Errorf("[rotate_file_writer.Write] cannot rotate log file \"%s\", because %s", w.file.Name(), err.Error())
 				return 0, err
 			}
 		}
@@ -112,7 +122,7 @@ func (w *RotateFileWriter) rotateFile() error {
 
 func (w *RotateFileWriter) openFile() error {
 	if w.file != nil {
-		BootWarnf("[rotate_file_writer.removeOldFiles] cannot reopen log file \"%s\"", w.file.Name())
+		logFallbackLogger.Warnf("[rotate_file_writer.removeOldFiles] cannot reopen log file \"%s\"", w.file.Name())
 		return nil
 	}
 
@@ -161,14 +171,14 @@ func (w *RotateFileWriter) removeOldFiles() {
 		}
 
 		if len(rotateDate) != len(logRotateSuffixDateFormat) {
-			BootErrorf("[rotate_file_writer.removeOldFiles] date suffix of old log file \"%s\" is invalid", file.Name())
+			logFallbackLogger.Errorf("[rotate_file_writer.removeOldFiles] date suffix of old log file \"%s\" is invalid", file.Name())
 			continue
 		}
 
 		rotateDateTime, err := time.ParseInLocation(logRotateSuffixDateFormat, rotateDate, time.Now().Location())
 
 		if err != nil {
-			BootErrorf("[rotate_file_writer.removeOldFiles] cannot parse rotate date of old log file \"%s\", because %s", file.Name(), err.Error())
+			logFallbackLogger.Errorf("[rotate_file_writer.removeOldFiles] cannot parse rotate date of old log file \"%s\", because %s", file.Name(), err.Error())
 			continue
 		}
 
@@ -179,7 +189,7 @@ func (w *RotateFileWriter) removeOldFiles() {
 		err = os.Remove(filepath.Join(dir, file.Name()))
 
 		if err != nil {
-			BootErrorf("[rotate_file_writer.removeOldFiles] cannot remove old log file \"%s\", because %s", file.Name(), err.Error())
+			logFallbackLogger.Errorf("[rotate_file_writer.removeOldFiles] cannot remove old log file \"%s\", because %s", file.Name(), err.Error())
 		}
 	}
 }

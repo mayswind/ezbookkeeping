@@ -146,7 +146,8 @@
                                                         </v-list-item>
                                                         <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }"
-                                                                     :append-icon="(query.categoryIds && queryAllFilterCategoryIdsCount > 1 ? icons.check : null)">
+                                                                     :append-icon="(query.categoryIds && queryAllFilterCategoryIdsCount > 1 ? icons.check : null)"
+                                                                     v-if="allAvailableCategoriesCount > 0">
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="showFilterCategoryDialog = true">
                                                                 <div class="d-flex align-center">
@@ -158,7 +159,7 @@
 
                                                         <template :key="categoryType"
                                                                   v-for="(categories, categoryType) in allPrimaryCategories">
-                                                            <v-list-item density="compact">
+                                                            <v-list-item density="compact" v-show="categories && categories.length">
                                                                 <v-list-item-title>
                                                                     <span class="text-sm">{{ getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type') }}</span>
                                                                 </v-list-item-title>
@@ -290,7 +291,8 @@
                                                         </v-list-item>
                                                         <v-list-item key="multiple" value="multiple" class="text-sm" density="compact"
                                                                      :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }"
-                                                                     :append-icon="(query.accountIds && queryAllFilterAccountIdsCount > 1 ? icons.check : null)">
+                                                                     :append-icon="(query.accountIds && queryAllFilterAccountIdsCount > 1 ? icons.check : null)"
+                                                                     v-if="allAvailableAccountsCount > 0">
                                                             <v-list-item-title class="cursor-pointer"
                                                                                @click="showFilterAccountDialog = true">
                                                                 <div class="d-flex align-center">
@@ -896,6 +898,9 @@ export default {
         allAccounts() {
             return this.accountsStore.allAccountsMap;
         },
+        allAvailableAccountsCount() {
+            return this.accountsStore.allAvailableAccountsCount;
+        },
         allCategories() {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
@@ -915,6 +920,25 @@ export default {
             }
 
             return primaryCategories;
+        },
+        allAvailableCategoriesCount() {
+            let totalCount = 0;
+
+            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
+                    continue;
+                }
+
+                if (this.transactionCategoriesStore.allTransactionCategories[categoryType]) {
+                    totalCount += this.transactionCategoriesStore.allTransactionCategories[categoryType].length;
+                }
+            }
+
+            return totalCount;
         },
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;

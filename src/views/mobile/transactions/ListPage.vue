@@ -300,7 +300,10 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.categoryIds"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }" :title="$t('Multiple Categories')" @click="filterMultipleCategories()">
+                <f7-list-item :class="{ 'list-item-selected': query.categoryIds && queryAllFilterCategoryIdsCount > 1 }"
+                              :title="$t('Multiple Categories')"
+                              @click="filterMultipleCategories()"
+                              v-if="allAvailableCategoriesCount > 0">
                     <template #media>
                         <f7-icon f7="rectangle_on_rectangle"></f7-icon>
                     </template>
@@ -313,6 +316,7 @@
                      class="no-margin-vertical"
                      :key="categoryType"
                      v-for="(categories, categoryType) in allPrimaryCategories"
+                     v-show="categories && categories.length"
             >
                 <f7-list-item divider :title="getTransactionTypeName(getTransactionTypeFromCategoryType(categoryType), 'Type')"></f7-list-item>
                 <f7-list-item accordion-item
@@ -371,7 +375,10 @@
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="!query.accountIds"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }" :title="$t('Multiple Accounts')" @click="filterMultipleAccounts()">
+                <f7-list-item :class="{ 'list-item-selected': query.accountIds && queryAllFilterAccountIdsCount > 1 }"
+                              :title="$t('Multiple Accounts')"
+                              @click="filterMultipleAccounts()"
+                              v-if="allAvailableAccountsCount > 0">
                     <template #media>
                         <f7-icon f7="rectangle_on_rectangle"></f7-icon>
                     </template>
@@ -657,6 +664,9 @@ export default {
         allAccounts() {
             return this.accountsStore.allAccountsMap;
         },
+        allAvailableAccountsCount() {
+            return this.accountsStore.allAvailableAccountsCount;
+        },
         allCategories() {
             return this.transactionCategoriesStore.allTransactionCategoriesMap;
         },
@@ -676,6 +686,25 @@ export default {
             }
 
             return primaryCategories;
+        },
+        allAvailableCategoriesCount() {
+            let totalCount = 0;
+
+            for (const categoryType in this.transactionCategoriesStore.allTransactionCategories) {
+                if (!Object.prototype.hasOwnProperty.call(this.transactionCategoriesStore.allTransactionCategories, categoryType)) {
+                    continue;
+                }
+
+                if (this.query.type && this.getTransactionTypeFromCategoryType(categoryType) !== this.query.type) {
+                    continue;
+                }
+
+                if (this.transactionCategoriesStore.allTransactionCategories[categoryType]) {
+                    totalCount += this.transactionCategoriesStore.allTransactionCategories[categoryType].length;
+                }
+            }
+
+            return totalCount;
         },
         allTransactionTags() {
             return this.transactionTagsStore.allTransactionTagsMap;

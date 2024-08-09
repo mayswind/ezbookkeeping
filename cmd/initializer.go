@@ -145,7 +145,9 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 
 	clonedConfig.DatabaseConfig.DatabasePassword = "****"
 	clonedConfig.SMTPConfig.SMTPPasswd = "****"
+	clonedConfig.MinIOConfig.SecretAccessKey = "****"
 	clonedConfig.SecretKey = "****"
+	clonedConfig.AmapApplicationSecret = "****"
 
 	return clonedConfig
 }

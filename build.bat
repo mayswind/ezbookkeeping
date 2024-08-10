@@ -228,6 +228,7 @@ goto :pre_parse_args
     rmdir package /s /q
     mkdir package
     mkdir package\data
+    mkdir package\storage
     mkdir package\log
     xcopy ezbookkeeping.exe package\
     xcopy dist package\public /e /i

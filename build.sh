@@ -202,6 +202,7 @@ build_package() {
     rm -rf package
     mkdir package
     mkdir package/data
+    mkdir package/storage
     mkdir package/log
     cp ezbookkeeping package/
     cp -R dist package/public

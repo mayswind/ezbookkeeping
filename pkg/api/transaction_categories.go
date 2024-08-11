@@ -123,7 +123,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
 
 	if settings.Container.Current.EnableDuplicateSubmissionsCheck && categoryCreateReq.ClientSessionId != "" {
-		found, remark := duplicatechecker.Container.Get(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId)
+		found, remark := duplicatechecker.Container.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId)
 
 		if found {
 			log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] another category \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
@@ -153,7 +153,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 
 	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] user \"uid:%d\" has created a new category \"id:%d\" successfully", uid, category.CategoryId)
 
-	duplicatechecker.Container.Set(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
+	duplicatechecker.Container.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
 	categoryResp := category.ToTransactionCategoryInfoResponse()
 
 	return categoryResp, nil

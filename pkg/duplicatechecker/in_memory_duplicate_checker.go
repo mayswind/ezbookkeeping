@@ -22,8 +22,8 @@ func NewInMemoryDuplicateChecker(config *settings.Config) (*InMemoryDuplicateChe
 	return checker, nil
 }
 
-// Get returns whether the same submission has been processed and related remark
-func (c *InMemoryDuplicateChecker) Get(checkerType DuplicateCheckerType, uid int64, identification string) (bool, string) {
+// GetSubmissionRemark returns whether the same submission has been processed and related remark
+func (c *InMemoryDuplicateChecker) GetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) (bool, string) {
 	existedRemark, found := c.cache.Get(c.getCacheKey(checkerType, uid, identification))
 
 	if found {
@@ -33,8 +33,8 @@ func (c *InMemoryDuplicateChecker) Get(checkerType DuplicateCheckerType, uid int
 	return false, ""
 }
 
-// Set saves the identification and remark to in-memory cache
-func (c *InMemoryDuplicateChecker) Set(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
+// SetSubmissionRemark saves the identification and remark to in-memory cache
+func (c *InMemoryDuplicateChecker) SetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
 	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, cache.DefaultExpiration)
 }
 

@@ -212,7 +212,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
 	if settings.Container.Current.EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
-		found, remark := duplicatechecker.Container.Get(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
+		found, remark := duplicatechecker.Container.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
 
 		if found {
 			log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] another account \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
@@ -256,7 +256,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 
 	log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] user \"uid:%d\" has created a new account \"id:%d\" successfully", uid, mainAccount.AccountId)
 
-	duplicatechecker.Container.Set(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
+	duplicatechecker.Container.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
 	accountInfoResp := mainAccount.ToAccountInfoResponse()
 
 	if len(childrenAccounts) > 0 {

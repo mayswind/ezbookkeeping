@@ -27,12 +27,12 @@ func InitializeDuplicateChecker(config *settings.Config) error {
 	return errs.ErrInvalidDuplicateCheckerType
 }
 
-// Get returns whether the same submission has been processed and related remark by the current duplicate checker
-func (c *DuplicateCheckerContainer) Get(checkerType DuplicateCheckerType, uid int64, identification string) (bool, string) {
-	return c.Current.Get(checkerType, uid, identification)
+// GetSubmissionRemark returns whether the same submission has been processed and related remark by the current duplicate checker
+func (c *DuplicateCheckerContainer) GetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) (bool, string) {
+	return c.Current.GetSubmissionRemark(checkerType, uid, identification)
 }
 
-// Set saves the identification and remark to in-memory cache by the current duplicate checker
-func (c *DuplicateCheckerContainer) Set(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
-	c.Current.Set(checkerType, uid, identification, remark)
+// SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
+func (c *DuplicateCheckerContainer) SetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
+	c.Current.SetSubmissionRemark(checkerType, uid, identification, remark)
 }

@@ -262,7 +262,7 @@ export default {
             return this.userStore.currentUserNickname || this.$t('User');
         },
         currentUserAvatar() {
-            return this.userStore.currentUserAvatar;
+            return this.userStore.getUserAvatarUrl(this.userStore.currentUserBasicInfo, true);
         },
         theme: {
             get: function () {

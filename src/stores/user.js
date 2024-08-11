@@ -127,6 +127,8 @@ export const useUserStore = defineStore('user', {
             });
         },
         updateUserAvatar({ avatarFile }) {
+            const self = this;
+
             return new Promise((resolve, reject) => {
                 services.updateAvatar({ avatarFile }).then(response => {
                     const data = response.data;
@@ -135,6 +137,8 @@ export const useUserStore = defineStore('user', {
                         reject({ message: 'Unable to update user avatar' });
                         return;
                     }
+
+                    self.storeUserBasicInfo(data.result);
 
                     resolve(data.result);
                 }).catch(error => {
@@ -151,6 +155,8 @@ export const useUserStore = defineStore('user', {
             });
         },
         removeUserAvatar() {
+            const self = this;
+
             return new Promise((resolve, reject) => {
                 services.removeAvatar().then(response => {
                     const data = response.data;
@@ -159,6 +165,8 @@ export const useUserStore = defineStore('user', {
                         reject({ message: 'Unable to remove user avatar' });
                         return;
                     }
+
+                    self.storeUserBasicInfo(data.result);
 
                     resolve(data.result);
                 }).catch(error => {

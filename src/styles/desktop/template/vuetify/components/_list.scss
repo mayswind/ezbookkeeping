@@ -1,0 +1,25 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 VList
+
+.v-list {
+    // .v-icon {
+    //   font-size: 1.375rem;font-sizefont-size
+    // }
+
+    .v-list-item {
+        &.v-list-item--active:not(.v-list-group__header) {
+            .v-list-item__content,
+            .v-list-item__prepend {
+                * {
+                    color: rgb(var(--v-theme-primary));
+                }
+            }
+
+            .v-list-item__overlay {
+                background: rgb(var(--v-theme-primary));
+            }
+        }
+    }
+}

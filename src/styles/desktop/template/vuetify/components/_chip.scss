@@ -1,0 +1,102 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 Chip
+.v-chip {
+    line-height: 1.25rem !important;
+
+    &:not(.v-chip--variant-elevated) {
+        color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+    }
+
+    .v-chip__close {
+        margin-inline: 4px -8px !important;
+
+        .v-icon {
+            opacity: 0.7;
+        }
+    }
+
+    &:not([class*="text-"]) {
+        --v-activated-opacity: 0.08;
+    }
+
+    &.v-chip--size-small {
+        --v-chip-height: 24px !important;
+
+        font-size: 13px !important;
+        padding-block: 0 !important;
+        padding-inline: 12px !important;
+
+        .v-chip__prepend {
+            .v-icon--start {
+                font-size: 1rem;
+                margin-inline: -8px 4px;
+            }
+
+            .v-avatar {
+                --v-avatar-height: 16px;
+            }
+
+            .v-avatar--start {
+                margin-inline: -8px 4px;
+            }
+        }
+
+        .v-chip__append {
+            .v-icon--end {
+                font-size: 1rem;
+                margin-inline: 4px -8px;
+            }
+
+            .v-avatar {
+                --v-avatar-height: 16px;
+            }
+
+            .v-avatar--end {
+                margin-inline: 4px -8px;
+            }
+        }
+
+        .v-chip__close {
+            font-size: 16px;
+            max-block-size: 16px;
+            max-inline-size: 16px;
+        }
+    }
+
+    &.v-chip--size-default {
+        padding-block: 0 !important;
+        padding-inline: 16px !important;
+
+        .v-chip__prepend {
+            .v-icon--start {
+                font-size: 1.25rem;
+                margin-inline: -8px 4px;
+            }
+
+            .v-avatar {
+                --v-avatar-height: 20px;
+            }
+
+            .v-avatar--start {
+                margin-inline: -8px 4px;
+            }
+        }
+
+        .v-chip__append {
+            .v-icon--end {
+                font-size: 1.25rem;
+                margin-inline: 4px -8px;
+            }
+
+            .v-avatar {
+                --v-avatar-height: 20px;
+            }
+
+            .v-avatar--end {
+                margin-inline: 4px -8px;
+            }
+        }
+    }
+}

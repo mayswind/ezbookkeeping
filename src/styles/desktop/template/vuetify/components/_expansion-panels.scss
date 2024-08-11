@@ -1,0 +1,50 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/mixins";
+
+// 👉 Expansion Panel
+.v-expansion-panels {
+    .v-expansion-panel {
+        .v-expansion-panel-title {
+            font-weight: 500;
+
+            &--active {
+                .v-expansion-panel-title__overlay,
+                &:hover .v-expansion-panel-title__overlay {
+                    opacity: 0 !important;
+                }
+            }
+
+            .v-expansion-panel-title__icon {
+                .v-icon {
+                    block-size: 1.25rem;
+                    font-size: 1.25rem;
+                    inline-size: 1.25rem;
+                }
+            }
+
+            &:hover {
+                .v-expansion-panel-title__overlay {
+                    opacity: 0 !important;
+                }
+            }
+        }
+
+        .v-expansion-panel-text {
+            color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+            font-size: 15px;
+            line-height: 1.375rem;
+        }
+    }
+
+    &:not(.v-expansion-panels--variant-accordion) {
+        .v-expansion-panel {
+            &.v-expansion-panel--active {
+                .v-expansion-panel__shadow {
+                    @include mixins.elevation(6);
+                }
+            }
+        }
+    }
+}

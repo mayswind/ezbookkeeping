@@ -1,0 +1,15 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 Dialog
+
+body {
+    .v-dialog {
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
+
+        .v-dialog-close-btn {
+            color: rgb(var(--v-theme-secondary)) !important;
+        }
+    }
+}

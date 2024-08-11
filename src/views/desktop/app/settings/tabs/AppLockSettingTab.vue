@@ -15,7 +15,7 @@
                     <v-switch :disabled="true"
                               :label="$t('Unlock with PIN Code')"
                               v-model="isEnableApplicationLock"/>
-                    <v-switch class="mt-2" :label="$t('Unlock with WebAuthn')"
+                    <v-switch :label="$t('Unlock with WebAuthn')"
                               :loading="enablingWebAuthn"
                               v-model="isEnableApplicationLockWebAuthn"/>
                 </v-card-text>

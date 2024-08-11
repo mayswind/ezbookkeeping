@@ -10,6 +10,11 @@ $ps-track-size: 0.5rem;
     inset-inline-end: 0.0625rem;
 }
 
+.ps__thumb-y,
+.ps__thumb-x {
+    background-color: rgb(var(--v-theme-perfect-scrollbar-thumb)) !important;
+}
+
 .ps__thumb-x {
     block-size: $ps-size !important;
 }
@@ -30,9 +35,4 @@ $ps-track-size: 0.5rem;
 .ps__rail-y:focus > .ps__thumb-y,
 .ps__rail-y:hover > .ps__thumb-y {
     inline-size: $ps-hover-size !important;
-}
-
-.ps__thumb-x,
-.ps__thumb-y {
-    background-color: rgb(var(--v-theme-perfect-scrollbar-thumb)) !important;
 }

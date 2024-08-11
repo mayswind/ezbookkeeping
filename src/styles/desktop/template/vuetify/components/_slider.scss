@@ -1,0 +1,31 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 Slider
+
+.v-slider {
+    .v-slider-track__background--opacity {
+        opacity: 0.16;
+    }
+}
+
+.v-slider-thumb {
+    .v-slider-thumb__surface::after {
+        border-radius: 50%;
+        background-color: #fff;
+        block-size: calc(var(--v-slider-thumb-size) - 10px);
+        inline-size: calc(var(--v-slider-thumb-size) - 10px);
+    }
+
+    .v-slider-thumb__label {
+        background-color: rgb(var(--v-tooltip-background));
+        color: rgb(var(--v-theme-surface));
+        font-weight: 500;
+        letter-spacing: 0.15px;
+        line-height: 1.25rem;
+
+        &::before {
+            content: none;
+        }
+    }
+}

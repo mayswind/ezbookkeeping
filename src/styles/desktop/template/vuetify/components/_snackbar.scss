@@ -1,0 +1,13 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 snackbar
+
+.v-snackbar {
+    .v-snackbar__actions {
+        .v-btn {
+            padding-block: 0;
+            padding-inline: 10px;
+        }
+    }
+}

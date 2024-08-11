@@ -1,0 +1,31 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/mixins";
+
+// 👉 Avatar
+body {
+    .v-avatar {
+        font-size: 0.9375rem;
+
+        .v-icon {
+            block-size: 1.5rem;
+            font-size: 1.5rem;
+            inline-size: 1.5rem;
+        }
+
+        &.v-avatar--variant-tonal:not([class*="text-"]) {
+            .v-avatar__underlay {
+                --v-activated-opacity: 0.08;
+            }
+        }
+    }
+
+    .v-avatar-group {
+        > * {
+            &:hover {
+                @include mixins.elevation(6);
+            }
+        }
+    }
+}

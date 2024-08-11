@@ -1,0 +1,61 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/configured-variables/template" as variables;
+@use "sass:map";
+@use "@/styles/desktop/template/vuetify/variables" as vuetify;
+@use "@/styles/desktop/template/base/mixins";
+@use "@/styles/desktop/template/base/utils";
+
+// 👉 VField
+// Override Vuetify's default outline color for text fields to match the theme
+// ℹ️ We cannot override directly border color because it does not work with dirty or focus state
+.v-field__outline {
+    color: rgba(var(--v-theme-on-surface));
+
+    &:not([class*="text-"]) .v-label {
+        color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+    }
+}
+
+// override input height on comfortable and compact density
+.v-text-field,
+.v-autocomplete,
+.v-combobox,
+.v-file-input,
+.v-select {
+    &.v-input.v-input--density-default:not(.v-textarea) .v-field__input {
+        min-block-size: 56px;
+    }
+
+    &.v-input.v-input--density-comfortable:not(.v-textarea) .v-field__input {
+        min-block-size: 48px;
+    }
+
+    &.v-input.v-input--density-compact:not(.v-textarea) .v-field__input {
+        min-block-size: 40px;
+    }
+}
+
+.v-field.v-field--focused .v-field__outline,
+.v-input.v-input--error .v-field__outline {
+    --v-field-border-opacity: 1 !important;
+}
+
+// hover state outline color
+@media (hover: hover) {
+    .v-field:not(.v-field--focused, .v-field--error):hover .v-field__outline {
+        --v-field-border-opacity: 0.6 !important;
+    }
+}
+
+.v-field__prepend-inner,
+.v-field__append-inner,
+.v-field__clearable,
+.v-input__prepend,
+.v-input__append {
+    > .v-icon {
+        font-size: 20px;
+        opacity: var(--v-high-emphasis-opacity) !important;
+    }
+}

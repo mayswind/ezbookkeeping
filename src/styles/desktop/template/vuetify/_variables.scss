@@ -81,12 +81,12 @@ $font-family-custom: "Inter", sans-serif, -apple-system, blinkmacsystemfont, "Se
             "line-height": 0.875rem,
             "letter-spacing": 0.05rem,
         ),
-        'button': (
-            'size': 0.9375rem,
-            'weight': 500,
-            'letter-spacing': normal,
-            'font-family': $font-family-custom,
-            'text-transform': capitalize,
+        "button": (
+            "size": 0.9375rem,
+            "weight": 500,
+            "letter-spacing": normal,
+            "font-family": $font-family-custom,
+            "text-transform": capitalize,
         ),
     )!default,
 
@@ -272,6 +272,15 @@ $font-family-custom: "Inter", sans-serif, -apple-system, blinkmacsystemfont, "Se
     // 👉 Slider
     $slider-thumb-hover-opacity: var(--v-activated-opacity) !default,
 
+    // 👉 Switch
+    $switch-inset-track-width: 1.875rem !default,
+    $switch-inset-track-height: 1.125rem !default,
+    $switch-inset-thumb-height: 0.875rem !default,
+    $switch-inset-thumb-width: 0.875rem !default,
+    $switch-inset-thumb-off-height: 0.875rem !default,
+    $switch-track-opacity: 1 !default,
+    $switch-track-background: rgba(var(--v-theme-on-surface), var(--v-focus-opacity)) !default,
+
     // 👉 Tooltip
     $tooltip-background-color: rgb(var(--v-tooltip-background)) !default,
     $tooltip-text-color: rgb(var(--v-theme-surface)) !default,
@@ -305,7 +314,10 @@ $font-family-custom: "Inter", sans-serif, -apple-system, blinkmacsystemfont, "Se
     $table-font-size: 15px !default,
     $table-column-padding: 0 20px !default,
 
-    // navigation drawer
+    // 👉 Radio
+    $radio-group-label-selection-group-padding-inline: 0 !default,
+
+    // 👉 navigation drawer
     $navigation-drawer-temporary-elevation: 8 !default,
     $navigation-drawer-transition-duration: 0.4s !default,
 

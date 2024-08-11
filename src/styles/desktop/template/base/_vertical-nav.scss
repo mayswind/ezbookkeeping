@@ -87,8 +87,8 @@
             }
         }
 
+        // ℹ️ Setting z-index 1 will make perfect scrollbar thumb appear on top of vertical nav items shadow;
         .ps__rail-y {
-            // ℹ️ Setting z-index: 1 will make perfect scrollbar thumb appear on top of vertical nav items shadow
             z-index: 1;
         }
 
@@ -131,6 +131,10 @@
                 opacity: var(--v-disabled-opacity);
                 pointer-events: none;
             }
+
+            a {
+                outline: none;
+            }
         }
 
         // 👉 Vertical nav link
@@ -147,7 +151,7 @@
 
                 // Adds vuetify states
 
-                &:not(.router-link-active, .router-link-exact-active){
+                &:not(.router-link-active, .router-link-exact-active) {
                     @include vuetifyStates.states($active: false);
                 }
             }

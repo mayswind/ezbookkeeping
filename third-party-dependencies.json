@@ -39,7 +39,7 @@
         "name": "cli",
         "copyright": "Copyright (c) 2022 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v2.27.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v2.27.3/LICENSE"
     },
     {
         "name": "INI",
@@ -85,7 +85,7 @@
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.25.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.26.0:LICENSE"
     },
     {
         "name": "Gomail",
@@ -124,21 +124,21 @@
     },
     {
         "name": "vuejs/core",
-        "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You",
+        "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.31/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.4.37/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.1.7/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/pinia%402.2.1/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v4.4.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v4.4.3/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -150,7 +150,7 @@
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-2023 John Jeremy Leider",
         "url": "https://vuetifyjs.com",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.6.11/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.6.13/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -216,13 +216,13 @@
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",
-        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v8.8.1/LICENSE"
+        "licenseUrl": "https://github.com/Vuepic/vue-datepicker/blob/v9.0.1/LICENSE"
     },
     {
         "name": "axios",
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.2/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.7.3/LICENSE"
     },
     {
         "name": "Moment.js",
@@ -282,7 +282,7 @@
         "name": "Materio - Vuetify VueJS 3 Free Admin Template",
         "copyright": "Copyright (c) 2022 ThemeSelection",
         "url": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free",
-        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.2.1/LICENSE"
+        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.2.2/LICENSE"
     },
     {
         "name": "Icons8 Line Awesome",

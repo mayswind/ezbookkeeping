@@ -3,12 +3,12 @@
 
 @use "sass:map";
 
-// 👉 Shadow opacities
+/* 👉 Shadow opacities */
 $shadow-key-umbra-opacity-custom: var(--v-shadow-key-umbra-opacity);
 $shadow-key-penumbra-opacity-custom: var(--v-shadow-key-penumbra-opacity);
 $shadow-key-ambient-opacity-custom: var(--v-shadow-key-ambient-opacity);
 
-// 👉 Card transition properties
+/* 👉 Card transition properties */
 $card-transition-property-custom: box-shadow, opacity;
 
 @forward "vuetify/settings" with (
@@ -38,6 +38,9 @@ $card-transition-property-custom: box-shadow, opacity;
     $list-item-icon-margin-end: 16px !default,
     $list-item-icon-margin-start: 16px !default,
     $list-item-subtitle-opacity: 1 !default,
+
+    // 👉 Navigation Drawer
+    $navigation-drawer-content-overflow-y: hidden !default,
 
     // 👉 Tooltip
     $tooltip-background-color: rgba(59, 55, 68, 0.9) !default,

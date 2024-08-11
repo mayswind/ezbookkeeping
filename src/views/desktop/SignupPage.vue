@@ -137,11 +137,11 @@
 
                             <v-window-item value="presetCategories" class="signup-preset-categories">
                                 <h4 class="text-h4 mb-1">{{ $t('Preset Categories') }}</h4>
-                                <p class="text-sm mt-2 mb-5">{{ $t('Set whether to use preset transaction categories') }}</p>
+                                <p class="text-sm mt-2 mb-2">{{ $t('Set whether to use preset transaction categories') }}</p>
 
                                 <v-row>
                                     <v-col cols="12" sm="6">
-                                        <v-switch :disabled="submitting || navigateToHomePage"
+                                        <v-switch class="mb-2" :disabled="submitting || navigateToHomePage"
                                                   :label="$t('Use Preset Transaction Categories')"
                                                   v-model="usePresetCategories"/>
                                     </v-col>

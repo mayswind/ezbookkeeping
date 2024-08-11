@@ -1,0 +1,60 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/configured-variables/template" as variables;
+@use "@/styles/desktop/template/base/mixins";
+
+// 👉 Switch
+
+.v-switch {
+    .v-label {
+        color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+        line-height: 22px;
+    }
+}
+
+.v-switch.v-switch--inset {
+    .v-selection-control .v-selection-control__wrapper {
+        block-size: 36px;
+    }
+
+    .v-ripple__container {
+        opacity: 0;
+    }
+
+    .v-switch__track {
+        background-color: rgba(var(--v-theme-on-surface), var(--v-focus-opacity));
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 16%) inset;
+        opacity: 1;
+    }
+
+    .v-selection-control__input {
+        transform: translateX(-5px) !important;
+
+        --v-selection-control-size: 1.125rem;
+
+        .v-switch__thumb {
+            background-color: #fff;
+            block-size: 0.875rem;
+            box-shadow: none;
+            filter: drop-shadow(0 2px 4px rgba(var(--v-shadow-key-umbra-color), 16%));
+            inline-size: 0.875rem;
+            transform: scale(1);
+        }
+    }
+
+    .v-selection-control--dirty {
+        @each $color-name in variables.$theme-colors-name {
+            .text-#{$color-name} {
+                .v-switch__track {
+                    border-color: rgb(var(--v-theme-#{$color-name}));
+                    background-color: rgb(var(--v-theme-#{$color-name}));
+                }
+            }
+        }
+
+        .v-selection-control__input {
+            transform: translateX(5px) !important;
+        }
+    }
+}

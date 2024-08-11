@@ -29,7 +29,9 @@
                 .layout-navbar {
                     @if variables.$layout-vertical-nav-navbar-is-contained {
                         @include mixins.boxed-content;
-                    } @else {
+                    }
+                    // else
+                    @else {
                         .navbar-content-container {
                             @include mixins.boxed-content;
                         }
@@ -62,7 +64,7 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.25s ease-in-out;
-        will-change: transform;
+        will-change: opacity;
 
         &.visible {
             opacity: 1;
@@ -76,7 +78,9 @@
 
     // Adjust right column pl when vertical nav is collapsed
     &.layout-vertical-nav-collapsed .layout-content-wrapper {
-        padding-inline-start: variables.$layout-vertical-nav-collapsed-width;
+        @media screen and (min-width: 1280px) {
+            padding-inline-start: variables.$layout-vertical-nav-collapsed-width;
+        }
     }
 
     // 👉 Content height fixed

@@ -47,8 +47,7 @@
     $vertical-nav-items-nested-icon-margin-inline: calc((variables.$vertical-nav-items-icon-size - variables.$vertical-nav-items-nested-icon-size) / 2);
 
     font-size: variables.$vertical-nav-items-nested-icon-size;
-    margin-inline-end: $vertical-nav-items-nested-icon-margin-inline + variables.$vertical-nav-items-icon-margin-inline-end;
-    margin-inline-start: $vertical-nav-items-nested-icon-margin-inline;
+    margin-inline: $vertical-nav-items-nested-icon-margin-inline $vertical-nav-items-nested-icon-margin-inline + variables.$vertical-nav-items-icon-margin-inline-end;
 }
 
 %vertical-nav-items-icon-after-2nd-level {
@@ -61,8 +60,8 @@
 }
 
 // Section title
+// ℹ️ Setting height will prevent jerking when text & icon is toggled
 %vertical-nav-section-title {
-    // ℹ️ Setting height will prevent jerking when text & icon is toggled
     block-size: 1.5rem;
     color: rgba(var(--v-theme-on-surface), var(--v-disabled-opacity));
     font-size: 0.75rem;

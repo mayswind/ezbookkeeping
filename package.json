@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
-    "@vuepic/vue-datepicker": "^8.8.1",
-    "axios": "^1.7.2",
+    "@vuepic/vue-datepicker": "^9.0.1",
+    "axios": "^1.7.3",
     "cbor-js": "^0.1.0",
     "clipboard": "^2.0.11",
     "crypto-js": "^4.2.0",
@@ -34,18 +34,18 @@
     "line-awesome": "^1.3.0",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
-    "pinia": "^2.1.7",
+    "pinia": "^2.2.1",
     "register-service-worker": "^1.7.2",
     "skeleton-elements": "^4.0.1",
     "swiper": "^10.2.0",
     "ua-parser-js": "^1.0.38",
-    "vue": "^3.4.31",
+    "vue": "^3.4.37",
     "vue-echarts": "^6.7.3",
     "vue-i18n": "^9.13.1",
-    "vue-router": "^4.4.0",
+    "vue-router": "^4.4.3",
     "vue3-perfect-scrollbar": "^2.0.0",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.6.11"
+    "vuetify": "^3.6.13"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",

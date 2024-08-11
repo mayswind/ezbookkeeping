@@ -1,0 +1,38 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+// 👉 Badge
+.v-badge {
+    &.v-badge--inline:not(.v-badge--dot) {
+        .v-badge__wrapper {
+            .v-badge__badge {
+                padding-block: 4px;
+                padding-inline: 8px;
+            }
+        }
+    }
+
+    &.v-badge--tonal {
+        @each $color-name in variables.$theme-colors-name {
+            .v-badge__wrapper {
+                .v-badge__badge.bg-#{$color-name} {
+                    background-color: rgba(var(--v-theme-#{$color-name}), var(--v-activated-opacity)) !important;
+                    color: rgb(var(--v-theme-#{$color-name})) !important;
+                }
+            }
+        }
+    }
+
+    /* stylelint-disable-next-line no-descending-specificity */
+    &.v-badge--bordered.v-badge--dot .v-badge__badge {
+        border-radius: 10px;
+        block-size: 12px;
+        inline-size: 12px;
+
+        &::after {
+            border-width: 2px;
+        }
+    }
+}

@@ -67,6 +67,13 @@
             color: rgb(var(--v-theme-primary)) !important;
         }
     }
+
+    &.custom-checkbox,
+    &.custom-radio {
+        .v-input__control {
+            grid-area: none;
+        }
+    }
 }
 
 // 👉 Datatable
@@ -161,8 +168,11 @@
 
 // loop for all colors bg
 @each $color-name in variables.$theme-colors-name {
-    .v-tabs.v-tabs-pill {
-        .v-tab-item--selected.v-tab--selected.text-#{$color-name} {
+    body .v-tabs.v-tabs-pill {
+        .v-slide-group__content {
+            gap: 0.25rem;
+        }
+        .v-tab--selected.text-#{$color-name} {
             background-color: rgb(var(--v-theme-#{$color-name}));
             color: rgb(var(--v-theme-on-#{$color-name})) !important;
         }

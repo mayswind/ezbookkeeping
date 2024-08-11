@@ -1,0 +1,50 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "@/styles/desktop/template/base/mixins";
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+// 👉 Radio
+.v-radio,
+.v-radio-btn {
+    &.v-selection-control--dirty {
+        .v-selection-control__input {
+            .custom-radio-checked {
+                filter: drop-shadow(rgba(var(--v-shadow-key-umbra-color), 16%) 0 2px 4px);
+            }
+        }
+    }
+
+    &.v-selection-control {
+        .v-selection-control__input {
+            svg {
+                font-size: 1.5rem;
+            }
+        }
+
+        .v-label {
+            color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+        }
+    }
+
+    &:not(.v-selection-control--dirty) {
+        .v-selection-control__input > .v-icon {
+            color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+            opacity: 1;
+        }
+    }
+}
+
+.v-radio-group.v-input > .v-input__control > .v-label {
+    font-size: 0.9375rem;
+    line-height: 22px;
+    margin-inline-start: 0;
+}
+
+.v-radio-group {
+    .v-selection-control-group {
+        .v-radio:not(:last-child) {
+            margin-inline-end: 0;
+        }
+    }
+}

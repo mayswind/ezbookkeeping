@@ -58,6 +58,12 @@ $card-spacer-content: 16px;
     color: rgba(255, 255, 255, var(--v-high-emphasis-opacity));
 }
 
+.text-link {
+    &:not(:hover) {
+        color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+    }
+}
+
 .bg-var-theme-background {
     background-color: rgba(var(--v-theme-on-background), var(--v-hover-opacity)) !important;
 }
@@ -130,6 +136,7 @@ $card-spacer-content: 16px;
             .v-btn__content {
                 .v-icon {
                     block-size: 8px !important;
+                    font-size: 8px !important;
                     inline-size: 8px !important;
                 }
             }
@@ -168,10 +175,10 @@ $card-spacer-content: 16px;
         line-height: 1.25rem;
     }
 
-    .timeline-chip{
+    .timeline-chip {
         border-radius: 6px;
         background: rgba(var(--v-theme-on-surface), var(--v-hover-opacity));
         padding-block: 5px;
-        padding-inline: 10px
+        padding-inline: 10px;
     }
 }

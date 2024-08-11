@@ -1,0 +1,9 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+// 👉 VMenu
+.v-menu {
+    .v-list-item--density-default:not(.v-list-item--nav).v-list-item--one-line {
+        padding-inline: 16px;
+    }
+}

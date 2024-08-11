@@ -411,7 +411,7 @@ export default {
 
 <style>
 .category-types .v-expansion-panel-text__wrapper {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 0;
 }
 
 .category-types .v-expansion-panel--active:not(:first-child),

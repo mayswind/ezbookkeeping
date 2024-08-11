@@ -14,7 +14,7 @@
                     <span>{{ endDateTime }}</span>
                 </p>
                 <slot></slot>
-                <vue-date-picker range inline enable-seconds auto-apply
+                <vue-date-picker inline enable-seconds auto-apply
                                  ref="datetimepicker"
                                  month-name-format="long"
                                  six-weeks="center"
@@ -26,7 +26,7 @@
                                  :day-names="dayNames"
                                  :year-first="isYearFirst"
                                  :is24="is24Hour"
-                                 :partial-range="false"
+                                 :range="{ partialRange: false }"
                                  :preset-dates="presetRanges"
                                  v-model="dateRange">
                     <template #month="{ text }">

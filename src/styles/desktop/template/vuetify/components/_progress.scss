@@ -1,6 +1,6 @@
 /** Materio Template Vuetify styles **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
-@use "@/styles/desktop/template/base/libs/vuetify";
-@use "./overrides";
-@use "./components/index";
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+// 👉 Progress

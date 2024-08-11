@@ -1,0 +1,45 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+@use "sass:list";
+@use "sass:map";
+@use "@/styles/desktop/template/vuetify/variables" as vuetify;
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+// 👉 checkbox box shadow
+.v-checkbox-btn {
+    &.v-selection-control--dirty {
+        .v-selection-control__input {
+            .v-icon.custom-checkbox-checked,
+            .v-icon.custom-checkbox-indeterminate {
+                // ℹ️ Using filter: drop-shadow() instead of box-shadow because box-shadow creates white background for SVG;Usingfilter
+                filter: drop-shadow(rgba(var(--v-shadow-key-umbra-color), 16%) 0 2px 4px);
+            }
+        }
+    }
+
+    &.v-selection-control {
+        .v-label {
+            color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+        }
+
+        .v-selection-control__input {
+            svg {
+                font-size: 1.5rem;
+            }
+        }
+    }
+
+    &:not(.v-selection-control--dirty) {
+        .v-selection-control__input {
+            > .v-icon {
+                color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+                opacity: 1;
+            }
+
+            > .custom-checkbox-indeterminate {
+                color: rgb(var(--v-theme-primary));
+            }
+        }
+    }
+}

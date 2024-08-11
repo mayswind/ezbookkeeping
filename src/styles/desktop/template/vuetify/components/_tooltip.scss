@@ -1,6 +1,10 @@
 /** Materio Template Vuetify styles **/
 /** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
 
-@use "@/styles/desktop/template/base/libs/vuetify";
-@use "./overrides";
-@use "./components/index";
+// 👉 Tooltip
+
+.v-tooltip {
+    .v-overlay__content {
+        font-weight: 500;
+    }
+}

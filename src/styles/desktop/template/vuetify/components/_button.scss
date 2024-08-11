@@ -1,0 +1,274 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+/* stylelint-disable no-descending-specificity */
+@use "sass:list";
+@use "sass:map";
+@use "@/styles/desktop/configured-variables/template" as variables;
+
+/* 👉 Button
+ Above map but opacity values as key and variant as value */
+
+body {
+    .v-btn {
+        &:not(.v-btn--block) {
+            min-inline-size: auto;
+        }
+
+        &--variant-elevated,
+        &--variant-flat {
+            &.v-btn--disabled {
+                .v-btn__overlay {
+                    opacity: 0.45;
+                }
+            }
+        }
+
+        // Default (elevated) button
+        /* stylelint-disable-next-line no-duplicate-selectors */
+        &--variant-elevated,
+        &--variant-flat {
+            // We want darker background on hover instead of light
+
+            &:hover {
+                .v-btn__overlay {
+                    opacity: 0;
+                }
+            }
+
+            &:not(.v-btn--loading, .v-btn--disabled) {
+                @each $color-name in variables.$theme-colors-name {
+                    &.bg-#{$color-name} {
+                        &:hover,
+                        &:active,
+                        &:focus {
+                            background-color: rgb(var(--v-theme-#{$color-name}-darken-1)) !important;
+                        }
+                    }
+                }
+            }
+        }
+
+        &--variant-elevated {
+            &:active {
+                box-shadow: none;
+            }
+        }
+
+        // Outlined variant
+        &--variant-outlined,
+        &--variant-text {
+            .v-btn__overlay {
+                --v-hover-opacity: 0.08;
+            }
+
+            &:active {
+                .v-btn__overlay {
+                    opacity: var(--v-hover-opacity);
+                }
+            }
+
+            &:focus {
+                .v-btn__overlay {
+                    opacity: var(--v-hover-opacity);
+                }
+            }
+        }
+
+        // Tonal variant
+        &--variant-tonal {
+            &:hover {
+                .v-btn__underlay {
+                    opacity: 0;
+                }
+
+                .v-btn__overlay {
+                    --v-hover-opacity: 0.24;
+                }
+            }
+
+            &:active {
+                .v-btn__overlay {
+                    --v-hover-opacity: 0.24;
+
+                    opacity: var(--v-hover-opacity);
+                }
+
+                .v-btn__underlay {
+                    opacity: 0;
+                }
+            }
+
+            &:focus {
+                .v-btn__overlay {
+                    --v-hover-opacity: 0.24;
+
+                    opacity: var(--v-hover-opacity);
+                }
+
+                .v-btn__underlay {
+                    opacity: 0;
+                }
+            }
+        }
+
+        &--icon.v-btn--density-default {
+            block-size: var(--v-btn-height);
+            inline-size: var(--v-btn-height);
+            padding-inline: 6px;
+
+            &.v-btn--size-default {
+                .v-icon {
+                    --v-icon-size-multiplier: 1 !important;
+                }
+            }
+
+            &.v-btn--size-small {
+                .v-icon {
+                    block-size: 20px;
+                    font-size: 20px;
+                    inline-size: 20px;
+                }
+            }
+
+            &.v-btn--size-large {
+                .v-icon {
+                    block-size: 28px;
+                    font-size: 28px;
+                    inline-size: 28px;
+                }
+            }
+        }
+
+        &:not(.v-btn--icon) .v-icon {
+            --v-icon-size-multiplier: 0.7115;
+
+            inline-size: auto;
+        }
+
+        &--variant-text,
+        &--variant-plain {
+            &:not(.v-btn--icon) {
+                padding-inline: 14px;
+            }
+        }
+
+        // Button Size
+        &--size-x-small {
+            --v-btn-height: 28px;
+            --v-btn-size: 11px;
+
+            &:not(.v-btn--icon) {
+                border-radius: 0.125rem;
+            }
+
+            line-height: 14px;
+            padding-block: 0;
+            padding-inline: 10px;
+        }
+
+        &--size-small {
+            --v-btn-height: 34px;
+            --v-btn-size: 13px;
+
+            &:not(.v-btn--icon) {
+                border-radius: 0.25rem;
+            }
+
+            line-height: 18px;
+            padding-block: 0;
+            padding-inline: 14px;
+
+            .v-icon {
+                --v-icon-size-multiplier: 0.718;
+            }
+        }
+
+        &--size-large {
+            --v-btn-height: 42px;
+            --v-btn-size: 17px;
+
+            &:not(.v-btn--icon) {
+                border-radius: 0.5rem;
+            }
+
+            line-height: 26px;
+            padding-block: 0;
+            padding-inline: 22px;
+        }
+
+        &--size-x-large {
+            --v-btn-height: 48px;
+            --v-btn-size: 19px;
+
+            &:not(.v-btn--icon) {
+                border-radius: 0.625rem;
+            }
+
+            line-height: 30px;
+            padding-block: 0;
+            padding-inline: 26px;
+        }
+
+        // Toggle Button
+        &-toggle {
+            .v-btn {
+                border-radius: 0.375rem;
+                block-size: 52px !important;
+                border-inline-end: none;
+                inline-size: 52px !important;
+
+                &.v-btn--density-comfortable {
+                    block-size: 44px !important;
+                    inline-size: 44px !important;
+                }
+
+                &.v-btn--density-compact {
+                    block-size: 36px !important;
+                    inline-size: 36px !important;
+                }
+
+                .v-icon {
+                    color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+                    font-size: 24px;
+                }
+
+                &--active {
+                    .v-icon {
+                        color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+                    }
+                }
+            }
+
+            &.v-btn-group {
+                align-items: center;
+                padding: 7px;
+                border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+                block-size: 66px;
+
+                .v-btn.v-btn--active {
+                    .v-btn__overlay {
+                        --v-activated-opacity: 0.08;
+                    }
+                }
+
+                &.v-btn-group--density-compact {
+                    block-size: 50px;
+                }
+
+                &.v-btn-group--density-comfortable {
+                    block-size: 58px;
+                }
+            }
+        }
+    }
+
+    // 👉 Btn group
+    .v-btn-group {
+        border: none;
+
+        &.v-btn-group--divided .v-btn:not(:last-child) {
+            border-inline-end-color: unset;
+        }
+    }
+}

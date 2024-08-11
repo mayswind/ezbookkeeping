@@ -26,7 +26,6 @@
                                          :dark="isDarkMode"
                                          :year-range="yearRange"
                                          :year-first="isYearFirst"
-                                         :partial-range="false"
                                          v-model="startTime">
                             <template #month="{ text }">
                                 {{ getMonthShortName(text) }}
@@ -43,7 +42,6 @@
                                          :dark="isDarkMode"
                                          :year-range="yearRange"
                                          :year-first="isYearFirst"
-                                         :partial-range="false"
                                          v-model="endTime">
                             <template #month="{ text }">
                                 {{ getMonthShortName(text) }}

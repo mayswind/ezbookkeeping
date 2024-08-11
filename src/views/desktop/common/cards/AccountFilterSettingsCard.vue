@@ -384,7 +384,7 @@ export default {
 
 <style>
 .account-categories .v-expansion-panel-text__wrapper {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 0;
 }
 
 .account-categories .v-expansion-panel--active:not(:first-child),

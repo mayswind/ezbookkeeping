@@ -1,0 +1,175 @@
+/** Materio Template Vuetify styles **/
+/** https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free **/
+
+/* stylelint-disable no-descending-specificity */
+@use "@/styles/desktop/configured-variables/template" as variables;
+@use "@/styles/desktop/template/base/mixins";
+
+// 👉 VPagination
+
+.v-pagination {
+    .v-pagination__list {
+        .v-pagination__next,
+        .v-pagination__last,
+        .v-pagination__first,
+        .v-pagination__prev {
+            .v-btn {
+                &.v-btn--icon {
+                    &.v-btn--size-default {
+                        .v-icon {
+                            block-size: 1.375rem;
+                            font-size: 1.375rem;
+                            inline-size: 1.375rem;
+                        }
+                    }
+
+                    &.v-btn--size-small {
+                        .v-icon {
+                            block-size: 1.25rem;
+                            font-size: 1.25rem;
+                            inline-size: 1.25rem;
+                        }
+                    }
+
+                    &.v-btn--size-large {
+                        .v-icon {
+                            block-size: 1.5rem;
+                            font-size: 1.5rem;
+                            inline-size: 1.5rem;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Common styles for buttons
+        .v-pagination__item,
+        .v-pagination__next,
+        .v-pagination__last,
+        .v-pagination__first,
+        .v-pagination__prev {
+            .v-btn {
+                color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+                font-weight: 400;
+                line-height: 1;
+                transform: none;
+
+                &--size-default {
+                    --v-btn-size: 13px;
+                }
+
+                &--size-large {
+                    --v-btn-size: 15px;
+                }
+
+                &.v-btn--disabled {
+                    opacity: 0.4;
+                }
+
+                &--variant-tonal {
+                    .v-btn__underlay {
+                        --v-activated-opacity: 0.08;
+                    }
+
+                    &:hover {
+                        .v-btn__underlay {
+                            --v-activated-opacity: 0;
+                        }
+
+                        .v-btn__overlay {
+                            --v-hover-opacity: 0.16;
+                        }
+                    }
+                }
+
+                @each $color-name in variables.$theme-colors-name {
+                    &--variant-tonal.text-#{$color-name} {
+                        .v-btn__underlay {
+                            background: rgb(var(--v-theme-on-surface));
+                        }
+
+                        .v-btn__content {
+                            color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+                        }
+
+                        &:hover {
+                            .v-btn__content {
+                                color: rgb(var(--v-theme-#{$color-name}));
+                            }
+                        }
+                    }
+                }
+
+                &--variant-outlined {
+                    &:hover {
+                        .v-btn__overlay {
+                            --v-hover-opacity: 0.06;
+                        }
+                    }
+                }
+            }
+        }
+
+        .v-pagination__item--is-active {
+            .v-btn {
+                &:not([class*="text-"]) {
+                    color: rgb(var(--v-theme-primary));
+                }
+            }
+
+            .v-btn.v-btn--variant-tonal {
+                .v-btn__overlay {
+                    --v-hover-opacity: 0.16;
+
+                    background: rgb(var(--v-theme-primary));
+                    opacity: var(--v-hover-opacity);
+                }
+
+                .v-btn__content {
+                    color: rgb(var(--v-theme-primary));
+                }
+
+                .v-btn__underlay {
+                    opacity: 0;
+                }
+
+                &:hover {
+                    .v-btn__overlay {
+                        --v-hover-opacity: 0.24;
+                    }
+                }
+            }
+
+            @each $color-name in variables.$theme-colors-name {
+                .v-btn.v-btn--variant-tonal.text-#{$color-name} {
+                    @include mixins.elevation(2);
+
+                    .v-btn__overlay {
+                        background: rgb(var(--v-theme-#{$color-name}));
+                        opacity: 1;
+                    }
+
+                    .v-btn__content {
+                        z-index: 1;
+                        color: #fff;
+                    }
+                }
+            }
+
+            .v-btn.v-btn--variant-outlined {
+                border-color: rgb(var(--v-theme-primary));
+
+                .v-btn__content {
+                    color: rgb(var(--v-theme-primary));
+                }
+
+                .v-btn__overlay {
+                    --v-hover-opacity: 0.16;
+
+                    background: rgb(var(--v-theme-primary));
+                    opacity: var(--v-hover-opacity);
+                }
+            }
+        }
+    }
+}

@@ -207,6 +207,32 @@ func (s *TokenService) DeleteTokensByType(c *core.Context, uid int64, tokenType 
 	})
 }
 
+// DeleteAllExpiredTokens deletes all expired tokens
+func (s *TokenService) DeleteAllExpiredTokens(c *core.Context) error {
+	var errors []error
+	totalCount := int64(0)
+
+	for i := 0; i < s.TokenDBCount(); i++ {
+		err := s.TokenDBByIndex(i).DoTransaction(c, func(sess *xorm.Session) error {
+			count, err := sess.Where("expired_unix_time<=?", time.Now().Unix()).Delete(&models.TokenRecord{})
+			totalCount += count
+			return err
+		})
+
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+
+	if totalCount > 0 {
+		log.Infof("[tokens.DeleteAllExpiredTokens] %d expired tokens have been deleted", totalCount)
+	} else if len(errors) == 0 {
+		log.Infof("[tokens.DeleteAllExpiredTokens] no expired tokens have been deleted")
+	}
+
+	return errs.NewMultiErrorOrNil(errors...)
+}
+
 // ExistsValidTokenByType returns whether the given token type exists
 func (s *TokenService) ExistsValidTokenByType(c *core.Context, uid int64, tokenType core.TokenType) (bool, error) {
 	if uid <= 0 {

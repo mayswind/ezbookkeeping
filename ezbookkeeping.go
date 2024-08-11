@@ -36,6 +36,7 @@ func main() {
 			cmd.WebServer,
 			cmd.Database,
 			cmd.UserData,
+			cmd.CronJobs,
 			cmd.SecurityUtils,
 			cmd.Utilities,
 		},

@@ -7,13 +7,13 @@ const TokenMaxUserAgentLength = 255
 
 // TokenRecord represents token data stored in database
 type TokenRecord struct {
-	Uid              int64          `xorm:"PK INDEX(IDX_token_record_uid_type_expired_time)"`
+	Uid              int64          `xorm:"PK INDEX(IDX_token_record_uid_type_expired_time) INDEX(IDX_token_record_expired_time)"`
 	UserTokenId      int64          `xorm:"PK"`
 	TokenType        core.TokenType `xorm:"INDEX(IDX_token_record_uid_type_expired_time) TINYINT NOT NULL"`
 	Secret           string         `xorm:"VARCHAR(10) NOT NULL"`
 	UserAgent        string         `xorm:"VARCHAR(255)"`
 	CreatedUnixTime  int64          `xorm:"PK"`
-	ExpiredUnixTime  int64          `xorm:"INDEX(IDX_token_record_uid_type_expired_time)"`
+	ExpiredUnixTime  int64          `xorm:"INDEX(IDX_token_record_uid_type_expired_time) INDEX(IDX_token_record_expired_time)"`
 	LastSeenUnixTime int64
 }
 

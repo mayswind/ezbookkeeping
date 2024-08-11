@@ -1,6 +1,8 @@
 package duplicatechecker
 
 import (
+	"time"
+
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -35,4 +37,14 @@ func (c *DuplicateCheckerContainer) GetSubmissionRemark(checkerType DuplicateChe
 // SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
 func (c *DuplicateCheckerContainer) SetSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string, remark string) {
 	c.Current.SetSubmissionRemark(checkerType, uid, identification, remark)
+}
+
+// GetOrSetCronJobRunningInfo returns the running info when the cron job is running or saves the running info by the current duplicate checker
+func (c *DuplicateCheckerContainer) GetOrSetCronJobRunningInfo(jobName string, runningInfo string, runningInterval time.Duration) (bool, string) {
+	return c.Current.GetOrSetCronJobRunningInfo(jobName, runningInfo, runningInterval)
+}
+
+// RemoveCronJobRunningInfo removes the running info of the cron job by the current duplicate checker
+func (c *DuplicateCheckerContainer) RemoveCronJobRunningInfo(jobName string) {
+	c.Current.RemoveCronJobRunningInfo(jobName)
 }

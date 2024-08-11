@@ -23,6 +23,16 @@ func (s *ServiceUsingDB) TokenDB(uid int64) *datastore.Database {
 	return s.container.TokenStore.Choose(uid)
 }
 
+// TokenDBByIndex returns the datastore by index
+func (s *ServiceUsingDB) TokenDBByIndex(index int) *datastore.Database {
+	return s.container.TokenStore.Get(index)
+}
+
+// TokenDBCount returns the count of datastores which contains user token
+func (s *ServiceUsingDB) TokenDBCount() int {
+	return s.container.TokenStore.Count()
+}
+
 // UserDataDB returns the datastore which contains user data
 func (s *ServiceUsingDB) UserDataDB(uid int64) *datastore.Database {
 	return s.container.UserDataStore.Choose(uid)

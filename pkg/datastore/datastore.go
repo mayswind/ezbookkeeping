@@ -12,6 +12,16 @@ type DataStore struct {
 	databases []*Database
 }
 
+// Count returns total count of database instances
+func (s *DataStore) Count() int {
+	return len(s.databases)
+}
+
+// Get returns a database instance by index
+func (s *DataStore) Get(index int) *Database {
+	return s.databases[index]
+}
+
 // Choose returns a database instance by sharding key
 func (s *DataStore) Choose(key int64) *Database {
 	return s.databases[0]

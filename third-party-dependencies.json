@@ -100,6 +100,12 @@
         "licenseUrl": "https://github.com/minio/minio-go/blob/v7.0.74/LICENSE"
     },
     {
+        "name": "gocron",
+        "copyright": "Copyright (c) 2014, 辣椒面",
+        "url": "https://github.com/go-co-op/gocron",
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.11.0/LICENSE"
+    },
+    {
         "name": "barcode",
         "copyright": "Copyright (c) 2014 Florian Sundermann",
         "url": "https://github.com/boombuler/barcode",

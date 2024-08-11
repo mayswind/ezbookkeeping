@@ -15,6 +15,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/api"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/cron"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/middlewares"
@@ -59,6 +60,13 @@ func startWebServer(c *cli.Context) error {
 
 	if err != nil {
 		log.BootErrorf("[webserver.startWebServer] initializes requestid generator failed, because %s", err.Error())
+		return err
+	}
+
+	err = cron.InitializeCronJobSchedulerContainer(config, true)
+
+	if err != nil {
+		log.BootErrorf("[webserver.startWebServer] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 

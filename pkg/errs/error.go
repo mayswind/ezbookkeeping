@@ -1,5 +1,9 @@
 package errs
 
+import (
+	"strings"
+)
+
 // ErrorCategory represents error category
 type ErrorCategory int32
 
@@ -16,6 +20,7 @@ const (
 	SystemSubcategoryDatabase = 2
 	SystemSubcategoryMail     = 3
 	SystemSubcategoryLogging  = 4
+	SystemSubcategoryCron     = 5
 )
 
 // Sub categories of normal error
@@ -44,6 +49,10 @@ type Error struct {
 	Context        any
 }
 
+type MultiErrors struct {
+	errors []error
+}
+
 // Error returns the error message
 func (err *Error) Error() string {
 	return err.Message
@@ -64,6 +73,34 @@ func New(category ErrorCategory, subCategory int32, index int32, httpStatusCode 
 		Message:        message,
 		BaseError:      baseError,
 	}
+}
+
+// Error returns the error message
+func (err *MultiErrors) Error() string {
+	if len(err.errors) == 1 {
+		return err.errors[0].Error()
+	}
+
+	var ret strings.Builder
+	var lastErrorChar byte
+
+	ret.WriteString("multi errors: ")
+
+	for i := 0; i < len(err.errors); i++ {
+		if i > 0 {
+			if lastErrorChar == '.' {
+				ret.WriteString(" ")
+			} else {
+				ret.WriteString(", ")
+			}
+		}
+
+		errorContent := err.errors[i].Error()
+		lastErrorChar = errorContent[len(errorContent)-1]
+		ret.WriteString(errorContent)
+	}
+
+	return ret.String()
 }
 
 // NewSystemError returns a new system error instance
@@ -104,6 +141,21 @@ func NewErrorWithContext(baseError *Error, context any) *Error {
 		Message:        baseError.Message,
 		BaseError:      baseError.BaseError,
 		Context:        context,
+	}
+}
+
+// NewMultiErrorOrNil returns a new multi error instance
+func NewMultiErrorOrNil(errors ...error) error {
+	count := len(errors)
+
+	if count < 1 {
+		return nil
+	} else if count == 1 {
+		return errors[0]
+	}
+
+	return &MultiErrors{
+		errors: errors,
 	}
 }
 

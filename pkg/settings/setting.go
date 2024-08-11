@@ -252,6 +252,9 @@ type Config struct {
 	DuplicateSubmissionsInterval                    uint32
 	DuplicateSubmissionsIntervalDuration            time.Duration
 
+	// Cron
+	EnableRemoveExpiredTokens bool
+
 	// Secret
 	SecretKeyNoSet                        bool
 	SecretKey                             string
@@ -368,6 +371,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadDuplicateCheckerConfiguration(config, cfgFile, "duplicate_checker")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadCronConfiguration(config, cfgFile, "cron")
 
 	if err != nil {
 		return nil, err
@@ -670,6 +679,12 @@ func loadDuplicateCheckerConfiguration(config *Config, configFile *ini.File, sec
 
 	config.DuplicateSubmissionsInterval = duplicateSubmissionsInterval
 	config.DuplicateSubmissionsIntervalDuration = time.Duration(config.DuplicateSubmissionsInterval) * time.Second
+
+	return nil
+}
+
+func loadCronConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableRemoveExpiredTokens = getConfigItemBoolValue(configFile, sectionName, "enable_remove_expired_tokens", false)
 
 	return nil
 }

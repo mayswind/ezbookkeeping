@@ -184,13 +184,13 @@ func (s *TokenService) DeleteTokenByClaims(c *core.Context, claims *core.UserTok
 }
 
 // DeleteTokensBeforeTime deletes tokens that is created before specific time
-func (s *TokenService) DeleteTokensBeforeTime(c *core.Context, uid int64, expireTime int64) error {
+func (s *TokenService) DeleteTokensBeforeTime(c *core.Context, uid int64, createTime int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
 	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		_, err := sess.Where("uid=? AND created_unix_time<?", uid, expireTime).Delete(&models.TokenRecord{})
+		_, err := sess.Where("uid=? AND created_unix_time<?", uid, createTime).Delete(&models.TokenRecord{})
 		return err
 	})
 }

@@ -19,6 +19,7 @@ import {
     isObject,
     isInteger,
     isYearMonth,
+    isYearMonthEquals,
     isObjectEmpty,
     objectFieldToArrayItem
 } from '@/lib/common.js';
@@ -726,12 +727,12 @@ export const useStatisticsStore = defineStore('statistics', {
                 changed = true;
             }
 
-            if (filter && (isYearMonth(filter.trendChartStartYearMonth) || filter.trendChartStartYearMonth === '') && this.transactionStatisticsFilter.trendChartStartYearMonth !== filter.trendChartStartYearMonth) {
+            if (filter && (isYearMonth(filter.trendChartStartYearMonth) || filter.trendChartStartYearMonth === '') && !isYearMonthEquals(this.transactionStatisticsFilter.trendChartStartYearMonth, filter.trendChartStartYearMonth)) {
                 this.transactionStatisticsFilter.trendChartStartYearMonth = filter.trendChartStartYearMonth;
                 changed = true;
             }
 
-            if (filter && (isYearMonth(filter.trendChartEndYearMonth) || filter.trendChartEndYearMonth === '') && this.transactionStatisticsFilter.trendChartEndYearMonth !== filter.trendChartEndYearMonth) {
+            if (filter && (isYearMonth(filter.trendChartEndYearMonth) || filter.trendChartEndYearMonth === '') && !isYearMonthEquals(this.transactionStatisticsFilter.trendChartEndYearMonth, filter.trendChartEndYearMonth)) {
                 this.transactionStatisticsFilter.trendChartEndYearMonth = filter.trendChartEndYearMonth;
                 changed = true;
             }

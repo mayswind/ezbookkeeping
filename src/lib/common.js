@@ -99,6 +99,21 @@ export function isEquals(obj1, obj2) {
     }
 }
 
+export function isYearMonthEquals(val1, val2) {
+    if (typeof(val1) !== 'string' || typeof(val2) !== 'string') {
+        return false;
+    }
+
+    const items1 = val1.split('-');
+    const items2 = val2.split('-');
+
+    if (items1.length !== 2 || items2.length !== 2) {
+        return false;
+    }
+
+    return (parseInt(items1[0]) && parseInt(items1[1])) && (parseInt(items1[0]) === parseInt(items2[0])) && (parseInt(items1[1]) === parseInt(items2[1]));
+}
+
 export function isObjectEmpty(obj) {
     if (!obj) {
         return true;

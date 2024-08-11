@@ -192,10 +192,6 @@ export function getYearAndMonth(date) {
     const year = getYear(date);
     let month = getMonth(date);
 
-    if (month < 10) {
-        month = '0' + month;
-    }
-
     return `${year}-${month}`;
 }
 

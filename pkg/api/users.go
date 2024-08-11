@@ -563,7 +563,7 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	if fileExtension != user.CustomAvatarType {
+	if fileExtension != user.CustomAvatarType && user.CustomAvatarType != "" {
 		err = storage.Container.DeleteAvatar(user.Uid, user.CustomAvatarType)
 
 		if err != nil {

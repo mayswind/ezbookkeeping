@@ -725,7 +725,22 @@ func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (any
 
 // UserGetAvatarHandler returns user avatar data for current user
 func (a *UsersApi) UserGetAvatarHandler(c *core.Context) ([]byte, string, *errs.Error) {
+	fileName := c.Param("fileName")
+	fileExtension := utils.GetFileNameExtension(fileName)
+	contentType := utils.GetImageContentType(fileExtension)
+
+	if contentType == "" {
+		return nil, "", errs.ErrImageTypeNotSupported
+	}
+
 	uid := c.GetCurrentUid()
+	fileBaseName := utils.GetFileNameWithoutExtension(fileName)
+
+	if utils.Int64ToString(uid) != fileBaseName {
+		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] cannot get other user avatar \"uid:%s\" for user \"uid:%d\"", fileBaseName, uid)
+		return nil, "", errs.ErrUserIdInvalid
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -740,16 +755,6 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.Context) ([]byte, string, *errs.
 		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user does not have avatar for user \"uid:%d\"", user.Uid)
 		return nil, "", errs.ErrUserAvatarNoExists
 	}
-
-	fileName := c.Param("fileName")
-	fileBaseName := utils.GetFileNameWithoutExtension(fileName)
-
-	if utils.Int64ToString(user.Uid) != fileBaseName {
-		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] cannot get other user avatar \"uid:%s\" for user \"uid:%d\"", fileBaseName, user.Uid)
-		return nil, "", errs.ErrUserIdInvalid
-	}
-
-	fileExtension := utils.GetFileNameExtension(fileName)
 
 	if user.CustomAvatarType != fileExtension {
 		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user avatar extension is invalid \"%s\" for user \"uid:%d\"", fileExtension, user.Uid)
@@ -777,5 +782,5 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.Context) ([]byte, string, *errs.
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	return avatarData, utils.GetImageContentType(fileExtension), nil
+	return avatarData, contentType, nil
 }

@@ -9,33 +9,35 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+// CronJob represents the cron job instance
 type CronJob struct {
 	Name        string
 	Description string
-	Interval    time.Duration
+	Period      CronJobPeriod
 	Run         func() error
 }
 
 func (c *CronJob) doRun() {
 	start := time.Now()
-	localAddr, err := utils.GetLocalIPAddressesString()
 
-	if err != nil {
-		log.Warnf("[cron_job.doRun] job \"%s\" cannot get local ipv4 address, because %s", c.Name, err.Error())
-		return
+	if duplicatechecker.Container.Current != nil {
+		localAddr, err := utils.GetLocalIPAddressesString()
+
+		if err != nil {
+			log.Warnf("[cron_job.doRun] job \"%s\" cannot get local ipv4 address, because %s", c.Name, err.Error())
+			return
+		}
+
+		currentInfo := fmt.Sprintf("ip: %s, startTime: %d", localAddr, time.Now().Unix())
+		found, runningInfo := duplicatechecker.Container.GetOrSetCronJobRunningInfo(c.Name, currentInfo, c.Period.GetInterval())
+
+		if found {
+			log.Warnf("[cron_job.doRun] job \"%s\" is already running (%s)", c.Name, runningInfo)
+			return
+		}
 	}
 
-	currentInfo := fmt.Sprintf("ip: %s, startTime: %d", localAddr, time.Now().Unix())
-	found, runningInfo := duplicatechecker.Container.GetOrSetCronJobRunningInfo(c.Name, currentInfo, c.Interval)
-
-	if found {
-		log.Warnf("[cron_job.doRun] job \"%s\" is already running (%s)", c.Name, runningInfo)
-		return
-	}
-
-	err = c.Run()
-
-	duplicatechecker.Container.Current.RemoveCronJobRunningInfo(c.Name)
+	err := c.Run()
 
 	now := time.Now()
 

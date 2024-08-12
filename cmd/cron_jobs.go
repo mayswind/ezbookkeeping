@@ -65,7 +65,7 @@ func listAllCronJobs(c *cli.Context) error {
 
 		fmt.Printf("[Name] %s\n", cronJob.Name)
 		fmt.Printf("[Description] %s\n", cronJob.Description)
-		fmt.Printf("[Interval] Every %s\n", cronJob.Interval)
+		fmt.Printf("[Interval] Every %s\n", cronJob.Period.GetInterval())
 	}
 
 	return nil

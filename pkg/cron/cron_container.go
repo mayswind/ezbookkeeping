@@ -83,7 +83,7 @@ func (c *CronJobSchedulerContainer) registerAllJobs(config *settings.Config) {
 
 func (c *CronJobSchedulerContainer) registerIntervalJob(job *CronJob) {
 	gocronJob, err := c.scheduler.NewJob(
-		gocron.DurationJob(job.Interval),
+		job.Period.ToJobDefinition(),
 		gocron.NewTask(job.doRun),
 		gocron.WithName(job.Name),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule),

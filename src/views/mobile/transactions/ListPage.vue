@@ -523,6 +523,7 @@ import {
     getTimezoneOffsetMinutes,
     getBrowserTimezoneOffsetMinutes,
     getActualUnixTimeForStore,
+    getYearMonthFirstUnixTime,
     getShiftedDateRangeAndDateType,
     getDateTypeByDateRange,
     getDateRangeByDateType
@@ -1088,7 +1089,7 @@ export default {
             scrollToSelectedItem(event.$el, '.popover-inner', 'li.list-item-selected');
         },
         getDisplayYearMonth(transactionMonthList) {
-            return this.$locale.formatTimeToLongYearMonth(this.userStore, transactionMonthList.yearMonth);
+            return this.$locale.formatUnixTimeToLongYearMonth(this.userStore, getYearMonthFirstUnixTime(transactionMonthList.yearMonth));
         },
         getDisplayTime(transaction) {
             return this.$locale.formatUnixTimeToShortTime(this.userStore, transaction.time, transaction.utcOffset, this.currentTimezoneOffsetMinutes);

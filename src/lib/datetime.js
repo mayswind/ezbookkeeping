@@ -163,10 +163,6 @@ export function formatUnixTime(unixTime, format, utcOffset, currentUtcOffset) {
     return parseDateFromUnixTime(unixTime, utcOffset, currentUtcOffset).format(format);
 }
 
-export function formatTime(dateTime, format) {
-    return moment(dateTime).format(format);
-}
-
 export function formatCurrentTime(format) {
     return moment().format(format);
 }
@@ -219,18 +215,6 @@ export function getMonthName(date) {
 
 export function getAMOrPM(hour) {
     return isPM(hour) ? dateTimeConstants.allMeridiemIndicators.PM : dateTimeConstants.allMeridiemIndicators.AM;
-}
-
-export function getHour(date) {
-    return moment(date).hour();
-}
-
-export function getMinute(date) {
-    return moment(date).minute();
-}
-
-export function getSecond(date) {
-    return moment(date).second();
 }
 
 export function getUnixTimeBeforeUnixTime(unixTime, amount, unit) {

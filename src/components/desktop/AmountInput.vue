@@ -142,17 +142,17 @@ export default {
     },
     methods: {
         onKeyUpDown(e) {
-            if (e.altKey || e.ctrlKey || e.metaKey || (e.code.indexOf('F') === 0 && (e.code.length === 2 || e.code.length === 3))
-                || e.code === 'ArrowLeft' || e.code === 'ArrowRight'
-                || e.code === 'Home' || e.code === 'End' || e.code === 'Tab'
-                || e.code === 'Backspace' || e.code === 'Delete' || e.code === 'Del') {
+            if (e.altKey || e.ctrlKey || e.metaKey || (e.key.indexOf('F') === 0 && (e.key.length === 2 || e.key.length === 3))
+                || e.key === 'ArrowLeft' || e.key === 'ArrowRight'
+                || e.key === 'Home' || e.key === 'End' || e.key === 'Tab'
+                || e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Del') {
                 return;
             }
 
             const digitGroupingSymbol = this.$locale.getCurrentDigitGroupingSymbol(this.userStore);
             const decimalSeparator = this.$locale.getCurrentDecimalSeparator(this.userStore);
 
-            if (e.code.indexOf('Digit') !== 0 && e.code !== 'Minus' && e.key !== decimalSeparator) {
+            if (!('0' <= e.key && e.key <= '9') && e.key !== '-' && e.key !== decimalSeparator) {
                 e.preventDefault();
                 return;
             }
@@ -163,7 +163,7 @@ export default {
                 str = removeAll(str, digitGroupingSymbol);
             }
 
-            if (e.code === 'Minus' && str.lastIndexOf('-') > 0) {
+            if (e.key === '-' && str.lastIndexOf('-') > 0) {
                 const lastMinusPos = str.lastIndexOf('-');
                 e.target.value = str.substring(0, lastMinusPos) + str.substring(lastMinusPos + 1, str.length);
                 this.currentValue = e.target.value;
@@ -205,7 +205,7 @@ export default {
                     str = str.substring(1);
                 }
 
-                while (str.charAt(0) === '0' && (str.length >= 2 || e.code !== 'Digit0')) {
+                while (str.charAt(0) === '0' && (str.length >= 2 || e.key !== '0')) {
                     str = str.substring(1);
                 }
 

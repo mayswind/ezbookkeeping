@@ -163,45 +163,45 @@ export default {
             }
         },
         onKeydown(index, event) {
-            if (event.altKey || (event.code.indexOf('F') === 0 && (event.code.length === 2 || event.code.length === 3))) {
+            if (event.altKey || (event.key.indexOf('F') === 0 && (event.key.length === 2 || event.key.length === 3))) {
                 return;
             }
 
-            if (event.code === 'Enter' && this.finalPinCode.length === this.length) {
+            if (event.key === 'Enter' && this.finalPinCode.length === this.length) {
                 this.$emit('pincode:confirm', this.finalPinCode);
                 event.preventDefault();
                 return;
             }
 
-            if (event.code === 'ArrowLeft' || (event.shiftKey && event.code === 'Tab')) {
+            if (event.key === 'ArrowLeft' || (event.shiftKey && event.key === 'Tab')) {
                 this.setPreviousFocus(index);
                 event.preventDefault();
                 return;
             }
 
-            if (event.code === 'ArrowRight' || (!event.shiftKey && event.code === 'Tab')) {
+            if (event.key === 'ArrowRight' || (!event.shiftKey && event.key === 'Tab')) {
                 this.setNextFocus(index);
                 event.preventDefault();
                 return;
             }
 
-            if (event.code === 'Home') {
+            if (event.key === 'Home') {
                 this.setFocus(0);
                 event.preventDefault();
                 return;
             }
 
-            if (event.code === 'End') {
+            if (event.key === 'End') {
                 this.setFocus(this.length - 1);
                 event.preventDefault();
                 return;
             }
 
-            if ((event.ctrlKey || event.metaKey) && event.code === 'KeyV') {
+            if (((event.ctrlKey || event.metaKey) && event.key === 'v') || event.key === 'Paste') {
                 return;
             }
 
-            if (event.code === 'Backspace' || event.code === 'Delete' || event.code === 'Del') {
+            if (event.key === 'Backspace' || event.key === 'Delete' || event.key === 'Del') {
                 for (let i = index; i < this.codes.length; i++) {
                     this.codes[i].value = '';
                     this.setInputType(i);
@@ -215,7 +215,7 @@ export default {
                 return;
             }
 
-            if (event.code.indexOf('Digit') === 0 && event.code.length === 6) {
+            if (event.key.length === 1 && '0' <= event.key && event.key <= '9') {
                 this.codes[index].value = event.key;
                 this.setInputType(index);
                 this.setNextFocus(index);

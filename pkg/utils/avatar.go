@@ -8,12 +8,12 @@ import (
 const gravatarUrlFormat = "https://www.gravatar.com/avatar/%s"
 
 // GetInternalAvatarUrl returns the internal avatar url
-func GetInternalAvatarUrl(uid int64, avatarFileExtesion string, webRootUrl string) string {
-	if avatarFileExtesion == "" {
+func GetInternalAvatarUrl(uid int64, avatarFileExtension string, webRootUrl string) string {
+	if avatarFileExtension == "" {
 		return ""
 	}
 
-	return fmt.Sprintf("%savatar/%d.%s", webRootUrl, uid, avatarFileExtesion)
+	return fmt.Sprintf("%savatar/%d.%s", webRootUrl, uid, avatarFileExtension)
 }
 
 // GetGravatarUrl returns the Gravatar url according to the specified user email address

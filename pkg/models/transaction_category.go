@@ -87,7 +87,7 @@ type TransactionCategoryHideRequest struct {
 
 // TransactionCategoryMoveRequest represents all parameters of transaction category moving request
 type TransactionCategoryMoveRequest struct {
-	NewDisplayOrders []*TransactionCategoryNewDisplayOrderRequest `json:"newDisplayOrders"`
+	NewDisplayOrders []*TransactionCategoryNewDisplayOrderRequest `json:"newDisplayOrders" binding:"required,min=1"`
 }
 
 // TransactionCategoryNewDisplayOrderRequest represents a data pair of id and display order

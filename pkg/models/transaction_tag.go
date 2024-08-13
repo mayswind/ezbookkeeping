@@ -37,7 +37,7 @@ type TransactionTagHideRequest struct {
 
 // TransactionTagMoveRequest represents all parameters of transaction tag moving request
 type TransactionTagMoveRequest struct {
-	NewDisplayOrders []*TransactionTagNewDisplayOrderRequest `json:"newDisplayOrders"`
+	NewDisplayOrders []*TransactionTagNewDisplayOrderRequest `json:"newDisplayOrders" binding:"required,min=1"`
 }
 
 // TransactionTagNewDisplayOrderRequest represents a data pair of id and display order

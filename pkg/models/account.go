@@ -111,7 +111,7 @@ type AccountHideRequest struct {
 
 // AccountMoveRequest represents all parameters of account moving request
 type AccountMoveRequest struct {
-	NewDisplayOrders []*AccountNewDisplayOrderRequest `json:"newDisplayOrders"`
+	NewDisplayOrders []*AccountNewDisplayOrderRequest `json:"newDisplayOrders" binding:"required,min=1"`
 }
 
 // AccountNewDisplayOrderRequest represents a data pair of id and display order

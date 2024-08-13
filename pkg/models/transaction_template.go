@@ -92,7 +92,7 @@ type TransactionTemplateHideRequest struct {
 
 // TransactionTemplateMoveRequest represents all parameters of transaction template moving request
 type TransactionTemplateMoveRequest struct {
-	NewDisplayOrders []*TransactionTemplateNewDisplayOrderRequest `json:"newDisplayOrders"`
+	NewDisplayOrders []*TransactionTemplateNewDisplayOrderRequest `json:"newDisplayOrders" binding:"required,min=1"`
 }
 
 // TransactionTemplateNewDisplayOrderRequest represents a data pair of id and display order

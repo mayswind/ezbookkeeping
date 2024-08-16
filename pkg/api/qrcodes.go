@@ -19,16 +19,21 @@ const (
 
 // QrCodesApi represents qrcode generator api
 type QrCodesApi struct {
+	ApiUsingConfig
 }
 
 // Initialize a qrcode generator api singleton instance
 var (
-	QrCodes = &QrCodesApi{}
+	QrCodes = &QrCodesApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+	}
 )
 
 // MobileUrlQrCodeHandler returns a mobile url qr code image
 func (a *QrCodesApi) MobileUrlQrCodeHandler(c *core.Context) ([]byte, string, *errs.Error) {
-	fullUrl := settings.Container.Current.RootUrl + "mobile"
+	fullUrl := a.CurrentConfig().RootUrl + "mobile"
 	data, err := a.generateUrlQrCode(c, fullUrl)
 
 	if err != nil {

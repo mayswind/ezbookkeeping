@@ -19,6 +19,7 @@ const pageCountForDataExport = 1000
 
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
+	ApiUsingConfig
 	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
 	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
 	tokens                   *services.TokenService
@@ -33,6 +34,9 @@ type DataManagementsApi struct {
 // Initialize a data management api singleton instance
 var (
 	DataManagements = &DataManagementsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
 		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
 		tokens:                   services.Tokens,
@@ -162,7 +166,7 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error
 }
 
 func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType string) ([]byte, string, *errs.Error) {
-	if !settings.Container.Current.EnableDataExport {
+	if !a.CurrentConfig().EnableDataExport {
 		return nil, "", errs.ErrDataExportNotAllowed
 	}
 

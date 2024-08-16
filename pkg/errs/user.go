@@ -34,4 +34,6 @@ var (
 	ErrNoUserAvatar                                        = NewNormalError(NormalSubcategoryUser, 25, http.StatusBadRequest, "no user avatar")
 	ErrUserAvatarIsEmpty                                   = NewNormalError(NormalSubcategoryUser, 26, http.StatusBadRequest, "user avatar is empty")
 	ErrUserAvatarNoExists                                  = NewNormalError(NormalSubcategoryUser, 27, http.StatusNotFound, "user avatar not exists")
+	ErrUserAvatarNotSet                                    = NewNormalError(NormalSubcategoryUser, 28, http.StatusNotFound, "user avatar not set")
+	ErrUserAvatarExtensionInvalid                          = NewNormalError(NormalSubcategoryUser, 29, http.StatusNotFound, "user avatar file extension invalid")
 )

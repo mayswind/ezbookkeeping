@@ -16,12 +16,20 @@ import (
 
 // TransactionTemplatesApi represents transaction template api
 type TransactionTemplatesApi struct {
+	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	templates *services.TransactionTemplateService
 }
 
 // Initialize a transaction template api singleton instance
 var (
 	TransactionTemplates = &TransactionTemplatesApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			container: duplicatechecker.Container,
+		},
 		templates: services.TransactionTemplates,
 	}
 )
@@ -117,8 +125,8 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
 	template := a.createNewTemplateModel(uid, &templateCreateReq, maxOrderId+1)
 
-	if settings.Container.Current.EnableDuplicateSubmissionsCheck && templateCreateReq.ClientSessionId != "" {
-		found, remark := duplicatechecker.Container.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId)
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && templateCreateReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId)
 
 		if found {
 			log.InfofWithRequestId(c, "[transaction_templates.TemplateCreateHandler] another template \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
@@ -148,7 +156,7 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 
 	log.InfofWithRequestId(c, "[transaction_templates.TemplateCreateHandler] user \"uid:%d\" has created a new template \"id:%d\" successfully", uid, template.TemplateId)
 
-	duplicatechecker.Container.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId, utils.Int64ToString(template.TemplateId))
+	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId, utils.Int64ToString(template.TemplateId))
 	templateResp := template.ToTransactionTemplateInfoResponse(serverUtcOffset)
 
 	return templateResp, nil

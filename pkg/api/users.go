@@ -1,8 +1,6 @@
 package api
 
 import (
-	"io"
-	"os"
 	"strings"
 	"time"
 
@@ -15,13 +13,13 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/storage"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
 // UsersApi represents user api
 type UsersApi struct {
+	ApiUsingConfig
 	users    *services.UserService
 	tokens   *services.TokenService
 	accounts *services.AccountService
@@ -30,6 +28,9 @@ type UsersApi struct {
 // Initialize a user api singleton instance
 var (
 	Users = &UsersApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		users:    services.Users,
 		tokens:   services.Tokens,
 		accounts: services.Accounts,
@@ -38,7 +39,7 @@ var (
 
 // UserRegisterHandler saves a new user by request parameters
 func (a *UsersApi) UserRegisterHandler(c *core.Context) (any, *errs.Error) {
-	if !settings.Container.Current.EnableUserRegister {
+	if !a.CurrentConfig().EnableUserRegister {
 		return nil, errs.ErrUserRegistrationNotAllowed
 	}
 
@@ -92,14 +93,14 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (any, *errs.Error) {
 	authResp := &models.RegisterResponse{
 		AuthResponse: models.AuthResponse{
 			Need2FA:             false,
-			User:                user.ToUserBasicInfo(),
-			NotificationContent: settings.Container.GetAfterRegisterNotificationContent(user.Language, c.GetClientLocale()),
+			User:                a.GetUserBasicInfo(user),
+			NotificationContent: a.GetAfterRegisterNotificationContent(user.Language, c.GetClientLocale()),
 		},
-		NeedVerifyEmail:       settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableUserForceVerifyEmail,
+		NeedVerifyEmail:       a.CurrentConfig().EnableUserVerifyEmail && a.CurrentConfig().EnableUserForceVerifyEmail,
 		PresetCategoriesSaved: presetCategoriesSaved,
 	}
 
-	if settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {
+	if a.CurrentConfig().EnableUserVerifyEmail && a.CurrentConfig().EnableSMTP {
 		token, _, err := a.tokens.CreateEmailVerifyToken(c, user)
 
 		if err != nil {
@@ -115,7 +116,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.Context) (any, *errs.Error) {
 		}
 	}
 
-	if settings.Container.Current.EnableUserForceVerifyEmail {
+	if a.CurrentConfig().EnableUserForceVerifyEmail {
 		return authResp, nil
 	}
 
@@ -187,8 +188,8 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.Context) (any, *errs.Error) {
 		}
 
 		resp.NewToken = token
-		resp.User = user.ToUserBasicInfo()
-		resp.NotificationContent = settings.Container.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
+		resp.User = a.GetUserBasicInfo(user)
+		resp.NotificationContent = a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
 
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
@@ -212,7 +213,7 @@ func (a *UsersApi) UserProfileHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.ErrUserNotFound
 	}
 
-	userResp := user.ToUserProfileResponse()
+	userResp := a.getUserProfileResponse(user)
 	return userResp, nil
 }
 
@@ -447,10 +448,10 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.Context) (any, *errs.Error) 
 	log.InfofWithRequestId(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" has updated successfully", user.Uid)
 
 	resp := &models.UserProfileUpdateResponse{
-		User: user.ToUserBasicInfo(),
+		User: a.GetUserBasicInfo(user),
 	}
 
-	if emailSetToUnverified && settings.Container.Current.EnableUserVerifyEmail && settings.Container.Current.EnableSMTP {
+	if emailSetToUnverified && a.CurrentConfig().EnableUserVerifyEmail && a.CurrentConfig().EnableSMTP {
 		err = a.tokens.DeleteTokensByType(c, uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY)
 
 		if err != nil {
@@ -547,32 +548,15 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.ErrOperationFailed
 	}
 
-	defer avatarFile.Close()
-
-	err = storage.Container.SaveAvatar(user.Uid, avatarFile, fileExtension)
+	err = a.users.UpdateUserAvatar(c, user.Uid, avatarFile, fileExtension, user.CustomAvatarType)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to save avatar file for user \"uid:%d\", because %s", user.Uid, err.Error())
-		return nil, errs.ErrOperationFailed
-	}
-
-	err = a.users.UpdateUserAvatar(c, user.Uid, fileExtension)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.ErrorfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to update avatar for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	if fileExtension != user.CustomAvatarType && user.CustomAvatarType != "" {
-		err = storage.Container.DeleteAvatar(user.Uid, user.CustomAvatarType)
-
-		if err != nil {
-			log.WarnfWithRequestId(c, "[users.UserUpdateAvatarHandler] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", user.CustomAvatarType, user.Uid, err.Error())
-		}
-	}
-
 	user.CustomAvatarType = fileExtension
-	userResp := user.ToUserProfileResponse()
+	userResp := a.getUserProfileResponse(user)
 	return userResp, nil
 }
 
@@ -593,39 +577,21 @@ func (a *UsersApi) UserRemoveAvatarHandler(c *core.Context) (any, *errs.Error) {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = storage.Container.DeleteAvatar(user.Uid, user.CustomAvatarType)
+	err = a.users.RemoveUserAvatar(c, user.Uid, user.CustomAvatarType)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to delete avatar file for user \"uid:%d\", because %s", user.Uid, err.Error())
-
-		exists, err := storage.Container.ExistsAvatar(user.Uid, user.CustomAvatarType)
-
-		if err != nil {
-			log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to check whether avatar file exist for user \"uid:%d\", because %s", user.Uid, err.Error())
-			return nil, errs.ErrOperationFailed
-		}
-
-		if exists {
-			log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to delete whether avatar file exist for user \"uid:%d\", the avatar file still exist", user.Uid)
-			return nil, errs.ErrOperationFailed
-		}
-	}
-
-	err = a.users.UpdateUserAvatar(c, user.Uid, "")
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to update user \"uid:%d\", because %s", user.Uid, err.Error())
+		log.ErrorfWithRequestId(c, "[users.UserRemoveAvatarHandler] failed to remove avatar for user \"uid:%d\", because %s", user.Uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	user.CustomAvatarType = ""
-	userResp := user.ToUserProfileResponse()
+	userResp := a.getUserProfileResponse(user)
 	return userResp, nil
 }
 
 // UserSendVerifyEmailByUnloginUserHandler sends unlogin user verify email
 func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (any, *errs.Error) {
-	if !settings.Container.Current.EnableUserVerifyEmail {
+	if !a.CurrentConfig().EnableUserVerifyEmail {
 		return nil, errs.ErrEmailValidationNotAllowed
 	}
 
@@ -657,7 +623,7 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (any
 		return nil, errs.ErrEmailIsVerified
 	}
 
-	if !settings.Container.Current.EnableSMTP {
+	if !a.CurrentConfig().EnableSMTP {
 		return nil, errs.ErrSMTPServerNotEnabled
 	}
 
@@ -681,7 +647,7 @@ func (a *UsersApi) UserSendVerifyEmailByUnloginUserHandler(c *core.Context) (any
 
 // UserSendVerifyEmailByLoginedUserHandler sends logined user verify email
 func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (any, *errs.Error) {
-	if !settings.Container.Current.EnableUserVerifyEmail {
+	if !a.CurrentConfig().EnableUserVerifyEmail {
 		return nil, errs.ErrEmailValidationNotAllowed
 	}
 
@@ -701,7 +667,7 @@ func (a *UsersApi) UserSendVerifyEmailByLoginedUserHandler(c *core.Context) (any
 		return nil, errs.ErrEmailIsVerified
 	}
 
-	if !settings.Container.Current.EnableSMTP {
+	if !a.CurrentConfig().EnableSMTP {
 		return nil, errs.ErrSMTPServerNotEnabled
 	}
 
@@ -741,46 +707,19 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.Context) ([]byte, string, *errs.
 		return nil, "", errs.ErrUserIdInvalid
 	}
 
-	user, err := a.users.GetUserById(c, uid)
+	avatarData, err := a.users.GetUserAvatar(c, uid, fileExtension)
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to get user, because %s", err.Error())
+			log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to get user avatar, because %s", err.Error())
 		}
 
-		return nil, "", errs.ErrUserNotFound
-	}
-
-	if user.CustomAvatarType == "" {
-		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user does not have avatar for user \"uid:%d\"", user.Uid)
-		return nil, "", errs.ErrUserAvatarNoExists
-	}
-
-	if user.CustomAvatarType != fileExtension {
-		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user avatar extension is invalid \"%s\" for user \"uid:%d\"", fileExtension, user.Uid)
-		return nil, "", errs.ErrUserAvatarNoExists
-	}
-
-	avatarFile, err := storage.Container.ReadAvatar(user.Uid, fileExtension)
-
-	if os.IsNotExist(err) {
-		log.WarnfWithRequestId(c, "[users.UserGetAvatarHandler] user avatar file not exist for user \"uid:%d\", because %s", user.Uid, err.Error())
-		return nil, "", errs.ErrUserAvatarNoExists
-	}
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to get user avatar object for user \"uid:%d\", because %s", user.Uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
-	}
-
-	defer avatarFile.Close()
-
-	avatarData, err := io.ReadAll(avatarFile)
-
-	if err != nil {
-		log.ErrorfWithRequestId(c, "[users.UserGetAvatarHandler] failed to read user avatar object data for user \"uid:%d\", because %s", user.Uid, err.Error())
-		return nil, "", errs.ErrOperationFailed
+		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	return avatarData, contentType, nil
+}
+
+func (a *UsersApi) getUserProfileResponse(user *models.User) *models.UserProfileResponse {
+	return user.ToUserProfileResponse(a.CurrentConfig().AvatarProvider, a.CurrentConfig().RootUrl)
 }

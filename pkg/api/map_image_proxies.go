@@ -24,11 +24,16 @@ const tianDiTuMapAnnotationUrlFormat = "https://t0.tianditu.gov.cn/cva_w/wmts?SE
 
 // MapImageProxy represents map image proxy
 type MapImageProxy struct {
+	ApiUsingConfig
 }
 
 // Initialize a map image proxy singleton instance
 var (
-	MapImages = &MapImageProxy{}
+	MapImages = &MapImageProxy{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+	}
 )
 
 // MapTileImageProxyHandler returns map tile image
@@ -47,7 +52,7 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 		} else if mapProvider == settings.CartoDBMapProvider {
 			return cartoDBMapTileImageUrlFormat, nil
 		} else if mapProvider == settings.TomTomMapProvider {
-			targetUrl := tomtomMapTileImageUrlFormat + "?key=" + settings.Container.Current.TomTomMapAPIKey
+			targetUrl := tomtomMapTileImageUrlFormat + "?key=" + p.CurrentConfig().TomTomMapAPIKey
 			language := c.Query("language")
 
 			if language != "" {
@@ -56,9 +61,9 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 
 			return targetUrl, nil
 		} else if mapProvider == settings.TianDiTuProvider {
-			return tianDiTuMapTileImageUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
+			return tianDiTuMapTileImageUrlFormat + "&tk=" + p.CurrentConfig().TianDiTuAPIKey, nil
 		} else if mapProvider == settings.CustomProvider {
-			return settings.Container.Current.CustomMapTileServerTileLayerUrl, nil
+			return p.CurrentConfig().CustomMapTileServerTileLayerUrl, nil
 		}
 
 		return "", errs.ErrParameterInvalid
@@ -69,9 +74,9 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
 	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
 		if mapProvider == settings.TianDiTuProvider {
-			return tianDiTuMapAnnotationUrlFormat + "&tk=" + settings.Container.Current.TianDiTuAPIKey, nil
+			return tianDiTuMapAnnotationUrlFormat + "&tk=" + p.CurrentConfig().TianDiTuAPIKey, nil
 		} else if mapProvider == settings.CustomProvider {
-			return settings.Container.Current.CustomMapTileServerAnnotationLayerUrl, nil
+			return p.CurrentConfig().CustomMapTileServerAnnotationLayerUrl, nil
 		}
 
 		return "", errs.ErrParameterInvalid
@@ -82,7 +87,7 @@ func (p *MapImageProxy) mapImageProxyHandler(c *core.Context, fn func(c *core.Co
 	mapProvider := strings.Replace(c.Query("provider"), "-", "_", -1)
 	targetUrl := ""
 
-	if mapProvider != settings.Container.Current.MapProvider {
+	if mapProvider != p.CurrentConfig().MapProvider {
 		return nil, errs.ErrMapProviderNotCurrent
 	}
 
@@ -105,7 +110,7 @@ func (p *MapImageProxy) mapImageProxyHandler(c *core.Context, fn func(c *core.Co
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, settings.Container.Current.MapProxy)
+	utils.SetProxyUrl(transport, p.CurrentConfig().MapProxy)
 
 	director := func(req *http.Request) {
 		imageRawUrl := targetUrl

@@ -15,6 +15,7 @@ import (
 
 // TokensApi represents token api
 type TokensApi struct {
+	ApiUsingConfig
 	tokens *services.TokenService
 	users  *services.UserService
 }
@@ -22,6 +23,9 @@ type TokensApi struct {
 // Initialize a token api singleton instance
 var (
 	Tokens = &TokensApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		tokens: services.Tokens,
 		users:  services.Users,
 	}
@@ -180,7 +184,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 	now := time.Now().Unix()
 	oldTokenClaims := c.GetTokenClaims()
 
-	if now-oldTokenClaims.IssuedAt < int64(settings.Container.Current.TokenMinRefreshInterval) {
+	if now-oldTokenClaims.IssuedAt < int64(a.CurrentConfig().TokenMinRefreshInterval) {
 		log.InfofWithRequestId(c, "[token.TokenRefreshHandler] token of user \"uid:%d\" does not need to be refreshed", uid)
 
 		userTokenId, err := utils.StringToInt64(oldTokenClaims.UserTokenId)
@@ -204,8 +208,8 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 		}
 
 		refreshResp := &models.TokenRefreshResponse{
-			User:                user.ToUserBasicInfo(),
-			NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
+			User:                a.GetUserBasicInfo(user),
+			NotificationContent: a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 		}
 
 		return refreshResp, nil
@@ -233,8 +237,8 @@ func (a *TokensApi) TokenRefreshHandler(c *core.Context) (any, *errs.Error) {
 	refreshResp := &models.TokenRefreshResponse{
 		NewToken:            token,
 		OldTokenId:          a.tokens.GenerateTokenId(oldTokenRecord),
-		User:                user.ToUserBasicInfo(),
-		NotificationContent: settings.Container.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
+		User:                a.GetUserBasicInfo(user),
+		NotificationContent: a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 	}
 
 	return refreshResp, nil

@@ -18,6 +18,8 @@ import (
 
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
+	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	transactions          *services.TransactionService
 	transactionCategories *services.TransactionCategoryService
 	transactionTags       *services.TransactionTagService
@@ -28,6 +30,12 @@ type TransactionsApi struct {
 // Initialize a transaction api singleton instance
 var (
 	Transactions = &TransactionsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			container: duplicatechecker.Container,
+		},
 		transactions:          services.Transactions,
 		transactionCategories: services.TransactionCategories,
 		transactionTags:       services.TransactionTags,
@@ -663,8 +671,8 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 		return nil, errs.ErrCannotCreateTransactionWithThisTransactionTime
 	}
 
-	if settings.Container.Current.EnableDuplicateSubmissionsCheck && transactionCreateReq.ClientSessionId != "" {
-		found, remark := duplicatechecker.Container.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId)
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && transactionCreateReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId)
 
 		if found {
 			log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] another transaction \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
@@ -694,7 +702,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 
 	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
-	duplicatechecker.Container.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId, utils.Int64ToString(transaction.TransactionId))
+	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId, utils.Int64ToString(transaction.TransactionId))
 	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 
 	return transactionResp, nil

@@ -967,6 +967,8 @@
         "no user avatar": "There is no user avatar file",
         "user avatar is empty": "User avatar file is empty",
         "user avatar not exists": "User avatar does not exist",
+        "user avatar not set": "User avatar is not set",
+        "user avatar file extension invalid": "User avatar file extension is invalid",
         "unauthorized access": "Unauthorized access",
         "current token is invalid": "Current token is invalid",
         "current token is expired": "Current token is expired",

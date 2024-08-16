@@ -3,7 +3,10 @@ package services
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/url"
+	"os"
 	"time"
 
 	"xorm.io/xorm"
@@ -12,9 +15,11 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/locales"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/storage"
 	"github.com/mayswind/ezbookkeeping/pkg/templates"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
@@ -28,6 +33,7 @@ type UserService struct {
 	ServiceUsingConfig
 	ServiceUsingMailer
 	ServiceUsingUuid
+	ServiceUsingStorage
 }
 
 // Initialize a user service singleton instance
@@ -44,6 +50,9 @@ var (
 		},
 		ServiceUsingUuid: ServiceUsingUuid{
 			container: uuid.Container,
+		},
+		ServiceUsingStorage: ServiceUsingStorage{
+			container: storage.Container,
 		},
 	}
 )
@@ -124,6 +133,50 @@ func (s *UserService) GetUserByEmail(c *core.Context, email string) (*models.Use
 	}
 
 	return user, nil
+}
+
+// GetUserAvatar returns the user avatar image data and image file extension according to user uid
+func (s *UserService) GetUserAvatar(c *core.Context, uid int64, fileExtension string) ([]byte, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	user := &models.User{}
+	has, err := s.UserDB().NewSession(c).ID(uid).Cols("uid", "deleted", "custom_avatar_type").Where("deleted=?", false).Get(user)
+
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.CustomAvatarType == "" {
+		return nil, errs.ErrUserAvatarNotSet
+	}
+
+	if user.CustomAvatarType != fileExtension {
+		return nil, errs.ErrUserAvatarExtensionInvalid
+	}
+
+	avatarFile, err := s.ReadAvatar(user.Uid, user.CustomAvatarType)
+
+	if os.IsNotExist(err) {
+		return nil, errs.ErrUserAvatarNoExists
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer avatarFile.Close()
+
+	avatarData, err := io.ReadAll(avatarFile)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return avatarData, nil
 }
 
 // CreateUser saves a new user model to database
@@ -294,16 +347,63 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 	return keyProfileUpdated, emailSetToUnverified, nil
 }
 
-// UpdateUserAvatar updated the custom avatar type of specified user
-func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, customAvatarType string) error {
+// UpdateUserAvatar updates the custom avatar type of specified user
+func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, avatarFile multipart.File, fileExtension string, oldFileExtension string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
+	}
+
+	defer avatarFile.Close()
+
+	err := s.SaveAvatar(uid, avatarFile, fileExtension)
+
+	if err != nil {
+		return err
 	}
 
 	now := time.Now().Unix()
 
 	updateModel := &models.User{
-		CustomAvatarType: customAvatarType,
+		CustomAvatarType: fileExtension,
+		UpdatedUnixTime:  now,
+	}
+
+	err = s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.ID(uid).Cols("custom_avatar_type", "updated_unix_time").Where("deleted=?", false).Update(updateModel)
+		return err
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if fileExtension != oldFileExtension && oldFileExtension != "" {
+		err = s.DeleteAvatar(uid, oldFileExtension)
+
+		if err != nil {
+			log.WarnfWithRequestId(c, "[users.UpdateUserAvatar] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", oldFileExtension, uid, err.Error())
+		}
+	}
+
+	return nil
+}
+
+// RemoveUserAvatar removes the custom avatar type of specified user
+func (s *UserService) RemoveUserAvatar(c *core.Context, uid int64, fileExtension string) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	err := s.DeleteAvatar(uid, fileExtension)
+
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.User{
+		CustomAvatarType: "",
 		UpdatedUnixTime:  now,
 	}
 

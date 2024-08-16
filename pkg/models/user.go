@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -253,13 +252,13 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOff
 }
 
 // ToUserBasicInfo returns a user basic view-object according to database model
-func (u *User) ToUserBasicInfo() *UserBasicInfo {
+func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, rootUrl string) *UserBasicInfo {
 	return &UserBasicInfo{
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
-		AvatarUrl:            u.getAvatarUrl(),
-		AvatarProvider:       u.getAvatarProvider(),
+		AvatarUrl:            u.getAvatarUrl(avatarProvider, rootUrl),
+		AvatarProvider:       string(avatarProvider),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
 		Language:             u.Language,
@@ -280,23 +279,17 @@ func (u *User) ToUserBasicInfo() *UserBasicInfo {
 }
 
 // ToUserProfileResponse returns a user profile view-object according to database model
-func (u *User) ToUserProfileResponse() *UserProfileResponse {
+func (u *User) ToUserProfileResponse(avatarProvider core.UserAvatarProviderType, rootUrl string) *UserProfileResponse {
 	return &UserProfileResponse{
-		UserBasicInfo: u.ToUserBasicInfo(),
+		UserBasicInfo: u.ToUserBasicInfo(avatarProvider, rootUrl),
 		LastLoginAt:   u.LastLoginUnixTime,
 	}
 }
 
-func (u *User) getAvatarProvider() string {
-	return settings.Container.Current.AvatarProvider
-}
-
-func (u *User) getAvatarUrl() string {
-	avatarProvider := settings.Container.Current.AvatarProvider
-
-	if avatarProvider == settings.InternalAvatarProvider {
-		return utils.GetInternalAvatarUrl(u.Uid, u.CustomAvatarType, settings.Container.Current.RootUrl)
-	} else if avatarProvider == settings.GravatarProvider {
+func (u *User) getAvatarUrl(avatarProvider core.UserAvatarProviderType, rootUrl string) string {
+	if avatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
+		return utils.GetInternalAvatarUrl(u.Uid, u.CustomAvatarType, rootUrl)
+	} else if avatarProvider == core.USER_AVATAR_PROVIDER_GRAVATAR {
 		return utils.GetGravatarUrl(u.Email)
 	}
 

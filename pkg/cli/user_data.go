@@ -19,6 +19,7 @@ const pageCountForDataExport = 1000
 
 // UserDataCli represents user data cli
 type UserDataCli struct {
+	CliUsingConfig
 	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
 	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
 	accounts                 *services.AccountService
@@ -34,6 +35,9 @@ type UserDataCli struct {
 // Initialize an user data cli singleton instance
 var (
 	UserData = &UserDataCli{
+		CliUsingConfig: CliUsingConfig{
+			container: settings.Container,
+		},
 		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
 		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
 		accounts:                 services.Accounts,
@@ -180,7 +184,7 @@ func (l *UserDataCli) SendPasswordResetMail(c *cli.Context, username string) err
 		return err
 	}
 
-	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
+	if l.CurrentConfig().ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.BootWarnf("[user_data.SendPasswordResetMail] user \"uid:%d\" has not verified email", user.Uid)
 		return errs.ErrEmailIsNotVerified
 	}
@@ -238,7 +242,7 @@ func (l *UserDataCli) DisableUser(c *cli.Context, username string) error {
 
 // ResendVerifyEmail resends an email with account activation link
 func (l *UserDataCli) ResendVerifyEmail(c *cli.Context, username string) error {
-	if !settings.Container.Current.EnableUserVerifyEmail {
+	if !l.CurrentConfig().EnableUserVerifyEmail {
 		return errs.ErrEmailValidationNotAllowed
 	}
 

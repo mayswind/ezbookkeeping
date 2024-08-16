@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"fmt"
-
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -36,26 +34,22 @@ func InitializeStorageContainer(config *settings.Config) error {
 	return errs.ErrInvalidStorageType
 }
 
-// ExistsAvatar returns whether the user avatar exists from the current object storage
-func (s *StorageContainer) ExistsAvatar(uid int64, fileExtension string) (bool, error) {
-	return s.AvatarCurrentStorage.Exists(s.getUserAvatarPath(uid, fileExtension))
+// ExistsAvatar returns whether the avatar file exists from the current avatar object storage
+func (s *StorageContainer) ExistsAvatar(path string) (bool, error) {
+	return s.AvatarCurrentStorage.Exists(path)
 }
 
-// ReadAvatar returns the user avatar from the current object storage
-func (s *StorageContainer) ReadAvatar(uid int64, fileExtension string) (ObjectInStorage, error) {
-	return s.AvatarCurrentStorage.Read(s.getUserAvatarPath(uid, fileExtension))
+// ReadAvatar returns the avatar file from the current avatar object storage
+func (s *StorageContainer) ReadAvatar(path string) (ObjectInStorage, error) {
+	return s.AvatarCurrentStorage.Read(path)
 }
 
-// SaveAvatar returns whether save the user avatar into the current object storage successfully
-func (s *StorageContainer) SaveAvatar(uid int64, object ObjectInStorage, fileExtension string) error {
-	return s.AvatarCurrentStorage.Save(s.getUserAvatarPath(uid, fileExtension), object)
+// SaveAvatar returns whether save the avatar file into the current avatar object storage successfully
+func (s *StorageContainer) SaveAvatar(path string, object ObjectInStorage) error {
+	return s.AvatarCurrentStorage.Save(path, object)
 }
 
-// DeleteAvatar returns whether delete the user avatar from the current object storage successfully
-func (s *StorageContainer) DeleteAvatar(uid int64, fileExtension string) error {
-	return s.AvatarCurrentStorage.Delete(s.getUserAvatarPath(uid, fileExtension))
-}
-
-func (s *StorageContainer) getUserAvatarPath(uid int64, fileExtension string) string {
-	return fmt.Sprintf("%d.%s", uid, fileExtension)
+// DeleteAvatar returns whether delete the avatar file from the current avatar object storage successfully
+func (s *StorageContainer) DeleteAvatar(path string) error {
+	return s.AvatarCurrentStorage.Delete(path)
 }

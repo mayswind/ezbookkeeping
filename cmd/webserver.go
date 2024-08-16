@@ -153,7 +153,7 @@ func startWebServer(c *cli.Context) error {
 		router.StaticFile("/desktop/"+workboxFileNames[i], filepath.Join(config.StaticRootPath, workboxFileNames[i]))
 	}
 
-	if config.AvatarProvider == settings.InternalAvatarProvider {
+	if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
 		avatarRoute := router.Group("/avatar")
 		avatarRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
 		{
@@ -261,7 +261,7 @@ func startWebServer(c *cli.Context) error {
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler))
 			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))
 
-			if config.AvatarProvider == settings.InternalAvatarProvider {
+			if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
 				apiV1Route.POST("/users/avatar/update.json", bindApi(api.Users.UserUpdateAvatarHandler))
 				apiV1Route.POST("/users/avatar/remove.json", bindApi(api.Users.UserRemoveAvatarHandler))
 			}

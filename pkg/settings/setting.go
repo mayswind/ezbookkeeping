@@ -10,6 +10,7 @@ import (
 
 	"gopkg.in/ini.v1"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/locales"
 )
@@ -72,12 +73,6 @@ const (
 // Duplicate checker types
 const (
 	InMemoryDuplicateCheckerType string = "in_memory"
-)
-
-// User avatar provider types
-const (
-	InternalAvatarProvider string = "internal"
-	GravatarProvider       string = "gravatar"
 )
 
 // Map provider types
@@ -276,7 +271,7 @@ type Config struct {
 	EnableUserForceVerifyEmail       bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
-	AvatarProvider                   string
+	AvatarProvider                   core.UserAvatarProviderType
 
 	// Data
 	EnableDataExport bool
@@ -744,10 +739,10 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
 
-	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == InternalAvatarProvider {
-		config.AvatarProvider = InternalAvatarProvider
-	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == GravatarProvider {
-		config.AvatarProvider = GravatarProvider
+	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == string(core.USER_AVATAR_PROVIDER_INTERNAL) {
+		config.AvatarProvider = core.USER_AVATAR_PROVIDER_INTERNAL
+	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == string(core.USER_AVATAR_PROVIDER_GRAVATAR) {
+		config.AvatarProvider = core.USER_AVATAR_PROVIDER_GRAVATAR
 	} else if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == "" {
 		config.AvatarProvider = ""
 	} else {

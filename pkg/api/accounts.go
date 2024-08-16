@@ -16,12 +16,20 @@ import (
 
 // AccountsApi represents account api
 type AccountsApi struct {
+	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	accounts *services.AccountService
 }
 
 // Initialize an account api singleton instance
 var (
 	Accounts = &AccountsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			container: duplicatechecker.Container,
+		},
 		accounts: services.Accounts,
 	}
 )
@@ -211,8 +219,8 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, maxOrderId+1)
 	childrenAccounts := a.createSubAccountModels(uid, &accountCreateReq)
 
-	if settings.Container.Current.EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
-		found, remark := duplicatechecker.Container.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
 
 		if found {
 			log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] another account \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
@@ -256,7 +264,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 
 	log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] user \"uid:%d\" has created a new account \"id:%d\" successfully", uid, mainAccount.AccountId)
 
-	duplicatechecker.Container.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
+	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
 	accountInfoResp := mainAccount.ToAccountInfoResponse()
 
 	if len(childrenAccounts) > 0 {

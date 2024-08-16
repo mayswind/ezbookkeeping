@@ -967,6 +967,8 @@
         "no user avatar": "没有用户头像文件",
         "user avatar is empty": "用户头像文件为空",
         "user avatar not exists": "用户头像不存在",
+        "user avatar not set": "用户没有设置头像",
+        "user avatar file extension invalid": "用户头像文件扩展名无效",
         "unauthorized access": "未授权的登录",
         "current token is invalid": "当前认证令牌无效",
         "current token is expired": "当前认证令牌已过期",

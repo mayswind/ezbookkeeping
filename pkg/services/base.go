@@ -1,10 +1,13 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/storage"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
@@ -75,4 +78,33 @@ func (s *ServiceUsingUuid) GenerateUuid(uuidType uuid.UuidType) int64 {
 // GenerateUuids generates new uuids according to given uuid type and count
 func (s *ServiceUsingUuid) GenerateUuids(uuidType uuid.UuidType, count uint8) []int64 {
 	return s.container.GenerateUuids(uuidType, count)
+}
+
+// ServiceUsingStorage represents a service that need to use storage
+type ServiceUsingStorage struct {
+	container *storage.StorageContainer
+}
+
+// ExistsAvatar returns whether the user avatar exists from the current avatar object storage
+func (s *ServiceUsingStorage) ExistsAvatar(uid int64, fileExtension string) (bool, error) {
+	return s.container.ExistsAvatar(s.getUserAvatarPath(uid, fileExtension))
+}
+
+// ReadAvatar returns the user avatar from the current avatar object storage
+func (s *ServiceUsingStorage) ReadAvatar(uid int64, fileExtension string) (storage.ObjectInStorage, error) {
+	return s.container.ReadAvatar(s.getUserAvatarPath(uid, fileExtension))
+}
+
+// SaveAvatar returns whether save the user avatar into the current avatar object storage successfully
+func (s *ServiceUsingStorage) SaveAvatar(uid int64, object storage.ObjectInStorage, fileExtension string) error {
+	return s.container.SaveAvatar(s.getUserAvatarPath(uid, fileExtension), object)
+}
+
+// DeleteAvatar returns whether delete the user avatar from the current avatar object storage successfully
+func (s *ServiceUsingStorage) DeleteAvatar(uid int64, fileExtension string) error {
+	return s.container.DeleteAvatar(s.getUserAvatarPath(uid, fileExtension))
+}
+
+func (s *ServiceUsingStorage) getUserAvatarPath(uid int64, fileExtension string) string {
+	return fmt.Sprintf("%d.%s", uid, fileExtension)
 }

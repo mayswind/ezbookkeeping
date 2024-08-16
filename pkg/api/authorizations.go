@@ -13,6 +13,7 @@ import (
 
 // AuthorizationsApi represents authorization api
 type AuthorizationsApi struct {
+	ApiUsingConfig
 	users                   *services.UserService
 	tokens                  *services.TokenService
 	twoFactorAuthorizations *services.TwoFactorAuthorizationService
@@ -21,6 +22,9 @@ type AuthorizationsApi struct {
 // Initialize a authorization api singleton instance
 var (
 	Authorizations = &AuthorizationsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		users:                   services.Users,
 		tokens:                  services.Tokens,
 		twoFactorAuthorizations: services.TwoFactorAuthorizations,
@@ -49,7 +53,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.Context) (any, *errs.Error)
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+	if a.CurrentConfig().EnableUserForceVerifyEmail && !user.EmailVerified {
 		hasValidEmailVerifyToken, err := a.tokens.ExistsValidTokenByType(c, user.Uid, core.USER_TOKEN_TYPE_EMAIL_VERIFY)
 
 		if err != nil {
@@ -143,7 +147,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.Context) (any, *er
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+	if a.CurrentConfig().EnableUserForceVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}
@@ -205,7 +209,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.Cont
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if settings.Container.Current.EnableUserForceVerifyEmail && !user.EmailVerified {
+	if a.CurrentConfig().EnableUserForceVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}
@@ -244,7 +248,7 @@ func (a *AuthorizationsApi) getAuthResponse(c *core.Context, token string, need2
 	return &models.AuthResponse{
 		Token:               token,
 		Need2FA:             need2FA,
-		User:                user.ToUserBasicInfo(),
-		NotificationContent: settings.Container.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
+		User:                a.GetUserBasicInfo(user),
+		NotificationContent: a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
 	}
 }

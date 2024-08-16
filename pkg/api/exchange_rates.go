@@ -18,11 +18,17 @@ import (
 )
 
 // ExchangeRatesApi represents exchange rate api
-type ExchangeRatesApi struct{}
+type ExchangeRatesApi struct {
+	ApiUsingConfig
+}
 
 // Initialize a exchange rate api singleton instance
 var (
-	ExchangeRates = &ExchangeRatesApi{}
+	ExchangeRates = &ExchangeRatesApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+	}
 )
 
 // LatestExchangeRateHandler returns latest exchange rate data
@@ -36,9 +42,9 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 	uid := c.GetCurrentUid()
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	utils.SetProxyUrl(transport, settings.Container.Current.ExchangeRatesProxy)
+	utils.SetProxyUrl(transport, a.CurrentConfig().ExchangeRatesProxy)
 
-	if settings.Container.Current.ExchangeRatesSkipTLSVerify {
+	if a.CurrentConfig().ExchangeRatesSkipTLSVerify {
 		transport.TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
@@ -46,7 +52,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   time.Duration(settings.Container.Current.ExchangeRatesRequestTimeout) * time.Millisecond,
+		Timeout:   time.Duration(a.CurrentConfig().ExchangeRatesRequestTimeout) * time.Millisecond,
 	}
 
 	urls := dataSource.GetRequestUrls()

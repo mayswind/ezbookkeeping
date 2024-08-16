@@ -13,6 +13,7 @@ import (
 
 // ForgetPasswordsApi represents user forget password api
 type ForgetPasswordsApi struct {
+	ApiUsingConfig
 	users           *services.UserService
 	tokens          *services.TokenService
 	forgetPasswords *services.ForgetPasswordService
@@ -21,6 +22,9 @@ type ForgetPasswordsApi struct {
 // Initialize a user api singleton instance
 var (
 	ForgetPasswords = &ForgetPasswordsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		users:           services.Users,
 		tokens:          services.Tokens,
 		forgetPasswords: services.ForgetPasswords,
@@ -52,12 +56,12 @@ func (a *ForgetPasswordsApi) UserForgetPasswordRequestHandler(c *core.Context) (
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
+	if a.CurrentConfig().ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserForgetPasswordRequestHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}
 
-	if !settings.Container.Current.EnableSMTP {
+	if !a.CurrentConfig().EnableSMTP {
 		return nil, errs.ErrSMTPServerNotEnabled
 	}
 
@@ -105,7 +109,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.Context) (any, *er
 		return nil, errs.ErrUserIsDisabled
 	}
 
-	if settings.Container.Current.ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
+	if a.CurrentConfig().ForgetPasswordRequireVerifyEmail && !user.EmailVerified {
 		log.WarnfWithRequestId(c, "[forget_passwords.UserResetPasswordHandler] user \"uid:%d\" has not verified email", user.Uid)
 		return nil, errs.ErrEmailIsNotVerified
 	}

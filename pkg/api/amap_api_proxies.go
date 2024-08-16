@@ -18,11 +18,16 @@ const amapRestApiUrl = "https://restapi.amap.com/"
 
 // AmapApiProxy represents amap api proxy
 type AmapApiProxy struct {
+	ApiUsingConfig
 }
 
 // Initialize a amap api proxy singleton instance
 var (
-	AmapApis = &AmapApiProxy{}
+	AmapApis = &AmapApiProxy{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+	}
 )
 
 // AmapApiProxyHandler returns amap api response
@@ -38,7 +43,7 @@ func (p *AmapApiProxy) AmapApiProxyHandler(c *core.Context) (*httputil.ReversePr
 	}
 
 	director := func(req *http.Request) {
-		targetRawUrl := fmt.Sprintf("%s?%s&jscode=%s", targetUrl, req.URL.RawQuery, settings.Container.Current.AmapApplicationSecret)
+		targetRawUrl := fmt.Sprintf("%s?%s&jscode=%s", targetUrl, req.URL.RawQuery, p.CurrentConfig().AmapApplicationSecret)
 		targetUrl, _ := url.Parse(targetRawUrl)
 
 		oldCookies := req.Cookies()

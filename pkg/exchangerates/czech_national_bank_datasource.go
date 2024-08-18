@@ -33,18 +33,18 @@ func (e *CzechNationalBankDataSource) GetRequestUrls() []string {
 }
 
 // Parse returns the common response entity according to the czech nation bank data source raw response
-func (e *CzechNationalBankDataSource) Parse(c *core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+func (e *CzechNationalBankDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
 	lines := strings.Split(string(content), "\n")
 
 	if len(lines) < 3 {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] content is invalid, content is %s", string(content))
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] content is invalid, content is %s", string(content))
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	headerLineItems := strings.Split(lines[0], "#")
 
 	if len(headerLineItems) != 2 {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] first line of content is invalid, content is %s", lines[0])
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] first line of content is invalid, content is %s", lines[0])
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -60,21 +60,21 @@ func (e *CzechNationalBankDataSource) Parse(c *core.Context, content []byte) (*m
 	currencyCodeColumnIndex, exists := titleItemMap["Code"]
 
 	if !exists {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] missing currency code column in title line, title line is %s", lines[1])
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] missing currency code column in title line, title line is %s", lines[1])
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	amountColumnIndex, exists := titleItemMap["Amount"]
 
 	if !exists {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] missing amount column in title line, title line is %s", lines[1])
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] missing amount column in title line, title line is %s", lines[1])
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	rateColumnIndex, exists := titleItemMap["Rate"]
 
 	if !exists {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] missing rate column in title line, title line is %s", lines[1])
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] missing rate column in title line, title line is %s", lines[1])
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -92,7 +92,7 @@ func (e *CzechNationalBankDataSource) Parse(c *core.Context, content []byte) (*m
 	timezone, err := time.LoadLocation(czechNationalBankDataUpdateDateTimezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] failed to get timezone, timezone name is %s", czechNationalBankDataUpdateDateTimezone)
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] failed to get timezone, timezone name is %s", czechNationalBankDataUpdateDateTimezone)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -100,7 +100,7 @@ func (e *CzechNationalBankDataSource) Parse(c *core.Context, content []byte) (*m
 	updateTime, err := time.ParseInLocation(czechNationalBankDataUpdateDateFormat, updateDateTime, timezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[czech_national_bank_datasource.Parse] failed to parse update date, datetime is %s", updateDateTime)
+		log.Errorf(c, "[czech_national_bank_datasource.Parse] failed to parse update date, datetime is %s", updateDateTime)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
@@ -115,7 +115,7 @@ func (e *CzechNationalBankDataSource) Parse(c *core.Context, content []byte) (*m
 	return latestExchangeRateResp, nil
 }
 
-func (e *CzechNationalBankDataSource) parseExchangeRate(c *core.Context, line string, currencyCodeColumnIndex int, amountColumnIndex int, rateColumnIndex int) *models.LatestExchangeRate {
+func (e *CzechNationalBankDataSource) parseExchangeRate(c core.Context, line string, currencyCodeColumnIndex int, amountColumnIndex int, rateColumnIndex int) *models.LatestExchangeRate {
 	if len(line) < 1 {
 		return nil
 	}
@@ -123,7 +123,7 @@ func (e *CzechNationalBankDataSource) parseExchangeRate(c *core.Context, line st
 	items := strings.Split(line, "|")
 
 	if currencyCodeColumnIndex >= len(items) || amountColumnIndex >= len(items) || rateColumnIndex >= len(items) {
-		log.WarnfWithRequestId(c, "[czech_national_bank_datasource.parseExchangeRate] missing column in data line, line is %s", line)
+		log.Warnf(c, "[czech_national_bank_datasource.parseExchangeRate] missing column in data line, line is %s", line)
 		return nil
 	}
 
@@ -136,19 +136,19 @@ func (e *CzechNationalBankDataSource) parseExchangeRate(c *core.Context, line st
 	amount, err := utils.StringToInt64(items[amountColumnIndex])
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[czech_national_bank_datasource.parseExchangeRate] failed to parse amount, line is %s", line)
+		log.Warnf(c, "[czech_national_bank_datasource.parseExchangeRate] failed to parse amount, line is %s", line)
 		return nil
 	}
 
 	rate, err := utils.StringToFloat64(items[rateColumnIndex])
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[czech_national_bank_datasource.parseExchangeRate] failed to parse rate, line is %s", line)
+		log.Warnf(c, "[czech_national_bank_datasource.parseExchangeRate] failed to parse rate, line is %s", line)
 		return nil
 	}
 
 	if rate <= 0 {
-		log.WarnfWithRequestId(c, "[czech_national_bank_datasource.parseExchangeRate] rate is invalid, line is %s", line)
+		log.Warnf(c, "[czech_national_bank_datasource.parseExchangeRate] rate is invalid, line is %s", line)
 		return nil
 	}
 

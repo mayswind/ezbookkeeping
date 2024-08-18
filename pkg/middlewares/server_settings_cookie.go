@@ -14,7 +14,7 @@ const settingsCookieName = "ebk_server_settings"
 
 // ServerSettingsCookie adds server settings to cookies in response
 func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
-	return func(c *core.Context) {
+	return func(c *core.WebContext) {
 		settingsArr := []string{
 			buildBooleanSetting("r", config.EnableUserRegister),
 			buildBooleanSetting("f", config.EnableUserForgetPassword),

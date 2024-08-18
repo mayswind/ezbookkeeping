@@ -36,12 +36,12 @@ var (
 )
 
 // CategoryListHandler returns transaction category list of current user
-func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryListHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryListReq models.TransactionCategoryListRequest
 	err := c.ShouldBindQuery(&categoryListReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryListHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -49,7 +49,7 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (any, *e
 	categories, err := a.categories.GetAllCategoriesByUid(c, uid, categoryListReq.Type, categoryListReq.ParentId)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryListHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryListHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -57,12 +57,12 @@ func (a *TransactionCategoriesApi) CategoryListHandler(c *core.Context) (any, *e
 }
 
 // CategoryGetHandler returns one specific transaction category of current user
-func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryGetReq models.TransactionCategoryGetRequest
 	err := c.ShouldBindQuery(&categoryGetReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryGetHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryGetHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -70,7 +70,7 @@ func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (any, *er
 	category, err := a.categories.GetCategoryByCategoryId(c, uid, categoryGetReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryGetHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryGetReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryGetHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryGetReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -80,17 +80,17 @@ func (a *TransactionCategoriesApi) CategoryGetHandler(c *core.Context) (any, *er
 }
 
 // CategoryCreateHandler saves a new transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryCreateReq models.TransactionCategoryCreateRequest
 	err := c.ShouldBindJSON(&categoryCreateReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryCreateHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	if categoryCreateReq.Type < models.CATEGORY_TYPE_INCOME || categoryCreateReq.Type > models.CATEGORY_TYPE_TRANSFER {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] category type invalid, type is %d", categoryCreateReq.Type)
+		log.Warnf(c, "[transaction_categories.CategoryCreateHandler] category type invalid, type is %d", categoryCreateReq.Type)
 		return nil, errs.ErrTransactionCategoryTypeInvalid
 	}
 
@@ -100,17 +100,17 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 		parentCategory, err := a.categories.GetCategoryByCategoryId(c, uid, categoryCreateReq.ParentId)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
+			log.Errorf(c, "[transaction_categories.CategoryCreateHandler] failed to get parent category \"id:%d\" for user \"uid:%d\", because %s", categoryCreateReq.ParentId, uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
 		if parentCategory == nil {
-			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" does not exist for user \"uid:%d\"", categoryCreateReq.ParentId, uid)
+			log.Warnf(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" does not exist for user \"uid:%d\"", categoryCreateReq.ParentId, uid)
 			return nil, errs.ErrParentTransactionCategoryNotFound
 		}
 
 		if parentCategory.ParentCategoryId > 0 {
-			log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" has another parent category \"id:%d\" for user \"uid:%d\"", parentCategory.CategoryId, parentCategory.ParentCategoryId, uid)
+			log.Warnf(c, "[transaction_categories.CategoryCreateHandler] parent category \"id:%d\" has another parent category \"id:%d\" for user \"uid:%d\"", parentCategory.CategoryId, parentCategory.ParentCategoryId, uid)
 			return nil, errs.ErrCannotAddToSecondaryTransactionCategory
 		}
 	}
@@ -124,7 +124,7 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 	}
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -134,14 +134,14 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId)
 
 		if found {
-			log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] another category \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			log.Infof(c, "[transaction_categories.CategoryCreateHandler] another category \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
 			categoryId, err := utils.StringToInt64(remark)
 
 			if err == nil {
 				category, err = a.categories.GetCategoryByCategoryId(c, uid, categoryId)
 
 				if err != nil {
-					log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to get existed category \"id:%d\" for user \"uid:%d\", because %s", categoryId, uid, err.Error())
+					log.Errorf(c, "[transaction_categories.CategoryCreateHandler] failed to get existed category \"id:%d\" for user \"uid:%d\", because %s", categoryId, uid, err.Error())
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
@@ -155,11 +155,11 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 	err = a.categories.CreateCategory(c, category)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateHandler] failed to create category \"id:%d\" for user \"uid:%d\", because %s", category.CategoryId, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryCreateHandler] failed to create category \"id:%d\" for user \"uid:%d\", because %s", category.CategoryId, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryCreateHandler] user \"uid:%d\" has created a new category \"id:%d\" successfully", uid, category.CategoryId)
+	log.Infof(c, "[transaction_categories.CategoryCreateHandler] user \"uid:%d\" has created a new category \"id:%d\" successfully", uid, category.CategoryId)
 
 	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId, utils.Int64ToString(category.CategoryId))
 	categoryResp := category.ToTransactionCategoryInfoResponse()
@@ -168,12 +168,12 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.Context) (any, 
 }
 
 // CategoryCreateBatchHandler saves some new transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryCreateBatchReq models.TransactionCategoryCreateBatchRequest
 	err := c.ShouldBindBodyWith(&categoryCreateBatchReq, binding.JSON)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryCreateBatchHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -189,12 +189,12 @@ func (a *TransactionCategoriesApi) CategoryCreateBatchHandler(c *core.Context) (
 }
 
 // CategoryModifyHandler saves an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryModifyReq models.TransactionCategoryModifyRequest
 	err := c.ShouldBindJSON(&categoryModifyReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -202,7 +202,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 	category, err := a.categories.GetCategoryByCategoryId(c, uid, categoryModifyReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryModifyHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -238,14 +238,14 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 		fromPrimaryCategory, err := a.categories.GetCategoryByCategoryId(c, uid, category.ParentCategoryId)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get old primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", category.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
+			log.Errorf(c, "[transaction_categories.CategoryModifyHandler] failed to get old primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", category.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
 		toPrimaryCategory, err := a.categories.GetCategoryByCategoryId(c, uid, newCategory.ParentCategoryId)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to get new primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", newCategory.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
+			log.Errorf(c, "[transaction_categories.CategoryModifyHandler] failed to get new primary category \"id:%d\" of category \"id:%d\" for user \"uid:%d\", because %s", newCategory.ParentCategoryId, categoryModifyReq.Id, uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
@@ -261,11 +261,11 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 	err = a.categories.ModifyCategory(c, newCategory)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryModifyHandler] failed to update category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryModifyHandler] failed to update category \"id:%d\" for user \"uid:%d\", because %s", categoryModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryModifyHandler] user \"uid:%d\" has updated category \"id:%d\" successfully", uid, categoryModifyReq.Id)
+	log.Infof(c, "[transaction_categories.CategoryModifyHandler] user \"uid:%d\" has updated category \"id:%d\" successfully", uid, categoryModifyReq.Id)
 
 	newCategory.Type = category.Type
 	newCategory.DisplayOrder = category.DisplayOrder
@@ -275,12 +275,12 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.Context) (any, 
 }
 
 // CategoryHideHandler hides an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryHideReq models.TransactionCategoryHideRequest
 	err := c.ShouldBindJSON(&categoryHideReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryHideHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryHideHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -288,21 +288,21 @@ func (a *TransactionCategoriesApi) CategoryHideHandler(c *core.Context) (any, *e
 	err = a.categories.HideCategory(c, uid, []int64{categoryHideReq.Id}, categoryHideReq.Hidden)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryHideHandler] failed to hide category \"id:%d\" for user \"uid:%d\", because %s", categoryHideReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryHideHandler] failed to hide category \"id:%d\" for user \"uid:%d\", because %s", categoryHideReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryHideHandler] user \"uid:%d\" has hidden category \"id:%d\"", uid, categoryHideReq.Id)
+	log.Infof(c, "[transaction_categories.CategoryHideHandler] user \"uid:%d\" has hidden category \"id:%d\"", uid, categoryHideReq.Id)
 	return true, nil
 }
 
 // CategoryMoveHandler moves display order of existed transaction categories by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryMoveReq models.TransactionCategoryMoveRequest
 	err := c.ShouldBindJSON(&categoryMoveReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryMoveHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryMoveHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -323,21 +323,21 @@ func (a *TransactionCategoriesApi) CategoryMoveHandler(c *core.Context) (any, *e
 	err = a.categories.ModifyCategoryDisplayOrders(c, uid, categories)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryMoveHandler] failed to move categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryMoveHandler] failed to move categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryMoveHandler] user \"uid:%d\" has moved categories", uid)
+	log.Infof(c, "[transaction_categories.CategoryMoveHandler] user \"uid:%d\" has moved categories", uid)
 	return true, nil
 }
 
 // CategoryDeleteHandler deletes an existed transaction category by request parameters for current user
-func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var categoryDeleteReq models.TransactionCategoryDeleteRequest
 	err := c.ShouldBindJSON(&categoryDeleteReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_categories.CategoryDeleteHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -345,15 +345,15 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.Context) (any, 
 	err = a.categories.DeleteCategory(c, uid, categoryDeleteReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] failed to delete category \"id:%d\" for user \"uid:%d\", because %s", categoryDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_categories.CategoryDeleteHandler] failed to delete category \"id:%d\" for user \"uid:%d\", because %s", categoryDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.CategoryDeleteHandler] user \"uid:%d\" has deleted category \"id:%d\"", uid, categoryDeleteReq.Id)
+	log.Infof(c, "[transaction_categories.CategoryDeleteHandler] user \"uid:%d\" has deleted category \"id:%d\"", uid, categoryDeleteReq.Id)
 	return true, nil
 }
 
-func (a *TransactionCategoriesApi) createBatchCategories(c *core.Context, uid int64, categoryCreateBatchReq *models.TransactionCategoryCreateBatchRequest) ([]*models.TransactionCategory, error) {
+func (a *TransactionCategoriesApi) createBatchCategories(c *core.WebContext, uid int64, categoryCreateBatchReq *models.TransactionCategoryCreateBatchRequest) ([]*models.TransactionCategory, error) {
 	var err error
 	categoryTypeMaxOrderMap := make(map[models.TransactionCategoryType]int32)
 	categoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
@@ -368,7 +368,7 @@ func (a *TransactionCategoriesApi) createBatchCategories(c *core.Context, uid in
 			maxOrderId, err = a.categories.GetMaxDisplayOrder(c, uid, categoryCreateReq.Type)
 
 			if err != nil {
-				log.ErrorfWithRequestId(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+				log.Errorf(c, "[transaction_categories.CategoryCreateBatchHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
 				return nil, errs.Or(err, errs.ErrOperationFailed)
 			}
 		}
@@ -396,11 +396,11 @@ func (a *TransactionCategoriesApi) createBatchCategories(c *core.Context, uid in
 	categories, err := a.categories.CreateCategories(c, uid, categoriesMap)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_categories.createBatchCategories] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_categories.createBatchCategories] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_categories.createBatchCategories] user \"uid:%d\" has created categories successfully", uid)
+	log.Infof(c, "[transaction_categories.createBatchCategories] user \"uid:%d\" has created categories successfully", uid)
 
 	return categories, nil
 }

@@ -39,10 +39,10 @@ func (c *XOrmContextAdapter) Value(key any) any {
 	return nil
 }
 
-func NewXOrmContextAdapter(c *core.Context) *XOrmContextAdapter {
+func NewXOrmContextAdapter(c core.Context) *XOrmContextAdapter {
 	if c != nil {
 		return &XOrmContextAdapter{
-			requestId: c.GetRequestId(),
+			requestId: c.GetContextId(),
 		}
 	}
 

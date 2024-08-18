@@ -35,7 +35,7 @@ var (
 )
 
 // SendPasswordResetEmail sends password reset email according to specified parameters
-func (s *ForgetPasswordService) SendPasswordResetEmail(c *core.Context, user *models.User, passwordResetToken string, backupLocale string) error {
+func (s *ForgetPasswordService) SendPasswordResetEmail(c core.Context, user *models.User, passwordResetToken string, backupLocale string) error {
 	if !s.CurrentConfig().EnableSMTP {
 		return errs.ErrSMTPServerNotEnabled
 	}

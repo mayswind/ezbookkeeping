@@ -3,7 +3,6 @@ package exchangerates
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -29,9 +28,7 @@ const nationalBankOfPolandMinimumRequiredContent = "<?xml version=\"1.0\" encodi
 
 func TestNationalBankOfPolandDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(nationalBankOfPolandMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -40,9 +37,7 @@ func TestNationalBankOfPolandDataSource_StandardDataExtractBaseCurrency(t *testi
 
 func TestNationalBankOfPolandDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(nationalBankOfPolandMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -58,9 +53,7 @@ func TestNationalBankOfPolandDataSource_StandardDataExtractExchangeRates(t *test
 
 func TestNationalBankOfPolandDataSource_BlankContent(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte(""))
 	assert.NotEqual(t, nil, err)
@@ -68,9 +61,7 @@ func TestNationalBankOfPolandDataSource_BlankContent(t *testing.T) {
 
 func TestNationalBankOfPolandDataSource_OnlyXMLHeader(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>"))
 	assert.NotEqual(t, nil, err)
@@ -78,9 +69,7 @@ func TestNationalBankOfPolandDataSource_OnlyXMLHeader(t *testing.T) {
 
 func TestNationalBankOfPolandDataSource_EmptyArrayOfExchangeRatesTable(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
@@ -90,9 +79,7 @@ func TestNationalBankOfPolandDataSource_EmptyArrayOfExchangeRatesTable(t *testin
 
 func TestNationalBankOfPolandDataSource_EmptyExchangeRatesTable(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
@@ -104,9 +91,7 @@ func TestNationalBankOfPolandDataSource_EmptyExchangeRatesTable(t *testing.T) {
 
 func TestNationalBankOfPolandDataSource_EmptyExchangeRatesContent(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
@@ -121,9 +106,7 @@ func TestNationalBankOfPolandDataSource_EmptyExchangeRatesContent(t *testing.T) 
 
 func TestNationalBankOfPolandDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
@@ -143,9 +126,7 @@ func TestNationalBankOfPolandDataSource_InvalidCurrency(t *testing.T) {
 
 func TestNationalBankOfPolandDataSource_EmptyRate(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+
@@ -165,9 +146,7 @@ func TestNationalBankOfPolandDataSource_EmptyRate(t *testing.T) {
 
 func TestNationalBankOfPolandDataSource_InvalidRate(t *testing.T) {
 	dataSource := &NationalBankOfPolandDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+
 		"<ArrayOfExchangeRatesTable xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"+

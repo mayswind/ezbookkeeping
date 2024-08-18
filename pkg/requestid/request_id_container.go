@@ -1,6 +1,7 @@
 package requestid
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -15,8 +16,8 @@ var (
 )
 
 // InitializeRequestIdGenerator initializes the current request id generator according to the config
-func InitializeRequestIdGenerator(config *settings.Config) error {
-	generator, err := NewDefaultRequestIdGenerator(config)
+func InitializeRequestIdGenerator(c core.Context, config *settings.Config) error {
+	generator, err := NewDefaultRequestIdGenerator(c, config)
 
 	if err != nil {
 		return err

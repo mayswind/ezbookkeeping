@@ -20,12 +20,12 @@ var (
 )
 
 // Recovery logs error message when error occurs
-func Recovery(c *core.Context) {
+func Recovery(c *core.WebContext) {
 	defer func() {
 		if err := recover(); err != nil {
 			stack := stack(3)
 
-			log.ErrorfWithRequestIdAndExtra(c, string(stack), "System Error! because %s", err)
+			log.ErrorfWithExtra(c, string(stack), "System Error! because %s", err)
 			utils.PrintJsonErrorResult(c, errs.ErrSystemError)
 		}
 	}()

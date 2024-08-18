@@ -60,14 +60,14 @@ type ReserveBankOfAustraliaExchangeRateObservation struct {
 }
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from the reserve bank of Australia
-func (e *ReserveBankOfAustraliaData) ToLatestExchangeRateResponse(c *core.Context) *models.LatestExchangeRateResponse {
+func (e *ReserveBankOfAustraliaData) ToLatestExchangeRateResponse(c core.Context) *models.LatestExchangeRateResponse {
 	if e.Channel == nil {
-		log.ErrorfWithRequestId(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] rss channel does not exist")
+		log.Errorf(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] rss channel does not exist")
 		return nil
 	}
 
 	if len(e.Items) < 1 {
-		log.ErrorfWithRequestId(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] rss items is empty")
+		log.Errorf(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] rss items is empty")
 		return nil
 	}
 
@@ -99,7 +99,7 @@ func (e *ReserveBankOfAustraliaData) ToLatestExchangeRateResponse(c *core.Contex
 	updateTime, err := time.Parse(reserveBankOfAustraliaDataUpdateDateFormat, updateDateTime)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
+		log.Errorf(c, "[reserve_bank_of_australia_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
 		return nil
 	}
 
@@ -128,19 +128,19 @@ func (e *ReserveBankOfAustraliaDataSource) GetRequestUrls() []string {
 }
 
 // Parse returns the common response entity according to the the reserve bank of Australia data source raw response
-func (e *ReserveBankOfAustraliaDataSource) Parse(c *core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+func (e *ReserveBankOfAustraliaDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
 	reserveBankOfAustraliaData := &ReserveBankOfAustraliaData{}
 	err := xml.Unmarshal(content, reserveBankOfAustraliaData)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[reserve_bank_of_australia_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())
+		log.Errorf(c, "[reserve_bank_of_australia_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	latestExchangeRateResponse := reserveBankOfAustraliaData.ToLatestExchangeRateResponse(c)
 
 	if latestExchangeRateResponse == nil {
-		log.ErrorfWithRequestId(c, "[reserve_bank_of_australia_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
+		log.Errorf(c, "[reserve_bank_of_australia_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 

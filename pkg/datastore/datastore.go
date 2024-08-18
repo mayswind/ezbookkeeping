@@ -28,12 +28,12 @@ func (s *DataStore) Choose(key int64) *Database {
 }
 
 // Query returns a new database session in a specific database by sharding key
-func (s *DataStore) Query(c *core.Context, key int64) *xorm.Session {
+func (s *DataStore) Query(c core.Context, key int64) *xorm.Session {
 	return s.Choose(key).NewSession(c)
 }
 
 // DoTransaction runs a new database transaction in a specific database by sharding key
-func (s *DataStore) DoTransaction(key int64, c *core.Context, fn func(sess *xorm.Session) error) (err error) {
+func (s *DataStore) DoTransaction(key int64, c core.Context, fn func(sess *xorm.Session) error) (err error) {
 	return s.Choose(key).DoTransaction(c, fn)
 }
 

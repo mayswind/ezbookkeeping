@@ -30,7 +30,7 @@ var (
 )
 
 // GetTotalNormalTemplateCountByUid returns total template count of user
-func (s *TransactionTemplateService) GetTotalNormalTemplateCountByUid(c *core.Context, uid int64) (int64, error) {
+func (s *TransactionTemplateService) GetTotalNormalTemplateCountByUid(c core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -41,7 +41,7 @@ func (s *TransactionTemplateService) GetTotalNormalTemplateCountByUid(c *core.Co
 }
 
 // GetAllTemplatesByUid returns all transaction template models of user
-func (s *TransactionTemplateService) GetAllTemplatesByUid(c *core.Context, uid int64, templateType models.TransactionTemplateType) ([]*models.TransactionTemplate, error) {
+func (s *TransactionTemplateService) GetAllTemplatesByUid(c core.Context, uid int64, templateType models.TransactionTemplateType) ([]*models.TransactionTemplate, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -53,7 +53,7 @@ func (s *TransactionTemplateService) GetAllTemplatesByUid(c *core.Context, uid i
 }
 
 // GetTemplateByTemplateId returns a transaction template model according to transaction template id
-func (s *TransactionTemplateService) GetTemplateByTemplateId(c *core.Context, uid int64, templateId int64) (*models.TransactionTemplate, error) {
+func (s *TransactionTemplateService) GetTemplateByTemplateId(c core.Context, uid int64, templateId int64) (*models.TransactionTemplate, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -75,7 +75,7 @@ func (s *TransactionTemplateService) GetTemplateByTemplateId(c *core.Context, ui
 }
 
 // GetMaxDisplayOrder returns the max display order
-func (s *TransactionTemplateService) GetMaxDisplayOrder(c *core.Context, uid int64, templateType models.TransactionTemplateType) (int32, error) {
+func (s *TransactionTemplateService) GetMaxDisplayOrder(c core.Context, uid int64, templateType models.TransactionTemplateType) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -95,7 +95,7 @@ func (s *TransactionTemplateService) GetMaxDisplayOrder(c *core.Context, uid int
 }
 
 // CreateTemplate saves a new transaction template model to database
-func (s *TransactionTemplateService) CreateTemplate(c *core.Context, template *models.TransactionTemplate) error {
+func (s *TransactionTemplateService) CreateTemplate(c core.Context, template *models.TransactionTemplate) error {
 	if template.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -117,7 +117,7 @@ func (s *TransactionTemplateService) CreateTemplate(c *core.Context, template *m
 }
 
 // ModifyTemplate saves an existed transaction template model to database
-func (s *TransactionTemplateService) ModifyTemplate(c *core.Context, template *models.TransactionTemplate) error {
+func (s *TransactionTemplateService) ModifyTemplate(c core.Context, template *models.TransactionTemplate) error {
 	if template.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -138,7 +138,7 @@ func (s *TransactionTemplateService) ModifyTemplate(c *core.Context, template *m
 }
 
 // HideTemplate updates hidden field of given transaction templates
-func (s *TransactionTemplateService) HideTemplate(c *core.Context, uid int64, ids []int64, hidden bool) error {
+func (s *TransactionTemplateService) HideTemplate(c core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -164,7 +164,7 @@ func (s *TransactionTemplateService) HideTemplate(c *core.Context, uid int64, id
 }
 
 // ModifyTemplateDisplayOrders updates display order of given transaction templates
-func (s *TransactionTemplateService) ModifyTemplateDisplayOrders(c *core.Context, uid int64, templates []*models.TransactionTemplate) error {
+func (s *TransactionTemplateService) ModifyTemplateDisplayOrders(c core.Context, uid int64, templates []*models.TransactionTemplate) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -190,7 +190,7 @@ func (s *TransactionTemplateService) ModifyTemplateDisplayOrders(c *core.Context
 }
 
 // DeleteTemplate deletes an existed transaction template from database
-func (s *TransactionTemplateService) DeleteTemplate(c *core.Context, uid int64, templateId int64) error {
+func (s *TransactionTemplateService) DeleteTemplate(c core.Context, uid int64, templateId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -216,7 +216,7 @@ func (s *TransactionTemplateService) DeleteTemplate(c *core.Context, uid int64, 
 }
 
 // DeleteAllTemplates deletes all existed transaction templates from database
-func (s *TransactionTemplateService) DeleteAllTemplates(c *core.Context, uid int64) error {
+func (s *TransactionTemplateService) DeleteAllTemplates(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}

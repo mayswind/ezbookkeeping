@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/urfave/cli/v2"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -16,32 +17,32 @@ var Database = &cli.Command{
 		{
 			Name:   "update",
 			Usage:  "Update database structure",
-			Action: updateDatabaseStructure,
+			Action: bindAction(updateDatabaseStructure),
 		},
 	},
 }
 
-func updateDatabaseStructure(c *cli.Context) error {
+func updateDatabaseStructure(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
 		return err
 	}
 
-	log.BootInfof("[database.updateDatabaseStructure] starting maintaining")
+	log.BootInfof(c, "[database.updateDatabaseStructure] starting maintaining")
 
-	err = updateAllDatabaseTablesStructure()
+	err = updateAllDatabaseTablesStructure(c)
 
 	if err != nil {
-		log.BootErrorf("[database.updateDatabaseStructure] update database table structure failed, because %s", err.Error())
+		log.BootErrorf(c, "[database.updateDatabaseStructure] update database table structure failed, because %s", err.Error())
 		return err
 	}
 
-	log.BootInfof("[database.updateDatabaseStructure] all tables maintained successfully")
+	log.BootInfof(c, "[database.updateDatabaseStructure] all tables maintained successfully")
 	return nil
 }
 
-func updateAllDatabaseTablesStructure() error {
+func updateAllDatabaseTablesStructure(c *core.CliContext) error {
 	var err error
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.User))
@@ -50,7 +51,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] user table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] user table maintained successfully")
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactor))
 
@@ -58,7 +59,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] two-factor table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] two-factor table maintained successfully")
 
 	err = datastore.Container.UserStore.SyncStructs(new(models.TwoFactorRecoveryCode))
 
@@ -66,7 +67,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] two-factor recovery code table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] two-factor recovery code table maintained successfully")
 
 	err = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
 
@@ -74,7 +75,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] token record table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] token record table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.Account))
 
@@ -82,7 +83,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] account table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] account table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.Transaction))
 
@@ -90,7 +91,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionCategory))
 
@@ -98,7 +99,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction category table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTag))
 
@@ -106,7 +107,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction tag table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTagIndex))
 
@@ -114,7 +115,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction tag index table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction tag index table maintained successfully")
 
 	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionTemplate))
 
@@ -122,7 +123,7 @@ func updateAllDatabaseTablesStructure() error {
 		return err
 	}
 
-	log.BootInfof("[database.updateAllDatabaseTablesStructure] transaction template table maintained successfully")
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction template table maintained successfully")
 
 	return nil
 }

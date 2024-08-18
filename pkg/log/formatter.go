@@ -41,7 +41,7 @@ func (f *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		b.WriteString("] ")
 	}
 
-	if requestId, exists := entry.Data[logFieldRequestId]; exists {
+	if requestId, exists := entry.Data[logFieldRequestId]; exists && requestId != "" {
 		b.WriteString(fmt.Sprintf("[%s] ", requestId))
 	}
 

@@ -3,7 +3,6 @@ package exchangerates
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -17,9 +16,7 @@ const czechNationalBankMinimumRequiredContent = "01 Apr 2021 #64\n" +
 
 func TestCzechNationalBankDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(czechNationalBankMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -28,9 +25,7 @@ func TestCzechNationalBankDataSource_StandardDataExtractBaseCurrency(t *testing.
 
 func TestCzechNationalBankDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(czechNationalBankMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -46,9 +41,7 @@ func TestCzechNationalBankDataSource_StandardDataExtractExchangeRates(t *testing
 
 func TestCzechNationalBankDataSource_BlankContent(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte(""))
 	assert.NotEqual(t, nil, err)
@@ -56,9 +49,7 @@ func TestCzechNationalBankDataSource_BlankContent(t *testing.T) {
 
 func TestCzechNationalBankDataSource_OnlyHeader(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("01 Apr 2021 #64"))
 	assert.NotEqual(t, nil, err)
@@ -66,9 +57,7 @@ func TestCzechNationalBankDataSource_OnlyHeader(t *testing.T) {
 
 func TestCzechNationalBankDataSource_OnlyHeaderAndTitle(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate"))
@@ -77,9 +66,7 @@ func TestCzechNationalBankDataSource_OnlyHeaderAndTitle(t *testing.T) {
 
 func TestCzechNationalBankDataSource_TitleMissingCode(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Rate\n"+
@@ -90,9 +77,7 @@ func TestCzechNationalBankDataSource_TitleMissingCode(t *testing.T) {
 
 func TestCzechNationalBankDataSource_TitleMissingRate(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code\n"+
@@ -103,9 +88,7 @@ func TestCzechNationalBankDataSource_TitleMissingRate(t *testing.T) {
 
 func TestCzechNationalBankDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate\n"+
@@ -116,9 +99,7 @@ func TestCzechNationalBankDataSource_InvalidCurrency(t *testing.T) {
 
 func TestCzechNationalBankDataSource_EmptyRate(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate\n"+
@@ -129,9 +110,7 @@ func TestCzechNationalBankDataSource_EmptyRate(t *testing.T) {
 
 func TestCzechNationalBankDataSource_InvalidRate(t *testing.T) {
 	dataSource := &CzechNationalBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("01 Apr 2021 #64\n"+
 		"Country|Currency|Amount|Code|Rate\n"+

@@ -46,7 +46,7 @@ var (
 )
 
 // GetUserTwoFactorSettingByUid returns the 2fa setting model according to user uid
-func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c *core.Context, uid int64) (*models.TwoFactor, error) {
+func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c core.Context, uid int64) (*models.TwoFactor, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -70,7 +70,7 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c *core.Con
 }
 
 // GenerateTwoFactorSecret generates a new 2fa secret
-func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c *core.Context, user *models.User) (*otp.Key, error) {
+func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c core.Context, user *models.User) (*otp.Key, error) {
 	if user == nil {
 		return nil, errs.ErrUserNotFound
 	}
@@ -86,7 +86,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c *core.Context,
 }
 
 // CreateTwoFactorSetting saves a new 2fa setting to database
-func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c *core.Context, twoFactor *models.TwoFactor) error {
+func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c core.Context, twoFactor *models.TwoFactor) error {
 	if twoFactor.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -107,7 +107,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c *core.Context, 
 }
 
 // DeleteTwoFactorSetting deletes an existed 2fa setting from database
-func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(c *core.Context, uid int64) error {
+func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -126,7 +126,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(c *core.Context, 
 }
 
 // ExistsTwoFactorSetting returns whether the given user has existed 2fa setting
-func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(c *core.Context, uid int64) (bool, error) {
+func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(c core.Context, uid int64) (bool, error) {
 	if uid <= 0 {
 		return false, errs.ErrUserIdInvalid
 	}
@@ -135,7 +135,7 @@ func (s *TwoFactorAuthorizationService) ExistsTwoFactorSetting(c *core.Context, 
 }
 
 // GetAndUseUserTwoFactorRecoveryCode checks whether the given 2fa recovery code exists and marks it used
-func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(c *core.Context, uid int64, recoveryCode string, salt string) error {
+func (s *TwoFactorAuthorizationService) GetAndUseUserTwoFactorRecoveryCode(c core.Context, uid int64, recoveryCode string, salt string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -173,7 +173,7 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorRecoveryCodes() ([]stri
 }
 
 // CreateTwoFactorRecoveryCodes saves new 2fa recovery codes to database
-func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(c *core.Context, uid int64, recoveryCodes []string, salt string) error {
+func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(c core.Context, uid int64, recoveryCodes []string, salt string) error {
 	twoFactorRecoveryCodes := make([]*models.TwoFactorRecoveryCode, len(recoveryCodes))
 
 	for i := 0; i < len(recoveryCodes); i++ {
@@ -206,7 +206,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(c *core.Con
 }
 
 // DeleteTwoFactorRecoveryCodes deletes existed 2fa recovery codes from database
-func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(c *core.Context, uid int64) error {
+func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}

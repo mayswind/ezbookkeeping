@@ -35,17 +35,17 @@ var (
 )
 
 // TemplateListHandler returns transaction template list of current user
-func (a *TransactionTemplatesApi) TemplateListHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateListHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateListReq models.TransactionTemplateListRequest
 	err := c.ShouldBindQuery(&templateListReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateListHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	if templateListReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateListReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateListHandler] template type invalid, type is %d", templateListReq.TemplateType)
+		log.Warnf(c, "[transaction_templates.TemplateListHandler] template type invalid, type is %d", templateListReq.TemplateType)
 		return nil, errs.ErrTransactionTemplateTypeInvalid
 	}
 
@@ -53,7 +53,7 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.Context) (any, *er
 	templates, err := a.templates.GetAllTemplatesByUid(c, uid, templateListReq.TemplateType)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateListHandler] failed to get templates for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateListHandler] failed to get templates for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -70,12 +70,12 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.Context) (any, *er
 }
 
 // TemplateGetHandler returns one specific transaction template of current user
-func (a *TransactionTemplatesApi) TemplateGetHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateGetHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateGetReq models.TransactionTemplateGetRequest
 	err := c.ShouldBindQuery(&templateGetReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateGetHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateGetHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -83,7 +83,7 @@ func (a *TransactionTemplatesApi) TemplateGetHandler(c *core.Context) (any, *err
 	template, err := a.templates.GetTemplateByTemplateId(c, uid, templateGetReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateGetHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateGetReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateGetHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateGetReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -94,22 +94,22 @@ func (a *TransactionTemplatesApi) TemplateGetHandler(c *core.Context) (any, *err
 }
 
 // TemplateCreateHandler saves a new transaction template by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateCreateReq models.TransactionTemplateCreateRequest
 	err := c.ShouldBindJSON(&templateCreateReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateCreateHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	if templateCreateReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateCreateReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] template type invalid, type is %d", templateCreateReq.TemplateType)
+		log.Warnf(c, "[transaction_templates.TemplateCreateHandler] template type invalid, type is %d", templateCreateReq.TemplateType)
 		return nil, errs.ErrTransactionTemplateTypeInvalid
 	}
 
 	if templateCreateReq.Type <= models.TRANSACTION_TYPE_MODIFY_BALANCE || templateCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] transaction type invalid, type is %d", templateCreateReq.Type)
+		log.Warnf(c, "[transaction_templates.TemplateCreateHandler] transaction type invalid, type is %d", templateCreateReq.Type)
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
@@ -118,7 +118,7 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 	maxOrderId, err := a.templates.GetMaxDisplayOrder(c, uid, templateCreateReq.TemplateType)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -129,14 +129,14 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId)
 
 		if found {
-			log.InfofWithRequestId(c, "[transaction_templates.TemplateCreateHandler] another template \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			log.Infof(c, "[transaction_templates.TemplateCreateHandler] another template \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
 			templateId, err := utils.StringToInt64(remark)
 
 			if err == nil {
 				template, err = a.templates.GetTemplateByTemplateId(c, uid, templateId)
 
 				if err != nil {
-					log.ErrorfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] failed to get existed template \"id:%d\" for user \"uid:%d\", because %s", templateId, uid, err.Error())
+					log.Errorf(c, "[transaction_templates.TemplateCreateHandler] failed to get existed template \"id:%d\" for user \"uid:%d\", because %s", templateId, uid, err.Error())
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
@@ -150,11 +150,11 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 	err = a.templates.CreateTemplate(c, template)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateCreateHandler] failed to create template \"id:%d\" for user \"uid:%d\", because %s", template.TemplateId, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateCreateHandler] failed to create template \"id:%d\" for user \"uid:%d\", because %s", template.TemplateId, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateCreateHandler] user \"uid:%d\" has created a new template \"id:%d\" successfully", uid, template.TemplateId)
+	log.Infof(c, "[transaction_templates.TemplateCreateHandler] user \"uid:%d\" has created a new template \"id:%d\" successfully", uid, template.TemplateId)
 
 	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TEMPLATE, uid, templateCreateReq.ClientSessionId, utils.Int64ToString(template.TemplateId))
 	templateResp := template.ToTransactionTemplateInfoResponse(serverUtcOffset)
@@ -163,17 +163,17 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.Context) (any, *
 }
 
 // TemplateModifyHandler saves an existed transaction template by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateModifyReq models.TransactionTemplateModifyRequest
 	err := c.ShouldBindJSON(&templateModifyReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	if templateModifyReq.Type <= models.TRANSACTION_TYPE_MODIFY_BALANCE || templateModifyReq.Type > models.TRANSACTION_TYPE_TRANSFER {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] transaction type invalid, type is %d", templateModifyReq.Type)
+		log.Warnf(c, "[transaction_templates.TemplateModifyHandler] transaction type invalid, type is %d", templateModifyReq.Type)
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
@@ -181,7 +181,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 	template, err := a.templates.GetTemplateByTemplateId(c, uid, templateModifyReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -216,11 +216,11 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 	err = a.templates.ModifyTemplate(c, newTemplate)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateModifyHandler] failed to update template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to update template \"id:%d\" for user \"uid:%d\", because %s", templateModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateModifyHandler] user \"uid:%d\" has updated template \"id:%d\" successfully", uid, templateModifyReq.Id)
+	log.Infof(c, "[transaction_templates.TemplateModifyHandler] user \"uid:%d\" has updated template \"id:%d\" successfully", uid, templateModifyReq.Id)
 
 	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
 	newTemplate.TemplateType = template.TemplateType
@@ -232,12 +232,12 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.Context) (any, *
 }
 
 // TemplateHideHandler hides an transaction template by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateHideHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateHideReq models.TransactionTemplateHideRequest
 	err := c.ShouldBindJSON(&templateHideReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateHideHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateHideHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -245,21 +245,21 @@ func (a *TransactionTemplatesApi) TemplateHideHandler(c *core.Context) (any, *er
 	err = a.templates.HideTemplate(c, uid, []int64{templateHideReq.Id}, templateHideReq.Hidden)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateHideHandler] failed to hide template \"id:%d\" for user \"uid:%d\", because %s", templateHideReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateHideHandler] failed to hide template \"id:%d\" for user \"uid:%d\", because %s", templateHideReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateHideHandler] user \"uid:%d\" has hidden template \"id:%d\"", uid, templateHideReq.Id)
+	log.Infof(c, "[transaction_templates.TemplateHideHandler] user \"uid:%d\" has hidden template \"id:%d\"", uid, templateHideReq.Id)
 	return true, nil
 }
 
 // TemplateMoveHandler moves display order of existed transaction templates by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateMoveHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateMoveHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateMoveReq models.TransactionTemplateMoveRequest
 	err := c.ShouldBindJSON(&templateMoveReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.CategoryMoveHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateMoveHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -280,21 +280,21 @@ func (a *TransactionTemplatesApi) TemplateMoveHandler(c *core.Context) (any, *er
 	err = a.templates.ModifyTemplateDisplayOrders(c, uid, templates)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateMoveHandler] failed to move templates for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateMoveHandler] failed to move templates for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateMoveHandler] user \"uid:%d\" has moved templates", uid)
+	log.Infof(c, "[transaction_templates.TemplateMoveHandler] user \"uid:%d\" has moved templates", uid)
 	return true, nil
 }
 
 // TemplateDeleteHandler deletes an existed transaction template by request parameters for current user
-func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateDeleteReq models.TransactionTemplateDeleteRequest
 	err := c.ShouldBindJSON(&templateDeleteReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transaction_templates.TemplateDeleteHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transaction_templates.TemplateDeleteHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -302,11 +302,11 @@ func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.Context) (any, *
 	err = a.templates.DeleteTemplate(c, uid, templateDeleteReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transaction_templates.TemplateDeleteHandler] failed to delete template \"id:%d\" for user \"uid:%d\", because %s", templateDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[transaction_templates.TemplateDeleteHandler] failed to delete template \"id:%d\" for user \"uid:%d\", because %s", templateDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transaction_templates.TemplateDeleteHandler] user \"uid:%d\" has deleted template \"id:%d\"", uid, templateDeleteReq.Id)
+	log.Infof(c, "[transaction_templates.TemplateDeleteHandler] user \"uid:%d\" has deleted template \"id:%d\"", uid, templateDeleteReq.Id)
 	return true, nil
 }
 

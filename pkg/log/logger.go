@@ -132,76 +132,87 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 	return nil
 }
 
-// Debugf logs debug log with custom format
-func Debugf(format string, args ...any) {
-	defaultLogger.Debug(getFinalLog(format, args...))
-}
-
-// DebugfWithRequestId logs debug log with custom format and request id
-func DebugfWithRequestId(c *core.Context, format string, args ...any) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Debug(getFinalLog(format, args...))
+// DebugfWithRequestId logs debug log with custom format
+func Debugf(c core.Context, format string, args ...any) {
+	if c == nil {
+		defaultLogger.Debug(getFinalLog(format, args...))
+	} else {
+		defaultLogger.WithField(logFieldRequestId, c.GetContextId()).Debug(getFinalLog(format, args...))
+	}
 }
 
 // Infof logs info log with custom format
-func Infof(format string, args ...any) {
-	defaultLogger.Info(getFinalLog(format, args...))
-}
-
-// InfofWithRequestId logs info log with custom format and request id
-func InfofWithRequestId(c *core.Context, format string, args ...any) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
+func Infof(c core.Context, format string, args ...any) {
+	if c == nil {
+		defaultLogger.Info(getFinalLog(format, args...))
+	} else {
+		defaultLogger.WithField(logFieldRequestId, c.GetContextId()).Info(getFinalLog(format, args...))
+	}
 }
 
 // Warnf logs warn log with custom format
-func Warnf(format string, args ...any) {
-	defaultLogger.Warn(getFinalLog(format, args...))
-}
-
-// WarnfWithRequestId logs warn log with custom format and request id
-func WarnfWithRequestId(c *core.Context, format string, args ...any) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Warn(getFinalLog(format, args...))
+func Warnf(c core.Context, format string, args ...any) {
+	if c == nil {
+		defaultLogger.Warn(getFinalLog(format, args...))
+	} else {
+		defaultLogger.WithField(logFieldRequestId, c.GetContextId()).Warn(getFinalLog(format, args...))
+	}
 }
 
 // Errorf logs error log with custom format
-func Errorf(format string, args ...any) {
-	defaultLogger.Error(getFinalLog(format, args...))
+func Errorf(c core.Context, format string, args ...any) {
+	if c == nil {
+		defaultLogger.Error(getFinalLog(format, args...))
+	} else {
+		defaultLogger.WithField(logFieldRequestId, c.GetContextId()).Error(getFinalLog(format, args...))
+	}
 }
 
-// ErrorfWithRequestId logs error log with custom format and request id
-func ErrorfWithRequestId(c *core.Context, format string, args ...any) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).Error(getFinalLog(format, args...))
-}
-
-// ErrorfWithRequestIdAndExtra logs error log with custom format and request id and extra info
-func ErrorfWithRequestIdAndExtra(c *core.Context, extraString string, format string, args ...any) {
-	defaultLogger.WithField(logFieldRequestId, c.GetRequestId()).WithField(logFieldExtra, extraString).Error(getFinalLog(format, args...))
+// ErrorfWithExtra logs error log with custom format and extra info
+func ErrorfWithExtra(c core.Context, extraString string, format string, args ...any) {
+	if c == nil {
+		defaultLogger.WithField(logFieldExtra, extraString).Error(getFinalLog(format, args...))
+	} else {
+		defaultLogger.WithField(logFieldRequestId, c.GetContextId()).WithField(logFieldExtra, extraString).Error(getFinalLog(format, args...))
+	}
 }
 
 // BootInfof logs boot info log
-func BootInfof(format string, args ...any) {
+func BootInfof(c core.Context, format string, args ...any) {
 	if bootLogger != nil {
-		bootLogger.Info(getFinalLog(format, args...))
+		if c == nil {
+			bootLogger.Info(getFinalLog(format, args...))
+		} else {
+			bootLogger.WithField(logFieldRequestId, c.GetContextId()).Info(getFinalLog(format, args...))
+		}
 	}
 }
 
 // BootWarnf logs boot warn log
-func BootWarnf(format string, args ...any) {
+func BootWarnf(c core.Context, format string, args ...any) {
 	if bootLogger != nil {
-		bootLogger.Warn(getFinalLog(format, args...))
+		if c == nil {
+			bootLogger.Warn(getFinalLog(format, args...))
+		} else {
+			bootLogger.WithField(logFieldRequestId, c.GetContextId()).Warn(getFinalLog(format, args...))
+		}
 	}
 }
 
 // BootErrorf logs boot error log
-func BootErrorf(format string, args ...any) {
+func BootErrorf(c core.Context, format string, args ...any) {
 	if bootLogger != nil {
-		bootLogger.Error(getFinalLog(format, args...))
-	}
-}
+		if c == nil {
+			bootLogger.Error(getFinalLog(format, args...))
+		} else {
+			bootLogger.WithField(logFieldRequestId, c.GetContextId()).Error(getFinalLog(format, args...))
+		}
+	}}
 
 // Requestf logs http request log with custom format
-func Requestf(c *core.Context, format string, args ...any) {
+func Requestf(c core.Context, format string, args ...any) {
 	if requestLogger != nil {
-		requestLogger.WithField(logFieldRequestId, c.GetRequestId()).Info(getFinalLog(format, args...))
+		requestLogger.WithField(logFieldRequestId, c.GetContextId()).Info(getFinalLog(format, args...))
 	}
 }
 

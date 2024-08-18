@@ -35,12 +35,12 @@ var (
 )
 
 // AccountListHandler returns accounts list of current user
-func (a *AccountsApi) AccountListHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountListHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountListReq models.AccountListRequest
 	err := c.ShouldBindQuery(&accountListReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountListHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -48,7 +48,7 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (any, *errs.Error) {
 	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountListHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[accounts.AccountListHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -95,12 +95,12 @@ func (a *AccountsApi) AccountListHandler(c *core.Context) (any, *errs.Error) {
 }
 
 // AccountGetHandler returns one specific account of current user
-func (a *AccountsApi) AccountGetHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountGetHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountGetReq models.AccountGetRequest
 	err := c.ShouldBindQuery(&accountGetReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountGetHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountGetHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -108,7 +108,7 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (any, *errs.Error) {
 	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountGetReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountGetHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountGetReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -138,50 +138,50 @@ func (a *AccountsApi) AccountGetHandler(c *core.Context) (any, *errs.Error) {
 }
 
 // AccountCreateHandler saves a new account by request parameters for current user
-func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountCreateReq models.AccountCreateRequest
 	err := c.ShouldBindJSON(&accountCreateReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountCreateHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountCreateHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
 	if accountCreateReq.Category < models.ACCOUNT_CATEGORY_CASH || accountCreateReq.Category > models.ACCOUNT_CATEGORY_INVESTMENT {
-		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account category invalid, category is %d", accountCreateReq.Category)
+		log.Warnf(c, "[accounts.AccountCreateHandler] account category invalid, category is %d", accountCreateReq.Category)
 		return nil, errs.ErrAccountCategoryInvalid
 	}
 
 	if accountCreateReq.Type == models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
 		if len(accountCreateReq.SubAccounts) > 0 {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot have any sub-accounts")
+			log.Warnf(c, "[accounts.AccountCreateHandler] account cannot have any sub-accounts")
 			return nil, errs.ErrAccountCannotHaveSubAccounts
 		}
 
 		if accountCreateReq.Currency == validators.ParentAccountCurrencyPlaceholder {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account cannot set currency placeholder")
+			log.Warnf(c, "[accounts.AccountCreateHandler] account cannot set currency placeholder")
 			return nil, errs.ErrAccountCurrencyInvalid
 		}
 	} else if accountCreateReq.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
 		if len(accountCreateReq.SubAccounts) < 1 {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account does not have any sub-accounts")
+			log.Warnf(c, "[accounts.AccountCreateHandler] account does not have any sub-accounts")
 			return nil, errs.ErrAccountHaveNoSubAccount
 		}
 
 		if accountCreateReq.Currency != validators.ParentAccountCurrencyPlaceholder {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parent account cannot set currency")
+			log.Warnf(c, "[accounts.AccountCreateHandler] parent account cannot set currency")
 			return nil, errs.ErrParentAccountCannotSetCurrency
 		}
 
 		if accountCreateReq.Balance != 0 {
-			log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] parent account cannot set balance")
+			log.Warnf(c, "[accounts.AccountCreateHandler] parent account cannot set balance")
 			return nil, errs.ErrParentAccountCannotSetBalance
 		}
 
@@ -189,22 +189,22 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 			subAccount := accountCreateReq.SubAccounts[i]
 
 			if subAccount.Category != accountCreateReq.Category {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] category of sub-account not equals to parent")
+				log.Warnf(c, "[accounts.AccountCreateHandler] category of sub-account not equals to parent")
 				return nil, errs.ErrSubAccountCategoryNotEqualsToParent
 			}
 
 			if subAccount.Type != models.ACCOUNT_TYPE_SINGLE_ACCOUNT {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub-account type invalid")
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account type invalid")
 				return nil, errs.ErrSubAccountTypeInvalid
 			}
 
 			if subAccount.Currency == validators.ParentAccountCurrencyPlaceholder {
-				log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] sub-account cannot set currency placeholder")
+				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account cannot set currency placeholder")
 				return nil, errs.ErrAccountCurrencyInvalid
 			}
 		}
 	} else {
-		log.WarnfWithRequestId(c, "[accounts.AccountCreateHandler] account type invalid, type is %d", accountCreateReq.Type)
+		log.Warnf(c, "[accounts.AccountCreateHandler] account type invalid, type is %d", accountCreateReq.Type)
 		return nil, errs.ErrAccountTypeInvalid
 	}
 
@@ -212,7 +212,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	maxOrderId, err := a.accounts.GetMaxDisplayOrder(c, uid, accountCreateReq.Category)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[accounts.AccountCreateHandler] failed to get max display order for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -223,14 +223,14 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
 
 		if found {
-			log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] another account \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			log.Infof(c, "[accounts.AccountCreateHandler] another account \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
 			accountId, err := utils.StringToInt64(remark)
 
 			if err == nil {
 				accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountId)
 
 				if err != nil {
-					log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to get existed account \"id:%d\" for user \"uid:%d\", because %s", accountId, uid, err.Error())
+					log.Errorf(c, "[accounts.AccountCreateHandler] failed to get existed account \"id:%d\" for user \"uid:%d\", because %s", accountId, uid, err.Error())
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
@@ -258,11 +258,11 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 	err = a.accounts.CreateAccounts(c, mainAccount, childrenAccounts, utcOffset)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountCreateHandler] failed to create account \"id:%d\" for user \"uid:%d\", because %s", mainAccount.AccountId, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountCreateHandler] failed to create account \"id:%d\" for user \"uid:%d\", because %s", mainAccount.AccountId, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountCreateHandler] user \"uid:%d\" has created a new account \"id:%d\" successfully", uid, mainAccount.AccountId)
+	log.Infof(c, "[accounts.AccountCreateHandler] user \"uid:%d\" has created a new account \"id:%d\" successfully", uid, mainAccount.AccountId)
 
 	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId, utils.Int64ToString(mainAccount.AccountId))
 	accountInfoResp := mainAccount.ToAccountInfoResponse()
@@ -279,17 +279,17 @@ func (a *AccountsApi) AccountCreateHandler(c *core.Context) (any, *errs.Error) {
 }
 
 // AccountModifyHandler saves an existed account by request parameters for current user
-func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountModifyReq models.AccountModifyRequest
 	err := c.ShouldBindJSON(&accountModifyReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountModifyHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	if accountModifyReq.Category < models.ACCOUNT_CATEGORY_CASH || accountModifyReq.Category > models.ACCOUNT_CATEGORY_INVESTMENT {
-		log.WarnfWithRequestId(c, "[accounts.AccountModifyHandler] account category invalid, category is %d", accountModifyReq.Category)
+		log.Warnf(c, "[accounts.AccountModifyHandler] account category invalid, category is %d", accountModifyReq.Category)
 		return nil, errs.ErrAccountCategoryInvalid
 	}
 
@@ -297,7 +297,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
 	accountAndSubAccounts, err := a.accounts.GetAccountAndSubAccountsByAccountId(c, uid, accountModifyReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountModifyHandler] failed to get account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -343,11 +343,11 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
 	err = a.accounts.ModifyAccounts(c, uid, toUpdateAccounts)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountModifyHandler] failed to update account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountModifyHandler] failed to update account \"id:%d\" for user \"uid:%d\", because %s", accountModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountModifyHandler] user \"uid:%d\" has updated account \"id:%d\" successfully", uid, accountModifyReq.Id)
+	log.Infof(c, "[accounts.AccountModifyHandler] user \"uid:%d\" has updated account \"id:%d\" successfully", uid, accountModifyReq.Id)
 
 	accountRespMap := make(map[int64]*models.AccountInfoResponse)
 
@@ -390,12 +390,12 @@ func (a *AccountsApi) AccountModifyHandler(c *core.Context) (any, *errs.Error) {
 }
 
 // AccountHideHandler hides an existed account by request parameters for current user
-func (a *AccountsApi) AccountHideHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountHideReq models.AccountHideRequest
 	err := c.ShouldBindJSON(&accountHideReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountHideHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountHideHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -403,21 +403,21 @@ func (a *AccountsApi) AccountHideHandler(c *core.Context) (any, *errs.Error) {
 	err = a.accounts.HideAccount(c, uid, []int64{accountHideReq.Id}, accountHideReq.Hidden)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountHideHandler] failed to hide account \"id:%d\" for user \"uid:%d\", because %s", accountHideReq.Id, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountHideHandler] failed to hide account \"id:%d\" for user \"uid:%d\", because %s", accountHideReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountHideHandler] user \"uid:%d\" has hidden account \"id:%d\"", uid, accountHideReq.Id)
+	log.Infof(c, "[accounts.AccountHideHandler] user \"uid:%d\" has hidden account \"id:%d\"", uid, accountHideReq.Id)
 	return true, nil
 }
 
 // AccountMoveHandler moves display order of existed accounts by request parameters for current user
-func (a *AccountsApi) AccountMoveHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountMoveHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountMoveReq models.AccountMoveRequest
 	err := c.ShouldBindJSON(&accountMoveReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountMoveHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountMoveHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -438,21 +438,21 @@ func (a *AccountsApi) AccountMoveHandler(c *core.Context) (any, *errs.Error) {
 	err = a.accounts.ModifyAccountDisplayOrders(c, uid, accounts)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountMoveHandler] failed to move accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[accounts.AccountMoveHandler] failed to move accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountMoveHandler] user \"uid:%d\" has moved accounts", uid)
+	log.Infof(c, "[accounts.AccountMoveHandler] user \"uid:%d\" has moved accounts", uid)
 	return true, nil
 }
 
 // AccountDeleteHandler deletes an existed account by request parameters for current user
-func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (any, *errs.Error) {
+func (a *AccountsApi) AccountDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var accountDeleteReq models.AccountDeleteRequest
 	err := c.ShouldBindJSON(&accountDeleteReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[accounts.AccountDeleteHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[accounts.AccountDeleteHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -460,11 +460,11 @@ func (a *AccountsApi) AccountDeleteHandler(c *core.Context) (any, *errs.Error) {
 	err = a.accounts.DeleteAccount(c, uid, accountDeleteReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[accounts.AccountDeleteHandler] failed to delete account \"id:%d\" for user \"uid:%d\", because %s", accountDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[accounts.AccountDeleteHandler] user \"uid:%d\" has deleted account \"id:%d\"", uid, accountDeleteReq.Id)
+	log.Infof(c, "[accounts.AccountDeleteHandler] user \"uid:%d\" has deleted account \"id:%d\"", uid, accountDeleteReq.Id)
 	return true, nil
 }
 

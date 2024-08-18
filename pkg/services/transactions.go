@@ -37,7 +37,7 @@ var (
 )
 
 // GetTotalTransactionCountByUid returns total transaction count of user
-func (s *TransactionService) GetTotalTransactionCountByUid(c *core.Context, uid int64) (int64, error) {
+func (s *TransactionService) GetTotalTransactionCountByUid(c core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -48,7 +48,7 @@ func (s *TransactionService) GetTotalTransactionCountByUid(c *core.Context, uid 
 }
 
 // GetAllTransactions returns all transactions
-func (s *TransactionService) GetAllTransactions(c *core.Context, uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAllTransactions(c core.Context, uid int64, pageCount int32, noDuplicated bool) ([]*models.Transaction, error) {
 	maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(time.Now().Unix())
 	var allTransactions []*models.Transaction
 
@@ -73,12 +73,12 @@ func (s *TransactionService) GetAllTransactions(c *core.Context, uid int64, page
 }
 
 // GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAllTransactionsByMaxTime(c core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
 	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, false, "", "", 1, count, false, noDuplicated)
 }
 
 // GetTransactionsByMaxTime returns transactions before given time
-func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsByMaxTime(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string, page int32, count int32, needOneMoreItem bool, noDuplicated bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -117,7 +117,7 @@ func (s *TransactionService) GetTransactionsByMaxTime(c *core.Context, uid int64
 }
 
 // GetTransactionsInMonthByPage returns all transactions in given year and month
-func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) ([]*models.Transaction, error) {
+func (s *TransactionService) GetTransactionsInMonthByPage(c core.Context, uid int64, year int32, month int32, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -157,7 +157,7 @@ func (s *TransactionService) GetTransactionsInMonthByPage(c *core.Context, uid i
 }
 
 // GetTransactionByTransactionId returns a transaction model according to transaction id
-func (s *TransactionService) GetTransactionByTransactionId(c *core.Context, uid int64, transactionId int64) (*models.Transaction, error) {
+func (s *TransactionService) GetTransactionByTransactionId(c core.Context, uid int64, transactionId int64) (*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -179,12 +179,12 @@ func (s *TransactionService) GetTransactionByTransactionId(c *core.Context, uid 
 }
 
 // GetAllTransactionCount returns total count of transactions
-func (s *TransactionService) GetAllTransactionCount(c *core.Context, uid int64) (int64, error) {
+func (s *TransactionService) GetAllTransactionCount(c core.Context, uid int64) (int64, error) {
 	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, nil, false, "", "")
 }
 
 // GetTransactionCount returns count of transactions
-func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) (int64, error) {
+func (s *TransactionService) GetTransactionCount(c core.Context, uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, noTags bool, amountFilter string, keyword string) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -202,7 +202,7 @@ func (s *TransactionService) GetTransactionCount(c *core.Context, uid int64, max
 }
 
 // CreateTransaction saves a new transaction to database
-func (s *TransactionService) CreateTransaction(c *core.Context, transaction *models.Transaction, tagIds []int64) error {
+func (s *TransactionService) CreateTransaction(c core.Context, transaction *models.Transaction, tagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -430,7 +430,7 @@ func (s *TransactionService) CreateTransaction(c *core.Context, transaction *mod
 }
 
 // ModifyTransaction saves an existed transaction to database
-func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *models.Transaction, currentTagIdsCount int, addTagIds []int64, removeTagIds []int64) error {
+func (s *TransactionService) ModifyTransaction(c core.Context, transaction *models.Transaction, currentTagIdsCount int, addTagIds []int64, removeTagIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -826,7 +826,7 @@ func (s *TransactionService) ModifyTransaction(c *core.Context, transaction *mod
 }
 
 // DeleteTransaction deletes an existed transaction from database
-func (s *TransactionService) DeleteTransaction(c *core.Context, uid int64, transactionId int64) error {
+func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transactionId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -950,7 +950,7 @@ func (s *TransactionService) DeleteTransaction(c *core.Context, uid int64, trans
 }
 
 // DeleteAllTransactions deletes all existed transactions from database
-func (s *TransactionService) DeleteAllTransactions(c *core.Context, uid int64) error {
+func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -1040,7 +1040,7 @@ func (s *TransactionService) GetRelatedTransferTransaction(originalTransaction *
 }
 
 // GetAccountsTotalIncomeAndExpense returns the every accounts total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c *core.Context, uid int64, startUnixTime int64, endUnixTime int64, utcOffset int16, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
+func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, utcOffset int16, useTransactionTimezone bool) (map[int64]int64, map[int64]int64, error) {
 	if uid <= 0 {
 		return nil, nil, errs.ErrUserIdInvalid
 	}
@@ -1129,7 +1129,7 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c *core.Context, u
 }
 
 // GetAccountsAndCategoriesTotalIncomeAndExpense returns the every accounts and categories total income and expense amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *core.Context, uid int64, startUnixTime int64, endUnixTime int64, utcOffset int16, useTransactionTimezone bool) ([]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, utcOffset int16, useTransactionTimezone bool) ([]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -1235,7 +1235,7 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalIncomeAndExpense(c *co
 }
 
 // GetAccountsAndCategoriesMonthlyIncomeAndExpense returns the every accounts monthly income and expense amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c *core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
+func (s *TransactionService) GetAccountsAndCategoriesMonthlyIncomeAndExpense(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, utcOffset int16, useTransactionTimezone bool) (map[int32][]*models.Transaction, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}

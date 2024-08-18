@@ -23,22 +23,22 @@ const (
 const tokenQueryStringParam = "token"
 
 // JWTAuthorization verifies whether current request is valid by jwt token in header
-func JWTAuthorization(c *core.Context) {
+func JWTAuthorization(c *core.WebContext) {
 	jwtAuthorization(c, TOKEN_SOURCE_TYPE_HEADER)
 }
 
 // JWTAuthorizationByQueryString verifies whether current request is valid by jwt token in query string
-func JWTAuthorizationByQueryString(c *core.Context) {
+func JWTAuthorizationByQueryString(c *core.WebContext) {
 	jwtAuthorization(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 }
 
 // JWTAuthorizationByCookie verifies whether current request is valid by jwt token in cookie
-func JWTAuthorizationByCookie(c *core.Context) {
+func JWTAuthorizationByCookie(c *core.WebContext) {
 	jwtAuthorization(c, TOKEN_SOURCE_TYPE_COOKIE)
 }
 
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
-func JWTTwoFactorAuthorization(c *core.Context) {
+func JWTTwoFactorAuthorization(c *core.WebContext) {
 	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 	if err != nil {
@@ -47,7 +47,7 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_REQUIRE_2FA {
-		log.WarnfWithRequestId(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two-factor authorization", claims.Uid)
+		log.Warnf(c, "[authorization.JWTTwoFactorAuthorization] user \"uid:%d\" token is not need two-factor authorization", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenNotRequire2FA)
 		return
 	}
@@ -57,7 +57,7 @@ func JWTTwoFactorAuthorization(c *core.Context) {
 }
 
 // JWTEmailVerifyAuthorization verifies whether current request is email verification
-func JWTEmailVerifyAuthorization(c *core.Context) {
+func JWTEmailVerifyAuthorization(c *core.WebContext) {
 	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 	if err != nil {
@@ -66,7 +66,7 @@ func JWTEmailVerifyAuthorization(c *core.Context) {
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_EMAIL_VERIFY {
-		log.WarnfWithRequestId(c, "[authorization.JWTEmailVerifyAuthorization] user \"uid:%d\" token is not for email verification", claims.Uid)
+		log.Warnf(c, "[authorization.JWTEmailVerifyAuthorization] user \"uid:%d\" token is not for email verification", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
 		return
 	}
@@ -76,7 +76,7 @@ func JWTEmailVerifyAuthorization(c *core.Context) {
 }
 
 // JWTResetPasswordAuthorization verifies whether current request is password reset
-func JWTResetPasswordAuthorization(c *core.Context) {
+func JWTResetPasswordAuthorization(c *core.WebContext) {
 	claims, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func JWTResetPasswordAuthorization(c *core.Context) {
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_PASSWORD_RESET {
-		log.WarnfWithRequestId(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
+		log.Warnf(c, "[authorization.JWTResetPasswordAuthorization] user \"uid:%d\" token is not for password request", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidToken)
 		return
 	}
@@ -94,7 +94,7 @@ func JWTResetPasswordAuthorization(c *core.Context) {
 	c.Next()
 }
 
-func jwtAuthorization(c *core.Context, source TokenSourceType) {
+func jwtAuthorization(c *core.WebContext, source TokenSourceType) {
 	claims, err := getTokenClaims(c, source)
 
 	if err != nil {
@@ -103,13 +103,13 @@ func jwtAuthorization(c *core.Context, source TokenSourceType) {
 	}
 
 	if claims.Type == core.USER_TOKEN_TYPE_REQUIRE_2FA {
-		log.WarnfWithRequestId(c, "[authorization.jwtAuthorization] user \"uid:%d\" token requires 2fa", claims.Uid)
+		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token requires 2fa", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentTokenRequire2FA)
 		return
 	}
 
 	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
-		log.WarnfWithRequestId(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type is invalid", claims.Uid)
+		log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type is invalid", claims.Uid)
 		utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
 		return
 	}
@@ -118,28 +118,28 @@ func jwtAuthorization(c *core.Context, source TokenSourceType) {
 	c.Next()
 }
 
-func getTokenClaims(c *core.Context, source TokenSourceType) (*core.UserTokenClaims, *errs.Error) {
+func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, *errs.Error) {
 	token, claims, err := parseToken(c, source)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
+		log.Warnf(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrUnauthorizedAccess)
 	}
 
 	if !token.Valid {
-		log.WarnfWithRequestId(c, "[authorization.getTokenClaims] token is invalid")
+		log.Warnf(c, "[authorization.getTokenClaims] token is invalid")
 		return nil, errs.ErrCurrentInvalidToken
 	}
 
 	if claims.Uid <= 0 {
-		log.WarnfWithRequestId(c, "[authorization.getTokenClaims] user id in token is invalid")
+		log.Warnf(c, "[authorization.getTokenClaims] user id in token is invalid")
 		return nil, errs.ErrCurrentInvalidToken
 	}
 
 	return claims, nil
 }
 
-func parseToken(c *core.Context, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, error) {
+func parseToken(c *core.WebContext, source TokenSourceType) (*jwt.Token, *core.UserTokenClaims, error) {
 	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
 		return services.Tokens.ParseTokenByArgument(c, tokenQueryStringParam)
 	} else if source == TOKEN_SOURCE_TYPE_COOKIE {

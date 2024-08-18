@@ -8,6 +8,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -33,13 +34,13 @@ func TestCronJobSchedulerContainerRegisterIntervalJob(t *testing.T) {
 		Period: CronJobIntervalPeriod{
 			Interval: 1 * time.Second,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			actualValue = true
 			return nil
 		},
 	}
 
-	container.registerIntervalJob(job)
+	container.registerIntervalJob(core.NewNullContext(), job)
 	container.scheduler.Start()
 
 	assert.Equal(t, 1, len(container.GetAllJobs()))
@@ -73,13 +74,13 @@ func TestCronJobSchedulerContainerSyncRunJobNow(t *testing.T) {
 		Period: CronJobIntervalPeriod{
 			Interval: 24 * time.Hour,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			actualValue = true
 			return nil
 		},
 	}
 
-	container.registerIntervalJob(job)
+	container.registerIntervalJob(core.NewNullContext(), job)
 
 	err = container.SyncRunJobNow("TestSyncRunJob")
 	assert.Nil(t, err)
@@ -115,17 +116,17 @@ func TestCronJobSchedulerContainerRepeatRun(t *testing.T) {
 		Period: CronJobFixedTimePeriod{
 			Time: runTime,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			runCount.Add(1)
 			return nil
 		},
 	}
 
-	container.registerIntervalJob(job)
-	container.registerIntervalJob(job)
-	container.registerIntervalJob(job)
-	container.registerIntervalJob(job)
-	container.registerIntervalJob(job)
+	container.registerIntervalJob(core.NewNullContext(), job)
+	container.registerIntervalJob(core.NewNullContext(), job)
+	container.registerIntervalJob(core.NewNullContext(), job)
+	container.registerIntervalJob(core.NewNullContext(), job)
+	container.registerIntervalJob(core.NewNullContext(), job)
 	container.scheduler.Start()
 
 	time.Sleep(10 * time.Second)

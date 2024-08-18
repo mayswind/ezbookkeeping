@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/urfave/cli/v2"
-
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/exchangerates"
@@ -17,7 +16,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
-func initializeSystem(c *cli.Context) (*settings.Config, error) {
+func initializeSystem(c *core.CliContext) (*settings.Config, error) {
 	var err error
 	configFilePath := c.String("conf-path")
 	isDisableBootLog := c.Bool("no-boot-log")
@@ -25,26 +24,26 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 	if configFilePath != "" {
 		if _, err = os.Stat(configFilePath); err != nil {
 			if !isDisableBootLog {
-				log.BootErrorf("[initializer.initializeSystem] cannot load configuration from custom config path %s, because file not exists", configFilePath)
+				log.BootErrorf(c, "[initializer.initializeSystem] cannot load configuration from custom config path %s, because file not exists", configFilePath)
 			}
 			return nil, err
 		}
 
 		if !isDisableBootLog {
-			log.BootInfof("[initializer.initializeSystem] will loading configuration from custom config path %s", configFilePath)
+			log.BootInfof(c, "[initializer.initializeSystem] will loading configuration from custom config path %s", configFilePath)
 		}
 	} else {
 		configFilePath, err = settings.GetDefaultConfigFilePath()
 
 		if err != nil {
 			if !isDisableBootLog {
-				log.BootErrorf("[initializer.initializeSystem] cannot get default configuration path, because %s", err.Error())
+				log.BootErrorf(c, "[initializer.initializeSystem] cannot get default configuration path, because %s", err.Error())
 			}
 			return nil, err
 		}
 
 		if !isDisableBootLog {
-			log.BootInfof("[initializer.initializeSystem] will load configuration from default config path %s", configFilePath)
+			log.BootInfof(c, "[initializer.initializeSystem] will load configuration from default config path %s", configFilePath)
 		}
 	}
 
@@ -52,13 +51,13 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] cannot load configuration, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] cannot load configuration, because %s", err.Error())
 		}
 		return nil, err
 	}
 
 	if config.SecretKeyNoSet {
-		log.BootWarnf("[initializer.initializeSystem] \"secret_key\" in config file is not set, please change it to keep your user data safe")
+		log.BootWarnf(c, "[initializer.initializeSystem] \"secret_key\" in config file is not set, please change it to keep your user data safe")
 	}
 
 	settings.SetCurrentConfig(config)
@@ -67,7 +66,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes data store failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes data store failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -76,7 +75,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] sets logger configuration failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] sets logger configuration failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -85,7 +84,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes object storage failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes object storage failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -94,7 +93,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes uuid generator failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes uuid generator failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -103,7 +102,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes duplicate checker failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes duplicate checker failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -112,7 +111,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes mailer failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes mailer failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -121,7 +120,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 
 	if err != nil {
 		if !isDisableBootLog {
-			log.BootErrorf("[initializer.initializeSystem] initializes exchange rates data source failed, because %s", err.Error())
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes exchange rates data source failed, because %s", err.Error())
 		}
 		return nil, err
 	}
@@ -129,7 +128,7 @@ func initializeSystem(c *cli.Context) (*settings.Config, error) {
 	cfgJson, _ := json.Marshal(getConfigWithoutSensitiveData(config))
 
 	if !isDisableBootLog {
-		log.BootInfof("[initializer.initializeSystem] has loaded configuration %s", cfgJson)
+		log.BootInfof(c, "[initializer.initializeSystem] has loaded configuration %s", cfgJson)
 	}
 
 	return config, nil

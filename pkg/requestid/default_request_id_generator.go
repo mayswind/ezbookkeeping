@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -51,8 +52,8 @@ type DefaultRequestIdGenerator struct {
 }
 
 // NewDefaultRequestIdGenerator returns a new default request id generator
-func NewDefaultRequestIdGenerator(config *settings.Config) (*DefaultRequestIdGenerator, error) {
-	serverUniqId, err := getServerUniqId(config)
+func NewDefaultRequestIdGenerator(c core.Context, config *settings.Config) (*DefaultRequestIdGenerator, error) {
+	serverUniqId, err := getServerUniqId(c, config)
 
 	if err != nil {
 		return nil, err
@@ -68,7 +69,7 @@ func NewDefaultRequestIdGenerator(config *settings.Config) (*DefaultRequestIdGen
 	return generator, nil
 }
 
-func getServerUniqId(config *settings.Config) (uint16, error) {
+func getServerUniqId(c core.Context, config *settings.Config) (uint16, error) {
 	localAddr := ""
 	settingAddr := net.ParseIP(config.HttpAddr)
 
@@ -79,7 +80,7 @@ func getServerUniqId(config *settings.Config) (uint16, error) {
 		localAddr, err = utils.GetLocalIPAddressesString()
 
 		if err != nil {
-			log.Warnf("[default_request_id_generator.getServerUniqId] failed to get local ipv4 address, because %s", err.Error())
+			log.Warnf(c, "[default_request_id_generator.getServerUniqId] failed to get local ipv4 address, because %s", err.Error())
 			return 0, err
 		}
 	}

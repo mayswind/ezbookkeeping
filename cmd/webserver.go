@@ -33,40 +33,40 @@ var WebServer = &cli.Command{
 		{
 			Name:   "run",
 			Usage:  "Run ezBookkeeping web server",
-			Action: startWebServer,
+			Action: bindAction(startWebServer),
 		},
 	},
 }
 
-func startWebServer(c *cli.Context) error {
+func startWebServer(c *core.CliContext) error {
 	config, err := initializeSystem(c)
 
 	if err != nil {
 		return err
 	}
 
-	log.BootInfof("[webserver.startWebServer] static root path is %s", config.StaticRootPath)
+	log.BootInfof(c, "[webserver.startWebServer] static root path is %s", config.StaticRootPath)
 
 	if config.AutoUpdateDatabase {
-		err = updateAllDatabaseTablesStructure()
+		err = updateAllDatabaseTablesStructure(c)
 
 		if err != nil {
-			log.BootErrorf("[webserver.startWebServer] update database table structure failed, because %s", err.Error())
+			log.BootErrorf(c, "[webserver.startWebServer] update database table structure failed, because %s", err.Error())
 			return err
 		}
 	}
 
-	err = requestid.InitializeRequestIdGenerator(config)
+	err = requestid.InitializeRequestIdGenerator(c, config)
 
 	if err != nil {
-		log.BootErrorf("[webserver.startWebServer] initializes requestid generator failed, because %s", err.Error())
+		log.BootErrorf(c, "[webserver.startWebServer] initializes requestid generator failed, because %s", err.Error())
 		return err
 	}
 
-	err = cron.InitializeCronJobSchedulerContainer(config, true)
+	err = cron.InitializeCronJobSchedulerContainer(c, config, true)
 
 	if err != nil {
-		log.BootErrorf("[webserver.startWebServer] initializes cron job scheduler failed, because %s", err.Error())
+		log.BootErrorf(c, "[webserver.startWebServer] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 
@@ -76,7 +76,7 @@ func startWebServer(c *cli.Context) error {
 		uuidServerInfo = fmt.Sprintf(", current uuid server id is %d", config.UuidServerId)
 	}
 
-	log.BootInfof("[webserver.startWebServer] %s%s", serverInfo, uuidServerInfo)
+	log.BootInfof(c, "[webserver.startWebServer] %s%s", serverInfo, uuidServerInfo)
 
 	if config.Mode == settings.MODE_PRODUCTION {
 		gin.SetMode(gin.ReleaseMode)
@@ -345,20 +345,20 @@ func startWebServer(c *cli.Context) error {
 	listenAddr := fmt.Sprintf("%s:%d", config.HttpAddr, config.HttpPort)
 
 	if config.Protocol == settings.SCHEME_SOCKET {
-		log.BootInfof("[webserver.startWebServer] will run at socks:%s", config.UnixSocketPath)
+		log.BootInfof(c, "[webserver.startWebServer] will run at socks:%s", config.UnixSocketPath)
 		err = router.RunUnix(config.UnixSocketPath)
 	} else if config.Protocol == settings.SCHEME_HTTP {
-		log.BootInfof("[webserver.startWebServer] will run at http://%s", listenAddr)
+		log.BootInfof(c, "[webserver.startWebServer] will run at http://%s", listenAddr)
 		err = router.Run(listenAddr)
 	} else if config.Protocol == settings.SCHEME_HTTPS {
-		log.BootInfof("[webserver.startWebServer] will run at https://%s", listenAddr)
+		log.BootInfof(c, "[webserver.startWebServer] will run at https://%s", listenAddr)
 		err = router.RunTLS(listenAddr, config.CertFile, config.CertKeyFile)
 	} else {
 		err = errs.ErrInvalidProtocol
 	}
 
 	if err != nil {
-		log.BootErrorf("[webserver.startWebServer] cannot start, because %s", err)
+		log.BootErrorf(c, "[webserver.startWebServer] cannot start, because %s", err)
 		return err
 	}
 
@@ -367,13 +367,13 @@ func startWebServer(c *cli.Context) error {
 
 func bindMiddleware(fn core.MiddlewareHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fn(core.WrapContext(c))
+		fn(core.WrapWebContext(c))
 	}
 }
 
 func bindApi(fn core.ApiHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, err := fn(c)
 
 		if err != nil {
@@ -386,7 +386,7 @@ func bindApi(fn core.ApiHandlerFunc) gin.HandlerFunc {
 
 func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, err := fn(c)
 
 		if err == nil && config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
@@ -403,7 +403,7 @@ func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin
 
 func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, fileName, err := fn(c)
 
 		if err != nil {
@@ -416,7 +416,7 @@ func bindCsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 
 func bindTsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, fileName, err := fn(c)
 
 		if err != nil {
@@ -429,7 +429,7 @@ func bindTsv(fn core.DataHandlerFunc) gin.HandlerFunc {
 
 func bindImage(fn core.ImageHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, contentType, err := fn(c)
 
 		if err != nil {
@@ -442,7 +442,7 @@ func bindImage(fn core.ImageHandlerFunc) gin.HandlerFunc {
 
 func bindCachedImage(fn core.ImageHandlerFunc, store persistence.CacheStore) gin.HandlerFunc {
 	return cache.CachePage(store, time.Minute, func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		result, contentType, err := fn(c)
 
 		if err != nil {
@@ -455,7 +455,7 @@ func bindCachedImage(fn core.ImageHandlerFunc, store persistence.CacheStore) gin
 
 func bindProxy(fn core.ProxyHandlerFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
-		c := core.WrapContext(ginCtx)
+		c := core.WrapWebContext(ginCtx)
 		proxy, err := fn(c)
 
 		if err != nil {

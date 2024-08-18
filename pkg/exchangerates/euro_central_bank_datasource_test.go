@@ -3,7 +3,6 @@ package exchangerates
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -22,9 +21,7 @@ const euroCentralBankMinimumRequiredContent = "<?xml version=\"1.0\" encoding=\"
 
 func TestEuroCentralBankDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(euroCentralBankMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -33,9 +30,7 @@ func TestEuroCentralBankDataSource_StandardDataExtractBaseCurrency(t *testing.T)
 
 func TestEuroCentralBankDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(euroCentralBankMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -51,9 +46,7 @@ func TestEuroCentralBankDataSource_StandardDataExtractExchangeRates(t *testing.T
 
 func TestEuroCentralBankDataSource_BlankContent(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte(""))
 	assert.NotEqual(t, nil, err)
@@ -61,9 +54,7 @@ func TestEuroCentralBankDataSource_BlankContent(t *testing.T) {
 
 func TestEuroCentralBankDataSource_OnlyXMLHeader(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
 	assert.NotEqual(t, nil, err)
@@ -71,9 +62,7 @@ func TestEuroCentralBankDataSource_OnlyXMLHeader(t *testing.T) {
 
 func TestEuroCentralBankDataSource_EmptyEnvelopeContent(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
@@ -83,9 +72,7 @@ func TestEuroCentralBankDataSource_EmptyEnvelopeContent(t *testing.T) {
 
 func TestEuroCentralBankDataSource_EmptyCubeContent(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
@@ -97,9 +84,7 @@ func TestEuroCentralBankDataSource_EmptyCubeContent(t *testing.T) {
 
 func TestEuroCentralBankDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
@@ -115,9 +100,7 @@ func TestEuroCentralBankDataSource_InvalidCurrency(t *testing.T) {
 
 func TestEuroCentralBankDataSource_EmptyRate(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+
@@ -133,9 +116,7 @@ func TestEuroCentralBankDataSource_EmptyRate(t *testing.T) {
 
 func TestEuroCentralBankDataSource_InvalidRate(t *testing.T) {
 	dataSource := &EuroCentralBankDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 		"<gesmes:Envelope xmlns:gesmes=\"http://www.gesmes.org/xml/2002-08-01\" xmlns=\"http://www.ecb.int/vocabulary/2002-08-01/eurofxref\">"+

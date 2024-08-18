@@ -3,7 +3,6 @@ package exchangerates
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -43,9 +42,7 @@ const reserveBankOfAustraliaMinimumRequiredContent = "<?xml version=\"1.0\" enco
 
 func TestReserveBankOfAustraliaDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(reserveBankOfAustraliaMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -54,9 +51,7 @@ func TestReserveBankOfAustraliaDataSource_StandardDataExtractBaseCurrency(t *tes
 
 func TestReserveBankOfAustraliaDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(reserveBankOfAustraliaMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -72,9 +67,7 @@ func TestReserveBankOfAustraliaDataSource_StandardDataExtractExchangeRates(t *te
 
 func TestReserveBankOfAustraliaDataSource_BlankContent(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte(""))
 	assert.NotEqual(t, nil, err)
@@ -82,9 +75,7 @@ func TestReserveBankOfAustraliaDataSource_BlankContent(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_OnlyXMLHeader(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
 	assert.NotEqual(t, nil, err)
@@ -92,9 +83,7 @@ func TestReserveBankOfAustraliaDataSource_OnlyXMLHeader(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_EmptyRDFContent(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -104,9 +93,7 @@ func TestReserveBankOfAustraliaDataSource_EmptyRDFContent(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_EmptyChannelContent(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -130,9 +117,7 @@ func TestReserveBankOfAustraliaDataSource_EmptyChannelContent(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_NoItem(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -145,9 +130,7 @@ func TestReserveBankOfAustraliaDataSource_NoItem(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_BaseCurrencyNotEqualPreset(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -173,9 +156,7 @@ func TestReserveBankOfAustraliaDataSource_BaseCurrencyNotEqualPreset(t *testing.
 
 func TestReserveBankOfAustraliaDataSource_UnitCurrencyNotEqualPreset(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -201,9 +182,7 @@ func TestReserveBankOfAustraliaDataSource_UnitCurrencyNotEqualPreset(t *testing.
 
 func TestReserveBankOfAustraliaDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -229,9 +208,7 @@ func TestReserveBankOfAustraliaDataSource_InvalidCurrency(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_EmptyRate(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+
@@ -257,9 +234,7 @@ func TestReserveBankOfAustraliaDataSource_EmptyRate(t *testing.T) {
 
 func TestReserveBankOfAustraliaDataSource_InvalidRate(t *testing.T) {
 	dataSource := &ReserveBankOfAustraliaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
 		"<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rba=\"https://www.rba.gov.au/statistics/frequency/exchange-rates.html\" xmlns:cb=\"http://www.cbwiki.net/wiki/index.php/Specification_1.2/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://purl.org/rss/1.0/\" xsi:schemaLocation=\"http://www.w3.org/1999/02/22-rdf-syntax-ns# rdf.xsd\">\n"+

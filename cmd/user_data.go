@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	clis "github.com/mayswind/ezbookkeeping/pkg/cli"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -21,7 +22,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-add",
 			Usage:  "Add new user",
-			Action: addNewUser,
+			Action: bindAction(addNewUser),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -58,7 +59,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-get",
 			Usage:  "Get specified user info",
-			Action: getUserInfo,
+			Action: bindAction(getUserInfo),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -71,7 +72,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-modify-password",
 			Usage:  "Modify user password",
-			Action: modifyUserPassword,
+			Action: bindAction(modifyUserPassword),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -90,7 +91,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-enable",
 			Usage:  "Enable specified user",
-			Action: enableUser,
+			Action: bindAction(enableUser),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -103,7 +104,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-disable",
 			Usage:  "Disable specified user",
-			Action: disableUser,
+			Action: bindAction(disableUser),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -116,7 +117,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-resend-verify-email",
 			Usage:  "Resend user verify email",
-			Action: resendUserVerifyEmail,
+			Action: bindAction(resendUserVerifyEmail),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -129,7 +130,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-set-email-verified",
 			Usage:  "Set user email address verified",
-			Action: setUserEmailVerified,
+			Action: bindAction(setUserEmailVerified),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -142,7 +143,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-set-email-unverified",
 			Usage:  "Set user email address unverified",
-			Action: setUserEmailUnverified,
+			Action: bindAction(setUserEmailUnverified),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -155,7 +156,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-delete",
 			Usage:  "Delete specified user",
-			Action: deleteUser,
+			Action: bindAction(deleteUser),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -168,7 +169,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-2fa-disable",
 			Usage:  "Disable user 2fa setting",
-			Action: disableUser2FA,
+			Action: bindAction(disableUser2FA),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -181,7 +182,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-session-list",
 			Usage:  "List all user sessions",
-			Action: listUserTokens,
+			Action: bindAction(listUserTokens),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -194,7 +195,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "user-session-clear",
 			Usage:  "Clear user all sessions",
-			Action: clearUserTokens,
+			Action: bindAction(clearUserTokens),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -207,7 +208,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "send-password-reset-mail",
 			Usage:  "Send password reset mail",
-			Action: sendPasswordResetMail,
+			Action: bindAction(sendPasswordResetMail),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -220,7 +221,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "transaction-check",
 			Usage:  "Check whether user all transactions and accounts are correct",
-			Action: checkUserTransactionAndAccount,
+			Action: bindAction(checkUserTransactionAndAccount),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -233,7 +234,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "transaction-tag-index-fix-transaction-time",
 			Usage:  "Fix the transaction tag index data which does not have transaction time",
-			Action: fixTransactionTagIndexNotHaveTransactionTime,
+			Action: bindAction(fixTransactionTagIndexNotHaveTransactionTime),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -246,7 +247,7 @@ var UserData = &cli.Command{
 		{
 			Name:   "transaction-export",
 			Usage:  "Export user all transactions to file",
-			Action: exportUserTransaction,
+			Action: bindAction(exportUserTransaction),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "username",
@@ -271,7 +272,7 @@ var UserData = &cli.Command{
 	},
 }
 
-func addNewUser(c *cli.Context) error {
+func addNewUser(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -287,7 +288,7 @@ func addNewUser(c *cli.Context) error {
 	user, err := clis.UserData.AddNewUser(c, username, email, nickname, password, defaultCurrency)
 
 	if err != nil {
-		log.BootErrorf("[user_data.addNewUser] error occurs when adding new user")
+		log.BootErrorf(c, "[user_data.addNewUser] error occurs when adding new user")
 		return err
 	}
 
@@ -296,7 +297,7 @@ func addNewUser(c *cli.Context) error {
 	return nil
 }
 
-func getUserInfo(c *cli.Context) error {
+func getUserInfo(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -307,7 +308,7 @@ func getUserInfo(c *cli.Context) error {
 	user, err := clis.UserData.GetUserByUsername(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.getUserInfo] error occurs when getting user data")
+		log.BootErrorf(c, "[user_data.getUserInfo] error occurs when getting user data")
 		return err
 	}
 
@@ -316,7 +317,7 @@ func getUserInfo(c *cli.Context) error {
 	return nil
 }
 
-func modifyUserPassword(c *cli.Context) error {
+func modifyUserPassword(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -328,16 +329,16 @@ func modifyUserPassword(c *cli.Context) error {
 	err = clis.UserData.ModifyUserPassword(c, username, password)
 
 	if err != nil {
-		log.BootErrorf("[user_data.modifyUserPassword] error occurs when modifying user password")
+		log.BootErrorf(c, "[user_data.modifyUserPassword] error occurs when modifying user password")
 		return err
 	}
 
-	log.BootInfof("[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
+	log.BootInfof(c, "[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
 
 	return nil
 }
 
-func sendPasswordResetMail(c *cli.Context) error {
+func sendPasswordResetMail(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -348,16 +349,16 @@ func sendPasswordResetMail(c *cli.Context) error {
 	err = clis.UserData.SendPasswordResetMail(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.sendPasswordResetMail] error occurs when sending password reset email")
+		log.BootErrorf(c, "[user_data.sendPasswordResetMail] error occurs when sending password reset email")
 		return err
 	}
 
-	log.BootInfof("[user_data.sendPasswordResetMail] a password reset email for user \"%s\" has been sent", username)
+	log.BootInfof(c, "[user_data.sendPasswordResetMail] a password reset email for user \"%s\" has been sent", username)
 
 	return nil
 }
 
-func enableUser(c *cli.Context) error {
+func enableUser(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -368,16 +369,16 @@ func enableUser(c *cli.Context) error {
 	err = clis.UserData.EnableUser(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.enableUser] error occurs when setting user enabled")
+		log.BootErrorf(c, "[user_data.enableUser] error occurs when setting user enabled")
 		return err
 	}
 
-	log.BootInfof("[user_data.enableUser] user \"%s\" has been set enabled", username)
+	log.BootInfof(c, "[user_data.enableUser] user \"%s\" has been set enabled", username)
 
 	return nil
 }
 
-func disableUser(c *cli.Context) error {
+func disableUser(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -388,16 +389,16 @@ func disableUser(c *cli.Context) error {
 	err = clis.UserData.DisableUser(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.disableUser] error occurs when setting user disabled")
+		log.BootErrorf(c, "[user_data.disableUser] error occurs when setting user disabled")
 		return err
 	}
 
-	log.BootInfof("[user_data.disableUser] user \"%s\" has been set disabled", username)
+	log.BootInfof(c, "[user_data.disableUser] user \"%s\" has been set disabled", username)
 
 	return nil
 }
 
-func resendUserVerifyEmail(c *cli.Context) error {
+func resendUserVerifyEmail(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -408,16 +409,16 @@ func resendUserVerifyEmail(c *cli.Context) error {
 	err = clis.UserData.ResendVerifyEmail(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.resendUserVerifyEmail] error occurs when resending user verify email")
+		log.BootErrorf(c, "[user_data.resendUserVerifyEmail] error occurs when resending user verify email")
 		return err
 	}
 
-	log.BootInfof("[user_data.resendUserVerifyEmail] verify email for user \"%s\" has been resent", username)
+	log.BootInfof(c, "[user_data.resendUserVerifyEmail] verify email for user \"%s\" has been resent", username)
 
 	return nil
 }
 
-func setUserEmailVerified(c *cli.Context) error {
+func setUserEmailVerified(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -428,16 +429,16 @@ func setUserEmailVerified(c *cli.Context) error {
 	err = clis.UserData.SetUserEmailVerified(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.setUserEmailVerified] error occurs when setting user email address verified")
+		log.BootErrorf(c, "[user_data.setUserEmailVerified] error occurs when setting user email address verified")
 		return err
 	}
 
-	log.BootInfof("[user_data.setUserEmailVerified] user \"%s\" email address has been set verified", username)
+	log.BootInfof(c, "[user_data.setUserEmailVerified] user \"%s\" email address has been set verified", username)
 
 	return nil
 }
 
-func setUserEmailUnverified(c *cli.Context) error {
+func setUserEmailUnverified(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -448,16 +449,16 @@ func setUserEmailUnverified(c *cli.Context) error {
 	err = clis.UserData.SetUserEmailUnverified(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.setUserEmailUnverified] error occurs when setting user email address unverified")
+		log.BootErrorf(c, "[user_data.setUserEmailUnverified] error occurs when setting user email address unverified")
 		return err
 	}
 
-	log.BootInfof("[user_data.setUserEmailUnverified] user \"%s\" email address has been set unverified", username)
+	log.BootInfof(c, "[user_data.setUserEmailUnverified] user \"%s\" email address has been set unverified", username)
 
 	return nil
 }
 
-func deleteUser(c *cli.Context) error {
+func deleteUser(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -468,16 +469,16 @@ func deleteUser(c *cli.Context) error {
 	err = clis.UserData.DeleteUser(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.deleteUser] error occurs when deleting user")
+		log.BootErrorf(c, "[user_data.deleteUser] error occurs when deleting user")
 		return err
 	}
 
-	log.BootInfof("[user_data.deleteUser] user \"%s\" has been deleted", username)
+	log.BootInfof(c, "[user_data.deleteUser] user \"%s\" has been deleted", username)
 
 	return nil
 }
 
-func disableUser2FA(c *cli.Context) error {
+func disableUser2FA(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -488,16 +489,16 @@ func disableUser2FA(c *cli.Context) error {
 	err = clis.UserData.DisableUserTwoFactorAuthorization(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.disableUser2FA] error occurs when disabling user two-factor authorization")
+		log.BootErrorf(c, "[user_data.disableUser2FA] error occurs when disabling user two-factor authorization")
 		return err
 	}
 
-	log.BootInfof("[user_data.disableUser2FA] two-factor authorization of user \"%s\" has been disabled", username)
+	log.BootInfof(c, "[user_data.disableUser2FA] two-factor authorization of user \"%s\" has been disabled", username)
 
 	return nil
 }
 
-func listUserTokens(c *cli.Context) error {
+func listUserTokens(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -508,7 +509,7 @@ func listUserTokens(c *cli.Context) error {
 	tokens, err := clis.UserData.ListUserTokens(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.listUserTokens] error occurs when getting user tokens")
+		log.BootErrorf(c, "[user_data.listUserTokens] error occurs when getting user tokens")
 		return err
 	}
 
@@ -523,7 +524,7 @@ func listUserTokens(c *cli.Context) error {
 	return nil
 }
 
-func clearUserTokens(c *cli.Context) error {
+func clearUserTokens(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -534,16 +535,16 @@ func clearUserTokens(c *cli.Context) error {
 	err = clis.UserData.ClearUserTokens(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.clearUserTokens] error occurs when clearing user tokens")
+		log.BootErrorf(c, "[user_data.clearUserTokens] error occurs when clearing user tokens")
 		return err
 	}
 
-	log.BootInfof("[user_data.clearUserTokens] all tokens of user \"%s\" has been cleared", username)
+	log.BootInfof(c, "[user_data.clearUserTokens] all tokens of user \"%s\" has been cleared", username)
 
 	return nil
 }
 
-func checkUserTransactionAndAccount(c *cli.Context) error {
+func checkUserTransactionAndAccount(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -552,21 +553,21 @@ func checkUserTransactionAndAccount(c *cli.Context) error {
 
 	username := c.String("username")
 
-	log.BootInfof("[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", username)
+	log.BootInfof(c, "[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", username)
 
 	_, err = clis.UserData.CheckTransactionAndAccount(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
+		log.BootErrorf(c, "[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
 		return err
 	}
 
-	log.BootInfof("[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
+	log.BootInfof(c, "[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
 
 	return nil
 }
 
-func fixTransactionTagIndexNotHaveTransactionTime(c *cli.Context) error {
+func fixTransactionTagIndexNotHaveTransactionTime(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -575,21 +576,21 @@ func fixTransactionTagIndexNotHaveTransactionTime(c *cli.Context) error {
 
 	username := c.String("username")
 
-	log.BootInfof("[user_data.fixTransactionTagIndexNotHaveTransactionTime] starting fixing user \"%s\" transaction tag index data", username)
+	log.BootInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] starting fixing user \"%s\" transaction tag index data", username)
 
 	_, err = clis.UserData.FixTransactionTagIndexWithTransactionTime(c, username)
 
 	if err != nil {
-		log.BootErrorf("[user_data.fixTransactionTagIndexNotHaveTransactionTime] error occurs when fixing user data")
+		log.BootErrorf(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] error occurs when fixing user data")
 		return err
 	}
 
-	log.BootInfof("[user_data.fixTransactionTagIndexNotHaveTransactionTime] user transaction tag index data has been fixed successfully")
+	log.BootInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] user transaction tag index data has been fixed successfully")
 
 	return nil
 }
 
-func exportUserTransaction(c *cli.Context) error {
+func exportUserTransaction(c *core.CliContext) error {
 	_, err := initializeSystem(c)
 
 	if err != nil {
@@ -601,39 +602,39 @@ func exportUserTransaction(c *cli.Context) error {
 	fileType := c.String("type")
 
 	if fileType != "" && fileType != "csv" && fileType != "tsv" {
-		log.BootErrorf("[user_data.exportUserTransaction] export file type is not supported")
+		log.BootErrorf(c, "[user_data.exportUserTransaction] export file type is not supported")
 		return errs.ErrNotSupported
 	}
 
 	if filePath == "" {
-		log.BootErrorf("[user_data.exportUserTransaction] export file path is unspecified")
+		log.BootErrorf(c, "[user_data.exportUserTransaction] export file path is unspecified")
 		return os.ErrNotExist
 	}
 
 	fileExists, err := utils.IsExists(filePath)
 
 	if fileExists {
-		log.BootErrorf("[user_data.exportUserTransaction] specified file path already exists")
+		log.BootErrorf(c, "[user_data.exportUserTransaction] specified file path already exists")
 		return os.ErrExist
 	}
 
-	log.BootInfof("[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
+	log.BootInfof(c, "[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
 
 	content, err := clis.UserData.ExportTransaction(c, username, fileType)
 
 	if err != nil {
-		log.BootErrorf("[user_data.exportUserTransaction] error occurs when exporting user data")
+		log.BootErrorf(c, "[user_data.exportUserTransaction] error occurs when exporting user data")
 		return err
 	}
 
 	err = utils.WriteFile(filePath, content)
 
 	if err != nil {
-		log.BootErrorf("[user_data.exportUserTransaction] failed to write to %s", filePath)
+		log.BootErrorf(c, "[user_data.exportUserTransaction] failed to write to %s", filePath)
 		return err
 	}
 
-	log.BootInfof("[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
+	log.BootInfof(c, "[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
 
 	return nil
 }

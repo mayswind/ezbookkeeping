@@ -10,14 +10,14 @@ const requestIdHeader = "X-Request-ID"
 
 // RequestId generates a new request id and add it to context and response header
 func RequestId(config *settings.Config) core.MiddlewareHandlerFunc {
-	return func(c *core.Context) {
+	return func(c *core.WebContext) {
 		if requestid.Container.Current == nil {
 			c.Next()
 			return
 		}
 
 		requestId := requestid.Container.Current.GenerateRequestId(c.ClientIP(), c.ClientPort())
-		c.SetRequestId(requestId)
+		c.SetContextId(requestId)
 
 		if config.EnableRequestIdHeader {
 			c.Header(requestIdHeader, requestId)

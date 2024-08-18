@@ -36,9 +36,9 @@ type BankOfCanadaExchangeRateData struct {
 type BankOfCanadaObservationData map[string]any
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from bank of Canada
-func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Context) *models.LatestExchangeRateResponse {
+func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c core.Context) *models.LatestExchangeRateResponse {
 	if len(e.Observations) < 1 {
-		log.ErrorfWithRequestId(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] observations is empty")
+		log.Errorf(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] observations is empty")
 		return nil
 	}
 
@@ -82,12 +82,12 @@ func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Cont
 		rate, err := utils.StringToFloat64(exchangeRate)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to parse rate, rate is %s", exchangeRate)
+			log.Warnf(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to parse rate, rate is %s", exchangeRate)
 			continue
 		}
 
 		if rate <= 0 {
-			log.WarnfWithRequestId(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] rate is invalid, rate is %s", exchangeRate)
+			log.Warnf(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] rate is invalid, rate is %s", exchangeRate)
 			continue
 		}
 
@@ -106,7 +106,7 @@ func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Cont
 	timezone, err := time.LoadLocation(bankOfCanadaDataUpdateDateTimezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to get timezone, timezone name is %s", bankOfCanadaDataUpdateDateTimezone)
+		log.Errorf(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to get timezone, timezone name is %s", bankOfCanadaDataUpdateDateTimezone)
 		return nil
 	}
 
@@ -114,7 +114,7 @@ func (e *BankOfCanadaExchangeRateData) ToLatestExchangeRateResponse(c *core.Cont
 	updateTime, err := time.ParseInLocation(bankOfCanadaDataUpdateDateFormat, updateDateTime, timezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
+		log.Errorf(c, "[bank_of_canada_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
 		return nil
 	}
 
@@ -135,19 +135,19 @@ func (e *BankOfCanadaDataSource) GetRequestUrls() []string {
 }
 
 // Parse returns the common response entity according to the bank of Canada data source raw response
-func (e *BankOfCanadaDataSource) Parse(c *core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+func (e *BankOfCanadaDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
 	bankOfCanadaData := &BankOfCanadaExchangeRateData{}
 	err := json.Unmarshal(content, bankOfCanadaData)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[bank_of_canada_datasource.Parse] failed to parse json data, content is %s, because %s", string(content), err.Error())
+		log.Errorf(c, "[bank_of_canada_datasource.Parse] failed to parse json data, content is %s, because %s", string(content), err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	latestExchangeRateResponse := bankOfCanadaData.ToLatestExchangeRateResponse(c)
 
 	if latestExchangeRateResponse == nil {
-		log.ErrorfWithRequestId(c, "[bank_of_canada_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
+		log.Errorf(c, "[bank_of_canada_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 

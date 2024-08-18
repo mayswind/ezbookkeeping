@@ -12,7 +12,7 @@ import (
 )
 
 // PrintJsonSuccessResult writes success response in json format to current http context
-func PrintJsonSuccessResult(c *core.Context, result any) {
+func PrintJsonSuccessResult(c *core.WebContext, result any) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"result":  result,
@@ -20,7 +20,7 @@ func PrintJsonSuccessResult(c *core.Context, result any) {
 }
 
 // PrintDataSuccessResult writes success response in custom content type to current http context
-func PrintDataSuccessResult(c *core.Context, contentType string, fileName string, result []byte) {
+func PrintDataSuccessResult(c *core.WebContext, contentType string, fileName string, result []byte) {
 	if fileName != "" {
 		c.Header("Content-Disposition", "attachment;filename="+fileName)
 	}
@@ -29,7 +29,7 @@ func PrintDataSuccessResult(c *core.Context, contentType string, fileName string
 }
 
 // PrintJsonErrorResult writes error response in json format to current http context
-func PrintJsonErrorResult(c *core.Context, err *errs.Error) {
+func PrintJsonErrorResult(c *core.WebContext, err *errs.Error) {
 	c.SetResponseError(err)
 
 	errorMessage := err.Error()
@@ -60,7 +60,7 @@ func PrintJsonErrorResult(c *core.Context, err *errs.Error) {
 }
 
 // PrintDataErrorResult writes error response in custom content type to current http context
-func PrintDataErrorResult(c *core.Context, contentType string, err *errs.Error) {
+func PrintDataErrorResult(c *core.WebContext, contentType string, err *errs.Error) {
 	c.SetResponseError(err)
 
 	errorMessage := err.Error()

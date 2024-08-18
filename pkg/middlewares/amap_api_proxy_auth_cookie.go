@@ -8,7 +8,7 @@ import (
 const tokenCookieParam = "ebk_auth_token"
 
 // AmapApiProxyAuthCookie adds amap api proxy auth cookie to cookies in response
-func AmapApiProxyAuthCookie(c *core.Context, config *settings.Config) {
+func AmapApiProxyAuthCookie(c *core.WebContext, config *settings.Config) {
 	token := c.GetTextualToken()
 
 	if token != "" {

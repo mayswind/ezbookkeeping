@@ -31,7 +31,7 @@ var (
 )
 
 // AmapApiProxyHandler returns amap api response
-func (p *AmapApiProxy) AmapApiProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
+func (p *AmapApiProxy) AmapApiProxyHandler(c *core.WebContext) (*httputil.ReverseProxy, *errs.Error) {
 	var targetUrl string
 
 	if strings.HasPrefix(c.Request.RequestURI, "/_AMapService/v4/map/styles") {

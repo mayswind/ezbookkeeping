@@ -5,6 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -16,7 +17,7 @@ var SecurityUtils = &cli.Command{
 		{
 			Name:   "gen-secret-key",
 			Usage:  "Generate a random secret key",
-			Action: genSecretKey,
+			Action: bindAction(genSecretKey),
 			Flags: []cli.Flag{
 				&cli.IntFlag{
 					Name:        "length",
@@ -30,7 +31,7 @@ var SecurityUtils = &cli.Command{
 	},
 }
 
-func genSecretKey(c *cli.Context) error {
+func genSecretKey(c *core.CliContext) error {
 	length := c.Int("length")
 
 	if length <= 0 {

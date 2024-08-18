@@ -32,7 +32,7 @@ var (
 )
 
 // GetTotalCategoryCountByUid returns total category count of user
-func (s *TransactionCategoryService) GetTotalCategoryCountByUid(c *core.Context, uid int64) (int64, error) {
+func (s *TransactionCategoryService) GetTotalCategoryCountByUid(c core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -43,7 +43,7 @@ func (s *TransactionCategoryService) GetTotalCategoryCountByUid(c *core.Context,
 }
 
 // GetAllCategoriesByUid returns all transaction category models of user
-func (s *TransactionCategoryService) GetAllCategoriesByUid(c *core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetAllCategoriesByUid(c core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -70,7 +70,7 @@ func (s *TransactionCategoryService) GetAllCategoriesByUid(c *core.Context, uid 
 }
 
 // GetSubCategoriesByCategoryIds returns sub-category models according to category ids
-func (s *TransactionCategoryService) GetSubCategoriesByCategoryIds(c *core.Context, uid int64, categoryIds []int64) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetSubCategoriesByCategoryIds(c core.Context, uid int64, categoryIds []int64) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -112,7 +112,7 @@ func (s *TransactionCategoryService) GetSubCategoriesByCategoryIds(c *core.Conte
 }
 
 // GetCategoryByCategoryId returns a transaction category model according to transaction category id
-func (s *TransactionCategoryService) GetCategoryByCategoryId(c *core.Context, uid int64, categoryId int64) (*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetCategoryByCategoryId(c core.Context, uid int64, categoryId int64) (*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -134,7 +134,7 @@ func (s *TransactionCategoryService) GetCategoryByCategoryId(c *core.Context, ui
 }
 
 // GetCategoriesByCategoryIds returns transaction category models according to transaction category ids
-func (s *TransactionCategoryService) GetCategoriesByCategoryIds(c *core.Context, uid int64, categoryIds []int64) (map[int64]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) GetCategoriesByCategoryIds(c core.Context, uid int64, categoryIds []int64) (map[int64]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -155,7 +155,7 @@ func (s *TransactionCategoryService) GetCategoriesByCategoryIds(c *core.Context,
 }
 
 // GetMaxDisplayOrder returns the max display order according to transaction category type
-func (s *TransactionCategoryService) GetMaxDisplayOrder(c *core.Context, uid int64, categoryType models.TransactionCategoryType) (int32, error) {
+func (s *TransactionCategoryService) GetMaxDisplayOrder(c core.Context, uid int64, categoryType models.TransactionCategoryType) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -175,7 +175,7 @@ func (s *TransactionCategoryService) GetMaxDisplayOrder(c *core.Context, uid int
 }
 
 // GetMaxSubCategoryDisplayOrder returns the max display order of sub transaction category according to transaction category type and parent transaction category id
-func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(c *core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int32, error) {
+func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(c core.Context, uid int64, categoryType models.TransactionCategoryType, parentCategoryId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -199,7 +199,7 @@ func (s *TransactionCategoryService) GetMaxSubCategoryDisplayOrder(c *core.Conte
 }
 
 // CreateCategory saves a new transaction category model to database
-func (s *TransactionCategoryService) CreateCategory(c *core.Context, category *models.TransactionCategory) error {
+func (s *TransactionCategoryService) CreateCategory(c core.Context, category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -221,7 +221,7 @@ func (s *TransactionCategoryService) CreateCategory(c *core.Context, category *m
 }
 
 // CreateCategories saves a few transaction category models to database
-func (s *TransactionCategoryService) CreateCategories(c *core.Context, uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
+func (s *TransactionCategoryService) CreateCategories(c core.Context, uid int64, categories map[*models.TransactionCategory][]*models.TransactionCategory) ([]*models.TransactionCategory, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -284,7 +284,7 @@ func (s *TransactionCategoryService) CreateCategories(c *core.Context, uid int64
 }
 
 // ModifyCategory saves an existed transaction category model to database
-func (s *TransactionCategoryService) ModifyCategory(c *core.Context, category *models.TransactionCategory) error {
+func (s *TransactionCategoryService) ModifyCategory(c core.Context, category *models.TransactionCategory) error {
 	if category.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -305,7 +305,7 @@ func (s *TransactionCategoryService) ModifyCategory(c *core.Context, category *m
 }
 
 // HideCategory updates hidden field of given transaction categories
-func (s *TransactionCategoryService) HideCategory(c *core.Context, uid int64, ids []int64, hidden bool) error {
+func (s *TransactionCategoryService) HideCategory(c core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -331,7 +331,7 @@ func (s *TransactionCategoryService) HideCategory(c *core.Context, uid int64, id
 }
 
 // ModifyCategoryDisplayOrders updates display order of given transaction categories
-func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(c *core.Context, uid int64, categories []*models.TransactionCategory) error {
+func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(c core.Context, uid int64, categories []*models.TransactionCategory) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -357,7 +357,7 @@ func (s *TransactionCategoryService) ModifyCategoryDisplayOrders(c *core.Context
 }
 
 // DeleteCategory deletes an existed transaction category from database
-func (s *TransactionCategoryService) DeleteCategory(c *core.Context, uid int64, categoryId int64) error {
+func (s *TransactionCategoryService) DeleteCategory(c core.Context, uid int64, categoryId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -406,7 +406,7 @@ func (s *TransactionCategoryService) DeleteCategory(c *core.Context, uid int64, 
 }
 
 // DeleteAllCategories deletes all existed transaction categories from database
-func (s *TransactionCategoryService) DeleteAllCategories(c *core.Context, uid int64) error {
+func (s *TransactionCategoryService) DeleteAllCategories(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}

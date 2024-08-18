@@ -5,6 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/cron"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 )
@@ -17,12 +18,12 @@ var CronJobs = &cli.Command{
 		{
 			Name:   "list",
 			Usage:  "List all enabled cron jobs",
-			Action: listAllCronJobs,
+			Action: bindAction(listAllCronJobs),
 		},
 		{
 			Name:   "run",
 			Usage:  "Run specified cron job",
-			Action: runCronJob,
+			Action: bindAction(runCronJob),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "name",
@@ -35,24 +36,24 @@ var CronJobs = &cli.Command{
 	},
 }
 
-func listAllCronJobs(c *cli.Context) error {
+func listAllCronJobs(c *core.CliContext) error {
 	config, err := initializeSystem(c)
 
 	if err != nil {
 		return err
 	}
 
-	err = cron.InitializeCronJobSchedulerContainer(config, false)
+	err = cron.InitializeCronJobSchedulerContainer(c, config, false)
 
 	if err != nil {
-		log.BootErrorf("[cron_jobs.listAllCronJobs] initializes cron job scheduler failed, because %s", err.Error())
+		log.BootErrorf(c, "[cron_jobs.listAllCronJobs] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 
 	cronJobs := cron.Container.GetAllJobs()
 
 	if len(cronJobs) < 1 {
-		log.BootErrorf("[cron_jobs.listAllCronJobs] there are no enabled cron jobs")
+		log.BootErrorf(c, "[cron_jobs.listAllCronJobs] there are no enabled cron jobs")
 		return err
 	}
 
@@ -71,17 +72,17 @@ func listAllCronJobs(c *cli.Context) error {
 	return nil
 }
 
-func runCronJob(c *cli.Context) error {
+func runCronJob(c *core.CliContext) error {
 	config, err := initializeSystem(c)
 
 	if err != nil {
 		return err
 	}
 
-	err = cron.InitializeCronJobSchedulerContainer(config, false)
+	err = cron.InitializeCronJobSchedulerContainer(c, config, false)
 
 	if err != nil {
-		log.BootErrorf("[cron_jobs.runCronJob] initializes cron job scheduler failed, because %s", err.Error())
+		log.BootErrorf(c, "[cron_jobs.runCronJob] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 
@@ -89,7 +90,7 @@ func runCronJob(c *cli.Context) error {
 	err = cron.Container.SyncRunJobNow(jobName)
 
 	if err != nil {
-		log.BootErrorf("[cron_jobs.runCronJob] failed to run cron job \"%s\", because %s", jobName, err.Error())
+		log.BootErrorf(c, "[cron_jobs.runCronJob] failed to run cron job \"%s\", because %s", jobName, err.Error())
 		return err
 	}
 

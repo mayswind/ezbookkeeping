@@ -45,12 +45,12 @@ var (
 )
 
 // TransactionCountHandler returns transaction total count of current user
-func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionCountHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionCountReq models.TransactionCountRequest
 	err := c.ShouldBindQuery(&transactionCountReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionCountHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -59,14 +59,14 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.E
 	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionCountReq.AccountIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get account error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionCountHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionCountReq.CategoryIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get transaction category error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionCountHandler] get transaction category error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -77,7 +77,7 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.E
 		allTagIds, err = a.getTagIds(transactionCountReq.TagIds)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionCountHandler] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[transactions.TransactionCountHandler] get transaction tag ids error, because %s", err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -85,7 +85,7 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.E
 	totalCount, err := a.transactions.GetTransactionCount(c, uid, transactionCountReq.MaxTime, transactionCountReq.MinTime, transactionCountReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, transactionCountReq.AmountFilter, transactionCountReq.Keyword)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionCountHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionCountHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -97,19 +97,19 @@ func (a *TransactionsApi) TransactionCountHandler(c *core.Context) (any, *errs.E
 }
 
 // TransactionListHandler returns transaction list of current user
-func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionListHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionListReq models.TransactionListByMaxTimeRequest
 	err := c.ShouldBindQuery(&transactionListReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionListHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -118,7 +118,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionListHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -127,14 +127,14 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get account error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionListHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get transaction category error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionListHandler] get transaction category error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -145,7 +145,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 		allTagIds, err = a.getTagIds(transactionListReq.TagIds)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionListHandler] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[transactions.TransactionListHandler] get transaction tag ids error, because %s", err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -156,7 +156,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 		totalCount, err = a.transactions.GetTransactionCount(c, uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, transactionListReq.AmountFilter, transactionListReq.Keyword)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.TransactionListHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -164,7 +164,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 	transactions, err := a.transactions.GetTransactionsByMaxTime(c, uid, transactionListReq.MaxTime, transactionListReq.MinTime, transactionListReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, transactionListReq.AmountFilter, transactionListReq.Keyword, transactionListReq.Page, transactionListReq.Count, true, true)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionListHandler] failed to get transactions earlier than \"%d\" for user \"uid:%d\", because %s", transactionListReq.MaxTime, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -180,7 +180,7 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 	transactionResult, err := a.getTransactionListResult(c, user, transactions, utcOffset, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -200,19 +200,19 @@ func (a *TransactionsApi) TransactionListHandler(c *core.Context) (any, *errs.Er
 }
 
 // TransactionMonthListHandler returns all transaction list of current user by month
-func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionMonthListHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionListReq models.TransactionListInMonthByPageRequest
 	err := c.ShouldBindQuery(&transactionListReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionMonthListHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionMonthListHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -221,7 +221,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionMonthListHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -230,14 +230,14 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 	allAccountIds, err := a.getAccountOrSubAccountIds(c, transactionListReq.AccountIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get account error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionMonthListHandler] get account error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	allCategoryIds, err := a.getCategoryOrSubCategoryIds(c, transactionListReq.CategoryIds, uid)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get transaction category error, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionMonthListHandler] get transaction category error, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -248,7 +248,7 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 		allTagIds, err = a.getTagIds(transactionListReq.TagIds)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[transactions.TransactionMonthListHandler] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[transactions.TransactionMonthListHandler] get transaction tag ids error, because %s", err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -256,14 +256,14 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 	transactions, err := a.transactions.GetTransactionsInMonthByPage(c, uid, transactionListReq.Year, transactionListReq.Month, transactionListReq.Type, allCategoryIds, allAccountIds, allTagIds, noTags, transactionListReq.AmountFilter, transactionListReq.Keyword)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to get transactions in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionMonthListHandler] failed to get transactions in month \"%d-%d\" for user \"uid:%d\", because %s", transactionListReq.Year, transactionListReq.Month, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	transactionResult, err := a.getTransactionListResult(c, user, transactions, utcOffset, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionMonthListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionMonthListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -276,19 +276,19 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.Context) (any, *er
 }
 
 // TransactionStatisticsHandler returns transaction statistics of current user
-func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionStatisticsHandler(c *core.WebContext) (any, *errs.Error) {
 	var statisticReq models.TransactionStatisticRequest
 	err := c.ShouldBindQuery(&statisticReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionStatisticsHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionStatisticsHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -296,7 +296,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *e
 	totalAmounts, err := a.transactions.GetAccountsAndCategoriesTotalIncomeAndExpense(c, uid, statisticReq.StartTime, statisticReq.EndTime, utcOffset, statisticReq.UseTransactionTimezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionStatisticsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionStatisticsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -320,26 +320,26 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.Context) (any, *e
 }
 
 // TransactionStatisticsTrendsHandler returns transaction statistics trends of current user
-func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.WebContext) (any, *errs.Error) {
 	var statisticTrendsReq models.TransactionStatisticTrendsRequest
 	err := c.ShouldBindQuery(&statisticTrendsReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionStatisticsTrendsHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionStatisticsTrendsHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
 	startYear, startMonth, endYear, endMonth, err := statisticTrendsReq.GetNumericYearMonthRange()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] cannot parse year month, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionStatisticsTrendsHandler] cannot parse year month, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -347,7 +347,7 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.Context) (a
 	allMonthlyTotalAmounts, err := a.transactions.GetAccountsAndCategoriesMonthlyIncomeAndExpense(c, uid, startYear, startMonth, endYear, endMonth, utcOffset, statisticTrendsReq.UseTransactionTimezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionStatisticsTrendsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionStatisticsTrendsHandler] failed to get accounts and categories total income and expense for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -378,36 +378,36 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.Context) (a
 }
 
 // TransactionAmountsHandler returns transaction amounts of current user
-func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionAmountsReq models.TransactionAmountsRequest
 	err := c.ShouldBindQuery(&transactionAmountsReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	requestItems, err := transactionAmountsReq.GetTransactionAmountsRequestItems()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] get request item failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] get request item failed, because %s", err.Error())
 		return nil, errs.ErrQueryItemsInvalid
 	}
 
 	if len(requestItems) < 1 {
-		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are no valid items")
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are no valid items")
 		return nil, errs.ErrQueryItemsEmpty
 	}
 
 	if len(requestItems) > 20 {
-		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are too many items")
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] parse request failed, because there are too many items")
 		return nil, errs.ErrQueryItemsTooMuch
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -417,7 +417,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 	accountMap := a.accounts.GetAccountMapByList(accounts)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionAmountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionAmountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -429,7 +429,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, utcOffset, transactionAmountsReq.UseTransactionTimezone)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
@@ -439,7 +439,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 			account, exists := accountMap[accountId]
 
 			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
+				log.Warnf(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
 				continue
 			}
 
@@ -461,7 +461,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 			account, exists := accountMap[accountId]
 
 			if !exists {
-				log.WarnfWithRequestId(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
+				log.Warnf(c, "[transactions.TransactionAmountsHandler] cannot find account for account \"id:%d\" of user \"uid:%d\"", accountId, uid)
 				continue
 			}
 
@@ -498,19 +498,19 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.Context) (any, *errs
 }
 
 // TransactionGetHandler returns one specific transaction of current user
-func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionGetReq models.TransactionGetRequest
 	err := c.ShouldBindQuery(&transactionGetReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionGetHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionGetHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -519,7 +519,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionGetHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -528,7 +528,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 	transaction, err := a.transactions.GetTransactionByTransactionId(c, uid, transactionGetReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionGetReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionGetHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionGetReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -547,13 +547,13 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 	accountMap, err := a.accounts.GetAccountsByAccountIds(c, uid, accountIds)
 
 	if _, exists := accountMap[transaction.AccountId]; !exists {
-		log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+		log.Warnf(c, "[transactions.TransactionGetHandler] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 		return nil, errs.ErrTransactionNotFound
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		if _, exists := accountMap[transaction.RelatedAccountId]; !exists {
-			log.WarnfWithRequestId(c, "[transactions.TransactionGetHandler] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+			log.Warnf(c, "[transactions.TransactionGetHandler] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 			return nil, errs.ErrTransactionNotFound
 		}
 	}
@@ -561,7 +561,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, []int64{transaction.TransactionId})
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionGetHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -572,7 +572,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 		category, err = a.transactionCategories.GetCategoryByCategoryId(c, uid, transaction.CategoryId)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions category for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.TransactionGetHandler] failed to get transactions category for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -581,7 +581,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 		tagMap, err = a.transactionTags.GetTagsByTagIds(c, uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionGetHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.TransactionGetHandler] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 	}
@@ -614,42 +614,42 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.Context) (any, *errs.Err
 }
 
 // TransactionCreateHandler saves a new transaction by request parameters for current user
-func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionCreateReq models.TransactionCreateRequest
 	err := c.ShouldBindJSON(&transactionCreateReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionCreateHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] parse tag ids failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionCreateHandler] parse tag ids failed, because %s", err.Error())
 		return nil, errs.ErrTransactionTagIdInvalid
 	}
 
 	if transactionCreateReq.Type < models.TRANSACTION_TYPE_MODIFY_BALANCE || transactionCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] transaction type is invalid")
+		log.Warnf(c, "[transactions.TransactionCreateHandler] transaction type is invalid")
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
 	if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId > 0 {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] balance modification transaction cannot set category id")
+		log.Warnf(c, "[transactions.TransactionCreateHandler] balance modification transaction cannot set category id")
 		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
 	}
 
 	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAccountId != 0 {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination account cannot be set")
+		log.Warnf(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination account cannot be set")
 		return nil, errs.ErrTransactionDestinationAccountCannotBeSet
 	} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId == transactionCreateReq.DestinationAccountId {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] transfer transaction source account must not be destination account")
+		log.Warnf(c, "[transactions.TransactionCreateHandler] transfer transaction source account must not be destination account")
 		return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
 	}
 
 	if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAmount != 0 {
-		log.WarnfWithRequestId(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination amount cannot be set")
+		log.Warnf(c, "[transactions.TransactionCreateHandler] non-transfer transaction destination amount cannot be set")
 		return nil, errs.ErrTransactionDestinationAmountCannotBeSet
 	}
 
@@ -658,7 +658,7 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionCreateHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -675,14 +675,14 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId)
 
 		if found {
-			log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] another transaction \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			log.Infof(c, "[transactions.TransactionCreateHandler] another transaction \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
 			transactionId, err := utils.StringToInt64(remark)
 
 			if err == nil {
 				transaction, err = a.transactions.GetTransactionByTransactionId(c, uid, transactionId)
 
 				if err != nil {
-					log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to get existed transaction \"id:%d\" for user \"uid:%d\", because %s", transactionId, uid, err.Error())
+					log.Errorf(c, "[transactions.TransactionCreateHandler] failed to get existed transaction \"id:%d\" for user \"uid:%d\", because %s", transactionId, uid, err.Error())
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
@@ -696,11 +696,11 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 	err = a.transactions.CreateTransaction(c, transaction, tagIds)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionCreateHandler] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionCreateHandler] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
+	log.Infof(c, "[transactions.TransactionCreateHandler] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
 	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId, utils.Int64ToString(transaction.TransactionId))
 	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
@@ -709,19 +709,19 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.Context) (any, *errs.
 }
 
 // TransactionModifyHandler saves an existed transaction by request parameters for current user
-func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionModifyReq models.TransactionModifyRequest
 	err := c.ShouldBindJSON(&transactionModifyReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionModifyHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionModifyHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	tagIds, err := utils.StringArrayToInt64Array(transactionModifyReq.TagIds)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionModifyHandler] parse tag ids failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionModifyHandler] parse tag ids failed, because %s", err.Error())
 		return nil, errs.ErrTransactionTagIdInvalid
 	}
 
@@ -730,7 +730,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionModifyHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -739,19 +739,19 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.
 	transaction, err := a.transactions.GetTransactionByTransactionId(c, uid, transactionModifyReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionModifyHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		log.WarnfWithRequestId(c, "[transactions.TransactionModifyHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionModifyReq.Id, uid)
+		log.Warnf(c, "[transactions.TransactionModifyHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionModifyReq.Id, uid)
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, []int64{transaction.TransactionId})
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionModifyHandler] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -816,11 +816,11 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.
 	err = a.transactions.ModifyTransaction(c, newTransaction, len(transactionTagIds), addTransactionTagIds, removeTransactionTagIds)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionModifyHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionModifyHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
+	log.Infof(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
 	newTransaction.Type = transaction.Type
 	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, transactionEditable)
@@ -829,19 +829,19 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.Context) (any, *errs.
 }
 
 // TransactionDeleteHandler deletes an existed transaction by request parameters for current user
-func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (any, *errs.Error) {
+func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionDeleteReq models.TransactionDeleteRequest
 	err := c.ShouldBindJSON(&transactionDeleteReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionDeleteHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionDeleteHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[transactions.TransactionDeleteHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[transactions.TransactionDeleteHandler] cannot get client timezone offset, because %s", err.Error())
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
@@ -850,7 +850,7 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (any, *errs.
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.ErrorfWithRequestId(c, "[transactions.TransactionDeleteHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[transactions.TransactionDeleteHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -859,12 +859,12 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (any, *errs.
 	transaction, err := a.transactions.GetTransactionByTransactionId(c, uid, transactionDeleteReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionDeleteHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionDeleteHandler] failed to get transaction \"id:%d\" for user \"uid:%d\", because %s", transactionDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		log.WarnfWithRequestId(c, "[transactions.TransactionDeleteHandler] cannot delete transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionDeleteReq.Id, uid)
+		log.Warnf(c, "[transactions.TransactionDeleteHandler] cannot delete transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionDeleteReq.Id, uid)
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
@@ -877,28 +877,28 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.Context) (any, *errs.
 	err = a.transactions.DeleteTransaction(c, uid, transactionDeleteReq.Id)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.TransactionDeleteHandler] failed to delete transaction \"id:%d\" for user \"uid:%d\", because %s", transactionDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[transactions.TransactionDeleteHandler] failed to delete transaction \"id:%d\" for user \"uid:%d\", because %s", transactionDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[transactions.TransactionDeleteHandler] user \"uid:%d\" has deleted transaction \"id:%d\"", uid, transactionDeleteReq.Id)
+	log.Infof(c, "[transactions.TransactionDeleteHandler] user \"uid:%d\" has deleted transaction \"id:%d\"", uid, transactionDeleteReq.Id)
 	return true, nil
 }
 
-func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account) []*models.Transaction {
+func (a *TransactionsApi) filterTransactions(c *core.WebContext, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account) []*models.Transaction {
 	finalTransactions := make([]*models.Transaction, 0, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 
 		if _, exists := accountMap[transaction.AccountId]; !exists {
-			log.WarnfWithRequestId(c, "[transactions.filterTransactions] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+			log.Warnf(c, "[transactions.filterTransactions] account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 			continue
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			if _, exists := accountMap[transaction.RelatedAccountId]; !exists {
-				log.WarnfWithRequestId(c, "[transactions.filterTransactions] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+				log.Warnf(c, "[transactions.filterTransactions] related account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
 				continue
 			}
 		}
@@ -909,7 +909,7 @@ func (a *TransactionsApi) filterTransactions(c *core.Context, uid int64, transac
 	return finalTransactions
 }
 
-func (a *TransactionsApi) getAccountOrSubAccountIds(c *core.Context, accountIds string, uid int64) ([]int64, error) {
+func (a *TransactionsApi) getAccountOrSubAccountIds(c *core.WebContext, accountIds string, uid int64) ([]int64, error) {
 	if accountIds == "" || accountIds == "0" {
 		return nil, nil
 	}
@@ -961,7 +961,7 @@ func (a *TransactionsApi) getAccountOrSubAccountIds(c *core.Context, accountIds 
 	return allAccountIds, nil
 }
 
-func (a *TransactionsApi) getCategoryOrSubCategoryIds(c *core.Context, categoryIds string, uid int64) ([]int64, error) {
+func (a *TransactionsApi) getCategoryOrSubCategoryIds(c *core.WebContext, categoryIds string, uid int64) ([]int64, error) {
 	if categoryIds == "" || categoryIds == "0" {
 		return nil, nil
 	}
@@ -1053,7 +1053,7 @@ func (a *TransactionsApi) getTransactionTagInfoResponses(tagIds []int64, allTran
 	return allTags
 }
 
-func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models.User, transactions []*models.Transaction, utcOffset int16, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
+func (a *TransactionsApi) getTransactionListResult(c *core.WebContext, user *models.User, transactions []*models.Transaction, utcOffset int16, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
 	uid := user.Uid
 	transactionIds := make([]int64, len(transactions))
 	accountIds := make([]int64, 0, len(transactions)*2)
@@ -1079,7 +1079,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 	allAccounts, err := a.accounts.GetAccountsByAccountIds(c, uid, utils.ToUniqueInt64Slice(accountIds))
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.getTransactionListResult] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, err
 	}
 
@@ -1088,7 +1088,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, transactionIds)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[transactions.getTransactionListResult] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, err
 	}
 
@@ -1099,7 +1099,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(c, uid, utils.ToUniqueInt64Slice(categoryIds))
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.getTransactionListResult] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, err
 		}
 	}
@@ -1108,7 +1108,7 @@ func (a *TransactionsApi) getTransactionListResult(c *core.Context, user *models
 		tagMap, err = a.transactionTags.GetTagsByTagIds(c, uid, utils.ToUniqueInt64Slice(a.getTransactionTagIds(allTransactionTagIds)))
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[transactions.getTransactionListResult] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[transactions.getTransactionListResult] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, err
 		}
 	}

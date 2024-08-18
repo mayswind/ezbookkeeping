@@ -12,12 +12,12 @@ type Database struct {
 }
 
 // NewSession starts a new session with the specified context
-func (db *Database) NewSession(c *core.Context) *xorm.Session {
+func (db *Database) NewSession(c core.Context) *xorm.Session {
 	return db.engineGroup.Context(NewXOrmContextAdapter(c))
 }
 
 // DoTransaction runs a new database transaction
-func (db *Database) DoTransaction(c *core.Context, fn func(sess *xorm.Session) error) (err error) {
+func (db *Database) DoTransaction(c core.Context, fn func(sess *xorm.Session) error) (err error) {
 	sess := db.engineGroup.NewSession()
 
 	if c != nil {

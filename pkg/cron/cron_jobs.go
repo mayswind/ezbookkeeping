@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 )
 
@@ -11,7 +12,7 @@ var RemoveExpiredTokensJob = &CronJob{
 	Period: CronJobFixedHourPeriod{
 		Hour: 0,
 	},
-	Run: func() error {
-		return services.Tokens.DeleteAllExpiredTokens(nil)
+	Run: func(c *core.CronContext) error {
+		return services.Tokens.DeleteAllExpiredTokens(c)
 	},
 }

@@ -33,7 +33,7 @@ var (
 )
 
 // GetTotalAccountCountByUid returns total account count of user
-func (s *AccountService) GetTotalAccountCountByUid(c *core.Context, uid int64) (int64, error) {
+func (s *AccountService) GetTotalAccountCountByUid(c core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -44,7 +44,7 @@ func (s *AccountService) GetTotalAccountCountByUid(c *core.Context, uid int64) (
 }
 
 // GetAllAccountsByUid returns all account models of user
-func (s *AccountService) GetAllAccountsByUid(c *core.Context, uid int64) ([]*models.Account, error) {
+func (s *AccountService) GetAllAccountsByUid(c core.Context, uid int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -56,7 +56,7 @@ func (s *AccountService) GetAllAccountsByUid(c *core.Context, uid int64) ([]*mod
 }
 
 // GetAccountAndSubAccountsByAccountId returns account model and sub-account models according to account id
-func (s *AccountService) GetAccountAndSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
+func (s *AccountService) GetAccountAndSubAccountsByAccountId(c core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -72,7 +72,7 @@ func (s *AccountService) GetAccountAndSubAccountsByAccountId(c *core.Context, ui
 }
 
 // GetSubAccountsByAccountId returns sub-account models according to account id
-func (s *AccountService) GetSubAccountsByAccountId(c *core.Context, uid int64, accountId int64) ([]*models.Account, error) {
+func (s *AccountService) GetSubAccountsByAccountId(c core.Context, uid int64, accountId int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -88,7 +88,7 @@ func (s *AccountService) GetSubAccountsByAccountId(c *core.Context, uid int64, a
 }
 
 // GetSubAccountsByAccountIds returns sub-account models according to account ids
-func (s *AccountService) GetSubAccountsByAccountIds(c *core.Context, uid int64, accountIds []int64) ([]*models.Account, error) {
+func (s *AccountService) GetSubAccountsByAccountIds(c core.Context, uid int64, accountIds []int64) ([]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -130,7 +130,7 @@ func (s *AccountService) GetSubAccountsByAccountIds(c *core.Context, uid int64, 
 }
 
 // GetAccountsByAccountIds returns account models according to account ids
-func (s *AccountService) GetAccountsByAccountIds(c *core.Context, uid int64, accountIds []int64) (map[int64]*models.Account, error) {
+func (s *AccountService) GetAccountsByAccountIds(c core.Context, uid int64, accountIds []int64) (map[int64]*models.Account, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -151,7 +151,7 @@ func (s *AccountService) GetAccountsByAccountIds(c *core.Context, uid int64, acc
 }
 
 // GetMaxDisplayOrder returns the max display order according to account category
-func (s *AccountService) GetMaxDisplayOrder(c *core.Context, uid int64, category models.AccountCategory) (int32, error) {
+func (s *AccountService) GetMaxDisplayOrder(c core.Context, uid int64, category models.AccountCategory) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -171,7 +171,7 @@ func (s *AccountService) GetMaxDisplayOrder(c *core.Context, uid int64, category
 }
 
 // GetMaxSubAccountDisplayOrder returns the max display order of sub-account according to account category and parent account id
-func (s *AccountService) GetMaxSubAccountDisplayOrder(c *core.Context, uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
+func (s *AccountService) GetMaxSubAccountDisplayOrder(c core.Context, uid int64, category models.AccountCategory, parentAccountId int64) (int32, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -195,7 +195,7 @@ func (s *AccountService) GetMaxSubAccountDisplayOrder(c *core.Context, uid int64
 }
 
 // CreateAccounts saves a new account model to database
-func (s *AccountService) CreateAccounts(c *core.Context, mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
+func (s *AccountService) CreateAccounts(c core.Context, mainAccount *models.Account, childrenAccounts []*models.Account, utcOffset int16) error {
 	if mainAccount.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -288,7 +288,7 @@ func (s *AccountService) CreateAccounts(c *core.Context, mainAccount *models.Acc
 }
 
 // ModifyAccounts saves an existed account model to database
-func (s *AccountService) ModifyAccounts(c *core.Context, uid int64, accounts []*models.Account) error {
+func (s *AccountService) ModifyAccounts(c core.Context, uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -316,7 +316,7 @@ func (s *AccountService) ModifyAccounts(c *core.Context, uid int64, accounts []*
 }
 
 // HideAccount updates hidden field of given accounts
-func (s *AccountService) HideAccount(c *core.Context, uid int64, ids []int64, hidden bool) error {
+func (s *AccountService) HideAccount(c core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -342,7 +342,7 @@ func (s *AccountService) HideAccount(c *core.Context, uid int64, ids []int64, hi
 }
 
 // ModifyAccountDisplayOrders updates display order of given accounts
-func (s *AccountService) ModifyAccountDisplayOrders(c *core.Context, uid int64, accounts []*models.Account) error {
+func (s *AccountService) ModifyAccountDisplayOrders(c core.Context, uid int64, accounts []*models.Account) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -368,7 +368,7 @@ func (s *AccountService) ModifyAccountDisplayOrders(c *core.Context, uid int64, 
 }
 
 // DeleteAccount deletes an existed account from database
-func (s *AccountService) DeleteAccount(c *core.Context, uid int64, accountId int64) error {
+func (s *AccountService) DeleteAccount(c core.Context, uid int64, accountId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}

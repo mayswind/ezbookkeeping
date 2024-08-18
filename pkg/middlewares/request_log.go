@@ -9,7 +9,7 @@ import (
 )
 
 // RequestLog logs the http request log
-func RequestLog(c *core.Context) {
+func RequestLog(c *core.WebContext) {
 	start := time.Now()
 	path := c.Request.URL.Path
 	query := c.Request.URL.RawQuery

@@ -42,9 +42,9 @@ type NationalBankOfPolandExchangeRate struct {
 }
 
 // ToLatestExchangeRateResponse returns a view-object according to original data from National Bank of Poland
-func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c *core.Context) *models.LatestExchangeRateResponse {
+func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c core.Context) *models.LatestExchangeRateResponse {
 	if len(e.AllExchangeRates) < 1 {
-		log.ErrorfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] all exchange rates is empty")
+		log.Errorf(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] all exchange rates is empty")
 		return nil
 	}
 
@@ -69,7 +69,7 @@ func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c *c
 	timezone, err := time.LoadLocation(nationalBankOfPolandDataUpdateDateTimezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] failed to get timezone, timezone name is %s", nationalBankOfPolandDataUpdateDateTimezone)
+		log.Errorf(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] failed to get timezone, timezone name is %s", nationalBankOfPolandDataUpdateDateTimezone)
 		return nil
 	}
 
@@ -77,7 +77,7 @@ func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c *c
 	updateTime, err := time.ParseInLocation(nationalBankOfPolandDataUpdateDateFormat, updateDateTime, timezone)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
+		log.Errorf(c, "[national_bank_of_poland_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", updateDateTime)
 		return nil
 	}
 
@@ -93,16 +93,16 @@ func (e *NationalBankOfPolandExchangeRateData) ToLatestExchangeRateResponse(c *c
 }
 
 // ToLatestExchangeRate returns a data pair according to original data from National Bank of Poland
-func (e *NationalBankOfPolandExchangeRate) ToLatestExchangeRate(c *core.Context) *models.LatestExchangeRate {
+func (e *NationalBankOfPolandExchangeRate) ToLatestExchangeRate(c core.Context) *models.LatestExchangeRate {
 	rate, err := utils.StringToFloat64(e.Rate)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRate] failed to parse rate, currency is %s, rate is %s", e.Currency, e.Rate)
+		log.Warnf(c, "[national_bank_of_poland_datasource.ToLatestExchangeRate] failed to parse rate, currency is %s, rate is %s", e.Currency, e.Rate)
 		return nil
 	}
 
 	if rate <= 0 {
-		log.WarnfWithRequestId(c, "[national_bank_of_poland_datasource.ToLatestExchangeRate] rate is invalid, currency is %s, rate is %s", e.Currency, e.Rate)
+		log.Warnf(c, "[national_bank_of_poland_datasource.ToLatestExchangeRate] rate is invalid, currency is %s, rate is %s", e.Currency, e.Rate)
 		return nil
 	}
 
@@ -124,7 +124,7 @@ func (e *NationalBankOfPolandDataSource) GetRequestUrls() []string {
 }
 
 // Parse returns the common response entity according to the National Bank of Poland data source raw response
-func (e *NationalBankOfPolandDataSource) Parse(c *core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
+func (e *NationalBankOfPolandDataSource) Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error) {
 	nationalBankOfPolandData := &NationalBankOfPolandExchangeRateData{}
 
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
@@ -132,14 +132,14 @@ func (e *NationalBankOfPolandDataSource) Parse(c *core.Context, content []byte) 
 	err := xmlDecoder.Decode(&nationalBankOfPolandData)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[national_bank_of_poland_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())
+		log.Errorf(c, "[national_bank_of_poland_datasource.Parse] failed to parse xml data, content is %s, because %s", string(content), err.Error())
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
 	latestExchangeRateResponse := nationalBankOfPolandData.ToLatestExchangeRateResponse(c)
 
 	if latestExchangeRateResponse == nil {
-		log.ErrorfWithRequestId(c, "[national_bank_of_poland_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
+		log.Errorf(c, "[national_bank_of_poland_datasource.Parse] failed to parse latest exchange rate data, content is %s", string(content))
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 

@@ -5,11 +5,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestNewDefaultRequestIdGenerator_Http(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "123.234.123.234", HttpPort: 8080, SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:  "123.234.123.234",
+		HttpPort:  8080,
+		SecretKey: "secretkey",
+	})
 	requestId := generator.GenerateRequestId("127.0.0.1", 20000)
 	requestIdInfo := generator.parseRequestIdInfo(generator.parseRequestIdFromUuid(requestId))
 
@@ -23,7 +28,12 @@ func TestNewDefaultRequestIdGenerator_Http(t *testing.T) {
 }
 
 func TestNewDefaultRequestIdGenerator_UnixSocket(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "1.2.3.4", UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock", Protocol: "socket", SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:       "1.2.3.4",
+		UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock",
+		Protocol:       "socket",
+		SecretKey:      "secretkey",
+	})
 	requestId := generator.GenerateRequestId("127.0.0.1", 20000)
 	requestIdInfo := generator.parseRequestIdInfo(generator.parseRequestIdFromUuid(requestId))
 
@@ -37,7 +47,12 @@ func TestNewDefaultRequestIdGenerator_UnixSocket(t *testing.T) {
 }
 
 func TestNewDefaultRequestIdGenerator_ClientIpv4(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "1.2.3.4", UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock", Protocol: "socket", SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:       "1.2.3.4",
+		UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock",
+		Protocol:       "socket",
+		SecretKey:      "secretkey",
+	})
 	requestId := generator.GenerateRequestId("127.0.0.1", 20000)
 	requestIdInfo := generator.parseRequestIdInfo(generator.parseRequestIdFromUuid(requestId))
 
@@ -62,7 +77,12 @@ func TestNewDefaultRequestIdGenerator_ClientIpv4(t *testing.T) {
 }
 
 func TestNewDefaultRequestIdGenerator_ClientIpv6(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "1.2.3.4", UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock", Protocol: "socket", SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:       "1.2.3.4",
+		UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock",
+		Protocol:       "socket",
+		SecretKey:      "secretkey",
+	})
 	requestId := generator.GenerateRequestId("2001:abc:def:1234::1", 20000)
 	requestIdInfo := generator.parseRequestIdInfo(generator.parseRequestIdFromUuid(requestId))
 
@@ -87,7 +107,12 @@ func TestNewDefaultRequestIdGenerator_ClientIpv6(t *testing.T) {
 }
 
 func TestNewDefaultRequestIdGenerator_ClientPort(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "1.2.3.4", UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock", Protocol: "socket", SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:       "1.2.3.4",
+		UnixSocketPath: "/var/lib/ezbookkeeping/ezbookkeeping.sock",
+		Protocol:       "socket",
+		SecretKey:      "secretkey",
+	})
 	requestId := generator.GenerateRequestId("127.0.0.1", 0)
 	requestIdInfo := generator.parseRequestIdInfo(generator.parseRequestIdFromUuid(requestId))
 
@@ -132,7 +157,11 @@ func TestNewDefaultRequestIdGenerator_ClientPort(t *testing.T) {
 }
 
 func TestGenerateRequestId_100Times(t *testing.T) {
-	generator, _ := NewDefaultRequestIdGenerator(&settings.Config{HttpAddr: "1.2.3.4", HttpPort: 1234, SecretKey: "secretkey"})
+	generator, _ := NewDefaultRequestIdGenerator(core.NewNullContext(), &settings.Config{
+		HttpAddr:  "1.2.3.4",
+		HttpPort:  1234,
+		SecretKey: "secretkey",
+	})
 
 	for i := 1; i <= 100; i++ {
 		requestId := generator.GenerateRequestId("127.0.0.1", 20000)

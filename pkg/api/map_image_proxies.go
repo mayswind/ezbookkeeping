@@ -37,8 +37,8 @@ var (
 )
 
 // MapTileImageProxyHandler returns map tile image
-func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
-	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
+func (p *MapImageProxy) MapTileImageProxyHandler(c *core.WebContext) (*httputil.ReverseProxy, *errs.Error) {
+	return p.mapImageProxyHandler(c, func(c *core.WebContext, mapProvider string) (string, *errs.Error) {
 		if mapProvider == settings.OpenStreetMapProvider {
 			return openStreetMapTileImageUrlFormat, nil
 		} else if mapProvider == settings.OpenStreetMapHumanitarianStyleProvider {
@@ -71,8 +71,8 @@ func (p *MapImageProxy) MapTileImageProxyHandler(c *core.Context) (*httputil.Rev
 }
 
 // MapAnnotationImageProxyHandler returns map annotation image
-func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.Context) (*httputil.ReverseProxy, *errs.Error) {
-	return p.mapImageProxyHandler(c, func(c *core.Context, mapProvider string) (string, *errs.Error) {
+func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.WebContext) (*httputil.ReverseProxy, *errs.Error) {
+	return p.mapImageProxyHandler(c, func(c *core.WebContext, mapProvider string) (string, *errs.Error) {
 		if mapProvider == settings.TianDiTuProvider {
 			return tianDiTuMapAnnotationUrlFormat + "&tk=" + p.CurrentConfig().TianDiTuAPIKey, nil
 		} else if mapProvider == settings.CustomProvider {
@@ -83,7 +83,7 @@ func (p *MapImageProxy) MapAnnotationImageProxyHandler(c *core.Context) (*httput
 	})
 }
 
-func (p *MapImageProxy) mapImageProxyHandler(c *core.Context, fn func(c *core.Context, mapProvider string) (string, *errs.Error)) (*httputil.ReverseProxy, *errs.Error) {
+func (p *MapImageProxy) mapImageProxyHandler(c *core.WebContext, fn func(c *core.WebContext, mapProvider string) (string, *errs.Error)) (*httputil.ReverseProxy, *errs.Error) {
 	mapProvider := strings.Replace(c.Query("provider"), "-", "_", -1)
 	targetUrl := ""
 

@@ -50,50 +50,50 @@ var (
 )
 
 // ExportDataToEzbookkeepingCSVHandler returns exported data in csv format
-func (a *DataManagementsApi) ExportDataToEzbookkeepingCSVHandler(c *core.Context) ([]byte, string, *errs.Error) {
+func (a *DataManagementsApi) ExportDataToEzbookkeepingCSVHandler(c *core.WebContext) ([]byte, string, *errs.Error) {
 	return a.getExportedFileContent(c, "csv")
 }
 
 // ExportDataToEzbookkeepingTSVHandler returns exported data in csv format
-func (a *DataManagementsApi) ExportDataToEzbookkeepingTSVHandler(c *core.Context) ([]byte, string, *errs.Error) {
+func (a *DataManagementsApi) ExportDataToEzbookkeepingTSVHandler(c *core.WebContext) ([]byte, string, *errs.Error) {
 	return a.getExportedFileContent(c, "tsv")
 }
 
 // DataStatisticsHandler returns user data statistics
-func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (any, *errs.Error) {
+func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	totalAccountCount, err := a.accounts.GetTotalAccountCountByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total account count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total account count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
 	totalTransactionCategoryCount, err := a.categories.GetTotalCategoryCountByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction category count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total transaction category count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
 	totalTransactionTagCount, err := a.tags.GetTotalTagCountByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction tag count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total transaction tag count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
 	totalTransactionCount, err := a.transactions.GetTotalTransactionCountByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total transaction count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
 	totalTransactionTemplateCount, err := a.templates.GetTotalNormalTemplateCountByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.DataStatisticsHandler] failed to get total transaction template count for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total transaction template count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrOperationFailed
 	}
 
@@ -109,12 +109,12 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.Context) (any, *errs.
 }
 
 // ClearDataHandler deletes all user data
-func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error) {
+func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Error) {
 	var clearDataReq models.ClearDataRequest
 	err := c.ShouldBindJSON(&clearDataReq)
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[data_managements.ClearDataHandler] parse request failed, because %s", err.Error())
+		log.Warnf(c, "[data_managements.ClearDataHandler] parse request failed, because %s", err.Error())
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
@@ -123,7 +123,7 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.WarnfWithRequestId(c, "[data_managements.ClearDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+			log.Warnf(c, "[data_managements.ClearDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
@@ -136,36 +136,36 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.Context) (any, *errs.Error
 	err = a.transactions.DeleteAllTransactions(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transactions, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transactions, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.categories.DeleteAllCategories(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction categories, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction categories, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.tags.DeleteAllTags(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.templates.DeleteAllTemplates(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.InfofWithRequestId(c, "[data_managements.ClearDataHandler] user \"uid:%d\" has cleared all data", uid)
+	log.Infof(c, "[data_managements.ClearDataHandler] user \"uid:%d\" has cleared all data", uid)
 	return true, nil
 }
 
-func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType string) ([]byte, string, *errs.Error) {
+func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType string) ([]byte, string, *errs.Error) {
 	if !a.CurrentConfig().EnableDataExport {
 		return nil, "", errs.ErrDataExportNotAllowed
 	}
@@ -174,7 +174,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 	utcOffset, err := c.GetClientTimezoneOffset()
 
 	if err != nil {
-		log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
+		log.Warnf(c, "[data_managements.ExportDataHandler] cannot get client timezone offset, because %s", err.Error())
 	} else {
 		timezone = time.FixedZone("Client Timezone", int(utcOffset)*60)
 	}
@@ -184,7 +184,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.WarnfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+			log.Warnf(c, "[data_managements.ExportDataHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
 		}
 
 		return nil, "", errs.ErrUserNotFound
@@ -193,28 +193,28 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	categories, err := a.categories.GetAllCategoriesByUid(c, uid, 0, -1)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	tags, err := a.tags.GetAllTagsByUid(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get tags for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
 	tagIndexes, err := a.tags.GetAllTagIdsMapOfAllTransactions(c, uid)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get tag index for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
@@ -225,7 +225,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 	allTransactions, err := a.transactions.GetAllTransactions(c, uid, pageCountForDataExport, true)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to all transactions user \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.ErrOperationFailed
 	}
 
@@ -240,7 +240,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.Context, fileType st
 	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)
 
 	if err != nil {
-		log.ErrorfWithRequestId(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())
 		return nil, "", errs.Or(err, errs.ErrOperationFailed)
 	}
 

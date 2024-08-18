@@ -6,6 +6,8 @@ import (
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 )
 
 func TestCronJobNextRunTimeWithIntervalPeriod(t *testing.T) {
@@ -20,7 +22,7 @@ func TestCronJobNextRunTimeWithIntervalPeriod(t *testing.T) {
 		Period: CronJobIntervalPeriod{
 			Interval: 2*time.Hour + 34*time.Minute + 56*time.Second,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			return nil
 		},
 	}
@@ -64,7 +66,7 @@ func TestCronJobNextRunTimeWithFixedHourPeriod(t *testing.T) {
 		Period: CronJobFixedHourPeriod{
 			Hour: 0,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			return nil
 		},
 	}
@@ -109,7 +111,7 @@ func TestCronJobNextRunTimeWithFixedTimePeriod(t *testing.T) {
 		Period: CronJobFixedTimePeriod{
 			Time: expectedTime,
 		},
-		Run: func() error {
+		Run: func(c *core.CronContext) error {
 			return nil
 		},
 	}

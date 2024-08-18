@@ -32,7 +32,7 @@ var (
 )
 
 // LatestExchangeRateHandler returns latest exchange rate data
-func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *errs.Error) {
+func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.WebContext) (any, *errs.Error) {
 	dataSource := exchangerates.Container.Current
 
 	if dataSource == nil {
@@ -65,12 +65,12 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 		resp, err := client.Do(req)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[exchange_rates.LatestExchangeRateHandler] failed to request latest exchange rate data for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
 		if resp.StatusCode != 200 {
-			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not 200", uid)
+			log.Errorf(c, "[exchange_rates.LatestExchangeRateHandler] failed to get latest exchange rate data response for user \"uid:%d\", because response code is not 200", uid)
 			return nil, errs.ErrFailedToRequestRemoteApi
 		}
 
@@ -79,7 +79,7 @@ func (a *ExchangeRatesApi) LatestExchangeRateHandler(c *core.Context) (any, *err
 		exchangeRateResp, err := dataSource.Parse(c, body)
 
 		if err != nil {
-			log.ErrorfWithRequestId(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[exchange_rates.LatestExchangeRateHandler] failed to parse response for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.Or(err, errs.ErrFailedToRequestRemoteApi)
 		}
 

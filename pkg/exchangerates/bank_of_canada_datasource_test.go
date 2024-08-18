@@ -3,7 +3,6 @@ package exchangerates
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -32,9 +31,7 @@ const bankOfCanadaMinimumRequiredContent = "{\n" +
 
 func TestBankOfCanadaDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(bankOfCanadaMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -43,9 +40,7 @@ func TestBankOfCanadaDataSource_StandardDataExtractBaseCurrency(t *testing.T) {
 
 func TestBankOfCanadaDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(bankOfCanadaMinimumRequiredContent))
 	assert.Equal(t, nil, err)
@@ -65,9 +60,7 @@ func TestBankOfCanadaDataSource_StandardDataExtractExchangeRates(t *testing.T) {
 
 func TestBankOfCanadaDataSource_BlankContent(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte(""))
 	assert.NotEqual(t, nil, err)
@@ -75,9 +68,7 @@ func TestBankOfCanadaDataSource_BlankContent(t *testing.T) {
 
 func TestBankOfCanadaDataSource_EmptyJsonObject(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("{}"))
 	assert.NotEqual(t, nil, err)
@@ -85,9 +76,7 @@ func TestBankOfCanadaDataSource_EmptyJsonObject(t *testing.T) {
 
 func TestBankOfCanadaDataSource_EmptyObservationsContent(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	_, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": []"+
@@ -97,9 +86,7 @@ func TestBankOfCanadaDataSource_EmptyObservationsContent(t *testing.T) {
 
 func TestBankOfCanadaDataSource_InvalidObservationFormat(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": [\n"+
@@ -117,9 +104,7 @@ func TestBankOfCanadaDataSource_InvalidObservationFormat(t *testing.T) {
 
 func TestBankOfCanadaDataSource_InvalidObservationFormat2(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": [\n"+
@@ -137,9 +122,7 @@ func TestBankOfCanadaDataSource_InvalidObservationFormat2(t *testing.T) {
 
 func TestBankOfCanadaDataSource_InvalidCurrency(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": [\n"+
@@ -157,9 +140,7 @@ func TestBankOfCanadaDataSource_InvalidCurrency(t *testing.T) {
 
 func TestBankOfCanadaDataSource_EmptyRate(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": [\n"+
@@ -177,9 +158,7 @@ func TestBankOfCanadaDataSource_EmptyRate(t *testing.T) {
 
 func TestBankOfCanadaDataSource_InvalidRate(t *testing.T) {
 	dataSource := &BankOfCanadaDataSource{}
-	context := &core.Context{
-		Context: &gin.Context{},
-	}
+	context := core.NewNullContext()
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("{"+
 		"    \"observations\": [\n"+

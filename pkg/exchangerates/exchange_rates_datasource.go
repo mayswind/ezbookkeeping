@@ -11,5 +11,5 @@ type ExchangeRatesDataSource interface {
 	GetRequestUrls() []string
 
 	// Parse returns the common response entity according to the data source raw response
-	Parse(c *core.Context, content []byte) (*models.LatestExchangeRateResponse, error)
+	Parse(c core.Context, content []byte) (*models.LatestExchangeRateResponse, error)
 }

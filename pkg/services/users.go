@@ -58,7 +58,7 @@ var (
 )
 
 // GetUserByUsernameOrEmailAndPassword returns the user model according to login name and password
-func (s *UserService) GetUserByUsernameOrEmailAndPassword(c *core.Context, loginname string, password string) (*models.User, error) {
+func (s *UserService) GetUserByUsernameOrEmailAndPassword(c core.Context, loginname string, password string) (*models.User, error) {
 	var user *models.User
 	var err error
 
@@ -82,7 +82,7 @@ func (s *UserService) GetUserByUsernameOrEmailAndPassword(c *core.Context, login
 }
 
 // GetUserById returns the user model according to user uid
-func (s *UserService) GetUserById(c *core.Context, uid int64) (*models.User, error) {
+func (s *UserService) GetUserById(c core.Context, uid int64) (*models.User, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -100,7 +100,7 @@ func (s *UserService) GetUserById(c *core.Context, uid int64) (*models.User, err
 }
 
 // GetUserByUsername returns the user model according to user name
-func (s *UserService) GetUserByUsername(c *core.Context, username string) (*models.User, error) {
+func (s *UserService) GetUserByUsername(c core.Context, username string) (*models.User, error) {
 	if username == "" {
 		return nil, errs.ErrUsernameIsEmpty
 	}
@@ -118,7 +118,7 @@ func (s *UserService) GetUserByUsername(c *core.Context, username string) (*mode
 }
 
 // GetUserByEmail returns the user model according to user email
-func (s *UserService) GetUserByEmail(c *core.Context, email string) (*models.User, error) {
+func (s *UserService) GetUserByEmail(c core.Context, email string) (*models.User, error) {
 	if email == "" {
 		return nil, errs.ErrEmailIsEmpty
 	}
@@ -136,7 +136,7 @@ func (s *UserService) GetUserByEmail(c *core.Context, email string) (*models.Use
 }
 
 // GetUserAvatar returns the user avatar image data and image file extension according to user uid
-func (s *UserService) GetUserAvatar(c *core.Context, uid int64, fileExtension string) ([]byte, error) {
+func (s *UserService) GetUserAvatar(c core.Context, uid int64, fileExtension string) ([]byte, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -180,7 +180,7 @@ func (s *UserService) GetUserAvatar(c *core.Context, uid int64, fileExtension st
 }
 
 // CreateUser saves a new user model to database
-func (s *UserService) CreateUser(c *core.Context, user *models.User) error {
+func (s *UserService) CreateUser(c core.Context, user *models.User) error {
 	exists, err := s.ExistsUsername(c, user.Username)
 
 	if err != nil {
@@ -226,7 +226,7 @@ func (s *UserService) CreateUser(c *core.Context, user *models.User) error {
 }
 
 // UpdateUser saves an existed user model to database
-func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, emailSetToUnverified bool, err error) {
+func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLanguage bool) (keyProfileUpdated bool, emailSetToUnverified bool, err error) {
 	if user.Uid <= 0 {
 		return false, false, errs.ErrUserIdInvalid
 	}
@@ -348,7 +348,7 @@ func (s *UserService) UpdateUser(c *core.Context, user *models.User, modifyUserL
 }
 
 // UpdateUserAvatar updates the custom avatar type of specified user
-func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, avatarFile multipart.File, fileExtension string, oldFileExtension string) error {
+func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile multipart.File, fileExtension string, oldFileExtension string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -381,7 +381,7 @@ func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, avatarFile mu
 		err = s.DeleteAvatar(uid, oldFileExtension)
 
 		if err != nil {
-			log.WarnfWithRequestId(c, "[users.UpdateUserAvatar] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", oldFileExtension, uid, err.Error())
+			log.Warnf(c, "[users.UpdateUserAvatar] failed to delete old avatar with extension \"%s\" for user \"uid:%d\", because %s", oldFileExtension, uid, err.Error())
 		}
 	}
 
@@ -389,7 +389,7 @@ func (s *UserService) UpdateUserAvatar(c *core.Context, uid int64, avatarFile mu
 }
 
 // RemoveUserAvatar removes the custom avatar type of specified user
-func (s *UserService) RemoveUserAvatar(c *core.Context, uid int64, fileExtension string) error {
+func (s *UserService) RemoveUserAvatar(c core.Context, uid int64, fileExtension string) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -414,7 +414,7 @@ func (s *UserService) RemoveUserAvatar(c *core.Context, uid int64, fileExtension
 }
 
 // UpdateUserLastLoginTime updates the last login time field
-func (s *UserService) UpdateUserLastLoginTime(c *core.Context, uid int64) error {
+func (s *UserService) UpdateUserLastLoginTime(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -426,7 +426,7 @@ func (s *UserService) UpdateUserLastLoginTime(c *core.Context, uid int64) error 
 }
 
 // EnableUser sets user enabled
-func (s *UserService) EnableUser(c *core.Context, username string) error {
+func (s *UserService) EnableUser(c core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -449,7 +449,7 @@ func (s *UserService) EnableUser(c *core.Context, username string) error {
 }
 
 // DisableUser sets user disabled
-func (s *UserService) DisableUser(c *core.Context, username string) error {
+func (s *UserService) DisableUser(c core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -472,7 +472,7 @@ func (s *UserService) DisableUser(c *core.Context, username string) error {
 }
 
 // SetUserEmailVerified sets user email address verified
-func (s *UserService) SetUserEmailVerified(c *core.Context, username string) error {
+func (s *UserService) SetUserEmailVerified(c core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -495,7 +495,7 @@ func (s *UserService) SetUserEmailVerified(c *core.Context, username string) err
 }
 
 // SetUserEmailUnverified sets user email address unverified
-func (s *UserService) SetUserEmailUnverified(c *core.Context, username string) error {
+func (s *UserService) SetUserEmailUnverified(c core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -518,7 +518,7 @@ func (s *UserService) SetUserEmailUnverified(c *core.Context, username string) e
 }
 
 // DeleteUser deletes an existed user from database
-func (s *UserService) DeleteUser(c *core.Context, username string) error {
+func (s *UserService) DeleteUser(c core.Context, username string) error {
 	if username == "" {
 		return errs.ErrUsernameIsEmpty
 	}
@@ -541,7 +541,7 @@ func (s *UserService) DeleteUser(c *core.Context, username string) error {
 }
 
 // ExistsUsername returns whether the given user name exists
-func (s *UserService) ExistsUsername(c *core.Context, username string) (bool, error) {
+func (s *UserService) ExistsUsername(c core.Context, username string) (bool, error) {
 	if username == "" {
 		return false, errs.ErrUsernameIsEmpty
 	}
@@ -550,7 +550,7 @@ func (s *UserService) ExistsUsername(c *core.Context, username string) (bool, er
 }
 
 // ExistsEmail returns whether the given user email exists
-func (s *UserService) ExistsEmail(c *core.Context, email string) (bool, error) {
+func (s *UserService) ExistsEmail(c core.Context, email string) (bool, error) {
 	if email == "" {
 		return false, errs.ErrEmailIsEmpty
 	}

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -14,11 +15,6 @@ type ApiUsingConfig struct {
 // CurrentConfig returns the current config
 func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
 	return a.container.Current
-}
-
-// GetUserBasicInfo returns the view-object of user basic info according to the user model
-func (a *ApiUsingConfig) GetUserBasicInfo(user *models.User) *models.UserBasicInfo {
-	return user.ToUserBasicInfo(a.CurrentConfig().AvatarProvider, a.CurrentConfig().RootUrl)
 }
 
 // GetAfterRegisterNotificationContent returns the notification content displayed each time users register
@@ -91,4 +87,25 @@ func (a *ApiUsingDuplicateChecker) GetSubmissionRemark(checkerType duplicatechec
 // SetSubmissionRemark saves the identification and remark to in-memory cache by the current duplicate checker
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemark(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
 	a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+}
+
+// ApiUsingAvatarProvider represents an api that need to use avatar provider
+type ApiUsingAvatarProvider struct {
+	container *avatars.AvatarProviderContainer
+}
+
+// GetAvatarUrl returns the avatar url by the current user avatar provider
+func (a *ApiUsingAvatarProvider) GetAvatarUrl(user *models.User) string {
+	return a.container.GetAvatarUrl(user)
+}
+
+// ApiWithUserInfo represents an api that can returns user info
+type ApiWithUserInfo struct {
+	ApiUsingConfig
+	ApiUsingAvatarProvider
+}
+
+// GetUserBasicInfo returns the view-object of user basic info according to the user model
+func (a *ApiWithUserInfo) GetUserBasicInfo(user *models.User) *models.UserBasicInfo {
+	return user.ToUserBasicInfo(a.CurrentConfig().AvatarProvider, a.GetAvatarUrl(user))
 }

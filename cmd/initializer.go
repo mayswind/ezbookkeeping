@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
@@ -103,6 +104,15 @@ func initializeSystem(c *core.CliContext) (*settings.Config, error) {
 	if err != nil {
 		if !isDisableBootLog {
 			log.BootErrorf(c, "[initializer.initializeSystem] initializes duplicate checker failed, because %s", err.Error())
+		}
+		return nil, err
+	}
+
+	err = avatars.InitializeAvatarProvider(config)
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf(c, "[initializer.initializeSystem] initializes avatar provider failed, because %s", err.Error())
 		}
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -16,6 +17,7 @@ import (
 // TokensApi represents token api
 type TokensApi struct {
 	ApiUsingConfig
+	ApiWithUserInfo
 	tokens *services.TokenService
 	users  *services.UserService
 }
@@ -25,6 +27,14 @@ var (
 	Tokens = &TokensApi{
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
+		},
+		ApiWithUserInfo: ApiWithUserInfo{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
+				container: avatars.Container,
+			},
 		},
 		tokens: services.Tokens,
 		users:  services.Users,

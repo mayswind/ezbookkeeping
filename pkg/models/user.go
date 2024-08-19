@@ -252,12 +252,12 @@ func (u *User) CanEditTransactionByTransactionTime(transactionTime int64, utcOff
 }
 
 // ToUserBasicInfo returns a user basic view-object according to database model
-func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, rootUrl string) *UserBasicInfo {
+func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, avatarUrl string) *UserBasicInfo {
 	return &UserBasicInfo{
 		Username:             u.Username,
 		Email:                u.Email,
 		Nickname:             u.Nickname,
-		AvatarUrl:            u.getAvatarUrl(avatarProvider, rootUrl),
+		AvatarUrl:            avatarUrl,
 		AvatarProvider:       string(avatarProvider),
 		DefaultAccountId:     u.DefaultAccountId,
 		TransactionEditScope: u.TransactionEditScope,
@@ -279,19 +279,9 @@ func (u *User) ToUserBasicInfo(avatarProvider core.UserAvatarProviderType, rootU
 }
 
 // ToUserProfileResponse returns a user profile view-object according to database model
-func (u *User) ToUserProfileResponse(avatarProvider core.UserAvatarProviderType, rootUrl string) *UserProfileResponse {
+func (u *User) ToUserProfileResponse(basicInfo *UserBasicInfo) *UserProfileResponse {
 	return &UserProfileResponse{
-		UserBasicInfo: u.ToUserBasicInfo(avatarProvider, rootUrl),
+		UserBasicInfo: basicInfo,
 		LastLoginAt:   u.LastLoginUnixTime,
 	}
-}
-
-func (u *User) getAvatarUrl(avatarProvider core.UserAvatarProviderType, rootUrl string) string {
-	if avatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
-		return utils.GetInternalAvatarUrl(u.Uid, u.CustomAvatarType, rootUrl)
-	} else if avatarProvider == core.USER_AVATAR_PROVIDER_GRAVATAR {
-		return utils.GetGravatarUrl(u.Email)
-	}
-
-	return ""
 }

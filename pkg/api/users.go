@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin/binding"
 
+	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/locales"
@@ -20,6 +21,7 @@ import (
 // UsersApi represents user api
 type UsersApi struct {
 	ApiUsingConfig
+	ApiWithUserInfo
 	users    *services.UserService
 	tokens   *services.TokenService
 	accounts *services.AccountService
@@ -30,6 +32,14 @@ var (
 	Users = &UsersApi{
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
+		},
+		ApiWithUserInfo: ApiWithUserInfo{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
+				container: avatars.Container,
+			},
 		},
 		users:    services.Users,
 		tokens:   services.Tokens,
@@ -721,5 +731,5 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.WebContext) ([]byte, string, *er
 }
 
 func (a *UsersApi) getUserProfileResponse(user *models.User) *models.UserProfileResponse {
-	return user.ToUserProfileResponse(a.CurrentConfig().AvatarProvider, a.CurrentConfig().RootUrl)
+	return user.ToUserProfileResponse(a.GetUserBasicInfo(user))
 }

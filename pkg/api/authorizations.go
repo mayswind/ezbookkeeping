@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/pquerna/otp/totp"
 
+	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -14,6 +15,7 @@ import (
 // AuthorizationsApi represents authorization api
 type AuthorizationsApi struct {
 	ApiUsingConfig
+	ApiWithUserInfo
 	users                   *services.UserService
 	tokens                  *services.TokenService
 	twoFactorAuthorizations *services.TwoFactorAuthorizationService
@@ -24,6 +26,14 @@ var (
 	Authorizations = &AuthorizationsApi{
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
+		},
+		ApiWithUserInfo: ApiWithUserInfo{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
+				container: avatars.Container,
+			},
 		},
 		users:                   services.Users,
 		tokens:                  services.Tokens,

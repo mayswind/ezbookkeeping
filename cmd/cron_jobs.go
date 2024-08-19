@@ -94,5 +94,7 @@ func runCronJob(c *core.CliContext) error {
 		return err
 	}
 
+	log.BootInfof(c, "[cron_jobs.runCronJob] run cron job \"%s\" successfully", jobName)
+
 	return nil
 }

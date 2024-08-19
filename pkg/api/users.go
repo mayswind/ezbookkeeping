@@ -532,26 +532,26 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrParameterInvalid
 	}
 
-	avatars := form.File["avatar"]
+	avatarFiles := form.File["avatar"]
 
-	if len(avatars) < 1 {
+	if len(avatarFiles) < 1 {
 		log.Warnf(c, "[users.UserUpdateAvatarHandler] there is no user avatar in request for user \"uid:%d\"", user.Uid)
 		return nil, errs.ErrNoUserAvatar
 	}
 
-	if avatars[0].Size < 1 {
+	if avatarFiles[0].Size < 1 {
 		log.Warnf(c, "[users.UserUpdateAvatarHandler] the size of user avatar in request is zero for user \"uid:%d\"", user.Uid)
 		return nil, errs.ErrUserAvatarIsEmpty
 	}
 
-	fileExtension := utils.GetFileNameExtension(avatars[0].Filename)
+	fileExtension := utils.GetFileNameExtension(avatarFiles[0].Filename)
 
 	if utils.GetImageContentType(fileExtension) == "" {
 		log.Warnf(c, "[users.UserUpdateAvatarHandler] the file extension \"%s\" of user avatar in request is not supported for user \"uid:%d\"", fileExtension, user.Uid)
 		return nil, errs.ErrImageTypeNotSupported
 	}
 
-	avatarFile, err := avatars[0].Open()
+	avatarFile, err := avatarFiles[0].Open()
 
 	if err != nil {
 		log.Errorf(c, "[users.UserUpdateAvatarHandler] failed to get avatar file from request for user \"uid:%d\", because %s", user.Uid, err.Error())

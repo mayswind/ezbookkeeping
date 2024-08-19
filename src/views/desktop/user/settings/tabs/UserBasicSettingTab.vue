@@ -9,7 +9,7 @@
 
                 <v-card-text class="d-flex">
                     <v-avatar rounded="lg" variant="tonal" size="100" class="me-4 user-profile-avatar-icon"
-                              :class="{ 'cursor-pointer': oldProfile.avatarProvider === 'internal' }"
+                              :class="{ 'cursor-pointer': oldProfile.avatarProvider === 'internal', 'user-profile-avatar-icon-modifiable': oldProfile.avatarProvider === 'internal' }"
                               :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                         <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                             <template #placeholder>
@@ -19,7 +19,7 @@
                             </template>
                         </v-img>
                         <v-icon size="48" class="user-profile-avatar-placeholder" :icon="icons.user" v-else-if="!currentUserAvatar"/>
-                        <div class="avatar-edit-icon">
+                        <div class="avatar-edit-icon" v-if="oldProfile.avatarProvider === 'internal'">
                             <v-icon size="48" :icon="icons.pencil"/>
                         </div>
                         <v-menu activator="parent" width="200" location="bottom" offset="14px" v-if="oldProfile.avatarProvider === 'internal'">
@@ -737,7 +737,7 @@ export default {
     vertical-align: middle;
 }
 
-.user-profile-avatar-icon:hover .user-profile-avatar-placeholder {
+.user-profile-avatar-icon-modifiable:hover .user-profile-avatar-placeholder {
     display: none;
 }
 </style>

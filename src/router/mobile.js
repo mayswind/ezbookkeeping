@@ -298,6 +298,11 @@ const routes = [
         beforeEnter: [checkLogin]
     },
     {
+        path: '/schedule/list',
+        async: asyncResolve(TemplateListPage),
+        beforeEnter: [checkLogin]
+    },
+    {
         path: '/template/add',
         async: asyncResolve(TransactionEditPage),
         beforeEnter: [checkLogin]

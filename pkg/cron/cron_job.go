@@ -20,7 +20,7 @@ type CronJob struct {
 
 func (j *CronJob) doRun() {
 	start := time.Now()
-	c := core.NewCronJobContext(j.Name)
+	c := core.NewCronJobContext(j.Name, j.Period.GetInterval())
 
 	if duplicatechecker.Container.Current != nil {
 		localAddr, err := utils.GetLocalIPAddressesString()

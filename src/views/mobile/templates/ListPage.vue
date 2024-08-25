@@ -2,7 +2,7 @@
     <f7-page :ptr="!sortable" @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
-            <f7-nav-title :title="$t('Transaction Templates')"></f7-nav-title>
+            <f7-nav-title :title="templateType === allTemplateTypes.Schedule ? $t('Scheduled Transactions') : $t('Transaction Templates')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !templates.length }" v-if="!sortable" @click="showMoreActionSheet = true"></f7-link>
                 <f7-link :href="'/template/add?templateType=' + templateType" icon-f7="plus" v-if="!sortable"></f7-link>
@@ -21,7 +21,10 @@
 
         <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
             <f7-list-item :title="$t('No available template')"
-                          :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"></f7-list-item>
+                          :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
+                          v-if="templateType === allTemplateTypes.Normal"></f7-list-item>
+            <f7-list-item :title="$t('No available scheduled transactions')" v-if="templateType === allTemplateTypes.Schedule"></f7-list-item>
+            <f7-list-item :title="$t('No available template')" v-else></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers sortable class="margin-top template-list"
@@ -37,7 +40,7 @@
                           v-show="showHidden || !template.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <f7-icon f7="doc_plaintext">
+                    <f7-icon :f7="templateType === allTemplateTypes.Schedule ? 'clock' : 'doc_plaintext'">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="template.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -91,6 +94,7 @@ import { onSwipeoutDeleted } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
+        'f7route',
         'f7router'
     ],
     data() {
@@ -138,10 +142,19 @@ export default {
             }
 
             return true;
+        },
+        allTemplateTypes() {
+            return templateConstants.allTemplateTypes;
         }
     },
     created() {
         const self = this;
+
+        if (self.f7route.path === '/template/list') {
+            self.templateType = templateConstants.allTemplateTypes.Normal;
+        } else if (self.f7route.path === '/schedule/list') {
+            self.templateType = templateConstants.allTemplateTypes.Schedule;
+        }
 
         self.loading = true;
 
@@ -263,7 +276,7 @@ export default {
             });
         },
         edit(template) {
-            this.f7router.navigate('/template/edit?id=' + template.id);
+            this.f7router.navigate(`/template/edit?id=${template.id}&templateType=${template.templateType}`);
         },
         hide(template, hidden) {
             const self = this;

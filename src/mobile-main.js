@@ -110,6 +110,7 @@ import InformationSheet from '@/components/mobile/InformationSheet.vue';
 import NumberPadSheet from '@/components/mobile/NumberPadSheet.vue';
 import MapSheet from '@/components/mobile/MapSheet.vue';
 import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSelectionSheet.vue';
+import ScheduleFrequencySheet from '@/components/mobile/ScheduleFrequencySheet.vue';
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.js';
 
@@ -188,6 +189,7 @@ app.component('InformationSheet', InformationSheet);
 app.component('NumberPadSheet', NumberPadSheet);
 app.component('MapSheet', MapSheet);
 app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
+app.component('ScheduleFrequencySheet', ScheduleFrequencySheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);
 

@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
+import templateConstants from '@/consts/template.js';
 import userState from '@/lib/userstate.js';
 
 import MainLayout from '@/views/desktop/MainLayout.vue';
@@ -141,7 +142,18 @@ const router = createRouter({
                 {
                     path: '/template/list',
                     component: TransactionTemplateListPage,
-                    beforeEnter: checkLogin
+                    beforeEnter: checkLogin,
+                    props: {
+                        initType: templateConstants.allTemplateTypes.Normal
+                    }
+                },
+                {
+                    path: '/schedule/list',
+                    component: TransactionTemplateListPage,
+                    beforeEnter: checkLogin,
+                    props: {
+                        initType: templateConstants.allTemplateTypes.Schedule
+                    }
                 },
                 {
                     path: '/exchange_rates',

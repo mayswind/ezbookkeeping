@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import transactionConstants from '@/consts/transaction.js';
+import templateConstants from '@/consts/template.js';
 import { isDefined, isObject, isArray, isEquals } from '@/lib/common.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
@@ -228,6 +229,12 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
 
             if (clientSessionId) {
                 submitTemplate.clientSessionId = clientSessionId;
+            }
+
+            if (template.templateType === templateConstants.allTemplateTypes.Schedule) {
+                submitTemplate.scheduledFrequencyType = template.scheduledFrequencyType;
+                submitTemplate.scheduledFrequency = template.scheduledFrequency;
+                submitTemplate.utcOffset = template.utcOffset;
             }
 
             if (template.type === transactionConstants.allTransactionTypes.Expense) {

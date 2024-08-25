@@ -195,7 +195,15 @@
                                         v-model="transaction.time"
                                         @error="showDateTimeError" />
                                 </v-col>
-                                <v-col cols="12" md="6" v-if="type === 'transaction'">
+                                <v-col cols="12" md="6" v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule">
+                                    <schedule-frequency-select
+                                        :readonly="mode === 'view'"
+                                        :disabled="loading || submitting"
+                                        :label="$t('Scheduled Transaction Frequency')"
+                                        v-model:type="transaction.scheduledFrequencyType"
+                                        v-model="transaction.scheduledFrequency" />
+                                </v-col>
+                                <v-col cols="12" md="6" v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule)">
                                     <v-autocomplete
                                         class="transaction-edit-timezone"
                                         item-title="displayNameWithUtcOffset"
@@ -349,6 +357,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
+import templateConstants from '@/consts/template.js';
 import logger from '@/lib/logger.js';
 import {
     getNameByKeyValue
@@ -423,11 +432,17 @@ export default {
                 } else {
                     return 'Transaction Detail';
                 }
-            } else if (this.type === 'template') {
+            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Normal) {
                 if (this.mode === 'add') {
                     return 'Add Transaction Template';
                 } else if (this.mode === 'edit') {
                     return 'Edit Transaction Template';
+                }
+            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                if (this.mode === 'add') {
+                    return 'Add Scheduled Transaction';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Scheduled Transaction';
                 }
             }
 
@@ -496,6 +511,9 @@ export default {
         },
         allCategoryTypes() {
             return categoryConstants.allCategoryTypes;
+        },
+        allTemplateTypes() {
+            return templateConstants.allTemplateTypes;
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -721,11 +739,22 @@ export default {
                     self.transaction.templateType = options.templateType;
                 }
 
+                if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                    self.transaction.scheduledFrequencyType = templateConstants.allTemplateScheduledFrequencyTypes.Disabled.type;
+                    self.transaction.scheduledFrequency = '';
+                }
+
                 if (options && options.id) {
                     if (options.currentTemplate) {
                         self.setTransaction(options.currentTemplate, options, false, false);
                         self.transaction.templateType = options.currentTemplate.templateType;
                         self.transaction.name = options.currentTemplate.name;
+
+                        if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                            self.transaction.scheduledFrequencyType = options.currentTemplate.scheduledFrequencyType;
+                            self.transaction.scheduledFrequency = options.currentTemplate.scheduledFrequency;
+                            self.transaction.utcOffset = options.currentTemplate.utcOffset;
+                        }
                     }
 
                     self.mode = 'edit';
@@ -772,6 +801,12 @@ export default {
                     self.setTransaction(template, options, false, false);
                     self.transaction.templateType = template.templateType;
                     self.transaction.name = template.name;
+
+                    if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                        self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
+                        self.transaction.scheduledFrequency = template.scheduledFrequency;
+                        self.transaction.utcOffset = template.utcOffset;
+                    }
                 } else {
                     self.setTransaction(null, options, true, true);
                 }

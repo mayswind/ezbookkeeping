@@ -130,3 +130,25 @@ func TestToUniqueInt64Slice_NilOrEmpty(t *testing.T) {
 	actualValue = ToUniqueInt64Slice(arr)
 	assert.Equal(t, expectedValue, actualValue)
 }
+
+func TestToSet(t *testing.T) {
+	arr := []int64{0, 1, 2, 3, 2, 4, 0}
+	actualValue := ToSet(arr)
+	assert.Equal(t, 5, len(actualValue))
+	assert.Equal(t, true, actualValue[0])
+	assert.Equal(t, true, actualValue[1])
+	assert.Equal(t, true, actualValue[2])
+	assert.Equal(t, true, actualValue[3])
+	assert.Equal(t, true, actualValue[4])
+	assert.Equal(t, false, actualValue[5])
+}
+
+func TestToSet_NilOrEmpty(t *testing.T) {
+	var arr []int64 = nil
+	actualValue := ToSet(arr)
+	assert.Equal(t, 0, len(actualValue))
+
+	arr = []int64{}
+	actualValue = ToSet(arr)
+	assert.Equal(t, 0, len(actualValue))
+}

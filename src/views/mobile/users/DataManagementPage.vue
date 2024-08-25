@@ -8,6 +8,7 @@
             <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Templates" after="Count"></f7-list-item>
+            <f7-list-item title="Scheduled Transactions" after="Count"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
@@ -16,6 +17,7 @@
             <f7-list-item :title="$t('Transaction Categories')" :after="displayDataStatistics.totalTransactionCategoryCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" :after="displayDataStatistics.totalTransactionTagCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Templates')" :after="displayDataStatistics.totalTransactionTemplateCount"></f7-list-item>
+            <f7-list-item :title="$t('Scheduled Transactions')" :after="displayDataStatistics.totalScheduledTransactionCount"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical" :class="{ 'disabled': loading }">
@@ -109,7 +111,8 @@ export default {
                 totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
                 totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
                 totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
-                totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount)
+                totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount),
+                totalScheduledTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalScheduledTransactionCount)
             };
         },
         isDataExportingEnabled() {

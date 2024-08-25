@@ -9,6 +9,7 @@ import colorConstants from '@/consts/color.js';
 import accountConstants from '@/consts/account.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
+import templateConstants from '@/consts/template.js';
 import statisticsConstants from '@/consts/statistics.js';
 import apiConstants from '@/consts/api.js';
 
@@ -17,6 +18,7 @@ import {
     isString,
     isNumber,
     isBoolean,
+    getNameByKeyValue,
     copyObjectTo,
     copyArrayTo
 } from './common.js';
@@ -311,12 +313,46 @@ function getMonthLongName(monthName, translateFn) {
     return translateFn(`datetime.${monthName}.long`);
 }
 
+function getMonthdayOrdinal(monthDay, translateFn) {
+    return translateFn(`datetime.monthDayOrdinal.${monthDay}`);
+}
+
+function getMonthdayShortName(monthDay, translateFn) {
+    return translateFn('format.misc.monthDay', {
+        ordinal: getMonthdayOrdinal(monthDay, translateFn)
+    });
+}
+
 function getWeekdayShortName(weekDayName, translateFn) {
     return translateFn(`datetime.${weekDayName}.short`);
 }
 
 function getWeekdayLongName(weekDayName, translateFn) {
     return translateFn(`datetime.${weekDayName}.long`);
+}
+
+function getMultiMonthdayShortNames(monthDays, translateFn) {
+    if (!monthDays) {
+        return '';
+    }
+
+    if (monthDays.length === 1) {
+        return translateFn('format.misc.monthDay', {
+            ordinal: getMonthdayOrdinal(monthDays[0], translateFn)
+        });
+    } else {
+        return translateFn('format.misc.monthDays', {
+            multiMonthDays: joinMultiText(monthDays.map(monthDay =>
+                translateFn('format.misc.eachMonthDayInMonthDays', {
+                    ordinal: getMonthdayOrdinal(monthDay, translateFn)
+                })), translateFn)
+        });
+    }
+}
+
+function getMultiWeekdayLongNames(weekdayTypes, translateFn) {
+    const allWeekDays = getAllWeekDays(null, translateFn)
+    return joinMultiText(weekdayTypes.map(type => getNameByKeyValue(allWeekDays, type, 'type', 'displayName')), translateFn);
 }
 
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
@@ -534,10 +570,23 @@ function getAllCurrencies(translateFn) {
     return allCurrencies;
 }
 
-function getAllWeekDays(translateFn) {
+function getAllWeekDays(firstDayOfWeek, translateFn) {
     const allWeekDays = [];
 
-    for (let i = 0; i < datetimeConstants.allWeekDaysArray.length; i++) {
+    if (!isNumber(firstDayOfWeek)) {
+        firstDayOfWeek = datetimeConstants.allWeekDays.Sunday.type;
+    }
+
+    for (let i = firstDayOfWeek; i < datetimeConstants.allWeekDaysArray.length; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+
+        allWeekDays.push({
+            type: weekDay.type,
+            displayName: translateFn(`datetime.${weekDay.name}.long`)
+        });
+    }
+
+    for (let i = 0; i < firstDayOfWeek; i++) {
         const weekDay = datetimeConstants.allWeekDaysArray[i];
 
         allWeekDays.push({
@@ -1078,6 +1127,25 @@ function getAllTransactionEditScopeTypes(translateFn) {
     return allEditScopeTypes;
 }
 
+function getAllTransactionScheduledFrequencyTypes(translateFn) {
+    const allScheduledFrequencyTypes = [];
+
+    for (const typeName in templateConstants.allTemplateScheduledFrequencyTypes) {
+        if (!Object.prototype.hasOwnProperty.call(templateConstants.allTemplateScheduledFrequencyTypes, typeName)) {
+            continue;
+        }
+
+        const frequencyType = templateConstants.allTemplateScheduledFrequencyTypes[typeName];
+
+        allScheduledFrequencyTypes.push({
+            type: frequencyType.type,
+            displayName: translateFn(frequencyType.name)
+        });
+    }
+
+    return allScheduledFrequencyTypes;
+}
+
 function getAllTransactionDefaultCategories(categoryType, locale, translateFn) {
     const allCategories = {};
     const categoryTypes = [];
@@ -1442,8 +1510,12 @@ export function i18nFunctions(i18nGlobal) {
         getAllShortTimeFormats: () => getAllShortTimeFormats(i18nGlobal.t),
         getMonthShortName: (month) => getMonthShortName(month, i18nGlobal.t),
         getMonthLongName: (month) => getMonthLongName(month, i18nGlobal.t),
+        getMonthdayOrdinal: (monthDay) => getMonthdayOrdinal(monthDay, i18nGlobal.t),
+        getMonthdayShortName: (monthDay) => getMonthdayShortName(monthDay, i18nGlobal.t),
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
+        getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
+        getMultiWeekdayLongNames: (weekdayTypes) => getMultiWeekdayLongNames(weekdayTypes, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),
@@ -1465,7 +1537,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTimezones: (includeSystemDefault) => getAllTimezones(includeSystemDefault, i18nGlobal.t),
         getTimezoneDifferenceDisplayText: (utcOffset) => getTimezoneDifferenceDisplayText(utcOffset, i18nGlobal.t),
         getAllCurrencies: () => getAllCurrencies(i18nGlobal.t),
-        getAllWeekDays: () => getAllWeekDays(i18nGlobal.t),
+        getAllWeekDays: (firstDayOfWeek) => getAllWeekDays(firstDayOfWeek, i18nGlobal.t),
         getAllDateRanges: (scene, includeCustom) => getAllDateRanges(scene, includeCustom, i18nGlobal.t),
         getAllRecentMonthDateRanges: (userStore, includeAll, includeCustom) => getAllRecentMonthDateRanges(userStore, includeAll, includeCustom, i18nGlobal.t),
         getDateRangeDisplayName: (userStore, dateType, startTime, endTime) => getDateRangeDisplayName(userStore, dateType, startTime, endTime, i18nGlobal.t),
@@ -1493,6 +1565,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllStatisticsChartDataTypes: (analysisType) => getAllStatisticsChartDataTypes(i18nGlobal.t, analysisType),
         getAllStatisticsSortingTypes: () => getAllStatisticsSortingTypes(i18nGlobal.t),
         getAllTransactionEditScopeTypes: () => getAllTransactionEditScopeTypes(i18nGlobal.t),
+        getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),

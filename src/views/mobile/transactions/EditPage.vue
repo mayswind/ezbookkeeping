@@ -37,7 +37,8 @@
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Category" title="Category Names"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Account" title="Account Name"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title" header="Transaction Time" title="YYYY/MM/DD HH:mm:ss" v-if="type === 'transaction'"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Timezone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'" v-if="type === 'transaction'"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title" header="Scheduled Transaction Frequency" title="Every XXXXX" v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after" header="Transaction Timezone" title="(UTC XX:XX) System Default" link="#" :no-chevron="mode === 'view'" v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule)"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-title-hide-overflow" header="Geographic Location" title="No Location" v-if="type === 'transaction'"></f7-list-item>
             <f7-list-item header="Tags">
                 <template #footer>
@@ -243,12 +244,27 @@
             </f7-list-item>
 
             <f7-list-item
+                class="list-item-with-header-and-title"
+                link="#" no-chevron
+                :class="{ 'readonly': mode === 'view' }"
+                :header="$t('Scheduled Transaction Frequency')"
+                :title="transactionDisplayScheduledFrequency"
+                @click="showTransactionScheduledFrequencySheet = true"
+                v-if="type === 'template' && transaction.templateType === allTemplateTypes.Schedule"
+            >
+                <schedule-frequency-sheet v-model:show="showTransactionScheduledFrequencySheet"
+                                          v-model:type="transaction.scheduledFrequencyType"
+                                          v-model="transaction.scheduledFrequency">
+                </schedule-frequency-sheet>
+            </f7-list-item>
+
+            <f7-list-item
                 :no-chevron="mode === 'view'"
                 class="list-item-with-header-and-title list-item-title-hide-overflow list-item-no-item-after"
                 :class="{ 'readonly': mode === 'view' }"
                 :header="$t('Transaction Timezone')"
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Timezone'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Transaction Timezone'), popupCloseLinkText: $t('Done') }"
-                v-if="type === 'transaction'"
+                v-if="type === 'transaction' || (type === 'template' && transaction.templateType === allTemplateTypes.Schedule)"
             >
                 <select v-model="transaction.timeZone">
                     <option :value="timezone.name" :key="timezone.name"
@@ -424,6 +440,7 @@ export default {
             showSourceAccountSheet: false,
             showDestinationAccountSheet: false,
             showTransactionDateTimeSheet: false,
+            showTransactionScheduledFrequencySheet: false,
             showGeoLocationMapSheet: false,
             showTransactionTagSheet: false
         };
@@ -439,11 +456,17 @@ export default {
                 } else {
                     return 'Transaction Detail';
                 }
-            } else if (this.type === 'template') {
+            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Normal) {
                 if (this.mode === 'add') {
                     return 'Add Transaction Template';
                 } else if (this.mode === 'edit') {
                     return 'Edit Transaction Template';
+                }
+            } else if (this.type === 'template' && this.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                if (this.mode === 'add') {
+                    return 'Add Scheduled Transaction';
+                } else if (this.mode === 'edit') {
+                    return 'Edit Scheduled Transaction';
                 }
             }
 
@@ -508,6 +531,9 @@ export default {
         },
         allCategoryTypes() {
             return categoryConstants.allCategoryTypes;
+        },
+        allTemplateTypes() {
+            return templateConstants.allTemplateTypes;
         },
         allTimezones() {
             return this.$locale.getAllTimezones(true);
@@ -580,6 +606,44 @@ export default {
             }
 
             return `${this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, this.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${getTimezoneOffset(this.settingsStore.appSettings.timeZone)})`;
+        },
+        transactionDisplayScheduledFrequency() {
+            if (this.type !== 'template') {
+                return '';
+            }
+
+            if (this.transaction.scheduledFrequencyType === templateConstants.allTemplateScheduledFrequencyTypes.Disabled.type) {
+                return this.$t('Disabled');
+            }
+
+            const items = this.transaction.scheduledFrequency.split(',');
+            const scheduledFrequencyValues = [];
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i]) {
+                    scheduledFrequencyValues.push(parseInt(items[i]));
+                }
+            }
+
+            if (this.transaction.scheduledFrequencyType === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
+                if (scheduledFrequencyValues.length) {
+                    return this.$t('format.misc.everyMultiDaysOfWeek', {
+                        days: this.$locale.getMultiWeekdayLongNames(scheduledFrequencyValues)
+                    });
+                } else {
+                    return this.$t('Weekly');
+                }
+            } else if (this.transaction.scheduledFrequencyType === templateConstants.allTemplateScheduledFrequencyTypes.Monthly.type) {
+                if (scheduledFrequencyValues.length) {
+                    return this.$t('format.misc.everyMultiDaysOfMonth', {
+                        days: this.$locale.getMultiMonthdayShortNames(scheduledFrequencyValues)
+                    });
+                } else {
+                    return this.$t('Monthly');
+                }
+            } else {
+                return '';
+            }
         },
         transactionDisplayTimezone() {
             return `UTC${getUtcOffsetByUtcOffsetMinutes(this.transaction.utcOffset)}`;
@@ -750,6 +814,11 @@ export default {
                 self.transaction.templateType = parseInt(query.templateType);
             }
 
+            if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                self.transaction.scheduledFrequencyType = templateConstants.allTemplateScheduledFrequencyTypes.Disabled.type;
+                self.transaction.scheduledFrequency = '';
+            }
+
             if (query.id) {
                 if (self.mode === 'edit') {
                     self.editId = query.id;
@@ -820,6 +889,12 @@ export default {
                 self.transaction.id = template.id;
                 self.transaction.templateType = template.templateType;
                 self.transaction.name = template.name;
+
+                if (self.transaction.templateType === templateConstants.allTemplateTypes.Schedule) {
+                    self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
+                    self.transaction.scheduledFrequency = template.scheduledFrequency;
+                    self.transaction.utcOffset = template.utcOffset;
+                }
             }
 
             self.loading = false;

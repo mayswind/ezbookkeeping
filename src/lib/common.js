@@ -130,6 +130,12 @@ export function isObjectEmpty(obj) {
     return true;
 }
 
+export function sortNumbersArray(array) {
+    return array.sort(function (num1, num2) {
+        return num1 - num2;
+    });
+}
+
 export function getObjectOwnFieldCount(object) {
     let count = 0;
 

@@ -57,3 +57,15 @@ func ToUniqueInt64Slice(items []int64) []int64 {
 
 	return uniqueItems
 }
+
+// ToSet returns a map where the keys are the items in the specified array
+func ToSet(items []int64) map[int64]bool {
+	itemExistMap := make(map[int64]bool)
+
+	for i := 0; i < len(items); i++ {
+		item := items[i]
+		itemExistMap[item] = true
+	}
+
+	return itemExistMap
+}

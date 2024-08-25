@@ -3,6 +3,7 @@ package api
 import (
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
@@ -44,9 +45,13 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.WebContext) (any, 
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	if templateListReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateListReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
+	if templateListReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateListReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
 		log.Warnf(c, "[transaction_templates.TemplateListHandler] template type invalid, type is %d", templateListReq.TemplateType)
 		return nil, errs.ErrTransactionTemplateTypeInvalid
+	}
+
+	if templateListReq.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
 	}
 
 	uid := c.GetCurrentUid()
@@ -87,6 +92,10 @@ func (a *TransactionTemplatesApi) TemplateGetHandler(c *core.WebContext) (any, *
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
+	}
+
 	serverUtcOffset := utils.GetServerTimezoneOffsetMinutes()
 	templateResp := template.ToTransactionTemplateInfoResponse(serverUtcOffset)
 
@@ -103,14 +112,32 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	if templateCreateReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateCreateReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
+	if templateCreateReq.TemplateType < models.TRANSACTION_TEMPLATE_TYPE_NORMAL || templateCreateReq.TemplateType > models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
 		log.Warnf(c, "[transaction_templates.TemplateCreateHandler] template type invalid, type is %d", templateCreateReq.TemplateType)
 		return nil, errs.ErrTransactionTemplateTypeInvalid
+	}
+
+	if templateCreateReq.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
 	}
 
 	if templateCreateReq.Type <= models.TRANSACTION_TYPE_MODIFY_BALANCE || templateCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
 		log.Warnf(c, "[transaction_templates.TemplateCreateHandler] transaction type invalid, type is %d", templateCreateReq.Type)
 		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	if templateCreateReq.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+		if templateCreateReq.ScheduledFrequencyType == nil ||
+			templateCreateReq.ScheduledFrequency == nil ||
+			templateCreateReq.ScheduledTimezoneUtcOffset == nil {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		}
+
+		if *templateCreateReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateCreateReq.ScheduledFrequency != "" {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		} else if *templateCreateReq.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateCreateReq.ScheduledFrequency == "" {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		}
 	}
 
 	uid := c.GetCurrentUid()
@@ -185,6 +212,24 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
+	}
+
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+		if templateModifyReq.ScheduledFrequencyType == nil ||
+			templateModifyReq.ScheduledFrequency == nil ||
+			templateModifyReq.ScheduledTimezoneUtcOffset == nil {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		}
+
+		if *templateModifyReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateModifyReq.ScheduledFrequency != "" {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		} else if *templateModifyReq.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateModifyReq.ScheduledFrequency == "" {
+			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		}
+	}
+
 	newTemplate := &models.TransactionTemplate{
 		TemplateId:           template.TemplateId,
 		Uid:                  uid,
@@ -200,6 +245,13 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		Comment:              templateModifyReq.Comment,
 	}
 
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+		newTemplate.ScheduledFrequencyType = *templateModifyReq.ScheduledFrequencyType
+		newTemplate.ScheduledFrequency = a.getOrderedFrequencyValues(*templateModifyReq.ScheduledFrequency)
+		newTemplate.ScheduledAt = a.getUTCScheduledAt(*templateModifyReq.ScheduledTimezoneUtcOffset)
+		newTemplate.ScheduledTimezoneUtcOffset = *templateModifyReq.ScheduledTimezoneUtcOffset
+	}
+
 	if newTemplate.Name == template.Name &&
 		newTemplate.Type == template.Type &&
 		newTemplate.CategoryId == template.CategoryId &&
@@ -210,7 +262,16 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		newTemplate.RelatedAccountAmount == template.RelatedAccountAmount &&
 		newTemplate.HideAmount == template.HideAmount &&
 		newTemplate.Comment == template.Comment {
-		return nil, errs.ErrNothingWillBeUpdated
+		if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_NORMAL {
+			return nil, errs.ErrNothingWillBeUpdated
+		} else if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+			if newTemplate.ScheduledFrequencyType == template.ScheduledFrequencyType &&
+				newTemplate.ScheduledFrequency == template.ScheduledFrequency &&
+				newTemplate.ScheduledAt == template.ScheduledAt &&
+				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset {
+				return nil, errs.ErrNothingWillBeUpdated
+			}
+		}
 	}
 
 	err = a.templates.ModifyTemplate(c, newTemplate)
@@ -242,6 +303,18 @@ func (a *TransactionTemplatesApi) TemplateHideHandler(c *core.WebContext) (any, 
 	}
 
 	uid := c.GetCurrentUid()
+
+	template, err := a.templates.GetTemplateByTemplateId(c, uid, templateHideReq.Id)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_templates.TemplateHideHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateHideReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
+	}
+
 	err = a.templates.HideTemplate(c, uid, []int64{templateHideReq.Id}, templateHideReq.Hidden)
 
 	if err != nil {
@@ -264,6 +337,20 @@ func (a *TransactionTemplatesApi) TemplateMoveHandler(c *core.WebContext) (any, 
 	}
 
 	uid := c.GetCurrentUid()
+
+	if len(templateMoveReq.NewDisplayOrders) > 0 {
+		template, err := a.templates.GetTemplateByTemplateId(c, uid, templateMoveReq.NewDisplayOrders[0].Id)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_templates.TemplateMoveHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateMoveReq.NewDisplayOrders[0].Id, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+			return nil, errs.ErrScheduledTransactionNotEnabled
+		}
+	}
+
 	templates := make([]*models.TransactionTemplate, len(templateMoveReq.NewDisplayOrders))
 
 	for i := 0; i < len(templateMoveReq.NewDisplayOrders); i++ {
@@ -299,6 +386,18 @@ func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.WebContext) (any
 	}
 
 	uid := c.GetCurrentUid()
+
+	template, err := a.templates.GetTemplateByTemplateId(c, uid, templateDeleteReq.Id)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_templates.TemplateDeleteHandler] failed to get template \"id:%d\" for user \"uid:%d\", because %s", templateDeleteReq.Id, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if template.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE && !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
+	}
+
 	err = a.templates.DeleteTemplate(c, uid, templateDeleteReq.Id)
 
 	if err != nil {
@@ -311,7 +410,7 @@ func (a *TransactionTemplatesApi) TemplateDeleteHandler(c *core.WebContext) (any
 }
 
 func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCreateReq *models.TransactionTemplateCreateRequest, order int32) *models.TransactionTemplate {
-	return &models.TransactionTemplate{
+	template := &models.TransactionTemplate{
 		Uid:                  uid,
 		TemplateType:         templateCreateReq.TemplateType,
 		Name:                 templateCreateReq.Name,
@@ -326,4 +425,60 @@ func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCrea
 		Comment:              templateCreateReq.Comment,
 		DisplayOrder:         order,
 	}
+
+	if templateCreateReq.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+		template.ScheduledFrequencyType = *templateCreateReq.ScheduledFrequencyType
+		template.ScheduledFrequency = a.getOrderedFrequencyValues(*templateCreateReq.ScheduledFrequency)
+		template.ScheduledAt = a.getUTCScheduledAt(*templateCreateReq.ScheduledTimezoneUtcOffset)
+		template.ScheduledTimezoneUtcOffset = *templateCreateReq.ScheduledTimezoneUtcOffset
+	}
+
+	return template
+}
+
+func (a *TransactionTemplatesApi) getUTCScheduledAt(scheduledTimezoneUtcOffset int16) int16 {
+	templateTimeZone := time.FixedZone("Template Timezone", int(scheduledTimezoneUtcOffset)*60)
+	transactionTime := time.Date(2020, 1, 1, 0, 0, 0, 0, templateTimeZone)
+	transactionTimeInUTC := transactionTime.In(time.UTC)
+
+	minutesElapsedOfDayInUtc := transactionTimeInUTC.Hour()*60 + transactionTimeInUTC.Minute()
+
+	return int16(minutesElapsedOfDayInUtc)
+}
+
+func (a *TransactionTemplatesApi) getOrderedFrequencyValues(frequencyValue string) string {
+	if frequencyValue == "" {
+		return ""
+	}
+
+	items := strings.Split(frequencyValue, ",")
+	values := make([]int, 0, len(items))
+	valueExistMap := make(map[int]bool)
+
+	for i := 0; i < len(items); i++ {
+		value, err := utils.StringToInt(items[i])
+
+		if err != nil {
+			continue
+		}
+
+		if _, exists := valueExistMap[value]; !exists {
+			values = append(values, value)
+			valueExistMap[value] = true
+		}
+	}
+
+	sort.Ints(values)
+
+	var sortedFrequencyValueBuilder strings.Builder
+
+	for i := 0; i < len(values); i++ {
+		if sortedFrequencyValueBuilder.Len() > 0 {
+			sortedFrequencyValueBuilder.WriteRune(',')
+		}
+
+		sortedFrequencyValueBuilder.WriteString(utils.IntToString(values[i]))
+	}
+
+	return sortedFrequencyValueBuilder.String()
 }

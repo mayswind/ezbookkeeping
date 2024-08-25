@@ -67,6 +67,12 @@
                         <span class="nav-item-title">{{ $t('Transaction Templates') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link" v-if="isUserScheduledTransactionEnabled">
+                    <router-link to="/schedule/list">
+                        <v-icon class="nav-item-icon" :icon="icons.scheduledTransactions"/>
+                        <span class="nav-item-title">{{ $t('Scheduled Transactions') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
                         <span class="title-text">{{ $t('Miscellaneous') }}</span>
@@ -168,7 +174,7 @@
             </div>
             <div class="layout-page-content">
                 <div class="page-content-container">
-                    <router-view/>
+                    <router-view :key="currentRoutePath" />
                 </div>
             </div>
         </div>
@@ -188,6 +194,7 @@
 <script>
 import { useDisplay } from 'vuetify';
 import { useTheme } from 'vuetify';
+import { useRoute } from 'vue-router';
 
 import { mapStores } from 'pinia';
 import { useRootStore } from '@/stores/index.js';
@@ -195,6 +202,7 @@ import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 
 import assetConstants from '@/consts/asset.js';
+import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.js';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 import {
@@ -205,6 +213,7 @@ import {
     mdiViewDashboardOutline,
     mdiTagOutline,
     mdiClipboardTextOutline,
+    mdiClipboardTextClockOutline,
     mdiChartPieOutline,
     mdiSwapHorizontal,
     mdiCogOutline,
@@ -235,6 +244,7 @@ export default {
                 categories: mdiViewDashboardOutline,
                 tags: mdiTagOutline,
                 templates: mdiClipboardTextOutline,
+                scheduledTransactions: mdiClipboardTextClockOutline,
                 statistics: mdiChartPieOutline,
                 exchangeRates: mdiSwapHorizontal,
                 settings: mdiCogOutline,
@@ -258,6 +268,10 @@ export default {
         mdAndDown() {
             return this.display.mdAndDown.value;
         },
+        currentRoutePath() {
+            const route = useRoute();
+            return route.path;
+        },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
         },
@@ -279,6 +293,9 @@ export default {
                     }
                 }
             }
+        },
+        isUserScheduledTransactionEnabled() {
+            return isUserScheduledTransactionEnabled();
         },
         isEnableApplicationLock() {
             return this.settingsStore.appSettings.applicationLock;

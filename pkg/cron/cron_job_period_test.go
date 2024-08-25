@@ -97,6 +97,61 @@ func TestCronJobNextRunTimeWithFixedHourPeriod(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestCronJobNextRunTimeWithEvery15MinutesPeriod(t *testing.T) {
+	scheduler, err := gocron.NewScheduler(
+		gocron.WithLocation(time.Local),
+	)
+	assert.Nil(t, err)
+
+	expectedSecond := uint32(23)
+
+	job := CronJob{
+		Name:        "TestCronJobWithEvery15MinutesPeriod",
+		Description: "The test cron job",
+		Period: CronJobEvery15MinutesPeriod{
+			Second: expectedSecond,
+		},
+		Run: func(c *core.CronContext) error {
+			return nil
+		},
+	}
+
+	assert.Equal(t, 15*time.Minute, job.Period.GetInterval())
+
+	gocronJob, err := scheduler.NewJob(
+		job.Period.ToJobDefinition(),
+		gocron.NewTask(job.doRun),
+		gocron.WithName(job.Name),
+		gocron.WithSingletonMode(gocron.LimitModeReschedule),
+	)
+	assert.Nil(t, err)
+
+	scheduler.Start()
+
+	nextRunTime, err := gocronJob.NextRun()
+	assert.Nil(t, err)
+
+	nextMinuteTime := time.Now()
+
+	if (nextMinuteTime.Minute() == 0 || nextMinuteTime.Minute() == 15 || nextMinuteTime.Minute() == 30 || nextMinuteTime.Minute() == 45) && nextMinuteTime.Second() < int(expectedSecond) {
+		// Do Nothing
+	} else {
+		nextMinute := ((nextMinuteTime.Minute() / 15) + 1) * 15
+		minuteDiff := nextMinute - nextMinuteTime.Minute()
+		nextMinuteTime = nextMinuteTime.Add(time.Duration(int64(minuteDiff) * int64(time.Minute)))
+	}
+
+	assert.Equal(t, nextMinuteTime.Year(), nextRunTime.Year())
+	assert.Equal(t, nextMinuteTime.Month(), nextRunTime.Month())
+	assert.Equal(t, nextMinuteTime.Day(), nextRunTime.Day())
+	assert.Equal(t, nextMinuteTime.Hour(), nextRunTime.Hour())
+	assert.Equal(t, nextMinuteTime.Minute(), nextRunTime.Minute())
+	assert.Equal(t, int(expectedSecond), nextRunTime.Second())
+
+	err = scheduler.Shutdown()
+	assert.Nil(t, err)
+}
+
 func TestCronJobNextRunTimeWithFixedTimePeriod(t *testing.T) {
 	scheduler, err := gocron.NewScheduler(
 		gocron.WithLocation(time.Local),

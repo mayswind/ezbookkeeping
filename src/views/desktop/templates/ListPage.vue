@@ -4,7 +4,7 @@
             <v-card>
                 <template #title>
                     <div class="title-and-toolbar d-flex align-center">
-                        <span>{{ $t('Transaction Templates') }}</span>
+                        <span>{{ templateType === allTemplateTypes.Schedule ? $t('Scheduled Transactions') : $t('Transaction Templates') }}</span>
                         <v-btn class="ml-3" color="default" variant="outlined"
                                :disabled="loading || updating" @click="add">{{ $t('Add') }}</v-btn>
                         <v-btn class="ml-3" color="primary" variant="tonal"
@@ -60,7 +60,9 @@
 
                     <tbody v-if="!loading && noAvailableTemplate">
                     <tr>
-                        <td>{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
+                        <td v-if="templateType === allTemplateTypes.Normal">{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
+                        <td v-if="templateType === allTemplateTypes.Schedule">{{ $t('No available scheduled transactions') }}</td>
+                        <td v-else>{{ $t('No available template') }}</td>
                     </tr>
                     </tbody>
 
@@ -79,9 +81,9 @@
                                             <v-badge class="right-bottom-icon" color="secondary"
                                                      location="bottom right" offset-x="8" :icon="icons.hide"
                                                      v-if="element.hidden">
-                                                <v-icon size="20" start :icon="icons.text"/>
+                                                <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule ? icons.clock : icons.text"/>
                                             </v-badge>
-                                            <v-icon size="20" start :icon="icons.text" v-else-if="!element.hidden"/>
+                                            <v-icon size="20" start :icon="templateType === allTemplateTypes.Schedule ? icons.clock : icons.text" v-else-if="!element.hidden"/>
                                             <span class="transaction-template-name">{{ element.name }}</span>
                                         </div>
 
@@ -162,13 +164,17 @@ import {
     mdiDeleteOutline,
     mdiDrag,
     mdiDotsVertical,
-    mdiTextBoxOutline
+    mdiTextBoxOutline,
+    mdiClockTimeNineOutline
 } from '@mdi/js';
 
 export default {
     components: {
         EditDialog
     },
+    props: [
+        'initType',
+    ],
     data() {
         return {
             templateType: templateConstants.allTemplateTypes.Normal,
@@ -189,7 +195,8 @@ export default {
                 remove: mdiDeleteOutline,
                 drag: mdiDrag,
                 more: mdiDotsVertical,
-                text: mdiTextBoxOutline
+                text: mdiTextBoxOutline,
+                clock: mdiClockTimeNineOutline
             }
         };
     },
@@ -217,11 +224,15 @@ export default {
             }
 
             return count;
+        },
+        allTemplateTypes() {
+            return templateConstants.allTemplateTypes;
         }
     },
     created() {
         const self = this;
 
+        self.templateType = self.initType;
         self.loading = true;
 
         self.transactionTemplatesStore.loadAllTemplates({
@@ -325,6 +336,7 @@ export default {
             self.$refs.editDialog.open({
                 id: template.id,
                 currentTemplate: {
+                    templateType: template.templateType,
                     name: template.name,
                     type: template.type,
                     categoryId: template.categoryId,
@@ -334,7 +346,10 @@ export default {
                     destinationAmount: template.destinationAmount,
                     hideAmount: template.hideAmount,
                     tagIds: template.tagIds,
-                    comment: template.comment
+                    comment: template.comment,
+                    scheduledFrequencyType: template.scheduledFrequencyType,
+                    scheduledFrequency: template.scheduledFrequency,
+                    utcOffset: template.utcOffset
                 }
             }).then(result => {
                 if (result && result.message) {

@@ -97,12 +97,20 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrOperationFailed
 	}
 
+	totalScheduledTransactionCount, err := a.templates.GetTotalScheduledTemplateCountByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total scheduled transaction count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	dataStatisticsResp := &models.DataStatisticsResponse{
-		TotalAccountCount:             totalAccountCount,
-		TotalTransactionCategoryCount: totalTransactionCategoryCount,
-		TotalTransactionTagCount:      totalTransactionTagCount,
-		TotalTransactionCount:         totalTransactionCount,
-		TotalTransactionTemplateCount: totalTransactionTemplateCount,
+		TotalAccountCount:              totalAccountCount,
+		TotalTransactionCategoryCount:  totalTransactionCategoryCount,
+		TotalTransactionTagCount:       totalTransactionTagCount,
+		TotalTransactionCount:          totalTransactionCount,
+		TotalTransactionTemplateCount:  totalTransactionTemplateCount,
+		TotalScheduledTransactionCount: totalScheduledTransactionCount,
 	}
 
 	return dataStatisticsResp, nil

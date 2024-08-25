@@ -11,6 +11,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
@@ -427,6 +428,135 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 
 		return err
 	})
+}
+
+// CreateScheduledTransactions saves all scheduled transactions that should be created now
+func (s *TransactionService) CreateScheduledTransactions(c core.Context, currentUnixTime int64, interval time.Duration) error {
+	var allTemplates []*models.TransactionTemplate
+	intervalMinute := int(interval / time.Minute)
+	currentTime := time.Unix(currentUnixTime, 0)
+	currentMinute := (currentTime.Minute() / intervalMinute) * intervalMinute
+
+	startTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), currentTime.Hour(), currentMinute, 0, 0, time.Local)
+	startTimeInUTC := startTime.In(time.UTC)
+
+	minutesElapsedOfDayInUtc := startTimeInUTC.Hour()*60 + startTimeInUTC.Minute()
+	secondsElapsedOfDayInUtc := minutesElapsedOfDayInUtc * 60
+	todayFirstTimeInUTC := startTimeInUTC.Add(time.Duration(-secondsElapsedOfDayInUtc) * time.Second)
+	todayFirstUnixTimeInUTC := todayFirstTimeInUTC.Unix()
+
+	minScheduledAt := minutesElapsedOfDayInUtc
+	maxScheduledAt := minScheduledAt + intervalMinute
+
+	for i := 0; i < s.UserDataDBCount(); i++ {
+		var templates []*models.TransactionTemplate
+		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=? AND template_type=? AND (scheduled_frequency_type=? OR scheduled_frequency_type=?) AND scheduled_at>=? AND scheduled_at<?", false, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, minScheduledAt, maxScheduledAt).Find(&templates)
+
+		if err != nil {
+			return err
+		}
+
+		allTemplates = append(allTemplates, templates...)
+	}
+
+	if len(allTemplates) < 1 {
+		return nil
+	}
+
+	log.Infof(c, "[transactions.CreateScheduledTransactions] should process %d scheduled transaction templates now (scheduled at from %d to %d)", len(allTemplates), minScheduledAt, maxScheduledAt)
+
+	successCount := 0
+	skipCount := 0
+	failedCount := 0
+
+	for i := 0; i < len(allTemplates); i++ {
+		template := allTemplates[i]
+
+		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED {
+			skipCount++
+			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" disabled scheduled transaction frequency", template.TemplateId)
+			continue
+		}
+
+		if (template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY &&
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY) ||
+			template.ScheduledFrequency == "" {
+			skipCount++
+			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency", template.TemplateId)
+			continue
+		}
+
+		frequencyValues, err := utils.StringArrayToInt64Array(strings.Split(template.ScheduledFrequency, ","))
+
+		if err != nil {
+			skipCount++
+			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency, because %s", template.TemplateId, err.Error())
+			continue
+		}
+
+		frequencyValueSet := utils.ToSet(frequencyValues)
+		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
+		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
+		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+
+		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY && !frequencyValueSet[int64(transactionTime.Weekday())] {
+			skipCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %s", template.TemplateId, startTimeInUTC.Weekday())
+			continue
+		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY && !frequencyValueSet[int64(transactionTime.Day())] {
+			skipCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d of month", template.TemplateId, startTimeInUTC.Day())
+			continue
+		}
+
+		var transactionDbType models.TransactionDbType
+
+		if template.Type == models.TRANSACTION_TYPE_EXPENSE {
+			transactionDbType = models.TRANSACTION_DB_TYPE_EXPENSE
+		} else if template.Type == models.TRANSACTION_TYPE_INCOME {
+			transactionDbType = models.TRANSACTION_DB_TYPE_INCOME
+		} else if template.Type == models.TRANSACTION_TYPE_TRANSFER {
+			transactionDbType = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
+		} else {
+			skipCount++
+			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid transaction type", template.TemplateId)
+			continue
+		}
+
+		transaction := &models.Transaction{
+			Uid:               template.Uid,
+			Type:              transactionDbType,
+			CategoryId:        template.CategoryId,
+			TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
+			TimezoneUtcOffset: template.ScheduledTimezoneUtcOffset,
+			AccountId:         template.AccountId,
+			Amount:            template.Amount,
+			HideAmount:        template.HideAmount,
+			Comment:           template.Comment,
+			CreatedIp:         "127.0.0.1",
+			ScheduledCreated:  true,
+		}
+
+		if template.Type == models.TRANSACTION_TYPE_TRANSFER {
+			transaction.RelatedAccountId = template.RelatedAccountId
+			transaction.RelatedAccountAmount = template.RelatedAccountAmount
+		}
+
+		tagIds := template.GetTagIds()
+		err = s.CreateTransaction(c, transaction, tagIds)
+
+		if err == nil {
+			successCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has created a new trasaction \"id:%d\"", template.TemplateId, transaction.TransactionId)
+		} else {
+			failedCount++
+			log.Errorf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" failed to create new trasaction", template.TemplateId)
+		}
+	}
+
+	log.Infof(c, "[transactions.CreateScheduledTransactions] %d transactions has been created successfully, %d templates does not need to create transactions and %d transactions failed to create", successCount, skipCount, failedCount)
+
+	return nil
 }
 
 // ModifyTransaction saves an existed transaction to database

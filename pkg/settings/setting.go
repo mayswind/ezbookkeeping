@@ -248,6 +248,7 @@ type Config struct {
 
 	// Cron
 	EnableRemoveExpiredTokens bool
+	EnableCreateScheduledTransaction bool
 
 	// Secret
 	SecretKeyNoSet                        bool
@@ -270,6 +271,7 @@ type Config struct {
 	EnableUserForceVerifyEmail       bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
+	EnableScheduledTransaction       bool
 	AvatarProvider                   core.UserAvatarProviderType
 
 	// Data
@@ -679,6 +681,7 @@ func loadDuplicateCheckerConfiguration(config *Config, configFile *ini.File, sec
 
 func loadCronConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableRemoveExpiredTokens = getConfigItemBoolValue(configFile, sectionName, "enable_remove_expired_tokens", false)
+	config.EnableCreateScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_create_scheduled_transaction", false)
 
 	return nil
 }
@@ -737,6 +740,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)
 
 	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == string(core.USER_AVATAR_PROVIDER_INTERNAL) {
 		config.AvatarProvider = core.USER_AVATAR_PROVIDER_INTERNAL

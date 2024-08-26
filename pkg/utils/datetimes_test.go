@@ -230,6 +230,11 @@ func TestFormatTimezoneOffset(t *testing.T) {
 	actualValue = FormatTimezoneOffset(timezone)
 	assert.Equal(t, expectedValue, actualValue)
 
+	timezone = time.FixedZone("Test Timezone", -150*60)
+	expectedValue = "-02:30"
+	actualValue = FormatTimezoneOffset(timezone)
+	assert.Equal(t, expectedValue, actualValue)
+
 	timezone = time.FixedZone("Test Timezone", 0)
 	expectedValue = "+00:00"
 	actualValue = FormatTimezoneOffset(timezone)
@@ -249,6 +254,11 @@ func TestParseFromTimezoneOffset(t *testing.T) {
 
 	expectedValue = time.FixedZone("Timezone", -720*60)
 	actualValue, err = ParseFromTimezoneOffset("-12:00")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = time.FixedZone("Timezone", -150*60)
+	actualValue, err = ParseFromTimezoneOffset("-02:30")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
 

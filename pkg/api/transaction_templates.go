@@ -140,6 +140,10 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any
 		}
 	}
 
+	if len(templateCreateReq.TagIds) > 10 {
+		return nil, errs.ErrTransactionTemplateHasTooManyTags
+	}
+
 	uid := c.GetCurrentUid()
 
 	maxOrderId, err := a.templates.GetMaxDisplayOrder(c, uid, templateCreateReq.TemplateType)
@@ -228,6 +232,10 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		} else if *templateModifyReq.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateModifyReq.ScheduledFrequency == "" {
 			return nil, errs.ErrScheduledTransactionFrequencyInvalid
 		}
+	}
+
+	if len(templateModifyReq.TagIds) > 10 {
+		return nil, errs.ErrTransactionTemplateHasTooManyTags
 	}
 
 	newTemplate := &models.TransactionTemplate{

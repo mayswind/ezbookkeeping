@@ -1087,6 +1087,7 @@
         "transaction template type is invalid": "Transaction template type is invalid",
         "scheduled transaction is not enabled": "Scheduled transaction is not enabled",
         "scheduled transaction frequency is invalid": "Scheduled transaction frequency is invalid",
+        "transaction template has too many tags": "There are too many tags in this transaction template",
         "query items cannot be blank": "There are no query items",
         "query items too much": "There are too many query items",
         "query items have invalid item": "There is invalid item in query items",

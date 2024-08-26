@@ -9,4 +9,5 @@ var (
 	ErrTransactionTemplateTypeInvalid       = NewNormalError(NormalSubcategoryTemplate, 2, http.StatusBadRequest, "transaction template type is invalid")
 	ErrScheduledTransactionNotEnabled       = NewNormalError(NormalSubcategoryTemplate, 3, http.StatusBadRequest, "scheduled transaction is not enabled")
 	ErrScheduledTransactionFrequencyInvalid = NewNormalError(NormalSubcategoryTemplate, 4, http.StatusBadRequest, "scheduled transaction frequency is invalid")
+	ErrTransactionTemplateHasTooManyTags    = NewNormalError(NormalSubcategoryTemplate, 5, http.StatusBadRequest, "transaction template has too many tags")
 )

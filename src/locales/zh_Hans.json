@@ -1087,6 +1087,7 @@
         "transaction template type is invalid": "交易模板类型无效",
         "scheduled transaction is not enabled": "定时交易没有启用",
         "scheduled transaction frequency is invalid": "定时交易周期无效",
+        "transaction template has too many tags": "交易模板中的标签过多",
         "query items cannot be blank": "请求项目不能为空",
         "query items too much": "请求项目过多",
         "query items have invalid item": "请求项目中有非法项目",

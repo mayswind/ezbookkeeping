@@ -526,6 +526,9 @@ export default {
         defaultAccountId() {
             return this.userStore.currentUserDefaultAccountId;
         },
+        firstDayOfWeek() {
+            return this.userStore.currentUserFirstDayOfWeek;
+        },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
         },
@@ -628,7 +631,7 @@ export default {
             if (this.transaction.scheduledFrequencyType === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
                 if (scheduledFrequencyValues.length) {
                     return this.$t('format.misc.everyMultiDaysOfWeek', {
-                        days: this.$locale.getMultiWeekdayLongNames(scheduledFrequencyValues)
+                        days: this.$locale.getMultiWeekdayLongNames(scheduledFrequencyValues, this.firstDayOfWeek)
                     });
                 } else {
                     return this.$t('Weekly');

@@ -146,7 +146,7 @@ export default {
             } else if (this.type === templateConstants.allTemplateScheduledFrequencyTypes.Weekly.type) {
                 if (this.frequencyValue.length) {
                     return this.$t('format.misc.everyMultiDaysOfWeek', {
-                        days: this.$locale.getMultiWeekdayLongNames(this.frequencyValue)
+                        days: this.$locale.getMultiWeekdayLongNames(this.frequencyValue, this.firstDayOfWeek)
                     });
                 } else {
                     return this.$t('Weekly');

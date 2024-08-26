@@ -350,9 +350,36 @@ function getMultiMonthdayShortNames(monthDays, translateFn) {
     }
 }
 
-function getMultiWeekdayLongNames(weekdayTypes, translateFn) {
+function getMultiWeekdayLongNames(weekdayTypes, firstDayOfWeek, translateFn) {
+    const weekdayTypesMap = {};
+    const finalWeekdayTypes = [];
+
+    if (!isNumber(firstDayOfWeek)) {
+        firstDayOfWeek = datetimeConstants.allWeekDays.Sunday.type;
+    }
+
+    for (let i = 0; i < weekdayTypes.length; i++) {
+        weekdayTypesMap[weekdayTypes[i]] = true;
+    }
+
+    for (let i = firstDayOfWeek; i < datetimeConstants.allWeekDaysArray.length; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+
+        if (weekdayTypesMap[weekDay.type]) {
+            finalWeekdayTypes.push(weekDay.type);
+        }
+    }
+
+    for (let i = 0; i < firstDayOfWeek; i++) {
+        const weekDay = datetimeConstants.allWeekDaysArray[i];
+
+        if (weekdayTypesMap[weekDay.type]) {
+            finalWeekdayTypes.push(weekDay.type);
+        }
+    }
+
     const allWeekDays = getAllWeekDays(null, translateFn)
-    return joinMultiText(weekdayTypes.map(type => getNameByKeyValue(allWeekDays, type, 'type', 'displayName')), translateFn);
+    return joinMultiText(finalWeekdayTypes.map(type => getNameByKeyValue(allWeekDays, type, 'type', 'displayName')), translateFn);
 }
 
 function getI18nLongDateFormat(translateFn, formatTypeValue) {
@@ -1515,7 +1542,7 @@ export function i18nFunctions(i18nGlobal) {
         getWeekdayShortName: (weekDay) => getWeekdayShortName(weekDay, i18nGlobal.t),
         getWeekdayLongName: (weekDay) => getWeekdayLongName(weekDay, i18nGlobal.t),
         getMultiMonthdayShortNames: (monthdays) => getMultiMonthdayShortNames(monthdays, i18nGlobal.t),
-        getMultiWeekdayLongNames: (weekdayTypes) => getMultiWeekdayLongNames(weekdayTypes, i18nGlobal.t),
+        getMultiWeekdayLongNames: (weekdayTypes, firstDayOfWeek) => getMultiWeekdayLongNames(weekdayTypes, firstDayOfWeek, i18nGlobal.t),
         formatUnixTimeToLongDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat) + ' ' + getI18nLongTimeFormat(i18nGlobal.t, userStore.currentUserLongTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToShortDateTime: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nShortDateFormat(i18nGlobal.t, userStore.currentUserShortDateFormat) + ' ' + getI18nShortTimeFormat(i18nGlobal.t, userStore.currentUserShortTimeFormat), utcOffset, currentUtcOffset),
         formatUnixTimeToLongDate: (userStore, unixTime, utcOffset, currentUtcOffset) => formatUnixTime(unixTime, getI18nLongDateFormat(i18nGlobal.t, userStore.currentUserLongDateFormat), utcOffset, currentUtcOffset),

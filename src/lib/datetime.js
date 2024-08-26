@@ -69,20 +69,6 @@ export function isPM(hour) {
     }
 }
 
-export function getUtcOffsetMinutesByUtcOffset(utcOffset) {
-    if (!utcOffset) {
-        return 0;
-    }
-
-    const parts = utcOffset.split(':');
-
-    if (parts.length !== 2) {
-        return 0;
-    }
-
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-}
-
 export function getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes) {
     let offsetHours = Math.trunc(Math.abs(utcOffsetMinutes) / 60);
     let offsetMinutes = Math.abs(utcOffsetMinutes) - offsetHours * 60;
@@ -111,8 +97,11 @@ export function getTimezoneOffset(timezone) {
 }
 
 export function getTimezoneOffsetMinutes(timezone) {
-    const utcOffset = getTimezoneOffset(timezone);
-    return getUtcOffsetMinutesByUtcOffset(utcOffset);
+    if (timezone) {
+        return moment().tz(timezone).utcOffset();
+    } else {
+        return moment().utcOffset();
+    }
 }
 
 export function getBrowserTimezoneOffset() {

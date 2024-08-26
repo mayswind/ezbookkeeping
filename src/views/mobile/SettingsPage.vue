@@ -8,7 +8,7 @@
             <f7-list-item :title="$t('Transaction Categories')" link="/category/all"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" link="/tag/list"></f7-list-item>
             <f7-list-item :title="$t('Transaction Templates')" link="/template/list"></f7-list-item>
-            <f7-list-item :title="$t('Scheduled Transactions')" link="/schedule/list"></f7-list-item>
+            <f7-list-item :title="$t('Scheduled Transactions')" link="/schedule/list" v-if="isUserScheduledTransactionEnabled"></f7-list-item>
             <f7-list-item :title="$t('Data Management')" link="/user/data/management"></f7-list-item>
             <f7-list-item :title="$t('Two-Factor Authentication')" link="/user/2fa"></f7-list-item>
             <f7-list-item :title="$t('Device & Sessions')" link="/user/sessions"></f7-list-item>
@@ -81,6 +81,7 @@ import { useStatisticsStore } from '@/stores/statistics.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import { getDesktopVersionPath } from '@/lib/version.js';
+import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.js';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui.js';
 
 export default {
@@ -108,6 +109,9 @@ export default {
         },
         currentNickName() {
             return this.userStore.currentUserNickname || this.$t('User');
+        },
+        isUserScheduledTransactionEnabled() {
+            return isUserScheduledTransactionEnabled();
         },
         theme: {
             get: function () {

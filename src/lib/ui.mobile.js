@@ -167,6 +167,22 @@ export function scrollToSelectedItem(parentEl, containerSelector, selectedItemSe
     let targetPos = selectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
         - (container.outerHeight() - selectedItem.outerHeight()) / 2;
 
+    if (selectedItem.length > 1) {
+        let firstSelectedItem = elements(selectedItem[0]);
+        let lastSelectedItem = elements(selectedItem[selectedItem.length - 1]);
+
+        let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
+        let lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
+        let lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
+            - (container.outerHeight() - firstSelectedItem.outerHeight());
+
+        targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
+
+        if (lastSelectedItemInTop - firstSelectedItemInTop > container.outerHeight()) {
+            targetPos = firstSelectedItemInTop;
+        }
+    }
+
     if (targetPos <= 0) {
         return;
     }

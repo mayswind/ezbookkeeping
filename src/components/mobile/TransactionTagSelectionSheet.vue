@@ -42,7 +42,7 @@
 
 <script>
 import { copyArrayTo } from '@/lib/common.js';
-import { elements } from '@/lib/ui.mobile.js';
+import { scrollToSelectedItem } from '@/lib/ui.mobile.js';
 
 export default {
     props: [
@@ -82,7 +82,7 @@ export default {
         },
         onSheetOpen(event) {
             this.selectedItemIds = copyArrayTo(this.modelValue, []);
-            this.scrollToSelectedItem(event.$el);
+            scrollToSelectedItem(event.$el, '.page-content', 'li.list-item-selected');
         },
         onSheetClosed() {
             this.$emit('update:show', false);
@@ -106,43 +106,6 @@ export default {
                     }
                 }
             }
-        },
-        scrollToSelectedItem(parent) {
-            if (!parent || !parent.length) {
-                return;
-            }
-
-            const container = parent.find('.page-content');
-            const selectedItem = parent.find('li.list-item-selected');
-
-            if (!container.length || !selectedItem.length) {
-                return;
-            }
-
-            let firstSelectedItem = selectedItem;
-            let lastSelectedItem = selectedItem;
-
-            if (selectedItem.length > 0) {
-                firstSelectedItem = elements(selectedItem[0]);
-                lastSelectedItem = elements(selectedItem[selectedItem.length - 1]);
-            }
-
-            let firstSelectedItemInTop = firstSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
-            let lastSelectedItemInTop = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10);
-            let lastSelectedItemInBottom = lastSelectedItem.offset().top - container.offset().top - parseInt(container.css('padding-top'), 10)
-                - (container.outerHeight() - firstSelectedItem.outerHeight());
-
-            let targetPos = (firstSelectedItemInTop + lastSelectedItemInBottom) / 2;
-
-            if (lastSelectedItemInTop - firstSelectedItemInTop > container.outerHeight()) {
-                targetPos = firstSelectedItemInTop;
-            }
-
-            if (targetPos <= 0) {
-                return;
-            }
-
-            container.scrollTop(targetPos);
         },
         isChecked(itemId) {
             for (let i = 0; i < this.selectedItemIds.length; i++) {

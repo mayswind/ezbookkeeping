@@ -754,6 +754,7 @@ export default {
                             self.transaction.scheduledFrequencyType = options.currentTemplate.scheduledFrequencyType;
                             self.transaction.scheduledFrequency = options.currentTemplate.scheduledFrequency;
                             self.transaction.utcOffset = options.currentTemplate.utcOffset;
+                            self.transaction.timeZone = undefined;
                         }
                     }
 
@@ -806,6 +807,7 @@ export default {
                         self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
                         self.transaction.scheduledFrequency = template.scheduledFrequency;
                         self.transaction.utcOffset = template.utcOffset;
+                        self.transaction.timeZone = undefined;
                     }
                 } else {
                     self.setTransaction(null, options, true, true);

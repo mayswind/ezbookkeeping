@@ -897,6 +897,7 @@ export default {
                     self.transaction.scheduledFrequencyType = template.scheduledFrequencyType;
                     self.transaction.scheduledFrequency = template.scheduledFrequency;
                     self.transaction.utcOffset = template.utcOffset;
+                    self.transaction.timeZone = undefined;
                 }
             }
 

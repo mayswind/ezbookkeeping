@@ -3,8 +3,9 @@
     <v-app>
         <router-view />
     </v-app>
-    <v-snackbar color="notification-background" location="top"
+    <v-snackbar class="cursor-pointer" color="notification-background" location="top"
                 :multi-line="true" :timeout="-1" :close-on-content-click="true" v-model="showNotification">
+        <v-tooltip activator="parent">{{ $t('Click to close') }}</v-tooltip>
         <div class="d-inline-flex">
             <img alt="logo" class="notification-logo" :src="ezBookkeepingLogoPath" />
             <span class="ml-2">{{ $t('global.app.title') }}</span>

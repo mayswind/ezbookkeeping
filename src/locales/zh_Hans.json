@@ -1752,5 +1752,6 @@
     "License": "许可协议",
     "An error occurred": "发生错误",
     "Parameter Invalid": "参数错误",
-    "Numeric Overflow": "数值溢出"
+    "Numeric Overflow": "数值溢出",
+    "Click to close": "点击关闭"
 }

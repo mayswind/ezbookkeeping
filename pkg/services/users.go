@@ -135,7 +135,7 @@ func (s *UserService) GetUserByEmail(c core.Context, email string) (*models.User
 	return user, nil
 }
 
-// GetUserAvatar returns the user avatar image data and image file extension according to user uid
+// GetUserAvatar returns the user avatar image data according to user uid
 func (s *UserService) GetUserAvatar(c core.Context, uid int64, fileExtension string) ([]byte, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid

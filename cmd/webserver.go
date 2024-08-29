@@ -161,6 +161,14 @@ func startWebServer(c *core.CliContext) error {
 		}
 	}
 
+	if config.EnableTransactionPictures {
+		pictureRoute := router.Group("/pictures")
+		pictureRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString))
+		{
+			pictureRoute.GET("/:fileName", bindImage(api.TransactionPictures.TransactionPictureGetHandler))
+		}
+	}
+
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler))
 
 	if config.Mode == settings.MODE_DEVELOPMENT {
@@ -308,6 +316,11 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/transactions/add.json", bindApi(api.Transactions.TransactionCreateHandler))
 			apiV1Route.POST("/transactions/modify.json", bindApi(api.Transactions.TransactionModifyHandler))
 			apiV1Route.POST("/transactions/delete.json", bindApi(api.Transactions.TransactionDeleteHandler))
+
+			// Transaction Pictures
+			if config.EnableTransactionPictures {
+				apiV1Route.POST("/transaction/pictures/upload.json", bindApi(api.TransactionPictures.TransactionPictureUploadHandler))
+			}
 
 			// Transaction Categories
 			apiV1Route.GET("/transaction/categories/list.json", bindApi(api.TransactionCategories.CategoryListHandler))

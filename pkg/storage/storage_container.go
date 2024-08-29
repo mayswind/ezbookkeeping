@@ -6,10 +6,12 @@ import (
 )
 
 const avatarPathPrefix = "avatar"
+const transactionPicturePathPrefix = "transaction"
 
 // StorageContainer contains the current object storage
 type StorageContainer struct {
-	AvatarCurrentStorage ObjectStorage
+	AvatarCurrentStorage             ObjectStorage
+	TransactionPictureCurrentStorage ObjectStorage
 }
 
 // Initialize a object storage container singleton instance
@@ -19,19 +21,23 @@ var (
 
 // InitializeStorageContainer initializes the current object storage according to the config
 func InitializeStorageContainer(config *settings.Config) error {
-	if config.StorageType == settings.LocalFileSystemObjectStorageType {
-		avatarStorage, err := NewLocalFileSystemObjectStorage(config, avatarPathPrefix)
-		Container.AvatarCurrentStorage = avatarStorage
+	avatarStorage, err := newObjectStorage(config, avatarPathPrefix)
 
-		return err
-	} else if config.StorageType == settings.MinIOStorageType {
-		avatarStorage, err := NewMinIOObjectStorage(config, avatarPathPrefix)
-		Container.AvatarCurrentStorage = avatarStorage
-
+	if err != nil {
 		return err
 	}
 
-	return errs.ErrInvalidStorageType
+	Container.AvatarCurrentStorage = avatarStorage
+
+	transactionPictureStorage, err := newObjectStorage(config, transactionPicturePathPrefix)
+
+	if err != nil {
+		return err
+	}
+
+	Container.TransactionPictureCurrentStorage = transactionPictureStorage
+
+	return nil
 }
 
 // ExistsAvatar returns whether the avatar file exists from the current avatar object storage
@@ -52,4 +58,34 @@ func (s *StorageContainer) SaveAvatar(path string, object ObjectInStorage) error
 // DeleteAvatar returns whether delete the avatar file from the current avatar object storage successfully
 func (s *StorageContainer) DeleteAvatar(path string) error {
 	return s.AvatarCurrentStorage.Delete(path)
+}
+
+// ExistsTransactionPicture returns whether the transaction picture file exists from the current transaction picture object storage
+func (s *StorageContainer) ExistsTransactionPicture(path string) (bool, error) {
+	return s.TransactionPictureCurrentStorage.Exists(path)
+}
+
+// ReadTransactionPicture returns the transaction picture file from the current transaction picture object storage
+func (s *StorageContainer) ReadTransactionPicture(path string) (ObjectInStorage, error) {
+	return s.TransactionPictureCurrentStorage.Read(path)
+}
+
+// SaveTransactionPicture returns whether save the transaction picture file into the current transaction picture object storage successfully
+func (s *StorageContainer) SaveTransactionPicture(path string, object ObjectInStorage) error {
+	return s.TransactionPictureCurrentStorage.Save(path, object)
+}
+
+// DeleteTransactionPicture returns whether delete the transaction picture file from the current transaction picture object storage successfully
+func (s *StorageContainer) DeleteTransactionPicture(path string) error {
+	return s.TransactionPictureCurrentStorage.Delete(path)
+}
+
+func newObjectStorage(config *settings.Config, pathPrefix string) (ObjectStorage, error) {
+	if config.StorageType == settings.LocalFileSystemObjectStorageType {
+		return NewLocalFileSystemObjectStorage(config, pathPrefix)
+	} else if config.StorageType == settings.MinIOStorageType {
+		return NewMinIOObjectStorage(config, pathPrefix)
+	}
+
+	return nil, errs.ErrInvalidStorageType
 }

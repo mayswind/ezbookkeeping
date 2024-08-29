@@ -2,12 +2,14 @@ package services
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/mail"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/storage"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
@@ -115,6 +117,30 @@ func (s *ServiceUsingStorage) DeleteAvatar(uid int64, fileExtension string) erro
 	return s.container.DeleteAvatar(s.getUserAvatarPath(uid, fileExtension))
 }
 
+// ExistsTransactionPicture returns whether the transaction picture exists from the current transaction picture object storage
+func (s *ServiceUsingStorage) ExistsTransactionPicture(uid int64, pictureId int64, fileExtension string) (bool, error) {
+	return s.container.ExistsTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+}
+
+// ReadTransactionPicture returns the transaction picture from the current transaction picture object storage
+func (s *ServiceUsingStorage) ReadTransactionPicture(uid int64, pictureId int64, fileExtension string) (storage.ObjectInStorage, error) {
+	return s.container.ReadTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+}
+
+// SaveTransactionPicture returns whether save the transaction picture into the current transaction picture object storage successfully
+func (s *ServiceUsingStorage) SaveTransactionPicture(uid int64, pictureId int64, object storage.ObjectInStorage, fileExtension string) error {
+	return s.container.SaveTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension), object)
+}
+
+// DeleteTransactionPicture returns whether delete the transaction picture from the current transaction picture object storage successfully
+func (s *ServiceUsingStorage) DeleteTransactionPicture(uid int64, pictureId int64, fileExtension string) error {
+	return s.container.DeleteTransactionPicture(s.getTransactionPicturePath(uid, pictureId, fileExtension))
+}
+
 func (s *ServiceUsingStorage) getUserAvatarPath(uid int64, fileExtension string) string {
 	return fmt.Sprintf("%d.%s", uid, fileExtension)
+}
+
+func (s *ServiceUsingStorage) getTransactionPicturePath(uid int64, pictureId int64, fileExtension string) string {
+	return filepath.Join(utils.Int64ToString(uid), fmt.Sprintf("%d.%s", pictureId, fileExtension))
 }

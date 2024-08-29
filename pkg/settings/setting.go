@@ -272,6 +272,7 @@ type Config struct {
 	EnableUserForceVerifyEmail       bool
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
+	EnableTransactionPictures        bool
 	EnableScheduledTransaction       bool
 	AvatarProvider                   core.UserAvatarProviderType
 
@@ -741,6 +742,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+	config.EnableTransactionPictures = getConfigItemBoolValue(configFile, sectionName, "enable_transaction_picture", false)
 	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)
 
 	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == string(core.USER_AVATAR_PROVIDER_INTERNAL) {

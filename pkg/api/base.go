@@ -1,11 +1,15 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
+
+const internalTransactionPictureUrlFormat = "%spictures/%d.%s"
 
 // ApiUsingConfig represents an api that need to use config
 type ApiUsingConfig struct {
@@ -15,6 +19,12 @@ type ApiUsingConfig struct {
 // CurrentConfig returns the current config
 func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
 	return a.container.Current
+}
+
+// GetTransactionPictureInfoResponse returns the view-object of transaction picture basic info according to the transaction picture model
+func (a *ApiUsingConfig) GetTransactionPictureInfoResponse(picture *models.TransactionPictureInfo) *models.TransactionPictureInfoBasicResponse {
+	originalUrl := fmt.Sprintf(internalTransactionPictureUrlFormat, a.CurrentConfig().RootUrl, picture.PictureId, picture.PictureExtension)
+	return picture.ToTransactionPictureInfoBasicResponse(originalUrl)
 }
 
 // GetAfterRegisterNotificationContent returns the notification content displayed each time users register

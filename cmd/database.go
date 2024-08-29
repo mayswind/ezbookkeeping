@@ -125,5 +125,13 @@ func updateAllDatabaseTablesStructure(c *core.CliContext) error {
 
 	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction template table maintained successfully")
 
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.TransactionPictureInfo))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] transaction picture table maintained successfully")
+
 	return nil
 }

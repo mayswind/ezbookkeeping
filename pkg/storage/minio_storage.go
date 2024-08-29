@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"strings"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -40,6 +41,7 @@ func NewMinIOObjectStorage(config *settings.Config, pathPrefix string) (*MinIOOb
 	}
 
 	storage.rootPath = storage.getFinalPath(pathPrefix)
+	storage.rootPath = strings.ReplaceAll(storage.rootPath, "\\", "/")
 
 	ctx := context.Background()
 	exists, err := minIOClient.BucketExists(ctx, minIOConfig.Bucket)
@@ -103,6 +105,8 @@ func (s *MinIOObjectStorage) getFinalPath(path string) string {
 	if len(path) > 0 && path[0] == '/' {
 		path = path[1:]
 	}
+
+	path = strings.ReplaceAll(path, "\\", "/")
 
 	return rootPath + path
 }

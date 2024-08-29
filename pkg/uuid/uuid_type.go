@@ -1,6 +1,6 @@
 package uuid
 
-// UuidType represents uuid type
+// UuidType represents uuid type, the value of uuid type should should be from 0 to 15
 type UuidType uint8
 
 // Types of uuid

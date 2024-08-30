@@ -44,6 +44,12 @@
                                 color: 'secondary'
                             },
                             {
+                                title: 'Transaction Pictures',
+                                count: displayDataStatistics ? displayDataStatistics.totalTransactionPictureCount : '-',
+                                icon: icons.pictures,
+                                color: 'error-darken-1'
+                            },
+                            {
                                 title: 'Transaction Templates',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTemplateCount : '-',
                                 icon: icons.templates,
@@ -167,6 +173,7 @@ import {
     mdiViewDashboardOutline,
     mdiTagOutline,
     mdiClipboardTextOutline,
+    mdiImage,
     mdiClipboardTextClockOutline,
     mdiAlert
 } from '@mdi/js';
@@ -185,6 +192,7 @@ export default {
                 accounts: mdiCreditCardOutline,
                 categories: mdiViewDashboardOutline,
                 tags: mdiTagOutline,
+                pictures: mdiImage,
                 templates: mdiClipboardTextOutline,
                 scheduledTransactions: mdiClipboardTextClockOutline,
                 alert: mdiAlert
@@ -205,6 +213,7 @@ export default {
                 totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
                 totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
                 totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
+                totalTransactionPictureCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionPictureCount),
                 totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount),
                 totalScheduledTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalScheduledTransactionCount)
             };

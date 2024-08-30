@@ -26,6 +26,7 @@ type DataManagementsApi struct {
 	users                    *services.UserService
 	accounts                 *services.AccountService
 	transactions             *services.TransactionService
+	pictures                 *services.TransactionPictureService
 	categories               *services.TransactionCategoryService
 	tags                     *services.TransactionTagService
 	templates                *services.TransactionTemplateService
@@ -43,6 +44,7 @@ var (
 		users:                    services.Users,
 		accounts:                 services.Accounts,
 		transactions:             services.Transactions,
+		pictures:                 services.TransactionPictures,
 		categories:               services.TransactionCategories,
 		tags:                     services.TransactionTags,
 		templates:                services.TransactionTemplates,
@@ -90,6 +92,13 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrOperationFailed
 	}
 
+	totalTransactionPictureCount, err := a.pictures.GetTotalTransactionPicturesCountByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total transaction picture count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	totalTransactionTemplateCount, err := a.templates.GetTotalNormalTemplateCountByUid(c, uid)
 
 	if err != nil {
@@ -109,6 +118,7 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		TotalTransactionCategoryCount:  totalTransactionCategoryCount,
 		TotalTransactionTagCount:       totalTransactionTagCount,
 		TotalTransactionCount:          totalTransactionCount,
+		TotalTransactionPictureCount:   totalTransactionPictureCount,
 		TotalTransactionTemplateCount:  totalTransactionTemplateCount,
 		TotalScheduledTransactionCount: totalScheduledTransactionCount,
 	}
@@ -145,6 +155,13 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	err = a.pictures.DeleteAllPictures(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction pictures, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

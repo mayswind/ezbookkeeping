@@ -16,6 +16,7 @@
             <f7-list-item :title="$t('Accounts')" :after="displayDataStatistics.totalAccountCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Categories')" :after="displayDataStatistics.totalTransactionCategoryCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Tags')" :after="displayDataStatistics.totalTransactionTagCount"></f7-list-item>
+            <f7-list-item :title="$t('Transaction Pictures')" :after="displayDataStatistics.totalTransactionPictureCount"></f7-list-item>
             <f7-list-item :title="$t('Transaction Templates')" :after="displayDataStatistics.totalTransactionTemplateCount"></f7-list-item>
             <f7-list-item :title="$t('Scheduled Transactions')" :after="displayDataStatistics.totalScheduledTransactionCount"></f7-list-item>
         </f7-list>
@@ -111,6 +112,7 @@ export default {
                 totalAccountCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalAccountCount),
                 totalTransactionCategoryCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionCategoryCount),
                 totalTransactionTagCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTagCount),
+                totalTransactionPictureCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionPictureCount),
                 totalTransactionTemplateCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalTransactionTemplateCount),
                 totalScheduledTransactionCount: self.$locale.appendDigitGroupingSymbol(self.userStore, self.dataStatistics.totalScheduledTransactionCount)
             };

@@ -38,6 +38,17 @@ var (
 	}
 )
 
+// GetTotalTransactionPicturesCountByUid returns total transaction pictures count of user
+func (s *TransactionPictureService) GetTotalTransactionPicturesCountByUid(c core.Context, uid int64) (int64, error) {
+	if uid <= 0 {
+		return 0, errs.ErrUserIdInvalid
+	}
+
+	count, err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).Count(&models.TransactionPictureInfo{})
+
+	return count, err
+}
+
 // GetPictureInfoByPictureId returns a transaction picture info model according to transaction picture id
 func (s *TransactionPictureService) GetPictureInfoByPictureId(c core.Context, uid int64, pictureId int64) (*models.TransactionPictureInfo, error) {
 	if uid <= 0 {
@@ -136,5 +147,29 @@ func (s *TransactionPictureService) UploadPicture(c core.Context, pictureInfo *m
 	return s.UserDataDB(pictureInfo.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		_, err := sess.Insert(pictureInfo)
 		return err
+	})
+}
+
+// DeleteAllPictures deletes all existed transaction pictures from database
+func (s *TransactionPictureService) DeleteAllPictures(c core.Context, uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.TransactionPictureInfo{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 }

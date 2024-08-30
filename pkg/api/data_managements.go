@@ -141,6 +141,13 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 		return nil, errs.ErrUserPasswordWrong
 	}
 
+	err = a.templates.DeleteAllTemplates(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	err = a.transactions.DeleteAllTransactions(c, uid)
 
 	if err != nil {
@@ -159,13 +166,6 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction tags, because %s", err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	err = a.templates.DeleteAllTemplates(c, uid)
-
-	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

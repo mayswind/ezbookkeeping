@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
@@ -22,9 +23,22 @@ func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
 }
 
 // GetTransactionPictureInfoResponse returns the view-object of transaction picture basic info according to the transaction picture model
-func (a *ApiUsingConfig) GetTransactionPictureInfoResponse(picture *models.TransactionPictureInfo) *models.TransactionPictureInfoBasicResponse {
-	originalUrl := fmt.Sprintf(internalTransactionPictureUrlFormat, a.CurrentConfig().RootUrl, picture.PictureId, picture.PictureExtension)
-	return picture.ToTransactionPictureInfoBasicResponse(originalUrl)
+func (a *ApiUsingConfig) GetTransactionPictureInfoResponse(pictureInfo *models.TransactionPictureInfo) *models.TransactionPictureInfoBasicResponse {
+	originalUrl := fmt.Sprintf(internalTransactionPictureUrlFormat, a.CurrentConfig().RootUrl, pictureInfo.PictureId, pictureInfo.PictureExtension)
+	return pictureInfo.ToTransactionPictureInfoBasicResponse(originalUrl)
+}
+
+// GetTransactionPictureInfoResponseList returns the view-object list of transaction picture basic info according to the transaction picture model
+func (a *ApiUsingConfig) GetTransactionPictureInfoResponseList(pictureInfos []*models.TransactionPictureInfo) models.TransactionPictureInfoBasicResponseSlice {
+	pictureInfoResps := make(models.TransactionPictureInfoBasicResponseSlice, len(pictureInfos))
+
+	for i := 0; i < len(pictureInfos); i++ {
+		pictureInfoResps[i] = a.GetTransactionPictureInfoResponse(pictureInfos[i])
+	}
+
+	sort.Sort(pictureInfoResps)
+
+	return pictureInfoResps
 }
 
 // GetAfterRegisterNotificationContent returns the notification content displayed each time users register

@@ -394,9 +394,9 @@ export default {
         return axios.get(`v1/transactions/amounts.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&query=' + queryParams.join('|') : ''));
     },
     getTransaction: ({ id }) => {
-        return axios.get(`v1/transactions/get.json?id=${id}&trim_account=true&trim_category=true&trim_tag=true`);
+        return axios.get(`v1/transactions/get.json?id=${id}&with_pictures=true&trim_account=true&trim_category=true&trim_tag=true`);
     },
-    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset, clientSessionId }) => {
+    addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, pictureIds, comment, geoLocation, utcOffset, clientSessionId }) => {
         return axios.post('v1/transactions/add.json', {
             type,
             categoryId,
@@ -407,13 +407,14 @@ export default {
             destinationAmount,
             hideAmount,
             tagIds,
+            pictureIds,
             comment,
             geoLocation,
             utcOffset,
             clientSessionId
         });
     },
-    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, geoLocation, utcOffset }) => {
+    modifyTransaction: ({ id, type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, pictureIds, comment, geoLocation, utcOffset }) => {
         return axios.post('v1/transactions/modify.json', {
             id,
             type,
@@ -425,6 +426,7 @@ export default {
             destinationAmount,
             hideAmount,
             tagIds,
+            pictureIds,
             comment,
             geoLocation,
             utcOffset
@@ -433,6 +435,12 @@ export default {
     deleteTransaction: ({ id }) => {
         return axios.post('v1/transactions/delete.json', {
             id
+        });
+    },
+    uploadTransactionPicture: ({ pictureFile, clientSessionId }) => {
+        return axios.postForm('v1/transaction/pictures/upload.json', {
+            picture: pictureFile,
+            clientSessionId: clientSessionId
         });
     },
     getAllTransactionCategories: () => {

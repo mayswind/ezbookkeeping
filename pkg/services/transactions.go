@@ -203,7 +203,7 @@ func (s *TransactionService) GetTransactionCount(c core.Context, uid int64, maxT
 }
 
 // CreateTransaction saves a new transaction to database
-func (s *TransactionService) CreateTransaction(c core.Context, transaction *models.Transaction, tagIds []int64) error {
+func (s *TransactionService) CreateTransaction(c core.Context, transaction *models.Transaction, tagIds []int64, pictureIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -261,6 +261,11 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 		}
 	}
 
+	pictureUpdateModel := &models.TransactionPictureInfo{
+		TransactionId:   transaction.TransactionId,
+		UpdatedUnixTime: now,
+	}
+
 	return s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Get and verify source and destination account
 		sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
@@ -291,6 +296,13 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 
 		// Get and verify tags
 		err = s.isTagsValid(sess, transaction, transactionTagIndexes, tagIds)
+
+		if err != nil {
+			return err
+		}
+
+		// Get and verify pictures
+		err = s.isPicturesValid(sess, transaction, pictureIds)
 
 		if err != nil {
 			return err
@@ -373,6 +385,15 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 				if err != nil {
 					return err
 				}
+			}
+		}
+
+		// Update transaction picture
+		if len(pictureIds) > 0 {
+			_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", pictureIds).Update(pictureUpdateModel)
+
+			if err != nil {
+				return err
 			}
 		}
 
@@ -543,7 +564,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		}
 
 		tagIds := template.GetTagIds()
-		err = s.CreateTransaction(c, transaction, tagIds)
+		err = s.CreateTransaction(c, transaction, tagIds, nil)
 
 		if err == nil {
 			successCount++
@@ -560,7 +581,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 }
 
 // ModifyTransaction saves an existed transaction to database
-func (s *TransactionService) ModifyTransaction(c core.Context, transaction *models.Transaction, currentTagIdsCount int, addTagIds []int64, removeTagIds []int64) error {
+func (s *TransactionService) ModifyTransaction(c core.Context, transaction *models.Transaction, currentTagIdsCount int, addTagIds []int64, removeTagIds []int64, addPictureIds []int64, removePictureIds []int64) error {
 	if transaction.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -736,6 +757,13 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			return err
 		}
 
+		// Get and verify pictures
+		err = s.isPicturesValid(sess, transaction, addPictureIds)
+
+		if err != nil {
+			return err
+		}
+
 		// Update transaction row
 		updatedRows, err := sess.ID(transaction.TransactionId).Cols(updateCols...).Where("uid=? AND deleted=?", transaction.Uid, false).Update(transaction)
 
@@ -795,6 +823,35 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			}
 
 			_, err := sess.Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).Update(tagIndexUpdateModel)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		// Update transaction picture
+		if len(removePictureIds) > 0 {
+			pictureUpdateModel := &models.TransactionPictureInfo{
+				Deleted:         true,
+				DeletedUnixTime: now,
+			}
+
+			deletedRows, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, transaction.TransactionId).In("picture_id", removePictureIds).Update(pictureUpdateModel)
+
+			if err != nil {
+				return err
+			} else if deletedRows < 1 {
+				return errs.ErrTransactionPictureNotFound
+			}
+		}
+
+		if len(addPictureIds) > 0 {
+			pictureUpdateModel := &models.TransactionPictureInfo{
+				TransactionId:   transaction.TransactionId,
+				UpdatedUnixTime: now,
+			}
+
+			_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", addPictureIds).Update(pictureUpdateModel)
 
 			if err != nil {
 				return err
@@ -973,6 +1030,11 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 		DeletedUnixTime: now,
 	}
 
+	pictureUpdateModel := &models.TransactionPictureInfo{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		// Get and verify current transaction
 		oldTransaction := &models.Transaction{}
@@ -1020,6 +1082,13 @@ func (s *TransactionService) DeleteTransaction(c core.Context, uid int64, transa
 
 		// Update transaction tag index
 		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", uid, false, oldTransaction.TransactionId).Update(tagIndexUpdateModel)
+
+		if err != nil {
+			return err
+		}
+
+		// Update transaction picture
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", uid, false, oldTransaction.TransactionId).Update(pictureUpdateModel)
 
 		if err != nil {
 			return err
@@ -1097,6 +1166,11 @@ func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) er
 		DeletedUnixTime: now,
 	}
 
+	pictureUpdateModel := &models.TransactionPictureInfo{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
 	accountUpdateModel := &models.Account{
 		Balance:         0,
 		Deleted:         true,
@@ -1113,6 +1187,13 @@ func (s *TransactionService) DeleteAllTransactions(c core.Context, uid int64) er
 
 		// Update all transaction tag index to deleted
 		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagIndexUpdateModel)
+
+		if err != nil {
+			return err
+		}
+
+		// Update all transaction picture to deleted
+		_, err = sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(pictureUpdateModel)
 
 		if err != nil {
 			return err
@@ -1493,6 +1574,17 @@ func (s *TransactionService) GetTransactionMapByList(transactions []*models.Tran
 	}
 
 	return transactionMap
+}
+
+// GetTransactionIds returns transaction ids list
+func (s *TransactionService) GetTransactionIds(transactions []*models.Transaction) []int64 {
+	transactionIds := make([]int64, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transactionIds[i] = transactions[i].TransactionId
+	}
+
+	return transactionIds
 }
 
 func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, amountFilter string, keyword string, noDuplicated bool) (string, []any) {
@@ -1918,6 +2010,35 @@ func (s *TransactionService) isTagsValid(sess *xorm.Session, transaction *models
 		for i := 0; i < len(transactionTagIndexes); i++ {
 			if _, exists := tagMap[transactionTagIndexes[i].TagId]; !exists {
 				return errs.ErrTransactionTagNotFound
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *TransactionService) isPicturesValid(sess *xorm.Session, transaction *models.Transaction, pictureIds []int64) error {
+	if len(pictureIds) > 0 {
+		var pictureInfos []*models.TransactionPictureInfo
+		err := sess.Where("uid=? AND deleted=?", transaction.Uid, false).In("picture_id", pictureIds).Find(&pictureInfos)
+
+		if err != nil {
+			return err
+		}
+
+		pictureInfoMap := make(map[int64]*models.TransactionPictureInfo)
+
+		for i := 0; i < len(pictureInfos); i++ {
+			if pictureInfos[i].TransactionId != models.TransactionPictureNewPictureTransactionId && pictureInfos[i].TransactionId != transaction.TransactionId {
+				return errs.ErrTransactionPictureIdInvalid
+			}
+
+			pictureInfoMap[pictureInfos[i].PictureId] = pictureInfos[i]
+		}
+
+		for i := 0; i < len(pictureIds); i++ {
+			if _, exists := pictureInfoMap[pictureIds[i]]; !exists {
+				return errs.ErrTransactionPictureNotFound
 			}
 		}
 	}

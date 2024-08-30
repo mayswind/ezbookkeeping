@@ -1,5 +1,7 @@
 package models
 
+const TransactionPictureNewPictureTransactionId = int64(0)
+
 // TransactionPictureInfo represents transaction picture file info stored in database
 type TransactionPictureInfo struct {
 	Uid              int64  `xorm:"INDEX(IDX_transaction_picture_uid_deleted_transaction_id_picture_id) INDEX(IDX_transaction_picture_uid_deleted_picture_id) NOT NULL"`
@@ -25,4 +27,22 @@ func (p *TransactionPictureInfo) ToTransactionPictureInfoBasicResponse(originalU
 		PictureId:   p.PictureId,
 		OriginalUrl: originalUrl,
 	}
+}
+
+// TransactionPictureInfoBasicResponseSlice represents the slice data structure of TransactionPictureInfoBasicResponse
+type TransactionPictureInfoBasicResponseSlice []*TransactionPictureInfoBasicResponse
+
+// Len returns the count of items
+func (s TransactionPictureInfoBasicResponseSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionPictureInfoBasicResponseSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s TransactionPictureInfoBasicResponseSlice) Less(i, j int) bool {
+	return s[i].PictureId < s[j].PictureId
 }

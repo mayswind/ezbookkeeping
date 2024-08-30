@@ -864,6 +864,18 @@ export const useTransactionsStore = defineStore('transactions', {
                 return Promise.reject('An error occurred');
             }
 
+            if (transaction.pictures && transaction.pictures.length > 0) {
+                const pictureIds = [];
+
+                for (let i = 0; i < transaction.pictures.length; i++) {
+                    if (transaction.pictures[i].pictureId) {
+                        pictureIds.push(transaction.pictures[i].pictureId);
+                    }
+                }
+
+                transaction.pictureIds = pictureIds;
+            }
+
             if (isEdit) {
                 submitTransaction.id = transaction.id;
             }
@@ -985,6 +997,30 @@ export const useTransactionsStore = defineStore('transactions', {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
                         reject({ message: 'Unable to delete this transaction' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        uploadTransactionPicture({ pictureFile, clientSessionId }) {
+            return new Promise((resolve, reject) => {
+                services.uploadTransactionPicture({ pictureFile, clientSessionId }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to upload transaction picture' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('Unable to upload transaction picture', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to upload transaction picture' });
                     } else {
                         reject(error);
                     }

@@ -73,6 +73,7 @@ type TransactionCreateRequest struct {
 	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	HideAmount           bool                           `json:"hideAmount"`
 	TagIds               []string                       `json:"tagIds"`
+	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 	ClientSessionId      string                         `json:"clientSessionId"`
@@ -90,6 +91,7 @@ type TransactionModifyRequest struct {
 	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
 	HideAmount           bool                           `json:"hideAmount"`
 	TagIds               []string                       `json:"tagIds"`
+	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 }
@@ -119,6 +121,7 @@ type TransactionListByMaxTimeRequest struct {
 	Page         int32             `form:"page" binding:"min=0"`
 	Count        int32             `form:"count" binding:"required,min=1,max=50"`
 	WithCount    bool              `form:"with_count"`
+	WithPictures bool              `form:"with_pictures"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -134,6 +137,7 @@ type TransactionListInMonthByPageRequest struct {
 	TagIds       string            `form:"tag_ids"`
 	AmountFilter string            `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string            `form:"keyword"`
+	WithPictures bool              `form:"with_pictures"`
 	TrimAccount  bool              `form:"trim_account"`
 	TrimCategory bool              `form:"trim_category"`
 	TrimTag      bool              `form:"trim_tag"`
@@ -168,6 +172,7 @@ type TransactionAmountsRequestItem struct {
 // TransactionGetRequest represents all parameters of transaction getting request
 type TransactionGetRequest struct {
 	Id           int64 `form:"id,string" binding:"required,min=1"`
+	WithPictures bool  `form:"with_pictures"`
 	TrimAccount  bool  `form:"trim_account"`
 	TrimCategory bool  `form:"trim_category"`
 	TrimTag      bool  `form:"trim_tag"`
@@ -192,25 +197,26 @@ type TransactionGeoLocationResponse struct {
 
 // TransactionInfoResponse represents a view-object of transaction
 type TransactionInfoResponse struct {
-	Id                   int64                            `json:"id,string"`
-	TimeSequenceId       int64                            `json:"timeSequenceId,string"`
-	Type                 TransactionType                  `json:"type"`
-	CategoryId           int64                            `json:"categoryId,string"`
-	Category             *TransactionCategoryInfoResponse `json:"category,omitempty"`
-	Time                 int64                            `json:"time"`
-	UtcOffset            int16                            `json:"utcOffset"`
-	SourceAccountId      int64                            `json:"sourceAccountId,string"`
-	SourceAccount        *AccountInfoResponse             `json:"sourceAccount,omitempty"`
-	DestinationAccountId int64                            `json:"destinationAccountId,string,omitempty"`
-	DestinationAccount   *AccountInfoResponse             `json:"destinationAccount,omitempty"`
-	SourceAmount         int64                            `json:"sourceAmount"`
-	DestinationAmount    int64                            `json:"destinationAmount,omitempty"`
-	HideAmount           bool                             `json:"hideAmount"`
-	TagIds               []string                         `json:"tagIds"`
-	Tags                 []*TransactionTagInfoResponse    `json:"tags,omitempty"`
-	Comment              string                           `json:"comment"`
-	GeoLocation          *TransactionGeoLocationResponse  `json:"geoLocation,omitempty"`
-	Editable             bool                             `json:"editable"`
+	Id                   int64                                    `json:"id,string"`
+	TimeSequenceId       int64                                    `json:"timeSequenceId,string"`
+	Type                 TransactionType                          `json:"type"`
+	CategoryId           int64                                    `json:"categoryId,string"`
+	Category             *TransactionCategoryInfoResponse         `json:"category,omitempty"`
+	Time                 int64                                    `json:"time"`
+	UtcOffset            int16                                    `json:"utcOffset"`
+	SourceAccountId      int64                                    `json:"sourceAccountId,string"`
+	SourceAccount        *AccountInfoResponse                     `json:"sourceAccount,omitempty"`
+	DestinationAccountId int64                                    `json:"destinationAccountId,string,omitempty"`
+	DestinationAccount   *AccountInfoResponse                     `json:"destinationAccount,omitempty"`
+	SourceAmount         int64                                    `json:"sourceAmount"`
+	DestinationAmount    int64                                    `json:"destinationAmount,omitempty"`
+	HideAmount           bool                                     `json:"hideAmount"`
+	TagIds               []string                                 `json:"tagIds"`
+	Tags                 []*TransactionTagInfoResponse            `json:"tags,omitempty"`
+	Pictures             TransactionPictureInfoBasicResponseSlice `json:"pictures,omitempty"`
+	Comment              string                                   `json:"comment"`
+	GeoLocation          *TransactionGeoLocationResponse          `json:"geoLocation,omitempty"`
+	Editable             bool                                     `json:"editable"`
 }
 
 // TransactionCountResponse represents transaction count response

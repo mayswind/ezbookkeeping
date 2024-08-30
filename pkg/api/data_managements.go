@@ -26,9 +26,9 @@ type DataManagementsApi struct {
 	users                    *services.UserService
 	accounts                 *services.AccountService
 	transactions             *services.TransactionService
-	pictures                 *services.TransactionPictureService
 	categories               *services.TransactionCategoryService
 	tags                     *services.TransactionTagService
+	pictures                 *services.TransactionPictureService
 	templates                *services.TransactionTemplateService
 }
 
@@ -44,9 +44,9 @@ var (
 		users:                    services.Users,
 		accounts:                 services.Accounts,
 		transactions:             services.Transactions,
-		pictures:                 services.TransactionPictures,
 		categories:               services.TransactionCategories,
 		tags:                     services.TransactionTags,
+		pictures:                 services.TransactionPictures,
 		templates:                services.TransactionTemplates,
 	}
 )
@@ -155,13 +155,6 @@ func (a *DataManagementsApi) ClearDataHandler(c *core.WebContext) (any, *errs.Er
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction templates, because %s", err.Error())
-		return nil, errs.Or(err, errs.ErrOperationFailed)
-	}
-
-	err = a.pictures.DeleteAllPictures(c, uid)
-
-	if err != nil {
-		log.Errorf(c, "[data_managements.ClearDataHandler] failed to delete all transaction pictures, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

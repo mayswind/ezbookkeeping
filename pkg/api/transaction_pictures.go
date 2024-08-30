@@ -147,6 +147,7 @@ func (a *TransactionPicturesApi) TransactionPictureGetHandler(c *core.WebContext
 func (a *TransactionPicturesApi) createNewPictureInfoModel(uid int64, fileExtension string, clientIp string) *models.TransactionPictureInfo {
 	return &models.TransactionPictureInfo{
 		Uid:              uid,
+		TransactionId:    models.TransactionPictureNewPictureTransactionId,
 		PictureExtension: fileExtension,
 		CreatedIp:        clientIp,
 	}

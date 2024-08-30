@@ -71,6 +71,67 @@ func (s *TransactionPictureService) GetPictureInfoByPictureId(c core.Context, ui
 	return pictureInfo, nil
 }
 
+// GetNewPictureInfosByPictureIds returns new transaction picture info models according to transaction picture ids
+func (s *TransactionPictureService) GetNewPictureInfosByPictureIds(c core.Context, uid int64, pictureIds []int64) ([]*models.TransactionPictureInfo, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if pictureIds == nil {
+		return nil, errs.ErrTransactionPictureIdInvalid
+	}
+
+	var pictureInfos []*models.TransactionPictureInfo
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND transaction_id=?", uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", pictureIds).OrderBy("picture_id asc").Find(&pictureInfos)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pictureInfos, nil
+}
+
+// GetPictureInfosByTransactionId returns transaction picture info models according to transaction id
+func (s *TransactionPictureService) GetPictureInfosByTransactionId(c core.Context, uid int64, transactionId int64) ([]*models.TransactionPictureInfo, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if transactionId <= 0 {
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	var pictureInfos []*models.TransactionPictureInfo
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND transaction_id=?", uid, false, transactionId).OrderBy("picture_id asc").Find(&pictureInfos)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pictureInfos, nil
+}
+
+// GetPictureInfosByTransactionIds returns transaction picture info models according to transaction ids
+func (s *TransactionPictureService) GetPictureInfosByTransactionIds(c core.Context, uid int64, transactionIds []int64) (map[int64][]*models.TransactionPictureInfo, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if transactionIds == nil {
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	var pictureInfos []*models.TransactionPictureInfo
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).OrderBy("picture_id asc").Find(&pictureInfos)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pictureInfoMap := s.GetPictureInfoListMapByList(pictureInfos)
+	return pictureInfoMap, err
+}
+
 // GetPictureByPictureId returns the transaction picture data according to transaction picture id
 func (s *TransactionPictureService) GetPictureByPictureId(c core.Context, uid int64, pictureId int64, fileExtension string) ([]byte, error) {
 	if uid <= 0 {
@@ -150,26 +211,39 @@ func (s *TransactionPictureService) UploadPicture(c core.Context, pictureInfo *m
 	})
 }
 
-// DeleteAllPictures deletes all existed transaction pictures from database
-func (s *TransactionPictureService) DeleteAllPictures(c core.Context, uid int64) error {
-	if uid <= 0 {
-		return errs.ErrUserIdInvalid
+// GetPictureInfoMapByList returns a transaction picture info list map by a list
+func (s *TransactionPictureService) GetPictureInfoMapByList(pictureInfos []*models.TransactionPictureInfo) map[int64]*models.TransactionPictureInfo {
+	pictureInfoMap := make(map[int64]*models.TransactionPictureInfo)
+
+	for i := 0; i < len(pictureInfos); i++ {
+		pictureInfo := pictureInfos[i]
+		pictureInfoMap[pictureInfo.PictureId] = pictureInfo
 	}
 
-	now := time.Now().Unix()
+	return pictureInfoMap
+}
 
-	updateModel := &models.TransactionPictureInfo{
-		Deleted:         true,
-		DeletedUnixTime: now,
+// GetPictureInfoListMapByList returns a transaction picture info list map by a list
+func (s *TransactionPictureService) GetPictureInfoListMapByList(pictureInfos []*models.TransactionPictureInfo) map[int64][]*models.TransactionPictureInfo {
+	pictureInfoMap := make(map[int64][]*models.TransactionPictureInfo)
+
+	for i := 0; i < len(pictureInfos); i++ {
+		pictureInfo := pictureInfos[i]
+
+		pictureInfos, _ := pictureInfoMap[pictureInfo.TransactionId]
+		pictureInfoMap[pictureInfo.TransactionId] = append(pictureInfos, pictureInfo)
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+	return pictureInfoMap
+}
 
-		if err != nil {
-			return err
-		}
+// GetTransactionPictureIds returns transaction picture ids list
+func (s *TransactionPictureService) GetTransactionPictureIds(pictureInfos []*models.TransactionPictureInfo) []int64 {
+	pictureIds := make([]int64, len(pictureInfos))
 
-		return nil
-	})
+	for i := 0; i < len(pictureInfos); i++ {
+		pictureIds[i] = pictureInfos[i].PictureId
+	}
+
+	return pictureIds
 }

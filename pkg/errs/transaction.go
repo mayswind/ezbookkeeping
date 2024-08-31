@@ -27,4 +27,6 @@ var (
 	ErrCannotUseHiddenAccount                              = NewNormalError(NormalSubcategoryTransaction, 20, http.StatusBadRequest, "cannot use hidden account")
 	ErrCannotUseHiddenTransactionCategory                  = NewNormalError(NormalSubcategoryTransaction, 21, http.StatusBadRequest, "cannot use hidden transaction category")
 	ErrCannotUseHiddenTransactionTag                       = NewNormalError(NormalSubcategoryTransaction, 22, http.StatusBadRequest, "cannot use hidden transaction tag")
+	ErrTransactionHasTooManyTags                           = NewNormalError(NormalSubcategoryTransaction, 23, http.StatusBadRequest, "transaction has too many tags")
+	ErrTransactionHasTooManyPictures                       = NewNormalError(NormalSubcategoryTransaction, 24, http.StatusBadRequest, "transaction has too many pictures")
 )

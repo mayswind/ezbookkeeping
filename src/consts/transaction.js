@@ -38,10 +38,12 @@ const allTransactionEditScopeTypes = {
 
 const minAmountNumber = -99999999999; // -999999999.99
 const maxAmountNumber = 99999999999; //  999999999.99
+const maxPictureCount = 10;
 
 export default {
     allTransactionTypes: allTransactionTypes,
     allTransactionEditScopeTypes: allTransactionEditScopeTypes,
     minAmountNumber: minAmountNumber,
     maxAmountNumber: maxAmountNumber,
+    maxPictureCount: maxPictureCount,
 };

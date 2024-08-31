@@ -790,7 +790,7 @@ export default {
                 return false;
             }
 
-            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < 10;
+            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < transactionConstants.maxPictureCount;
         },
         mapProvider() {
             return getMapProvider();

@@ -15,6 +15,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const maximumTagsCountOfTemplate = 10
+
 // TransactionTemplatesApi represents transaction template api
 type TransactionTemplatesApi struct {
 	ApiUsingConfig
@@ -140,7 +142,7 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any
 		}
 	}
 
-	if len(templateCreateReq.TagIds) > 10 {
+	if len(templateCreateReq.TagIds) > maximumTagsCountOfTemplate {
 		return nil, errs.ErrTransactionTemplateHasTooManyTags
 	}
 
@@ -234,7 +236,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		}
 	}
 
-	if len(templateModifyReq.TagIds) > 10 {
+	if len(templateModifyReq.TagIds) > maximumTagsCountOfTemplate {
 		return nil, errs.ErrTransactionTemplateHasTooManyTags
 	}
 

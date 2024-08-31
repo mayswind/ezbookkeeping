@@ -5,6 +5,8 @@ const baseProxyUrlPath = '/proxy';
 const baseAmapApiProxyUrlPath = '/_AMapService';
 const apiNotFoundErrorCode = 100001;
 const validatorErrorCode = 200000;
+const userEmailNotVerifiedErrorCode = 201020;
+const transactionPictureNotFoundErrorCode = 211001;
 const googleMapJavascriptUrl = 'https://maps.googleapis.com/maps/api/js';
 const baiduMapJavascriptUrl = 'https://api.map.baidu.com/api?v=3.0';
 const amapJavascriptUrl = 'https://webapi.amap.com/maps?v=2.0';
@@ -145,6 +147,8 @@ export default {
     baseAmapApiProxyUrlPath: baseAmapApiProxyUrlPath,
     apiNotFoundErrorCode: apiNotFoundErrorCode,
     validatorErrorCode: validatorErrorCode,
+    userEmailNotVerifiedErrorCode: userEmailNotVerifiedErrorCode,
+    transactionPictureNotFoundErrorCode: transactionPictureNotFoundErrorCode,
     specifiedApiNotFoundErrors: specifiedApiNotFoundErrors,
     parameterizedErrors: parameterizedErrors,
     googleMapJavascriptUrl: googleMapJavascriptUrl,

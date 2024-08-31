@@ -435,6 +435,7 @@ import fileConstants from '@/consts/file.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import templateConstants from '@/consts/template.js';
+import apiConstants from '@/consts/api.js';
 import logger from '@/lib/logger.js';
 import {
     isArray,
@@ -1220,7 +1221,7 @@ export default {
                     self.removingPictureId = '';
                     self.submitting = false;
                 }).catch(error => {
-                    if (error.error && error.error.errorCode === 211001) {
+                    if (error.error && error.error.errorCode === apiConstants.transactionPictureNotFoundErrorCode) {
                         for (let i = 0; i < self.transaction.pictures.length; i++) {
                             if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
                                 self.transaction.pictures.splice(i, 1);

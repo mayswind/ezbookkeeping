@@ -10,4 +10,5 @@ var (
 	ErrTransactionPictureIsEmpty          = NewNormalError(NormalSubcategoryPicture, 3, http.StatusBadRequest, "transaction picture is empty")
 	ErrTransactionPictureNoExists         = NewNormalError(NormalSubcategoryPicture, 4, http.StatusNotFound, "transaction picture not exists")
 	ErrTransactionPictureExtensionInvalid = NewNormalError(NormalSubcategoryPicture, 5, http.StatusNotFound, "transaction picture file extension invalid")
+	ErrTransactionPictureTooMuch          = NewNormalError(NormalSubcategoryPicture, 6, http.StatusBadRequest, "transaction pictures too much")
 )

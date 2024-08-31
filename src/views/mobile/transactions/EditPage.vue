@@ -328,6 +328,42 @@
                 </template>
             </f7-list-item>
 
+            <f7-list-item
+                link="#" no-chevron
+                :header="$t('Pictures')"
+                v-if="showTransactionPictures || (transaction.pictures && transaction.pictures.length > 0)"
+            >
+                <template #footer>
+                    <f7-block class="margin-top-half no-padding no-margin" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
+                        <swiper-container
+                            :pagination="false"
+                            :space-between="10"
+                            :slides-per-view="'auto'"
+                            class="transaction-pictures"
+                        >
+                            <swiper-slide class="transaction-picture-container" :key="picIdx"
+                                          v-for="(pictureInfo, picIdx) in transaction.pictures"
+                                          @click="viewOrRemovePicture(pictureInfo)">
+                                <div class="transaction-picture">
+                                    <div class="display-flex justify-content-center align-items-center transaction-picture-control-backdrop"
+                                         v-if="mode === 'add' || mode === 'edit'">
+                                        <f7-icon class="picture-control-icon picture-remove-icon" f7="trash" v-if="pictureInfo.pictureId !== removingPictureId"></f7-icon>
+                                        <f7-preloader color="white" :size="28" v-if="pictureInfo.pictureId === removingPictureId" />
+                                    </div>
+                                    <img alt="picture" :src="getTransactionPictureUrl(pictureInfo)"/>
+                                </div>
+                            </swiper-slide>
+                            <swiper-slide @click="showOpenPictureDialog" v-if="canAddTransactionPicture">
+                                <div class="display-flex justify-content-center align-items-center transaction-picture transaction-picture-add">
+                                    <f7-icon class="picture-control-icon" f7="plus" v-if="!uploadingPicture"></f7-icon>
+                                    <f7-preloader :size="28" v-if="uploadingPicture" />
+                                </div>
+                            </swiper-slide>
+                        </swiper-container>
+                    </f7-block>
+                </template>
+            </f7-list-item>
+
             <f7-list-input
                 type="textarea"
                 class="transaction-edit-comment"
@@ -363,6 +399,9 @@
                 <f7-actions-button v-if="transaction.hideAmount" @click="transaction.hideAmount = false">{{ $t('Show Amount') }}</f7-actions-button>
                 <f7-actions-button v-if="!transaction.hideAmount" @click="transaction.hideAmount = true">{{ $t('Hide Amount') }}</f7-actions-button>
             </f7-actions-group>
+            <f7-actions-group v-if="type === 'transaction' && (mode === 'add' || mode === 'edit') && isTransactionPicturesEnabled && !showTransactionPictures">
+                <f7-actions-button @click="showTransactionPictures = true">{{ $t('Add Picture') }}</f7-actions-button>
+            </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ $t('Cancel') }}</f7-actions-button>
             </f7-actions-group>
@@ -373,6 +412,11 @@
                 <span class="tabbar-primary-link">{{ $t(saveButtonTitle) }}</span>
             </f7-link>
         </f7-toolbar>
+
+        <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
+                          :theme="isDarkMode ? 'dark' : 'light'" :navbar-show-count="true" :exposition="false"
+                          :photos="transactionPictures" :thumbs="transactionThumbs" />
+        <input ref="pictureInput" type="file" style="display: none" :accept="supportedImageExtensions" @change="uploadPicture($event)" />
     </f7-page>
 </template>
 
@@ -387,11 +431,13 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import fileConstants from '@/consts/file.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import templateConstants from '@/consts/template.js';
 import logger from '@/lib/logger.js';
 import {
+    isArray,
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
@@ -407,8 +453,11 @@ import {
     getTransactionSecondaryCategoryName,
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
-import { getMapProvider } from '@/lib/server_settings.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
+import {
+    isTransactionPicturesEnabled,
+    getMapProvider
+} from '@/lib/server_settings.js';
 
 export default {
     props: [
@@ -430,6 +479,8 @@ export default {
             loadingError: null,
             geoLocationStatus: null,
             submitting: false,
+            uploadingPicture: false,
+            removingPictureId: null,
             isSupportGeoLocation: !!navigator.geolocation,
             showTimeInDefaultTimezone: false,
             showGeoLocationActionSheet: false,
@@ -442,11 +493,15 @@ export default {
             showTransactionDateTimeSheet: false,
             showTransactionScheduledFrequencySheet: false,
             showGeoLocationMapSheet: false,
-            showTransactionTagSheet: false
+            showTransactionTagSheet: false,
+            showTransactionPictures: false
         };
     },
     computed: {
         ...mapStores(useSettingsStore, useUserStore, useAccountsStore, useTransactionCategoriesStore, useTransactionTagsStore, useTransactionsStore, useTransactionTemplatesStore, useExchangeRatesStore),
+        isDarkMode() {
+            return this.$root.isDarkMode;
+        },
         title() {
             if (this.type === 'transaction') {
                 if (this.mode === 'add') {
@@ -564,6 +619,9 @@ export default {
         },
         allTagsMap() {
             return this.transactionTagsStore.allTransactionTagsMap;
+        },
+        supportedImageExtensions() {
+            return fileConstants.supportedImageExtensions;
         },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
@@ -687,6 +745,34 @@ export default {
                 return this.$t('No Location');
             }
         },
+        transactionPictures() {
+            const thumbs = [];
+
+            if (!this.transaction.pictures || !this.transaction.pictures.length) {
+                return thumbs;
+            }
+
+            for (let i = 0; i < this.transaction.pictures.length; i++) {
+                thumbs.push({
+                    url: this.getTransactionPictureUrl(this.transaction.pictures[i])
+                });
+            }
+
+            return thumbs;
+        },
+        transactionThumbs() {
+            const thumbs = [];
+
+            if (!this.transaction.pictures || !this.transaction.pictures.length) {
+                return thumbs;
+            }
+
+            for (let i = 0; i < this.transaction.pictures.length; i++) {
+                thumbs.push(this.getTransactionPictureUrl(this.transaction.pictures[i]));
+            }
+
+            return thumbs;
+        },
         allowedMinAmount() {
             return transactionConstants.minAmountNumber;
         },
@@ -695,6 +781,16 @@ export default {
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
+        },
+        isTransactionPicturesEnabled() {
+            return isTransactionPicturesEnabled();
+        },
+        canAddTransactionPicture() {
+            if (this.type !== 'transaction' || (this.mode !== 'add' && this.mode !== 'edit')) {
+                return false;
+            }
+
+            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < 10;
         },
         mapProvider() {
             return getMapProvider();
@@ -1062,6 +1158,86 @@ export default {
                 this.transaction.destinationAmount = oldSourceAmount;
             }
         },
+        showOpenPictureDialog() {
+            if (!this.canAddTransactionPicture || this.submitting) {
+                return;
+            }
+
+            this.$refs.pictureInput.click();
+        },
+        uploadPicture(event) {
+            if (!event || !event.target || !event.target.files || !event.target.files.length) {
+                return;
+            }
+
+            const self = this;
+            const pictureFile = event.target.files[0];
+
+            event.target.value = null;
+
+            self.uploadingPicture = true;
+            self.submitting = true;
+
+            self.transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
+                if (!isArray(self.transaction.pictures)) {
+                    self.transaction.pictures = [];
+                }
+
+                self.transaction.pictures.push(response);
+
+                self.uploadingPicture = false;
+                self.submitting = false;
+            }).catch(error => {
+                self.uploadingPicture = false;
+                self.submitting = false;
+
+                if (!error.processed) {
+                    self.$toast(error.message || error);
+                }
+            });
+        },
+        viewOrRemovePicture(pictureInfo) {
+            if (this.mode !== 'add' && this.mode !== 'edit' && this.transaction.pictures && this.transaction.pictures.length) {
+                this.$refs.pictureBrowser.open();
+                return;
+            }
+
+            const self = this;
+
+            self.$confirm('Are you sure you want to remove this transaction picture?', () => {
+                self.removingPictureId = pictureInfo.pictureId;
+                self.submitting = true;
+
+                self.transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
+                    if (response && isArray(self.transaction.pictures)) {
+                        for (let i = 0; i < self.transaction.pictures.length; i++) {
+                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
+                                self.transaction.pictures.splice(i, 1);
+                            }
+                        }
+                    }
+
+                    self.removingPictureId = '';
+                    self.submitting = false;
+                }).catch(error => {
+                    if (error.error && error.error.errorCode === 211001) {
+                        for (let i = 0; i < self.transaction.pictures.length; i++) {
+                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
+                                self.transaction.pictures.splice(i, 1);
+                            }
+                        }
+                    } else if (!error.processed) {
+                        self.$toast(error.message || error);
+                    }
+
+                    self.removingPictureId = '';
+                    self.submitting = false;
+                });
+            });
+        },
+        getTransactionPictureUrl(pictureInfo) {
+            return this.transactionsStore.getTransactionPictureUrl(pictureInfo);
+        },
         getFontClassByAmount(amount) {
             if (amount >= 100000000 || amount <= -100000000) {
                 return 'ebk-small-amount';
@@ -1129,5 +1305,52 @@ export default {
 
 .transaction-edit-tag > .chip-media {
     opacity: 0.6;
+}
+
+.transaction-pictures {
+    height: 128px;
+}
+
+.transaction-picture-container,
+.transaction-picture {
+    width: 128px;
+    height: 128px;
+}
+
+.transaction-picture .transaction-picture-control-backdrop {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+}
+
+.transaction-picture .picture-control-icon {
+    z-index: 15;
+    font-size: 40px;
+}
+
+.transaction-picture .picture-remove-icon {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 32px;
+}
+
+.transaction-picture > img {
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.transaction-picture-add {
+    width: 126px;
+    height: 124px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
 }
 </style>

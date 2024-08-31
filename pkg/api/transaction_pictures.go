@@ -144,6 +144,27 @@ func (a *TransactionPicturesApi) TransactionPictureGetHandler(c *core.WebContext
 	return pictureData, contentType, nil
 }
 
+// TransactionPictureRemoveUnusedHandler removes unused transaction picture by request parameters for current user
+func (a *TransactionPicturesApi) TransactionPictureRemoveUnusedHandler(c *core.WebContext) (any, *errs.Error) {
+	var pictureDeleteReq models.TransactionPictureUnusedDeleteRequest
+	err := c.ShouldBindJSON(&pictureDeleteReq)
+
+	if err != nil {
+		log.Warnf(c, "[transaction_pictures.TransactionPictureRemoveUnusedHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+	err = a.pictures.RemoveUnusedTransactionPicture(c, uid, pictureDeleteReq.Id)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_pictures.TransactionPictureRemoveUnusedHandler] failed to remove unused transaction picture for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return true, nil
+}
+
 func (a *TransactionPicturesApi) createNewPictureInfoModel(uid int64, fileExtension string, clientIp string) *models.TransactionPictureInfo {
 	return &models.TransactionPictureInfo{
 		Uid:              uid,

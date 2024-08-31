@@ -41,6 +41,10 @@ export function isUserVerifyEmailEnabled() {
     return getServerSetting('v') === '1';
 }
 
+export function isTransactionPicturesEnabled() {
+    return getServerSetting('p') === '1';
+}
+
 export function isUserScheduledTransactionEnabled() {
     return getServerSetting('s') === '1';
 }

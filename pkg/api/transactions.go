@@ -589,7 +589,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 		}
 	}
 
-	if transactionGetReq.WithPictures {
+	if transactionGetReq.WithPictures && a.CurrentConfig().EnableTransactionPictures {
 		pictureInfos, err = a.transactionPictures.GetPictureInfosByTransactionId(c, uid, transaction.TransactionId)
 
 		if err != nil {
@@ -622,7 +622,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 		transactionResp.Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
 	}
 
-	if transactionGetReq.WithPictures {
+	if transactionGetReq.WithPictures && a.CurrentConfig().EnableTransactionPictures {
 		transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
 	}
 
@@ -651,6 +651,10 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionCreateHandler] parse picture ids failed, because %s", err.Error())
 		return nil, errs.ErrTransactionPictureIdInvalid
+	}
+
+	if len(pictureIds) > 10 {
+		return nil, errs.ErrTransactionPictureTooMuch
 	}
 
 	if transactionCreateReq.Type < models.TRANSACTION_TYPE_MODIFY_BALANCE || transactionCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
@@ -773,6 +777,10 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] parse picture ids failed, because %s", err.Error())
 		return nil, errs.ErrTransactionPictureIdInvalid
+	}
+
+	if len(pictureIds) > 10 {
+		return nil, errs.ErrTransactionPictureTooMuch
 	}
 
 	uid := c.GetCurrentUid()
@@ -1214,7 +1222,7 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 		}
 	}
 
-	if withPictures {
+	if withPictures && a.CurrentConfig().EnableTransactionPictures {
 		pictureInfoMap, err = a.transactionPictures.GetPictureInfosByTransactionIds(c, uid, utils.ToUniqueInt64Slice(a.transactions.GetTransactionIds(transactions)))
 
 		if err != nil {
@@ -1256,7 +1264,7 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 			result[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
 		}
 
-		if withPictures {
+		if withPictures && a.CurrentConfig().EnableTransactionPictures {
 			pictureInfos, exists := pictureInfoMap[transaction.TransactionId]
 
 			if exists {

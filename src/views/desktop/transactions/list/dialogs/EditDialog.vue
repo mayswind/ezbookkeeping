@@ -61,6 +61,9 @@
                         <v-tab value="map" :disabled="!transaction.geoLocation" v-if="type === 'transaction' && mapProvider">
                             <span>{{ $t('Location on Map') }}</span>
                         </v-tab>
+                        <v-tab value="pictures" :disabled="mode !== 'add' && mode !== 'edit' && (!transaction.pictures || !transaction.pictures.length)" v-if="type === 'transaction' && isTransactionPicturesEnabled">
+                            <span>{{ $t('Pictures') }}</span>
+                        </v-tab>
                     </v-tabs>
                 </div>
 
@@ -314,6 +317,38 @@
                             </v-col>
                         </v-row>
                     </v-window-item>
+                    <v-window-item value="pictures">
+                        <v-row class="transaction-pictures align-content-start" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
+                            <v-col :key="picIdx" cols="6" md="3" v-for="(pictureInfo, picIdx) in transaction.pictures">
+                                <v-avatar rounded="lg" variant="tonal" size="160"
+                                          class="cursor-pointer transaction-picture"
+                                          color="rgba(0,0,0,0)" @click="viewOrRemovePicture(pictureInfo)">
+                                    <v-img :src="getTransactionPictureUrl(pictureInfo)">
+                                        <template #placeholder>
+                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                                <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
+                                            </div>
+                                        </template>
+                                    </v-img>
+                                    <div class="picture-control-icon" :class="{ 'show-control-icon': pictureInfo.pictureId === removingPictureId }">
+                                        <v-icon size="64" :icon="icons.remove" v-if="(mode === 'add' || mode === 'edit') && pictureInfo.pictureId !== removingPictureId"/>
+                                        <v-progress-circular color="grey-500" indeterminate size="48" v-if="(mode === 'add' || mode === 'edit') && pictureInfo.pictureId === removingPictureId"></v-progress-circular>
+                                        <v-icon size="64" :icon="icons.fullscreen" v-if="mode !== 'add' && mode !== 'edit'"/>
+                                    </div>
+                                </v-avatar>
+                            </v-col>
+                            <v-col cols="6" md="3" v-if="canAddTransactionPicture">
+                                <v-avatar rounded="lg" variant="tonal" size="160"
+                                          class="transaction-picture transaction-picture-add"
+                                          :class="{ 'enabled': !submitting, 'cursor-pointer': !submitting }"
+                                          color="rgba(0,0,0,0)" @click="showOpenPictureDialog">
+                                    <v-tooltip activator="parent" v-if="!submitting">{{ $t('Add Picture') }}</v-tooltip>
+                                    <v-icon class="transaction-picture-add-icon" size="56" :icon="icons.add" v-if="!uploadingPicture"/>
+                                    <v-progress-circular color="grey-500" indeterminate size="48" v-if="uploadingPicture"></v-progress-circular>
+                                </v-avatar>
+                            </v-col>
+                        </v-row>
+                    </v-window-item>
                 </v-window>
             </v-card-text>
             <v-card-text class="overflow-y-visible">
@@ -342,6 +377,7 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
+    <input ref="pictureInput" type="file" style="display: none" :accept="supportedImageExtensions" @change="uploadPicture($event)" />
 </template>
 
 <script>
@@ -355,11 +391,13 @@ import { useTransactionsStore } from '@/stores/transaction.js';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
+import fileConstants from '@/consts/file.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import templateConstants from '@/consts/template.js';
 import logger from '@/lib/logger.js';
 import {
+    isArray,
     getNameByKeyValue
 } from '@/lib/common.js';
 import {
@@ -374,14 +412,21 @@ import {
     getFirstAvailableCategoryId
 } from '@/lib/category.js';
 import { setTransactionModelByTransaction } from '@/lib/transaction.js';
-import { getMapProvider } from '@/lib/server_settings.js';
+import {
+    isTransactionPicturesEnabled,
+    getMapProvider
+} from '@/lib/server_settings.js';
 
 import {
     mdiDotsVertical,
     mdiEyeOffOutline,
     mdiEyeOutline,
     mdiSwapHorizontal,
-    mdiPound
+    mdiPound,
+    mdiImageOutline,
+    mdiImagePlusOutline,
+    mdiTrashCanOutline,
+    mdiFullscreen
 } from '@mdi/js';
 
 export default {
@@ -409,6 +454,8 @@ export default {
             geoLocationStatus: null,
             geoMenuState: false,
             submitting: false,
+            uploadingPicture: false,
+            removingPictureId: '',
             isSupportGeoLocation: !!navigator.geolocation,
             resolve: null,
             reject: null,
@@ -417,7 +464,11 @@ export default {
                 show: mdiEyeOutline,
                 hide: mdiEyeOffOutline,
                 swap: mdiSwapHorizontal,
-                tag: mdiPound
+                tag: mdiPound,
+                picture: mdiImageOutline ,
+                add: mdiImagePlusOutline,
+                remove: mdiTrashCanOutline,
+                fullscreen : mdiFullscreen
             }
         };
     },
@@ -542,6 +593,9 @@ export default {
         allTagsMap() {
             return this.transactionTagsStore.allTransactionTagsMap;
         },
+        supportedImageExtensions() {
+            return fileConstants.supportedImageExtensions;
+        },
         hasAvailableExpenseCategories() {
             if (!this.allCategories || !this.allCategories[this.allCategoryTypes.Expense] || !this.allCategories[this.allCategoryTypes.Expense].length) {
                 return false;
@@ -608,6 +662,16 @@ export default {
         },
         showAccountBalance() {
             return this.settingsStore.appSettings.showAccountBalance;
+        },
+        isTransactionPicturesEnabled() {
+            return isTransactionPicturesEnabled();
+        },
+        canAddTransactionPicture() {
+            if (this.type !== 'transaction' || (this.mode !== 'add' && this.mode !== 'edit')) {
+                return false;
+            }
+
+            return !isArray(this.transaction.pictures) || this.transaction.pictures.length < 10;
         },
         mapProvider() {
             return getMapProvider();
@@ -926,6 +990,7 @@ export default {
             this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
             this.transaction.utcOffset = getTimezoneOffsetMinutes(this.transaction.timeZone);
             this.transaction.geoLocation = null;
+            this.transaction.pictures = [];
             this.mode = 'add';
         },
         edit() {
@@ -1034,6 +1099,86 @@ export default {
                 this.transaction.destinationAmount = oldSourceAmount;
             }
         },
+        showOpenPictureDialog() {
+            if (!this.canAddTransactionPicture || this.submitting) {
+                return;
+            }
+
+            this.$refs.pictureInput.click();
+        },
+        uploadPicture(event) {
+            if (!event || !event.target || !event.target.files || !event.target.files.length) {
+                return;
+            }
+
+            const self = this;
+            const pictureFile = event.target.files[0];
+
+            event.target.value = null;
+
+            self.uploadingPicture = true;
+            self.submitting = true;
+
+            self.transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
+                if (!isArray(self.transaction.pictures)) {
+                    self.transaction.pictures = [];
+                }
+
+                self.transaction.pictures.push(response);
+
+                self.uploadingPicture = false;
+                self.submitting = false;
+            }).catch(error => {
+                self.uploadingPicture = false;
+                self.submitting = false;
+
+                if (!error.processed) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
+        },
+        viewOrRemovePicture(pictureInfo) {
+            if (this.mode !== 'add' && this.mode !== 'edit') {
+                window.open(this.getTransactionPictureUrl(pictureInfo), '_blank');
+                return;
+            }
+
+            const self = this;
+
+            self.$refs.confirmDialog.open('Are you sure you want to remove this transaction picture?').then(() => {
+                self.removingPictureId = pictureInfo.pictureId;
+                self.submitting = true;
+
+                self.transactionsStore.removeUnusedTransactionPicture({ pictureInfo }).then(response => {
+                    if (response && isArray(self.transaction.pictures)) {
+                        for (let i = 0; i < self.transaction.pictures.length; i++) {
+                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
+                                self.transaction.pictures.splice(i, 1);
+                            }
+                        }
+                    }
+
+                    self.removingPictureId = '';
+                    self.submitting = false;
+                }).catch(error => {
+                    if (error.error && error.error.errorCode === 211001) {
+                        for (let i = 0; i < self.transaction.pictures.length; i++) {
+                            if (self.transaction.pictures[i].pictureId === pictureInfo.pictureId) {
+                                self.transaction.pictures.splice(i, 1);
+                            }
+                        }
+                    } else if (!error.processed) {
+                        self.$refs.snackbar.showError(error);
+                    }
+
+                    self.removingPictureId = '';
+                    self.submitting = false;
+                });
+            });
+        },
+        getTransactionPictureUrl(pictureInfo) {
+            return this.transactionsStore.getTransactionPictureUrl(pictureInfo);
+        },
         getPrimaryCategoryName(categoryId, allCategories) {
             return getTransactionPrimaryCategoryName(categoryId, allCategories);
         },
@@ -1085,11 +1230,23 @@ export default {
     .transaction-edit-map-view {
         height: 300px;
     }
+
+    @media (min-width: 960px) {
+        .transaction-pictures {
+            min-height: 300px;
+        }
+    }
 }
 
 @media (min-height: 700px) {
     .transaction-edit-map-view {
         height: 350px;
+    }
+
+    @media (min-width: 960px) {
+        .transaction-pictures {
+            min-height: 350px;
+        }
     }
 }
 
@@ -1097,11 +1254,64 @@ export default {
     .transaction-edit-map-view {
         height: 450px;
     }
+
+    @media (min-width: 960px) {
+        .transaction-pictures {
+            min-height: 450px;
+        }
+    }
 }
 
 @media (min-height: 900px) {
     .transaction-edit-map-view {
         height: 550px;
+    }
+
+    @media (min-width: 960px) {
+        .transaction-pictures {
+            min-height: 550px;
+        }
+    }
+}
+
+.transaction-picture .picture-control-icon {
+    display: none;
+    position: absolute;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.transaction-picture .picture-control-icon > i.v-icon {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.transaction-picture:hover .picture-control-icon,
+.transaction-picture .picture-control-icon.show-control-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.transaction-picture:hover .transaction-picture-placeholder {
+    display: none;
+}
+
+.transaction-picture-add {
+    border: 2px dashed rgba(var(--v-theme-grey-500));
+
+    .transaction-picture-add-icon {
+        color: rgba(var(--v-theme-grey-500));
+    }
+}
+
+.transaction-picture-add.enabled:hover {
+    border: 2px dashed rgba(var(--v-theme-grey-700));
+
+    .transaction-picture-add-icon {
+        color: rgba(var(--v-theme-grey-700));
     }
 }
 </style>

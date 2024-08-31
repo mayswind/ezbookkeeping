@@ -34,6 +34,8 @@ import Framework7Tooltip from 'framework7/components/tooltip';
 import Framework7Skeleton from 'framework7/components/skeleton';
 import Framework7Treeview from 'framework7/components/treeview';
 import Framework7Typography from 'framework7/components/typography';
+import Framework7Swiper from 'framework7/components/swiper';
+import Framework7PhotoBrowser from 'framework7/components/photo-browser';
 import Framework7Vue, { registerComponents } from 'framework7-vue/bundle';
 
 import 'framework7/css';
@@ -68,6 +70,8 @@ import 'framework7/components/tooltip/css';
 import 'framework7/components/skeleton/css';
 import 'framework7/components/treeview/css';
 import 'framework7/components/typography/css';
+import 'framework7/components/swiper/css';
+import 'framework7/components/photo-browser/css';
 
 import 'framework7-icons';
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
@@ -158,6 +162,8 @@ Framework7.use([
     Framework7Skeleton,
     Framework7Treeview,
     Framework7Typography,
+    Framework7Swiper,
+    Framework7PhotoBrowser,
     Framework7Vue
 ]);
 

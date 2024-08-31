@@ -15,6 +15,11 @@ type TransactionPictureInfo struct {
 	DeletedUnixTime  int64
 }
 
+// TransactionPictureUnusedDeleteRequest represents all parameters of unused transaction picture deleting request
+type TransactionPictureUnusedDeleteRequest struct {
+	Id int64 `json:"id,string" binding:"required,min=1"`
+}
+
 // TransactionPictureInfoBasicResponse represents a view-object of transaction picture basic info
 type TransactionPictureInfoBasicResponse struct {
 	PictureId   int64  `json:"pictureId,string"`

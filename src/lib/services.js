@@ -443,6 +443,11 @@ export default {
             clientSessionId: clientSessionId
         });
     },
+    removeUnusedTransactionPicture: ({ id }) => {
+        return axios.post('v1/transaction/pictures/remove_unused.json', {
+            id
+        });
+    },
     getAllTransactionCategories: () => {
         return axios.get('v1/transaction/categories/list.json');
     },
@@ -650,6 +655,28 @@ export default {
             return avatarUrl + '&' + params.join('&');
         } else {
             return avatarUrl + '?' + params.join('&');
+        }
+    },
+    getTransactionPictureUrlWithToken(pictureUrl, disableBrowserCache) {
+        if (!pictureUrl) {
+            return pictureUrl;
+        }
+
+        const params = [];
+        params.push('token=' + userState.getToken());
+
+        if (disableBrowserCache) {
+            if (isBoolean(disableBrowserCache)) {
+                params.push('_nocache=' + generateRandomUUID());
+            } else {
+                params.push('_nocache=' + disableBrowserCache);
+            }
+        }
+
+        if (pictureUrl.indexOf('?') >= 0) {
+            return pictureUrl + '&' + params.join('&');
+        } else {
+            return pictureUrl + '?' + params.join('&');
         }
     }
 };

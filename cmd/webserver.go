@@ -320,6 +320,7 @@ func startWebServer(c *core.CliContext) error {
 			// Transaction Pictures
 			if config.EnableTransactionPictures {
 				apiV1Route.POST("/transaction/pictures/upload.json", bindApi(api.TransactionPictures.TransactionPictureUploadHandler))
+				apiV1Route.POST("/transaction/pictures/remove_unused.json", bindApi(api.TransactionPictures.TransactionPictureRemoveUnusedHandler))
 			}
 
 			// Transaction Categories

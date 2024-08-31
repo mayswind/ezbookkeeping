@@ -211,6 +211,36 @@ func (s *TransactionPictureService) UploadPicture(c core.Context, pictureInfo *m
 	})
 }
 
+// RemoveUnusedTransactionPicture removes the unused transaction picture of specified user
+func (s *TransactionPictureService) RemoveUnusedTransactionPicture(c core.Context, uid int64, pictureId int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	if pictureId <= 0 {
+		return errs.ErrTransactionPictureIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.TransactionPictureInfo{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		deletedRows, err := sess.ID(pictureId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", uid, false, models.TransactionPictureNewPictureTransactionId).Update(updateModel)
+
+		if err != nil {
+			return err
+		} else if deletedRows < 1 {
+			return errs.ErrTransactionPictureNotFound
+		}
+
+		return err
+	})
+}
+
 // GetPictureInfoMapByList returns a transaction picture info list map by a list
 func (s *TransactionPictureService) GetPictureInfoMapByList(pictureInfos []*models.TransactionPictureInfo) map[int64]*models.TransactionPictureInfo {
 	pictureInfoMap := make(map[int64]*models.TransactionPictureInfo)

@@ -1081,6 +1081,7 @@
         "transaction tag name already exists": "Transaction tag title already exists",
         "transaction tag is in use and cannot be deleted": "Transaction tag is in use and it cannot be deleted",
         "transaction tag index not found": "Transaction tag index is not found",
+        "transaction tags too much": "There are too many transaction tags",
         "data export not allowed": "User data export is not allowed",
         "transaction template id is invalid": "Transaction template ID is invalid",
         "transaction template not found": "Transaction template is not found",

@@ -646,6 +646,10 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionTagIdInvalid
 	}
 
+	if len(tagIds) > 10 {
+		return nil, errs.ErrTransactionTagTooMuch
+	}
+
 	pictureIds, err := utils.StringArrayToInt64Array(transactionCreateReq.PictureIds)
 
 	if err != nil {
@@ -770,6 +774,10 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	if err != nil {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] parse tag ids failed, because %s", err.Error())
 		return nil, errs.ErrTransactionTagIdInvalid
+	}
+
+	if len(tagIds) > 10 {
+		return nil, errs.ErrTransactionTagTooMuch
 	}
 
 	pictureIds, err := utils.StringArrayToInt64Array(transactionModifyReq.PictureIds)

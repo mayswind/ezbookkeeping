@@ -1081,6 +1081,7 @@
         "transaction tag name already exists": "交易标签标题已经存在",
         "transaction tag is in use and cannot be deleted": "交易标签正在被使用，无法删除",
         "transaction tag index not found": "交易标签索引不存在",
+        "transaction tags too much": "交易标签过多",
         "data export not allowed": "不允许用户数据导出",
         "transaction template id is invalid": "交易模板ID无效",
         "transaction template not found": "交易模板不存在",

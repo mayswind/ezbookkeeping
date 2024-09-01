@@ -94,3 +94,32 @@ func Float64ToString(num float64) string {
 func StringToFloat64(str string) (float64, error) {
 	return strconv.ParseFloat(str, 64)
 }
+
+// FormatAmount returns a textual representation of amount
+func FormatAmount(amount int64) string {
+	displayAmount := Int64ToString(amount)
+	negative := displayAmount[0] == '-'
+
+	if negative {
+		displayAmount = displayAmount[1:]
+	}
+
+	integer := SubString(displayAmount, 0, len(displayAmount)-2)
+	decimals := SubString(displayAmount, -2, 2)
+
+	if integer == "" {
+		integer = "0"
+	}
+
+	if len(decimals) == 0 {
+		decimals = "00"
+	} else if len(decimals) == 1 {
+		decimals = "0" + decimals
+	}
+
+	if negative {
+		return "-" + integer + "." + decimals
+	}
+
+	return integer + "." + decimals
+}

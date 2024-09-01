@@ -122,3 +122,53 @@ func TestStringToFloat64(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
 }
+
+func TestFormatAmount(t *testing.T) {
+	expectedValue := "0.00"
+	actualValue := FormatAmount(0)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "0.00"
+	actualValue = FormatAmount(-0)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "0.01"
+	actualValue = FormatAmount(1)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-0.01"
+	actualValue = FormatAmount(-1)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "0.10"
+	actualValue = FormatAmount(10)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-0.10"
+	actualValue = FormatAmount(-10)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "0.12"
+	actualValue = FormatAmount(12)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-0.12"
+	actualValue = FormatAmount(-12)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "1.23"
+	actualValue = FormatAmount(123)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-1.23"
+	actualValue = FormatAmount(-123)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "12.34"
+	actualValue = FormatAmount(1234)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-12.34"
+	actualValue = FormatAmount(-1234)
+	assert.Equal(t, expectedValue, actualValue)
+}

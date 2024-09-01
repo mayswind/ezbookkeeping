@@ -50,7 +50,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		subCategory := e.replaceDelimiters(e.getTransactionSubCategoryName(transaction.CategoryId, categoryMap), separator)
 		account := e.replaceDelimiters(e.getAccountName(transaction.AccountId, accountMap), separator)
 		accountCurrency := e.getAccountCurrency(transaction.AccountId, accountMap)
-		amount := e.getDisplayAmount(transaction.Amount)
+		amount := utils.FormatAmount(transaction.Amount)
 		account2 := ""
 		account2Currency := ""
 		account2Amount := ""
@@ -59,7 +59,7 @@ func (e *EzBookKeepingPlainFileExporter) toExportedContent(uid int64, separator 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			account2 = e.replaceDelimiters(e.getAccountName(transaction.RelatedAccountId, accountMap), separator)
 			account2Currency = e.getAccountCurrency(transaction.RelatedAccountId, accountMap)
-			account2Amount = e.getDisplayAmount(transaction.RelatedAccountAmount)
+			account2Amount = utils.FormatAmount(transaction.RelatedAccountAmount)
 		}
 
 		if transaction.GeoLongitude != 0 || transaction.GeoLatitude != 0 {
@@ -137,26 +137,6 @@ func (e *EzBookKeepingPlainFileExporter) getAccountCurrency(accountId int64, acc
 	} else {
 		return ""
 	}
-}
-
-func (e *EzBookKeepingPlainFileExporter) getDisplayAmount(amount int64) string {
-	displayAmount := utils.Int64ToString(amount)
-	integer := utils.SubString(displayAmount, 0, len(displayAmount)-2)
-	decimals := utils.SubString(displayAmount, -2, 2)
-
-	if integer == "" {
-		integer = "0"
-	} else if integer == "-" {
-		integer = "-0"
-	}
-
-	if len(decimals) == 0 {
-		decimals = "00"
-	} else if len(decimals) == 1 {
-		decimals = "0" + decimals
-	}
-
-	return integer + "." + decimals
 }
 
 func (e *EzBookKeepingPlainFileExporter) getTags(transactionId int64, allTagIndexes map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {

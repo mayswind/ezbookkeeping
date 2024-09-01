@@ -1309,13 +1309,13 @@ export default {
 }
 
 .transaction-pictures {
-    height: 128px;
+    height: var(--ebk-transaction-picture-size);
 }
 
 .transaction-picture-container,
 .transaction-picture {
-    width: 128px;
-    height: 128px;
+    width: var(--ebk-transaction-picture-size);
+    height: var(--ebk-transaction-picture-size);
 }
 
 .transaction-picture .transaction-picture-control-backdrop {
@@ -1329,13 +1329,13 @@ export default {
 
 .transaction-picture .picture-control-icon {
     z-index: 15;
-    font-size: 40px;
+    font-size: var(--ebk-transaction-picture-add-icon-size);
 }
 
 .transaction-picture .picture-remove-icon {
     background-color: transparent;
     color: rgba(255, 255, 255, 0.8);
-    font-size: 32px;
+    font-size: var(--ebk-transaction-picture-remove-icon-size);
 }
 
 .transaction-picture > img {
@@ -1349,8 +1349,8 @@ export default {
 }
 
 .transaction-picture-add {
-    width: 126px;
-    height: 124px;
+    width: calc(var(--ebk-transaction-picture-size) - 2px);
+    height: calc(var(--ebk-transaction-picture-size) - 4px);
     border: 2px dashed #ccc;
     border-radius: 8px;
 }

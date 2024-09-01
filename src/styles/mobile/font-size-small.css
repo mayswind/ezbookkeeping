@@ -78,6 +78,9 @@
     --ebk-transaction-tag-chip-font-size: 13px;
     --ebk-transaction-tag-chip-media-size: 18px;
     --ebk-transaction-tag-chip-height: 18px;
+    --ebk-transaction-picture-size: 112px;
+    --ebk-transaction-picture-add-icon-size: 32px;
+    --ebk-transaction-picture-remove-icon-size: 28px;
     --ebk-login-page-title-font-size: 28px;
     --ebk-license-popup-title-font-size: 30px;
     --ebk-license-content-font-size: 13px;

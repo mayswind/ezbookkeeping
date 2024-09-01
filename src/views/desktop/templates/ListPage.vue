@@ -61,7 +61,7 @@
                     <tbody v-if="!loading && noAvailableTemplate">
                     <tr>
                         <td v-if="templateType === allTemplateTypes.Normal">{{ $t('No available template. Once you add templates, you can quickly add a new transaction using the dropdown menu of the Add button on the transaction list page') }}</td>
-                        <td v-if="templateType === allTemplateTypes.Schedule">{{ $t('No available scheduled transactions') }}</td>
+                        <td v-else-if="templateType === allTemplateTypes.Schedule">{{ $t('No available scheduled transactions') }}</td>
                         <td v-else>{{ $t('No available template') }}</td>
                     </tr>
                     </tbody>

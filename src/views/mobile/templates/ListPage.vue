@@ -23,7 +23,7 @@
             <f7-list-item :title="$t('No available template')"
                           :footer="$t('Once you add templates, you can long press the Add button on the home page to quickly add a new transaction')"
                           v-if="templateType === allTemplateTypes.Normal"></f7-list-item>
-            <f7-list-item :title="$t('No available scheduled transactions')" v-if="templateType === allTemplateTypes.Schedule"></f7-list-item>
+            <f7-list-item :title="$t('No available scheduled transactions')" v-else-if="templateType === allTemplateTypes.Schedule"></f7-list-item>
             <f7-list-item :title="$t('No available template')" v-else></f7-list-item>
         </f7-list>
 

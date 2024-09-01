@@ -7,6 +7,7 @@
             <f7-list-item title="Accounts" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Categories" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Tags" after="Count"></f7-list-item>
+            <f7-list-item title="Transaction Pictures" after="Count"></f7-list-item>
             <f7-list-item title="Transaction Templates" after="Count"></f7-list-item>
             <f7-list-item title="Scheduled Transactions" after="Count"></f7-list-item>
         </f7-list>

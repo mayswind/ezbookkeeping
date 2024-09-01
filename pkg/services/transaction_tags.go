@@ -414,6 +414,17 @@ func (s *TransactionTagService) GetTagMapByList(tags []*models.TransactionTag) m
 	return tagMap
 }
 
+// GetTagNameMapByList returns a transaction tag map by a list
+func (s *TransactionTagService) GetTagNameMapByList(tags []*models.TransactionTag) map[string]*models.TransactionTag {
+	tagMap := make(map[string]*models.TransactionTag)
+
+	for i := 0; i < len(tags); i++ {
+		tag := tags[i]
+		tagMap[tag.Name] = tag
+	}
+	return tagMap
+}
+
 func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexes []*models.TransactionTagIndex) map[int64][]int64 {
 	allTransactionTagIds := make(map[int64][]int64)
 

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -29,6 +30,24 @@ const (
 	TRANSACTION_DB_TYPE_TRANSFER_OUT   TransactionDbType = 4
 	TRANSACTION_DB_TYPE_TRANSFER_IN    TransactionDbType = 5
 )
+
+// String returns a textual representation of the transaction types for db enum
+func (s TransactionDbType) String() string {
+	switch s {
+	case TRANSACTION_DB_TYPE_MODIFY_BALANCE:
+		return "Modify Balance"
+	case TRANSACTION_DB_TYPE_INCOME:
+		return "Income"
+	case TRANSACTION_DB_TYPE_EXPENSE:
+		return "Expense"
+	case TRANSACTION_DB_TYPE_TRANSFER_OUT:
+		return "Transfer Out"
+	case TRANSACTION_DB_TYPE_TRANSFER_IN:
+		return "Transfer In"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(s))
+	}
+}
 
 // Transaction represents transaction data stored in database
 type Transaction struct {

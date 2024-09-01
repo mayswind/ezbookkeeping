@@ -21,6 +21,7 @@ var (
 	ErrQueryItemsInvalid               = NewNormalError(NormalSubcategoryGlobal, 11, http.StatusBadRequest, "query items have invalid item")
 	ErrParameterInvalid                = NewNormalError(NormalSubcategoryGlobal, 12, http.StatusBadRequest, "parameter invalid")
 	ErrFormatInvalid                   = NewNormalError(NormalSubcategoryGlobal, 13, http.StatusBadRequest, "format invalid")
+	ErrNumberInvalid                   = NewNormalError(NormalSubcategoryGlobal, 14, http.StatusBadRequest, "number invalid")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

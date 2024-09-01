@@ -970,6 +970,7 @@
         "system is busy": "系统繁忙",
         "not supported": "不支持",
         "image type not supported": "图片类型不支持",
+        "import file type not supported": "导入文件类型不支持",
         "database operation failed": "数据库操作失败",
         "SMTP server is not enabled": "SMTP 服务器没有启用",
         "incomplete or incorrect submission": "提交不完整或不正确",
@@ -1084,6 +1085,8 @@
         "transaction tag is in use and cannot be deleted": "交易标签正在被使用，无法删除",
         "transaction tag index not found": "交易标签索引不存在",
         "data export not allowed": "不允许用户数据导出",
+        "data import not allowed": "不允许用户数据导入",
+        "import too many transactions": "导入的交易过多",
         "transaction template id is invalid": "交易模板ID无效",
         "transaction template not found": "交易模板不存在",
         "transaction template type is invalid": "交易模板类型无效",
@@ -1099,7 +1102,9 @@
         "query items cannot be blank": "请求项目不能为空",
         "query items too much": "请求项目过多",
         "query items have invalid item": "请求项目中有非法项目",
-        "parameter invalid": "参数错误"
+        "parameter invalid": "参数错误",
+        "format invalid": "格式错误",
+        "number invalid": "数字错误"
     },
     "parameter": {
         "id": "ID",

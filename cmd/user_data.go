@@ -245,6 +245,31 @@ var UserData = &cli.Command{
 			},
 		},
 		{
+			Name:   "transaction-import",
+			Usage:  "Import transactions to specified user",
+			Action: bindAction(importUserTransaction),
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "username",
+					Aliases:  []string{"n"},
+					Required: true,
+					Usage:    "Specific user name",
+				},
+				&cli.StringFlag{
+					Name:     "file",
+					Aliases:  []string{"f"},
+					Required: true,
+					Usage:    "Specific import file path (e.g. transaction.csv)",
+				},
+				&cli.StringFlag{
+					Name:     "type",
+					Aliases:  []string{"t"},
+					Required: true,
+					Usage:    "Import file type (supports \"ezbookkeeping_csv\", \"ezbookkeeping_tsv\")",
+				},
+			},
+		},
+		{
 			Name:   "transaction-export",
 			Usage:  "Export user all transactions to file",
 			Action: bindAction(exportUserTransaction),
@@ -635,6 +660,55 @@ func exportUserTransaction(c *core.CliContext) error {
 	}
 
 	log.BootInfof(c, "[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
+
+	return nil
+}
+
+func importUserTransaction(c *core.CliContext) error {
+	_, err := initializeSystem(c)
+
+	if err != nil {
+		return err
+	}
+
+	username := c.String("username")
+	filePath := c.String("file")
+	filetype := c.String("type")
+
+	if filePath == "" {
+		log.BootErrorf(c, "[user_data.importUserTransaction] import file path is not specified")
+		return os.ErrNotExist
+	}
+
+	fileExists, err := utils.IsExists(filePath)
+
+	if !fileExists {
+		log.BootErrorf(c, "[user_data.importUserTransaction] import file does not exist")
+		return os.ErrExist
+	}
+
+	if filetype != "ezbookkeeping_csv" && filetype != "ezbookkeeping_tsv" {
+		log.BootErrorf(c, "[user_data.importUserTransaction] unknown file type \"%s\"", filetype)
+		return errs.ErrImportFileTypeNotSupported
+	}
+
+	data, err := os.ReadFile(filePath)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.importUserTransaction] failed to load import file")
+		return err
+	}
+
+	log.BootInfof(c, "[user_data.importUserTransaction] start importing transactions to user \"%s\"", username)
+
+	err = clis.UserData.ImportTransaction(c, username, filetype, data)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.importUserTransaction] error occurs when importing user data")
+		return err
+	}
+
+	log.BootInfof(c, "[user_data.importUserTransaction] transactions have been imported to user \"%s\"", username)
 
 	return nil
 }

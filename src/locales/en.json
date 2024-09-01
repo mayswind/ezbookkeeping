@@ -970,6 +970,7 @@
         "system is busy": "System is busy",
         "not supported": "Not supported",
         "image type not supported": "Image type is not supported",
+        "import file type not supported": "Import file type is not supported",
         "database operation failed": "Database operation failed",
         "SMTP server is not enabled": "SMTP server is not enabled",
         "incomplete or incorrect submission": "Incomplete or incorrect submission",
@@ -1084,6 +1085,8 @@
         "transaction tag is in use and cannot be deleted": "Transaction tag is in use and it cannot be deleted",
         "transaction tag index not found": "Transaction tag index is not found",
         "data export not allowed": "User data export is not allowed",
+        "data import not allowed": "User data import is not allowed",
+        "import too many transactions": "There are too many transactions to import",
         "transaction template id is invalid": "Transaction template ID is invalid",
         "transaction template not found": "Transaction template is not found",
         "transaction template type is invalid": "Transaction template type is invalid",
@@ -1099,7 +1102,9 @@
         "query items cannot be blank": "There are no query items",
         "query items too much": "There are too many query items",
         "query items have invalid item": "There is invalid item in query items",
-        "parameter invalid": "Parameter is invalid"
+        "parameter invalid": "Parameter is invalid",
+        "format invalid": "Format is invalid",
+        "number invalid": "Number is invalid"
     },
     "parameter": {
         "id": "ID",

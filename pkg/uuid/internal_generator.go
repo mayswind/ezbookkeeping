@@ -60,7 +60,7 @@ func (u *InternalUuidGenerator) GenerateUuid(idType UuidType) int64 {
 }
 
 // GenerateUuids generates new uuids
-func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint8) []int64 {
+func (u *InternalUuidGenerator) GenerateUuids(idType UuidType, count uint16) []int64 {
 	// 63bits = unixTime(32bits) + uuidType(4bits) + uuidServerId(8bits) + sequentialNumber(19bits)
 
 	uuids := make([]int64, count)

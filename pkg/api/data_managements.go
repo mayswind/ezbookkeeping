@@ -20,8 +20,8 @@ const pageCountForDataExport = 1000
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
 	ApiUsingConfig
-	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
-	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
+	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileConverter
+	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileConverter
 	tokens                   *services.TokenService
 	users                    *services.UserService
 	accounts                 *services.AccountService
@@ -38,8 +38,8 @@ var (
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
 		},
-		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
-		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
+		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileConverter{},
+		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileConverter{},
 		tokens:                   services.Tokens,
 		users:                    services.Users,
 		accounts:                 services.Accounts,

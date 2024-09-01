@@ -223,7 +223,7 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 		needUuidCount = 2
 	}
 
-	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint8(needUuidCount))
+	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint16(needUuidCount))
 
 	if len(uuids) < needUuidCount {
 		return errs.ErrSystemIsBusy
@@ -267,187 +267,75 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 	}
 
 	return s.UserDataDB(transaction.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		// Get and verify source and destination account
-		sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
+		return s.doCreateTransaction(sess, transaction, transactionTagIndexes, tagIds, pictureIds, pictureUpdateModel)
+	})
+}
+
+// BatchCreateTransactions saves new transactions to database
+func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, transactions []*models.Transaction) error {
+	now := time.Now().Unix()
+	needUuidCount := uint16(0)
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Uid != uid {
+			return errs.ErrUserIdInvalid
+		}
+
+		// Check whether account id is valid
+		err := s.isAccountIdValid(transaction)
 
 		if err != nil {
 			return err
 		}
-
-		if sourceAccount.Hidden || (destinationAccount != nil && destinationAccount.Hidden) {
-			return errs.ErrCannotAddTransactionToHiddenAccount
-		}
-
-		if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
-			return errs.ErrCannotAddTransactionToParentAccount
-		}
-
-		if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
-			sourceAccount.Currency == destinationAccount.Currency && transaction.Amount != transaction.RelatedAccountAmount {
-			return errs.ErrTransactionSourceAndDestinationAmountNotEqual
-		}
-
-		// Get and verify category
-		err = s.isCategoryValid(sess, transaction)
-
-		if err != nil {
-			return err
-		}
-
-		// Get and verify tags
-		err = s.isTagsValid(sess, transaction, transactionTagIndexes, tagIds)
-
-		if err != nil {
-			return err
-		}
-
-		// Get and verify pictures
-		err = s.isPicturesValid(sess, transaction, pictureIds)
-
-		if err != nil {
-			return err
-		}
-
-		// Verify balance modification transaction and calculate real amount
-		if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
-			otherTransactionExists, err := sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND account_id=?", transaction.Uid, false, sourceAccount.AccountId).Limit(1).Exist(&models.Transaction{})
-
-			if err != nil {
-				return err
-			} else if otherTransactionExists {
-				return errs.ErrBalanceModificationTransactionCannotAddWhenNotEmpty
-			}
-
-			transaction.RelatedAccountId = transaction.AccountId
-			transaction.RelatedAccountAmount = transaction.Amount - sourceAccount.Balance
-		}
-
-		// Insert transaction row
-		var relatedTransaction *models.Transaction
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			relatedTransaction = s.GetRelatedTransferTransaction(transaction)
+			needUuidCount += 2
+		} else {
+			needUuidCount++
 		}
 
-		createdRows, err := sess.Insert(transaction)
+		transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
-		if err != nil || createdRows < 1 { // maybe another transaction has same time
-			sameSecondLatestTransaction := &models.Transaction{}
-			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
-			maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+		transaction.CreatedUnixTime = now
+		transaction.UpdatedUnixTime = now
+	}
 
-			has, err := sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+	if needUuidCount > uint16(65535) {
+		return errs.ErrImportTooManyTransaction
+	}
 
-			if err != nil {
-				return err
-			} else if !has {
-				return errs.ErrDatabaseOperationFailed
-			} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
-				return errs.ErrTooMuchTransactionInOneSecond
-			}
+	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, needUuidCount)
+	uuidIndex := 0
 
-			transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
-			createdRows, err := sess.Insert(transaction)
+	if len(uuids) < int(needUuidCount) {
+		return errs.ErrSystemIsBusy
+	}
 
-			if err != nil {
-				return err
-			} else if createdRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		transaction.TransactionId = uuids[uuidIndex]
+		uuidIndex++
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			transaction.RelatedId = uuids[uuidIndex]
+			uuidIndex++
 		}
+	}
 
-		if relatedTransaction != nil {
-			relatedTransaction.TransactionTime = transaction.TransactionTime + 1
-
-			if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(relatedTransaction.TransactionTime) {
-				return errs.ErrTooMuchTransactionInOneSecond
-			}
-
-			createdRows, err := sess.Insert(relatedTransaction)
-
-			if err != nil {
-				return err
-			} else if createdRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-		}
-
-		err = nil
-
-		// Insert transaction tag index
-		if len(transactionTagIndexes) > 0 {
-			for i := 0; i < len(transactionTagIndexes); i++ {
-				transactionTagIndex := transactionTagIndexes[i]
-				transactionTagIndex.TransactionTime = transaction.TransactionTime
-
-				_, err := sess.Insert(transactionTagIndex)
-
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		// Update transaction picture
-		if len(pictureIds) > 0 {
-			_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", pictureIds).Update(pictureUpdateModel)
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		for i := 0; i < len(transactions); i++ {
+			transaction := transactions[i]
+			err := s.doCreateTransaction(sess, transaction, nil, nil, nil, nil)
 
 			if err != nil {
 				return err
 			}
 		}
 
-		// Update account table
-		if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
-
-			if err != nil {
-				return err
-			} else if updatedRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
-
-			if err != nil {
-				return err
-			} else if updatedRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-		} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
-
-			if err != nil {
-				return err
-			} else if updatedRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			sourceAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedSourceRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
-
-			if err != nil {
-				return err
-			} else if updatedSourceRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-
-			destinationAccount.UpdatedUnixTime = time.Now().Unix()
-			updatedDestinationRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
-
-			if err != nil {
-				return err
-			} else if updatedDestinationRows < 1 {
-				return errs.ErrDatabaseOperationFailed
-			}
-		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			return errs.ErrTransactionTypeInvalid
-		}
-
-		return err
+		return nil
 	})
 }
 
@@ -1585,6 +1473,190 @@ func (s *TransactionService) GetTransactionIds(transactions []*models.Transactio
 	}
 
 	return transactionIds
+}
+
+func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction *models.Transaction, transactionTagIndexes []*models.TransactionTagIndex, tagIds []int64, pictureIds []int64, pictureUpdateModel *models.TransactionPictureInfo) error {
+	// Get and verify source and destination account
+	sourceAccount, destinationAccount, err := s.getAccountModels(sess, transaction)
+
+	if err != nil {
+		return err
+	}
+
+	if sourceAccount.Hidden || (destinationAccount != nil && destinationAccount.Hidden) {
+		return errs.ErrCannotAddTransactionToHiddenAccount
+	}
+
+	if sourceAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS || (destinationAccount != nil && destinationAccount.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS) {
+		return errs.ErrCannotAddTransactionToParentAccount
+	}
+
+	if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
+		sourceAccount.Currency == destinationAccount.Currency && transaction.Amount != transaction.RelatedAccountAmount {
+		return errs.ErrTransactionSourceAndDestinationAmountNotEqual
+	}
+
+	// Get and verify category
+	err = s.isCategoryValid(sess, transaction)
+
+	if err != nil {
+		return err
+	}
+
+	// Get and verify tags
+	err = s.isTagsValid(sess, transaction, transactionTagIndexes, tagIds)
+
+	if err != nil {
+		return err
+	}
+
+	// Get and verify pictures
+	err = s.isPicturesValid(sess, transaction, pictureIds)
+
+	if err != nil {
+		return err
+	}
+
+	// Verify balance modification transaction and calculate real amount
+	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+		otherTransactionExists, err := sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND account_id=?", transaction.Uid, false, sourceAccount.AccountId).Limit(1).Exist(&models.Transaction{})
+
+		if err != nil {
+			return err
+		} else if otherTransactionExists {
+			return errs.ErrBalanceModificationTransactionCannotAddWhenNotEmpty
+		}
+
+		transaction.RelatedAccountId = transaction.AccountId
+		transaction.RelatedAccountAmount = transaction.Amount - sourceAccount.Balance
+	}
+
+	// Insert transaction row
+	var relatedTransaction *models.Transaction
+
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		relatedTransaction = s.GetRelatedTransferTransaction(transaction)
+	}
+
+	createdRows, err := sess.Insert(transaction)
+
+	if err != nil || createdRows < 1 { // maybe another transaction has same time
+		sameSecondLatestTransaction := &models.Transaction{}
+		minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+		maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
+
+		has, err := sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+
+		if err != nil {
+			return err
+		} else if !has {
+			return errs.ErrDatabaseOperationFailed
+		} else if sameSecondLatestTransaction.TransactionTime == maxTransactionTime-1 {
+			return errs.ErrTooMuchTransactionInOneSecond
+		}
+
+		transaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
+		createdRows, err := sess.Insert(transaction)
+
+		if err != nil {
+			return err
+		} else if createdRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	}
+
+	if relatedTransaction != nil {
+		relatedTransaction.TransactionTime = transaction.TransactionTime + 1
+
+		if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(relatedTransaction.TransactionTime) {
+			return errs.ErrTooMuchTransactionInOneSecond
+		}
+
+		createdRows, err := sess.Insert(relatedTransaction)
+
+		if err != nil {
+			return err
+		} else if createdRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	}
+
+	err = nil
+
+	// Insert transaction tag index
+	if len(transactionTagIndexes) > 0 {
+		for i := 0; i < len(transactionTagIndexes); i++ {
+			transactionTagIndex := transactionTagIndexes[i]
+			transactionTagIndex.TransactionTime = transaction.TransactionTime
+
+			_, err := sess.Insert(transactionTagIndex)
+
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Update transaction picture
+	if len(pictureIds) > 0 {
+		_, err = sess.Cols("transaction_id", "updated_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", transaction.Uid, false, models.TransactionPictureNewPictureTransactionId).In("picture_id", pictureIds).Update(pictureUpdateModel)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	// Update account table
+	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+		sourceAccount.UpdatedUnixTime = time.Now().Unix()
+		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
+		sourceAccount.UpdatedUnixTime = time.Now().Unix()
+		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+		sourceAccount.UpdatedUnixTime = time.Now().Unix()
+		updatedRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		sourceAccount.UpdatedUnixTime = time.Now().Unix()
+		updatedSourceRows, err := sess.ID(sourceAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance-(%d)", transaction.Amount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", sourceAccount.Uid, false).Update(sourceAccount)
+
+		if err != nil {
+			return err
+		} else if updatedSourceRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+
+		destinationAccount.UpdatedUnixTime = time.Now().Unix()
+		updatedDestinationRows, err := sess.ID(destinationAccount.AccountId).SetExpr("balance", fmt.Sprintf("balance+(%d)", transaction.RelatedAccountAmount)).Cols("updated_unix_time").Where("uid=? AND deleted=?", destinationAccount.Uid, false).Update(destinationAccount)
+
+		if err != nil {
+			return err
+		} else if updatedDestinationRows < 1 {
+			return errs.ErrDatabaseOperationFailed
+		}
+	} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		return errs.ErrTransactionTypeInvalid
+	}
+
+	return err
 }
 
 func (s *TransactionService) getTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagIds []int64, amountFilter string, keyword string, noDuplicated bool) (string, []any) {

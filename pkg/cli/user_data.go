@@ -10,6 +10,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
@@ -19,8 +20,8 @@ const pageCountForDataExport = 1000
 // UserDataCli represents user data cli
 type UserDataCli struct {
 	CliUsingConfig
-	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileExporter
-	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileExporter
+	ezBookKeepingCsvExporter *converters.EzBookKeepingCSVFileConverter
+	ezBookKeepingTsvExporter *converters.EzBookKeepingTSVFileConverter
 	accounts                 *services.AccountService
 	transactions             *services.TransactionService
 	categories               *services.TransactionCategoryService
@@ -37,8 +38,8 @@ var (
 		CliUsingConfig: CliUsingConfig{
 			container: settings.Container,
 		},
-		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileExporter{},
-		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileExporter{},
+		ezBookKeepingCsvExporter: &converters.EzBookKeepingCSVFileConverter{},
+		ezBookKeepingTsvExporter: &converters.EzBookKeepingTSVFileConverter{},
 		accounts:                 services.Accounts,
 		transactions:             services.Transactions,
 		categories:               services.TransactionCategories,
@@ -662,6 +663,73 @@ func (l *UserDataCli) ExportTransaction(c *core.CliContext, username string, fil
 	return result, nil
 }
 
+func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fileType string, data []byte) error {
+	if username == "" {
+		log.BootErrorf(c, "[user_data.ImportTransaction] user name is empty")
+		return errs.ErrUsernameIsEmpty
+	}
+
+	var dataImporter converters.DataConverter
+
+	if fileType == "ezbookkeeping_csv" {
+		dataImporter = l.ezBookKeepingCsvExporter
+	} else if fileType == "ezbookkeeping_tsv" {
+		dataImporter = l.ezBookKeepingTsvExporter
+	} else {
+		return errs.ErrImportFileTypeNotSupported
+	}
+
+	user, err := l.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.ImportTransaction] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	accountMap, categoryMap, tagMap, err := l.getUserEssentialDataForImport(c, user.Uid, username)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.ImportTransaction] failed to get essential data for user \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	newTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.ImportTransaction] failed to parse imported data for \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if len(newTransactions) < 1 {
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are no transactions in import file")
+		return errs.ErrOperationFailed
+	}
+
+	if len(newAccounts) > 0 {
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d accounts need to be created, please create them manually", len(newAccounts))
+		return errs.ErrOperationFailed
+	}
+
+	if len(newCategories) > 0 {
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction categories need to be created, please create them manually", len(newCategories))
+		return errs.ErrOperationFailed
+	}
+
+	if len(newTags) > 0 {
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction tags need to be created, please create them manually", len(newTags))
+		return errs.ErrOperationFailed
+	}
+
+	err = l.transactions.BatchCreateTransactions(c, user.Uid, newTransactions)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.ImportTransaction] failed to create transaction, because %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (l *UserDataCli) getUserIdByUsername(c *core.CliContext, username string) (int64, error) {
 	user, err := l.GetUserByUsername(c, username)
 
@@ -716,6 +784,42 @@ func (l *UserDataCli) getUserEssentialData(c *core.CliContext, uid int64, userna
 	tagIndexesMap = l.tags.GetGroupedTransactionTagIds(tagIndexes)
 
 	return accountMap, categoryMap, tagMap, tagIndexes, tagIndexesMap, nil
+}
+
+func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int64, username string) (accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag, err error) {
+	if uid <= 0 {
+		log.BootErrorf(c, "[user_data.getUserEssentialDataForImport] user uid \"%d\" is invalid", uid)
+		return nil, nil, nil, errs.ErrUserIdInvalid
+	}
+
+	accounts, err := l.accounts.GetAllAccountsByUid(c, uid)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get accounts for user \"%s\", because %s", username, err.Error())
+		return nil, nil, nil, err
+	}
+
+	accountMap = l.accounts.GetAccountNameMapByList(accounts)
+
+	categories, err := l.categories.GetAllCategoriesByUid(c, uid, 0, -1)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get categories for user \"%s\", because %s", username, err.Error())
+		return nil, nil, nil, err
+	}
+
+	categoryMap = l.categories.GetCategoryNameMapByList(categories)
+
+	tags, err := l.tags.GetAllTagsByUid(c, uid)
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get tags for user \"%s\", because %s", username, err.Error())
+		return nil, nil, nil, err
+	}
+
+	tagMap = l.tags.GetTagNameMapByList(tags)
+
+	return accountMap, categoryMap, tagMap, nil
 }
 
 func (l *UserDataCli) checkTransactionAccount(c *core.CliContext, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {

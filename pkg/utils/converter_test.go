@@ -172,3 +172,133 @@ func TestFormatAmount(t *testing.T) {
 	actualValue = FormatAmount(-1234)
 	assert.Equal(t, expectedValue, actualValue)
 }
+
+func TestParseAmount(t *testing.T) {
+	expectedValue := int64(0)
+	actualValue, err := ParseAmount("")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(0)
+	actualValue, err = ParseAmount("0")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(0)
+	actualValue, err = ParseAmount("-0")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(0)
+	actualValue, err = ParseAmount("0.00")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(0)
+	actualValue, err = ParseAmount("-0.00")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(1)
+	actualValue, err = ParseAmount("0.01")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-1)
+	actualValue, err = ParseAmount("-0.01")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(10)
+	actualValue, err = ParseAmount("0.10")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-10)
+	actualValue, err = ParseAmount("-0.10")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(10)
+	actualValue, err = ParseAmount("0.1")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-10)
+	actualValue, err = ParseAmount("-0.1")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(12)
+	actualValue, err = ParseAmount("0.12")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-12)
+	actualValue, err = ParseAmount("-0.12")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(100)
+	actualValue, err = ParseAmount("1")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-100)
+	actualValue, err = ParseAmount("-1")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(120)
+	actualValue, err = ParseAmount("1.2")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-120)
+	actualValue, err = ParseAmount("-1.2")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(123)
+	actualValue, err = ParseAmount("1.23")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-123)
+	actualValue, err = ParseAmount("-1.23")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(1234)
+	actualValue, err = ParseAmount("12.34")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(-1234)
+	actualValue, err = ParseAmount("-12.34")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestParseAmount_InvalidAmount(t *testing.T) {
+	_, err := ParseAmount("-")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("--1")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("-.-1")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("0.-")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("0.-1")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("1.2.3")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("1.234")
+	assert.NotNil(t, err)
+}

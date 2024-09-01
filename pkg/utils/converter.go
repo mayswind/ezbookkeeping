@@ -1,6 +1,11 @@
 package utils
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+)
 
 // IntToString returns the textual representation of this number
 func IntToString(num int) string {
@@ -122,4 +127,66 @@ func FormatAmount(amount int64) string {
 	}
 
 	return integer + "." + decimals
+}
+
+// ParseAmount parses a textual representation of amount
+func ParseAmount(amount string) (int64, error) {
+	if len(amount) < 1 {
+		return 0, nil
+	}
+
+	sign := int64(1)
+
+	if amount[0] == '-' {
+		amount = amount[1:]
+		sign = -1
+	}
+
+	if len(amount) < 1 {
+		return 0, errs.ErrNumberInvalid
+	}
+
+	items := strings.Split(amount, ".")
+
+	if len(items) > 2 {
+		return 0, errs.ErrNumberInvalid
+	}
+
+	var err error
+	integer := int64(0)
+	decimals := int64(0)
+
+	if len(items[0]) > 0 {
+		integer, err = StringToInt64(items[0])
+
+		if err != nil {
+			return 0, err
+		}
+
+		if integer < 0 {
+			return 0, errs.ErrNumberInvalid
+		}
+	}
+
+	if len(items) == 2 {
+		if len(items[1]) > 2 {
+			return 0, errs.ErrNumberInvalid
+		}
+
+		decimals, err = StringToInt64(items[1])
+
+		if err != nil {
+			return 0, err
+		}
+
+		if decimals < 0 {
+			return 0, errs.ErrNumberInvalid
+		}
+
+		if len(items[1]) == 1 {
+			decimals = decimals * 10
+		}
+	}
+
+	return sign*integer*100 + sign*decimals, nil
 }

@@ -217,7 +217,7 @@ func TestGenerateUuids_Count0(t *testing.T) {
 func TestGenerateUuids_Count255(t *testing.T) {
 	expectedUuidServerId := uint8(90)
 	expectedUuidType := UUID_TYPE_TRANSACTION
-	expectedUuidCount := uint8(255)
+	expectedUuidCount := uint16(255)
 
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: expectedUuidServerId})
 
@@ -250,7 +250,7 @@ func TestGenerateUuids_Count255(t *testing.T) {
 func TestGenerateUuids_30TimesIn3Seconds(t *testing.T) {
 	expectedUuidServerId := uint8(90)
 	expectedUuidType := UUID_TYPE_TRANSACTION
-	expectedUuidCount := uint8(255)
+	expectedUuidCount := uint16(255)
 
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: expectedUuidServerId})
 
@@ -289,7 +289,7 @@ func TestGenerateUuids_30TimesIn3Seconds(t *testing.T) {
 
 func TestGenerateUuids_20000TimesConcurrent(t *testing.T) {
 	concurrentCount := 10
-	expectedUuidCount := uint8(20)
+	expectedUuidCount := uint16(20)
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 3})
 	var mutex sync.Mutex
 	var generatedIds sync.Map
@@ -338,7 +338,7 @@ func TestGenerateUuids_20000TimesConcurrent(t *testing.T) {
 
 func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 	concurrentCount := 10
-	expectedUuidCount := uint8(250)
+	expectedUuidCount := uint16(250)
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 3})
 	var mutex sync.Mutex
 	var generatedIds sync.Map
@@ -391,7 +391,7 @@ func TestGenerateUuids_1000000TimesConcurrent(t *testing.T) {
 
 func TestGenerateUuid_Over524287Times(t *testing.T) {
 	generator, _ := NewInternalUuidGenerator(&settings.Config{UuidServerId: 1})
-	onceGenerateCount := uint8(255)
+	onceGenerateCount := uint16(255)
 	generationStartUnixTime := time.Now().Unix()
 
 	for i := 0; i < 2057; i++ { // 2056*255=524280, 2057*255=524,535 (only can generates 524,287 uuids per second)

@@ -33,6 +33,6 @@ func (u *UuidContainer) GenerateUuid(uuidType UuidType) int64 {
 }
 
 // GenerateUuids returns new uuids by the current uuid generator
-func (u *UuidContainer) GenerateUuids(uuidType UuidType, count uint8) []int64 {
+func (u *UuidContainer) GenerateUuids(uuidType UuidType, count uint16) []int64 {
 	return u.Current.GenerateUuids(uuidType, count)
 }

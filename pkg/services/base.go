@@ -88,7 +88,7 @@ func (s *ServiceUsingUuid) GenerateUuid(uuidType uuid.UuidType) int64 {
 }
 
 // GenerateUuids generates new uuids according to given uuid type and count
-func (s *ServiceUsingUuid) GenerateUuids(uuidType uuid.UuidType, count uint8) []int64 {
+func (s *ServiceUsingUuid) GenerateUuids(uuidType uuid.UuidType, count uint16) []int64 {
 	return s.container.GenerateUuids(uuidType, count)
 }
 

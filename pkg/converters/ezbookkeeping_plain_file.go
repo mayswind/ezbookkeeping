@@ -441,10 +441,6 @@ func (e *EzBookKeepingPlainFileConverter) getTags(transactionId int64, allTagInd
 	var ret strings.Builder
 
 	for i := 0; i < len(tagIndexes); i++ {
-		if i > 0 {
-			ret.WriteString(transactionTagSeparator)
-		}
-
 		tagIndex := tagIndexes[i]
 		tag, exists := tagMap[tagIndex]
 
@@ -452,7 +448,11 @@ func (e *EzBookKeepingPlainFileConverter) getTags(transactionId int64, allTagInd
 			continue
 		}
 
-		ret.WriteString(tag.Name)
+		if ret.Len() > 0 {
+			ret.WriteString(transactionTagSeparator)
+		}
+
+		ret.WriteString(strings.Replace(tag.Name, transactionTagSeparator, " ", -1))
 	}
 
 	return ret.String()
@@ -461,6 +461,7 @@ func (e *EzBookKeepingPlainFileConverter) getTags(transactionId int64, allTagInd
 func (e *EzBookKeepingPlainFileConverter) replaceDelimiters(text string, separator string) string {
 	text = strings.Replace(text, separator, " ", -1)
 	text = strings.Replace(text, "\r\n", " ", -1)
+	text = strings.Replace(text, "\r", " ", -1)
 	text = strings.Replace(text, "\n", " ", -1)
 
 	return text

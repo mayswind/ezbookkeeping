@@ -281,23 +281,23 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "default_currency")
 	}
 
-	if models.WEEKDAY_SUNDAY <= user.FirstDayOfWeek && user.FirstDayOfWeek <= models.WEEKDAY_SATURDAY {
+	if core.WEEKDAY_SUNDAY <= user.FirstDayOfWeek && user.FirstDayOfWeek <= core.WEEKDAY_SATURDAY {
 		updateCols = append(updateCols, "first_day_of_week")
 	}
 
-	if models.LONG_DATE_FORMAT_DEFAULT <= user.LongDateFormat && user.LongDateFormat <= models.LONG_DATE_FORMAT_D_M_YYYY {
+	if core.LONG_DATE_FORMAT_DEFAULT <= user.LongDateFormat && user.LongDateFormat <= core.LONG_DATE_FORMAT_D_M_YYYY {
 		updateCols = append(updateCols, "long_date_format")
 	}
 
-	if models.SHORT_DATE_FORMAT_DEFAULT <= user.ShortDateFormat && user.ShortDateFormat <= models.SHORT_DATE_FORMAT_D_M_YYYY {
+	if core.SHORT_DATE_FORMAT_DEFAULT <= user.ShortDateFormat && user.ShortDateFormat <= core.SHORT_DATE_FORMAT_D_M_YYYY {
 		updateCols = append(updateCols, "short_date_format")
 	}
 
-	if models.LONG_TIME_FORMAT_DEFAULT <= user.LongTimeFormat && user.LongTimeFormat <= models.LONG_TIME_FORMAT_HH_MM_SS_A {
+	if core.LONG_TIME_FORMAT_DEFAULT <= user.LongTimeFormat && user.LongTimeFormat <= core.LONG_TIME_FORMAT_HH_MM_SS_A {
 		updateCols = append(updateCols, "long_time_format")
 	}
 
-	if models.SHORT_TIME_FORMAT_DEFAULT <= user.ShortTimeFormat && user.ShortTimeFormat <= models.SHORT_TIME_FORMAT_HH_MM_A {
+	if core.SHORT_TIME_FORMAT_DEFAULT <= user.ShortTimeFormat && user.ShortTimeFormat <= core.SHORT_TIME_FORMAT_HH_MM_A {
 		updateCols = append(updateCols, "short_time_format")
 	}
 

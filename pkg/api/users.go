@@ -330,7 +330,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.FirstDayOfWeek = *userUpdateReq.FirstDayOfWeek
 		anythingUpdate = true
 	} else {
-		userNew.FirstDayOfWeek = models.WEEKDAY_INVALID
+		userNew.FirstDayOfWeek = core.WEEKDAY_INVALID
 	}
 
 	if userUpdateReq.LongDateFormat != nil && *userUpdateReq.LongDateFormat != user.LongDateFormat {
@@ -338,7 +338,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.LongDateFormat = *userUpdateReq.LongDateFormat
 		anythingUpdate = true
 	} else {
-		userNew.LongDateFormat = models.LONG_DATE_FORMAT_INVALID
+		userNew.LongDateFormat = core.LONG_DATE_FORMAT_INVALID
 	}
 
 	if userUpdateReq.ShortDateFormat != nil && *userUpdateReq.ShortDateFormat != user.ShortDateFormat {
@@ -346,7 +346,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.ShortDateFormat = *userUpdateReq.ShortDateFormat
 		anythingUpdate = true
 	} else {
-		userNew.ShortDateFormat = models.SHORT_DATE_FORMAT_INVALID
+		userNew.ShortDateFormat = core.SHORT_DATE_FORMAT_INVALID
 	}
 
 	if userUpdateReq.LongTimeFormat != nil && *userUpdateReq.LongTimeFormat != user.LongTimeFormat {
@@ -354,7 +354,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.LongTimeFormat = *userUpdateReq.LongTimeFormat
 		anythingUpdate = true
 	} else {
-		userNew.LongTimeFormat = models.LONG_TIME_FORMAT_INVALID
+		userNew.LongTimeFormat = core.LONG_TIME_FORMAT_INVALID
 	}
 
 	if userUpdateReq.ShortTimeFormat != nil && *userUpdateReq.ShortTimeFormat != user.ShortTimeFormat {
@@ -362,7 +362,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.ShortTimeFormat = *userUpdateReq.ShortTimeFormat
 		anythingUpdate = true
 	} else {
-		userNew.ShortTimeFormat = models.SHORT_TIME_FORMAT_INVALID
+		userNew.ShortTimeFormat = core.SHORT_TIME_FORMAT_INVALID
 	}
 
 	if userUpdateReq.DecimalSeparator != nil && *userUpdateReq.DecimalSeparator != user.DecimalSeparator {

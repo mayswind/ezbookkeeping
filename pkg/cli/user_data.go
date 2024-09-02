@@ -89,7 +89,7 @@ func (l *UserDataCli) AddNewUser(c *core.CliContext, username string, email stri
 		Nickname:             nickname,
 		Password:             password,
 		DefaultCurrency:      defaultCurrency,
-		FirstDayOfWeek:       models.WEEKDAY_SUNDAY,
+		FirstDayOfWeek:       core.WEEKDAY_SUNDAY,
 		TransactionEditScope: models.TRANSACTION_EDIT_SCOPE_ALL,
 	}
 

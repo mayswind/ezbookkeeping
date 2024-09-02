@@ -93,11 +93,11 @@ type User struct {
 	TransactionEditScope TransactionEditScope     `xorm:"TINYINT NOT NULL"`
 	Language             string                   `xorm:"VARCHAR(10)"`
 	DefaultCurrency      string                   `xorm:"VARCHAR(3) NOT NULL"`
-	FirstDayOfWeek       WeekDay                  `xorm:"TINYINT NOT NULL"`
-	LongDateFormat       LongDateFormat           `xorm:"TINYINT"`
-	ShortDateFormat      ShortDateFormat          `xorm:"TINYINT"`
-	LongTimeFormat       LongTimeFormat           `xorm:"TINYINT"`
-	ShortTimeFormat      ShortTimeFormat          `xorm:"TINYINT"`
+	FirstDayOfWeek       core.WeekDay             `xorm:"TINYINT NOT NULL"`
+	LongDateFormat       core.LongDateFormat      `xorm:"TINYINT"`
+	ShortDateFormat      core.ShortDateFormat     `xorm:"TINYINT"`
+	LongTimeFormat       core.LongTimeFormat      `xorm:"TINYINT"`
+	ShortTimeFormat      core.ShortTimeFormat     `xorm:"TINYINT"`
 	DecimalSeparator     core.DecimalSeparator    `xorm:"TINYINT"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `xorm:"TINYINT"`
 	DigitGrouping        core.DigitGroupingType   `xorm:"TINYINT"`
@@ -124,11 +124,11 @@ type UserBasicInfo struct {
 	TransactionEditScope TransactionEditScope     `json:"transactionEditScope"`
 	Language             string                   `json:"language"`
 	DefaultCurrency      string                   `json:"defaultCurrency"`
-	FirstDayOfWeek       WeekDay                  `json:"firstDayOfWeek"`
-	LongDateFormat       LongDateFormat           `json:"longDateFormat"`
-	ShortDateFormat      ShortDateFormat          `json:"shortDateFormat"`
-	LongTimeFormat       LongTimeFormat           `json:"longTimeFormat"`
-	ShortTimeFormat      ShortTimeFormat          `json:"shortTimeFormat"`
+	FirstDayOfWeek       core.WeekDay             `json:"firstDayOfWeek"`
+	LongDateFormat       core.LongDateFormat      `json:"longDateFormat"`
+	ShortDateFormat      core.ShortDateFormat     `json:"shortDateFormat"`
+	LongTimeFormat       core.LongTimeFormat      `json:"longTimeFormat"`
+	ShortTimeFormat      core.ShortTimeFormat     `json:"shortTimeFormat"`
 	DecimalSeparator     core.DecimalSeparator    `json:"decimalSeparator"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `json:"digitGroupingSymbol"`
 	DigitGrouping        core.DigitGroupingType   `json:"digitGrouping"`
@@ -146,13 +146,13 @@ type UserLoginRequest struct {
 
 // UserRegisterRequest represents all parameters of user registering request
 type UserRegisterRequest struct {
-	Username        string  `json:"username" binding:"required,notBlank,max=32,validUsername"`
-	Email           string  `json:"email" binding:"required,notBlank,max=100,validEmail"`
-	Nickname        string  `json:"nickname" binding:"required,notBlank,max=64"`
-	Password        string  `json:"password" binding:"required,min=6,max=128"`
-	Language        string  `json:"language" binding:"required,min=2,max=16"`
-	DefaultCurrency string  `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
-	FirstDayOfWeek  WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	Username        string       `json:"username" binding:"required,notBlank,max=32,validUsername"`
+	Email           string       `json:"email" binding:"required,notBlank,max=100,validEmail"`
+	Nickname        string       `json:"nickname" binding:"required,notBlank,max=64"`
+	Password        string       `json:"password" binding:"required,min=6,max=128"`
+	Language        string       `json:"language" binding:"required,min=2,max=16"`
+	DefaultCurrency string       `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
+	FirstDayOfWeek  core.WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
 	TransactionCategoryCreateBatchRequest
 }
 
@@ -184,11 +184,11 @@ type UserProfileUpdateRequest struct {
 	TransactionEditScope *TransactionEditScope     `json:"transactionEditScope" binding:"omitempty,min=0,max=6"`
 	Language             string                    `json:"language" binding:"omitempty,min=2,max=16"`
 	DefaultCurrency      string                    `json:"defaultCurrency" binding:"omitempty,len=3,validCurrency"`
-	FirstDayOfWeek       *WeekDay                  `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
-	LongDateFormat       *LongDateFormat           `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
-	ShortDateFormat      *ShortDateFormat          `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
-	LongTimeFormat       *LongTimeFormat           `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
-	ShortTimeFormat      *ShortTimeFormat          `json:"shortTimeFormat" binding:"omitempty,min=0,max=3"`
+	FirstDayOfWeek       *core.WeekDay             `json:"firstDayOfWeek" binding:"omitempty,min=0,max=6"`
+	LongDateFormat       *core.LongDateFormat      `json:"longDateFormat" binding:"omitempty,min=0,max=3"`
+	ShortDateFormat      *core.ShortDateFormat     `json:"shortDateFormat" binding:"omitempty,min=0,max=3"`
+	LongTimeFormat       *core.LongTimeFormat      `json:"longTimeFormat" binding:"omitempty,min=0,max=3"`
+	ShortTimeFormat      *core.ShortTimeFormat     `json:"shortTimeFormat" binding:"omitempty,min=0,max=3"`
 	DecimalSeparator     *core.DecimalSeparator    `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *core.DigitGroupingSymbol `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *core.DigitGroupingType   `json:"digitGrouping" binding:"omitempty,min=0,max=2"`

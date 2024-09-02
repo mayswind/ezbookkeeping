@@ -331,6 +331,9 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 			err := s.doCreateTransaction(sess, transaction, nil, nil, nil, nil)
 
 			if err != nil {
+				transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
+				transactionTimeZone := time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
+				log.Errorf(c, "[transactions.BatchCreateTransactions] failed to create trasaction (datetime: %s, type: %s, amount: %d)", utils.FormatUnixTimeToLongDateTime(transactionUnixTime, transactionTimeZone), transaction.Type, transaction.Amount)
 				return err
 			}
 		}

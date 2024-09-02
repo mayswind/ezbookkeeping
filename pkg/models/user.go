@@ -101,7 +101,7 @@ type User struct {
 	DecimalSeparator     core.DecimalSeparator    `xorm:"TINYINT"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `xorm:"TINYINT"`
 	DigitGrouping        core.DigitGroupingType   `xorm:"TINYINT"`
-	CurrencyDisplayType  CurrencyDisplayType      `xorm:"TINYINT"`
+	CurrencyDisplayType  core.CurrencyDisplayType `xorm:"TINYINT"`
 	ExpenseAmountColor   AmountColorType          `xorm:"TINYINT"`
 	IncomeAmountColor    AmountColorType          `xorm:"TINYINT"`
 	Disabled             bool
@@ -132,7 +132,7 @@ type UserBasicInfo struct {
 	DecimalSeparator     core.DecimalSeparator    `json:"decimalSeparator"`
 	DigitGroupingSymbol  core.DigitGroupingSymbol `json:"digitGroupingSymbol"`
 	DigitGrouping        core.DigitGroupingType   `json:"digitGrouping"`
-	CurrencyDisplayType  CurrencyDisplayType      `json:"currencyDisplayType"`
+	CurrencyDisplayType  core.CurrencyDisplayType `json:"currencyDisplayType"`
 	ExpenseAmountColor   AmountColorType          `json:"expenseAmountColor"`
 	IncomeAmountColor    AmountColorType          `json:"incomeAmountColor"`
 	EmailVerified        bool                     `json:"emailVerified"`
@@ -192,7 +192,7 @@ type UserProfileUpdateRequest struct {
 	DecimalSeparator     *core.DecimalSeparator    `json:"decimalSeparator" binding:"omitempty,min=0,max=3"`
 	DigitGroupingSymbol  *core.DigitGroupingSymbol `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping        *core.DigitGroupingType   `json:"digitGrouping" binding:"omitempty,min=0,max=2"`
-	CurrencyDisplayType  *CurrencyDisplayType      `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
+	CurrencyDisplayType  *core.CurrencyDisplayType `json:"currencyDisplayType" binding:"omitempty,min=0,max=11"`
 	ExpenseAmountColor   *AmountColorType          `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
 	IncomeAmountColor    *AmountColorType          `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
 }

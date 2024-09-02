@@ -394,7 +394,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		userNew.CurrencyDisplayType = *userUpdateReq.CurrencyDisplayType
 		anythingUpdate = true
 	} else {
-		userNew.CurrencyDisplayType = models.CURRENCY_DISPLAY_TYPE_INVALID
+		userNew.CurrencyDisplayType = core.CURRENCY_DISPLAY_TYPE_INVALID
 	}
 
 	if userUpdateReq.ExpenseAmountColor != nil && *userUpdateReq.ExpenseAmountColor != user.ExpenseAmountColor {

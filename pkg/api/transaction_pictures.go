@@ -55,6 +55,11 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 		return nil, errs.ErrTransactionPictureIsEmpty
 	}
 
+	if pictureFiles[0].Size > int64(a.CurrentConfig().MaxTransactionPictureFileSize) {
+		log.Warnf(c, "[transaction_pictures.TransactionPictureUploadHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of transaction picture for user \"uid:%d\"", pictureFiles[0].Size, a.CurrentConfig().MaxTransactionPictureFileSize, uid)
+		return nil, errs.ErrExceedMaxTransactionPictureFileSize
+	}
+
 	fileExtension := utils.GetFileNameExtension(pictureFiles[0].Filename)
 
 	if utils.GetImageContentType(fileExtension) == "" {

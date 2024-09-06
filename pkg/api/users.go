@@ -544,6 +544,11 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrUserAvatarIsEmpty
 	}
 
+	if avatarFiles[0].Size > int64(a.CurrentConfig().MaxAvatarFileSize) {
+		log.Warnf(c, "[users.UserUpdateAvatarHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of user avatar for user \"uid:%d\"", avatarFiles[0].Size, a.CurrentConfig().MaxAvatarFileSize, uid)
+		return nil, errs.ErrExceedMaxUserAvatarFileSize
+	}
+
 	fileExtension := utils.GetFileNameExtension(avatarFiles[0].Filename)
 
 	if utils.GetImageContentType(fileExtension) == "" {

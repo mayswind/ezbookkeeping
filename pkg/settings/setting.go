@@ -135,6 +135,9 @@ const (
 	defaultEmailVerifyTokenExpiredTime   uint32 = 3600    // 60 minutes
 	defaultPasswordResetTokenExpiredTime uint32 = 3600    // 60 minutes
 
+	defaultTransactionPictureFileMaxSize uint32 = 10485760 // 10MB
+	defaultUserAvatarFileMaxSize         uint32 = 1048576  // 1MB
+
 	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
 )
 
@@ -273,8 +276,10 @@ type Config struct {
 	EnableUserForgetPassword         bool
 	ForgetPasswordRequireVerifyEmail bool
 	EnableTransactionPictures        bool
+	MaxTransactionPictureFileSize    uint32
 	EnableScheduledTransaction       bool
 	AvatarProvider                   core.UserAvatarProviderType
+	MaxAvatarFileSize                uint32
 
 	// Data
 	EnableDataExport bool
@@ -743,6 +748,7 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
 	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
 	config.EnableTransactionPictures = getConfigItemBoolValue(configFile, sectionName, "enable_transaction_picture", false)
+	config.MaxTransactionPictureFileSize = getConfigItemUint32Value(configFile, sectionName, "max_transaction_picture_size", defaultTransactionPictureFileMaxSize)
 	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)
 
 	if getConfigItemStringValue(configFile, sectionName, "avatar_provider") == string(core.USER_AVATAR_PROVIDER_INTERNAL) {
@@ -754,6 +760,8 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	} else {
 		return errs.ErrInvalidAvatarProvider
 	}
+
+	config.MaxAvatarFileSize = getConfigItemUint32Value(configFile, sectionName, "max_user_avatar_size", defaultUserAvatarFileMaxSize)
 
 	return nil
 }

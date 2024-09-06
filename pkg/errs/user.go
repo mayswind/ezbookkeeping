@@ -36,4 +36,5 @@ var (
 	ErrUserAvatarNoExists                                  = NewNormalError(NormalSubcategoryUser, 27, http.StatusNotFound, "user avatar not exists")
 	ErrUserAvatarNotSet                                    = NewNormalError(NormalSubcategoryUser, 28, http.StatusNotFound, "user avatar not set")
 	ErrUserAvatarExtensionInvalid                          = NewNormalError(NormalSubcategoryUser, 29, http.StatusNotFound, "user avatar file extension invalid")
+	ErrExceedMaxUserAvatarFileSize                         = NewNormalError(NormalSubcategoryUser, 30, http.StatusBadRequest, "exceed the maximum size of user avatar file")
 )

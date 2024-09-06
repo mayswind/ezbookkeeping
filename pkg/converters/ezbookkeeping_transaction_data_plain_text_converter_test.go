@@ -10,7 +10,7 @@ import (
 )
 
 func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	transactions := make([]*models.Transaction, 3)
 	transactions[0] = &models.Transaction{
@@ -116,21 +116,21 @@ func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
 		"2024-09-01 12:34:56,+08:00,Income,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,123.450000 45.670000,Test Tag;Test Tag2,Hello World\n" +
 		"2024-09-01 12:34:56,+00:00,Expense,Test Category2,Test Sub Category2,Test Account,CNY,-0.10,,,,,Test Tag,Foo#Bar\n" +
 		"2024-09-01 12:34:56,-05:00,Transfer,Test Category3,Test Sub Category3,Test Account,CNY,123.45,Test Account2,USD,17.35,,Test Tag2,T\te s t test\n"
-	actualContent, err := converter.toExportedContent(123, ",", transactions, accountMap, categoryMap, tagMap, allTagIndexes)
+	actualContent, err := converter.ToExportedContent(123, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedContent, string(actualContent))
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 00:00:00,Balance Modification,,Test Account,123.45,,\n"+
 		"2024-09-01 01:23:45,Income,Test Category,Test Account,0.12,,\n"+
 		"2024-09-01 12:34:56,Expense,Test Category2,Test Account,1.00,,\n"+
@@ -182,44 +182,44 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01T12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"09/01/2024 12:34:56,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Type,Test Category,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,+08:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -227,57 +227,57 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Asia/Shanghai,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidSubCategoryName(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Expense,,Test Account,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountName(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,,123.45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,,123.45"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, allNewAccounts, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	allNewTransactions, allNewAccounts, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,Test Category,Test Account,USD,123.45,,,\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category2,Test Account,USD,1.23,Test Account2,EUR,1.10"), 0, nil, nil, nil)
 
@@ -296,67 +296,67 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurre
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account,CNY,1.23,Test Account2,EUR,1.10"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category3,Test Account2,CNY,1.23,Test Account,EUR,1.10"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Balance Modification,Test Category,Test Account,XXX,123.45,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
 		"2024-09-01 01:23:45,Transfer,Test Category,Test Account,USD,123.45,Test Account2,XXX,123.45"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123 45,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2,123 45"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,123.45 45.56"), 0, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -366,38 +366,38 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLo
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidGeographicLocation(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1"), 0, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, float64(0), allNewTransactions[0].GeoLongitude)
 	assert.Equal(t, float64(0), allNewTransactions[0].GeoLatitude)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,a b"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Geographic Location\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,1 "), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, allNewTags, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Tags\n"+
+	_, _, _, allNewTags, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Tags\n"+
 		"2024-09-01 00:00:00,Balance Modification,,Test Account,123.45,,,foo;;bar.;#test;hello\tworld;;"), 0, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -418,14 +418,14 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1234567890,
 		DefaultCurrency: "CNY",
 	}
 
-	allNewTransactions, _, _, _, err := converter.parseImportedData(user, ",", []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Description\n"+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Description\n"+
 		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,foo    bar\t#test"), 0, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -434,45 +434,45 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := &EzBookKeepingPlainFileConverter{}
+	converter := EzBookKeepingTransactionDataCSVFileConverter
 
 	user := &models.User{
 		Uid:             1,
 		DefaultCurrency: "CNY",
 	}
 
-	_, _, _, _, err := converter.parseImportedData(user, ",", []byte(""), 0, nil, nil, nil)
+	_, _, _, _, err := converter.ParseImportedData(user, []byte(""), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Type,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Type,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Category,Sub Category,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Timezone,Type,Category,Sub Category,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
-	_, _, _, _, err = converter.parseImportedData(user, ",", []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
+	_, _, _, _, err = converter.ParseImportedData(user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }

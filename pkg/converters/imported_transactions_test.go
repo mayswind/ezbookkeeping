@@ -10,7 +10,7 @@ import (
 )
 
 func TestImportTransactionSliceLess(t *testing.T) {
-	var transactionSlice ImportTransactionSlice
+	var transactionSlice ImportedTransactionSlice
 	transactionSlice = append(transactionSlice, &models.Transaction{
 		TransactionId:   1,
 		Type:            models.TRANSACTION_DB_TYPE_EXPENSE,

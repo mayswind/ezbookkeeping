@@ -29,5 +29,4 @@ var (
 	ErrCannotUseHiddenTransactionTag                       = NewNormalError(NormalSubcategoryTransaction, 22, http.StatusBadRequest, "cannot use hidden transaction tag")
 	ErrTransactionHasTooManyTags                           = NewNormalError(NormalSubcategoryTransaction, 23, http.StatusBadRequest, "transaction has too many tags")
 	ErrTransactionHasTooManyPictures                       = NewNormalError(NormalSubcategoryTransaction, 24, http.StatusBadRequest, "transaction has too many pictures")
-	ErrExceedMaxTransactionPictureFileSize                 = NewNormalError(NormalSubcategoryTransaction, 25, http.StatusBadRequest, "exceed the maximum size of transaction picture file")
 )

@@ -6,7 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
@@ -44,7 +46,7 @@ type DataTableTransactionDataConverter struct {
 	transactionTagSeparator    string
 }
 
-func (c *DataTableTransactionDataConverter) buildExportedContent(dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
+func (c *DataTableTransactionDataConverter) buildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 
@@ -80,8 +82,9 @@ func (c *DataTableTransactionDataConverter) buildExportedContent(dataTableBuilde
 	return nil
 }
 
-func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.DataRowCount() < 1 {
+		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
 		return nil, nil, nil, nil, errs.ErrOperationFailed
 	}
 
@@ -108,6 +111,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 
 	if !timeColumnExists || !typeColumnExists || !subCategoryColumnExists ||
 		!accountColumnExists || !amountColumnExists || !account2ColumnExists || !amount2ColumnExists {
+		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
 		return nil, nil, nil, nil, errs.ErrFormatInvalid
 	}
 
@@ -129,8 +133,10 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 	allNewTags := make([]*models.TransactionTag, 0)
 
 	dataRowIterator := dataTable.DataRowIterator()
+	dataRowIndex := 0
 
 	for dataRowIterator.HasNext() {
+		dataRowIndex++
 		dataRow := dataRowIterator.Next()
 		columnCount := dataRow.ColumnCount()
 
@@ -139,6 +145,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 		}
 
 		if columnCount < len(headerLineItems) {
+			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse data row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", dataRowIndex, user.Uid, columnCount, len(headerLineItems))
 			return nil, nil, nil, nil, errs.ErrFormatInvalid
 		}
 
@@ -148,6 +155,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 			transactionTimezone, err := utils.ParseFromTimezoneOffset(dataRow.GetData(timezoneColumnIdx))
 
 			if err != nil {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse time zone \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(timezoneColumnIdx), dataRowIndex, user.Uid, err.Error())
 				return nil, nil, nil, nil, err
 			}
 
@@ -157,12 +165,14 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 		transactionTime, err := utils.ParseFromLongDateTime(dataRow.GetData(timeColumnIdx), timezoneOffset)
 
 		if err != nil {
+			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse time \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(timeColumnIdx), dataRowIndex, user.Uid, err.Error())
 			return nil, nil, nil, nil, err
 		}
 
 		transactionDbType, err := c.getTransactionDbType(dataRow.GetData(typeColumnIdx))
 
 		if err != nil {
+			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse transaction type \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(typeColumnIdx), dataRowIndex, user.Uid, err.Error())
 			return nil, nil, nil, nil, err
 		}
 
@@ -172,12 +182,14 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 			transactionCategoryType, err := c.getTransactionCategoryType(transactionDbType)
 
 			if err != nil {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse transaction category type in data row \"index:%d\" for user \"uid:%d\", because %s", dataRowIndex, user.Uid, err.Error())
 				return nil, nil, nil, nil, err
 			}
 
 			subCategoryName := dataRow.GetData(subCategoryColumnIdx)
 
 			if subCategoryName == "" {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] sub category type is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
 				return nil, nil, nil, nil, errs.ErrFormatInvalid
 			}
 
@@ -195,6 +207,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 		accountName := dataRow.GetData(accountColumnIdx)
 
 		if accountName == "" {
+			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account name is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
 			return nil, nil, nil, nil, errs.ErrFormatInvalid
 		}
 
@@ -207,6 +220,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 				currency = dataRow.GetData(accountCurrencyColumnIdx)
 
 				if _, ok := validators.AllCurrencyNames[currency]; !ok {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", currency, dataRowIndex, user.Uid)
 					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 				}
 			}
@@ -218,6 +232,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 
 		if accountCurrencyColumnExists {
 			if account.Currency != dataRow.GetData(accountCurrencyColumnIdx) {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", dataRow.GetData(accountCurrencyColumnIdx), dataRowIndex, account.Currency, user.Uid)
 				return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 			}
 		}
@@ -225,6 +240,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 		amount, err := utils.ParseAmount(dataRow.GetData(amountColumnIdx))
 
 		if err != nil {
+			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse acmount \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(amountColumnIdx), dataRowIndex, user.Uid, err.Error())
 			return nil, nil, nil, nil, err
 		}
 
@@ -235,6 +251,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 			account2Name := dataRow.GetData(account2ColumnIdx)
 
 			if account2Name == "" {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 name is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
 				return nil, nil, nil, nil, errs.ErrFormatInvalid
 			}
 
@@ -247,6 +264,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 					currency = dataRow.GetData(account2CurrencyColumnIdx)
 
 					if _, ok := validators.AllCurrencyNames[currency]; !ok {
+						log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", currency, dataRowIndex, user.Uid)
 						return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 					}
 				}
@@ -258,6 +276,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 
 			if account2CurrencyColumnExists {
 				if account2.Currency != dataRow.GetData(account2CurrencyColumnIdx) {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", dataRow.GetData(account2CurrencyColumnIdx), dataRowIndex, account2.Currency, user.Uid)
 					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 				}
 			}
@@ -266,6 +285,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 			relatedAccountAmount, err = utils.ParseAmount(dataRow.GetData(amount2ColumnIdx))
 
 			if err != nil {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse acmount2 \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(amount2ColumnIdx), dataRowIndex, user.Uid, err.Error())
 				return nil, nil, nil, nil, err
 			}
 		}
@@ -280,12 +300,14 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 				geoLongitude, err = utils.StringToFloat64(geoLocationItems[0])
 
 				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse geographic location \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(geoLocationIdx), dataRowIndex, user.Uid, err.Error())
 					return nil, nil, nil, nil, err
 				}
 
 				geoLatitude, err = utils.StringToFloat64(geoLocationItems[1])
 
 				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse geographic location \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(geoLocationIdx), dataRowIndex, user.Uid, err.Error())
 					return nil, nil, nil, nil, err
 				}
 			}

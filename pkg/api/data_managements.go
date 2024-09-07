@@ -255,7 +255,7 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		dataExporter = a.ezBookKeepingCsvConverter
 	}
 
-	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)
+	result, err := dataExporter.ToExportedContent(c, uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ExportDataHandler] failed to get csv format exported data for \"uid:%d\", because %s", uid, err.Error())

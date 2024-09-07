@@ -653,7 +653,7 @@ func (l *UserDataCli) ExportTransaction(c *core.CliContext, username string, fil
 		dataExporter = l.ezBookKeepingCsvConverter
 	}
 
-	result, err := dataExporter.ToExportedContent(uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexesMap)
+	result, err := dataExporter.ToExportedContent(c, uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexesMap)
 
 	if err != nil {
 		log.BootErrorf(c, "[user_data.ExportTransaction] failed to get csv format exported data for \"%s\", because %s", username, err.Error())
@@ -693,7 +693,7 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return err
 	}
 
-	newTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
+	newTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(c, user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
 
 	if err != nil {
 		log.BootErrorf(c, "[user_data.ImportTransaction] failed to parse imported data for \"%s\", because %s", username, err.Error())

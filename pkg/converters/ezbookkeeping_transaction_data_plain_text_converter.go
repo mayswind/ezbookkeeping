@@ -1,6 +1,7 @@
 package converters
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
@@ -60,9 +61,9 @@ var ezbookkeepingDataColumns = []DataTableColumn{
 }
 
 // ToExportedContent returns the exported transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
+func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
 	dataTableBuilder := createNewezbookkeepingTransactionPlainTextDataTableBuilder(len(transactions), c.columns, c.dataColumnMapping, c.columnSeparator, c.lineSeparator)
-	err := c.buildExportedContent(dataTableBuilder, uid, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
+	err := c.buildExportedContent(ctx, dataTableBuilder, uid, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
 
 	if err != nil {
 		return nil, err
@@ -72,12 +73,12 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(uid i
 }
 
 // ParseImportedData returns the imported data by parsing the transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	dataTable, err := createNewezbookkeepingTransactionPlainTextDataTable(string(data), c.columnSeparator, c.lineSeparator)
 
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	return c.parseImportedData(user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	return c.parseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
 }

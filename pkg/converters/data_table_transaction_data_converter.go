@@ -134,7 +134,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(user *models.User,
 		dataRow := dataRowIterator.Next()
 		columnCount := dataRow.ColumnCount()
 
-		if columnCount < 1 {
+		if columnCount < 1 || (columnCount == 1 && dataRow.GetData(0) == "") {
 			continue
 		}
 

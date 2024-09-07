@@ -59,7 +59,7 @@ var ezbookkeepingDataColumns = []DataTableColumn{
 	DATA_TABLE_DESCRIPTION,
 }
 
-// ToExportedContent returns the exported plain text transaction data
+// ToExportedContent returns the exported transaction plain text data
 func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
 	dataTableBuilder := createNewezbookkeepingTransactionPlainTextDataTableBuilder(len(transactions), c.columns, c.dataColumnMapping, c.columnSeparator, c.lineSeparator)
 	err := c.buildExportedContent(dataTableBuilder, uid, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
@@ -71,6 +71,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(uid i
 	return []byte(dataTableBuilder.String()), nil
 }
 
+// ParseImportedData returns the imported data by parsing the transaction plain text data
 func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	dataTable, err := createNewezbookkeepingTransactionPlainTextDataTable(string(data), c.columnSeparator, c.lineSeparator)
 

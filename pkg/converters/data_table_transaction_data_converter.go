@@ -82,7 +82,7 @@ func (c *DataTableTransactionDataConverter) buildExportedContent(ctx core.Contex
 	return nil
 }
 
-func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.DataRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
 		return nil, nil, nil, nil, errs.ErrOperationFailed
@@ -127,7 +127,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 		tagMap = make(map[string]*models.TransactionTag)
 	}
 
-	allNewTransactions := make(ImportedTransactionSlice, 0, dataTable.DataRowCount())
+	allNewTransactions := make(models.ImportedTransactionSlice, 0, dataTable.DataRowCount())
 	allNewAccounts := make([]*models.Account, 0)
 	allNewSubCategories := make([]*models.TransactionCategory, 0)
 	allNewTags := make([]*models.TransactionTag, 0)
@@ -177,6 +177,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 		}
 
 		categoryId := int64(0)
+		subCategoryName := ""
 
 		if transactionDbType != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 			transactionCategoryType, err := c.getTransactionCategoryType(transactionDbType)
@@ -186,7 +187,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 				return nil, nil, nil, nil, err
 			}
 
-			subCategoryName := dataRow.GetData(subCategoryColumnIdx)
+			subCategoryName = dataRow.GetData(subCategoryColumnIdx)
 
 			if subCategoryName == "" {
 				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] sub category type is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
@@ -211,30 +212,32 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 			return nil, nil, nil, nil, errs.ErrFormatInvalid
 		}
 
+		accountCurrency := user.DefaultCurrency
+
+		if accountCurrencyColumnExists {
+			accountCurrency = dataRow.GetData(accountCurrencyColumnIdx)
+
+			if _, ok := validators.AllCurrencyNames[accountCurrency]; !ok {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", accountCurrency, dataRowIndex, user.Uid)
+				return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+			}
+		}
+
 		account, exists := accountMap[accountName]
 
 		if !exists {
-			currency := user.DefaultCurrency
-
-			if accountCurrencyColumnExists {
-				currency = dataRow.GetData(accountCurrencyColumnIdx)
-
-				if _, ok := validators.AllCurrencyNames[currency]; !ok {
-					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", currency, dataRowIndex, user.Uid)
-					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
-				}
-			}
-
-			account = c.createNewAccountModel(user.Uid, accountName, currency)
+			account = c.createNewAccountModel(user.Uid, accountName, accountCurrency)
 			allNewAccounts = append(allNewAccounts, account)
 			accountMap[accountName] = account
 		}
 
 		if accountCurrencyColumnExists {
-			if account.Currency != dataRow.GetData(accountCurrencyColumnIdx) {
-				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", dataRow.GetData(accountCurrencyColumnIdx), dataRowIndex, account.Currency, user.Uid)
+			if account.Currency != accountCurrency {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", accountCurrency, dataRowIndex, account.Currency, user.Uid)
 				return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 			}
+		} else if exists {
+			accountCurrency = account.Currency
 		}
 
 		amount, err := utils.ParseAmount(dataRow.GetData(amountColumnIdx))
@@ -246,39 +249,43 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 
 		relatedAccountId := int64(0)
 		relatedAccountAmount := int64(0)
+		account2Name := ""
+		account2Currency := ""
 
 		if transactionDbType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			account2Name := dataRow.GetData(account2ColumnIdx)
+			account2Name = dataRow.GetData(account2ColumnIdx)
 
 			if account2Name == "" {
 				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 name is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
 				return nil, nil, nil, nil, errs.ErrFormatInvalid
 			}
 
+			account2Currency = user.DefaultCurrency
+
+			if account2CurrencyColumnExists {
+				account2Currency = dataRow.GetData(account2CurrencyColumnIdx)
+
+				if _, ok := validators.AllCurrencyNames[account2Currency]; !ok {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", account2Currency, dataRowIndex, user.Uid)
+					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
+				}
+			}
+
 			account2, exists := accountMap[account2Name]
 
 			if !exists {
-				currency := user.DefaultCurrency
-
-				if accountCurrencyColumnExists {
-					currency = dataRow.GetData(account2CurrencyColumnIdx)
-
-					if _, ok := validators.AllCurrencyNames[currency]; !ok {
-						log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 currency \"%s\" is not supported in data row \"index:%d\" for user \"uid:%d\"", currency, dataRowIndex, user.Uid)
-						return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
-					}
-				}
-
-				account2 = c.createNewAccountModel(user.Uid, account2Name, currency)
+				account2 = c.createNewAccountModel(user.Uid, account2Name, account2Currency)
 				allNewAccounts = append(allNewAccounts, account2)
 				accountMap[account2Name] = account2
 			}
 
 			if account2CurrencyColumnExists {
-				if account2.Currency != dataRow.GetData(account2CurrencyColumnIdx) {
-					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", dataRow.GetData(account2CurrencyColumnIdx), dataRowIndex, account2.Currency, user.Uid)
+				if account2.Currency != account2Currency {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", account2Currency, dataRowIndex, account2.Currency, user.Uid)
 					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 				}
+			} else if exists {
+				account2Currency = account2.Currency
 			}
 
 			relatedAccountId = account2.AccountId
@@ -313,11 +320,14 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 			}
 		}
 
-		if tagsColumnExists {
-			tagNames := strings.Split(dataRow.GetData(tagsColumnIdx), c.transactionTagSeparator)
+		var tagIds []string
+		var tagNames []string
 
-			for i := 0; i < len(tagNames); i++ {
-				tagName := tagNames[i]
+		if tagsColumnExists {
+			tagNameItems := strings.Split(dataRow.GetData(tagsColumnIdx), c.transactionTagSeparator)
+
+			for i := 0; i < len(tagNameItems); i++ {
+				tagName := tagNameItems[i]
 
 				if tagName == "" {
 					continue
@@ -330,6 +340,12 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 					allNewTags = append(allNewTags, tag)
 					tagMap[tagName] = tag
 				}
+
+				if tag != nil {
+					tagIds = append(tagIds, utils.Int64ToString(tag.TagId))
+				}
+
+				tagNames = append(tagNames, tagName)
 			}
 		}
 
@@ -339,21 +355,30 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 			description = dataRow.GetData(descriptionColumnIdx)
 		}
 
-		transaction := &models.Transaction{
-			Uid:                  user.Uid,
-			Type:                 transactionDbType,
-			CategoryId:           categoryId,
-			TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
-			TimezoneUtcOffset:    timezoneOffset,
-			AccountId:            account.AccountId,
-			Amount:               amount,
-			HideAmount:           false,
-			RelatedAccountId:     relatedAccountId,
-			RelatedAccountAmount: relatedAccountAmount,
-			Comment:              description,
-			GeoLongitude:         geoLongitude,
-			GeoLatitude:          geoLatitude,
-			CreatedIp:            "127.0.0.1",
+		transaction := &models.ImportTransaction{
+			Transaction: &models.Transaction{
+				Uid:                  user.Uid,
+				Type:                 transactionDbType,
+				CategoryId:           categoryId,
+				TransactionTime:      utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
+				TimezoneUtcOffset:    timezoneOffset,
+				AccountId:            account.AccountId,
+				Amount:               amount,
+				HideAmount:           false,
+				RelatedAccountId:     relatedAccountId,
+				RelatedAccountAmount: relatedAccountAmount,
+				Comment:              description,
+				GeoLongitude:         geoLongitude,
+				GeoLatitude:          geoLatitude,
+				CreatedIp:            "127.0.0.1",
+			},
+			TagIds:                             tagIds,
+			OriginalCategoryName:               subCategoryName,
+			OriginalSourceAccountName:          accountName,
+			OriginalSourceAccountCurrency:      accountCurrency,
+			OriginalDestinationAccountName:     account2Name,
+			OriginalDestinationAccountCurrency: account2Currency,
+			OriginalTagNames:                   tagNames,
 		}
 
 		allNewTransactions = append(allNewTransactions, transaction)

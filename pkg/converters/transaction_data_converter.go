@@ -14,7 +14,7 @@ type TransactionDataExporter interface {
 // TransactionDataImporter defines the structure of transaction data importer
 type TransactionDataImporter interface {
 	// ParseImportedData returns the imported data
-	ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error)
+	ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error)
 }
 
 // TransactionDataConverter defines the structure of transaction data converter

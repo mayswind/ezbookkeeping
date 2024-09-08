@@ -2,8 +2,8 @@
     <div class="d-flex" :style="`min-width: ${minWidth}px`" v-if="minWidth"></div>
     <v-slide-group class="slide-group-with-stepper mb-10 hidden-xs" show-arrows>
         <v-slide-group-item :key="idx" v-for="(step, idx) in steps">
-            <div class="cursor-pointer mx-1"
-                 :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx) }"
+            <div class="mx-1"
+                 :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx), 'cursor-pointer': isClickable }"
                  @click="changeStep(step)">
                 <div class="d-flex align-center gap-x-2">
                     <div class="d-flex align-center gap-2">
@@ -23,8 +23,8 @@
     </v-slide-group>
     <v-slide-group class="slide-group-with-stepper mb-3 hidden-sm-and-up" direction="vertical">
         <v-slide-group-item :key="idx" v-for="(step, idx) in steps">
-            <div class="cursor-pointer mx-1 mb-3"
-                 :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx) }"
+            <div class="mx-1 mb-3"
+                 :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx), 'cursor-pointer': isClickable }"
                  @click="changeStep(step)">
                 <div class="d-flex align-center gap-x-2">
                     <div class="d-flex align-center gap-2">
@@ -48,14 +48,22 @@ export default {
     props: [
         'steps',
         'currentStep',
+        'clickable',
         'minWidth'
     ],
     emits: [
         'step:change'
     ],
+    computed: {
+        isClickable() {
+            return this.clickable !== 'false' && this.clickable !== false;
+        }
+    },
     methods: {
         changeStep(step) {
-            this.$emit('step:change', step.name);
+            if (this.isClickable) {
+                this.$emit('step:change', step.name);
+            }
         },
         isStepActive(step) {
             return this.currentStep === step.name;

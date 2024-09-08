@@ -138,6 +138,8 @@ const (
 	defaultTransactionPictureFileMaxSize uint32 = 10485760 // 10MB
 	defaultUserAvatarFileMaxSize         uint32 = 1048576  // 1MB
 
+	defaultImportFileMaxSize uint32 = 10485760 // 10MB
+
 	defaultExchangeRatesDataRequestTimeout uint32 = 10000 // 10 seconds
 )
 
@@ -282,7 +284,9 @@ type Config struct {
 	MaxAvatarFileSize                uint32
 
 	// Data
-	EnableDataExport bool
+	EnableDataExport  bool
+	EnableDataImport  bool
+	MaxImportFileSize uint32
 
 	// Notification
 	AfterRegisterNotification NotificationConfig
@@ -768,6 +772,8 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 
 func loadDataConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.EnableDataExport = getConfigItemBoolValue(configFile, sectionName, "enable_export", false)
+	config.EnableDataImport = getConfigItemBoolValue(configFile, sectionName, "enable_import", false)
+	config.MaxImportFileSize = getConfigItemUint32Value(configFile, sectionName, "max_import_file_size", defaultImportFileMaxSize)
 
 	return nil
 }

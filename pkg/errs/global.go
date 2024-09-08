@@ -22,6 +22,9 @@ var (
 	ErrParameterInvalid                = NewNormalError(NormalSubcategoryGlobal, 12, http.StatusBadRequest, "parameter invalid")
 	ErrFormatInvalid                   = NewNormalError(NormalSubcategoryGlobal, 13, http.StatusBadRequest, "format invalid")
 	ErrNumberInvalid                   = NewNormalError(NormalSubcategoryGlobal, 14, http.StatusBadRequest, "number invalid")
+	ErrNoFilesUpload                   = NewNormalError(NormalSubcategoryGlobal, 15, http.StatusBadRequest, "no files uploaded")
+	ErrUploadedFileEmpty               = NewNormalError(NormalSubcategoryGlobal, 16, http.StatusBadRequest, "uploaded file is empty")
+	ErrExceedMaxUploadFileSize         = NewNormalError(NormalSubcategoryGlobal, 17, http.StatusBadRequest, "uploaded file size exceeds the maximum allowed size")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

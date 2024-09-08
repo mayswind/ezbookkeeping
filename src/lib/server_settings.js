@@ -53,6 +53,10 @@ export function isDataExportingEnabled() {
     return getServerSetting('e') === '1';
 }
 
+export function isDataImportingEnabled() {
+    return getServerSetting('i') === '1';
+}
+
 export function getMapProvider() {
     return getServerSetting('m');
 }

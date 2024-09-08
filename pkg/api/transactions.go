@@ -1,11 +1,13 @@
 package api
 
 import (
+	"io"
 	"sort"
 	"strings"
 
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -23,12 +25,14 @@ const maximumPicturesCountOfTransaction = 10
 type TransactionsApi struct {
 	ApiUsingConfig
 	ApiUsingDuplicateChecker
-	transactions          *services.TransactionService
-	transactionCategories *services.TransactionCategoryService
-	transactionTags       *services.TransactionTagService
-	transactionPictures   *services.TransactionPictureService
-	accounts              *services.AccountService
-	users                 *services.UserService
+	ezBookKeepingCsvConverter converters.TransactionDataConverter
+	ezBookKeepingTsvConverter converters.TransactionDataConverter
+	transactions              *services.TransactionService
+	transactionCategories     *services.TransactionCategoryService
+	transactionTags           *services.TransactionTagService
+	transactionPictures       *services.TransactionPictureService
+	accounts                  *services.AccountService
+	users                     *services.UserService
 }
 
 // Initialize a transaction api singleton instance
@@ -40,12 +44,14 @@ var (
 		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
 			container: duplicatechecker.Container,
 		},
-		transactions:          services.Transactions,
-		transactionCategories: services.TransactionCategories,
-		transactionTags:       services.TransactionTags,
-		transactionPictures:   services.TransactionPictures,
-		accounts:              services.Accounts,
-		users:                 services.Users,
+		ezBookKeepingCsvConverter: converters.EzBookKeepingTransactionDataCSVFileConverter,
+		ezBookKeepingTsvConverter: converters.EzBookKeepingTransactionDataTSVFileConverter,
+		transactions:              services.Transactions,
+		transactionCategories:     services.TransactionCategories,
+		transactionTags:           services.TransactionTags,
+		transactionPictures:       services.TransactionPictures,
+		accounts:                  services.Accounts,
+		users:                     services.Users,
 	}
 )
 
@@ -1002,6 +1008,230 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *er
 
 	log.Infof(c, "[transactions.TransactionDeleteHandler] user \"uid:%d\" has deleted transaction \"id:%d\"", uid, transactionDeleteReq.Id)
 	return true, nil
+}
+
+// TransactionParseImportFileHandler returns the parsed transaction data by request parameters for current user
+func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	form, err := c.MultipartForm()
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get multi-part form data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrParameterInvalid
+	}
+
+	utcOffset, err := c.GetClientTimezoneOffset()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] cannot get client timezone offset, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	fileTypes := form.Value["fileType"]
+
+	if len(fileTypes) < 1 || fileTypes[0] == "" {
+		return nil, errs.ErrImportFileTypeIsEmpty
+	}
+
+	fileType := fileTypes[0]
+	var dataImporter converters.TransactionDataImporter
+
+	if fileType == "ezbookkeeping_csv" {
+		dataImporter = a.ezBookKeepingCsvConverter
+	} else if fileType == "ezbookkeeping_tsv" {
+		dataImporter = a.ezBookKeepingTsvConverter
+	} else {
+		return nil, errs.ErrImportFileTypeNotSupported
+	}
+
+	importFiles := form.File["file"]
+
+	if len(importFiles) < 1 {
+		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] there is no import file in request for user \"uid:%d\"", uid)
+		return nil, errs.ErrNoFilesUpload
+	}
+
+	if importFiles[0].Size < 1 {
+		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] the size of import file in request is zero for user \"uid:%d\"", uid)
+		return nil, errs.ErrUploadedFileEmpty
+	}
+
+	if importFiles[0].Size > int64(a.CurrentConfig().MaxImportFileSize) {
+		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, a.CurrentConfig().MaxImportFileSize, uid)
+		return nil, errs.ErrExceedMaxUploadFileSize
+	}
+
+	importFile, err := importFiles[0].Open()
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get import file from request for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
+	fileData, err := io.ReadAll(importFile)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to read import file data for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionParseImportFileHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	accounts, err := a.accounts.GetAllAccountsByUid(c, user.Uid)
+
+	if err != nil {
+		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get accounts for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	accountMap := a.accounts.GetAccountNameMapByList(accounts)
+
+	categories, err := a.transactionCategories.GetAllCategoriesByUid(c, user.Uid, 0, -1)
+
+	if err != nil {
+		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get categories for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	categoryMap := a.transactionCategories.GetCategoryNameMapByList(categories)
+
+	tags, err := a.transactionTags.GetAllTagsByUid(c, user.Uid)
+
+	if err != nil {
+		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to get tags for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	tagMap := a.transactionTags.GetTagNameMapByList(tags)
+
+	parsedTransactions, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, categoryMap, tagMap)
+
+	if err != nil {
+		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	parsedTransactionRespsList := parsedTransactions.ToImportTransactionResponseList()
+
+	if len(parsedTransactionRespsList) < 1 {
+		return nil, errs.ErrNoDataToImport
+	}
+
+	parsedTransactionResps := &models.ImportTransactionResponsePageWrapper{
+		Items:      parsedTransactionRespsList,
+		TotalCount: int64(len(parsedTransactionRespsList)),
+	}
+
+	return parsedTransactionResps, nil
+}
+
+// TransactionImportHandler imports transactions by request parameters for current user
+func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionImportReq models.TransactionImportRequest
+	err := c.ShouldBindJSON(&transactionImportReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionImportHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	uid := c.GetCurrentUid()
+
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && transactionImportReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId)
+
+		if found {
+			log.Infof(c, "[transactions.TransactionImportHandler] another \"%s\" transactions has been imported for user \"uid:%d\"", remark, uid)
+			count, err := utils.StringToInt(remark)
+
+			if err == nil {
+				return count, nil
+			}
+		}
+	}
+
+	for i := 0; i < len(transactionImportReq.Transactions); i++ {
+		transactionCreateReq := transactionImportReq.Transactions[i]
+		tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
+
+		if err != nil {
+			log.Warnf(c, "[transactions.TransactionImportHandler] parse tag ids failed of transaction \"index:%d\", because %s", i, err.Error())
+			return nil, errs.ErrTransactionTagIdInvalid
+		}
+
+		if len(tagIds) > maximumTagsCountOfTransaction {
+			return nil, errs.ErrTransactionHasTooManyTags
+		}
+
+		if transactionCreateReq.Type < models.TRANSACTION_TYPE_MODIFY_BALANCE || transactionCreateReq.Type > models.TRANSACTION_TYPE_TRANSFER {
+			log.Warnf(c, "[transactions.TransactionImportHandler] transaction type of transaction \"index:%d\" is invalid", i)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		if transactionCreateReq.Type == models.TRANSACTION_TYPE_MODIFY_BALANCE && transactionCreateReq.CategoryId > 0 {
+			log.Warnf(c, "[transactions.TransactionImportHandler] balance modification transaction \"index:%d\" cannot set category id", i)
+			return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
+		}
+
+		if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAccountId != 0 {
+			log.Warnf(c, "[transactions.TransactionImportHandler] non-transfer transaction \"index:%d\" destination account cannot be set", i)
+			return nil, errs.ErrTransactionDestinationAccountCannotBeSet
+		} else if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.SourceAccountId == transactionCreateReq.DestinationAccountId {
+			log.Warnf(c, "[transactions.TransactionImportHandler] transfer transaction \"index:%d\" source account must not be destination account", i)
+			return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
+		}
+
+		if transactionCreateReq.Type != models.TRANSACTION_TYPE_TRANSFER && transactionCreateReq.DestinationAmount != 0 {
+			log.Warnf(c, "[transactions.TransactionImportHandler] non-transfer transaction \"index:%d\" destination amount cannot be set", i)
+			return nil, errs.ErrTransactionDestinationAmountCannotBeSet
+		}
+	}
+
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionImportHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	newTransactions := make([]*models.Transaction, len(transactionImportReq.Transactions))
+
+	for i := 0; i < len(transactionImportReq.Transactions); i++ {
+		transactionCreateReq := transactionImportReq.Transactions[i]
+		transaction := a.createNewTransactionModel(uid, transactionCreateReq, c.ClientIP())
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, transactionCreateReq.UtcOffset)
+
+		if !transactionEditable {
+			return nil, errs.ErrCannotCreateTransactionWithThisTransactionTime
+		}
+
+		newTransactions[i] = transaction
+	}
+
+	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions)
+	count := len(newTransactions)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionImportHandler] failed to import %d transactions for user \"uid:%d\", because %s", count, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.TransactionImportHandler] user \"uid:%d\" has imported %d transactions successfully", uid, count)
+
+	a.SetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_IMPORT_TRANSACTIONS, uid, transactionImportReq.ClientSessionId, utils.IntToString(count))
+
+	return count, nil
 }
 
 func (a *TransactionsApi) filterTransactions(c *core.WebContext, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account) []*models.Transaction {

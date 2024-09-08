@@ -292,6 +292,36 @@ function fillTransactionObject(state, transaction, currentUtcOffset) {
     return transaction;
 }
 
+function buildBasicSubmitTransaction(transaction, dummyTime) {
+    const submitTransaction = {
+        type: transaction.type,
+        time: dummyTime ? getActualUnixTimeForStore(transaction.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes()) : transaction.time,
+        sourceAccountId: transaction.sourceAccountId,
+        sourceAmount: transaction.sourceAmount,
+        destinationAccountId: '0',
+        destinationAmount: 0,
+        hideAmount: transaction.hideAmount,
+        tagIds: transaction.tagIds,
+        comment: transaction.comment,
+        geoLocation: transaction.geoLocation,
+        utcOffset: transaction.utcOffset
+    };
+
+    if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+        submitTransaction.categoryId = transaction.expenseCategory;
+    } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+        submitTransaction.categoryId = transaction.incomeCategory;
+    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+        submitTransaction.categoryId = transaction.transferCategory;
+        submitTransaction.destinationAccountId = transaction.destinationAccountId;
+        submitTransaction.destinationAmount = transaction.destinationAmount;
+    } else {
+        return null;
+    }
+
+    return submitTransaction;
+}
+
 export const useTransactionsStore = defineStore('transactions', {
     state: () => ({
         transactionsFilter: {
@@ -835,34 +865,14 @@ export const useTransactionsStore = defineStore('transactions', {
             const settingsStore = useSettingsStore();
             const exchangeRatesStore = useExchangeRatesStore();
 
-            const submitTransaction = {
-                type: transaction.type,
-                time: getActualUnixTimeForStore(transaction.time, transaction.utcOffset, getBrowserTimezoneOffsetMinutes()),
-                sourceAccountId: transaction.sourceAccountId,
-                sourceAmount: transaction.sourceAmount,
-                destinationAccountId: '0',
-                destinationAmount: 0,
-                hideAmount: transaction.hideAmount,
-                tagIds: transaction.tagIds,
-                comment: transaction.comment,
-                geoLocation: transaction.geoLocation,
-                utcOffset: transaction.utcOffset
-            };
+            const submitTransaction = buildBasicSubmitTransaction(transaction, true);
+
+            if (!submitTransaction) {
+                return Promise.reject('An error occurred');
+            }
 
             if (clientSessionId) {
                 submitTransaction.clientSessionId = clientSessionId;
-            }
-
-            if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
-                submitTransaction.categoryId = transaction.expenseCategory;
-            } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
-                submitTransaction.categoryId = transaction.incomeCategory;
-            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
-                submitTransaction.categoryId = transaction.transferCategory;
-                submitTransaction.destinationAccountId = transaction.destinationAccountId;
-                submitTransaction.destinationAmount = transaction.destinationAmount;
-            } else {
-                return Promise.reject('An error occurred');
             }
 
             if (transaction.pictures && transaction.pictures.length > 0) {
@@ -998,6 +1008,81 @@ export const useTransactionsStore = defineStore('transactions', {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
                         reject({ message: 'Unable to delete this transaction' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        parseImportTransaction({ fileType, importFile }) {
+            return new Promise((resolve, reject) => {
+                services.parseImportTransaction({ fileType, importFile }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to parse import file' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('Unable to parse import file', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to parse import file' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        importTransactions({ transactions, clientSessionId }) {
+            const submitTransactions = [];
+
+            if (transactions) {
+                for (let i = 0; i < transactions.length; i++) {
+                    const transaction = transactions[i];
+
+                    if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                        transaction.incomeCategory = transaction.categoryId;
+                    } else if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                        transaction.expenseCategory = transaction.categoryId;
+                    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+                        transaction.transferCategory = transaction.categoryId;
+                    }
+
+                    const submitTransaction = buildBasicSubmitTransaction(transaction, false);
+
+                    if (!submitTransaction) {
+                        return Promise.reject('An error occurred');
+                    }
+
+                    submitTransactions.push(submitTransaction);
+                }
+            }
+
+            return new Promise((resolve, reject) => {
+                services.importTransactions({
+                    transactions: submitTransactions,
+                    clientSessionId: clientSessionId
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to import transactions' });
+                        return;
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('Unable to import transactions', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to import transactions' });
                     } else {
                         reject(error);
                     }

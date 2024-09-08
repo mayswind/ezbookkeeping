@@ -73,7 +73,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 }
 
 // ParseImportedData returns the imported data by parsing the transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) ([]*models.Transaction, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	dataTable, err := createNewezbookkeepingTransactionPlainTextDataTable(string(data), c.columnSeparator, c.lineSeparator)
 
 	if err != nil {

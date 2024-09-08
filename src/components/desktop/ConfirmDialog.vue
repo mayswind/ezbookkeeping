@@ -52,12 +52,12 @@ export default {
             this.showState = true;
 
             if (isString(text)) {
-                this.titleContent = this.$t(title);
-                this.textContent = this.$t(text);
+                this.titleContent = this.$t(title, options);
+                this.textContent = this.$t(text, options);
             } else {
-                this.titleContent = this.$t('global.app.title');
-                this.textContent = this.$t(title);
                 options = text;
+                this.titleContent = this.$t('global.app.title');
+                this.textContent = this.$t(title, options);
             }
 
             if (options && options.color) {

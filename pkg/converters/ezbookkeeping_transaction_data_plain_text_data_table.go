@@ -147,7 +147,9 @@ func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnS
 		return nil, errs.ErrOperationFailed
 	}
 
-	headerLineItems := strings.Split(allLines[0], columnSeparator)
+	headerLine := allLines[0]
+	headerLine = strings.ReplaceAll(headerLine, "\r", "")
+	headerLineItems := strings.Split(headerLine, columnSeparator)
 
 	return &ezBookKeepingTransactionPlainTextDataTable{
 		columnSeparator:       columnSeparator,

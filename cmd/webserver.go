@@ -317,6 +317,11 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/transactions/modify.json", bindApi(api.Transactions.TransactionModifyHandler))
 			apiV1Route.POST("/transactions/delete.json", bindApi(api.Transactions.TransactionDeleteHandler))
 
+			if config.EnableDataImport {
+				apiV1Route.POST("/transactions/parse_import.json", bindApi(api.Transactions.TransactionParseImportFileHandler))
+				apiV1Route.POST("/transactions/import.json", bindApi(api.Transactions.TransactionImportHandler))
+			}
+
 			// Transaction Pictures
 			if config.EnableTransactionPictures {
 				apiV1Route.POST("/transaction/pictures/upload.json", bindApi(api.TransactionPictures.TransactionPictureUploadHandler))

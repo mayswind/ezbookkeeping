@@ -115,6 +115,12 @@ type TransactionModifyRequest struct {
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 }
 
+// TransactionImportRequest represents all parameters of transaction import request
+type TransactionImportRequest struct {
+	Transactions    []*TransactionCreateRequest `json:"transactions"`
+	ClientSessionId string                      `json:"clientSessionId"`
+}
+
 // TransactionCountRequest represents transaction count request
 type TransactionCountRequest struct {
 	Type         TransactionDbType `form:"type" binding:"min=0,max=4"`

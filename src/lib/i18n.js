@@ -7,6 +7,7 @@ import timezoneConstants from '@/consts/timezone.js';
 import currencyConstants from '@/consts/currency.js';
 import colorConstants from '@/consts/color.js';
 import accountConstants from '@/consts/account.js';
+import fileConstants from '@/consts/file.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import templateConstants from '@/consts/template.js';
@@ -1252,6 +1253,22 @@ function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
     return availableExchangeRates;
 }
 
+function getAllSupportedImportFileTypes(translateFn) {
+    const allSupportedImportFileTypes = [];
+
+    for (let i = 0; i < fileConstants.supportedImportFileTypes.length; i++) {
+        const fileType = fileConstants.supportedImportFileTypes[i];
+
+        allSupportedImportFileTypes.push({
+            type: fileType.type,
+            displayName: translateFn(fileType.name),
+            extensions: fileType.extensions
+        });
+    }
+
+    return allSupportedImportFileTypes;
+}
+
 function getEnableDisableOptions(translateFn) {
     return [{
         value: true,
@@ -1595,6 +1612,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
+        getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),

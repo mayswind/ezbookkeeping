@@ -1,0 +1,145 @@
+package models
+
+import "github.com/mayswind/ezbookkeeping/pkg/utils"
+
+// ImportTransaction represents the imported transaction data
+type ImportTransaction struct {
+	*Transaction
+	TagIds                             []string
+	OriginalCategoryName               string
+	OriginalSourceAccountName          string
+	OriginalSourceAccountCurrency      string
+	OriginalDestinationAccountName     string
+	OriginalDestinationAccountCurrency string
+	OriginalTagNames                   []string
+}
+
+// ImportTransactionResponse represents a view-object of the imported transaction data
+type ImportTransactionResponse struct {
+	Type                               TransactionType                 `json:"type"`
+	CategoryId                         int64                           `json:"categoryId,string"`
+	OriginalCategoryName               string                          `json:"originalCategoryName"`
+	Time                               int64                           `json:"time"`
+	UtcOffset                          int16                           `json:"utcOffset"`
+	SourceAccountId                    int64                           `json:"sourceAccountId,string"`
+	OriginalSourceAccountName          string                          `json:"originalSourceAccountName"`
+	OriginalSourceAccountCurrency      string                          `json:"originalSourceAccountCurrency"`
+	DestinationAccountId               int64                           `json:"destinationAccountId,string,omitempty"`
+	OriginalDestinationAccountName     string                          `json:"originalDestinationAccountName,omitempty"`
+	OriginalDestinationAccountCurrency string                          `json:"originalDestinationAccountCurrency,omitempty"`
+	SourceAmount                       int64                           `json:"sourceAmount"`
+	DestinationAmount                  int64                           `json:"destinationAmount,omitempty"`
+	TagIds                             []string                        `json:"tagIds"`
+	OriginalTagNames                   []string                        `json:"originalTagNames"`
+	Comment                            string                          `json:"comment"`
+	GeoLocation                        *TransactionGeoLocationResponse `json:"geoLocation,omitempty"`
+}
+
+// ImportTransactionResponsePageWrapper represents a response of imported transaction which contains items and count
+type ImportTransactionResponsePageWrapper struct {
+	Items      []*ImportTransactionResponse `json:"items"`
+	TotalCount int64                        `json:"totalCount"`
+}
+
+// ToImportTransactionResponse returns the a view-objects according to imported transaction data
+func (t ImportTransaction) ToImportTransactionResponse() *ImportTransactionResponse {
+	var transactionType TransactionType
+
+	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+		transactionType = TRANSACTION_TYPE_MODIFY_BALANCE
+	} else if t.Type == TRANSACTION_DB_TYPE_EXPENSE {
+		transactionType = TRANSACTION_TYPE_EXPENSE
+	} else if t.Type == TRANSACTION_DB_TYPE_INCOME {
+		transactionType = TRANSACTION_TYPE_INCOME
+	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		transactionType = TRANSACTION_TYPE_TRANSFER
+	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		transactionType = TRANSACTION_TYPE_TRANSFER
+	} else {
+		return nil
+	}
+
+	geoLocation := &TransactionGeoLocationResponse{}
+
+	if t.GeoLongitude != 0 || t.GeoLatitude != 0 {
+		geoLocation.Longitude = t.GeoLongitude
+		geoLocation.Latitude = t.GeoLatitude
+	} else {
+		geoLocation = nil
+	}
+
+	return &ImportTransactionResponse{
+		Type:                               transactionType,
+		CategoryId:                         t.CategoryId,
+		OriginalCategoryName:               t.OriginalCategoryName,
+		Time:                               utils.GetUnixTimeFromTransactionTime(t.TransactionTime),
+		UtcOffset:                          t.TimezoneUtcOffset,
+		SourceAccountId:                    t.AccountId,
+		OriginalSourceAccountName:          t.OriginalSourceAccountName,
+		OriginalSourceAccountCurrency:      t.OriginalSourceAccountCurrency,
+		DestinationAccountId:               t.RelatedAccountId,
+		OriginalDestinationAccountName:     t.OriginalDestinationAccountName,
+		OriginalDestinationAccountCurrency: t.OriginalDestinationAccountCurrency,
+		SourceAmount:                       t.Amount,
+		DestinationAmount:                  t.RelatedAccountAmount,
+		TagIds:                             t.TagIds,
+		OriginalTagNames:                   t.OriginalTagNames,
+		Comment:                            t.Comment,
+		GeoLocation:                        geoLocation,
+	}
+}
+
+// ImportedTransactionSlice represents the slice data structure of import transaction data
+type ImportedTransactionSlice []*ImportTransaction
+
+// Len returns the count of items
+func (s ImportedTransactionSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s ImportedTransactionSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is less than the second one
+func (s ImportedTransactionSlice) Less(i, j int) bool {
+	if s[i].Type != s[j].Type && (s[i].Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE || s[j].Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE) {
+		if s[i].Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			return true
+		} else if s[j].Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			return false
+		}
+	}
+
+	return s[i].TransactionTime < s[j].TransactionTime
+}
+
+// ToTransactionsList returns the a list of transactions
+func (s ImportedTransactionSlice) ToTransactionsList() []*Transaction {
+	transactions := make([]*Transaction, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		transactions[i] = s[i].Transaction
+	}
+
+	return transactions
+}
+
+// ToImportTransactionResponseList returns the a list of view-objects according to imported transaction data
+func (s ImportedTransactionSlice) ToImportTransactionResponseList() []*ImportTransactionResponse {
+	transactionResps := make([]*ImportTransactionResponse, 0, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		importedTransaction := s[i]
+		importedTransactionResp := importedTransaction.ToImportTransactionResponse()
+
+		if importedTransactionResp == nil {
+			continue
+		}
+
+		transactionResps = append(transactionResps, importedTransactionResp)
+	}
+
+	return transactionResps
+}

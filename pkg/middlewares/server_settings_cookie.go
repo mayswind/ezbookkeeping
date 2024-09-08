@@ -22,6 +22,7 @@ func ServerSettingsCookie(config *settings.Config) core.MiddlewareHandlerFunc {
 			buildBooleanSetting("p", config.EnableTransactionPictures),
 			buildBooleanSetting("s", config.EnableScheduledTransaction),
 			buildBooleanSetting("e", config.EnableDataExport),
+			buildBooleanSetting("i", config.EnableDataImport),
 			buildStringSetting("m", strings.Replace(config.MapProvider, "_", "-", -1)),
 		}
 

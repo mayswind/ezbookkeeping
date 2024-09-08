@@ -437,6 +437,18 @@ export default {
             id
         });
     },
+    parseImportTransaction: ({ fileType, importFile }) => {
+        return axios.postForm('v1/transactions/parse_import.json', {
+            fileType: fileType,
+            file: importFile
+        });
+    },
+    importTransactions: ({ transactions, clientSessionId }) => {
+        return axios.post('v1/transactions/import.json', {
+            transactions: transactions,
+            clientSessionId: clientSessionId
+        });
+    },
     uploadTransactionPicture: ({ pictureFile, clientSessionId }) => {
         return axios.postForm('v1/transaction/pictures/upload.json', {
             picture: pictureFile,

@@ -53,6 +53,11 @@
                                                     </v-list>
                                                 </v-menu>
                                             </v-btn>
+                                            <v-btn class="ml-3" color="default" variant="outlined"
+                                                   :disabled="loading" @click="importTransaction"
+                                                   v-if="isDataImportingEnabled">
+                                                {{ $t('Import') }}
+                                            </v-btn>
                                             <v-btn density="compact" color="default" variant="text" size="24"
                                                    class="ml-2" :icon="true" :loading="loading" @click="reload">
                                                 <template #loader>
@@ -494,6 +499,7 @@
                                  v-model:show="showCustomDateRangeDialog"
                                  @dateRange:change="changeCustomDateFilter" />
     <edit-dialog ref="editDialog" type="transaction" :persistent="true" />
+    <import-dialog ref="importDialog" :persistent="true" />
 
     <v-dialog width="800" v-model="showFilterAccountDialog">
         <account-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
@@ -516,6 +522,7 @@
 
 <script>
 import EditDialog from './list/dialogs/EditDialog.vue';
+import ImportDialog from './list/dialogs/ImportDialog.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
 import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
@@ -562,6 +569,7 @@ import {
 } from '@/lib/category.js';
 import { getUnifiedSelectedAccountsCurrencyOrDefaultCurrency } from '@/lib/account.js';
 import { getTransactionDisplayAmount } from '@/lib/transaction.js';
+import { isDataImportingEnabled } from '@/lib/server_settings.js';
 import { scrollToSelectedItem } from '@/lib/ui.desktop.js';
 
 import {
@@ -585,6 +593,7 @@ export default {
     components: {
         TransactionTagFilterSettingsCard,
         EditDialog,
+        ImportDialog,
         AccountFilterSettingsCard,
         CategoryFilterSettingsCard
     },
@@ -657,6 +666,9 @@ export default {
             }
 
             return true;
+        },
+        isDataImportingEnabled() {
+            return isDataImportingEnabled();
         },
         currentTimezoneOffsetMinutes() {
             return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
@@ -1365,6 +1377,21 @@ export default {
                 tagIds: self.query.tagIds || '',
                 template: template
             }).then(result => {
+                if (result && result.message) {
+                    self.$refs.snackbar.showMessage(result.message);
+                }
+
+                self.reload(false);
+            }).catch(error => {
+                if (error) {
+                    self.$refs.snackbar.showError(error);
+                }
+            });
+        },
+        importTransaction() {
+            const self = this;
+
+            self.$refs.importDialog.open().then(result => {
                 if (result && result.message) {
                     self.$refs.snackbar.showMessage(result.message);
                 }

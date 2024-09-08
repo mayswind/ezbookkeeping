@@ -8,6 +8,9 @@ module.exports = {
         'plugin:vue/vue3-essential'
     ],
     'rules': {
-        'vue/no-use-v-if-with-v-for': 'off'
+        'vue/no-use-v-if-with-v-for': 'off',
+        'vue/valid-v-slot': ['error', {
+            allowModifiers: true,
+        }]
     }
 }

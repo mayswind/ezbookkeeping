@@ -131,6 +131,14 @@ func TestToUniqueInt64Slice_NilOrEmpty(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestInt64Sort(t *testing.T) {
+	actualValue := []int64{4, 3, 2, 1, 5}
+	expectedValue := []int64{1, 2, 3, 4, 5}
+
+	Int64Sort(actualValue)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestToSet(t *testing.T) {
 	arr := []int64{0, 1, 2, 3, 2, 4, 0}
 	actualValue := ToSet(arr)

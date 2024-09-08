@@ -9,6 +9,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
@@ -440,5 +441,10 @@ func (s *TransactionTagService) GetGroupedTransactionTagIds(tagIndexes []*models
 		transactionTagIds = append(transactionTagIds, tagIndex.TagId)
 		allTransactionTagIds[tagIndex.TransactionId] = transactionTagIds
 	}
+
+	for _, tagIds := range allTransactionTagIds {
+		utils.Int64Sort(tagIds)
+	}
+
 	return allTransactionTagIds
 }

@@ -1,5 +1,7 @@
 package utils
 
+import "sort"
+
 // Int64SliceEquals returns whether specific two int64 arrays equal
 func Int64SliceEquals(s1, s2 []int64) bool {
 	if (s1 == nil) != (s2 == nil) {
@@ -56,6 +58,13 @@ func ToUniqueInt64Slice(items []int64) []int64 {
 	}
 
 	return uniqueItems
+}
+
+// Int64Sort sorts the specified array with int64 items
+func Int64Sort(items []int64) {
+	sort.Slice(items, func(i, j int) bool {
+		return items[i] < items[j]
+	})
 }
 
 // ToSet returns a map where the keys are the items in the specified array

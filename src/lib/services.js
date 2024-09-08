@@ -197,6 +197,8 @@ export default {
     updateAvatar: ({ avatarFile }) => {
         return axios.postForm('v1/users/avatar/update.json', {
             avatar: avatarFile
+        }, {
+            timeout: apiConstants.uploadTimeout
         });
     },
     removeAvatar: () => {
@@ -441,18 +443,24 @@ export default {
         return axios.postForm('v1/transactions/parse_import.json', {
             fileType: fileType,
             file: importFile
+        }, {
+            timeout: apiConstants.uploadTimeout
         });
     },
     importTransactions: ({ transactions, clientSessionId }) => {
         return axios.post('v1/transactions/import.json', {
             transactions: transactions,
             clientSessionId: clientSessionId
+        }, {
+            timeout: apiConstants.importTimeout
         });
     },
     uploadTransactionPicture: ({ pictureFile, clientSessionId }) => {
         return axios.postForm('v1/transaction/pictures/upload.json', {
             picture: pictureFile,
             clientSessionId: clientSessionId
+        }, {
+            timeout: apiConstants.uploadTimeout
         });
     },
     removeUnusedTransactionPicture: ({ id }) => {

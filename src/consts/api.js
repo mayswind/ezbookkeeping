@@ -1,4 +1,6 @@
 const defaultTimeout = 10000; // 10s
+const uploadTimeout = 30000; // 30s
+const importTimeout = 120000; // 120s
 const baseApiUrlPath = '/api';
 const baseQrcodePath = '/qrcode';
 const baseProxyUrlPath = '/proxy';
@@ -141,6 +143,8 @@ const parameterizedErrors = [
 
 export default {
     defaultTimeout: defaultTimeout,
+    uploadTimeout: uploadTimeout,
+    importTimeout: importTimeout,
     baseApiUrlPath: baseApiUrlPath,
     baseQrcodePath: baseQrcodePath,
     baseProxyUrlPath: baseProxyUrlPath,

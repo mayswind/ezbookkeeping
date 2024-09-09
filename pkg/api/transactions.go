@@ -1158,6 +1158,8 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		}
 	}
 
+	newTransactionTagIdsMap := make(map[int][]int64, len(transactionImportReq.Transactions))
+
 	for i := 0; i < len(transactionImportReq.Transactions); i++ {
 		transactionCreateReq := transactionImportReq.Transactions[i]
 		tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
@@ -1193,6 +1195,8 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 			log.Warnf(c, "[transactions.TransactionImportHandler] non-transfer transaction \"index:%d\" destination amount cannot be set", i)
 			return nil, errs.ErrTransactionDestinationAmountCannotBeSet
 		}
+
+		newTransactionTagIdsMap[i] = tagIds
 	}
 
 	user, err := a.users.GetUserById(c, uid)
@@ -1219,7 +1223,7 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 		newTransactions[i] = transaction
 	}
 
-	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions)
+	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions, newTransactionTagIdsMap)
 	count := len(newTransactions)
 
 	if err != nil {

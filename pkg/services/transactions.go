@@ -272,9 +272,10 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 }
 
 // BatchCreateTransactions saves new transactions to database
-func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, transactions []*models.Transaction) error {
+func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, transactions []*models.Transaction, allTagIds map[int][]int64) error {
 	now := time.Now().Unix()
-	needUuidCount := uint16(0)
+	needTransactionUuidCount := uint16(0)
+	needTagIndexUuidCount := uint16(0)
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
@@ -291,9 +292,9 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			needUuidCount += 2
+			needTransactionUuidCount += 2
 		} else {
-			needUuidCount++
+			needTransactionUuidCount++
 		}
 
 		transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
@@ -302,33 +303,78 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 		transaction.UpdatedUnixTime = now
 	}
 
-	if needUuidCount > uint16(65535) {
+	for index, tagIds := range allTagIds {
+		if index < 0 || index >= len(transactions) {
+			return errs.ErrOperationFailed
+		}
+
+		uniqueTagIds := utils.ToUniqueInt64Slice(tagIds)
+		needTagIndexUuidCount += uint16(len(uniqueTagIds))
+	}
+
+	if needTransactionUuidCount > uint16(65535) || needTagIndexUuidCount > uint16(65535) {
 		return errs.ErrImportTooManyTransaction
 	}
 
-	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, needUuidCount)
-	uuidIndex := 0
+	transactionUuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, needTransactionUuidCount)
+	transactionUuidIndex := 0
 
-	if len(uuids) < int(needUuidCount) {
+	if len(transactionUuids) < int(needTransactionUuidCount) {
 		return errs.ErrSystemIsBusy
 	}
 
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 
-		transaction.TransactionId = uuids[uuidIndex]
-		uuidIndex++
+		transaction.TransactionId = transactionUuids[transactionUuidIndex]
+		transactionUuidIndex++
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-			transaction.RelatedId = uuids[uuidIndex]
-			uuidIndex++
+			transaction.RelatedId = transactionUuids[transactionUuidIndex]
+			transactionUuidIndex++
 		}
+	}
+
+	tagIndexUuids := s.GenerateUuids(uuid.UUID_TYPE_TAG_INDEX, needTagIndexUuidCount)
+	tagIndexUuidIndex := 0
+
+	if len(tagIndexUuids) < int(needTagIndexUuidCount) {
+		return errs.ErrSystemIsBusy
+	}
+
+	allTransactionTagIndexes := make(map[int64][]*models.TransactionTagIndex)
+	allTransactionTagIds := make(map[int64][]int64)
+
+	for index, tagIds := range allTagIds {
+		transaction := transactions[index]
+		uniqueTagIds := utils.ToUniqueInt64Slice(tagIds)
+
+		transactionTagIndexes := make([]*models.TransactionTagIndex, len(uniqueTagIds))
+
+		for i := 0; i < len(uniqueTagIds); i++ {
+			transactionTagIndexes[i] = &models.TransactionTagIndex{
+				TagIndexId:      tagIndexUuids[tagIndexUuidIndex],
+				Uid:             transaction.Uid,
+				Deleted:         false,
+				TagId:           uniqueTagIds[i],
+				TransactionId:   transaction.TransactionId,
+				CreatedUnixTime: now,
+				UpdatedUnixTime: now,
+			}
+
+			tagIndexUuidIndex++
+		}
+
+		allTransactionTagIndexes[transaction.TransactionId] = transactionTagIndexes
+		allTransactionTagIds[transaction.TransactionId] = uniqueTagIds
 	}
 
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
 		for i := 0; i < len(transactions); i++ {
 			transaction := transactions[i]
-			err := s.doCreateTransaction(sess, transaction, nil, nil, nil, nil)
+			transactionTagIndexes := allTransactionTagIndexes[transaction.TransactionId]
+			transactionTagIds := allTransactionTagIds[transaction.TransactionId]
+			err := s.doCreateTransaction(sess, transaction, transactionTagIndexes, transactionTagIds, nil, nil)
 
 			if err != nil {
 				transactionUnixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)

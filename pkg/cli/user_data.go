@@ -693,14 +693,14 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return err
 	}
 
-	newTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(c, user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
+	parsedTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(c, user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
 
 	if err != nil {
 		log.BootErrorf(c, "[user_data.ImportTransaction] failed to parse imported data for \"%s\", because %s", username, err.Error())
 		return err
 	}
 
-	if len(newTransactions) < 1 {
+	if len(parsedTransactions) < 1 {
 		log.BootErrorf(c, "[user_data.ImportTransaction] there are no transactions in import file")
 		return errs.ErrOperationFailed
 	}
@@ -720,7 +720,15 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return errs.ErrOperationFailed
 	}
 
-	err = l.transactions.BatchCreateTransactions(c, user.Uid, newTransactions.ToTransactionsList())
+	newTransactions := parsedTransactions.ToTransactionsList()
+	newTransactionTagIdsMap, err := parsedTransactions.ToTransactionTagIdsMap()
+
+	if err != nil {
+		log.BootErrorf(c, "[user_data.ImportTransaction] failed to get transaction tag ids map, because %s", err.Error())
+		return errs.ErrOperationFailed
+	}
+
+	err = l.transactions.BatchCreateTransactions(c, user.Uid, newTransactions, newTransactionTagIdsMap)
 
 	if err != nil {
 		log.BootErrorf(c, "[user_data.ImportTransaction] failed to create transaction, because %s", err.Error())

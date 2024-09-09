@@ -115,7 +115,7 @@ func (s ImportedTransactionSlice) Less(i, j int) bool {
 	return s[i].TransactionTime < s[j].TransactionTime
 }
 
-// ToTransactionsList returns the a list of transactions
+// ToTransactionsList returns a list of transaction models
 func (s ImportedTransactionSlice) ToTransactionsList() []*Transaction {
 	transactions := make([]*Transaction, s.Len())
 
@@ -124,6 +124,23 @@ func (s ImportedTransactionSlice) ToTransactionsList() []*Transaction {
 	}
 
 	return transactions
+}
+
+// ToTransactionTagIdsMap returns a list of transaction tag ids
+func (s ImportedTransactionSlice) ToTransactionTagIdsMap() (map[int][]int64, error) {
+	transactionTagIdsMap := make(map[int][]int64, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		tagIds, err := utils.StringArrayToInt64Array(s[i].TagIds)
+
+		if err != nil {
+			return nil, err
+		}
+
+		transactionTagIdsMap[i] = tagIds
+	}
+
+	return transactionTagIdsMap, nil
 }
 
 // ToImportTransactionResponseList returns the a list of view-objects according to imported transaction data

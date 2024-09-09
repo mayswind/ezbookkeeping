@@ -278,6 +278,9 @@ const vuetify = createVuetify({
         },
         VTooltip: {
             location: 'top'
+        },
+        VWindow: {
+            touch: false
         }
     },
     theme: {

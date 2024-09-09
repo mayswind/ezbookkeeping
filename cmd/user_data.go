@@ -313,7 +313,7 @@ func addNewUser(c *core.CliContext) error {
 	user, err := clis.UserData.AddNewUser(c, username, email, nickname, password, defaultCurrency)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.addNewUser] error occurs when adding new user")
+		log.CliErrorf(c, "[user_data.addNewUser] error occurs when adding new user")
 		return err
 	}
 
@@ -333,7 +333,7 @@ func getUserInfo(c *core.CliContext) error {
 	user, err := clis.UserData.GetUserByUsername(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.getUserInfo] error occurs when getting user data")
+		log.CliErrorf(c, "[user_data.getUserInfo] error occurs when getting user data")
 		return err
 	}
 
@@ -354,11 +354,11 @@ func modifyUserPassword(c *core.CliContext) error {
 	err = clis.UserData.ModifyUserPassword(c, username, password)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.modifyUserPassword] error occurs when modifying user password")
+		log.CliErrorf(c, "[user_data.modifyUserPassword] error occurs when modifying user password")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
+	log.CliInfof(c, "[user_data.modifyUserPassword] password of user \"%s\" has been changed", username)
 
 	return nil
 }
@@ -374,11 +374,11 @@ func sendPasswordResetMail(c *core.CliContext) error {
 	err = clis.UserData.SendPasswordResetMail(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.sendPasswordResetMail] error occurs when sending password reset email")
+		log.CliErrorf(c, "[user_data.sendPasswordResetMail] error occurs when sending password reset email")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.sendPasswordResetMail] a password reset email for user \"%s\" has been sent", username)
+	log.CliInfof(c, "[user_data.sendPasswordResetMail] a password reset email for user \"%s\" has been sent", username)
 
 	return nil
 }
@@ -394,11 +394,11 @@ func enableUser(c *core.CliContext) error {
 	err = clis.UserData.EnableUser(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.enableUser] error occurs when setting user enabled")
+		log.CliErrorf(c, "[user_data.enableUser] error occurs when setting user enabled")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.enableUser] user \"%s\" has been set enabled", username)
+	log.CliInfof(c, "[user_data.enableUser] user \"%s\" has been set enabled", username)
 
 	return nil
 }
@@ -414,11 +414,11 @@ func disableUser(c *core.CliContext) error {
 	err = clis.UserData.DisableUser(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.disableUser] error occurs when setting user disabled")
+		log.CliErrorf(c, "[user_data.disableUser] error occurs when setting user disabled")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.disableUser] user \"%s\" has been set disabled", username)
+	log.CliInfof(c, "[user_data.disableUser] user \"%s\" has been set disabled", username)
 
 	return nil
 }
@@ -434,11 +434,11 @@ func resendUserVerifyEmail(c *core.CliContext) error {
 	err = clis.UserData.ResendVerifyEmail(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.resendUserVerifyEmail] error occurs when resending user verify email")
+		log.CliErrorf(c, "[user_data.resendUserVerifyEmail] error occurs when resending user verify email")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.resendUserVerifyEmail] verify email for user \"%s\" has been resent", username)
+	log.CliInfof(c, "[user_data.resendUserVerifyEmail] verify email for user \"%s\" has been resent", username)
 
 	return nil
 }
@@ -454,11 +454,11 @@ func setUserEmailVerified(c *core.CliContext) error {
 	err = clis.UserData.SetUserEmailVerified(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.setUserEmailVerified] error occurs when setting user email address verified")
+		log.CliErrorf(c, "[user_data.setUserEmailVerified] error occurs when setting user email address verified")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.setUserEmailVerified] user \"%s\" email address has been set verified", username)
+	log.CliInfof(c, "[user_data.setUserEmailVerified] user \"%s\" email address has been set verified", username)
 
 	return nil
 }
@@ -474,11 +474,11 @@ func setUserEmailUnverified(c *core.CliContext) error {
 	err = clis.UserData.SetUserEmailUnverified(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.setUserEmailUnverified] error occurs when setting user email address unverified")
+		log.CliErrorf(c, "[user_data.setUserEmailUnverified] error occurs when setting user email address unverified")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.setUserEmailUnverified] user \"%s\" email address has been set unverified", username)
+	log.CliInfof(c, "[user_data.setUserEmailUnverified] user \"%s\" email address has been set unverified", username)
 
 	return nil
 }
@@ -494,11 +494,11 @@ func deleteUser(c *core.CliContext) error {
 	err = clis.UserData.DeleteUser(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.deleteUser] error occurs when deleting user")
+		log.CliErrorf(c, "[user_data.deleteUser] error occurs when deleting user")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.deleteUser] user \"%s\" has been deleted", username)
+	log.CliInfof(c, "[user_data.deleteUser] user \"%s\" has been deleted", username)
 
 	return nil
 }
@@ -514,11 +514,11 @@ func disableUser2FA(c *core.CliContext) error {
 	err = clis.UserData.DisableUserTwoFactorAuthorization(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.disableUser2FA] error occurs when disabling user two-factor authorization")
+		log.CliErrorf(c, "[user_data.disableUser2FA] error occurs when disabling user two-factor authorization")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.disableUser2FA] two-factor authorization of user \"%s\" has been disabled", username)
+	log.CliInfof(c, "[user_data.disableUser2FA] two-factor authorization of user \"%s\" has been disabled", username)
 
 	return nil
 }
@@ -534,7 +534,7 @@ func listUserTokens(c *core.CliContext) error {
 	tokens, err := clis.UserData.ListUserTokens(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.listUserTokens] error occurs when getting user tokens")
+		log.CliErrorf(c, "[user_data.listUserTokens] error occurs when getting user tokens")
 		return err
 	}
 
@@ -560,11 +560,11 @@ func clearUserTokens(c *core.CliContext) error {
 	err = clis.UserData.ClearUserTokens(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.clearUserTokens] error occurs when clearing user tokens")
+		log.CliErrorf(c, "[user_data.clearUserTokens] error occurs when clearing user tokens")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.clearUserTokens] all tokens of user \"%s\" has been cleared", username)
+	log.CliInfof(c, "[user_data.clearUserTokens] all tokens of user \"%s\" has been cleared", username)
 
 	return nil
 }
@@ -578,16 +578,16 @@ func checkUserTransactionAndAccount(c *core.CliContext) error {
 
 	username := c.String("username")
 
-	log.BootInfof(c, "[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", username)
+	log.CliInfof(c, "[user_data.checkUserTransactionAndAccount] starting checking user \"%s\" data", username)
 
 	_, err = clis.UserData.CheckTransactionAndAccount(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
+		log.CliErrorf(c, "[user_data.checkUserTransactionAndAccount] error occurs when checking user data")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
+	log.CliInfof(c, "[user_data.checkUserTransactionAndAccount] user transactions and accounts data has been checked successfully, there is no problem with user data")
 
 	return nil
 }
@@ -601,16 +601,16 @@ func fixTransactionTagIndexNotHaveTransactionTime(c *core.CliContext) error {
 
 	username := c.String("username")
 
-	log.BootInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] starting fixing user \"%s\" transaction tag index data", username)
+	log.CliInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] starting fixing user \"%s\" transaction tag index data", username)
 
 	_, err = clis.UserData.FixTransactionTagIndexWithTransactionTime(c, username)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] error occurs when fixing user data")
+		log.CliErrorf(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] error occurs when fixing user data")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] user transaction tag index data has been fixed successfully")
+	log.CliInfof(c, "[user_data.fixTransactionTagIndexNotHaveTransactionTime] user transaction tag index data has been fixed successfully")
 
 	return nil
 }
@@ -627,39 +627,39 @@ func exportUserTransaction(c *core.CliContext) error {
 	fileType := c.String("type")
 
 	if fileType != "" && fileType != "csv" && fileType != "tsv" {
-		log.BootErrorf(c, "[user_data.exportUserTransaction] export file type is not supported")
+		log.CliErrorf(c, "[user_data.exportUserTransaction] export file type is not supported")
 		return errs.ErrNotSupported
 	}
 
 	if filePath == "" {
-		log.BootErrorf(c, "[user_data.exportUserTransaction] export file path is unspecified")
+		log.CliErrorf(c, "[user_data.exportUserTransaction] export file path is unspecified")
 		return os.ErrNotExist
 	}
 
 	fileExists, err := utils.IsExists(filePath)
 
 	if fileExists {
-		log.BootErrorf(c, "[user_data.exportUserTransaction] specified file path already exists")
+		log.CliErrorf(c, "[user_data.exportUserTransaction] specified file path already exists")
 		return os.ErrExist
 	}
 
-	log.BootInfof(c, "[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
+	log.CliInfof(c, "[user_data.exportUserTransaction] starting exporting user \"%s\" data", username)
 
 	content, err := clis.UserData.ExportTransaction(c, username, fileType)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.exportUserTransaction] error occurs when exporting user data")
+		log.CliErrorf(c, "[user_data.exportUserTransaction] error occurs when exporting user data")
 		return err
 	}
 
 	err = utils.WriteFile(filePath, content)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.exportUserTransaction] failed to write to %s", filePath)
+		log.CliErrorf(c, "[user_data.exportUserTransaction] failed to write to %s", filePath)
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
+	log.CliInfof(c, "[user_data.exportUserTransaction] user transactions have been exported to %s", filePath)
 
 	return nil
 }
@@ -676,39 +676,39 @@ func importUserTransaction(c *core.CliContext) error {
 	filetype := c.String("type")
 
 	if filePath == "" {
-		log.BootErrorf(c, "[user_data.importUserTransaction] import file path is not specified")
+		log.CliErrorf(c, "[user_data.importUserTransaction] import file path is not specified")
 		return os.ErrNotExist
 	}
 
 	fileExists, err := utils.IsExists(filePath)
 
 	if !fileExists {
-		log.BootErrorf(c, "[user_data.importUserTransaction] import file does not exist")
+		log.CliErrorf(c, "[user_data.importUserTransaction] import file does not exist")
 		return os.ErrExist
 	}
 
 	if filetype != "ezbookkeeping_csv" && filetype != "ezbookkeeping_tsv" {
-		log.BootErrorf(c, "[user_data.importUserTransaction] unknown file type \"%s\"", filetype)
+		log.CliErrorf(c, "[user_data.importUserTransaction] unknown file type \"%s\"", filetype)
 		return errs.ErrImportFileTypeNotSupported
 	}
 
 	data, err := os.ReadFile(filePath)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.importUserTransaction] failed to load import file")
+		log.CliErrorf(c, "[user_data.importUserTransaction] failed to load import file")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.importUserTransaction] start importing transactions to user \"%s\"", username)
+	log.CliInfof(c, "[user_data.importUserTransaction] start importing transactions to user \"%s\"", username)
 
 	err = clis.UserData.ImportTransaction(c, username, filetype, data)
 
 	if err != nil {
-		log.BootErrorf(c, "[user_data.importUserTransaction] error occurs when importing user data")
+		log.CliErrorf(c, "[user_data.importUserTransaction] error occurs when importing user data")
 		return err
 	}
 
-	log.BootInfof(c, "[user_data.importUserTransaction] transactions have been imported to user \"%s\"", username)
+	log.CliInfof(c, "[user_data.importUserTransaction] transactions have been imported to user \"%s\"", username)
 
 	return nil
 }

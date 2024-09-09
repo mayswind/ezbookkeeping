@@ -46,14 +46,14 @@ func listAllCronJobs(c *core.CliContext) error {
 	err = cron.InitializeCronJobSchedulerContainer(c, config, false)
 
 	if err != nil {
-		log.BootErrorf(c, "[cron_jobs.listAllCronJobs] initializes cron job scheduler failed, because %s", err.Error())
+		log.CliErrorf(c, "[cron_jobs.listAllCronJobs] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 
 	cronJobs := cron.Container.GetAllJobs()
 
 	if len(cronJobs) < 1 {
-		log.BootErrorf(c, "[cron_jobs.listAllCronJobs] there are no enabled cron jobs")
+		log.CliErrorf(c, "[cron_jobs.listAllCronJobs] there are no enabled cron jobs")
 		return err
 	}
 
@@ -82,7 +82,7 @@ func runCronJob(c *core.CliContext) error {
 	err = cron.InitializeCronJobSchedulerContainer(c, config, false)
 
 	if err != nil {
-		log.BootErrorf(c, "[cron_jobs.runCronJob] initializes cron job scheduler failed, because %s", err.Error())
+		log.CliErrorf(c, "[cron_jobs.runCronJob] initializes cron job scheduler failed, because %s", err.Error())
 		return err
 	}
 
@@ -90,11 +90,11 @@ func runCronJob(c *core.CliContext) error {
 	err = cron.Container.SyncRunJobNow(jobName)
 
 	if err != nil {
-		log.BootErrorf(c, "[cron_jobs.runCronJob] failed to run cron job \"%s\", because %s", jobName, err.Error())
+		log.CliErrorf(c, "[cron_jobs.runCronJob] failed to run cron job \"%s\", because %s", jobName, err.Error())
 		return err
 	}
 
-	log.BootInfof(c, "[cron_jobs.runCronJob] run cron job \"%s\" successfully", jobName)
+	log.CliInfof(c, "[cron_jobs.runCronJob] run cron job \"%s\" successfully", jobName)
 
 	return nil
 }

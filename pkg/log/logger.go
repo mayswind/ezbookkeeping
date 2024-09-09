@@ -16,6 +16,7 @@ const logFieldRequestId = "REQUEST_ID"
 const logFieldExtra = "EXTRA"
 
 var bootLogger = logrus.New()
+var cliLogger = logrus.New()
 var defaultLogger = logrus.New()
 var requestLogger = logrus.New()
 var sqlQueryLogger = logrus.New()
@@ -24,6 +25,10 @@ func init() {
 	bootLogger.SetFormatter(&LogFormatter{})
 	bootLogger.SetOutput(os.Stdout)
 	bootLogger.SetLevel(logrus.InfoLevel)
+
+	cliLogger.SetFormatter(&LogFormatter{})
+	cliLogger.SetOutput(os.Stdout)
+	cliLogger.SetLevel(logrus.InfoLevel)
 
 	defaultLogger.SetFormatter(&LogFormatter{})
 	defaultLogger.SetOutput(os.Stdout)
@@ -108,15 +113,19 @@ func SetLoggerConfiguration(config *settings.Config, isDisableBootLog bool) erro
 	sqlQueryLogger.SetOutput(queryMultipleWriter)
 
 	if config.LogLevel == settings.LOGLEVEL_DEBUG {
+		cliLogger.SetLevel(logrus.DebugLevel)
 		bootLogger.SetLevel(logrus.DebugLevel)
 		defaultLogger.SetLevel(logrus.DebugLevel)
 	} else if config.LogLevel == settings.LOGLEVEL_INFO {
+		cliLogger.SetLevel(logrus.InfoLevel)
 		bootLogger.SetLevel(logrus.InfoLevel)
 		defaultLogger.SetLevel(logrus.InfoLevel)
 	} else if config.LogLevel == settings.LOGLEVEL_WARN {
+		cliLogger.SetLevel(logrus.WarnLevel)
 		bootLogger.SetLevel(logrus.WarnLevel)
 		defaultLogger.SetLevel(logrus.WarnLevel)
 	} else if config.LogLevel == settings.LOGLEVEL_ERROR {
+		cliLogger.SetLevel(logrus.ErrorLevel)
 		bootLogger.SetLevel(logrus.ErrorLevel)
 		defaultLogger.SetLevel(logrus.ErrorLevel)
 	}
@@ -207,7 +216,41 @@ func BootErrorf(c core.Context, format string, args ...any) {
 		} else {
 			bootLogger.WithField(logFieldRequestId, c.GetContextId()).Error(getFinalLog(format, args...))
 		}
-	}}
+	}
+}
+
+// CliInfof logs boot info log
+func CliInfof(c core.Context, format string, args ...any) {
+	if cliLogger != nil {
+		if c == nil {
+			cliLogger.Info(getFinalLog(format, args...))
+		} else {
+			cliLogger.WithField(logFieldRequestId, c.GetContextId()).Info(getFinalLog(format, args...))
+		}
+	}
+}
+
+// CliWarnf logs boot warn log
+func CliWarnf(c core.Context, format string, args ...any) {
+	if cliLogger != nil {
+		if c == nil {
+			cliLogger.Warn(getFinalLog(format, args...))
+		} else {
+			cliLogger.WithField(logFieldRequestId, c.GetContextId()).Warn(getFinalLog(format, args...))
+		}
+	}
+}
+
+// CliErrorf logs boot error log
+func CliErrorf(c core.Context, format string, args ...any) {
+	if cliLogger != nil {
+		if c == nil {
+			cliLogger.Error(getFinalLog(format, args...))
+		} else {
+			cliLogger.WithField(logFieldRequestId, c.GetContextId()).Error(getFinalLog(format, args...))
+		}
+	}
+}
 
 // Requestf logs http request log with custom format
 func Requestf(c core.Context, format string, args ...any) {

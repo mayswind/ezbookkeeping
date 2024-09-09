@@ -29,16 +29,16 @@ func updateDatabaseStructure(c *core.CliContext) error {
 		return err
 	}
 
-	log.BootInfof(c, "[database.updateDatabaseStructure] starting maintaining")
+	log.CliInfof(c, "[database.updateDatabaseStructure] starting maintaining")
 
 	err = updateAllDatabaseTablesStructure(c)
 
 	if err != nil {
-		log.BootErrorf(c, "[database.updateDatabaseStructure] update database table structure failed, because %s", err.Error())
+		log.CliErrorf(c, "[database.updateDatabaseStructure] update database table structure failed, because %s", err.Error())
 		return err
 	}
 
-	log.BootInfof(c, "[database.updateDatabaseStructure] all tables maintained successfully")
+	log.CliInfof(c, "[database.updateDatabaseStructure] all tables maintained successfully")
 	return nil
 }
 

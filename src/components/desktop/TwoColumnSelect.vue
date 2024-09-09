@@ -1,6 +1,8 @@
 <template>
     <v-select
         persistent-placeholder
+        :density="density"
+        :variant="variant"
         :readonly="readonly"
         :disabled="disabled"
         :label="label"
@@ -87,6 +89,8 @@ import {
 export default {
     props: [
         'modelValue',
+        'density',
+        'variant',
         'disabled',
         'readonly',
         'label',

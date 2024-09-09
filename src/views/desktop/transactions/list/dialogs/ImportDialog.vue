@@ -49,7 +49,6 @@
                         fixed-header
                         fixed-footer
                         show-select
-                        show-expand
                         class="import-transaction-table"
                         density="compact"
                         item-value="index"
@@ -59,7 +58,6 @@
                         :no-data-text="$t('No data to import')"
                         v-model:items-per-page="countPerPage"
                         v-model:page="currentPage"
-                        v-model:expanded="expandedTransactions"
                     >
                         <template #header.data-table-select>
                             <v-checkbox readonly class="cursor-pointer"
@@ -104,10 +102,11 @@
                                         :disabled="loading || submitting || !item.valid"
                                         v-model="item.selected"></v-checkbox>
                         </template>
-                        <template #item.data-table-expand="{ item, internalItem, toggleExpand }">
+                        <template #item.valid="{ item }">
                             <v-icon size="small" :class="{ 'text-error': !item.valid }"
                                     :disabled="loading || submitting"
-                                    :icon="icons.edit" @click="toggleExpand(internalItem)">
+                                    :icon="editingTransaction === item ? icons.complete : icons.edit"
+                                    @click="editTransaction(item)">
                             </v-icon>
                             <v-tooltip activator="parent" v-if="!loading && !submitting">{{ $t('Edit') }}</v-tooltip>
                         </template>
@@ -124,7 +123,7 @@
                             <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ $t('Unknown') }}</v-chip>
                         </template>
                         <template #item.categoryId="{ item }">
-                            <div class="d-flex align-center">
+                            <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === allTransactionTypes.ModifyBalance">
                                 <span v-if="item.type === allTransactionTypes.ModifyBalance">-</span>
                                 <ItemIcon size="24px" icon-type="category"
                                           :icon-id="allCategoriesMap[item.categoryId].icon"
@@ -138,6 +137,60 @@
                                     <span>{{ item.originalCategoryName }}</span>
                                 </div>
                             </div>
+                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Expense">
+                                <two-column-select density="compact" variant="underlined"
+                                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   secondary-hidden-field="hidden"
+                                                   :disabled="loading || submitting || !hasAvailableExpenseCategories"
+                                                   :show-selection-primary-text="true"
+                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
+                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
+                                                   :placeholder="$t('Category')"
+                                                   :items="allCategories[allCategoryTypes.Expense]"
+                                                   v-model="item.categoryId"
+                                                   @update:model-value="updateTransactionData(item)">
+                                </two-column-select>
+                            </div>
+                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Income">
+                                <two-column-select density="compact" variant="underlined"
+                                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   secondary-hidden-field="hidden"
+                                                   :disabled="loading || submitting || !hasAvailableIncomeCategories"
+                                                   :show-selection-primary-text="true"
+                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
+                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
+                                                   :placeholder="$t('Category')"
+                                                   :items="allCategories[allCategoryTypes.Income]"
+                                                   v-model="item.categoryId"
+                                                   @update:model-value="updateTransactionData(item)">
+                                </two-column-select>
+                            </div>
+                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
+                                <two-column-select density="compact" variant="underlined"
+                                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                   secondary-hidden-field="hidden"
+                                                   :disabled="loading || submitting || !hasAvailableTransferCategories"
+                                                   :show-selection-primary-text="true"
+                                                   :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
+                                                   :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
+                                                   :placeholder="$t('Category')"
+                                                   :items="allCategories[allCategoryTypes.Transfer]"
+                                                   v-model="item.categoryId"
+                                                   @update:model-value="updateTransactionData(item)">
+                                </two-column-select>
+                            </div>
                         </template>
                         <template #item.sourceAmount="{ item }">
                             <span>{{ getTransactionDisplayAmount(item) }}</span>
@@ -145,7 +198,7 @@
                             <span v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
                         <template #item.sourceAccountId="{ item }">
-                            <div class="d-flex align-center">
+                            <div class="d-flex align-center" v-if="editingTransaction !== item">
                                 <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else>
                                     <v-icon class="mr-1" :icon="icons.alert"/>
@@ -158,156 +211,99 @@
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
                             </div>
+                            <div style="width: 360px" v-if="editingTransaction === item">
+                                <two-column-select density="compact" variant="underlined"
+                                                   primary-key-field="id" primary-value-field="category"
+                                                   primary-title-field="name" primary-footer-field="displayBalance"
+                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                   primary-sub-items-field="accounts"
+                                                   :primary-title-i18n="true"
+                                                   secondary-key-field="id" secondary-value-field="id"
+                                                   secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                   :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                   :custom-selection-primary-text="getSourceAccountDisplayName(item)"
+                                                   :placeholder="getSourceAccountTitle(item)"
+                                                   :items="categorizedAccounts"
+                                                   v-model="item.sourceAccountId"
+                                                   @update:model-value="updateTransactionData(item)">
+                                </two-column-select>
+                            </div>
+                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
+                                <two-column-select density="compact" variant="underlined"
+                                                   primary-key-field="id" primary-value-field="category"
+                                                   primary-title-field="name" primary-footer-field="displayBalance"
+                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                   primary-sub-items-field="accounts"
+                                                   :primary-title-i18n="true"
+                                                   secondary-key-field="id" secondary-value-field="id"
+                                                   secondary-title-field="name" secondary-footer-field="displayBalance"
+                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                   :disabled="loading || submitting || !allVisibleAccounts.length"
+                                                   :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
+                                                   :placeholder="$t('Destination Account')"
+                                                   :items="categorizedAccounts"
+                                                   v-model="item.destinationAccountId"
+                                                   @update:model-value="updateTransactionData(item)">
+                                </two-column-select>
+                            </div>
                         </template>
                         <template #item.geoLocation="{ item }">
                             <span class="cursor-pointer" v-if="item.geoLocation">{{ `(${item.geoLocation.longitude}, ${item.geoLocation.latitude})` }}</span>
                             <span class="cursor-pointer" v-else-if="!item.geoLocation">{{ $t('None') }}</span>
                         </template>
                         <template #item.tagIds="{ item }">
-                            <v-chip class="transaction-tag" size="small"
-                                    :class="{ 'font-italic': !tagId || tagId === '0' || !allTagsMap[tagId] }"
-                                    :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? icons.tag : icons.alert"
-                                    :color="tagId && tagId !== '0' && allTagsMap[tagId] ? 'default' : 'error'"
-                                    :text="tagId && tagId !== '0' && allTagsMap[tagId] ? allTagsMap[tagId].name : item.originalTagNames[index]"
-                                    :key="tagId"
-                                    v-for="(tagId, index) in item.tagIds"/>
-                            <v-chip class="transaction-tag" size="small"
-                                    :text="$t('None')"
-                                    v-if="!item.tagIds || !item.tagIds.length"/>
-                        </template>
-                        <template #expanded-row="{ columns, item }">
-                            <tr>
-                                <td :colspan="columns.length">
-                                    <v-row class="py-4" style="width: 400px">
-                                        <v-col cols="12" v-if="item.type === allTransactionTypes.Expense">
-                                            <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                               primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                               secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                               secondary-hidden-field="hidden"
-                                                               :disabled="loading || submitting || !hasAvailableExpenseCategories"
-                                                               :show-selection-primary-text="true"
-                                                               :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
-                                                               :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
-                                                               :label="$t('Category')" :placeholder="$t('Category')"
-                                                               :items="allCategories[allCategoryTypes.Expense]"
-                                                               v-model="item.categoryId"
-                                                               @update:model-value="updateTransactionData(item)">
-                                            </two-column-select>
-                                        </v-col>
-                                        <v-col cols="12" v-if="item.type === allTransactionTypes.Income">
-                                            <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                               primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                               secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                               secondary-hidden-field="hidden"
-                                                               :disabled="loading || submitting || !hasAvailableIncomeCategories"
-                                                               :show-selection-primary-text="true"
-                                                               :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
-                                                               :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
-                                                               :label="$t('Category')" :placeholder="$t('Category')"
-                                                               :items="allCategories[allCategoryTypes.Income]"
-                                                               v-model="item.categoryId"
-                                                               @update:model-value="updateTransactionData(item)">
-                                            </two-column-select>
-                                        </v-col>
-                                        <v-col cols="12" v-if="item.type === allTransactionTypes.Transfer">
-                                            <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                                               primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                                               secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                                               secondary-hidden-field="hidden"
-                                                               :disabled="loading || submitting || !hasAvailableTransferCategories"
-                                                               :show-selection-primary-text="true"
-                                                               :custom-selection-primary-text="getPrimaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
-                                                               :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
-                                                               :label="$t('Category')" :placeholder="$t('Category')"
-                                                               :items="allCategories[allCategoryTypes.Transfer]"
-                                                               v-model="item.categoryId"
-                                                               @update:model-value="updateTransactionData(item)">
-                                            </two-column-select>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <two-column-select primary-key-field="id" primary-value-field="category"
-                                                               primary-title-field="name" primary-footer-field="displayBalance"
-                                                               primary-icon-field="icon" primary-icon-type="account"
-                                                               primary-sub-items-field="accounts"
-                                                               :primary-title-i18n="true"
-                                                               secondary-key-field="id" secondary-value-field="id"
-                                                               secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                               :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                               :custom-selection-primary-text="getSourceAccountDisplayName(item)"
-                                                               :label="getSourceAccountTitle(item)"
-                                                               :placeholder="getSourceAccountTitle(item)"
-                                                               :items="categorizedAccounts"
-                                                               v-model="item.sourceAccountId"
-                                                               @update:model-value="updateTransactionData(item)">
-                                            </two-column-select>
-                                        </v-col>
-                                        <v-col cols="12" v-if="item.type === allTransactionTypes.Transfer">
-                                            <two-column-select primary-key-field="id" primary-value-field="category"
-                                                               primary-title-field="name" primary-footer-field="displayBalance"
-                                                               primary-icon-field="icon" primary-icon-type="account"
-                                                               primary-sub-items-field="accounts"
-                                                               :primary-title-i18n="true"
-                                                               secondary-key-field="id" secondary-value-field="id"
-                                                               secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                               :disabled="loading || submitting || !allVisibleAccounts.length"
-                                                               :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
-                                                               :label="$t('Destination Account')"
-                                                               :placeholder="$t('Destination Account')"
-                                                               :items="categorizedAccounts"
-                                                               v-model="item.destinationAccountId"
-                                                               @update:model-value="updateTransactionData(item)">
-                                            </two-column-select>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-autocomplete
-                                                item-title="name"
-                                                item-value="id"
-                                                auto-select-first
-                                                persistent-placeholder
-                                                multiple
-                                                chips
-                                                closable-chips
-                                                :disabled="loading || submitting"
-                                                :label="$t('Tags')"
-                                                :placeholder="$t('None')"
-                                                :items="allTags"
-                                                :no-data-text="$t('No available tag')"
-                                                v-model="item.tagIds"
-                                                @update:model-value="updateTransactionData(item)"
-                                            >
-                                                <template #chip="{ props, index }">
-                                                    <v-chip :class="{ 'font-italic': !isTagValid(item, index) }"
-                                                            :prepend-icon="isTagValid(item, index) ? icons.tag : icons.alert"
-                                                            :color="isTagValid(item, index) ? 'default' : 'error'"
-                                                            :text="isTagValid(item, index) ? allTagsMap[item.tagIds[index]].name : item.originalTagNames[index]"
-                                                            v-bind="props"/>
-                                                </template>
+                            <div v-if="editingTransaction !== item">
+                                <v-chip class="transaction-tag" size="small"
+                                        :class="{ 'font-italic': !tagId || tagId === '0' || !allTagsMap[tagId] }"
+                                        :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? icons.tag : icons.alert"
+                                        :color="tagId && tagId !== '0' && allTagsMap[tagId] ? 'default' : 'error'"
+                                        :text="tagId && tagId !== '0' && allTagsMap[tagId] ? allTagsMap[tagId].name : item.originalTagNames[index]"
+                                        :key="tagId"
+                                        v-for="(tagId, index) in item.tagIds"/>
+                                <v-chip class="transaction-tag" size="small"
+                                        :text="$t('None')"
+                                        v-if="!item.tagIds || !item.tagIds.length"/>
+                            </div>
+                            <div style="width: 360px" v-if="editingTransaction === item">
+                                <v-autocomplete
+                                    item-title="name"
+                                    item-value="id"
+                                    auto-select-first
+                                    persistent-placeholder
+                                    multiple
+                                    chips
+                                    closable-chips
+                                    density="compact" variant="underlined"
+                                    :disabled="loading || submitting"
+                                    :placeholder="$t('None')"
+                                    :items="allTags"
+                                    :no-data-text="$t('No available tag')"
+                                    v-model="item.tagIds"
+                                    @update:model-value="updateTransactionData(item)"
+                                >
+                                    <template #chip="{ props, index }">
+                                        <v-chip :class="{ 'font-italic': !isTagValid(item, index) }"
+                                                :prepend-icon="isTagValid(item, index) ? icons.tag : icons.alert"
+                                                :color="isTagValid(item, index) ? 'default' : 'error'"
+                                                :text="isTagValid(item, index) ? allTagsMap[item.tagIds[index]].name : item.originalTagNames[index]"
+                                                v-bind="props"/>
+                                    </template>
 
-                                                <template #item="{ props, item }">
-                                                    <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
-                                                        <template #title>
-                                                            <v-list-item-title>
-                                                                <div class="d-flex align-center">
-                                                                    <v-icon size="20" start :icon="icons.tag"/>
-                                                                    <span>{{ item.title }}</span>
-                                                                </div>
-                                                            </v-list-item-title>
-                                                        </template>
-                                                    </v-list-item>
-                                                </template>
-                                            </v-autocomplete>
-                                        </v-col>
-                                    </v-row>
-                                </td>
-                            </tr>
+                                    <template #item="{ props, item }">
+                                        <v-list-item :value="item.value" v-bind="props" v-if="!item.raw.hidden">
+                                            <template #title>
+                                                <v-list-item-title>
+                                                    <div class="d-flex align-center">
+                                                        <v-icon size="20" start :icon="icons.tag"/>
+                                                        <span>{{ item.title }}</span>
+                                                    </div>
+                                                </v-list-item-title>
+                                            </template>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
+                            </div>
                         </template>
                         <template #bottom>
                             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2"
@@ -422,7 +418,7 @@ export default {
             fileType: 'ezbookkeeping_csv',
             importFile: null,
             importTransactions: null,
-            expandedTransactions: [],
+            editingTransaction: null,
             currentPage: 1,
             countPerPage: 10,
             importedCount: null,
@@ -553,7 +549,7 @@ export default {
         },
         importTransactionHeaders() {
             return [
-                { value: 'valid', key: 'data-table-expand', sortable: true, nowrap: true },
+                { value: 'valid', sortable: true, nowrap: true },
                 { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true },
                 { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true },
                 { value: 'categoryId', title: this.$t('Category'), sortable: true, nowrap: true },
@@ -621,7 +617,7 @@ export default {
         fileType: function () {
             this.importFile = null;
             this.importTransactions = null;
-            this.expandedTransactions = [];
+            this.editingTransaction = null;
             this.currentPage = 1;
             this.countPerPage = 10;
         }
@@ -633,7 +629,7 @@ export default {
             self.currentStep = 'uploadFile';
             self.importFile = null;
             self.importTransactions = null;
-            self.expandedTransactions = [];
+            self.editingTransaction = null;
             self.currentPage = 1;
             self.countPerPage = 10;
             self.showState = true;
@@ -700,7 +696,7 @@ export default {
                 }
 
                 self.importTransactions = parsedTransactions;
-                self.expandedTransactions = [];
+                self.editingTransaction = null;
                 self.currentPage = 1;
 
                 if (self.importTransactions && self.importTransactions.length >= 0 && self.importTransactions.length < 10) {
@@ -739,6 +735,7 @@ export default {
             self.$refs.confirmDialog.open('format.misc.confirmImportTransactions', {
                 count: transactions.length
             }).then(() => {
+                self.editingTransaction = null;
                 self.submitting = true;
 
                 self.transactionsStore.importTransactions({
@@ -814,6 +811,13 @@ export default {
                 if (this.importTransactions[i] && (this.importTransactions[i].valid || this.importTransactions[i].selected)) {
                     this.importTransactions[i].selected = !this.importTransactions[i].selected;
                 }
+            }
+        },
+        editTransaction(transaction) {
+            if (this.editingTransaction === transaction) {
+                this.editingTransaction = null;
+            } else {
+                this.editingTransaction = transaction;
             }
         },
         updateTransactionData(transaction) {

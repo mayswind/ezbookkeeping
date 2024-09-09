@@ -307,16 +307,9 @@ function buildBasicSubmitTransaction(transaction, dummyTime) {
         utcOffset: transaction.utcOffset
     };
 
-    if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
-        submitTransaction.categoryId = transaction.expenseCategory;
-    } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
-        submitTransaction.categoryId = transaction.incomeCategory;
-    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
-        submitTransaction.categoryId = transaction.transferCategory;
+    if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
         submitTransaction.destinationAccountId = transaction.destinationAccountId;
         submitTransaction.destinationAmount = transaction.destinationAmount;
-    } else {
-        return null;
     }
 
     return submitTransaction;
@@ -867,7 +860,13 @@ export const useTransactionsStore = defineStore('transactions', {
 
             const submitTransaction = buildBasicSubmitTransaction(transaction, true);
 
-            if (!submitTransaction) {
+            if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                submitTransaction.categoryId = transaction.expenseCategory;
+            } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                submitTransaction.categoryId = transaction.incomeCategory;
+            } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+                submitTransaction.categoryId = transaction.transferCategory;
+            } else {
                 return Promise.reject('An error occurred');
             }
 
@@ -1044,21 +1043,9 @@ export const useTransactionsStore = defineStore('transactions', {
             if (transactions) {
                 for (let i = 0; i < transactions.length; i++) {
                     const transaction = transactions[i];
-
-                    if (transaction.type === transactionConstants.allTransactionTypes.Income) {
-                        transaction.incomeCategory = transaction.categoryId;
-                    } else if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
-                        transaction.expenseCategory = transaction.categoryId;
-                    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
-                        transaction.transferCategory = transaction.categoryId;
-                    }
-
                     const submitTransaction = buildBasicSubmitTransaction(transaction, false);
 
-                    if (!submitTransaction) {
-                        return Promise.reject('An error occurred');
-                    }
-
+                    submitTransaction.categoryId = transaction.categoryId;
                     submitTransactions.push(submitTransaction);
                 }
             }

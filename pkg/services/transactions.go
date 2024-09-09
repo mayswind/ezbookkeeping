@@ -217,22 +217,30 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 
 	now := time.Now().Unix()
 
-	needUuidCount := 1
+	needTransactionUuidCount := 1
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		needUuidCount = 2
+		needTransactionUuidCount = 2
 	}
 
-	uuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint16(needUuidCount))
+	transactionUuids := s.GenerateUuids(uuid.UUID_TYPE_TRANSACTION, uint16(needTransactionUuidCount))
 
-	if len(uuids) < needUuidCount {
+	if len(transactionUuids) < needTransactionUuidCount {
 		return errs.ErrSystemIsBusy
 	}
 
-	transaction.TransactionId = uuids[0]
+	tagIds = utils.ToUniqueInt64Slice(tagIds)
+	needTagIndexUuidCount := uint16(len(tagIds))
+	tagIndexUuids := s.GenerateUuids(uuid.UUID_TYPE_TAG_INDEX, needTagIndexUuidCount)
+
+	if len(tagIndexUuids) < int(needTagIndexUuidCount) {
+		return errs.ErrSystemIsBusy
+	}
+
+	transaction.TransactionId = transactionUuids[0]
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
-		transaction.RelatedId = uuids[1]
+		transaction.RelatedId = transactionUuids[1]
 	}
 
 	transaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
@@ -240,18 +248,11 @@ func (s *TransactionService) CreateTransaction(c core.Context, transaction *mode
 	transaction.CreatedUnixTime = now
 	transaction.UpdatedUnixTime = now
 
-	tagIds = utils.ToUniqueInt64Slice(tagIds)
 	transactionTagIndexes := make([]*models.TransactionTagIndex, len(tagIds))
 
 	for i := 0; i < len(tagIds); i++ {
-		tagIndexId := s.GenerateUuid(uuid.UUID_TYPE_TAG_INDEX)
-
-		if tagIndexId < 1 {
-			return errs.ErrSystemIsBusy
-		}
-
 		transactionTagIndexes[i] = &models.TransactionTagIndex{
-			TagIndexId:      tagIndexId,
+			TagIndexId:      tagIndexUuids[i],
 			Uid:             transaction.Uid,
 			Deleted:         false,
 			TagId:           tagIds[i],

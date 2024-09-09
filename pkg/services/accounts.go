@@ -474,3 +474,14 @@ func (s *AccountService) GetAccountNameMapByList(accounts []*models.Account) map
 	}
 	return accountMap
 }
+
+// GetAccountNames returns a list with account names from account models list
+func (s *AccountService) GetAccountNames(accounts []*models.Account) []string {
+	accountNames := make([]string, len(accounts))
+
+	for i := 0; i < len(accounts); i++ {
+		accountNames[i] = accounts[i].Name
+	}
+
+	return accountNames
+}

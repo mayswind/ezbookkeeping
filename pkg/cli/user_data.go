@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters"
@@ -706,17 +707,20 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 	}
 
 	if len(newAccounts) > 0 {
-		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d accounts need to be created, please create them manually", len(newAccounts))
+		accountNames := l.accounts.GetAccountNames(newAccounts)
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d accounts (%s) need to be created, please create them manually", len(newAccounts), strings.Join(accountNames, ","))
 		return errs.ErrOperationFailed
 	}
 
 	if len(newCategories) > 0 {
-		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction categories need to be created, please create them manually", len(newCategories))
+		categoryNames := l.categories.GetCategoryNames(newCategories)
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction categories (%s) need to be created, please create them manually", len(newCategories), strings.Join(categoryNames, ","))
 		return errs.ErrOperationFailed
 	}
 
 	if len(newTags) > 0 {
-		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction tags need to be created, please create them manually", len(newTags))
+		tagNames := l.tags.GetTagNames(newTags)
+		log.BootErrorf(c, "[user_data.ImportTransaction] there are %d transaction tags (%s) need to be created, please create them manually", len(newTags), strings.Join(tagNames, ","))
 		return errs.ErrOperationFailed
 	}
 

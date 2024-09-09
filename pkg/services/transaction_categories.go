@@ -458,3 +458,14 @@ func (s *TransactionCategoryService) GetCategoryNameMapByList(categories []*mode
 	}
 	return categoryMap
 }
+
+// GetCategoryNames returns a list with transaction category names from transaction category models list
+func (s *TransactionCategoryService) GetCategoryNames(categories []*models.TransactionCategory) []string {
+	categoryNames := make([]string, len(categories))
+
+	for i := 0; i < len(categories); i++ {
+		categoryNames[i] = categories[i].Name
+	}
+
+	return categoryNames
+}

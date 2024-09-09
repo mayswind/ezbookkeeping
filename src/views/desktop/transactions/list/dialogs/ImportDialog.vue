@@ -64,6 +64,7 @@
                         <template #header.data-table-select>
                             <v-checkbox readonly class="cursor-pointer"
                                         density="compact" width="28"
+                                        :disabled="loading || submitting"
                                         :indeterminate="anyButNotAllTransactionSelected"
                                         v-model="allTransactionSelected"
                             >
@@ -71,22 +72,28 @@
                                     <v-list>
                                         <v-list-item :prepend-icon="icons.selectAll"
                                                      :title="$t('Select All')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectAll"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectNone"
                                                      :title="$t('Select None')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectNone"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectInverse"
                                                      :title="$t('Invert Selection')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectInvert"></v-list-item>
                                         <v-divider class="my-2"/>
                                         <v-list-item :prepend-icon="icons.selectAll"
                                                      :title="$t('Select All in This Page')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectAllInThisPage"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectNone"
                                                      :title="$t('Select None in This Page')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectNoneInThisPage"></v-list-item>
                                         <v-list-item :prepend-icon="icons.selectInverse"
                                                      :title="$t('Invert Selection in This Page')"
+                                                     :disabled="loading || submitting"
                                                      @click="selectInvertInThisPage"></v-list-item>
                                     </v-list>
                                 </v-menu>
@@ -94,14 +101,15 @@
                         </template>
                         <template #item.data-table-select="{ item }">
                             <v-checkbox density="compact"
-                                        :disabled="!item.valid"
+                                        :disabled="loading || submitting || !item.valid"
                                         v-model="item.selected"></v-checkbox>
                         </template>
                         <template #item.data-table-expand="{ item, internalItem, toggleExpand }">
                             <v-icon size="small" :class="{ 'text-error': !item.valid }"
+                                    :disabled="loading || submitting"
                                     :icon="icons.edit" @click="toggleExpand(internalItem)">
                             </v-icon>
-                            <v-tooltip activator="parent">{{ $t('Edit') }}</v-tooltip>
+                            <v-tooltip activator="parent" v-if="!loading && !submitting">{{ $t('Edit') }}</v-tooltip>
                         </template>
                         <template #item.time="{ item }">
                             <span>{{ getDisplayDateTime(item) }}</span>

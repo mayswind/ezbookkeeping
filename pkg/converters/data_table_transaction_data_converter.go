@@ -210,7 +210,7 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 	descriptionColumnIdx, descriptionColumnExists := headerItemMap[c.dataColumnMapping[DATA_TABLE_DESCRIPTION]]
 
 	if !timeColumnExists || !typeColumnExists || !subCategoryColumnExists ||
-		!accountColumnExists || !amountColumnExists || !account2ColumnExists || !amount2ColumnExists {
+		!accountColumnExists || !amountColumnExists || !account2ColumnExists {
 		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
 		return nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
@@ -389,11 +389,16 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 			}
 
 			relatedAccountId = account2.AccountId
-			relatedAccountAmount, err = utils.ParseAmount(dataRow.GetData(amount2ColumnIdx))
 
-			if err != nil {
-				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse acmount2 \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(amount2ColumnIdx), dataRowIndex, user.Uid, err.Error())
-				return nil, nil, nil, nil, errs.ErrAmountInvalid
+			if amount2ColumnExists {
+				relatedAccountAmount, err = utils.ParseAmount(dataRow.GetData(amount2ColumnIdx))
+
+				if err != nil {
+					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse acmount2 \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(amount2ColumnIdx), dataRowIndex, user.Uid, err.Error())
+					return nil, nil, nil, nil, errs.ErrAmountInvalid
+				}
+			} else if transactionDbType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+				relatedAccountAmount = amount
 			}
 		}
 

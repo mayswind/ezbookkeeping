@@ -361,6 +361,30 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *
 	assert.NotNil(t, err)
 }
 
+func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNoAmount2(t *testing.T) {
+	converter := EzBookKeepingTransactionDataCSVFileConverter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,"), 0, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+	assert.Equal(t, int64(0), allNewTransactions[0].RelatedAccountAmount)
+
+	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2\n"+
+		"2024-09-01 12:34:56,Transfer,Test Category,Test Account,123.45,Test Account2"), 0, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+	assert.Equal(t, int64(12345), allNewTransactions[0].RelatedAccountAmount)
+}
+
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
 	converter := EzBookKeepingTransactionDataCSVFileConverter
 	context := core.NewNullContext()
@@ -483,10 +507,6 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MissingRequiredColumn(
 	assert.NotNil(t, err)
 
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 

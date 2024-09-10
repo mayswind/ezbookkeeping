@@ -35,10 +35,19 @@ const (
 	DATA_TABLE_DESCRIPTION              DataTableColumn = 14
 )
 
-// DataTableTransactionDataConverter defines the structure of data table importer for transaction data
-type DataTableTransactionDataConverter struct {
+// DataTableTransactionDataExporter defines the structure of plain text data table exporter for transaction data
+type DataTableTransactionDataExporter struct {
+	dataColumnMapping       map[DataTableColumn]string
+	transactionTypeMapping  map[models.TransactionDbType]string
+	columnSeparator         string
+	lineSeparator           string
+	geoLocationSeparator    string
+	transactionTagSeparator string
+}
+
+// DataTableTransactionDataImporter defines the structure of plain text data table importer for transaction data
+type DataTableTransactionDataImporter struct {
 	dataColumnMapping          map[DataTableColumn]string
-	transactionTypeMapping     map[models.TransactionDbType]string
 	transactionTypeNameMapping map[string]models.TransactionDbType
 	columnSeparator            string
 	lineSeparator              string
@@ -46,7 +55,7 @@ type DataTableTransactionDataConverter struct {
 	transactionTagSeparator    string
 }
 
-func (c *DataTableTransactionDataConverter) buildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
+func (c *DataTableTransactionDataExporter) buildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 
@@ -82,7 +91,112 @@ func (c *DataTableTransactionDataConverter) buildExportedContent(ctx core.Contex
 	return nil
 }
 
-func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *DataTableTransactionDataExporter) getDisplayTransactionTypeName(transactionDbType models.TransactionDbType) string {
+	transactionTypeName, exists := c.transactionTypeMapping[transactionDbType]
+
+	if !exists {
+		return ""
+	}
+
+	return transactionTypeName
+}
+
+func (c *DataTableTransactionDataExporter) getExportedTransactionCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
+	category, exists := categoryMap[categoryId]
+
+	if !exists {
+		return ""
+	}
+
+	if category.ParentCategoryId == 0 {
+		return c.replaceDelimiters(category.Name)
+	}
+
+	parentCategory, exists := categoryMap[category.ParentCategoryId]
+
+	if !exists {
+		return ""
+	}
+
+	return c.replaceDelimiters(parentCategory.Name)
+}
+
+func (c *DataTableTransactionDataExporter) getExportedTransactionSubCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
+	category, exists := categoryMap[categoryId]
+
+	if exists {
+		return c.replaceDelimiters(category.Name)
+	} else {
+		return ""
+	}
+}
+
+func (c *DataTableTransactionDataExporter) getExportedAccountName(accountId int64, accountMap map[int64]*models.Account) string {
+	account, exists := accountMap[accountId]
+
+	if exists {
+		return c.replaceDelimiters(account.Name)
+	} else {
+		return ""
+	}
+}
+
+func (c *DataTableTransactionDataExporter) getAccountCurrency(accountId int64, accountMap map[int64]*models.Account) string {
+	account, exists := accountMap[accountId]
+
+	if exists {
+		return c.replaceDelimiters(account.Currency)
+	} else {
+		return ""
+	}
+}
+
+func (c *DataTableTransactionDataExporter) getExportedGeographicLocation(transaction *models.Transaction) string {
+	if transaction.GeoLongitude != 0 || transaction.GeoLatitude != 0 {
+		return fmt.Sprintf("%f%s%f", transaction.GeoLongitude, c.geoLocationSeparator, transaction.GeoLatitude)
+	}
+
+	return ""
+}
+
+func (c *DataTableTransactionDataExporter) getExportedTags(transactionId int64, allTagIndexes map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
+	tagIndexes, exists := allTagIndexes[transactionId]
+
+	if !exists {
+		return ""
+	}
+
+	var ret strings.Builder
+
+	for i := 0; i < len(tagIndexes); i++ {
+		tagIndex := tagIndexes[i]
+		tag, exists := tagMap[tagIndex]
+
+		if !exists {
+			continue
+		}
+
+		if ret.Len() > 0 {
+			ret.WriteString(c.transactionTagSeparator)
+		}
+
+		ret.WriteString(strings.Replace(tag.Name, c.transactionTagSeparator, " ", -1))
+	}
+
+	return c.replaceDelimiters(ret.String())
+}
+
+func (c *DataTableTransactionDataExporter) replaceDelimiters(text string) string {
+	text = strings.Replace(text, "\r\n", " ", -1)
+	text = strings.Replace(text, "\r", " ", -1)
+	text = strings.Replace(text, "\n", " ", -1)
+	text = strings.Replace(text, c.columnSeparator, " ", -1)
+	text = strings.Replace(text, c.lineSeparator, " ", -1)
+
+	return text
+}
+
+func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.DataRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
 		return nil, nil, nil, nil, errs.ErrOperationFailed
@@ -389,7 +503,7 @@ func (c *DataTableTransactionDataConverter) parseImportedData(ctx core.Context, 
 	return allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, nil
 }
 
-func (c *DataTableTransactionDataConverter) getTransactionDbType(transactionTypeName string) (models.TransactionDbType, error) {
+func (c *DataTableTransactionDataImporter) getTransactionDbType(transactionTypeName string) (models.TransactionDbType, error) {
 	transactionType, exists := c.transactionTypeNameMapping[transactionTypeName]
 
 	if !exists {
@@ -399,7 +513,7 @@ func (c *DataTableTransactionDataConverter) getTransactionDbType(transactionType
 	return transactionType, nil
 }
 
-func (c *DataTableTransactionDataConverter) getTransactionCategoryType(transactionType models.TransactionDbType) (models.TransactionCategoryType, error) {
+func (c *DataTableTransactionDataImporter) getTransactionCategoryType(transactionType models.TransactionDbType) (models.TransactionCategoryType, error) {
 	if transactionType == models.TRANSACTION_DB_TYPE_INCOME {
 		return models.CATEGORY_TYPE_INCOME, nil
 	} else if transactionType == models.TRANSACTION_DB_TYPE_EXPENSE {
@@ -411,112 +525,7 @@ func (c *DataTableTransactionDataConverter) getTransactionCategoryType(transacti
 	}
 }
 
-func (c *DataTableTransactionDataConverter) getDisplayTransactionTypeName(transactionDbType models.TransactionDbType) string {
-	transactionTypeName, exists := c.transactionTypeMapping[transactionDbType]
-
-	if !exists {
-		return ""
-	}
-
-	return transactionTypeName
-}
-
-func (c *DataTableTransactionDataConverter) getExportedTransactionCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
-	category, exists := categoryMap[categoryId]
-
-	if !exists {
-		return ""
-	}
-
-	if category.ParentCategoryId == 0 {
-		return c.replaceDelimiters(category.Name)
-	}
-
-	parentCategory, exists := categoryMap[category.ParentCategoryId]
-
-	if !exists {
-		return ""
-	}
-
-	return c.replaceDelimiters(parentCategory.Name)
-}
-
-func (c *DataTableTransactionDataConverter) getExportedTransactionSubCategoryName(categoryId int64, categoryMap map[int64]*models.TransactionCategory) string {
-	category, exists := categoryMap[categoryId]
-
-	if exists {
-		return c.replaceDelimiters(category.Name)
-	} else {
-		return ""
-	}
-}
-
-func (c *DataTableTransactionDataConverter) getExportedAccountName(accountId int64, accountMap map[int64]*models.Account) string {
-	account, exists := accountMap[accountId]
-
-	if exists {
-		return c.replaceDelimiters(account.Name)
-	} else {
-		return ""
-	}
-}
-
-func (c *DataTableTransactionDataConverter) getAccountCurrency(accountId int64, accountMap map[int64]*models.Account) string {
-	account, exists := accountMap[accountId]
-
-	if exists {
-		return c.replaceDelimiters(account.Currency)
-	} else {
-		return ""
-	}
-}
-
-func (c *DataTableTransactionDataConverter) getExportedGeographicLocation(transaction *models.Transaction) string {
-	if transaction.GeoLongitude != 0 || transaction.GeoLatitude != 0 {
-		return fmt.Sprintf("%f%s%f", transaction.GeoLongitude, c.geoLocationSeparator, transaction.GeoLatitude)
-	}
-
-	return ""
-}
-
-func (c *DataTableTransactionDataConverter) getExportedTags(transactionId int64, allTagIndexes map[int64][]int64, tagMap map[int64]*models.TransactionTag) string {
-	tagIndexes, exists := allTagIndexes[transactionId]
-
-	if !exists {
-		return ""
-	}
-
-	var ret strings.Builder
-
-	for i := 0; i < len(tagIndexes); i++ {
-		tagIndex := tagIndexes[i]
-		tag, exists := tagMap[tagIndex]
-
-		if !exists {
-			continue
-		}
-
-		if ret.Len() > 0 {
-			ret.WriteString(c.transactionTagSeparator)
-		}
-
-		ret.WriteString(strings.Replace(tag.Name, c.transactionTagSeparator, " ", -1))
-	}
-
-	return c.replaceDelimiters(ret.String())
-}
-
-func (c *DataTableTransactionDataConverter) replaceDelimiters(text string) string {
-	text = strings.Replace(text, "\r\n", " ", -1)
-	text = strings.Replace(text, "\r", " ", -1)
-	text = strings.Replace(text, "\n", " ", -1)
-	text = strings.Replace(text, c.columnSeparator, " ", -1)
-	text = strings.Replace(text, c.lineSeparator, " ", -1)
-
-	return text
-}
-
-func (c *DataTableTransactionDataConverter) createNewAccountModel(uid int64, accountName string, currency string) *models.Account {
+func (c *DataTableTransactionDataImporter) createNewAccountModel(uid int64, accountName string, currency string) *models.Account {
 	return &models.Account{
 		Uid:      uid,
 		Name:     accountName,
@@ -524,7 +533,7 @@ func (c *DataTableTransactionDataConverter) createNewAccountModel(uid int64, acc
 	}
 }
 
-func (c *DataTableTransactionDataConverter) createNewTransactionCategoryModel(uid int64, categoryName string, transactionCategoryType models.TransactionCategoryType) *models.TransactionCategory {
+func (c *DataTableTransactionDataImporter) createNewTransactionCategoryModel(uid int64, categoryName string, transactionCategoryType models.TransactionCategoryType) *models.TransactionCategory {
 	return &models.TransactionCategory{
 		Uid:  uid,
 		Name: categoryName,
@@ -532,7 +541,7 @@ func (c *DataTableTransactionDataConverter) createNewTransactionCategoryModel(ui
 	}
 }
 
-func (c *DataTableTransactionDataConverter) createNewTransactionTagModel(uid int64, tagName string) *models.TransactionTag {
+func (c *DataTableTransactionDataImporter) createNewTransactionTagModel(uid int64, tagName string) *models.TransactionTag {
 	return &models.TransactionTag{
 		Uid:  uid,
 		Name: tagName,

@@ -8,12 +8,16 @@ import (
 // ezBookKeepingTransactionDataPlainTextExporter defines the structure of ezbookkeeping plain text exporter for transaction data
 type ezBookKeepingTransactionDataPlainTextExporter struct {
 	DataTableTransactionDataExporter
-	columns []DataTableColumn
+	columns         []DataTableColumn
+	columnSeparator string
+	lineSeparator   string
 }
 
 // ezBookKeepingTransactionDataPlainTextImporter defines the structure of ezbookkeeping plain text importer for transaction data
 type ezBookKeepingTransactionDataPlainTextImporter struct {
 	DataTableTransactionDataImporter
+	columnSeparator string
+	lineSeparator   string
 }
 
 var ezbookkeepingDataColumnNameMapping = map[DataTableColumn]string{

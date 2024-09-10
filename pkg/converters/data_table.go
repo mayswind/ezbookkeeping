@@ -34,4 +34,7 @@ type ImportedDataRowIterator interface {
 type DataTableBuilder interface {
 	// AppendTransaction appends the specified transaction to data builder
 	AppendTransaction(data map[DataTableColumn]string)
+
+	// ReplaceDelimiters returns the text after removing the delimiters
+	ReplaceDelimiters(text string) string
 }

@@ -13,22 +13,22 @@ var (
 			DataTableTransactionDataExporter: DataTableTransactionDataExporter{
 				dataColumnMapping:       ezbookkeepingDataColumnNameMapping,
 				transactionTypeMapping:  ezbookkeepingTransactionTypeNameMapping,
-				columnSeparator:         "\t",
-				lineSeparator:           "\n",
 				geoLocationSeparator:    " ",
 				transactionTagSeparator: ";",
 			},
-			columns: ezbookkeepingDataColumns,
+			columns:         ezbookkeepingDataColumns,
+			columnSeparator: "\t",
+			lineSeparator:   "\n",
 		},
 		ezBookKeepingTransactionDataPlainTextImporter{
 			DataTableTransactionDataImporter: DataTableTransactionDataImporter{
 				dataColumnMapping:          ezbookkeepingDataColumnNameMapping,
 				transactionTypeNameMapping: ezbookkeepingNameTransactionTypeMapping,
-				columnSeparator:            "\t",
-				lineSeparator:              "\n",
 				geoLocationSeparator:       " ",
 				transactionTagSeparator:    ";",
 			},
+			columnSeparator: "\t",
+			lineSeparator:   "\n",
 		},
 	}
 )

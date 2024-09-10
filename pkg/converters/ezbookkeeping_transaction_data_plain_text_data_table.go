@@ -100,6 +100,17 @@ func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) AppendTransaction(da
 	b.builder.WriteString(fmt.Sprintf(b.dataLineFormat, dataRowParams...))
 }
 
+// ReplaceDelimiters returns the text after removing the delimiters
+func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) ReplaceDelimiters(text string) string {
+	text = strings.Replace(text, "\r\n", " ", -1)
+	text = strings.Replace(text, "\r", " ", -1)
+	text = strings.Replace(text, "\n", " ", -1)
+	text = strings.Replace(text, b.columnSeparator, " ", -1)
+	text = strings.Replace(text, b.lineSeparator, " ", -1)
+
+	return text
+}
+
 // String returns the textual representation of this data
 func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) String() string {
 	return b.builder.String()

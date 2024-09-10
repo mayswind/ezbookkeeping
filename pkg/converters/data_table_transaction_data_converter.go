@@ -252,7 +252,7 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 		timezoneOffset := defaultTimezoneOffset
 
 		if timezoneColumnExists {
-			transactionTimezone, err := utils.ParseFromTimezoneOffset(dataRow.GetData(timezoneColumnIdx))
+			transactionTimezone, err := dataRow.GetTimezoneOffset(timezoneColumnIdx)
 
 			if err != nil {
 				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse time zone \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(timezoneColumnIdx), dataRowIndex, user.Uid, err.Error())
@@ -262,7 +262,7 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 			timezoneOffset = utils.GetTimezoneOffsetMinutes(transactionTimezone)
 		}
 
-		transactionTime, err := utils.ParseFromLongDateTime(dataRow.GetData(timeColumnIdx), timezoneOffset)
+		transactionTime, err := dataRow.GetTime(timeColumnIdx, timezoneOffset)
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse time \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(timeColumnIdx), dataRowIndex, user.Uid, err.Error())

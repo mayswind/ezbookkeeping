@@ -3,8 +3,10 @@ package converters
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // ezBookKeepingTransactionPlainTextDataTable defines the structure of ezbookkeeping transaction plain text data table
@@ -66,6 +68,16 @@ func (r *ezBookKeepingTransactionPlainTextDataRow) ColumnCount() int {
 // GetData returns the data in the specified column index
 func (r *ezBookKeepingTransactionPlainTextDataRow) GetData(columnIndex int) string {
 	return r.allItems[columnIndex]
+}
+
+// GetTime returns the time in the specified column index
+func (r *ezBookKeepingTransactionPlainTextDataRow) GetTime(columnIndex int, timezoneOffset int16) (time.Time, error) {
+	return utils.ParseFromLongDateTime(r.GetData(columnIndex), timezoneOffset)
+}
+
+// GetTimezoneOffset returns the time zone offset in the specified column index
+func (r *ezBookKeepingTransactionPlainTextDataRow) GetTimezoneOffset(columnIndex int) (*time.Location, error) {
+	return utils.ParseFromTimezoneOffset(r.GetData(columnIndex))
 }
 
 // HasNext returns whether the iterator does not reach the end

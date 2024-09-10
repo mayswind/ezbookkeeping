@@ -1,5 +1,7 @@
 package converters
 
+import "time"
+
 // ImportedDataTable defines the structure of imported data table
 type ImportedDataTable interface {
 	// DataRowCount returns the total count of data row
@@ -19,6 +21,12 @@ type ImportedDataRow interface {
 
 	// GetData returns the data in the specified column index
 	GetData(columnIndex int) string
+
+	// GetTime returns the time in the specified column index
+	GetTime(columnIndex int, timezoneOffset int16) (time.Time, error)
+
+	// GetTimezoneOffset returns the time zone offset in the specified column index
+	GetTimezoneOffset(columnIndex int) (*time.Location, error)
 }
 
 // ImportedDataRowIterator defines the structure of imported data row iterator

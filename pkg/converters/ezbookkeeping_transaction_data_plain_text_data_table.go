@@ -144,7 +144,7 @@ func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnS
 	allLines := strings.Split(content, lineSeparator)
 
 	if len(allLines) < 2 {
-		return nil, errs.ErrOperationFailed
+		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	headerLine := allLines[0]

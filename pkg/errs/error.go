@@ -37,6 +37,7 @@ const (
 	NormalSubcategoryMapProxy       = 9
 	NormalSubcategoryTemplate       = 10
 	NormalSubcategoryPicture        = 11
+	NormalSubcategoryConverter      = 12
 )
 
 // Error represents the specific error returned to user

@@ -246,20 +246,6 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t
 	assert.NotNil(t, err)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidSubCategoryName(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
-	context := core.NewNullContext()
-
-	user := &models.User{
-		Uid:             1234567890,
-		DefaultCurrency: "CNY",
-	}
-
-	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,Expense,,Test Account,123.45,,"), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-}
-
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountName(t *testing.T) {
 	converter := EzBookKeepingTransactionDataCSVFileConverter
 	context := core.NewNullContext()

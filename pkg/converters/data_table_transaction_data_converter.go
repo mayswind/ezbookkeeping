@@ -288,12 +288,6 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 			}
 
 			subCategoryName = dataRow.GetData(subCategoryColumnIdx)
-
-			if subCategoryName == "" {
-				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] sub category type is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
-				return nil, nil, nil, nil, errs.ErrSubCategoryNameCannotBeBlank
-			}
-
 			subCategory, exists := categoryMap[subCategoryName]
 
 			if !exists {

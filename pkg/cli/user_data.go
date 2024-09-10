@@ -21,16 +21,14 @@ const pageCountForDataExport = 1000
 // UserDataCli represents user data cli
 type UserDataCli struct {
 	CliUsingConfig
-	ezBookKeepingCsvConverter converters.TransactionDataConverter
-	ezBookKeepingTsvConverter converters.TransactionDataConverter
-	accounts                  *services.AccountService
-	transactions              *services.TransactionService
-	categories                *services.TransactionCategoryService
-	tags                      *services.TransactionTagService
-	users                     *services.UserService
-	twoFactorAuthorizations   *services.TwoFactorAuthorizationService
-	tokens                    *services.TokenService
-	forgetPasswords           *services.ForgetPasswordService
+	accounts                *services.AccountService
+	transactions            *services.TransactionService
+	categories              *services.TransactionCategoryService
+	tags                    *services.TransactionTagService
+	users                   *services.UserService
+	twoFactorAuthorizations *services.TwoFactorAuthorizationService
+	tokens                  *services.TokenService
+	forgetPasswords         *services.ForgetPasswordService
 }
 
 // Initialize an user data cli singleton instance
@@ -39,16 +37,14 @@ var (
 		CliUsingConfig: CliUsingConfig{
 			container: settings.Container,
 		},
-		ezBookKeepingCsvConverter: converters.EzBookKeepingTransactionDataCSVFileConverter,
-		ezBookKeepingTsvConverter: converters.EzBookKeepingTransactionDataTSVFileConverter,
-		accounts:                  services.Accounts,
-		transactions:              services.Transactions,
-		categories:                services.TransactionCategories,
-		tags:                      services.TransactionTags,
-		users:                     services.Users,
-		twoFactorAuthorizations:   services.TwoFactorAuthorizations,
-		tokens:                    services.Tokens,
-		forgetPasswords:           services.ForgetPasswords,
+		accounts:                services.Accounts,
+		transactions:            services.Transactions,
+		categories:              services.TransactionCategories,
+		tags:                    services.TransactionTags,
+		users:                   services.Users,
+		twoFactorAuthorizations: services.TwoFactorAuthorizations,
+		tokens:                  services.Tokens,
+		forgetPasswords:         services.ForgetPasswords,
 	}
 )
 
@@ -646,12 +642,10 @@ func (l *UserDataCli) ExportTransaction(c *core.CliContext, username string, fil
 		return nil, err
 	}
 
-	var dataExporter converters.TransactionDataExporter
+	dataExporter := converters.GetTransactionDataExporter(fileType)
 
-	if fileType == "tsv" {
-		dataExporter = l.ezBookKeepingTsvConverter
-	} else {
-		dataExporter = l.ezBookKeepingCsvConverter
+	if dataExporter == nil {
+		return nil, errs.ErrNotImplemented
 	}
 
 	result, err := dataExporter.ToExportedContent(c, uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexesMap)
@@ -670,14 +664,10 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return errs.ErrUsernameIsEmpty
 	}
 
-	var dataImporter converters.TransactionDataImporter
+	dataImporter, err := converters.GetTransactionDataImporter(fileType)
 
-	if fileType == "ezbookkeeping_csv" {
-		dataImporter = l.ezBookKeepingCsvConverter
-	} else if fileType == "ezbookkeeping_tsv" {
-		dataImporter = l.ezBookKeepingTsvConverter
-	} else {
-		return errs.ErrImportFileTypeNotSupported
+	if err != nil {
+		return err
 	}
 
 	user, err := l.GetUserByUsername(c, username)

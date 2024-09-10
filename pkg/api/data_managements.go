@@ -20,16 +20,14 @@ const pageCountForDataExport = 1000
 // DataManagementsApi represents data management api
 type DataManagementsApi struct {
 	ApiUsingConfig
-	ezBookKeepingCsvConverter converters.TransactionDataConverter
-	ezBookKeepingTsvConverter converters.TransactionDataConverter
-	tokens                    *services.TokenService
-	users                     *services.UserService
-	accounts                  *services.AccountService
-	transactions              *services.TransactionService
-	categories                *services.TransactionCategoryService
-	tags                      *services.TransactionTagService
-	pictures                  *services.TransactionPictureService
-	templates                 *services.TransactionTemplateService
+	tokens       *services.TokenService
+	users        *services.UserService
+	accounts     *services.AccountService
+	transactions *services.TransactionService
+	categories   *services.TransactionCategoryService
+	tags         *services.TransactionTagService
+	pictures     *services.TransactionPictureService
+	templates    *services.TransactionTemplateService
 }
 
 // Initialize a data management api singleton instance
@@ -38,16 +36,14 @@ var (
 		ApiUsingConfig: ApiUsingConfig{
 			container: settings.Container,
 		},
-		ezBookKeepingCsvConverter: converters.EzBookKeepingTransactionDataCSVFileConverter,
-		ezBookKeepingTsvConverter: converters.EzBookKeepingTransactionDataTSVFileConverter,
-		tokens:                    services.Tokens,
-		users:                     services.Users,
-		accounts:                  services.Accounts,
-		transactions:              services.Transactions,
-		categories:                services.TransactionCategories,
-		tags:                      services.TransactionTags,
-		pictures:                  services.TransactionPictures,
-		templates:                 services.TransactionTemplates,
+		tokens:       services.Tokens,
+		users:        services.Users,
+		accounts:     services.Accounts,
+		transactions: services.Transactions,
+		categories:   services.TransactionCategories,
+		tags:         services.TransactionTags,
+		pictures:     services.TransactionPictures,
+		templates:    services.TransactionTemplates,
 	}
 )
 
@@ -247,12 +243,10 @@ func (a *DataManagementsApi) getExportedFileContent(c *core.WebContext, fileType
 		return nil, "", errs.ErrOperationFailed
 	}
 
-	var dataExporter converters.TransactionDataExporter
+	dataExporter := converters.GetTransactionDataExporter(fileType)
 
-	if fileType == "tsv" {
-		dataExporter = a.ezBookKeepingTsvConverter
-	} else {
-		dataExporter = a.ezBookKeepingCsvConverter
+	if dataExporter == nil {
+		return nil, "", errs.ErrNotImplemented
 	}
 
 	result, err := dataExporter.ToExportedContent(c, uid, allTransactions, accountMap, categoryMap, tagMap, tagIndexes)

@@ -25,14 +25,12 @@ const maximumPicturesCountOfTransaction = 10
 type TransactionsApi struct {
 	ApiUsingConfig
 	ApiUsingDuplicateChecker
-	ezBookKeepingCsvConverter converters.TransactionDataConverter
-	ezBookKeepingTsvConverter converters.TransactionDataConverter
-	transactions              *services.TransactionService
-	transactionCategories     *services.TransactionCategoryService
-	transactionTags           *services.TransactionTagService
-	transactionPictures       *services.TransactionPictureService
-	accounts                  *services.AccountService
-	users                     *services.UserService
+	transactions          *services.TransactionService
+	transactionCategories *services.TransactionCategoryService
+	transactionTags       *services.TransactionTagService
+	transactionPictures   *services.TransactionPictureService
+	accounts              *services.AccountService
+	users                 *services.UserService
 }
 
 // Initialize a transaction api singleton instance
@@ -44,14 +42,12 @@ var (
 		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
 			container: duplicatechecker.Container,
 		},
-		ezBookKeepingCsvConverter: converters.EzBookKeepingTransactionDataCSVFileConverter,
-		ezBookKeepingTsvConverter: converters.EzBookKeepingTransactionDataTSVFileConverter,
-		transactions:              services.Transactions,
-		transactionCategories:     services.TransactionCategories,
-		transactionTags:           services.TransactionTags,
-		transactionPictures:       services.TransactionPictures,
-		accounts:                  services.Accounts,
-		users:                     services.Users,
+		transactions:          services.Transactions,
+		transactionCategories: services.TransactionCategories,
+		transactionTags:       services.TransactionTags,
+		transactionPictures:   services.TransactionPictures,
+		accounts:              services.Accounts,
+		users:                 services.Users,
 	}
 )
 
@@ -1034,14 +1030,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	}
 
 	fileType := fileTypes[0]
-	var dataImporter converters.TransactionDataImporter
+	dataImporter, err := converters.GetTransactionDataImporter(fileType)
 
-	if fileType == "ezbookkeeping_csv" {
-		dataImporter = a.ezBookKeepingCsvConverter
-	} else if fileType == "ezbookkeeping_tsv" {
-		dataImporter = a.ezBookKeepingTsvConverter
-	} else {
-		return nil, errs.ErrImportFileTypeNotSupported
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
 	}
 
 	importFiles := form.File["file"]

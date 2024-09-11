@@ -136,7 +136,8 @@ func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
 }
 
 // ParseFromLongDateTimeWithoutSecond parses a formatted string in long date time format (no second)
-func ParseFromLongDateTimeWithoutSecond(t string, timezone *time.Location) (time.Time, error) {
+func ParseFromLongDateTimeWithoutSecond(t string, utcOffset int16) (time.Time, error) {
+	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
 	return time.ParseInLocation(longDateTimeWithoutSecondFormat, t, timezone)
 }
 

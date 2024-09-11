@@ -133,7 +133,7 @@ func TestParseFromLongDateTime(t *testing.T) {
 
 func TestParseFromLongDateTimeWithoutSecond(t *testing.T) {
 	expectedValue := int64(1691947440)
-	actualTime, err := ParseFromLongDateTimeWithoutSecond("2023-08-13 17:24", time.UTC)
+	actualTime, err := ParseFromLongDateTimeWithoutSecond("2023-08-13 17:24", 0)
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()

@@ -10,6 +10,11 @@ const supportedImportFileTypes = [
         type: 'ezbookkeeping_tsv',
         name: 'ezbookkeeping Data Export File (TSV)',
         extensions: '.tsv'
+    },
+    {
+        type: 'feidee_mymoney_xls',
+        name: 'Feidee MyMoney (Web) Data Export File',
+        extensions: '.xls'
     }
 ];
 

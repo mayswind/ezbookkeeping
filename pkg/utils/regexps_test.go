@@ -112,3 +112,120 @@ func TestIsValidHexRGBColor_InvalidHexRGBColor(t *testing.T) {
 	actualValue = IsValidHexRGBColor(color)
 	assert.Equal(t, expectedValue, actualValue)
 }
+
+func TestIsValidLongDateTimeFormat_ValidLongDateTimeFormat(t *testing.T) {
+	datetime := "2024-09-01 12:34:56"
+	expectedValue := true
+	actualValue := IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-10-01 00:00:00"
+	expectedValue = true
+	actualValue = IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "9999-12-31 23:59:59"
+	expectedValue = true
+	actualValue = IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidLongDateTimeFormat_InvalidLongDateTimeFormat(t *testing.T) {
+	datetime := "2024-09-01"
+	expectedValue := false
+	actualValue := IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12"
+	expectedValue = false
+	actualValue = IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12:34"
+	expectedValue = false
+	actualValue = IsValidLongDateTimeFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidLongDateTimeWithoutSecondFormat_ValidLongDateTimeWithoutSecondFormat(t *testing.T) {
+	datetime := "2024-09-01 12:34"
+	expectedValue := true
+	actualValue := IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-10-01 00:00"
+	expectedValue = true
+	actualValue = IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "9999-12-31 23:59"
+	expectedValue = true
+	actualValue = IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidLongDateTimeWithoutSecondFormat_InvalidLongDateTimeWithoutSecondFormat(t *testing.T) {
+	datetime := "2024-09-01"
+	expectedValue := false
+	actualValue := IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12"
+	expectedValue = false
+	actualValue = IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12:34:56"
+	expectedValue = false
+	actualValue = IsValidLongDateTimeWithoutSecondFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidLongDateFormat_ValidLongDateFormat(t *testing.T) {
+	datetime := "2024-09-01"
+	expectedValue := true
+	actualValue := IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "9999-12-31"
+	expectedValue = true
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestIsValidLongDateFormat_InvalidLongDateFormat(t *testing.T) {
+	datetime := "24-09-01"
+	expectedValue := false
+	actualValue := IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-9-1"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-1"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-9-01"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12:34"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+
+	datetime = "2024-09-01 12:34:56"
+	expectedValue = false
+	actualValue = IsValidLongDateFormat(datetime)
+	assert.Equal(t, expectedValue, actualValue)
+}

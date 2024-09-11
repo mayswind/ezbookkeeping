@@ -112,6 +112,11 @@
         "licenseUrl": "https://github.com/boombuler/barcode/blob/v1.0.2/LICENSE"
     },
     {
+        "name": "xlsReader",
+        "url": "https://github.com/shakinm/xlsReader",
+        "licenseUrl": "https://github.com/shakinm/xlsReader/blob/v0.9.12/LICENSE"
+    },
+    {
         "name": "go-ordered-map",
         "url": "https://github.com/wk8/go-ordered-map",
         "licenseUrl": "https://github.com/wk8/go-ordered-map/blob/v2.1.8/LICENSE"

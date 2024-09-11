@@ -549,7 +549,7 @@ export default {
         },
         importTransactionHeaders() {
             return [
-                { value: 'valid', sortable: true, nowrap: true, maxWidth: 50 },
+                { value: 'valid', sortable: true, nowrap: true, width: 35 },
                 { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
                 { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true, maxWidth: 140 },
                 { value: 'categoryId', title: this.$t('Category'), sortable: true, nowrap: true },

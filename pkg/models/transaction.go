@@ -49,6 +49,23 @@ func (s TransactionDbType) String() string {
 	}
 }
 
+// ToTransactionType returns the transaction type for this db enum
+func (s TransactionDbType) ToTransactionType() (TransactionType, error) {
+	if s == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+		return TRANSACTION_TYPE_MODIFY_BALANCE, nil
+	} else if s == TRANSACTION_DB_TYPE_EXPENSE {
+		return TRANSACTION_TYPE_EXPENSE, nil
+	} else if s == TRANSACTION_DB_TYPE_INCOME {
+		return TRANSACTION_TYPE_INCOME, nil
+	} else if s == TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		return TRANSACTION_TYPE_TRANSFER, nil
+	} else if s == TRANSACTION_DB_TYPE_TRANSFER_IN {
+		return TRANSACTION_TYPE_TRANSFER, nil
+	} else {
+		return 0, errs.ErrTransactionTypeInvalid
+	}
+}
+
 // Transaction represents transaction data stored in database
 type Transaction struct {
 	TransactionId        int64             `xorm:"PK"`
@@ -325,19 +342,9 @@ func (t *Transaction) IsEditable(currentUser *User, utcOffset int16, account *Ac
 
 // ToTransactionInfoResponse returns a view-object according to database model
 func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *TransactionInfoResponse {
-	var transactionType TransactionType
+	transactionType, err := t.Type.ToTransactionType()
 
-	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
-		transactionType = TRANSACTION_TYPE_MODIFY_BALANCE
-	} else if t.Type == TRANSACTION_DB_TYPE_EXPENSE {
-		transactionType = TRANSACTION_TYPE_EXPENSE
-	} else if t.Type == TRANSACTION_DB_TYPE_INCOME {
-		transactionType = TRANSACTION_TYPE_INCOME
-	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
-		transactionType = TRANSACTION_TYPE_TRANSFER
-	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
-		transactionType = TRANSACTION_TYPE_TRANSFER
-	} else {
+	if err != nil {
 		return nil
 	}
 

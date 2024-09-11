@@ -37,19 +37,11 @@ var ezbookkeepingDataColumnNameMapping = map[DataTableColumn]string{
 	DATA_TABLE_DESCRIPTION:              "Description",
 }
 
-var ezbookkeepingTransactionTypeNameMapping = map[models.TransactionDbType]string{
-	models.TRANSACTION_DB_TYPE_MODIFY_BALANCE: "Balance Modification",
-	models.TRANSACTION_DB_TYPE_INCOME:         "Income",
-	models.TRANSACTION_DB_TYPE_EXPENSE:        "Expense",
-	models.TRANSACTION_DB_TYPE_TRANSFER_OUT:   "Transfer",
-	models.TRANSACTION_DB_TYPE_TRANSFER_IN:    "Transfer",
-}
-
-var ezbookkeepingNameTransactionTypeMapping = map[string]models.TransactionDbType{
-	"Balance Modification": models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,
-	"Income":               models.TRANSACTION_DB_TYPE_INCOME,
-	"Expense":              models.TRANSACTION_DB_TYPE_EXPENSE,
-	"Transfer":             models.TRANSACTION_DB_TYPE_TRANSFER_OUT,
+var ezbookkeepingTransactionTypeNameMapping = map[models.TransactionType]string{
+	models.TRANSACTION_TYPE_MODIFY_BALANCE: "Balance Modification",
+	models.TRANSACTION_TYPE_INCOME:         "Income",
+	models.TRANSACTION_TYPE_EXPENSE:        "Expense",
+	models.TRANSACTION_TYPE_TRANSFER:       "Transfer",
 }
 
 var ezbookkeepingDataColumns = []DataTableColumn{

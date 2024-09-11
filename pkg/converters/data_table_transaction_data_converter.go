@@ -38,17 +38,17 @@ const (
 // DataTableTransactionDataExporter defines the structure of plain text data table exporter for transaction data
 type DataTableTransactionDataExporter struct {
 	dataColumnMapping       map[DataTableColumn]string
-	transactionTypeMapping  map[models.TransactionDbType]string
+	transactionTypeMapping  map[models.TransactionType]string
 	geoLocationSeparator    string
 	transactionTagSeparator string
 }
 
 // DataTableTransactionDataImporter defines the structure of plain text data table importer for transaction data
 type DataTableTransactionDataImporter struct {
-	dataColumnMapping          map[DataTableColumn]string
-	transactionTypeNameMapping map[string]models.TransactionDbType
-	geoLocationSeparator       string
-	transactionTagSeparator    string
+	dataColumnMapping       map[DataTableColumn]string
+	transactionTypeMapping  map[models.TransactionType]string
+	geoLocationSeparator    string
+	transactionTagSeparator string
 }
 
 func (c *DataTableTransactionDataExporter) buildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
@@ -88,7 +88,13 @@ func (c *DataTableTransactionDataExporter) buildExportedContent(ctx core.Context
 }
 
 func (c *DataTableTransactionDataExporter) getDisplayTransactionTypeName(transactionDbType models.TransactionDbType) string {
-	transactionTypeName, exists := c.transactionTypeMapping[transactionDbType]
+	transactionType, err := transactionDbType.ToTransactionType()
+
+	if err != nil {
+		return ""
+	}
+
+	transactionTypeName, exists := c.transactionTypeMapping[transactionType]
 
 	if !exists {
 		return ""
@@ -188,6 +194,12 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 		return nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
+	nameDbTypeMap, err := c.buildTransactionTypeNameDbTypeMap()
+
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
 	headerLineItems := dataTable.HeaderLineColumnNames()
 	headerItemMap := make(map[string]int)
 
@@ -269,7 +281,7 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 			return nil, nil, nil, nil, errs.ErrTransactionTimeInvalid
 		}
 
-		transactionDbType, err := c.getTransactionDbType(dataRow.GetData(typeColumnIdx))
+		transactionDbType, err := c.getTransactionDbType(nameDbTypeMap, dataRow.GetData(typeColumnIdx))
 
 		if err != nil {
 			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse transaction type \"%s\" in data row \"index:%d\" for user \"uid:%d\", because %s", dataRow.GetData(typeColumnIdx), dataRowIndex, user.Uid, err.Error())
@@ -488,8 +500,22 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 	return allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, nil
 }
 
-func (c *DataTableTransactionDataImporter) getTransactionDbType(transactionTypeName string) (models.TransactionDbType, error) {
-	transactionType, exists := c.transactionTypeNameMapping[transactionTypeName]
+func (c *DataTableTransactionDataImporter) buildTransactionTypeNameDbTypeMap() (map[string]models.TransactionDbType, error) {
+	if c.transactionTypeMapping == nil {
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	nameDbTypeMap := make(map[string]models.TransactionDbType, len(c.transactionTypeMapping))
+	nameDbTypeMap[c.transactionTypeMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]] = models.TRANSACTION_DB_TYPE_MODIFY_BALANCE
+	nameDbTypeMap[c.transactionTypeMapping[models.TRANSACTION_TYPE_INCOME]] = models.TRANSACTION_DB_TYPE_INCOME
+	nameDbTypeMap[c.transactionTypeMapping[models.TRANSACTION_TYPE_EXPENSE]] = models.TRANSACTION_DB_TYPE_EXPENSE
+	nameDbTypeMap[c.transactionTypeMapping[models.TRANSACTION_TYPE_TRANSFER]] = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
+
+	return nameDbTypeMap, nil
+}
+
+func (c *DataTableTransactionDataImporter) getTransactionDbType(nameDbTypeMap map[string]models.TransactionDbType, transactionTypeName string) (models.TransactionDbType, error) {
+	transactionType, exists := nameDbTypeMap[transactionTypeName]
 
 	if !exists {
 		return 0, errs.ErrTransactionTypeInvalid

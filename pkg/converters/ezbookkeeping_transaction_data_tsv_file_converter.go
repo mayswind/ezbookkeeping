@@ -22,10 +22,10 @@ var (
 		},
 		ezBookKeepingTransactionDataPlainTextImporter{
 			DataTableTransactionDataImporter: DataTableTransactionDataImporter{
-				dataColumnMapping:          ezbookkeepingDataColumnNameMapping,
-				transactionTypeNameMapping: ezbookkeepingNameTransactionTypeMapping,
-				geoLocationSeparator:       " ",
-				transactionTagSeparator:    ";",
+				dataColumnMapping:       ezbookkeepingDataColumnNameMapping,
+				transactionTypeMapping:  ezbookkeepingTransactionTypeNameMapping,
+				geoLocationSeparator:    " ",
+				transactionTagSeparator: ";",
 			},
 			columnSeparator: "\t",
 			lineSeparator:   "\n",

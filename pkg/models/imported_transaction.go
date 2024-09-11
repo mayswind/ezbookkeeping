@@ -43,19 +43,9 @@ type ImportTransactionResponsePageWrapper struct {
 
 // ToImportTransactionResponse returns the a view-objects according to imported transaction data
 func (t ImportTransaction) ToImportTransactionResponse() *ImportTransactionResponse {
-	var transactionType TransactionType
+	transactionType, err := t.Type.ToTransactionType()
 
-	if t.Type == TRANSACTION_DB_TYPE_MODIFY_BALANCE {
-		transactionType = TRANSACTION_TYPE_MODIFY_BALANCE
-	} else if t.Type == TRANSACTION_DB_TYPE_EXPENSE {
-		transactionType = TRANSACTION_TYPE_EXPENSE
-	} else if t.Type == TRANSACTION_DB_TYPE_INCOME {
-		transactionType = TRANSACTION_TYPE_INCOME
-	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
-		transactionType = TRANSACTION_TYPE_TRANSFER
-	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
-		transactionType = TRANSACTION_TYPE_TRANSFER
-	} else {
+	if err != nil {
 		return nil
 	}
 

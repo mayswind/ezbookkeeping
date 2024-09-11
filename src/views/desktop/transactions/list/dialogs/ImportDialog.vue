@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="1000" :persistent="!!persistent" v-model="showState">
+    <v-dialog :persistent="!!persistent" v-model="showState">
         <v-card class="pa-6 pa-sm-10 pa-md-12">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -549,9 +549,9 @@ export default {
         },
         importTransactionHeaders() {
             return [
-                { value: 'valid', sortable: true, nowrap: true },
-                { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true },
-                { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true },
+                { value: 'valid', sortable: true, nowrap: true, maxWidth: 50 },
+                { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
+                { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true, maxWidth: 140 },
                 { value: 'categoryId', title: this.$t('Category'), sortable: true, nowrap: true },
                 { value: 'sourceAmount', title: this.$t('Amount'), sortable: true, nowrap: true },
                 { value: 'sourceAccountId', title: this.$t('Account'), sortable: true, nowrap: true },

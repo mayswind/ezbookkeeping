@@ -31,7 +31,7 @@ Online Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-dem
 7. Multi-language support
 8. Two-factor authentication
 9. Application lock (PIN code / WebAuthn)
-10. Data export
+10. Data import & export
 
 ## Screenshots
 ### Desktop Version

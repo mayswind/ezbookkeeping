@@ -283,7 +283,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurre
 	}
 
 	allNewTransactions, allNewAccounts, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
-		"2024-09-01 01:23:45,Balance Modification,Test Category,Test Account,USD,123.45,,,\n"+
+		"2024-09-01 01:23:45,Balance Modification,,Test Account,USD,123.45,,,\n"+
 		"2024-09-01 12:34:56,Transfer,Test Category2,Test Account,USD,1.23,Test Account2,EUR,1.10"), 0, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -330,7 +330,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurre
 	}
 
 	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
-		"2024-09-01 01:23:45,Balance Modification,Test Category,Test Account,XXX,123.45,,,"), 0, nil, nil, nil)
+		"2024-09-01 01:23:45,Balance Modification,,Test Account,XXX,123.45,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount\n"+
@@ -481,31 +481,33 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MissingRequiredColumn(
 	_, _, _, _, err := converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Time Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
+		"+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Type Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Sub Category Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Type,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
 		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Account,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Account Name Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,CNY,123.45,,,,,,"), 0, nil, nil, nil)
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,CNY,123.45,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Amount Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,,,,,,"), 0, nil, nil, nil)
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 
+	// Missing Account2 Name Column
 	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Category,Sub Category,Account,Account Currency,Amount,Account2,Account2 Currency,Account2 Amount,Geographic Location,Tags,Description\n"+
-		"2024-09-01 00:00:00,+08:00,Balance Modification,Test Category,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
+		"2024-09-01 00:00:00,+08:00,Balance Modification,,Test Sub Category,Test Account,CNY,123.45,,,,,"), 0, nil, nil, nil)
 	assert.NotNil(t, err)
 }

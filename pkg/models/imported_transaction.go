@@ -102,7 +102,31 @@ func (s ImportedTransactionSlice) Less(i, j int) bool {
 		}
 	}
 
-	return s[i].TransactionTime < s[j].TransactionTime
+	if s[i].TransactionTime != s[j].TransactionTime {
+		return s[i].TransactionTime < s[j].TransactionTime
+	}
+
+	if s[i].Type != s[j].Type {
+		return s[i].Type < s[j].Type
+	}
+
+	if s[i].OriginalCategoryName != s[j].OriginalCategoryName {
+		return s[i].OriginalCategoryName < s[j].OriginalCategoryName
+	}
+
+	if s[i].OriginalSourceAccountName != s[j].OriginalSourceAccountName {
+		return s[i].OriginalSourceAccountName < s[j].OriginalSourceAccountName
+	}
+
+	if s[i].Amount != s[j].Amount {
+		return s[i].Amount < s[j].Amount
+	}
+
+	if s[i].Comment != s[j].Comment {
+		return s[i].Comment < s[j].Comment
+	}
+
+	return false
 }
 
 // ToTransactionsList returns a list of transaction models

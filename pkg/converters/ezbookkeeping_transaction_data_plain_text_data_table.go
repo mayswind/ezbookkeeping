@@ -67,6 +67,10 @@ func (r *ezBookKeepingTransactionPlainTextDataRow) ColumnCount() int {
 
 // GetData returns the data in the specified column index
 func (r *ezBookKeepingTransactionPlainTextDataRow) GetData(columnIndex int) string {
+	if columnIndex >= len(r.allItems) {
+		return ""
+	}
+
 	return r.allItems[columnIndex]
 }
 

@@ -2,7 +2,7 @@ package cli
 
 import "github.com/mayswind/ezbookkeeping/pkg/settings"
 
-// CliUsingConfig represents an cli that need to use config
+// CliUsingConfig represents a cli that need to use config
 type CliUsingConfig struct {
 	container *settings.ConfigContainer
 }

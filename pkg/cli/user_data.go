@@ -31,7 +31,7 @@ type UserDataCli struct {
 	forgetPasswords         *services.ForgetPasswordService
 }
 
-// Initialize an user data cli singleton instance
+// Initialize a user data cli singleton instance
 var (
 	UserData = &UserDataCli{
 		CliUsingConfig: CliUsingConfig{

@@ -144,7 +144,7 @@ func (a *TransactionTagsApi) TagModifyHandler(c *core.WebContext) (any, *errs.Er
 	return tagResp, nil
 }
 
-// TagHideHandler hides an transaction tag by request parameters for current user
+// TagHideHandler hides a transaction tag by request parameters for current user
 func (a *TransactionTagsApi) TagHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var tagHideReq models.TransactionTagHideRequest
 	err := c.ShouldBindJSON(&tagHideReq)

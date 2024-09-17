@@ -286,7 +286,7 @@ type TransactionStatisticResponse struct {
 	Items     []*TransactionStatisticResponseItem `json:"items"`
 }
 
-// TransactionStatisticResponseItem represents total amount item for an response
+// TransactionStatisticResponseItem represents total amount item for a response
 type TransactionStatisticResponseItem struct {
 	CategoryId  int64 `json:"categoryId,string"`
 	AccountId   int64 `json:"accountId,string"`
@@ -314,7 +314,7 @@ type TransactionMonthAmountsResponseItem struct {
 	Amounts []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
 }
 
-// TransactionAmountsResponseItemAmountInfo represents amount info for an response item
+// TransactionAmountsResponseItemAmountInfo represents amount info for a response item
 type TransactionAmountsResponseItemAmountInfo struct {
 	Currency      string `json:"currency"`
 	IncomeAmount  int64  `json:"incomeAmount"`

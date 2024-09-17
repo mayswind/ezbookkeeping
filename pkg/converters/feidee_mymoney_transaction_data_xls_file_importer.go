@@ -28,7 +28,7 @@ var feideeMymoneyTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER:       "转账",
 }
 
-// Initialize an feidee mymoney transaction data xls file importer singleton instance
+// Initialize a feidee mymoney transaction data xls file importer singleton instance
 var (
 	FeideeMymoneyTransactionDataXlsImporter = &feideeMymoneyTransactionDataXlsImporter{
 		DataTableTransactionDataImporter{

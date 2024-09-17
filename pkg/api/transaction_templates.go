@@ -302,7 +302,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 	return templateResp, nil
 }
 
-// TemplateHideHandler hides an transaction template by request parameters for current user
+// TemplateHideHandler hides a transaction template by request parameters for current user
 func (a *TransactionTemplatesApi) TemplateHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var templateHideReq models.TransactionTemplateHideRequest
 	err := c.ShouldBindJSON(&templateHideReq)

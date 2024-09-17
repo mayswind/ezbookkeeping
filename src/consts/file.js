@@ -12,6 +12,11 @@ const supportedImportFileTypes = [
         extensions: '.tsv'
     },
     {
+        type: 'feidee_mymoney_csv',
+        name: 'Feidee MyMoney (App) Data Export File',
+        extensions: '.csv'
+    },
+    {
         type: 'feidee_mymoney_xls',
         name: 'Feidee MyMoney (Web) Data Export File',
         extensions: '.xls'

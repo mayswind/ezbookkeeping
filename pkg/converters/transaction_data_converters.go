@@ -19,6 +19,8 @@ func GetTransactionDataImporter(fileType string) (TransactionDataImporter, error
 		return EzBookKeepingTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
 		return EzBookKeepingTransactionDataTSVFileConverter, nil
+	} else if fileType == "feidee_mymoney_csv" {
+		return FeideeMymoneyTransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
 		return FeideeMymoneyTransactionDataXlsImporter, nil
 	} else {

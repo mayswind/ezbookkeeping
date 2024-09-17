@@ -1,0 +1,368 @@
+package converters
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+)
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"\",\"Test Account\",\"123.45\",\"\",\"\"\n"+
+		"\"收入\",\"2024-09-01 01:23:45\",\"Test Category\",\"Test Account\",\"0.12\",\"\",\"\"\n"+
+		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category2\",\"Test Account\",\"1.00\",\"\",\"\"\n"+
+		"\"转出\",\"2024-09-01 23:59:59\",\"Test Category3\",\"Test Account\",\"0.05\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 23:59:59\",\"Test Category3\",\"Test Account2\",\"0.05\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-02 23:59:59\",\"Test Category3\",\"Test Account\",\"0.5\",\"\",\"00000000-0000-0000-0000-000000000002\"\n"+
+		"\"转出\",\"2024-09-02 23:59:59\",\"Test Category3\",\"Test Account2\",\"0.5\",\"\",\"00000000-0000-0000-0000-000000000002\""), 0, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 5, len(allNewTransactions))
+	assert.Equal(t, 2, len(allNewAccounts))
+	assert.Equal(t, 3, len(allNewSubCategories))
+	assert.Equal(t, 0, len(allNewTags))
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, allNewTransactions[0].Type)
+	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[0].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[1].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_INCOME, allNewTransactions[1].Type)
+	assert.Equal(t, int64(1725153825), utils.GetUnixTimeFromTransactionTime(allNewTransactions[1].TransactionTime))
+	assert.Equal(t, int64(12), allNewTransactions[1].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[1].OriginalSourceAccountName)
+	assert.Equal(t, "Test Category", allNewTransactions[1].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[2].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[2].Type)
+	assert.Equal(t, int64(1725194096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime))
+	assert.Equal(t, int64(100), allNewTransactions[2].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[2].OriginalSourceAccountName)
+	assert.Equal(t, "Test Category2", allNewTransactions[2].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[3].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[3].Type)
+	assert.Equal(t, int64(1725235199), utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime))
+	assert.Equal(t, int64(5), allNewTransactions[3].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[3].OriginalSourceAccountName)
+	assert.Equal(t, "Test Account2", allNewTransactions[3].OriginalDestinationAccountName)
+	assert.Equal(t, "Test Category3", allNewTransactions[3].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[4].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[4].Type)
+	assert.Equal(t, int64(1725321599), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
+	assert.Equal(t, int64(50), allNewTransactions[4].Amount)
+	assert.Equal(t, "Test Account2", allNewTransactions[4].OriginalSourceAccountName)
+	assert.Equal(t, "Test Account", allNewTransactions[4].OriginalDestinationAccountName)
+	assert.Equal(t, "Test Category3", allNewTransactions[4].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
+	assert.Equal(t, "Test Account", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[1].Uid)
+	assert.Equal(t, "Test Account2", allNewAccounts[1].Name)
+	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewSubCategories[0].Uid)
+	assert.Equal(t, "Test Category", allNewSubCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubCategories[1].Uid)
+	assert.Equal(t, "Test Category2", allNewSubCategories[1].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubCategories[2].Uid)
+	assert.Equal(t, "Test Category3", allNewSubCategories[2].Name)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"收入\",\"2024-09-01T12:34:56\",\"Test Category\",\"Test Account\",\"0.12\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"收入\",\"09/01/2024 12:34:56\",\"Test Category\",\"Test Account\",\"0.12\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"Type\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"0.12\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAccountName(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"USD\",\"123.45\",\"\",\"\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account\",\"USD\",\"1.23\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account2\",\"EUR\",\"1.10\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allNewTransactions))
+	assert.Equal(t, 2, len(allNewAccounts))
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
+	assert.Equal(t, "Test Account", allNewAccounts[0].Name)
+	assert.Equal(t, "USD", allNewAccounts[0].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[1].Uid)
+	assert.Equal(t, "Test Account2", allNewAccounts[1].Name)
+	assert.Equal(t, "EUR", allNewAccounts[1].Currency)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"USD\",\"123.45\",\"\",\"\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account\",\"CNY\",\"1.23\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account2\",\"EUR\",\"1.10\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"USD\",\"123.45\",\"\",\"\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account2\",\"CNY\",\"1.23\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category3\",\"Test Account\",\"EUR\",\"1.10\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"XXX\",\"123.45\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"USD\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"XXX\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"账户币种\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"XXX\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"USD\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 01:23:45\",\"\",\"Test Account\",\"123 45\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123 45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"123 45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"Test\n"+
+		"A new line break\",\"\""), 0, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "Test\nA new line break", allNewTransactions[0].Comment)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_InvalidRelatedId(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 23:59:59\",\"Test Category3\",\"Test Account\",\"0.05\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转入\",\"2024-09-01 23:59:59\",\"Test Category3\",\"Test Account\",\"0.05\",\"\",\"\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"转出\",\"2024-09-01 23:59:59\",\"Test Category3\",\"Test Account\",\"0.05\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
+		"\"转入\",\"2024-09-02 23:59:59\",\"Test Category3\",\"Test Account\",\"0.5\",\"\",\"00000000-0000-0000-0000-000000000002\""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1,
+		DefaultCurrency: "CNY",
+	}
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"\",\"Test Account\",\"123.45\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}
+
+func TestFeideeMymoneyCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
+	converter := FeideeMymoneyTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, err := converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Time Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"\",\"Test Account\",\"123.45\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Type Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"2024-09-01 00:00:00\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Sub Category Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"Test Account\",\"123.45\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Account Name Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"金额\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"\",\"123.45\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Amount Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"备注\",\"关联Id\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"\",\"Test Account\",\"\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+
+	// Missing Related ID Column
+	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
+		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\"\n"+
+		"\"余额变更\",\"2024-09-01 00:00:00\",\"\",\"Test Account\",\"123.45\",\"\"\n"), 0, nil, nil, nil)
+	assert.NotNil(t, err)
+}

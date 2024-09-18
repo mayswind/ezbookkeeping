@@ -1,19 +1,20 @@
-package converters
+package feidee
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-var feideeMymoneyDataColumnNameMapping = map[DataTableColumn]string{
-	DATA_TABLE_TRANSACTION_TIME:     "日期",
-	DATA_TABLE_TRANSACTION_TYPE:     "交易类型",
-	DATA_TABLE_CATEGORY:             "分类",
-	DATA_TABLE_SUB_CATEGORY:         "子分类",
-	DATA_TABLE_ACCOUNT_NAME:         "账户1",
-	DATA_TABLE_AMOUNT:               "金额",
-	DATA_TABLE_RELATED_ACCOUNT_NAME: "账户2",
-	DATA_TABLE_DESCRIPTION:          "备注",
+var feideeMymoneyDataColumnNameMapping = map[datatable.DataTableColumn]string{
+	datatable.DATA_TABLE_TRANSACTION_TIME:     "日期",
+	datatable.DATA_TABLE_TRANSACTION_TYPE:     "交易类型",
+	datatable.DATA_TABLE_CATEGORY:             "分类",
+	datatable.DATA_TABLE_SUB_CATEGORY:         "子分类",
+	datatable.DATA_TABLE_ACCOUNT_NAME:         "账户1",
+	datatable.DATA_TABLE_AMOUNT:               "金额",
+	datatable.DATA_TABLE_RELATED_ACCOUNT_NAME: "账户2",
+	datatable.DATA_TABLE_DESCRIPTION:          "备注",
 }
 
 var feideeMymoneyTransactionTypeNameMapping = map[models.TransactionType]string{

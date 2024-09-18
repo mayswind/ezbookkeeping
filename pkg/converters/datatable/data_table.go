@@ -1,4 +1,4 @@
-package converters
+package datatable
 
 import "time"
 

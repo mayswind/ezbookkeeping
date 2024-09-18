@@ -1,4 +1,4 @@
-package converters
+package datatable
 
 import (
 	"testing"
@@ -17,8 +17,7 @@ func TestWritableDataTableAdd(t *testing.T) {
 	columns[3] = DATA_TABLE_ACCOUNT_NAME
 	columns[4] = DATA_TABLE_AMOUNT
 
-	writableDataTable, err := createNewWritableDataTable(columns)
-	assert.Nil(t, err)
+	writableDataTable := CreateNewWritableDataTable(columns)
 
 	assert.Equal(t, 0, writableDataTable.DataRowCount())
 
@@ -66,8 +65,7 @@ func TestWritableDataTableAdd_NotExistsColumn(t *testing.T) {
 	columns := make([]DataTableColumn, 1)
 	columns[0] = DATA_TABLE_TRANSACTION_TIME
 
-	writableDataTable, err := createNewWritableDataTable(columns)
-	assert.Nil(t, err)
+	writableDataTable := CreateNewWritableDataTable(columns)
 
 	expectedTransactionUnixTime := time.Now().Unix()
 	expectedTextualTransactionTime := utils.FormatUnixTimeToLongDateTime(expectedTransactionUnixTime, time.Local)
@@ -87,9 +85,7 @@ func TestWritableDataTableGet_NotExistsRow(t *testing.T) {
 	columns := make([]DataTableColumn, 1)
 	columns[0] = DATA_TABLE_TRANSACTION_TIME
 
-	writableDataTable, err := createNewWritableDataTable(columns)
-	assert.Nil(t, err)
-
+	writableDataTable := CreateNewWritableDataTable(columns)
 	assert.Equal(t, 0, writableDataTable.DataRowCount())
 
 	dataRow := writableDataTable.Get(0)
@@ -100,8 +96,7 @@ func TestWritableDataRowGetData_NotExistsColumn(t *testing.T) {
 	columns := make([]DataTableColumn, 1)
 	columns[0] = DATA_TABLE_TRANSACTION_TIME
 
-	writableDataTable, err := createNewWritableDataTable(columns)
-	assert.Nil(t, err)
+	writableDataTable := CreateNewWritableDataTable(columns)
 
 	expectedTransactionUnixTime := time.Now().Unix()
 	expectedTextualTransactionTime := utils.FormatUnixTimeToLongDateTime(expectedTransactionUnixTime, time.Local)
@@ -124,9 +119,7 @@ func TestWritableDataTableDataRowIterator(t *testing.T) {
 	columns[3] = DATA_TABLE_ACCOUNT_NAME
 	columns[4] = DATA_TABLE_AMOUNT
 
-	writableDataTable, err := createNewWritableDataTable(columns)
-	assert.Nil(t, err)
-
+	writableDataTable := CreateNewWritableDataTable(columns)
 	assert.Equal(t, 0, writableDataTable.DataRowCount())
 
 	expectedTransactionUnixTimes := make([]int64, 3)

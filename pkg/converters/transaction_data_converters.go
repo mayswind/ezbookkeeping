@@ -1,28 +1,33 @@
 package converters
 
-import "github.com/mayswind/ezbookkeeping/pkg/errs"
+import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/base"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
+)
 
 // GetTransactionDataExporter returns the transaction data exporter according to the file type
-func GetTransactionDataExporter(fileType string) TransactionDataExporter {
+func GetTransactionDataExporter(fileType string) base.TransactionDataExporter {
 	if fileType == "csv" {
-		return EzBookKeepingTransactionDataCSVFileConverter
+		return _default.EzBookKeepingTransactionDataCSVFileConverter
 	} else if fileType == "tsv" {
-		return EzBookKeepingTransactionDataTSVFileConverter
+		return _default.EzBookKeepingTransactionDataTSVFileConverter
 	} else {
 		return nil
 	}
 }
 
 // GetTransactionDataImporter returns the transaction data importer according to the file type
-func GetTransactionDataImporter(fileType string) (TransactionDataImporter, error) {
+func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, error) {
 	if fileType == "ezbookkeeping_csv" {
-		return EzBookKeepingTransactionDataCSVFileConverter, nil
+		return _default.EzBookKeepingTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
-		return EzBookKeepingTransactionDataTSVFileConverter, nil
+		return _default.EzBookKeepingTransactionDataTSVFileConverter, nil
 	} else if fileType == "feidee_mymoney_csv" {
-		return FeideeMymoneyTransactionDataCsvImporter, nil
+		return feidee.FeideeMymoneyTransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
-		return FeideeMymoneyTransactionDataXlsImporter, nil
+		return feidee.FeideeMymoneyTransactionDataXlsImporter, nil
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}

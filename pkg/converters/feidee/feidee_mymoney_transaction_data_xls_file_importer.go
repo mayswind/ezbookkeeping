@@ -1,24 +1,19 @@
-package converters
+package feidee
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // feideeMymoneyTransactionDataXlsImporter defines the structure of feidee mymoney xls importer for transaction data
 type feideeMymoneyTransactionDataXlsImporter struct {
-	DataTableTransactionDataImporter
+	datatable.DataTableTransactionDataImporter
 }
 
 // Initialize a feidee mymoney transaction data xls file importer singleton instance
 var (
-	FeideeMymoneyTransactionDataXlsImporter = &feideeMymoneyTransactionDataXlsImporter{
-		DataTableTransactionDataImporter{
-			dataColumnMapping:      feideeMymoneyDataColumnNameMapping,
-			transactionTypeMapping: feideeMymoneyTransactionTypeNameMapping,
-			postProcessFunc:        feideeMymoneyTransactionDataImporterPostProcess,
-		},
-	}
+	FeideeMymoneyTransactionDataXlsImporter = &feideeMymoneyTransactionDataXlsImporter{}
 )
 
 // ParseImportedData returns the imported data by parsing the feidee mymoney transaction xls data
@@ -29,5 +24,11 @@ func (c *feideeMymoneyTransactionDataXlsImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, err
 	}
 
-	return c.parseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	dataTableImporter := datatable.CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(
+		feideeMymoneyDataColumnNameMapping,
+		feideeMymoneyTransactionTypeNameMapping,
+		feideeMymoneyTransactionDataImporterPostProcess,
+	)
+
+	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
 }

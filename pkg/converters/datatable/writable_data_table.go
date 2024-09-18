@@ -1,4 +1,4 @@
-package converters
+package datatable
 
 import (
 	"time"
@@ -136,9 +136,10 @@ func (t *WritableDataRowIterator) Next() ImportedDataRow {
 	}
 }
 
-func createNewWritableDataTable(columns []DataTableColumn) (*WritableDataTable, error) {
+// CreateNewWritableDataTable returns a new writable data table according to the specified columns
+func CreateNewWritableDataTable(columns []DataTableColumn) *WritableDataTable {
 	return &WritableDataTable{
 		allData: make([]map[DataTableColumn]string, 0),
 		columns: columns,
-	}, nil
+	}
 }

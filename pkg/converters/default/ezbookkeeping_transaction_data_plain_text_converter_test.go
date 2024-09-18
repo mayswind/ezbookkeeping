@@ -1,4 +1,4 @@
-package converters
+package _default
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package converters
+package feidee
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/shakinm/xlsReader/xls"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -53,7 +54,7 @@ func (t *feideeMymoneyTransactionExcelFileDataTable) HeaderLineColumnNames() []s
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowIterator() ImportedDataRowIterator {
+func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
 	return &feideeMymoneyTransactionExcelFileDataRowIterator{
 		dataTable:              t,
 		currentTableIndex:      0,
@@ -141,7 +142,7 @@ func (t *feideeMymoneyTransactionExcelFileDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next() ImportedDataRow {
+func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
 	allSheets := t.dataTable.workbook.GetSheets()
 	currentRowIndexInTable := t.currentRowIndexInTable
 

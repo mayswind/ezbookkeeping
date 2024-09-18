@@ -1,4 +1,4 @@
-package converters
+package feidee
 
 import (
 	"os"
@@ -21,7 +21,7 @@ func TestFeideeMymoneyTransactionDataXlsImporterParseImportedData_MinimumValidDa
 		DefaultCurrency: "CNY",
 	}
 
-	testdata, err := os.ReadFile("../../testdata/feidee_mymoney_test_file.xls")
+	testdata, err := os.ReadFile("../../../testdata/feidee_mymoney_test_file.xls")
 	assert.Nil(t, err)
 
 	allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, err := converter.ParseImportedData(context, user, testdata, 0, nil, nil, nil)

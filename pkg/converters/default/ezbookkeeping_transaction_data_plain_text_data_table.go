@@ -1,10 +1,11 @@
-package converters
+package _default
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -32,8 +33,8 @@ type ezBookKeepingTransactionPlainTextDataRowIterator struct {
 type ezBookKeepingTransactionPlainTextDataTableBuilder struct {
 	columnSeparator       string
 	lineSeparator         string
-	columns               []DataTableColumn
-	dataColumnNameMapping map[DataTableColumn]string
+	columns               []datatable.DataTableColumn
+	dataColumnNameMapping map[datatable.DataTableColumn]string
 	dataLineFormat        string
 	builder               *strings.Builder
 }
@@ -53,7 +54,7 @@ func (t *ezBookKeepingTransactionPlainTextDataTable) HeaderLineColumnNames() []s
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowIterator() ImportedDataRowIterator {
+func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
 	return &ezBookKeepingTransactionPlainTextDataRowIterator{
 		dataTable:    t,
 		currentIndex: 0,
@@ -90,7 +91,7 @@ func (t *ezBookKeepingTransactionPlainTextDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next() ImportedDataRow {
+func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next() datatable.ImportedDataRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {
 		return nil
 	}
@@ -106,7 +107,7 @@ func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next() ImportedDataRo
 }
 
 // AppendTransaction appends the specified transaction to data builder
-func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) AppendTransaction(data map[DataTableColumn]string) {
+func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) AppendTransaction(data map[datatable.DataTableColumn]string) {
 	dataRowParams := make([]any, len(b.columns))
 
 	for i := 0; i < len(b.columns); i++ {
@@ -186,7 +187,7 @@ func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnS
 	}, nil
 }
 
-func createNewezbookkeepingTransactionPlainTextDataTableBuilder(transactionCount int, columns []DataTableColumn, dataColumnNameMapping map[DataTableColumn]string, columnSeparator string, lineSeparator string) *ezBookKeepingTransactionPlainTextDataTableBuilder {
+func createNewezbookkeepingTransactionPlainTextDataTableBuilder(transactionCount int, columns []datatable.DataTableColumn, dataColumnNameMapping map[datatable.DataTableColumn]string, columnSeparator string, lineSeparator string) *ezBookKeepingTransactionPlainTextDataTableBuilder {
 	var builder strings.Builder
 	builder.Grow(transactionCount * 100)
 

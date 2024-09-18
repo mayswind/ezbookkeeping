@@ -1,10 +1,11 @@
-package converters
+package feidee
 
 import (
 	"encoding/csv"
 	"io"
 	"strings"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -15,15 +16,11 @@ const feideeMymoneyTransactionDataCsvFileHeader = "随手记导出文件(headers
 const feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + feideeMymoneyTransactionDataCsvFileHeader
 
 // feideeMymoneyTransactionDataCsvImporter defines the structure of feidee mymoney csv importer for transaction data
-type feideeMymoneyTransactionDataCsvImporter struct {
-	transactionTypeMapping map[models.TransactionType]string
-}
+type feideeMymoneyTransactionDataCsvImporter struct{}
 
 // Initialize a feidee mymoney transaction data csv file importer singleton instance
 var (
-	FeideeMymoneyTransactionDataCsvImporter = &feideeMymoneyTransactionDataCsvImporter{
-		transactionTypeMapping: feideeMymoneyTransactionTypeNameMapping,
-	}
+	FeideeMymoneyTransactionDataCsvImporter = &feideeMymoneyTransactionDataCsvImporter{}
 )
 
 // ParseImportedData returns the imported data by parsing the feidee mymoney transaction csv data
@@ -68,41 +65,36 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
-	newColumns := make([]DataTableColumn, 0, 11)
-	newColumns = append(newColumns, DATA_TABLE_TRANSACTION_TYPE)
-	newColumns = append(newColumns, DATA_TABLE_TRANSACTION_TIME)
+	newColumns := make([]datatable.DataTableColumn, 0, 11)
+	newColumns = append(newColumns, datatable.DATA_TABLE_TRANSACTION_TYPE)
+	newColumns = append(newColumns, datatable.DATA_TABLE_TRANSACTION_TIME)
 
 	if categoryColumnExists {
-		newColumns = append(newColumns, DATA_TABLE_CATEGORY)
+		newColumns = append(newColumns, datatable.DATA_TABLE_CATEGORY)
 	}
 
-	newColumns = append(newColumns, DATA_TABLE_SUB_CATEGORY)
-	newColumns = append(newColumns, DATA_TABLE_ACCOUNT_NAME)
+	newColumns = append(newColumns, datatable.DATA_TABLE_SUB_CATEGORY)
+	newColumns = append(newColumns, datatable.DATA_TABLE_ACCOUNT_NAME)
 
 	if accountCurrencyColumnExists {
-		newColumns = append(newColumns, DATA_TABLE_ACCOUNT_CURRENCY)
+		newColumns = append(newColumns, datatable.DATA_TABLE_ACCOUNT_CURRENCY)
 	}
 
-	newColumns = append(newColumns, DATA_TABLE_AMOUNT)
-	newColumns = append(newColumns, DATA_TABLE_RELATED_ACCOUNT_NAME)
+	newColumns = append(newColumns, datatable.DATA_TABLE_AMOUNT)
+	newColumns = append(newColumns, datatable.DATA_TABLE_RELATED_ACCOUNT_NAME)
 
 	if accountCurrencyColumnExists {
-		newColumns = append(newColumns, DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
+		newColumns = append(newColumns, datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
 	}
 
-	newColumns = append(newColumns, DATA_TABLE_RELATED_AMOUNT)
+	newColumns = append(newColumns, datatable.DATA_TABLE_RELATED_AMOUNT)
 
 	if descriptionColumnExists {
-		newColumns = append(newColumns, DATA_TABLE_DESCRIPTION)
+		newColumns = append(newColumns, datatable.DATA_TABLE_DESCRIPTION)
 	}
 
-	dataTable, err := createNewWritableDataTable(newColumns)
-
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
-
-	transferTransactionsMap := make(map[string]map[DataTableColumn]string, 0)
+	dataTable := datatable.CreateNewWritableDataTable(newColumns)
+	transferTransactionsMap := make(map[string]map[datatable.DataTableColumn]string, 0)
 
 	for i := 1; i < len(allLines); i++ {
 		items := allLines[i]
@@ -132,20 +124,20 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 			return nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 		}
 
-		transactionType := data[DATA_TABLE_TRANSACTION_TYPE]
+		transactionType := data[datatable.DATA_TABLE_TRANSACTION_TYPE]
 
 		if transactionType == "余额变更" || transactionType == "收入" || transactionType == "支出" {
 			if transactionType == "余额变更" {
-				data[DATA_TABLE_TRANSACTION_TYPE] = c.transactionTypeMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
+				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
 			} else if transactionType == "收入" {
-				data[DATA_TABLE_TRANSACTION_TYPE] = c.transactionTypeMapping[models.TRANSACTION_TYPE_INCOME]
+				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
 			} else if transactionType == "支出" {
-				data[DATA_TABLE_TRANSACTION_TYPE] = c.transactionTypeMapping[models.TRANSACTION_TYPE_EXPENSE]
+				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
 			}
 
-			data[DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
-			data[DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = ""
-			data[DATA_TABLE_RELATED_AMOUNT] = ""
+			data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+			data[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = ""
+			data[datatable.DATA_TABLE_RELATED_AMOUNT] = ""
 			dataTable.Add(data)
 		} else if transactionType == "转入" || transactionType == "转出" {
 			if relatedId == "" {
@@ -160,18 +152,18 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 				continue
 			}
 
-			if transactionType == "转入" && relatedData[DATA_TABLE_TRANSACTION_TYPE] == "转出" {
-				relatedData[DATA_TABLE_TRANSACTION_TYPE] = c.transactionTypeMapping[models.TRANSACTION_TYPE_TRANSFER]
-				relatedData[DATA_TABLE_RELATED_ACCOUNT_NAME] = data[DATA_TABLE_ACCOUNT_NAME]
-				relatedData[DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[DATA_TABLE_ACCOUNT_CURRENCY]
-				relatedData[DATA_TABLE_RELATED_AMOUNT] = data[DATA_TABLE_AMOUNT]
+			if transactionType == "转入" && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == "转出" {
+				relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
+				relatedData[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.DATA_TABLE_ACCOUNT_NAME]
+				relatedData[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.DATA_TABLE_ACCOUNT_CURRENCY]
+				relatedData[datatable.DATA_TABLE_RELATED_AMOUNT] = data[datatable.DATA_TABLE_AMOUNT]
 				dataTable.Add(relatedData)
 				delete(transferTransactionsMap, relatedId)
-			} else if transactionType == "转出" && relatedData[DATA_TABLE_TRANSACTION_TYPE] == "转入" {
-				data[DATA_TABLE_TRANSACTION_TYPE] = c.transactionTypeMapping[models.TRANSACTION_TYPE_TRANSFER]
-				data[DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedData[DATA_TABLE_ACCOUNT_NAME]
-				data[DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = relatedData[DATA_TABLE_ACCOUNT_CURRENCY]
-				data[DATA_TABLE_RELATED_AMOUNT] = relatedData[DATA_TABLE_AMOUNT]
+			} else if transactionType == "转出" && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == "转入" {
+				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
+				data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedData[datatable.DATA_TABLE_ACCOUNT_NAME]
+				data[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = relatedData[datatable.DATA_TABLE_ACCOUNT_CURRENCY]
+				data[datatable.DATA_TABLE_RELATED_AMOUNT] = relatedData[datatable.DATA_TABLE_AMOUNT]
 				dataTable.Add(data)
 				delete(transferTransactionsMap, relatedId)
 			} else {
@@ -189,13 +181,13 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, errs.ErrFoundRecordNotHasRelatedRecord
 	}
 
-	dataTableImporter := DataTableTransactionDataImporter{
-		dataColumnMapping:      dataTable.GetDataColumnMapping(),
-		transactionTypeMapping: c.transactionTypeMapping,
-		postProcessFunc:        feideeMymoneyTransactionDataImporterPostProcess,
-	}
+	dataTableImporter := datatable.CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(
+		dataTable.GetDataColumnMapping(),
+		feideeMymoneyTransactionTypeNameMapping,
+		feideeMymoneyTransactionDataImporterPostProcess,
+	)
 
-	return dataTableImporter.parseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
 }
 
 func (c *feideeMymoneyTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx core.Context, content string) ([][]string, error) {
@@ -246,40 +238,40 @@ func (c *feideeMymoneyTransactionDataCsvImporter) parseTransactionData(
 	descriptionColumnExists bool,
 	relatedIdColumnIdx int,
 	relatedIdColumnExists bool,
-) (map[DataTableColumn]string, string) {
-	data := make(map[DataTableColumn]string, 11)
+) (map[datatable.DataTableColumn]string, string) {
+	data := make(map[datatable.DataTableColumn]string, 11)
 	relatedId := ""
 
 	if timeColumnExists && timeColumnIdx < len(items) {
-		data[DATA_TABLE_TRANSACTION_TIME] = items[timeColumnIdx]
+		data[datatable.DATA_TABLE_TRANSACTION_TIME] = items[timeColumnIdx]
 	}
 
 	if typeColumnExists && typeColumnIdx < len(items) {
-		data[DATA_TABLE_TRANSACTION_TYPE] = items[typeColumnIdx]
+		data[datatable.DATA_TABLE_TRANSACTION_TYPE] = items[typeColumnIdx]
 	}
 
 	if categoryColumnExists && categoryColumnIdx < len(items) {
-		data[DATA_TABLE_CATEGORY] = items[categoryColumnIdx]
+		data[datatable.DATA_TABLE_CATEGORY] = items[categoryColumnIdx]
 	}
 
 	if subCategoryColumnExists && subCategoryColumnIdx < len(items) {
-		data[DATA_TABLE_SUB_CATEGORY] = items[subCategoryColumnIdx]
+		data[datatable.DATA_TABLE_SUB_CATEGORY] = items[subCategoryColumnIdx]
 	}
 
 	if accountColumnExists && accountColumnIdx < len(items) {
-		data[DATA_TABLE_ACCOUNT_NAME] = items[accountColumnIdx]
+		data[datatable.DATA_TABLE_ACCOUNT_NAME] = items[accountColumnIdx]
 	}
 
 	if accountCurrencyColumnExists && accountCurrencyColumnIdx < len(items) {
-		data[DATA_TABLE_ACCOUNT_CURRENCY] = items[accountCurrencyColumnIdx]
+		data[datatable.DATA_TABLE_ACCOUNT_CURRENCY] = items[accountCurrencyColumnIdx]
 	}
 
 	if amountColumnExists && amountColumnIdx < len(items) {
-		data[DATA_TABLE_AMOUNT] = items[amountColumnIdx]
+		data[datatable.DATA_TABLE_AMOUNT] = items[amountColumnIdx]
 	}
 
 	if descriptionColumnExists && descriptionColumnIdx < len(items) {
-		data[DATA_TABLE_DESCRIPTION] = items[descriptionColumnIdx]
+		data[datatable.DATA_TABLE_DESCRIPTION] = items[descriptionColumnIdx]
 	}
 
 	if relatedIdColumnExists && relatedIdColumnIdx < len(items) {
@@ -289,7 +281,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) parseTransactionData(
 	return data, relatedId
 }
 
-func (c *feideeMymoneyTransactionDataCsvImporter) getRelatedIds(transferTransactionsMap map[string]map[DataTableColumn]string) string {
+func (c *feideeMymoneyTransactionDataCsvImporter) getRelatedIds(transferTransactionsMap map[string]map[datatable.DataTableColumn]string) string {
 	builder := strings.Builder{}
 
 	for relatedId := range transferTransactionsMap {

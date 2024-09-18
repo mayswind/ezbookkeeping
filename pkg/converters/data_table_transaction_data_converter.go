@@ -49,7 +49,11 @@ type DataTableTransactionDataImporter struct {
 	transactionTypeMapping  map[models.TransactionType]string
 	geoLocationSeparator    string
 	transactionTagSeparator string
+	postProcessFunc         DataTableTransactionDataImporterPostProcessFunc
 }
+
+// DataTableTransactionDataImporterPostProcessFunc represents item post process function of DataTableTransactionDataImporter
+type DataTableTransactionDataImporterPostProcessFunc func(core.Context, *models.ImportTransaction) error
 
 func (c *DataTableTransactionDataExporter) buildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
 	for i := 0; i < len(transactions); i++ {
@@ -490,6 +494,15 @@ func (c *DataTableTransactionDataImporter) parseImportedData(ctx core.Context, u
 			OriginalDestinationAccountName:     account2Name,
 			OriginalDestinationAccountCurrency: account2Currency,
 			OriginalTagNames:                   tagNames,
+		}
+
+		if c.postProcessFunc != nil {
+			err = c.postProcessFunc(ctx, transaction)
+
+			if err != nil {
+				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot post process data row \"index:%d\" for user \"uid:%d\", because %s", dataRowIndex, user.Uid, err.Error())
+				return nil, nil, nil, nil, err
+			}
 		}
 
 		allNewTransactions = append(allNewTransactions, transaction)

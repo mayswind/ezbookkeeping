@@ -192,6 +192,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 	dataTableImporter := DataTableTransactionDataImporter{
 		dataColumnMapping:      dataTable.GetDataColumnMapping(),
 		transactionTypeMapping: c.transactionTypeMapping,
+		postProcessFunc:        feideeMymoneyTransactionDataImporterPostProcess,
 	}
 
 	return dataTableImporter.parseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)

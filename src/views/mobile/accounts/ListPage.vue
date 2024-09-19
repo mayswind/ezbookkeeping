@@ -71,7 +71,7 @@
              v-show="(showHidden && hasAccount(accountCategory, false)) || hasAccount(accountCategory, true)">
             <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
                      :sortable-enabled="sortable"
-                     v-if="categorizedAccounts[accountCategory.id]"
+                     v-if="allCategorizedAccountsMap[accountCategory.id]"
                      @sortable:sort="onSort">
                 <f7-list-item group-title :sortable="false">
                     <small>
@@ -86,7 +86,7 @@
                               :after="accountBalance(account)"
                               :link="!sortable ? '/transaction/list?accountIds=' + account.id : null"
                               :key="account.id"
-                              v-for="account in categorizedAccounts[accountCategory.id].accounts"
+                              v-for="account in allCategorizedAccountsMap[accountCategory.id].accounts"
                               v-show="showHidden || !account.hidden"
                               @taphold="setSortable()"
                 >
@@ -210,8 +210,8 @@ export default {
         allAccountCategories() {
             return accountConstants.allCategories;
         },
-        categorizedAccounts() {
-            return this.accountsStore.allCategorizedAccounts;
+        allCategorizedAccountsMap() {
+            return this.accountsStore.allCategorizedAccountsMap;
         },
         allAccountCount() {
             return this.accountsStore.allAvailableAccountsCount;

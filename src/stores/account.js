@@ -28,7 +28,7 @@ function loadAccountList(state, accounts) {
         }
     }
 
-    state.allCategorizedAccounts = getCategorizedAccountsMap(accounts);
+    state.allCategorizedAccountsMap = getCategorizedAccountsMap(accounts);
 }
 
 function addAccountToAccountList(state, account) {
@@ -52,11 +52,11 @@ function addAccountToAccountList(state, account) {
         }
     }
 
-    if (state.allCategorizedAccounts[account.category]) {
-        const accountList = state.allCategorizedAccounts[account.category].accounts;
+    if (state.allCategorizedAccountsMap[account.category]) {
+        const accountList = state.allCategorizedAccountsMap[account.category].accounts;
         accountList.push(account);
     } else {
-        state.allCategorizedAccounts = getCategorizedAccountsMap(state.allAccounts);
+        state.allCategorizedAccountsMap = getCategorizedAccountsMap(state.allAccounts);
     }
 }
 
@@ -77,8 +77,8 @@ function updateAccountToAccountList(state, account) {
         }
     }
 
-    if (state.allCategorizedAccounts[account.category]) {
-        const accountList = state.allCategorizedAccounts[account.category].accounts;
+    if (state.allCategorizedAccountsMap[account.category]) {
+        const accountList = state.allCategorizedAccountsMap[account.category].accounts;
 
         for (let i = 0; i < accountList.length; i++) {
             if (accountList[i].id === account.id) {
@@ -93,8 +93,8 @@ function updateAccountDisplayOrderInAccountList(state, { account, from, to, upda
     let fromAccount = null;
     let toAccount = null;
 
-    if (state.allCategorizedAccounts[account.category]) {
-        const accountList = state.allCategorizedAccounts[account.category].accounts;
+    if (state.allCategorizedAccountsMap[account.category]) {
+        const accountList = state.allCategorizedAccountsMap[account.category].accounts;
 
         if (updateListOrder) {
             fromAccount = accountList[from];
@@ -158,8 +158,8 @@ function removeAccountFromAccountList(state, account) {
         delete state.allAccountsMap[account.id];
     }
 
-    if (state.allCategorizedAccounts[account.category]) {
-        const accountList = state.allCategorizedAccounts[account.category].accounts;
+    if (state.allCategorizedAccountsMap[account.category]) {
+        const accountList = state.allCategorizedAccountsMap[account.category].accounts;
 
         for (let i = 0; i < accountList.length; i++) {
             if (accountList[i].id === account.id) {
@@ -174,7 +174,7 @@ export const useAccountsStore = defineStore('accounts', {
     state: () => ({
         allAccounts: [],
         allAccountsMap: {},
-        allCategorizedAccounts: {},
+        allCategorizedAccountsMap: {},
         accountListStateInvalid: true,
     }),
     getters: {
@@ -221,12 +221,12 @@ export const useAccountsStore = defineStore('accounts', {
         allAvailableAccountsCount(state) {
             let allAccountCount = 0;
 
-            for (let category in state.allCategorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(state.allCategorizedAccounts, category)) {
+            for (let category in state.allCategorizedAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(state.allCategorizedAccountsMap, category)) {
                     continue;
                 }
 
-                allAccountCount += state.allCategorizedAccounts[category].accounts.length;
+                allAccountCount += state.allCategorizedAccountsMap[category].accounts.length;
             }
 
             return allAccountCount;
@@ -234,12 +234,12 @@ export const useAccountsStore = defineStore('accounts', {
         allVisibleAccountsCount(state) {
             let shownAccountCount = 0;
 
-            for (let category in state.allCategorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(state.allCategorizedAccounts, category)) {
+            for (let category in state.allCategorizedAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(state.allCategorizedAccountsMap, category)) {
                     continue;
                 }
 
-                const accountList = state.allCategorizedAccounts[category].accounts;
+                const accountList = state.allCategorizedAccountsMap[category].accounts;
 
                 for (let i = 0; i < accountList.length; i++) {
                     if (!accountList[i].hidden) {
@@ -288,7 +288,7 @@ export const useAccountsStore = defineStore('accounts', {
         resetAccounts() {
             this.allAccounts = [];
             this.allAccountsMap = {};
-            this.allCategorizedAccounts = {};
+            this.allCategorizedAccountsMap = {};
             this.accountListStateInvalid = true;
         },
         getFirstShowingIds(showHidden) {
@@ -297,16 +297,16 @@ export const useAccountsStore = defineStore('accounts', {
                 subAccounts: {}
             };
 
-            for (let category in this.allCategorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.allCategorizedAccounts, category)) {
+            for (let category in this.allCategorizedAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(this.allCategorizedAccountsMap, category)) {
                     continue;
                 }
 
-                if (!this.allCategorizedAccounts[category] || !this.allCategorizedAccounts[category].accounts) {
+                if (!this.allCategorizedAccountsMap[category] || !this.allCategorizedAccountsMap[category].accounts) {
                     continue;
                 }
 
-                const accounts = this.allCategorizedAccounts[category].accounts;
+                const accounts = this.allCategorizedAccountsMap[category].accounts;
 
                 for (let i = 0; i < accounts.length; i++) {
                     const account = accounts[i];
@@ -337,16 +337,16 @@ export const useAccountsStore = defineStore('accounts', {
                 subAccounts: {}
             };
 
-            for (let category in this.allCategorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(this.allCategorizedAccounts, category)) {
+            for (let category in this.allCategorizedAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(this.allCategorizedAccountsMap, category)) {
                     continue;
                 }
 
-                if (!this.allCategorizedAccounts[category] || !this.allCategorizedAccounts[category].accounts) {
+                if (!this.allCategorizedAccountsMap[category] || !this.allCategorizedAccountsMap[category].accounts) {
                     continue;
                 }
 
-                const accounts = this.allCategorizedAccounts[category].accounts;
+                const accounts = this.allCategorizedAccountsMap[category].accounts;
 
                 for (let i = accounts.length - 1; i >= 0; i--) {
                     const account = accounts[i];
@@ -378,7 +378,7 @@ export const useAccountsStore = defineStore('accounts', {
 
             const userStore = useUserStore();
             const exchangeRatesStore = useExchangeRatesStore();
-            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccounts, () => true);
+            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, () => true);
             let netAssets = 0;
             let hasUnCalculatedAmount = false;
 
@@ -410,7 +410,7 @@ export const useAccountsStore = defineStore('accounts', {
 
             const userStore = useUserStore();
             const exchangeRatesStore = useExchangeRatesStore();
-            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccounts, account => account.isAsset);
+            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, account => account.isAsset);
             let totalAssets = 0;
             let hasUnCalculatedAmount = false;
 
@@ -442,7 +442,7 @@ export const useAccountsStore = defineStore('accounts', {
 
             const userStore = useUserStore();
             const exchangeRatesStore = useExchangeRatesStore();
-            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccounts, account => account.isLiability);
+            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, account => account.isLiability);
             let totalLiabilities = 0;
             let hasUnCalculatedAmount = false;
 
@@ -474,7 +474,7 @@ export const useAccountsStore = defineStore('accounts', {
 
             const userStore = useUserStore();
             const exchangeRatesStore = useExchangeRatesStore();
-            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccounts, account => account.category === accountCategory.id);
+            const accountsBalance = getAllFilteredAccountsBalance(this.allCategorizedAccountsMap, account => account.category === accountCategory.id);
             let totalBalance = 0;
             let hasUnCalculatedAmount = false;
 
@@ -630,16 +630,16 @@ export const useAccountsStore = defineStore('accounts', {
             };
         },
         hasAccount(accountCategory, visibleOnly) {
-            if (!this.allCategorizedAccounts[accountCategory.id] ||
-                !this.allCategorizedAccounts[accountCategory.id].accounts ||
-                !this.allCategorizedAccounts[accountCategory.id].accounts.length) {
+            if (!this.allCategorizedAccountsMap[accountCategory.id] ||
+                !this.allCategorizedAccountsMap[accountCategory.id].accounts ||
+                !this.allCategorizedAccountsMap[accountCategory.id].accounts.length) {
                 return false;
             }
 
             let shownCount = 0;
 
-            for (let i = 0; i < this.allCategorizedAccounts[accountCategory.id].accounts.length; i++) {
-                const account = this.allCategorizedAccounts[accountCategory.id].accounts[i];
+            for (let i = 0; i < this.allCategorizedAccountsMap[accountCategory.id].accounts.length; i++) {
+                const account = this.allCategorizedAccountsMap[accountCategory.id].accounts[i];
 
                 if (!visibleOnly || !account.hidden) {
                     shownCount++;
@@ -842,9 +842,9 @@ export const useAccountsStore = defineStore('accounts', {
 
             return new Promise((resolve, reject) => {
                 if (!account ||
-                    !self.allCategorizedAccounts[account.category] ||
-                    !self.allCategorizedAccounts[account.category].accounts ||
-                    !self.allCategorizedAccounts[account.category].accounts[to]) {
+                    !self.allCategorizedAccountsMap[account.category] ||
+                    !self.allCategorizedAccountsMap[account.category].accounts ||
+                    !self.allCategorizedAccountsMap[account.category].accounts[to]) {
                     reject({ message: 'Unable to move account' });
                     return;
                 }
@@ -868,12 +868,12 @@ export const useAccountsStore = defineStore('accounts', {
             const self = this;
             const newDisplayOrders = [];
 
-            for (let category in self.allCategorizedAccounts) {
-                if (!Object.prototype.hasOwnProperty.call(self.allCategorizedAccounts, category)) {
+            for (let category in self.allCategorizedAccountsMap) {
+                if (!Object.prototype.hasOwnProperty.call(self.allCategorizedAccountsMap, category)) {
                     continue;
                 }
 
-                const accountList = self.allCategorizedAccounts[category].accounts;
+                const accountList = self.allCategorizedAccountsMap[category].accounts;
 
                 for (let i = 0; i < accountList.length; i++) {
                     newDisplayOrders.push({

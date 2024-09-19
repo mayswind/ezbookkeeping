@@ -103,7 +103,7 @@
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name"
                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                      :items="allCategorizedAccounts"
+                                                      :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showAccountSheet"
                                                       v-model="newProfile.defaultAccountId">
                 </two-column-list-item-selection-sheet>
@@ -415,7 +415,7 @@ export default {
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
         },
-        allCategorizedAccounts() {
+        allVisibleCategorizedAccounts() {
             return getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {

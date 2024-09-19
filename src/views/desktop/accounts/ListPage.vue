@@ -146,8 +146,8 @@
                                                 handle=".drag-handle"
                                                 ghost-class="dragging-item"
                                                 :disabled="activeAccountCategoryVisibleAccountCount <= 1"
-                                                :list="categorizedAccounts[activeAccountCategory.id].accounts"
-                                                v-if="categorizedAccounts[activeAccountCategory.id] && categorizedAccounts[activeAccountCategory.id].accounts && categorizedAccounts[activeAccountCategory.id].accounts.length"
+                                                :list="allCategorizedAccountsMap[activeAccountCategory.id].accounts"
+                                                v-if="allCategorizedAccountsMap[activeAccountCategory.id] && allCategorizedAccountsMap[activeAccountCategory.id].accounts && allCategorizedAccountsMap[activeAccountCategory.id].accounts.length"
                                                 @change="onMove"
                                             >
                                                 <template #item="{ element }">
@@ -330,8 +330,8 @@ export default {
         allAccountCategories() {
             return accountConstants.allCategories;
         },
-        categorizedAccounts() {
-            return this.accountsStore.allCategorizedAccounts;
+        allCategorizedAccountsMap() {
+            return this.accountsStore.allCategorizedAccountsMap;
         },
         allAccountCount() {
             return this.accountsStore.allAvailableAccountsCount;
@@ -355,11 +355,11 @@ export default {
             return this.accountCategoryTotalBalance(this.activeAccountCategory);
         },
         activeAccountCategoryVisibleAccountCount() {
-            if (!this.categorizedAccounts[this.activeAccountCategory.id] || !this.categorizedAccounts[this.activeAccountCategory.id].accounts) {
+            if (!this.allCategorizedAccountsMap[this.activeAccountCategory.id] || !this.allCategorizedAccountsMap[this.activeAccountCategory.id].accounts) {
                 return 0;
             }
 
-            const accounts = this.categorizedAccounts[this.activeAccountCategory.id].accounts;
+            const accounts = this.allCategorizedAccountsMap[this.activeAccountCategory.id].accounts;
 
             if (this.showHidden) {
                 return accounts.length;

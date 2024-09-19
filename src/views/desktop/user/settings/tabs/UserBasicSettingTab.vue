@@ -89,7 +89,7 @@
                                                    :disabled="loading || saving || !allVisibleAccounts.length"
                                                    :label="$t('Default Account')"
                                                    :placeholder="$t('Default Account')"
-                                                   :items="allCategorizedAccounts"
+                                                   :items="allVisibleCategorizedAccounts"
                                                    :no-item-text="$t('Unspecified')"
                                                    v-model="newProfile.defaultAccountId">
                                 </two-column-select>
@@ -420,7 +420,7 @@ export default {
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
         },
-        allCategorizedAccounts() {
+        allVisibleCategorizedAccounts() {
             return getCategorizedAccounts(this.allVisibleAccounts);
         },
         allWeekDays() {

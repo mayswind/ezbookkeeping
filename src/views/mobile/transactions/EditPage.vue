@@ -200,7 +200,7 @@
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                      :items="categorizedAccounts"
+                                                      :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showSourceAccountSheet"
                                                       v-model="transaction.sourceAccountId">
                 </two-column-list-item-selection-sheet>
@@ -223,7 +223,7 @@
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
                                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                                      :items="categorizedAccounts"
+                                                      :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showDestinationAccountSheet"
                                                       v-model="transaction.destinationAccountId">
                 </two-column-list-item-selection-sheet>
@@ -606,7 +606,7 @@ export default {
         allAccountsMap() {
             return this.accountsStore.allAccountsMap;
         },
-        categorizedAccounts() {
+        allVisibleCategorizedAccounts() {
             return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
         },
         allCategories() {

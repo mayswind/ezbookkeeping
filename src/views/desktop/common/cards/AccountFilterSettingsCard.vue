@@ -216,7 +216,7 @@ export default {
             return accountConstants.allAccountTypes;
         },
         allCategorizedAccounts() {
-            return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccounts);
+            return getCategorizedAccountsWithVisibleCount(this.accountsStore.allCategorizedAccountsMap);
         },
         hasAnyAvailableAccount() {
             return this.accountsStore.allAvailableAccountsCount > 0;

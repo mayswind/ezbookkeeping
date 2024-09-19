@@ -146,17 +146,17 @@ export function getCategorizedAccounts(allAccounts) {
     return ret;
 }
 
-export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
+export function getCategorizedAccountsWithVisibleCount(categorizedAccountsMap) {
     const ret = [];
 
     for (let i = 0; i < accountConstants.allCategories.length; i++) {
         const accountCategory = accountConstants.allCategories[i];
 
-        if (!categorizedAccounts[accountCategory.id] || !categorizedAccounts[accountCategory.id].accounts) {
+        if (!categorizedAccountsMap[accountCategory.id] || !categorizedAccountsMap[accountCategory.id].accounts) {
             continue;
         }
 
-        const allAccounts = categorizedAccounts[accountCategory.id].accounts;
+        const allAccounts = categorizedAccountsMap[accountCategory.id].accounts;
         const allSubAccounts = {};
         const allVisibleSubAccountCounts = {};
         const allFirstVisibleSubAccountIndexes = {};

@@ -168,7 +168,7 @@
                                                        :custom-selection-primary-text="sourceAccountName"
                                                        :label="$t(sourceAccountTitle)"
                                                        :placeholder="$t(sourceAccountTitle)"
-                                                       :items="categorizedAccounts"
+                                                       :items="allVisibleCategorizedAccounts"
                                                        v-model="transaction.sourceAccountId">
                                     </two-column-select>
                                 </v-col>
@@ -186,7 +186,7 @@
                                                        :custom-selection-primary-text="destinationAccountName"
                                                        :label="$t('Destination Account')"
                                                        :placeholder="$t('Destination Account')"
-                                                       :items="categorizedAccounts"
+                                                       :items="allVisibleCategorizedAccounts"
                                                        v-model="transaction.destinationAccountId">
                                     </two-column-select>
                                 </v-col>
@@ -576,7 +576,7 @@ export default {
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
         },
-        categorizedAccounts() {
+        allVisibleCategorizedAccounts() {
             return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
         },
         allAccountsMap() {

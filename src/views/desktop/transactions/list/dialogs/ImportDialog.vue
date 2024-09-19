@@ -224,7 +224,7 @@
                                                    :disabled="loading || submitting || !allVisibleAccounts.length"
                                                    :custom-selection-primary-text="getSourceAccountDisplayName(item)"
                                                    :placeholder="getSourceAccountTitle(item)"
-                                                   :items="categorizedAccounts"
+                                                   :items="allVisibleCategorizedAccounts"
                                                    v-model="item.sourceAccountId"
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
@@ -242,7 +242,7 @@
                                                    :disabled="loading || submitting || !allVisibleAccounts.length"
                                                    :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
                                                    :placeholder="$t('Destination Account')"
-                                                   :items="categorizedAccounts"
+                                                   :items="allVisibleCategorizedAccounts"
                                                    v-model="item.destinationAccountId"
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
@@ -480,7 +480,7 @@ export default {
         allVisibleAccounts() {
             return this.accountsStore.allVisiblePlainAccounts;
         },
-        categorizedAccounts() {
+        allVisibleCategorizedAccounts() {
             return this.$locale.getCategorizedAccountsWithDisplayBalance(this.allVisibleAccounts, this.showAccountBalance, this.defaultCurrency, this.settingsStore, this.userStore, this.exchangeRatesStore);
         },
         allAccountsMap() {

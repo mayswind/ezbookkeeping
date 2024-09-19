@@ -55,8 +55,8 @@ type DataTableTransactionDataImporter struct {
 // DataTableTransactionDataImporterPostProcessFunc represents item post process function of DataTableTransactionDataImporter
 type DataTableTransactionDataImporterPostProcessFunc func(core.Context, *models.ImportTransaction) error
 
-// CreateNewDataTableTransactionDataExporter returns a new data table transaction data exporter according to the specified arguments
-func CreateNewDataTableTransactionDataExporter(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, geoLocationSeparator string, transactionTagSeparator string) *DataTableTransactionDataExporter {
+// CreateNewExporter returns a new data table transaction data exporter according to the specified arguments
+func CreateNewExporter(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, geoLocationSeparator string, transactionTagSeparator string) *DataTableTransactionDataExporter {
 	return &DataTableTransactionDataExporter{
 		dataColumnMapping:       dataColumnMapping,
 		transactionTypeMapping:  transactionTypeMapping,
@@ -65,8 +65,8 @@ func CreateNewDataTableTransactionDataExporter(dataColumnMapping map[DataTableCo
 	}
 }
 
-// CreateNewDataTableTransactionDataImporter returns a new data table transaction data importer according to the specified arguments
-func CreateNewDataTableTransactionDataImporter(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, geoLocationSeparator string, transactionTagSeparator string) *DataTableTransactionDataImporter {
+// CreateNewImporter returns a new data table transaction data importer according to the specified arguments
+func CreateNewImporter(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, geoLocationSeparator string, transactionTagSeparator string) *DataTableTransactionDataImporter {
 	return &DataTableTransactionDataImporter{
 		dataColumnMapping:       dataColumnMapping,
 		transactionTypeMapping:  transactionTypeMapping,
@@ -75,8 +75,8 @@ func CreateNewDataTableTransactionDataImporter(dataColumnMapping map[DataTableCo
 	}
 }
 
-// CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc returns a new data table transaction data importer according to the specified arguments
-func CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, postProcessFunc DataTableTransactionDataImporterPostProcessFunc) *DataTableTransactionDataImporter {
+// CreateNewSimpleImporterWithPostProcessFunc returns a new data table transaction data importer according to the specified arguments
+func CreateNewSimpleImporterWithPostProcessFunc(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, postProcessFunc DataTableTransactionDataImporterPostProcessFunc) *DataTableTransactionDataImporter {
 	return &DataTableTransactionDataImporter{
 		dataColumnMapping:      dataColumnMapping,
 		transactionTypeMapping: transactionTypeMapping,
@@ -84,6 +84,16 @@ func CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(dataColu
 	}
 }
 
+// CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc returns a new data table transaction data importer according to the specified arguments
+func CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc(writableDataTable *WritableDataTable, transactionTypeMapping map[models.TransactionType]string, postProcessFunc DataTableTransactionDataImporterPostProcessFunc) *DataTableTransactionDataImporter {
+	return &DataTableTransactionDataImporter{
+		dataColumnMapping:      writableDataTable.GetDataColumnMapping(),
+		transactionTypeMapping: transactionTypeMapping,
+		postProcessFunc:        postProcessFunc,
+	}
+}
+
+// BuildExportedContent writes the exported transaction data to the data table builder 
 func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
@@ -221,6 +231,7 @@ func (c *DataTableTransactionDataExporter) getExportedTags(dataTableBuilder Data
 	return dataTableBuilder.ReplaceDelimiters(ret.String())
 }
 
+// ParseImportedData returns the imported transaction data
 func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, dataTable ImportedDataTable, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	if dataTable.DataRowCount() < 1 {
 		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)

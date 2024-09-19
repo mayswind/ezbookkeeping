@@ -24,7 +24,7 @@ func (c *feideeMymoneyTransactionDataXlsImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(
+	dataTableImporter := datatable.CreateNewSimpleImporterWithPostProcessFunc(
 		feideeMymoneyDataColumnNameMapping,
 		feideeMymoneyTransactionTypeNameMapping,
 		feideeMymoneyTransactionDataImporterPostProcess,

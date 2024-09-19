@@ -181,8 +181,8 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 		return nil, nil, nil, nil, errs.ErrFoundRecordNotHasRelatedRecord
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleDataTableTransactionDataImporterWithPostProcessFunc(
-		dataTable.GetDataColumnMapping(),
+	dataTableImporter := datatable.CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc(
+		dataTable,
 		feideeMymoneyTransactionTypeNameMapping,
 		feideeMymoneyTransactionDataImporterPostProcess,
 	)
@@ -204,7 +204,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx c
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.parseCsvData] cannot parse feidee mymoney csv data, because %s", err.Error())
+			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.parseAllLinesFromCsvData] cannot parse feidee mymoney csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 

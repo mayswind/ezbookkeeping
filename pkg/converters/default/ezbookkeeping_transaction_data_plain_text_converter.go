@@ -66,7 +66,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 		ezbookkeepingLineSeparator,
 	)
 
-	dataTableExporter := datatable.CreateNewDataTableTransactionDataExporter(
+	dataTableExporter := datatable.CreateNewExporter(
 		ezbookkeepingDataColumnNameMapping,
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
@@ -94,7 +94,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx c
 		return nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewDataTableTransactionDataImporter(
+	dataTableImporter := datatable.CreateNewImporter(
 		ezbookkeepingDataColumnNameMapping,
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,

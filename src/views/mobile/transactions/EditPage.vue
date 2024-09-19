@@ -1059,7 +1059,28 @@ export default {
                         self.submitting = false;
                         self.$hideLoading();
 
-                        if (!error.processed) {
+                        if (error.error && (error.error.errorCode === apiConstants.transactionCannotCreateInThisTimeErrorCode || error.error.errorCode === apiConstants.transactionCannotModifyInThisTimeErrorCode)) {
+                            self.$confirm('You have set this time range to prevent editing transactions. Would you like to change the editable transaction range to All?', () => {
+                                self.submitting = true;
+                                self.$showLoading(() => self.submitting);
+
+                                self.userStore.updateUserTransactionEditScope({
+                                    transactionEditScope: transactionConstants.allTransactionEditScopeTypes.All.type
+                                }).then(() => {
+                                    self.submitting = false;
+                                    self.$hideLoading();
+
+                                    self.$toast('Your editable transaction range has been set to All');
+                                }).catch(error => {
+                                    self.submitting = false;
+                                    self.$hideLoading();
+
+                                    if (!error.processed) {
+                                        self.$toast(error.message || error);
+                                    }
+                                });
+                            });
+                        } else if (!error.processed) {
                             self.$toast(error.message || error);
                         }
                     });

@@ -8,6 +8,8 @@ const baseAmapApiProxyUrlPath = '/_AMapService';
 const apiNotFoundErrorCode = 100001;
 const validatorErrorCode = 200000;
 const userEmailNotVerifiedErrorCode = 201020;
+const transactionCannotCreateInThisTimeErrorCode = 205017;
+const transactionCannotModifyInThisTimeErrorCode = 205018;
 const transactionPictureNotFoundErrorCode = 211001;
 const googleMapJavascriptUrl = 'https://maps.googleapis.com/maps/api/js';
 const baiduMapJavascriptUrl = 'https://api.map.baidu.com/api?v=3.0';
@@ -152,6 +154,8 @@ export default {
     apiNotFoundErrorCode: apiNotFoundErrorCode,
     validatorErrorCode: validatorErrorCode,
     userEmailNotVerifiedErrorCode: userEmailNotVerifiedErrorCode,
+    transactionCannotCreateInThisTimeErrorCode: transactionCannotCreateInThisTimeErrorCode,
+    transactionCannotModifyInThisTimeErrorCode: transactionCannotModifyInThisTimeErrorCode,
     transactionPictureNotFoundErrorCode: transactionPictureNotFoundErrorCode,
     specifiedApiNotFoundErrors: specifiedApiNotFoundErrors,
     parameterizedErrors: parameterizedErrors,

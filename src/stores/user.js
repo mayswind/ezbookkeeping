@@ -5,7 +5,10 @@ import { useSettingsStore } from './setting.js';
 import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber } from '@/lib/common.js';
+import {
+    isObject,
+    isNumber
+} from '@/lib/common.js';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
@@ -120,6 +123,37 @@ export const useUserStore = defineStore('user', {
                         reject({ error: error.response.data });
                     } else if (!error.processed) {
                         reject({ message: 'Unable to retrieve user profile' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+        },
+        updateUserTransactionEditScope({ transactionEditScope }) {
+            return new Promise((resolve, reject) => {
+                services.updateProfile({
+                    transactionEditScope: transactionEditScope,
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to update editable transaction range' });
+                        return;
+                    }
+
+                    if (data.result.user && isObject(data.result.user)) {
+                        const userStore = useUserStore();
+                        userStore.storeUserBasicInfo(data.result.user);
+                    }
+
+                    resolve(data.result);
+                }).catch(error => {
+                    logger.error('failed to save editable transaction range', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to update editable transaction range' });
                     } else {
                         reject(error);
                     }

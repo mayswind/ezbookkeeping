@@ -11,7 +11,7 @@ func TestAccountInfoResponseSliceLess(t *testing.T) {
 	var accountRespSlice AccountInfoResponseSlice
 	accountRespSlice = append(accountRespSlice, &AccountInfoResponse{
 		Id:           1,
-		Category:     ACCOUNT_CATEGORY_DEBIT_CARD,
+		Category:     ACCOUNT_CATEGORY_CHECKING_ACCOUNT,
 		DisplayOrder: int32(1),
 	})
 	accountRespSlice = append(accountRespSlice, &AccountInfoResponse{

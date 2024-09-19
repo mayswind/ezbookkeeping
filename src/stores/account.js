@@ -10,7 +10,7 @@ import colorConstants from '@/consts/color.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
 import { isNumber, isEquals } from '@/lib/common.js';
-import { getCategorizedAccounts, getAllFilteredAccountsBalance } from '@/lib/account.js';
+import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.js';
 
 function loadAccountList(state, accounts) {
     state.allAccounts = accounts;
@@ -28,7 +28,7 @@ function loadAccountList(state, accounts) {
         }
     }
 
-    state.allCategorizedAccounts = getCategorizedAccounts(accounts);
+    state.allCategorizedAccounts = getCategorizedAccountsMap(accounts);
 }
 
 function addAccountToAccountList(state, account) {
@@ -56,7 +56,7 @@ function addAccountToAccountList(state, account) {
         const accountList = state.allCategorizedAccounts[account.category].accounts;
         accountList.push(account);
     } else {
-        state.allCategorizedAccounts = getCategorizedAccounts(state.allAccounts);
+        state.allCategorizedAccounts = getCategorizedAccountsMap(state.allAccounts);
     }
 }
 

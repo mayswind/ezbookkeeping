@@ -8,33 +8,39 @@ type AccountCategory byte
 
 // Account categories
 const (
-	ACCOUNT_CATEGORY_CASH        AccountCategory = 1
-	ACCOUNT_CATEGORY_DEBIT_CARD  AccountCategory = 2
-	ACCOUNT_CATEGORY_CREDIT_CARD AccountCategory = 3
-	ACCOUNT_CATEGORY_VIRTUAL     AccountCategory = 4
-	ACCOUNT_CATEGORY_DEBT        AccountCategory = 5
-	ACCOUNT_CATEGORY_RECEIVABLES AccountCategory = 6
-	ACCOUNT_CATEGORY_INVESTMENT  AccountCategory = 7
+	ACCOUNT_CATEGORY_CASH                   AccountCategory = 1
+	ACCOUNT_CATEGORY_CHECKING_ACCOUNT       AccountCategory = 2
+	ACCOUNT_CATEGORY_CREDIT_CARD            AccountCategory = 3
+	ACCOUNT_CATEGORY_VIRTUAL                AccountCategory = 4
+	ACCOUNT_CATEGORY_DEBT                   AccountCategory = 5
+	ACCOUNT_CATEGORY_RECEIVABLES            AccountCategory = 6
+	ACCOUNT_CATEGORY_INVESTMENT             AccountCategory = 7
+	ACCOUNT_CATEGORY_SAVINGS_ACCOUNT        AccountCategory = 8
+	ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT AccountCategory = 9
 )
 
 var assetAccountCategory = map[AccountCategory]bool{
-	ACCOUNT_CATEGORY_CASH:        true,
-	ACCOUNT_CATEGORY_DEBIT_CARD:  true,
-	ACCOUNT_CATEGORY_CREDIT_CARD: false,
-	ACCOUNT_CATEGORY_VIRTUAL:     true,
-	ACCOUNT_CATEGORY_DEBT:        false,
-	ACCOUNT_CATEGORY_RECEIVABLES: true,
-	ACCOUNT_CATEGORY_INVESTMENT:  true,
+	ACCOUNT_CATEGORY_CASH:                   true,
+	ACCOUNT_CATEGORY_CHECKING_ACCOUNT:       true,
+	ACCOUNT_CATEGORY_CREDIT_CARD:            false,
+	ACCOUNT_CATEGORY_VIRTUAL:                true,
+	ACCOUNT_CATEGORY_DEBT:                   false,
+	ACCOUNT_CATEGORY_RECEIVABLES:            true,
+	ACCOUNT_CATEGORY_INVESTMENT:             true,
+	ACCOUNT_CATEGORY_SAVINGS_ACCOUNT:        true,
+	ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT: true,
 }
 
 var liabilityAccountCategory = map[AccountCategory]bool{
-	ACCOUNT_CATEGORY_CASH:        false,
-	ACCOUNT_CATEGORY_DEBIT_CARD:  false,
-	ACCOUNT_CATEGORY_CREDIT_CARD: true,
-	ACCOUNT_CATEGORY_VIRTUAL:     false,
-	ACCOUNT_CATEGORY_DEBT:        true,
-	ACCOUNT_CATEGORY_RECEIVABLES: false,
-	ACCOUNT_CATEGORY_INVESTMENT:  false,
+	ACCOUNT_CATEGORY_CASH:                   false,
+	ACCOUNT_CATEGORY_CHECKING_ACCOUNT:       false,
+	ACCOUNT_CATEGORY_CREDIT_CARD:            true,
+	ACCOUNT_CATEGORY_VIRTUAL:                false,
+	ACCOUNT_CATEGORY_DEBT:                   true,
+	ACCOUNT_CATEGORY_RECEIVABLES:            false,
+	ACCOUNT_CATEGORY_INVESTMENT:             false,
+	ACCOUNT_CATEGORY_SAVINGS_ACCOUNT:        false,
+	ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT: false,
 }
 
 // AccountType represents account type

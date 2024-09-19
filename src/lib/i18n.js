@@ -55,7 +55,7 @@ import {
 } from './currency.js';
 
 import {
-    getCategorizedAccounts,
+    getCategorizedAccountsMap,
     getAllFilteredAccountsBalance
 } from './account.js';
 
@@ -1280,14 +1280,17 @@ function getEnableDisableOptions(translateFn) {
 }
 
 function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, translateFn) {
-    const categorizedAccounts = copyObjectTo(getCategorizedAccounts(allVisibleAccounts), {});
+    const ret = [];
+    const categorizedAccounts = copyObjectTo(getCategorizedAccountsMap(allVisibleAccounts), {});
 
-    for (let category in categorizedAccounts) {
-        if (!Object.prototype.hasOwnProperty.call(categorizedAccounts, category)) {
+    for (let i = 0; i < accountConstants.allCategories.length; i++) {
+        const category = accountConstants.allCategories[i];
+
+        if (!categorizedAccounts[category.id]) {
             continue;
         }
 
-        const accountCategory = categorizedAccounts[category];
+        const accountCategory = categorizedAccounts[category.id];
 
         if (accountCategory.accounts) {
             for (let i = 0; i < accountCategory.accounts.length; i++) {
@@ -1339,9 +1342,11 @@ function getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccoun
         } else {
             accountCategory.displayBalance = '***';
         }
+
+        ret.push(accountCategory);
     }
 
-    return categorizedAccounts;
+    return ret;
 }
 
 function joinMultiText(textArray, translateFn) {

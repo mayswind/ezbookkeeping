@@ -6,7 +6,12 @@ const allAccountCategories = [
     },
     {
         id: 2,
-        name: 'Debit Card',
+        name: 'Checking Account',
+        defaultAccountIconId: '100'
+    },
+    {
+        id: 8,
+        name: 'Savings Account',
         defaultAccountIconId: '100'
     },
     {
@@ -28,6 +33,11 @@ const allAccountCategories = [
         id: 6,
         name: 'Receivables',
         defaultAccountIconId: '700'
+    },
+    {
+        id: 9,
+        name: 'Certificate of Deposit',
+        defaultAccountIconId: '110'
     },
     {
         id: 7,

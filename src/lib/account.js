@@ -100,7 +100,7 @@ export function getSubAccountCurrencies(account, showHidden, subAccountId) {
     return subAccountCurrencies;
 }
 
-export function getCategorizedAccounts(allAccounts) {
+export function getCategorizedAccountsMap(allAccounts) {
     const ret = {};
 
     for (let i = 0; i < allAccounts.length; i++) {
@@ -128,8 +128,26 @@ export function getCategorizedAccounts(allAccounts) {
     return ret;
 }
 
+export function getCategorizedAccounts(allAccounts) {
+    const ret = [];
+    const categorizedAccounts = getCategorizedAccountsMap(allAccounts);
+
+    for (let i = 0; i < accountConstants.allCategories.length; i++) {
+        const category = accountConstants.allCategories[i];
+
+        if (!categorizedAccounts[category.id]) {
+            continue;
+        }
+
+        const accountCategory = categorizedAccounts[category.id];
+        ret.push(accountCategory);
+    }
+
+    return ret;
+}
+
 export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
-    const ret = {};
+    const ret = [];
 
     for (let i = 0; i < accountConstants.allCategories.length; i++) {
         const accountCategory = accountConstants.allCategories[i];
@@ -181,7 +199,7 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
         }
 
         if (allAccounts.length > 0) {
-            ret[accountCategory.id] = {
+            ret.push({
                 category: accountCategory.id,
                 name: accountCategory.name,
                 icon: accountCategory.defaultAccountIconId,
@@ -191,7 +209,7 @@ export function getCategorizedAccountsWithVisibleCount(categorizedAccounts) {
                 allSubAccounts: allSubAccounts,
                 allVisibleSubAccountCounts: allVisibleSubAccountCounts,
                 allFirstVisibleSubAccountIndexes: allFirstVisibleSubAccountIndexes
-            };
+            });
         }
     }
 

@@ -130,21 +130,20 @@ export const useUserStore = defineStore('user', {
             });
         },
         updateUserTransactionEditScope({ transactionEditScope }) {
+            const self = this;
+
             return new Promise((resolve, reject) => {
                 services.updateProfile({
                     transactionEditScope: transactionEditScope,
                 }).then(response => {
                     const data = response.data;
 
-                    if (!data || !data.success || !data.result) {
+                    if (!data || !data.success || !data.result || !data.result.user || !isObject(data.result.user)) {
                         reject({ message: 'Unable to update editable transaction range' });
                         return;
                     }
 
-                    if (data.result.user && isObject(data.result.user)) {
-                        const userStore = useUserStore();
-                        userStore.storeUserBasicInfo(data.result.user);
-                    }
+                    self.storeUserBasicInfo(data.result.user);
 
                     resolve(data.result);
                 }).catch(error => {

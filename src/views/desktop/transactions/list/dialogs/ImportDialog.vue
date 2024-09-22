@@ -60,7 +60,7 @@
                         v-model:page="currentPage"
                     >
                         <template #header.data-table-select>
-                            <v-checkbox readonly class="cursor-pointer"
+                            <v-checkbox readonly class="always-cursor-pointer"
                                         density="compact" width="28"
                                         :disabled="loading || submitting"
                                         :indeterminate="anyButNotAllTransactionSelected"

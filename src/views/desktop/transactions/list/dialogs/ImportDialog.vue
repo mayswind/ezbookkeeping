@@ -69,6 +69,15 @@
                                 <v-menu activator="parent" location="bottom">
                                     <v-list>
                                         <v-list-item :prepend-icon="icons.selectAll"
+                                                     :title="$t('Select All Valid Items')"
+                                                     :disabled="loading || submitting"
+                                                     @click="selectAllValid"></v-list-item>
+                                        <v-list-item :prepend-icon="icons.selectAll"
+                                                     :title="$t('Select All Invalid Items')"
+                                                     :disabled="loading || submitting"
+                                                     @click="selectAllInvalid"></v-list-item>
+                                        <v-divider class="my-2"/>
+                                        <v-list-item :prepend-icon="icons.selectAll"
                                                      :title="$t('Select All')"
                                                      :disabled="loading || submitting"
                                                      @click="selectAll"></v-list-item>
@@ -99,7 +108,7 @@
                         </template>
                         <template #item.data-table-select="{ item }">
                             <v-checkbox density="compact"
-                                        :disabled="loading || submitting || !item.valid"
+                                        :disabled="loading || submitting"
                                         v-model="item.selected"></v-checkbox>
                         </template>
                         <template #item.valid="{ item }">
@@ -308,7 +317,9 @@
                         <template #bottom>
                             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2"
                                  v-if="importTransactions && importTransactions.length > 10">
-                                <span>{{ $t('format.misc.selectedCount', { count: selectedImportTransactionCount, totalCount: importTransactions.length }) }}</span>
+                                <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
+                                    {{ $t('format.misc.selectedCount', { count: selectedImportTransactionCount, totalCount: importTransactions.length }) }}
+                                </span>
                                 <v-spacer/>
                                 <span>{{ $t('Transactions Per Page') }}</span>
                                 <v-select class="ml-2" density="compact" max-width="100"
@@ -378,7 +389,7 @@
                     {{ $t('Next') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
-                <v-btn color="teal" :disabled="submitting || selectedImportTransactionCount < 1"
+                <v-btn color="teal" :disabled="submitting || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
                        :append-icon="!submitting ? icons.next : null" @click="submit"
                        v-if="currentStep === 'checkData'">
                     {{ $t('Import') }}
@@ -659,6 +670,17 @@ export default {
 
             return count;
         },
+        selectedInvalidTransactionCount() {
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (!this.importTransactions[i].valid && this.importTransactions[i].selected) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
         anyButNotAllTransactionSelected: {
             get: function () {
                 return this.selectedImportTransactionCount > 0 && this.selectedImportTransactionCount !== this.importTransactions.length;
@@ -781,6 +803,9 @@ export default {
 
                 if (transaction.valid && transaction.selected) {
                     transactions.push(transaction);
+                } else if (!transaction.valid && transaction.selected) {
+                    self.$refs.snackbar.showError('Cannot import invalid transactions');
+                    return;
                 }
             }
 
@@ -830,11 +855,23 @@ export default {
 
             this.showState = false;
         },
-        selectAll() {
+        selectAllValid() {
             for (let i = 0; i < this.importTransactions.length; i++) {
                 if (this.importTransactions[i].valid) {
                     this.importTransactions[i].selected = true;
                 }
+            }
+        },
+        selectAllInvalid() {
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (!this.importTransactions[i].valid) {
+                    this.importTransactions[i].selected = true;
+                }
+            }
+        },
+        selectAll() {
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                this.importTransactions[i].selected = true;
             }
         },
         selectNone() {
@@ -844,9 +881,7 @@ export default {
         },
         selectInvert() {
             for (let i = 0; i < this.importTransactions.length; i++) {
-                if (this.importTransactions[i].valid || this.importTransactions[i].selected) {
-                    this.importTransactions[i].selected = !this.importTransactions[i].selected;
-                }
+                this.importTransactions[i].selected = !this.importTransactions[i].selected;
             }
         },
         selectAllInThisPage() {

@@ -1034,7 +1034,7 @@ export default {
         remove() {
             const self = this;
 
-            if (this.type !== 'transaction' || self.mode !== 'view') {
+            if (self.type !== 'transaction' || self.mode !== 'view') {
                 return;
             }
 

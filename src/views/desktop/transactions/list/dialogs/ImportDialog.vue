@@ -451,8 +451,7 @@ import {
 
 export default {
     props: [
-        'persistent',
-        'show'
+        'persistent'
     ],
     expose: [
         'open'

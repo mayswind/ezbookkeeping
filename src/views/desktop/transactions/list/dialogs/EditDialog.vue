@@ -447,6 +447,8 @@ export default {
             showState: false,
             mode: 'add',
             activeTab: 'basicInfo',
+            addByTemplateId: null,
+            duplicateFromId: null,
             editId: null,
             originalTransactionEditable: false,
             clientSessionId: '',
@@ -758,6 +760,8 @@ export default {
     methods: {
         open(options) {
             const self = this;
+            self.addByTemplateId = null;
+            self.duplicateFromId = null;
             self.showState = true;
             self.activeTab = 'basicInfo';
             self.loading = true;
@@ -790,6 +794,9 @@ export default {
 
                     if (options.template) {
                         self.setTransaction(options.template, options, false, false);
+                        self.addByTemplateId = options.template.id;
+                    } else if ((self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && self.transactionsStore.transactionDraft) {
+                        self.setTransaction(self.transactionsStore.transactionDraft, options, false, false);
                     }
 
                     if (self.settingsStore.appSettings.autoGetCurrentGeoLocation
@@ -931,6 +938,10 @@ export default {
                             }
                         }
 
+                        if (self.mode === 'add' && !self.addByTemplateId && !self.duplicateFromId) {
+                            self.transactionsStore.clearTransactionDraft();
+                        }
+
                         self.showState = false;
                     }).catch(error => {
                         self.submitting = false;
@@ -1004,6 +1015,7 @@ export default {
             }
 
             this.editId = null;
+            this.duplicateFromId = this.transaction.id;
             this.transaction.id = null;
             this.transaction.time = getCurrentUnixTime();
             this.transaction.timeZone = this.settingsStore.appSettings.timeZone;
@@ -1049,11 +1061,40 @@ export default {
             });
         },
         cancel() {
-            if (this.reject) {
-                this.reject();
+            const self = this;
+
+            const doClose = function () {
+                if (self.reject) {
+                    self.reject();
+                }
+
+                self.showState = false;
+            };
+
+            if (self.type !== 'transaction' || self.mode !== 'add' || self.addByTemplateId || self.duplicateFromId) {
+                doClose();
+                return;
             }
 
-            this.showState = false;
+            if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
+                if (self.transactionsStore.isTransactionDraftModified(self.transaction)) {
+                    self.$refs.confirmDialog.open('Do you want to save this transaction draft?').then(() => {
+                        self.transactionsStore.saveTransactionDraft(self.transaction);
+                        doClose();
+                    }).catch(() => {
+                        self.transactionsStore.clearTransactionDraft();
+                        doClose();
+                    });
+                } else {
+                    self.transactionsStore.clearTransactionDraft();
+                    doClose();
+                }
+            } else if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
+                self.transactionsStore.saveTransactionDraft(self.transaction);
+                doClose();
+            } else {
+                doClose();
+            }
         },
         showDateTimeError(error) {
             this.$refs.snackbar.showError(error);

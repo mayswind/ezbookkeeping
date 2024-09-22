@@ -11,6 +11,7 @@ const defaultSettings = {
     applicationLock: false,
     applicationLockWebAuthn: false,
     autoUpdateExchangeRatesData: true,
+    autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
     showAmountInHomePage: true,
     timezoneUsedForStatisticsInHomePage: timezoneConstants.defaultTimezoneTypesUsedForStatistics,
@@ -155,6 +156,14 @@ export function isAutoUpdateExchangeRatesData() {
 
 export function setAutoUpdateExchangeRatesData(value) {
     setOption('autoUpdateExchangeRatesData', value);
+}
+
+export function getAutoSaveTransactionDraft() {
+    return getOption('autoSaveTransactionDraft');
+}
+
+export function setAutoSaveTransactionDraft(value) {
+    setOption('autoSaveTransactionDraft', value);
 }
 
 export function isAutoGetCurrentGeoLocation() {

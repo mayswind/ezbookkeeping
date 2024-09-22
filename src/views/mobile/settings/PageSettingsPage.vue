@@ -34,6 +34,15 @@
 
         <f7-block-title>{{ $t('Transaction Edit Page') }}</f7-block-title>
         <f7-list strong inset dividers>
+            <f7-list-item
+                :title="$t('Automatically Save Draft')"
+                smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Automatically Save Draft'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), popupCloseLinkText: $t('Done') }">
+                <select v-model="autoSaveTransactionDraft">
+                    <option value="disabled">{{ $t('Disabled') }}</option>
+                    <option value="enabled">{{ $t('Enabled') }}</option>
+                    <option value="confirmation">{{ $t('Show Confirmation Every Time') }}</option>
+                </select>
+            </f7-list-item>
             <f7-list-item>
                 <span>{{ $t('Automatically Add Geolocation') }}</span>
                 <f7-toggle :checked="isAutoGetCurrentGeoLocation" @toggle:change="isAutoGetCurrentGeoLocation = $event"></f7-toggle>
@@ -45,11 +54,12 @@
 <script>
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 import { useOverviewStore } from '@/stores/overview.js';
 
 export default {
     computed: {
-        ...mapStores(useSettingsStore, useOverviewStore),
+        ...mapStores(useSettingsStore, useTransactionsStore, useOverviewStore),
         allTimezoneTypesUsedForStatistics() {
             return this.$locale.getAllTimezoneTypesUsedForStatistics();
         },
@@ -84,6 +94,18 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setShowTagInTransactionListPage(value);
+            }
+        },
+        autoSaveTransactionDraft: {
+            get: function () {
+                return this.settingsStore.appSettings.autoSaveTransactionDraft;
+            },
+            set: function (value) {
+                this.settingsStore.setAutoSaveTransactionDraft(value);
+
+                if (value === 'disabled') {
+                    this.transactionsStore.clearTransactionDraft();
+                }
             }
         },
         isAutoGetCurrentGeoLocation: {

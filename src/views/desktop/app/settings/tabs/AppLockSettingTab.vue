@@ -64,6 +64,7 @@
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 
 import logger from '@/lib/logger.js';
 import webauthn from '@/lib/webauthn.js';
@@ -77,7 +78,7 @@ export default {
         };
     },
     computed: {
-        ...mapStores(useSettingsStore, useUserStore),
+        ...mapStores(useSettingsStore, useUserStore, useTransactionsStore),
         isEnableApplicationLock: {
             get: function () {
                 return this.settingsStore.appSettings.applicationLock;
@@ -168,6 +169,7 @@ export default {
 
             this.$user.encryptToken(user.username, this.pinCode);
             this.settingsStore.setEnableApplicationLock(true);
+            this.transactionsStore.saveTransactionDraft();
 
             this.settingsStore.setEnableApplicationLockWebAuthn(false);
             this.$user.clearWebAuthnConfig();
@@ -190,6 +192,7 @@ export default {
 
             this.$user.decryptToken();
             this.settingsStore.setEnableApplicationLock(false);
+            this.transactionsStore.saveTransactionDraft();
 
             this.settingsStore.setEnableApplicationLockWebAuthn(false);
             this.$user.clearWebAuthnConfig();

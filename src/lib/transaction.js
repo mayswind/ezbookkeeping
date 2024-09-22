@@ -165,10 +165,7 @@ export function setTransactionModelByTransaction(transaction, transaction2, allC
 
         transaction.hideAmount = transaction2.hideAmount;
         transaction.tagIds = transaction2.tagIds || [];
-
-        if (setContextData) {
-            transaction.pictures = transaction2.pictures || [];
-        }
+        transaction.pictures = transaction2.pictures || [];
 
         transaction.comment = transaction2.comment;
 

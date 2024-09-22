@@ -2,7 +2,10 @@ import axios from 'axios';
 
 import apiConstants from '@/consts/api.js';
 import userState from './userstate.js';
-import { isBoolean } from './common.js';
+import {
+    isDefined,
+    isBoolean
+} from './common.js';
 import {
     getGoogleMapAPIKey,
     getBaiduMapAK,
@@ -395,8 +398,12 @@ export default {
 
         return axios.get(`v1/transactions/amounts.json?use_transaction_timezone=${useTransactionTimezone}` + (queryParams.length ? '&query=' + queryParams.join('|') : ''));
     },
-    getTransaction: ({ id }) => {
-        return axios.get(`v1/transactions/get.json?id=${id}&with_pictures=true&trim_account=true&trim_category=true&trim_tag=true`);
+    getTransaction: ({ id, withPictures }) => {
+        if (!isDefined(withPictures)) {
+            withPictures = true;
+        }
+
+        return axios.get(`v1/transactions/get.json?id=${id}&with_pictures=${withPictures}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     addTransaction: ({ type, categoryId, time, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, pictureIds, comment, geoLocation, utcOffset, clientSessionId }) => {
         return axios.post('v1/transactions/add.json', {

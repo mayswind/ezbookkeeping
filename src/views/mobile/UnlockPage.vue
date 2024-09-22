@@ -70,6 +70,7 @@ import { useRootStore } from '@/stores/index.js';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
 import { useTokensStore } from '@/stores/token.js';
+import { useTransactionsStore } from '@/stores/transaction.js';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 
 import assetConstants from '@/consts/asset.js';
@@ -88,7 +89,7 @@ export default {
         }
     },
     computed: {
-        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useExchangeRatesStore),
+        ...mapStores(useRootStore, useSettingsStore, useUserStore, useTokensStore, useTransactionsStore, useExchangeRatesStore),
         ezBookkeepingLogoPath() {
             return assetConstants.ezBookkeepingLogoPath;
         },
@@ -134,6 +135,7 @@ export default {
                 self.$hideLoading();
 
                 self.$user.unlockTokenByWebAuthn(id, userName, userSecret);
+                self.transactionsStore.initTransactionDraft();
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);
@@ -188,6 +190,7 @@ export default {
 
             try {
                 self.$user.unlockTokenByPinCode(user.username, pinCode);
+                self.transactionsStore.initTransactionDraft();
                 self.tokensStore.refreshTokenAndRevokeOldToken().then(response => {
                     if (response.user) {
                         const localeDefaultSettings = self.$locale.setLanguage(response.user.language);

@@ -150,6 +150,22 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
+                                    :label="$t('Automatically Save Draft')"
+                                    :placeholder="$t('Automatically Save Draft')"
+                                    :items="[
+                                        { value: 'disabled', displayName: $t('Disabled') },
+                                        { value: 'enabled', displayName: $t('Enabled') },
+                                        { value: 'confirmation', displayName: $t('Show Confirmation Every Time') }
+                                    ]"
+                                    v-model="autoSaveTransactionDraft"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
                                     :label="$t('Automatically Add Geolocation')"
                                     :placeholder="$t('Automatically Add Geolocation')"
                                     :items="enableDisableOptions"
@@ -273,6 +289,18 @@ export default {
             },
             set: function (value) {
                 this.settingsStore.setItemsCountInTransactionListPage(value);
+            }
+        },
+        autoSaveTransactionDraft: {
+            get: function () {
+                return this.settingsStore.appSettings.autoSaveTransactionDraft;
+            },
+            set: function (value) {
+                this.settingsStore.setAutoSaveTransactionDraft(value);
+
+                if (value === 'disabled') {
+                    this.transactionsStore.clearTransactionDraft();
+                }
             }
         },
         isAutoGetCurrentGeoLocation: {

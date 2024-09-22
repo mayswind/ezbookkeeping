@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.js';
+import { useUserStore } from './user.js';
 import { useAccountsStore } from './account.js';
 import { useTransactionCategoriesStore } from './transactionCategory.js';
 import { useOverviewStore } from './overview.js';
@@ -8,10 +9,16 @@ import { useStatisticsStore } from './statistics.js';
 import { useExchangeRatesStore } from './exchangeRates.js';
 
 import datetimeConstants from '@/consts/datetime.js';
+import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
+import userState from '@/lib/userstate.js';
 import services from '@/lib/services.js';
 import logger from '@/lib/logger.js';
-import { isNumber, isString } from '@/lib/common.js';
+import {
+    isDefined,
+    isNumber,
+    isString
+} from '@/lib/common.js';
 import {
     getCurrentUnixTime,
     getTimezoneOffsetMinutes,
@@ -25,6 +32,7 @@ import {
     getDay,
     getDayOfWeekName
 } from '@/lib/datetime.js';
+import { getFirstAvailableCategoryId } from '@/lib/category.js';
 
 const emptyTransactionResult = {
     items: [],
@@ -315,8 +323,47 @@ function buildBasicSubmitTransaction(transaction, dummyTime) {
     return submitTransaction;
 }
 
+function buildTransactionDraft(transaction) {
+    if (!transaction) {
+        return null;
+    }
+
+    let categoryId = '';
+
+    if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+        categoryId = transaction.expenseCategory;
+    } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+        categoryId = transaction.incomeCategory;
+    } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+        categoryId = transaction.transferCategory;
+    } else {
+        return null;
+    }
+
+    const transactionDraft = {
+        type: transaction.type,
+        categoryId: categoryId,
+        sourceAccountId: transaction.sourceAccountId,
+        sourceAmount: transaction.sourceAmount,
+        destinationAccountId: '0',
+        destinationAmount: 0,
+        hideAmount: transaction.hideAmount,
+        tagIds: transaction.tagIds,
+        pictures: transaction.pictures,
+        comment: transaction.comment,
+    };
+
+    if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+        transactionDraft.destinationAccountId = transaction.destinationAccountId;
+        transactionDraft.destinationAmount = transaction.destinationAmount;
+    }
+
+    return transactionDraft;
+}
+
 export const useTransactionsStore = defineStore('transactions', {
     state: () => ({
+        transactionDraft: userState.getUserTransactionDraft(),
         transactionsFilter: {
             dateType: datetimeConstants.allDateRanges.All.type,
             maxTime: 0,
@@ -447,6 +494,104 @@ export const useTransactionsStore = defineStore('transactions', {
         }
     },
     actions: {
+        initTransactionDraft() {
+            const settingsStore = useSettingsStore();
+
+            if (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
+                this.transactionDraft = userState.getUserTransactionDraft();
+            } else {
+                this.transactionDraft = null;
+            }
+        },
+        isTransactionDraftModified(transaction) {
+            if (!transaction) {
+                return false;
+            }
+
+            const userStore = useUserStore();
+            const transactionCategoriesStore = useTransactionCategoriesStore();
+
+            if (transaction.sourceAmount !== 0) {
+                return true;
+            }
+
+            if (transaction.type === transactionConstants.allTransactionTypes.Transfer && transaction.destinationAmount !== 0) {
+                return true;
+            }
+
+            if (transaction.sourceAccountId && transaction.sourceAccountId !== '0' && transaction.sourceAccountId !== userStore.currentUserDefaultAccountId) {
+                return true;
+            }
+
+            if (transaction.type === transactionConstants.allTransactionTypes.Transfer && transaction.destinationAccountId && transaction.destinationAccountId !== '0' && transaction.destinationAccountId !== userStore.currentUserDefaultAccountId) {
+                return true;
+            }
+
+            const allCategories = transactionCategoriesStore.allTransactionCategories;
+
+            if (allCategories) {
+                if (transaction.type === transactionConstants.allTransactionTypes.Expense) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Expense]);
+
+                    if (transaction.expenseCategory && transaction.expenseCategory !== '0' && transaction.expenseCategory !== defaultCategoryId) {
+                        return true;
+                    }
+                } else if (transaction.type === transactionConstants.allTransactionTypes.Income) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Income]);
+
+                    if (transaction.incomeCategory && transaction.incomeCategory !== '0' && transaction.incomeCategory !== defaultCategoryId) {
+                        return true;
+                    }
+                } else if (transaction.type === transactionConstants.allTransactionTypes.Transfer) {
+                    const defaultCategoryId = getFirstAvailableCategoryId(allCategories[categoryConstants.allCategoryTypes.Transfer]);
+
+                    if (transaction.transferCategory && transaction.transferCategory !== '0' && transaction.transferCategory !== defaultCategoryId) {
+                        return true;
+                    }
+                }
+            }
+
+            if (transaction.hideAmount) {
+                return true;
+            }
+
+            if (transaction.tagIds && transaction.tagIds.length > 0) {
+                return true;
+            }
+
+            if (transaction.pictures && transaction.pictures.length > 0) {
+                return true;
+            }
+
+            if (transaction.comment && transaction.comment.trim()) {
+                return true;
+            }
+
+            return false;
+        },
+        saveTransactionDraft(transaction) {
+            const settingsStore = useSettingsStore();
+
+            if (settingsStore.appSettings.autoSaveTransactionDraft !== 'enabled' && settingsStore.appSettings.autoSaveTransactionDraft !== 'confirmation') {
+                this.clearTransactionDraft();
+                return;
+            }
+
+            if (transaction) {
+                if (!this.isTransactionDraftModified(transaction)) {
+                    this.clearTransactionDraft();
+                    return;
+                }
+
+                this.transactionDraft = buildTransactionDraft(transaction);
+            }
+
+            userState.updateUserTransactionDraft(this.transactionDraft);
+        },
+        clearTransactionDraft() {
+            this.transactionDraft = null;
+            userState.clearUserTransactionDraft();
+        },
         generateNewTransactionModel(type) {
             const settingsStore = useSettingsStore();
             const now = getCurrentUnixTime();
@@ -827,10 +972,15 @@ export const useTransactionsStore = defineStore('transactions', {
                 });
             });
         },
-        getTransaction({ transactionId }) {
+        getTransaction({ transactionId, withPictures }) {
             return new Promise((resolve, reject) => {
+                if (!isDefined(withPictures)) {
+                    withPictures = true;
+                }
+
                 services.getTransaction({
-                    id: transactionId
+                    id: transactionId,
+                    withPictures: withPictures
                 }).then(response => {
                     const data = response.data;
 

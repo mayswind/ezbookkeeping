@@ -9,6 +9,7 @@ const appLockSecretBaseStringPrefix = 'EBK_LOCK_SECRET_';
 const tokenLocalStorageKey = 'ebk_user_token';
 const webauthnConfigLocalStorageKey = 'ebk_user_webauthn_config';
 const userInfoLocalStorageKey = 'ebk_user_info';
+const transactionDraftLocalStorageKey = 'ebk_user_draft_transaction';
 
 const tokenSessionStorageKey = 'ebk_user_session_token';
 const encryptedTokenSessionStorageKey = 'ebk_user_session_encrypted_token';
@@ -56,6 +57,21 @@ function getToken() {
 
 function getUserInfo() {
     const data = localStorage.getItem(userInfoLocalStorageKey);
+    return JSON.parse(data);
+}
+
+function getUserTransactionDraft() {
+    let data = localStorage.getItem(transactionDraftLocalStorageKey);
+
+    if (!data) {
+        return null;
+    }
+
+    if (isEnableApplicationLock()) {
+        const appLockState = getUserAppLockState();
+        data = getDecryptedToken(data, appLockState);
+    }
+
     return JSON.parse(data);
 }
 
@@ -183,8 +199,27 @@ function updateUserInfo(user) {
     }
 }
 
+function updateUserTransactionDraft(transaction) {
+    if (!isObject(transaction)) {
+        return;
+    }
+
+    let data = JSON.stringify(transaction);
+
+    if (isEnableApplicationLock()) {
+        const appLockState = getUserAppLockState();
+        data = getEncryptedToken(data, appLockState);
+    }
+
+    localStorage.setItem(transactionDraftLocalStorageKey, data);
+}
+
 function clearUserInfo() {
     localStorage.removeItem(userInfoLocalStorageKey);
+}
+
+function clearUserTransactionDraft() {
+    localStorage.removeItem(transactionDraftLocalStorageKey);
 }
 
 function clearSessionToken() {
@@ -201,12 +236,14 @@ function clearTokenAndUserInfo(clearAppLockState) {
     sessionStorage.removeItem(tokenSessionStorageKey);
     sessionStorage.removeItem(encryptedTokenSessionStorageKey);
     localStorage.removeItem(tokenLocalStorageKey);
+    clearUserTransactionDraft();
     clearUserInfo();
 }
 
 export default {
     getToken,
     getUserInfo,
+    getUserTransactionDraft,
     getUserAppLockState,
     isUserLogined,
     isUserUnlocked,
@@ -219,8 +256,10 @@ export default {
     decryptToken,
     isCorrectPinCode,
     updateToken,
+    updateUserTransactionDraft,
     updateUserInfo,
     clearUserInfo,
+    clearUserTransactionDraft,
     clearSessionToken,
     clearTokenAndUserInfo
 };

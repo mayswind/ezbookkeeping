@@ -1,5 +1,5 @@
 <template>
-    <f7-page with-subnavbar @page:afterin="onPageAfterIn">
+    <f7-page with-subnavbar @page:afterin="onPageAfterIn" @page:beforeout="onPageBeforeOut">
         <f7-navbar>
             <f7-nav-left :back-link="$t('Back')"></f7-nav-left>
             <f7-nav-title :title="$t(title)"></f7-nav-title>
@@ -473,6 +473,8 @@ export default {
         return {
             type: 'transaction',
             mode: 'add',
+            addByTemplateId: null,
+            duplicateFromId: null,
             editId: null,
             transaction: newTransaction,
             clientSessionId: '',
@@ -480,6 +482,7 @@ export default {
             loadingError: null,
             geoLocationStatus: null,
             submitting: false,
+            submitted: false,
             uploadingPicture: false,
             removingPictureId: null,
             isSupportGeoLocation: !!navigator.geolocation,
@@ -903,9 +906,11 @@ export default {
             if (query.id) {
                 if (self.mode === 'edit') {
                     self.editId = query.id;
+                } else if (self.mode === 'add') {
+                    self.duplicateFromId = query.id;
                 }
 
-                promises.push(self.transactionsStore.getTransaction({ transactionId: query.id }));
+                promises.push(self.transactionsStore.getTransaction({ transactionId: query.id, withPictures: self.mode !== 'add' }));
             }
         } else if (self.type === 'template') {
             self.transaction.name = '';
@@ -953,12 +958,22 @@ export default {
 
             let fromTransaction = null;
 
-            if (self.type === 'transaction' && query.id) {
-                fromTransaction = responses[4];
-            } else if (self.type === 'transaction' && self.transactionTemplatesStore.allTransactionTemplatesMap && self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal]) {
-                fromTransaction = self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal][query.templateId];
-            } else if (self.type === 'template' && query.id) {
-                fromTransaction = responses[4];
+            if (self.type === 'transaction') {
+                if (query.id) {
+                    fromTransaction = responses[4];
+                } else if (query.templateId && self.transactionTemplatesStore.allTransactionTemplatesMap && self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal]) {
+                    fromTransaction = self.transactionTemplatesStore.allTransactionTemplatesMap[templateConstants.allTemplateTypes.Normal][query.templateId];
+
+                    if (fromTransaction) {
+                        self.addByTemplateId = fromTransaction.id;
+                    }
+                } else if ((self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && self.transactionsStore.transactionDraft) {
+                    fromTransaction = self.transactionsStore.transactionDraft;
+                }
+            } else if (self.type === 'template') {
+                if (query.id) {
+                    fromTransaction = responses[4];
+                }
             }
 
             setTransactionModelByTransaction(
@@ -1019,6 +1034,27 @@ export default {
                 this.updateGeoLocation(false);
             }
         },
+        onPageBeforeOut() {
+            const self = this;
+
+            if (self.submitted || self.type !== 'transaction' || self.mode !== 'add' || self.addByTemplateId || self.duplicateFromId) {
+                return;
+            }
+
+            if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') {
+                if (self.transactionsStore.isTransactionDraftModified(self.transaction)) {
+                    self.$confirm('Do you want to save this transaction draft?', () => {
+                        self.transactionsStore.saveTransactionDraft(self.transaction);
+                    }, () => {
+                        self.transactionsStore.clearTransactionDraft();
+                    });
+                } else {
+                    self.transactionsStore.clearTransactionDraft();
+                }
+            } else if (self.settingsStore.appSettings.autoSaveTransactionDraft === 'enabled') {
+                self.transactionsStore.saveTransactionDraft(self.transaction);
+            }
+        },
         save() {
             const self = this;
             const router = self.f7router;
@@ -1054,6 +1090,11 @@ export default {
                             self.$toast('You have saved this transaction');
                         }
 
+                        if (self.mode === 'add' && !self.addByTemplateId && !self.duplicateFromId) {
+                            self.transactionsStore.clearTransactionDraft();
+                        }
+
+                        self.submitted = true;
                         router.back();
                     }).catch(error => {
                         self.submitting = false;
@@ -1111,6 +1152,7 @@ export default {
                         self.$toast('You have saved this template');
                     }
 
+                    self.submitted = true;
                     router.back();
                 }).catch(error => {
                     self.submitting = false;

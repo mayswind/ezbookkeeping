@@ -13,6 +13,7 @@ export const useSettingsStore = defineStore('settings', {
             applicationLock: settings.isEnableApplicationLock(),
             applicationLockWebAuthn: settings.isEnableApplicationLockWebAuthn(),
             autoUpdateExchangeRatesData: settings.isAutoUpdateExchangeRatesData(),
+            autoSaveTransactionDraft: settings.getAutoSaveTransactionDraft(),
             autoGetCurrentGeoLocation: settings.isAutoGetCurrentGeoLocation(),
             showAmountInHomePage: settings.isShowAmountInHomePage(),
             timezoneUsedForStatisticsInHomePage: settings.getTimezoneUsedForStatisticsInHomePage(),
@@ -62,6 +63,10 @@ export const useSettingsStore = defineStore('settings', {
         setAutoUpdateExchangeRatesData(value) {
             settings.setAutoUpdateExchangeRatesData(value);
             this.appSettings.autoUpdateExchangeRatesData = value;
+        },
+        setAutoSaveTransactionDraft(value) {
+            settings.setAutoSaveTransactionDraft(value);
+            this.appSettings.autoSaveTransactionDraft = value;
         },
         setAutoGetCurrentGeoLocation(value) {
             settings.setAutoGetCurrentGeoLocation(value);

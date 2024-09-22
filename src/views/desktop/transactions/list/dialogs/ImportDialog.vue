@@ -37,7 +37,7 @@
                                 class="always-cursor-pointer"
                                 :disabled="submitting"
                                 :label="$t('Data File')"
-                                :placeholder="$t('Click to select import file')"
+                                :placeholder="$t('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
                                 v-model="fileName"
                                 @click="showOpenFileDialog"
                             />

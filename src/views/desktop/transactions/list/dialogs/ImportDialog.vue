@@ -211,7 +211,7 @@
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
                             </div>
-                            <div style="width: 360px" v-if="editingTransaction === item">
+                            <div class="d-flex align-center" style="width: 360px" v-if="editingTransaction === item">
                                 <two-column-select density="compact" variant="underlined"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -228,8 +228,7 @@
                                                    v-model="item.sourceAccountId"
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
-                            </div>
-                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
+                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
                                 <two-column-select density="compact" variant="underlined"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
@@ -244,6 +243,7 @@
                                                    :placeholder="$t('Destination Account')"
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.destinationAccountId"
+                                                   v-if="item.type === allTransactionTypes.Transfer"
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
                             </div>

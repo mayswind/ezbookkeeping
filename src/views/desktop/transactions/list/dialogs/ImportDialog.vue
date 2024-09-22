@@ -321,7 +321,43 @@
                                 <v-pagination density="compact"
                                               :total-visible="6"
                                               :length="totalPageCount"
-                                              v-model="currentPage"></v-pagination>
+                                              v-model="currentPage">
+                                    <template #item="{ page, isActive }">
+                                        <v-btn density="compact"
+                                               variant="text"
+                                               :icon="true"
+                                               :color="isActive ? 'primary' : 'default'"
+                                               @click="currentPage = parseInt(page)"
+                                               v-if="page !== '...'"
+                                        >
+                                            <span>{{ page }}</span>
+                                        </v-btn>
+                                        <v-btn density="compact"
+                                               variant="text"
+                                               color="default"
+                                               :icon="true"
+                                               v-if="page === '...'"
+                                        >
+                                            <span>{{ page }}</span>
+                                            <v-menu :close-on-content-click="false" activator="parent">
+                                                <v-list>
+                                                    <v-list-item class="text-sm" density="compact">
+                                                        <v-list-item-title class="cursor-pointer">
+                                                            <v-autocomplete density="compact"
+                                                                            width="100"
+                                                                            item-title="page"
+                                                                            item-value="page"
+                                                                            :items="allPages"
+                                                                            :no-data-text="$t('No results')"
+                                                                            v-model="inputCurrentPage"
+                                                            />
+                                                        </v-list-item-title>
+                                                    </v-list-item>
+                                                </v-list>
+                                            </v-menu>
+                                        </v-btn>
+                                    </template>
+                                </v-pagination>
                             </div>
                         </template>
                     </v-data-table>
@@ -583,6 +619,27 @@ export default {
             pageOptions.push({ value: -1, title: this.$t('All') });
 
             return pageOptions;
+        },
+        allPages() {
+            const pages = [];
+
+            for (let i = 1; i < this.totalPageCount; i++) {
+                pages.push({
+                    page: i
+                });
+            }
+
+            return pages;
+        },
+        inputCurrentPage: {
+            get: function () {
+                return this.currentPage;
+            },
+            set: function (value) {
+                if (value && value >= 1 && value < this.totalPageCount) {
+                    this.currentPage = value;
+                }
+            }
         },
         totalPageCount() {
             if (!this.importTransactions || this.importTransactions.length < 1) {

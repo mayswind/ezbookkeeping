@@ -249,8 +249,8 @@
                             </div>
                         </template>
                         <template #item.geoLocation="{ item }">
-                            <span class="cursor-pointer" v-if="item.geoLocation">{{ `(${item.geoLocation.longitude}, ${item.geoLocation.latitude})` }}</span>
-                            <span class="cursor-pointer" v-else-if="!item.geoLocation">{{ $t('None') }}</span>
+                            <span v-if="item.geoLocation">{{ `(${item.geoLocation.longitude}, ${item.geoLocation.latitude})` }}</span>
+                            <span v-else-if="!item.geoLocation">{{ $t('None') }}</span>
                         </template>
                         <template #item.tagIds="{ item }">
                             <div v-if="editingTransaction !== item">

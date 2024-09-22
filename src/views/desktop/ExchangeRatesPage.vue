@@ -210,12 +210,12 @@ export default {
             }).then(() => {
                 self.loading = false;
 
-                if (this.exchangeRatesData && this.exchangeRatesData.exchangeRates) {
+                if (self.exchangeRatesData && self.exchangeRatesData.exchangeRates) {
                     let foundDefaultCurrency = false;
 
-                    for (let i = 0; i < this.exchangeRatesData.exchangeRates.length; i++) {
-                        const exchangeRate = this.exchangeRatesData.exchangeRates[i];
-                        if (exchangeRate.currency === this.baseCurrency) {
+                    for (let i = 0; i < self.exchangeRatesData.exchangeRates.length; i++) {
+                        const exchangeRate = self.exchangeRatesData.exchangeRates[i];
+                        if (exchangeRate.currency === self.baseCurrency) {
                             foundDefaultCurrency = true;
                             break;
                         }
@@ -224,7 +224,7 @@ export default {
                     if (force) {
                         self.$refs.snackbar.showMessage('Exchange rates data has been updated');
                     } else if (!foundDefaultCurrency) {
-                        this.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
+                        self.$refs.snackbar.showMessage('There is no exchange rates data for your default currency');
                     }
                 }
             }).catch(error => {

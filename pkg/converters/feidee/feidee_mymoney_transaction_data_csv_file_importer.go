@@ -195,6 +195,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx c
 	csvReader.FieldsPerRecord = -1
 
 	allLines := make([][]string, 0)
+	hasFileHeader := false
 
 	for {
 		items, err := csvReader.Read()
@@ -208,8 +209,15 @@ func (c *feideeMymoneyTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx c
 			return nil, errs.ErrInvalidCSVFile
 		}
 
-		if len(items) <= 0 || strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
-			continue
+		if !hasFileHeader {
+			if len(items) <= 0 {
+				continue
+			} else if strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
+				hasFileHeader = true
+				continue
+			} else {
+				log.Warnf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.parseAllLinesFromCsvData] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+			}
 		}
 
 		allLines = append(allLines, items)

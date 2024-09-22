@@ -11,6 +11,7 @@ type LocaleTextItems struct {
 	ForgetPasswordMailTextItems *ForgetPasswordMailTextItems
 }
 
+// DefaultTypes represents default types for the language
 type DefaultTypes struct {
 	DecimalSeparator    core.DecimalSeparator
 	DigitGroupingSymbol core.DigitGroupingSymbol

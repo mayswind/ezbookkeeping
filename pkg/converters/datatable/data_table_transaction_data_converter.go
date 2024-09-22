@@ -84,6 +84,14 @@ func CreateNewSimpleImporterWithPostProcessFunc(dataColumnMapping map[DataTableC
 	}
 }
 
+// CreateNewSimpleImporterFromWritableDataTable returns a new data table transaction data importer according to the specified arguments
+func CreateNewSimpleImporterFromWritableDataTable(writableDataTable *WritableDataTable, transactionTypeMapping map[models.TransactionType]string) *DataTableTransactionDataImporter {
+	return &DataTableTransactionDataImporter{
+		dataColumnMapping:      writableDataTable.GetDataColumnMapping(),
+		transactionTypeMapping: transactionTypeMapping,
+	}
+}
+
 // CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc returns a new data table transaction data importer according to the specified arguments
 func CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc(writableDataTable *WritableDataTable, transactionTypeMapping map[models.TransactionType]string, postProcessFunc DataTableTransactionDataImporterPostProcessFunc) *DataTableTransactionDataImporter {
 	return &DataTableTransactionDataImporter{
@@ -93,7 +101,7 @@ func CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc(writableDat
 	}
 }
 
-// BuildExportedContent writes the exported transaction data to the data table builder 
+// BuildExportedContent writes the exported transaction data to the data table builder
 func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context, dataTableBuilder DataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
@@ -356,12 +364,6 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		}
 
 		accountName := dataRow.GetData(accountColumnIdx)
-
-		if accountName == "" {
-			log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account name is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
-			return nil, nil, nil, nil, errs.ErrAccountNameCannotBeBlank
-		}
-
 		accountCurrency := user.DefaultCurrency
 
 		if accountCurrencyColumnExists {
@@ -382,7 +384,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		}
 
 		if accountCurrencyColumnExists {
-			if account.Currency != accountCurrency {
+			if account.Name != "" && account.Currency != accountCurrency {
 				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account for user \"uid:%d\"", accountCurrency, dataRowIndex, account.Currency, user.Uid)
 				return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 			}
@@ -404,12 +406,6 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 		if transactionDbType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			account2Name = dataRow.GetData(account2ColumnIdx)
-
-			if account2Name == "" {
-				log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] account2 name is empty in data row \"index:%d\" for user \"uid:%d\"", dataRowIndex, user.Uid)
-				return nil, nil, nil, nil, errs.ErrDestinationAccountNameCannotBeBlank
-			}
-
 			account2Currency = user.DefaultCurrency
 
 			if account2CurrencyColumnExists {
@@ -430,7 +426,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			}
 
 			if account2CurrencyColumnExists {
-				if account2.Currency != account2Currency {
+				if account2.Name != "" && account2.Currency != account2Currency {
 					log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] currency \"%s\" in data row \"index:%d\" not equals currency \"%s\" of the account2 for user \"uid:%d\"", account2Currency, dataRowIndex, account2.Currency, user.Uid)
 					return nil, nil, nil, nil, errs.ErrAccountCurrencyInvalid
 				}

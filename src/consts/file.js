@@ -20,6 +20,11 @@ const supportedImportFileTypes = [
         type: 'feidee_mymoney_xls',
         name: 'Feidee MyMoney (Web) Data Export File',
         extensions: '.xls'
+    },
+    {
+        type: 'alipay_csv',
+        name: 'Alipay Data Export File',
+        extensions: '.csv'
     }
 ];
 

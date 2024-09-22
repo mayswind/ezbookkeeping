@@ -19,6 +19,11 @@ func (c *CronContext) GetContextId() string {
 	return c.contextId
 }
 
+// GetClientLocale returns the client locale name
+func (c *CronContext) GetClientLocale() string {
+	return ""
+}
+
 // GetInterval returns the current cron job interval
 func (c *CronContext) GetInterval() time.Duration {
 	return c.cronJobInterval

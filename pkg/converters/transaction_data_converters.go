@@ -1,6 +1,7 @@
 package converters
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/alipay"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/base"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
@@ -28,6 +29,8 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return feidee.FeideeMymoneyTransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
 		return feidee.FeideeMymoneyTransactionDataXlsImporter, nil
+	} else if fileType == "alipay_csv" {
+		return alipay.AlipayTransactionDataCsvImporter, nil
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}

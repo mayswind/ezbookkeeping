@@ -82,6 +82,14 @@ func TestGetFirstLowerCharString(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestContainsOnlyOneRune(t *testing.T) {
+	actualValue := ContainsOnlyOneRune("-------", '-')
+	assert.Equal(t, true, actualValue)
+
+	actualValue = ContainsOnlyOneRune(" -------", '-')
+	assert.Equal(t, false, actualValue)
+}
+
 func TestGetRandomString(t *testing.T) {
 	actualValue, err := GetRandomString(10)
 	assert.Equal(t, nil, err)

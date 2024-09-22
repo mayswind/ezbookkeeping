@@ -9,6 +9,9 @@ var en = &LocaleTextItems{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_DOT,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
 	},
+	DataConverterTextItems: &DataConverterTextItems{
+		Alipay: "Alipay",
+	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "Verify Email",
 		SalutationFormat:          "Hi %s,",

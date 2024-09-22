@@ -135,33 +135,6 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidType(t *testi
 	assert.NotNil(t, err)
 }
 
-func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAccountName(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
-	context := core.NewNullContext()
-
-	user := &models.User{
-		Uid:             1234567890,
-		DefaultCurrency: "CNY",
-	}
-
-	_, _, _, _, err := converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
-		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
-		"\"支出\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"\""), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
-		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
-		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
-		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account2\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte("随手记导出文件(headers:v5;xxxxx)\n"+
-		"\"交易类型\",\"日期\",\"子类别\",\"账户\",\"金额\",\"备注\",\"关联Id\"\n"+
-		"\"转出\",\"2024-09-01 12:34:56\",\"Test Category\",\"Test Account\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\"\n"+
-		"\"转入\",\"2024-09-01 12:34:56\",\"Test Category\",\"\",\"123.45\",\"\",\"00000000-0000-0000-0000-000000000001\""), 0, nil, nil, nil)
-	assert.NotNil(t, err)
-}
-
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
 	converter := FeideeMymoneyTransactionDataCsvImporter
 	context := core.NewNullContext()

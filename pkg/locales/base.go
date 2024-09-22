@@ -7,6 +7,7 @@ import (
 // LocaleTextItems represents all text items need to be translated
 type LocaleTextItems struct {
 	DefaultTypes                *DefaultTypes
+	DataConverterTextItems      *DataConverterTextItems
 	VerifyEmailTextItems        *VerifyEmailTextItems
 	ForgetPasswordMailTextItems *ForgetPasswordMailTextItems
 }
@@ -15,6 +16,11 @@ type LocaleTextItems struct {
 type DefaultTypes struct {
 	DecimalSeparator    core.DecimalSeparator
 	DigitGroupingSymbol core.DigitGroupingSymbol
+}
+
+// DataConverterTextItems represents text items need to be translated in data converter
+type DataConverterTextItems struct {
+	Alipay string
 }
 
 // VerifyEmailTextItems represents text items need to be translated in verify mail

@@ -14,6 +14,11 @@ func (c *NullContext) GetContextId() string {
 	return nullContextId
 }
 
+// GetClientLocale returns the client locale name
+func (c *NullContext) GetClientLocale() string {
+	return ""
+}
+
 // NewCronJobContext returns a new null context
 func NewNullContext() *NullContext {
 	return &NullContext{

@@ -76,6 +76,21 @@ func GetFirstLowerCharString(s string) string {
 	return string(chars)
 }
 
+// ContainsOnlyOneRune returns the source string only contains one character
+func ContainsOnlyOneRune(s string, r rune) bool {
+	if len(s) < 1 {
+		return false
+	}
+
+	for i := 0; i < len(s); i++ {
+		if rune(s[i]) != r {
+			return false
+		}
+	}
+
+	return true
+}
+
 // GetRandomString returns a random string of which length is n
 func GetRandomString(n int) (string, error) {
 	var result = make([]byte, n)

@@ -9,6 +9,9 @@ var zhHans = &LocaleTextItems{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_DOT,
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
 	},
+	DataConverterTextItems: &DataConverterTextItems{
+		Alipay: "支付宝",
+	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "验证邮箱",
 		SalutationFormat:          "%s 您好，",

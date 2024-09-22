@@ -14,6 +14,11 @@ func (c *CliContext) GetContextId() string {
 	return ""
 }
 
+// GetClientLocale returns the client locale name
+func (c *CliContext) GetClientLocale() string {
+	return ""
+}
+
 // WrapCliContext returns a context wrapped by this file
 func WrapCilContext(cliCtx *cli.Context) *CliContext {
 	return &CliContext{

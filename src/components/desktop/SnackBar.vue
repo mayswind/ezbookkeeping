@@ -37,9 +37,9 @@ export default {
         }
     },
     methods: {
-        showMessage(message) {
+        showMessage(message, options) {
             this.showState = true;
-            this.messageContent = this.$t(message);
+            this.messageContent = this.$t(message, options);
         },
         showError(error) {
             this.showState = true;

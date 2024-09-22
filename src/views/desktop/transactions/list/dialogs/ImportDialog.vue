@@ -7,6 +7,34 @@
                         <h4 class="text-h4">{{ $t('Import Transactions') }}</h4>
                         <v-progress-circular indeterminate size="22" class="ml-2" v-if="loading"></v-progress-circular>
                     </div>
+                    <v-btn density="comfortable" color="default" variant="text" class="ml-2" :icon="true"
+                           v-if="currentStep === 'checkData'">
+                        <v-icon :icon="icons.more" />
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="allInvalidExpenseCategoryNames < 1"
+                                             :title="$t('Replace Invalid Expense Categories')"
+                                             @click="showReplaceInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="allInvalidIncomeCategoryNames < 1"
+                                             :title="$t('Replace Invalid Income Categories')"
+                                             @click="showReplaceInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="allInvalidTransferCategoryNames < 1"
+                                             :title="$t('Replace Invalid Transfer Categories')"
+                                             @click="showReplaceInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="allInvalidAccountNames < 1"
+                                             :title="$t('Replace Invalid Accounts')"
+                                             @click="showReplaceInvalidItemDialog('account', allInvalidAccountNames)"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="allInvalidTransactionTagNames < 1"
+                                             :title="$t('Replace Invalid Transaction Tags')"
+                                             @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
                 </div>
             </template>
 
@@ -131,7 +159,7 @@
                             <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === allTransactionTypes.Transfer">{{ $t('Transfer') }}</v-chip>
                             <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ $t('Unknown') }}</v-chip>
                         </template>
-                        <template #item.categoryId="{ item }">
+                        <template #item.originalCategoryName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === allTransactionTypes.ModifyBalance">
                                 <span v-if="item.type === allTransactionTypes.ModifyBalance">-</span>
                                 <ItemIcon size="24px" icon-type="category"
@@ -206,7 +234,7 @@
                             <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                             <span v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
-                        <template #item.sourceAccountId="{ item }">
+                        <template #item.originalSourceAccountName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item">
                                 <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else>
@@ -403,12 +431,15 @@
         </v-card>
     </v-dialog>
 
+    <replace-invalid-item-dialog ref="replaceInvalidItemDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
     <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />
 </template>
 
 <script>
+import ReplaceInvalidItemDialog from './ReplaceInvalidItemDialog.vue';
+
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
 import { useUserStore } from '@/stores/user.js';
@@ -438,6 +469,8 @@ import {
 } from '@/lib/category.js';
 
 import {
+    mdiDotsVertical,
+    mdiFindReplace,
     mdiClose,
     mdiArrowRight,
     mdiCheck,
@@ -450,6 +483,9 @@ import {
 } from '@mdi/js';
 
 export default {
+    components: {
+        ReplaceInvalidItemDialog
+    },
     props: [
         'persistent'
     ],
@@ -473,6 +509,8 @@ export default {
             resolve: null,
             reject: null,
             icons: {
+                more: mdiDotsVertical,
+                replace: mdiFindReplace,
                 previous: mdiClose,
                 next: mdiArrowRight,
                 complete: mdiCheck,
@@ -598,9 +636,9 @@ export default {
                 { value: 'valid', sortable: true, nowrap: true, width: 35 },
                 { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
                 { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true, maxWidth: 140 },
-                { value: 'categoryId', title: this.$t('Category'), sortable: true, nowrap: true },
+                { value: 'originalCategoryName', title: this.$t('Category'), sortable: true, nowrap: true },
                 { value: 'sourceAmount', title: this.$t('Amount'), sortable: true, nowrap: true },
-                { value: 'sourceAccountId', title: this.$t('Account'), sortable: true, nowrap: true },
+                { value: 'originalSourceAccountName', title: this.$t('Account'), sortable: true, nowrap: true },
                 { value: 'geoLocation', title: this.$t('Geographic Location'), sortable: true, nowrap: true },
                 { value: 'tagIds', title: this.$t('Tags'), sortable: true, nowrap: true },
                 { value: 'comment', title: this.$t('Description'), sortable: true, nowrap: true },
@@ -689,6 +727,21 @@ export default {
             get: function () {
                 return this.selectedImportTransactionCount === this.importTransactions.length;
             }
+        },
+        allInvalidExpenseCategoryNames() {
+            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Expense);
+        },
+        allInvalidIncomeCategoryNames() {
+            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Income);
+        },
+        allInvalidTransferCategoryNames() {
+            return this.getCurrentInvalidCategoryNames(this.allTransactionTypes.Transfer);
+        },
+        allInvalidAccountNames() {
+            return this.getCurrentInvalidAccountNames();
+        },
+        allInvalidTransactionTagNames() {
+            return this.getCurrentInvalidTagNames();
         }
     },
     watch: {
@@ -913,6 +966,175 @@ export default {
         },
         updateTransactionData(transaction) {
             transaction.valid = this.isTransactionValid(transaction);
+        },
+        showReplaceInvalidItemDialog(type, invalidItems) {
+            const self = this;
+
+            self.$refs.replaceInvalidItemDialog.open({
+                type: type,
+                invalidItems: invalidItems
+            }).then(result => {
+                if (!result || (!result.sourceItem && result.sourceItem !== '') || !result.targetItem) {
+                    return;
+                }
+
+                let updatedCount = 0;
+
+                for (let i = 0; i < self.importTransactions.length; i++) {
+                    const transaction = self.importTransactions[i];
+
+                    if (transaction.valid) {
+                        continue;
+                    }
+
+                    let updated = false;
+
+                    if (type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory') {
+                        const categoryId = transaction.categoryId;
+                        const originalCategoryName = transaction.originalCategoryName;
+
+                        if (transaction.type !== self.allTransactionTypes.ModifyBalance && originalCategoryName === result.sourceItem && (!categoryId || categoryId === '0' || !self.allCategoriesMap[categoryId])) {
+                            if (type === 'expenseCategory' && transaction.type === self.allTransactionTypes.Expense) {
+                                transaction.categoryId = result.targetItem;
+                                updated = true;
+                            } else if (type === 'incomeCategory' && transaction.type === self.allTransactionTypes.Income) {
+                                transaction.categoryId = result.targetItem;
+                                updated = true;
+                            } else if (type === 'transferCategory' && transaction.type === self.allTransactionTypes.Transfer) {
+                                transaction.categoryId = result.targetItem;
+                                updated = true;
+                            }
+                        }
+                    } else if (type === 'account') {
+                        const sourceAccountId = transaction.sourceAccountId;
+                        const originalSourceAccountName = transaction.originalSourceAccountName;
+                        const destinationAccountId = transaction.destinationAccountId;
+                        const originalDestinationAccountName = transaction.originalDestinationAccountName;
+
+                        if (originalSourceAccountName === result.sourceItem && (!sourceAccountId || sourceAccountId === '0' || !self.allAccountsMap[sourceAccountId])) {
+                            transaction.sourceAccountId = result.targetItem;
+                            updated = true;
+                        }
+
+                        if (transaction.type === self.allTransactionTypes.Transfer && originalDestinationAccountName === result.sourceItem && (!destinationAccountId || destinationAccountId === '0' || !self.allAccountsMap[destinationAccountId])) {
+                            transaction.destinationAccountId = result.targetItem;
+                            updated = true;
+                        }
+                    } else if (type === 'tag') {
+                        for (let j = 0; j < transaction.tagIds.length; j++) {
+                            const tagId = transaction.tagIds[j];
+                            const originalTagName = transaction.originalTagNames[j];
+
+                            if (originalTagName === result.sourceItem && (!tagId || tagId === '0' || !self.allTagsMap[tagId])) {
+                                transaction.tagIds[j] = result.targetItem;
+                                updated = true;
+                            }
+                        }
+                    }
+
+                    if (updated) {
+                        updatedCount++;
+                        self.updateTransactionData(transaction);
+                    }
+                }
+
+                if (updatedCount > 0) {
+                    self.$refs.snackbar.showMessage('format.misc.youHaveUpdatedTransactions', {
+                        count: updatedCount
+                    });
+                }
+            });
+        },
+        getCurrentInvalidCategoryNames(transactionType) {
+            const invalidCategoryNames = {};
+            const invalidCategories = [];
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+                const categoryId = transaction.categoryId;
+
+                if (transaction.type === transactionType && (!categoryId || categoryId === '0' || !this.allCategoriesMap[categoryId])) {
+                    invalidCategoryNames[transaction.originalCategoryName] = true;
+                }
+            }
+
+            for (let name in invalidCategoryNames) {
+                if (!Object.prototype.hasOwnProperty.call(invalidCategoryNames, name)) {
+                    continue;
+                }
+
+                invalidCategories.push({
+                    name: name || this.$t('(Empty)'),
+                    value: name
+                });
+            }
+
+            return invalidCategories;
+        },
+        getCurrentInvalidAccountNames() {
+            const invalidAccountNames = {};
+            const invalidAccounts = [];
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+                const sourceAccountId = transaction.sourceAccountId;
+                const destinationAccountId = transaction.destinationAccountId;
+
+                if (!sourceAccountId || sourceAccountId === '0' || !this.allAccountsMap[sourceAccountId]) {
+                    invalidAccountNames[transaction.originalSourceAccountName] = true;
+                }
+
+                if (transaction.type === this.allTransactionTypes.Transfer && (!destinationAccountId || destinationAccountId === '0' || !this.allAccountsMap[destinationAccountId])) {
+                    invalidAccountNames[transaction.originalDestinationAccountName] = true;
+                }
+            }
+
+            for (let name in invalidAccountNames) {
+                if (!Object.prototype.hasOwnProperty.call(invalidAccountNames, name)) {
+                    continue;
+                }
+
+                invalidAccounts.push({
+                    name: name || this.$t('(Empty)'),
+                    value: name
+                });
+            }
+
+            return invalidAccounts;
+        },
+        getCurrentInvalidTagNames() {
+            const invalidTagNames = {};
+            const invalidTags = [];
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                const transaction = this.importTransactions[i];
+
+                if (!transaction.tagIds || !transaction.originalTagNames) {
+                    continue;
+                }
+
+                for (let j = 0; j < transaction.tagIds.length; j++) {
+                    const tagId = transaction.tagIds[j];
+                    const originalTagName = transaction.originalTagNames[j];
+
+                    if (!tagId || tagId === '0' || !this.allTagsMap[tagId]) {
+                        invalidTagNames[originalTagName] = true;
+                    }
+                }
+            }
+
+            for (let name in invalidTagNames) {
+                if (!Object.prototype.hasOwnProperty.call(invalidTagNames, name)) {
+                    continue;
+                }
+
+                invalidTags.push({
+                    name: name || this.$t('(Empty)'),
+                    value: name
+                });
+            }
+
+            return invalidTags;
         },
         isTransactionValid(transaction) {
             if (!transaction) {

@@ -13,6 +13,27 @@
                         <v-menu activator="parent">
                             <v-list>
                                 <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="selectedExpenseTransactionCount < 1"
+                                             :title="$t('Batch Replace Selected Expense Categories')"
+                                             @click="showBatchReplaceDialog('expenseCategory')"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="selectedIncomeTransactionCount < 1"
+                                             :title="$t('Batch Replace Selected Income Categories')"
+                                             @click="showBatchReplaceDialog('incomeCategory')"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="selectedTransferTransactionCount < 1"
+                                             :title="$t('Batch Replace Selected Transfer Categories')"
+                                             @click="showBatchReplaceDialog('transferCategory')"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="selectedImportTransactionCount < 1"
+                                             :title="$t('Batch Replace Selected Accounts')"
+                                             @click="showBatchReplaceDialog('account')"></v-list-item>
+                                <v-list-item :prepend-icon="icons.replace"
+                                             :disabled="selectedTransferTransactionCount < 1"
+                                             :title="$t('Batch Replace Selected Destination Accounts')"
+                                             @click="showBatchReplaceDialog('destinationAccount')"></v-list-item>
+                                <v-divider class="my-2"/>
+                                <v-list-item :prepend-icon="icons.replace"
                                              :disabled="allInvalidExpenseCategoryNames < 1"
                                              :title="$t('Replace Invalid Expense Categories')"
                                              @click="showReplaceInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
@@ -241,7 +262,7 @@
                                     <v-icon class="mr-1" :icon="icons.alert"/>
                                     <span>{{ item.originalSourceAccountName }}</span>
                                 </div>
-                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                                <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
                                 <span v-if="item.type === allTransactionTypes.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else-if="item.type === allTransactionTypes.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
                                     <v-icon class="mr-1" :icon="icons.alert"/>
@@ -431,14 +452,14 @@
         </v-card>
     </v-dialog>
 
-    <replace-invalid-item-dialog ref="replaceInvalidItemDialog" />
+    <batch-replace-dialog ref="batchReplaceDialog" />
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
     <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />
 </template>
 
 <script>
-import ReplaceInvalidItemDialog from './ReplaceInvalidItemDialog.vue';
+import BatchReplaceDialog from './BatchReplaceDialog.vue';
 
 import { mapStores } from 'pinia';
 import { useSettingsStore } from '@/stores/setting.js';
@@ -484,7 +505,7 @@ import {
 
 export default {
     components: {
-        ReplaceInvalidItemDialog
+        BatchReplaceDialog
     },
     props: [
         'persistent'
@@ -701,6 +722,39 @@ export default {
 
             for (let i = 0; i < this.importTransactions.length; i++) {
                 if (this.importTransactions[i].selected) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+        selectedExpenseTransactionCount() {
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Expense) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+        selectedIncomeTransactionCount() {
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Income) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+        selectedTransferTransactionCount() {
+            let count = 0;
+
+            for (let i = 0; i < this.importTransactions.length; i++) {
+                if (this.importTransactions[i].selected && this.importTransactions[i].type === this.allTransactionTypes.Transfer) {
                     count++;
                 }
             }
@@ -938,23 +992,17 @@ export default {
         },
         selectAllInThisPage() {
             for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                if (this.importTransactions[i] && this.importTransactions[i].valid) {
-                    this.importTransactions[i].selected = true;
-                }
+                this.importTransactions[i].selected = true;
             }
         },
         selectNoneInThisPage() {
             for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                if (this.importTransactions[i]) {
-                    this.importTransactions[i].selected = false;
-                }
+                this.importTransactions[i].selected = false;
             }
         },
         selectInvertInThisPage() {
             for (let i = Math.max(0, (this.currentPage - 1) * this.countPerPage); i < Math.min(this.importTransactions.length, this.currentPage * this.countPerPage); i++) {
-                if (this.importTransactions[i] && (this.importTransactions[i].valid || this.importTransactions[i].selected)) {
-                    this.importTransactions[i].selected = !this.importTransactions[i].selected;
-                }
+                this.importTransactions[i].selected = !this.importTransactions[i].selected;
             }
         },
         editTransaction(transaction) {
@@ -967,10 +1015,71 @@ export default {
         updateTransactionData(transaction) {
             transaction.valid = this.isTransactionValid(transaction);
         },
+        showBatchReplaceDialog(type) {
+            const self = this;
+
+            self.$refs.batchReplaceDialog.open({
+                mode: 'batchReplace',
+                type: type
+            }).then(result => {
+                if (!result || !result.targetItem) {
+                    return;
+                }
+
+                let updatedCount = 0;
+
+                for (let i = 0; i < self.importTransactions.length; i++) {
+                    const transaction = self.importTransactions[i];
+
+                    if (!transaction.selected) {
+                        continue;
+                    }
+
+                    let updated = false;
+
+                    if (type === 'expenseCategory') {
+                        if (transaction.type === self.allTransactionTypes.Expense) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        }
+                    } else if (type === 'incomeCategory') {
+                        if (transaction.type === self.allTransactionTypes.Income) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        }
+                    } else if (type === 'transferCategory') {
+                        if (transaction.type === self.allTransactionTypes.Transfer) {
+                            transaction.categoryId = result.targetItem;
+                            updated = true;
+                        }
+                    } else if (type === 'account') {
+                        transaction.sourceAccountId = result.targetItem;
+                        updated = true;
+                    } else if (type === 'destinationAccount') {
+                        if (transaction.type === self.allTransactionTypes.Transfer) {
+                            transaction.destinationAccountId = result.targetItem;
+                            updated = true;
+                        }
+                    }
+
+                    if (updated) {
+                        updatedCount++;
+                        self.updateTransactionData(transaction);
+                    }
+                }
+
+                if (updatedCount > 0) {
+                    self.$refs.snackbar.showMessage('format.misc.youHaveUpdatedTransactions', {
+                        count: updatedCount
+                    });
+                }
+            });
+        },
         showReplaceInvalidItemDialog(type, invalidItems) {
             const self = this;
 
-            self.$refs.replaceInvalidItemDialog.open({
+            self.$refs.batchReplaceDialog.open({
+                mode: 'replaceInvalidItems',
                 type: type,
                 invalidItems: invalidItems
             }).then(result => {

@@ -3,16 +3,21 @@
         <v-card class="pa-2 pa-sm-4 pa-md-4">
             <template #title>
                 <div class="d-flex align-center justify-center">
-                    <h4 class="text-h4" v-if="type === 'expenseCategory'">{{ $t('Replace Invalid Expense Categories') }}</h4>
-                    <h4 class="text-h4" v-if="type === 'incomeCategory'">{{ $t('Replace Invalid Income Categories') }}</h4>
-                    <h4 class="text-h4" v-if="type === 'transferCategory'">{{ $t('Replace Invalid Transfer Categories') }}</h4>
-                    <h4 class="text-h4" v-if="type === 'account'">{{ $t('Replace Invalid Accounts') }}</h4>
-                    <h4 class="text-h4" v-if="type === 'tag'">{{ $t('Replace Invalid Transaction Tags') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'expenseCategory'">{{ $t('Batch Replace Selected Expense Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'incomeCategory'">{{ $t('Batch Replace Selected Income Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'transferCategory'">{{ $t('Batch Replace Selected Transfer Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'account'">{{ $t('Batch Replace Selected Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'batchReplace' && type === 'destinationAccount'">{{ $t('Batch Replace Selected Destination Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'expenseCategory'">{{ $t('Replace Invalid Expense Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'incomeCategory'">{{ $t('Replace Invalid Income Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ $t('Replace Invalid Transfer Categories') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ $t('Replace Invalid Accounts') }}</h4>
+                    <h4 class="text-h4" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ $t('Replace Invalid Transaction Tags') }}</h4>
                 </div>
             </template>
             <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory'">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" v-if="mode === 'replaceInvalidItems'">
                         <v-autocomplete
                             item-title="name"
                             item-value="value"
@@ -76,9 +81,9 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'account'">
+            <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'account' || type === 'destinationAccount'">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" v-if="mode === 'replaceInvalidItems'">
                         <v-autocomplete
                             item-title="name"
                             item-value="value"
@@ -111,7 +116,7 @@
             </v-card-text>
             <v-card-text class="my-md-4 w-100 d-flex justify-center" v-if="type === 'tag'">
                 <v-row>
-                    <v-col cols="12">
+                    <v-col cols="12" v-if="mode === 'replaceInvalidItems'">
                         <v-autocomplete
                             item-title="name"
                             item-value="value"
@@ -157,7 +162,7 @@
             </v-card-text>
             <v-card-text class="overflow-y-visible">
                 <div class="w-100 d-flex justify-center gap-4">
-                    <v-btn :disabled="(!sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ $t('OK') }}</v-btn>
+                    <v-btn :disabled="(mode === 'replaceInvalidItems' && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '')" @click="confirm">{{ $t('OK') }}</v-btn>
                     <v-btn color="secondary" variant="tonal" @click="cancel">{{ $t('Cancel') }}</v-btn>
                 </div>
             </v-card-text>
@@ -198,6 +203,7 @@ export default {
     data() {
         return {
             showState: false,
+            mode: '',
             type: '',
             invalidItems: [],
             sourceItem: null,
@@ -264,9 +270,16 @@ export default {
     methods: {
         open(options) {
             const self = this;
+            self.mode = options.mode;
             self.type = options.type;
-            self.invalidItems = options.invalidItems;
             self.sourceItem = null;
+
+            if (self.mode === 'batchReplace') {
+                self.invalidItems = null;
+            } else if (self.mode === 'replaceInvalidItems') {
+                self.invalidItems = options.invalidItems;
+            }
+
             self.targetItem = null;
             self.showState = true;
 
@@ -277,10 +290,16 @@ export default {
         },
         confirm() {
             if (this.resolve) {
-                this.resolve({
-                    sourceItem: this.sourceItem,
-                    targetItem: this.targetItem
-                });
+                if (this.mode === 'batchReplace') {
+                    this.resolve({
+                        targetItem: this.targetItem
+                    });
+                } else if (this.mode === 'replaceInvalidItems') {
+                    this.resolve({
+                        sourceItem: this.sourceItem,
+                        targetItem: this.targetItem
+                    });
+                }
             }
 
             this.showState = false;

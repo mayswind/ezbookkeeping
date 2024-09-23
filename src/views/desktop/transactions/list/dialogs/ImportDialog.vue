@@ -13,44 +13,44 @@
                         <v-menu activator="parent">
                             <v-list>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="selectedExpenseTransactionCount < 1"
+                                             :disabled="editingTransaction || selectedExpenseTransactionCount < 1"
                                              :title="$t('Batch Replace Selected Expense Categories')"
                                              @click="showBatchReplaceDialog('expenseCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="selectedIncomeTransactionCount < 1"
+                                             :disabled="editingTransaction || selectedIncomeTransactionCount < 1"
                                              :title="$t('Batch Replace Selected Income Categories')"
                                              @click="showBatchReplaceDialog('incomeCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="selectedTransferTransactionCount < 1"
+                                             :disabled="editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="$t('Batch Replace Selected Transfer Categories')"
                                              @click="showBatchReplaceDialog('transferCategory')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="selectedImportTransactionCount < 1"
+                                             :disabled="editingTransaction || selectedImportTransactionCount < 1"
                                              :title="$t('Batch Replace Selected Accounts')"
                                              @click="showBatchReplaceDialog('account')"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="selectedTransferTransactionCount < 1"
+                                             :disabled="editingTransaction || selectedTransferTransactionCount < 1"
                                              :title="$t('Batch Replace Selected Destination Accounts')"
                                              @click="showBatchReplaceDialog('destinationAccount')"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="allInvalidExpenseCategoryNames < 1"
+                                             :disabled="editingTransaction || allInvalidExpenseCategoryNames < 1"
                                              :title="$t('Replace Invalid Expense Categories')"
                                              @click="showReplaceInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="allInvalidIncomeCategoryNames < 1"
+                                             :disabled="editingTransaction || allInvalidIncomeCategoryNames < 1"
                                              :title="$t('Replace Invalid Income Categories')"
                                              @click="showReplaceInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="allInvalidTransferCategoryNames < 1"
+                                             :disabled="editingTransaction || allInvalidTransferCategoryNames < 1"
                                              :title="$t('Replace Invalid Transfer Categories')"
                                              @click="showReplaceInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="allInvalidAccountNames < 1"
+                                             :disabled="editingTransaction || allInvalidAccountNames < 1"
                                              :title="$t('Replace Invalid Accounts')"
                                              @click="showReplaceInvalidItemDialog('account', allInvalidAccountNames)"></v-list-item>
                                 <v-list-item :prepend-icon="icons.replace"
-                                             :disabled="allInvalidTransactionTagNames < 1"
+                                             :disabled="editingTransaction || allInvalidTransactionTagNames < 1"
                                              :title="$t('Replace Invalid Transaction Tags')"
                                              @click="showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames)"></v-list-item>
                             </v-list>
@@ -210,8 +210,7 @@
                                                    :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Expense])"
                                                    :placeholder="$t('Category')"
                                                    :items="allCategories[allCategoryTypes.Expense]"
-                                                   v-model="item.categoryId"
-                                                   @update:model-value="updateTransactionData(item)">
+                                                   v-model="item.categoryId">
                                 </two-column-select>
                             </div>
                             <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Income">
@@ -228,8 +227,7 @@
                                                    :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Income])"
                                                    :placeholder="$t('Category')"
                                                    :items="allCategories[allCategoryTypes.Income]"
-                                                   v-model="item.categoryId"
-                                                   @update:model-value="updateTransactionData(item)">
+                                                   v-model="item.categoryId">
                                 </two-column-select>
                             </div>
                             <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
@@ -246,8 +244,7 @@
                                                    :custom-selection-secondary-text="getSecondaryCategoryName(item.categoryId, allCategories[allCategoryTypes.Transfer])"
                                                    :placeholder="$t('Category')"
                                                    :items="allCategories[allCategoryTypes.Transfer]"
-                                                   v-model="item.categoryId"
-                                                   @update:model-value="updateTransactionData(item)">
+                                                   v-model="item.categoryId">
                                 </two-column-select>
                             </div>
                         </template>
@@ -284,8 +281,7 @@
                                                    :custom-selection-primary-text="getSourceAccountDisplayName(item)"
                                                    :placeholder="getSourceAccountTitle(item)"
                                                    :items="allVisibleCategorizedAccounts"
-                                                   v-model="item.sourceAccountId"
-                                                   @update:model-value="updateTransactionData(item)">
+                                                   v-model="item.sourceAccountId">
                                 </two-column-select>
                                 <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
                                 <two-column-select density="compact" variant="plain"
@@ -302,8 +298,7 @@
                                                    :placeholder="$t('Destination Account')"
                                                    :items="allVisibleCategorizedAccounts"
                                                    v-model="item.destinationAccountId"
-                                                   v-if="item.type === allTransactionTypes.Transfer"
-                                                   @update:model-value="updateTransactionData(item)">
+                                                   v-if="item.type === allTransactionTypes.Transfer">
                                 </two-column-select>
                             </div>
                         </template>
@@ -338,14 +333,13 @@
                                     :placeholder="$t('None')"
                                     :items="allTags"
                                     :no-data-text="$t('No available tag')"
-                                    v-model="item.tagIds"
-                                    @update:model-value="updateTransactionData(item)"
+                                    v-model="editingTags"
                                 >
                                     <template #chip="{ props, index }">
-                                        <v-chip :class="{ 'font-italic': !isTagValid(item, index) }"
-                                                :prepend-icon="isTagValid(item, index) ? icons.tag : icons.alert"
-                                                :color="isTagValid(item, index) ? 'default' : 'error'"
-                                                :text="isTagValid(item, index) ? allTagsMap[item.tagIds[index]].name : item.originalTagNames[index]"
+                                        <v-chip :class="{ 'font-italic': !isTagValid(editingTags, index) }"
+                                                :prepend-icon="isTagValid(editingTags, index) ? icons.tag : icons.alert"
+                                                :color="isTagValid(editingTags, index) ? 'default' : 'error'"
+                                                :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index]].name : item.originalTagNames[index]"
                                                 v-bind="props"/>
                                     </template>
 
@@ -439,7 +433,7 @@
                     {{ $t('Next') }}
                     <v-progress-circular indeterminate size="22" class="ml-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
-                <v-btn color="teal" :disabled="submitting || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
+                <v-btn color="teal" :disabled="submitting || editingTransaction || selectedImportTransactionCount < 1 || selectedInvalidTransactionCount > 0"
                        :append-icon="!submitting ? icons.next : null" @click="submit"
                        v-if="currentStep === 'checkData'">
                     {{ $t('Import') }}
@@ -523,6 +517,7 @@ export default {
             importFile: null,
             importTransactions: null,
             editingTransaction: null,
+            editingTags: [],
             currentPage: 1,
             countPerPage: 10,
             importedCount: null,
@@ -804,6 +799,7 @@ export default {
             this.importFile = null;
             this.importTransactions = null;
             this.editingTransaction = null;
+            this.editingTags = [];
             this.currentPage = 1;
             this.countPerPage = 10;
         }
@@ -816,6 +812,7 @@ export default {
             self.importFile = null;
             self.importTransactions = null;
             self.editingTransaction = null;
+            self.editingTags = [];
             self.currentPage = 1;
             self.countPerPage = 10;
             self.showState = true;
@@ -885,6 +882,7 @@ export default {
 
                 self.importTransactions = parsedTransactions;
                 self.editingTransaction = null;
+                self.editingTags = [];
                 self.currentPage = 1;
 
                 if (self.importTransactions && self.importTransactions.length >= 0 && self.importTransactions.length < 10) {
@@ -905,6 +903,11 @@ export default {
         },
         submit() {
             const self = this;
+
+            if (self.editingTransaction) {
+                return;
+            }
+
             const transactions = [];
 
             for (let i = 0; i < self.importTransactions.length; i++) {
@@ -927,6 +930,7 @@ export default {
                 count: transactions.length
             }).then(() => {
                 self.editingTransaction = null;
+                self.editingTags = [];
                 self.submitting = true;
 
                 self.transactionsStore.importTransactions({
@@ -1009,10 +1013,17 @@ export default {
             }
         },
         editTransaction(transaction) {
+            if (this.editingTransaction) {
+                this.editingTransaction.tagIds = this.editingTags;
+                this.updateTransactionData(this.editingTransaction);
+            }
+
             if (this.editingTransaction === transaction) {
+                this.editingTags = [];
                 this.editingTransaction = null;
             } else {
                 this.editingTransaction = transaction;
+                this.editingTags = this.editingTransaction.tagIds;
             }
         },
         updateTransactionData(transaction) {
@@ -1028,6 +1039,10 @@ export default {
         },
         showBatchReplaceDialog(type) {
             const self = this;
+
+            if (self.editingTransaction) {
+                return;
+            }
 
             self.$refs.batchReplaceDialog.open({
                 mode: 'batchReplace',
@@ -1088,6 +1103,10 @@ export default {
         },
         showReplaceInvalidItemDialog(type, invalidItems) {
             const self = this;
+
+            if (self.editingTransaction) {
+                return;
+            }
 
             self.$refs.batchReplaceDialog.open({
                 mode: 'replaceInvalidItems',
@@ -1283,16 +1302,16 @@ export default {
 
             return true;
         },
-        isTagValid(transaction, tagIndex) {
-            if (!transaction || !transaction.tagIds || !transaction.tagIds[tagIndex]) {
+        isTagValid(tagIds, tagIndex) {
+            if (!tagIds || !tagIds[tagIndex]) {
                 return false;
             }
 
-            if (transaction.tagIds[tagIndex] === '0') {
+            if (tagIds[tagIndex] === '0') {
                 return false;
             }
 
-            const tagId = transaction.tagIds[tagIndex];
+            const tagId = tagIds[tagIndex];
             return !!this.allTagsMap[tagId];
         },
         getDisplayDateTime(transaction) {

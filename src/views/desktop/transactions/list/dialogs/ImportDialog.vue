@@ -180,7 +180,7 @@
                             <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === allTransactionTypes.Transfer">{{ $t('Transfer') }}</v-chip>
                             <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ $t('Unknown') }}</v-chip>
                         </template>
-                        <template #item.originalCategoryName="{ item }">
+                        <template #item.actualCategoryName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === allTransactionTypes.ModifyBalance">
                                 <span v-if="item.type === allTransactionTypes.ModifyBalance">-</span>
                                 <ItemIcon size="24px" icon-type="category"
@@ -255,7 +255,7 @@
                             <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                             <span v-if="item.type === allTransactionTypes.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                         </template>
-                        <template #item.originalSourceAccountName="{ item }">
+                        <template #item.actualSourceAccountName="{ item }">
                             <div class="d-flex align-center" v-if="editingTransaction !== item">
                                 <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId].name }}</span>
                                 <div class="text-error font-italic" v-else>
@@ -657,9 +657,9 @@ export default {
                 { value: 'valid', sortable: true, nowrap: true, width: 35 },
                 { value: 'time', title: this.$t('Transaction Time'), sortable: true, nowrap: true, maxWidth: 280 },
                 { value: 'type', title: this.$t('Type'), sortable: true, nowrap: true, maxWidth: 140 },
-                { value: 'originalCategoryName', title: this.$t('Category'), sortable: true, nowrap: true },
+                { value: 'actualCategoryName', title: this.$t('Category'), sortable: true, nowrap: true },
                 { value: 'sourceAmount', title: this.$t('Amount'), sortable: true, nowrap: true },
-                { value: 'originalSourceAccountName', title: this.$t('Account'), sortable: true, nowrap: true },
+                { value: 'actualSourceAccountName', title: this.$t('Account'), sortable: true, nowrap: true },
                 { value: 'geoLocation', title: this.$t('Geographic Location'), sortable: true, nowrap: true },
                 { value: 'tagIds', title: this.$t('Tags'), sortable: true, nowrap: true },
                 { value: 'comment', title: this.$t('Description'), sortable: true, nowrap: true },
@@ -877,6 +877,8 @@ export default {
                         transaction.index = i;
                         transaction.selected = false;
                         transaction.valid = self.isTransactionValid(transaction);
+                        transaction.actualCategoryName = transaction.originalCategoryName;
+                        transaction.actualSourceAccountName = transaction.originalSourceAccountName;
                     }
                 }
 
@@ -1014,6 +1016,14 @@ export default {
         },
         updateTransactionData(transaction) {
             transaction.valid = this.isTransactionValid(transaction);
+
+            if (transaction.categoryId && this.allCategoriesMap[transaction.categoryId]) {
+                transaction.actualCategoryName = this.allCategoriesMap[transaction.categoryId].name;
+            }
+
+            if (transaction.sourceAccountId && this.allAccountsMap[transaction.sourceAccountId]) {
+                transaction.actualSourceAccountName = this.allAccountsMap[transaction.sourceAccountId].name;
+            }
         },
         showBatchReplaceDialog(type) {
             const self = this;

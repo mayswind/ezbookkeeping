@@ -195,8 +195,8 @@
                                     <span>{{ item.originalCategoryName }}</span>
                                 </div>
                             </div>
-                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Expense">
-                                <two-column-select density="compact" variant="underlined"
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Expense">
+                                <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -213,8 +213,8 @@
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
                             </div>
-                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Income">
-                                <two-column-select density="compact" variant="underlined"
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Income">
+                                <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -231,8 +231,8 @@
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
                             </div>
-                            <div style="width: 360px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
-                                <two-column-select density="compact" variant="underlined"
+                            <div style="width: 260px" v-if="editingTransaction === item && item.type === allTransactionTypes.Transfer">
+                                <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                    primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -269,8 +269,8 @@
                                     <span>{{ item.originalDestinationAccountName }}</span>
                                 </div>
                             </div>
-                            <div class="d-flex align-center" style="width: 360px" v-if="editingTransaction === item">
-                                <two-column-select density="compact" variant="underlined"
+                            <div class="d-flex align-center" style="width: 200px" v-if="editingTransaction === item">
+                                <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
                                                    primary-icon-field="icon" primary-icon-type="account"
@@ -287,7 +287,7 @@
                                                    @update:model-value="updateTransactionData(item)">
                                 </two-column-select>
                                 <v-icon class="mx-1" size="13" :icon="icons.arrowRight" v-if="item.type === allTransactionTypes.Transfer"></v-icon>
-                                <two-column-select density="compact" variant="underlined"
+                                <two-column-select density="compact" variant="plain"
                                                    primary-key-field="id" primary-value-field="category"
                                                    primary-title-field="name" primary-footer-field="displayBalance"
                                                    primary-icon-field="icon" primary-icon-type="account"
@@ -323,7 +323,7 @@
                                         :text="$t('None')"
                                         v-if="!item.tagIds || !item.tagIds.length"/>
                             </div>
-                            <div style="width: 360px" v-if="editingTransaction === item">
+                            <div style="width: 200px" v-if="editingTransaction === item">
                                 <v-autocomplete
                                     item-title="name"
                                     item-value="id"
@@ -332,7 +332,7 @@
                                     multiple
                                     chips
                                     closable-chips
-                                    density="compact" variant="underlined"
+                                    density="compact" variant="plain"
                                     :disabled="loading || submitting"
                                     :placeholder="$t('None')"
                                     :items="allTags"
@@ -1360,6 +1360,12 @@ export default {
 </script>
 
 <style>
+.import-transaction-table .v-autocomplete.v-input.v-input--density-compact:not(.v-textarea) .v-field__input,
+.import-transaction-table .v-select.v-input.v-input--density-compact:not(.v-textarea) .v-field__input {
+    min-height: inherit;
+    padding-top: 4px;
+}
+
 .import-transaction-table .v-chip.transaction-tag {
     margin-right: 4px;
     margin-top: 2px;

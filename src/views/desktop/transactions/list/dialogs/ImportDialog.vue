@@ -98,6 +98,7 @@
                         fixed-header
                         fixed-footer
                         show-select
+                        multi-sort
                         class="import-transaction-table"
                         density="compact"
                         item-value="index"

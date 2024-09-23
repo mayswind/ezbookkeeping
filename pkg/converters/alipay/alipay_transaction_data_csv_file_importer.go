@@ -50,18 +50,18 @@ var (
 )
 
 // ParseImportedData returns the imported data by parsing the alipay transaction csv data
-func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	enc := simplifiedchinese.GB18030
 	reader := transform.NewReader(bytes.NewReader(data), enc.NewDecoder())
 	allLines, err := c.parseAllLinesFromCsvData(ctx, reader)
 
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	if len(allLines) <= 1 {
 		log.Errorf(ctx, "[alipayTransactionDataCsvImporter.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
-		return nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
+		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	headerLineItems := allLines[0]
@@ -81,7 +81,7 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 
 	if !timeColumnExists || !amountColumnExists || !statusColumnExists || !fundStatusColumnExists {
 		log.Errorf(ctx, "[alipayTransactionDataCsvImporter.ParseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
-		return nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
+		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
 	newColumns := make([]datatable.DataTableColumn, 0, 7)
@@ -126,7 +126,7 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 
 		if len(items) < len(headerLineItems) {
 			log.Errorf(ctx, "[alipayTransactionDataCsvImporter.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
-			return nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 		}
 
 		if items[statusColumnIdx] == alipayTransactionDataStatusSuccessName || items[statusColumnIdx] == alipayTransactionDataStatusPaymentSuccessName || items[statusColumnIdx] == alipayTransactionDataStatusRepaymentSuccessName {
@@ -145,7 +145,7 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 		alipayTransactionTypeFundStatusNameMapping,
 	)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
 func (c *alipayTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx core.Context, reader io.Reader) ([][]string, error) {

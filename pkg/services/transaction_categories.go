@@ -449,14 +449,24 @@ func (s *TransactionCategoryService) GetCategoryMapByList(categories []*models.T
 }
 
 // GetCategoryNameMapByList returns a transaction category map by a list
-func (s *TransactionCategoryService) GetCategoryNameMapByList(categories []*models.TransactionCategory) map[string]*models.TransactionCategory {
-	categoryMap := make(map[string]*models.TransactionCategory)
+func (s *TransactionCategoryService) GetCategoryNameMapByList(categories []*models.TransactionCategory) (expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory) {
+	expenseCategoryMap = make(map[string]*models.TransactionCategory)
+	incomeCategoryMap = make(map[string]*models.TransactionCategory)
+	transferCategoryMap = make(map[string]*models.TransactionCategory)
 
 	for i := 0; i < len(categories); i++ {
 		category := categories[i]
-		categoryMap[category.Name] = category
+
+		if category.Type == models.CATEGORY_TYPE_INCOME {
+			incomeCategoryMap[category.Name] = category
+		} else if category.Type == models.CATEGORY_TYPE_EXPENSE {
+			expenseCategoryMap[category.Name] = category
+		} else if category.Type == models.CATEGORY_TYPE_TRANSFER {
+			transferCategoryMap[category.Name] = category
+		}
 	}
-	return categoryMap
+
+	return expenseCategoryMap, incomeCategoryMap, transferCategoryMap
 }
 
 // GetCategoryNames returns a list with transaction category names from transaction category models list

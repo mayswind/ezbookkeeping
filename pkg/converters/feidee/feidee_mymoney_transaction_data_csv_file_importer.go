@@ -24,22 +24,22 @@ var (
 )
 
 // ParseImportedData returns the imported data by parsing the feidee mymoney transaction csv data
-func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	content := string(data)
 
 	if strings.Index(content, feideeMymoneyTransactionDataCsvFileHeader) != 0 && strings.Index(content, feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom) != 0 {
-		return nil, nil, nil, nil, errs.ErrInvalidFileHeader
+		return nil, nil, nil, nil, nil, nil, errs.ErrInvalidFileHeader
 	}
 
 	allLines, err := c.parseAllLinesFromCsvData(ctx, content)
 
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	if len(allLines) <= 1 {
 		log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
-		return nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
+		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	headerLineItems := allLines[0]
@@ -62,7 +62,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 	if !timeColumnExists || !typeColumnExists || !subCategoryColumnExists ||
 		!accountColumnExists || !amountColumnExists || !relatedIdColumnExists {
 		log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
-		return nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
+		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
 	newColumns := make([]datatable.DataTableColumn, 0, 11)
@@ -121,7 +121,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 
 		if len(items) < len(headerLineItems) {
 			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
-			return nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 		}
 
 		transactionType := data[datatable.DATA_TABLE_TRANSACTION_TYPE]
@@ -142,7 +142,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 		} else if transactionType == "转入" || transactionType == "转出" {
 			if relatedId == "" {
 				log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] transfer transaction has blank related id in row \"index:%d\" for user \"uid:%d\"", i, user.Uid)
-				return nil, nil, nil, nil, errs.ErrRelatedIdCannotBeBlank
+				return nil, nil, nil, nil, nil, nil, errs.ErrRelatedIdCannotBeBlank
 			}
 
 			relatedData, exists := transferTransactionsMap[relatedId]
@@ -168,17 +168,17 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 				delete(transferTransactionsMap, relatedId)
 			} else {
 				log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] transfer transaction type \"%s\" is not expected in row \"index:%d\" for user \"uid:%d\"", transactionType, i, user.Uid)
-				return nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
+				return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
 			}
 		} else {
 			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse transaction type \"%s\" in row \"index:%d\" for user \"uid:%d\"", transactionType, i, user.Uid)
-			return nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
+			return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
 		}
 	}
 
 	if len(transferTransactionsMap) > 0 {
 		log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] there are %d transactions (related id is %s) which don't have related records", len(transferTransactionsMap), c.getRelatedIds(transferTransactionsMap))
-		return nil, nil, nil, nil, errs.ErrFoundRecordNotHasRelatedRecord
+		return nil, nil, nil, nil, nil, nil, errs.ErrFoundRecordNotHasRelatedRecord
 	}
 
 	dataTableImporter := datatable.CreateNewSimpleImporterFromWritableDataTableWithPostProcessFunc(
@@ -187,7 +187,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 		feideeMymoneyTransactionDataImporterPostProcess,
 	)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
 func (c *feideeMymoneyTransactionDataCsvImporter) parseAllLinesFromCsvData(ctx core.Context, content string) ([][]string, error) {

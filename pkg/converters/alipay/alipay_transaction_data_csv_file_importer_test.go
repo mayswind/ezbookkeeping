@@ -34,12 +34,14 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, allNewAccounts, allNewSubCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil)
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 3, len(allNewTransactions))
 	assert.Equal(t, 2, len(allNewAccounts))
-	assert.Equal(t, 1, len(allNewSubCategories))
+	assert.Equal(t, 1, len(allNewSubExpenseCategories))
+	assert.Equal(t, 1, len(allNewSubIncomeCategories))
+	assert.Equal(t, 1, len(allNewSubTransferCategories))
 	assert.Equal(t, 0, len(allNewTags))
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -72,8 +74,14 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 	assert.Equal(t, "", allNewAccounts[1].Name)
 	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
 
-	assert.Equal(t, int64(1234567890), allNewSubCategories[0].Uid)
-	assert.Equal(t, "", allNewSubCategories[0].Name)
+	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[0].Uid)
+	assert.Equal(t, "", allNewSubExpenseCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubIncomeCategories[0].Uid)
+	assert.Equal(t, "", allNewSubIncomeCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubTransferCategories[0].Uid)
+	assert.Equal(t, "", allNewSubTransferCategories[0].Name)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
@@ -94,7 +102,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -113,7 +121,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
@@ -142,7 +150,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	data2, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
@@ -154,7 +162,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -176,7 +184,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
@@ -199,7 +207,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -215,7 +223,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -231,7 +239,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -248,7 +256,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -265,7 +273,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -282,7 +290,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data6), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data6), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -299,7 +307,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data7), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data7), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -325,7 +333,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -340,7 +348,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	allNewTransactions, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil)
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -362,10 +370,10 @@ func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) 
 			"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(""), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidFileHeader.Message)
 }
 
@@ -386,7 +394,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"金额（元）,交易状态    ,资金状态     ,\n" +
 		"0.12   ,交易成功    ,已收入      ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
@@ -397,7 +405,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,交易状态    ,资金状态     ,\n" +
 		"2024-09-01 12:34:56 ,交易成功    ,已收入      ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Status Column
@@ -408,7 +416,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,金额（元）,资金状态     ,\n" +
 		"2024-09-01 12:34:56 ,0.12   ,已收入      ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Fund Status Column
@@ -419,6 +427,6 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"交易创建时间              ,金额（元）,交易状态    ,\n" +
 		"2024-09-01 12:34:56 ,0.12   ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
-	_, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil)
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }

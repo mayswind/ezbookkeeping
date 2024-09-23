@@ -83,7 +83,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 }
 
 // ParseImportedData returns the imported data by parsing the transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	dataTable, err := createNewezbookkeepingTransactionPlainTextDataTable(
 		string(data),
 		c.columnSeparator,
@@ -91,7 +91,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx c
 	)
 
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	dataTableImporter := datatable.CreateNewImporter(
@@ -101,5 +101,5 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx c
 		ezbookkeepingTagSeparator,
 	)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, categoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

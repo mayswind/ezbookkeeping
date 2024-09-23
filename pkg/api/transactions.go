@@ -1093,7 +1093,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	categoryMap := a.transactionCategories.GetCategoryNameMapByList(categories)
+	expenseCategoryMap, incomeCategoryMap, transferCategoryMap := a.transactionCategories.GetCategoryNameMapByList(categories)
 
 	tags, err := a.transactionTags.GetAllTagsByUid(c, user.Uid)
 
@@ -1104,7 +1104,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	tagMap := a.transactionTags.GetTagNameMapByList(tags)
 
-	parsedTransactions, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, categoryMap, tagMap)
+	parsedTransactions, _, _, _, _, _, err := dataImporter.ParseImportedData(c, user, fileData, utcOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
 		log.BootErrorf(c, "[transactions.TransactionParseImportFileHandler] failed to parse imported data for user \"uid:%d\", because %s", user.Uid, err.Error())

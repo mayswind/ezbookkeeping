@@ -677,14 +677,14 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return err
 	}
 
-	accountMap, categoryMap, tagMap, err := l.getUserEssentialDataForImport(c, user.Uid, username)
+	accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap, err := l.getUserEssentialDataForImport(c, user.Uid, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.ImportTransaction] failed to get essential data for user \"%s\", because %s", username, err.Error())
 		return err
 	}
 
-	parsedTransactions, newAccounts, newCategories, newTags, err := dataImporter.ParseImportedData(c, user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, categoryMap, tagMap)
+	parsedTransactions, newAccounts, newSubExpenseCategories, newSubIncomeCategories, newSubTransferCategories, newTags, err := dataImporter.ParseImportedData(c, user, data, utils.GetTimezoneOffsetMinutes(time.Local), accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.ImportTransaction] failed to parse imported data for \"%s\", because %s", username, err.Error())
@@ -702,9 +702,21 @@ func (l *UserDataCli) ImportTransaction(c *core.CliContext, username string, fil
 		return errs.ErrOperationFailed
 	}
 
-	if len(newCategories) > 0 {
-		categoryNames := l.categories.GetCategoryNames(newCategories)
-		log.CliErrorf(c, "[user_data.ImportTransaction] there are %d transaction categories (%s) need to be created, please create them manually", len(newCategories), strings.Join(categoryNames, ","))
+	if len(newSubExpenseCategories) > 0 {
+		categoryNames := l.categories.GetCategoryNames(newSubExpenseCategories)
+		log.CliErrorf(c, "[user_data.ImportTransaction] there are %d expense categories (%s) need to be created, please create them manually", len(newSubExpenseCategories), strings.Join(categoryNames, ","))
+		return errs.ErrOperationFailed
+	}
+
+	if len(newSubIncomeCategories) > 0 {
+		categoryNames := l.categories.GetCategoryNames(newSubIncomeCategories)
+		log.CliErrorf(c, "[user_data.ImportTransaction] there are %d income categories (%s) need to be created, please create them manually", len(newSubIncomeCategories), strings.Join(categoryNames, ","))
+		return errs.ErrOperationFailed
+	}
+
+	if len(newSubTransferCategories) > 0 {
+		categoryNames := l.categories.GetCategoryNames(newSubTransferCategories)
+		log.CliErrorf(c, "[user_data.ImportTransaction] there are %d transfer categories (%s) need to be created, please create them manually", len(newSubTransferCategories), strings.Join(categoryNames, ","))
 		return errs.ErrOperationFailed
 	}
 
@@ -788,17 +800,17 @@ func (l *UserDataCli) getUserEssentialData(c *core.CliContext, uid int64, userna
 	return accountMap, categoryMap, tagMap, tagIndexes, tagIndexesMap, nil
 }
 
-func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int64, username string) (accountMap map[string]*models.Account, categoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag, err error) {
+func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int64, username string) (accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag, err error) {
 	if uid <= 0 {
 		log.CliErrorf(c, "[user_data.getUserEssentialDataForImport] user uid \"%d\" is invalid", uid)
-		return nil, nil, nil, errs.ErrUserIdInvalid
+		return nil, nil, nil, nil, nil, errs.ErrUserIdInvalid
 	}
 
 	accounts, err := l.accounts.GetAllAccountsByUid(c, uid)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get accounts for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	accountMap = l.accounts.GetAccountNameMapByList(accounts)
@@ -807,21 +819,21 @@ func (l *UserDataCli) getUserEssentialDataForImport(c *core.CliContext, uid int6
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get categories for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
-	categoryMap = l.categories.GetCategoryNameMapByList(categories)
+	expenseCategoryMap, incomeCategoryMap, transferCategoryMap = l.categories.GetCategoryNameMapByList(categories)
 
 	tags, err := l.tags.GetAllTagsByUid(c, uid)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.getUserEssentialDataForImport] failed to get tags for user \"%s\", because %s", username, err.Error())
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	tagMap = l.tags.GetTagNameMapByList(tags)
 
-	return accountMap, categoryMap, tagMap, nil
+	return accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap, nil
 }
 
 func (l *UserDataCli) checkTransactionAccount(c *core.CliContext, transaction *models.Transaction, accountMap map[int64]*models.Account, accountHasChild map[int64]bool) error {

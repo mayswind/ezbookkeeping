@@ -230,15 +230,21 @@
             </f7-list-item>
 
             <f7-list-item
-                class="list-item-with-header-and-title"
+                class="transaction-edit-datetime list-item-with-header-and-title"
                 link="#" no-chevron
                 :class="{ 'readonly': mode === 'view' && transaction.utcOffset === currentTimezoneOffsetMinutes }"
-                :header="$t('Transaction Time')"
-                :title="transactionDisplayTime"
-                @click="mode !== 'view' ? showTransactionDateTimeSheet = true : showTimeInDefaultTimezone = !showTimeInDefaultTimezone"
                 v-if="type === 'transaction'"
             >
-                <date-time-selection-sheet v-model:show="showTransactionDateTimeSheet"
+                <template #header>
+                    <div class="transaction-edit-datetime-header" @click="showDateTimeDialog('time')">{{ $t('Transaction Time') }}</div>
+                </template>
+                <template #title>
+                    <div class="transaction-edit-datetime-title">
+                        <div @click="showDateTimeDialog('date')">{{ transactionDisplayDate }}</div>&nbsp;<div class="transaction-edit-datetime-time" @click="showDateTimeDialog('time')">{{ transactionDisplayTime }}</div>
+                    </div>
+                </template>
+                <date-time-selection-sheet :init-mode="transactionDateTimeSheetMode"
+                                           v-model:show="showTransactionDateTimeSheet"
                                            v-model="transaction.time">
                 </date-time-selection-sheet>
             </f7-list-item>
@@ -486,6 +492,7 @@ export default {
             uploadingPicture: false,
             removingPictureId: null,
             isSupportGeoLocation: !!navigator.geolocation,
+            transactionDateTimeSheetMode: 'time',
             showTimeInDefaultTimezone: false,
             showGeoLocationActionSheet: false,
             showMoreActionSheet: false,
@@ -665,12 +672,19 @@ export default {
                 return this.$t('None');
             }
         },
-        transactionDisplayTime() {
+        transactionDisplayDate() {
             if (this.mode !== 'view' || !this.showTimeInDefaultTimezone) {
-                return this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()))
+                return this.$locale.formatUnixTimeToLongDate(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
             }
 
-            return `${this.$locale.formatUnixTimeToLongDateTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, this.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${getTimezoneOffset(this.settingsStore.appSettings.timeZone)})`;
+            return this.$locale.formatUnixTimeToLongDate(this.userStore, getActualUnixTimeForStore(this.transaction.time, this.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()));
+        },
+        transactionDisplayTime() {
+            if (this.mode !== 'view' || !this.showTimeInDefaultTimezone) {
+                return this.$locale.formatUnixTimeToLongTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, getTimezoneOffsetMinutes(), getBrowserTimezoneOffsetMinutes()));
+            }
+
+            return `${this.$locale.formatUnixTimeToLongTime(this.userStore, getActualUnixTimeForStore(this.transaction.time, this.transaction.utcOffset, getBrowserTimezoneOffsetMinutes()))} (UTC${getTimezoneOffset(this.settingsStore.appSettings.timeZone)})`;
         },
         transactionDisplayScheduledFrequency() {
             if (this.type !== 'template') {
@@ -1222,6 +1236,14 @@ export default {
                 this.transaction.destinationAmount = oldSourceAmount;
             }
         },
+        showDateTimeDialog(sheetMode) {
+            if (this.mode === 'view') {
+                this.showTimeInDefaultTimezone = !this.showTimeInDefaultTimezone;
+            } else {
+                this.transactionDateTimeSheetMode = sheetMode;
+                this.showTransactionDateTimeSheet = true;
+            }
+        },
         showOpenPictureDialog() {
             if (!this.canAddTransactionPicture || this.submitting) {
                 return;
@@ -1353,6 +1375,26 @@ export default {
 
 .transaction-edit-amount .item-header {
     padding-top: calc(var(--f7-typography-padding) / 2);
+}
+
+.transaction-edit-datetime .item-title {
+    width: 100%;
+}
+
+.transaction-edit-datetime .item-title > .item-header > .transaction-edit-datetime-header {
+    display: block;
+    width: 100%;
+}
+
+.transaction-edit-datetime .item-title > .transaction-edit-datetime-title {
+    display: flex;
+    width: 100%;
+}
+
+.transaction-edit-datetime .item-title > .transaction-edit-datetime-title > .transaction-edit-datetime-time {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .transaction-edit-timezone-name {

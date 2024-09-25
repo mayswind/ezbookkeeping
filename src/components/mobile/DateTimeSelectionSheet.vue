@@ -70,6 +70,7 @@ import { createInlinePicker } from '@/lib/ui.mobile.js';
 export default {
     props: [
         'modelValue',
+        'initMode',
         'show'
     ],
     emits: [
@@ -93,7 +94,7 @@ export default {
         const datetime = getLocalDatetimeFromUnixTime(value);
 
         return {
-            mode: 'time',
+            mode: self.initMode || 'time',
             yearRange: [
                 2000,
                 getCurrentYear() + 1
@@ -136,7 +137,7 @@ export default {
     methods: {
         onSheetOpen() {
             const self = this;
-            self.mode = 'time';
+            self.mode = self.initMode || 'time';
 
             if (self.modelValue) {
                 self.dateTime = getLocalDatetimeFromUnixTime(self.modelValue);
@@ -148,8 +149,10 @@ export default {
                 self.timePickerHolder = createInlinePicker('#time-picker-container', '#time-picker-input',
                     self.getTimePickerColumns(), self.timeValues, {
                         change(picker, values) {
-                            self.timeValues = values;
-                            self.dateTime = getCombinedDateAndTimeValues(self.dateTime, self.timeValues, self.is24Hour, self.isMeridiemIndicatorFirst);
+                            if (self.mode === 'time') {
+                                self.timeValues = values;
+                                self.dateTime = getCombinedDateAndTimeValues(self.dateTime, self.timeValues, self.is24Hour, self.isMeridiemIndicatorFirst);
+                            }
                         }
                     });
             } else {

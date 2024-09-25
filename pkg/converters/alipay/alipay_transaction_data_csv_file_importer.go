@@ -98,6 +98,11 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 	for i := 1; i < len(allLines); i++ {
 		items := allLines[i]
 
+		if len(items) < len(headerLineItems) {
+			log.Errorf(ctx, "[alipayTransactionDataCsvImporter.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
+			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+		}
+
 		if items[fundStatusColumnIdx] != alipayTransactionTypeFundStatusNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 			items[fundStatusColumnIdx] != alipayTransactionTypeFundStatusNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 			items[fundStatusColumnIdx] != alipayTransactionTypeFundStatusNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
@@ -124,18 +129,18 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 			fundStatusColumnExists,
 		)
 
-		if len(items) < len(headerLineItems) {
-			log.Errorf(ctx, "[alipayTransactionDataCsvImporter.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
-			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
-		}
-
 		if items[statusColumnIdx] == alipayTransactionDataStatusSuccessName || items[statusColumnIdx] == alipayTransactionDataStatusPaymentSuccessName || items[statusColumnIdx] == alipayTransactionDataStatusRepaymentSuccessName {
 			dataTable.Add(data)
 		} else if items[statusColumnIdx] == alipayTransactionDataStatusClosedName {
 			dataTable.Add(data)
 		} else if items[statusColumnIdx] == alipayTransactionDataStatusRefundSuccessName || items[statusColumnIdx] == alipayTransactionDataStatusTaxRefundSuccessName {
-			data[datatable.DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeFundStatusNameMapping[models.TRANSACTION_TYPE_EXPENSE]
-			data[datatable.DATA_TABLE_AMOUNT] = "-" + data[datatable.DATA_TABLE_AMOUNT]
+			amount, err := utils.ParseAmount(data[datatable.DATA_TABLE_AMOUNT])
+
+			if err == nil {
+				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeFundStatusNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+				data[datatable.DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+			}
+
 			dataTable.Add(data)
 		}
 	}

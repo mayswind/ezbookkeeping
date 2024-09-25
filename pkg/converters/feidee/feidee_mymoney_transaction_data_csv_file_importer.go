@@ -98,6 +98,12 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 
 	for i := 1; i < len(allLines); i++ {
 		items := allLines[i]
+
+		if len(items) < len(headerLineItems) {
+			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
+			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+		}
+
 		data, relatedId := c.parseTransactionData(items,
 			timeColumnIdx,
 			timeColumnExists,
@@ -118,11 +124,6 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 			relatedIdColumnIdx,
 			relatedIdColumnExists,
 		)
-
-		if len(items) < len(headerLineItems) {
-			log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
-			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
-		}
 
 		transactionType := data[datatable.DATA_TABLE_TRANSACTION_TYPE]
 

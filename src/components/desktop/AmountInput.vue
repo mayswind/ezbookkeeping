@@ -137,7 +137,25 @@ export default {
             }
         },
         'currentValue': function (newValue) {
-            this.$emit('update:modelValue', this.$locale.parseAmount(this.userStore, newValue));
+            let finalValue = '';
+
+            if (newValue) {
+                const decimalSeparator = this.$locale.getCurrentDecimalSeparator(this.userStore);
+
+                for (let i = 0; i < newValue.length; i++) {
+                    if (!('0' <= newValue[i] && newValue[i] <= '9') && newValue[i] !== '-' && newValue[i] !== decimalSeparator) {
+                        break;
+                    }
+
+                    finalValue += newValue[i];
+                }
+            }
+
+            if (finalValue !== newValue) {
+                this.currentValue = finalValue;
+            } else {
+                this.$emit('update:modelValue', this.$locale.parseAmount(this.userStore, finalValue));
+            }
         }
     },
     methods: {

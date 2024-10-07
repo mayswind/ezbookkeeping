@@ -29,6 +29,8 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return feidee.FeideeMymoneyTransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
 		return feidee.FeideeMymoneyTransactionDataXlsImporter, nil
+	} else if fileType == "alipay_app_csv" {
+		return alipay.AlipayAppTransactionDataCsvImporter, nil
 	} else if fileType == "alipay_web_csv" {
 		return alipay.AlipayWebTransactionDataCsvImporter, nil
 	} else {

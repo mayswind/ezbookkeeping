@@ -38,7 +38,7 @@ const supportedImportFileTypes = [
         }
     },
     {
-        type: 'alipay_csv',
+        type: 'alipay_web_csv',
         name: 'Alipay (Web) Data Export File',
         extensions: '.csv',
         document: {

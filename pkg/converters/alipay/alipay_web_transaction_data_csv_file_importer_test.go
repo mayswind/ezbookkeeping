@@ -15,7 +15,7 @@ import (
 )
 
 func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -27,17 +27,18 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 01:23:45 ,0.12   ,交易成功    ,已收入      ,\n" +
-		"2024-09-01 12:34:56 ,123.45  ,交易成功    ,已支出      ,\n" +
-		"2024-09-01 23:59:59 ,0.05   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 01:23:45 ,xxxx            ,0.12   ,收入      ,交易成功    ,\n" +
+		"2024-09-01 12:34:56 ,xxxx            ,123.45  ,支出      ,交易成功    ,\n" +
+		"2024-09-01 23:59:59 ,充值-普通充值             ,0.05   ,不计收支    ,交易成功    ,\n" +
+		"2024-09-02 23:59:59 ,提现-普通提现             ,0.03   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
 	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 
-	assert.Equal(t, 3, len(allNewTransactions))
+	assert.Equal(t, 4, len(allNewTransactions))
 	assert.Equal(t, 2, len(allNewAccounts))
 	assert.Equal(t, 1, len(allNewSubExpenseCategories))
 	assert.Equal(t, 1, len(allNewSubIncomeCategories))
@@ -63,8 +64,16 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 	assert.Equal(t, "2024-09-01 23:59:59", utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime), time.UTC))
 	assert.Equal(t, int64(5), allNewTransactions[2].Amount)
 	assert.Equal(t, "", allNewTransactions[2].OriginalSourceAccountName)
-	assert.Equal(t, "", allNewTransactions[2].OriginalDestinationAccountName)
+	assert.Equal(t, "Alipay", allNewTransactions[2].OriginalDestinationAccountName)
 	assert.Equal(t, "", allNewTransactions[2].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[3].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[3].Type)
+	assert.Equal(t, "2024-09-02 23:59:59", utils.FormatUnixTimeToLongDateTime(utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime), time.UTC))
+	assert.Equal(t, int64(3), allNewTransactions[3].Amount)
+	assert.Equal(t, "Alipay", allNewTransactions[3].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[3].OriginalDestinationAccountName)
+	assert.Equal(t, "", allNewTransactions[3].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
 	assert.Equal(t, "Alipay", allNewAccounts[0].Name)
@@ -85,7 +94,7 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -97,8 +106,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 01:23:45 ,0.12   ,退款成功    ,已收入      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 01:23:45 ,0.12   ,不计收支    ,退款成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -116,8 +125,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 01:23:45 ,0.12   ,退税成功    ,已收入      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 01:23:45 ,0.12   ,收入      ,退税成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -133,7 +142,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -145,8 +154,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01T12:34:56 ,0.12   ,交易成功    ,已收入      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01T12:34:56 ,0.12   ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -157,8 +166,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"09/01/2024 12:34:56 ,0.12   ,交易成功    ,已收入      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"09/01/2024 12:34:56 ,0.12   ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -167,7 +176,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -179,8 +188,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,0.12   ,交易成功    ,          ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,0.12   ,        ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -189,7 +198,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -202,8 +211,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,0.12   ,交易成功    ,已收入      ,\n" +
+		"交易创建时间              ,交易对方            ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,0.12   ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -213,13 +222,13 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "Alipay", allNewTransactions[0].OriginalSourceAccountName)
 
-	// income to other account
+	// refund to other account
 	data2, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,0.12   ,退款成功    ,已收入      ,\n" +
+		"交易创建时间              ,交易对方            ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,0.12   ,不计收支    ,退款成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -234,8 +243,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,充值-普通充值             ,0.12   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,充值-普通充值             ,0.12   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -251,8 +260,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,提现-实时提现             ,0.12   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,提现-实时提现             ,0.12   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -268,8 +277,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,xx-转入             ,0.12   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,xx-转入             ,0.12   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -285,8 +294,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,xx-转出             ,0.12   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,xx-转出             ,0.12   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -302,8 +311,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,xx还款             ,0.12   ,交易成功    ,资金转移     ,\n" +
+		"交易创建时间              ,交易对方            ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,test                ,xx还款             ,0.12   ,不计收支    ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -316,7 +325,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -328,8 +337,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,商品名称                ,金额（元）,交易状态    ,备注                  ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,0.12   ,交易成功    ,test2               ,已收入      ,\n" +
+		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,备注                  ,\n" +
+		"2024-09-01 12:34:56 ,test                ,0.12   ,收入      ,交易成功    ,test2               ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -343,8 +352,8 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,商品名称                ,金额（元）,交易状态    ,备注                  ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,test                ,0.12   ,交易成功    ,                    ,已收入      ,\n" +
+		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,备注                  ,\n" +
+		"2024-09-01 12:34:56 ,test                ,0.12   ,收入      ,交易成功    ,                    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -356,7 +365,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -365,8 +374,8 @@ func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) 
 	}
 
 	data, err := simplifiedchinese.GB18030.NewEncoder().String(
-		"交易创建时间              ,金额（元）,交易状态    ,资金状态     ,\n" +
-			"2024-09-01 12:34:56 ,0.12   ,交易成功    ,Type      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+			"2024-09-01 12:34:56 ,0.12   ,收入      ,交易成功    ,\n" +
 			"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 
@@ -378,7 +387,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) 
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := AlipayTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -391,8 +400,8 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"金额（元）,交易状态    ,资金状态     ,\n" +
-		"0.12   ,交易成功    ,已收入      ,\n" +
+		"金额（元）,收/支     ,交易状态    ,\n" +
+		"0.12   ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
@@ -402,8 +411,8 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,交易状态    ,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,交易成功    ,已收入      ,\n" +
+		"交易创建时间              ,收/支     ,交易状态    ,\n" +
+		"2024-09-01 12:34:56 ,收入      ,交易成功    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
@@ -413,13 +422,13 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
 		"---------------------------------交易记录明细列表------------------------------------\n" +
-		"交易创建时间              ,金额（元）,资金状态     ,\n" +
-		"2024-09-01 12:34:56 ,0.12   ,已收入      ,\n" +
+		"交易创建时间              ,金额（元）,收/支     ,\n" +
+		"2024-09-01 12:34:56 ,0.12   ,收入      ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
-	// Missing Fund Status Column
+	// Missing Type Column
 	data4, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
 		"账号:[xxx@xxx.xxx]\n" +
 		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +

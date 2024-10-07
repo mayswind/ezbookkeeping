@@ -62,6 +62,10 @@ import {
 import logger from './logger.js';
 import services from './services.js';
 
+function getLanguageDisplayName(translateFn, languageName) {
+    return translateFn(`language.${languageName}`);
+}
+
 function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
     const ret = [];
 
@@ -72,7 +76,7 @@ function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
 
         const languageInfo = allLanguages[languageTag];
         let displayName = languageInfo.displayName;
-        let languageNameInCurrentLanguage = translateFn(`language.${languageInfo.name}`);
+        let languageNameInCurrentLanguage = getLanguageDisplayName(translateFn, languageInfo.name);
 
         if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
             displayName = `${languageNameInCurrentLanguage} (${displayName})`;
@@ -1255,16 +1259,51 @@ function getAllDisplayExchangeRates(exchangeRatesData, translateFn) {
     return availableExchangeRates;
 }
 
-function getAllSupportedImportFileTypes(translateFn) {
+function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
     const allSupportedImportFileTypes = [];
 
     for (let i = 0; i < fileConstants.supportedImportFileTypes.length; i++) {
         const fileType = fileConstants.supportedImportFileTypes[i];
+        let document = {
+            language: '',
+            displayLanguageName: '',
+            anchor: ''
+        };
+
+        if (fileType.document) {
+            if (fileType.document.supportMultiLanguages === true) {
+                document.language = getCurrentLanguageTag(i18nGlobal);
+                document.anchor = translateFn(`document.anchor.export_and_import.${fileType.document.anchor}`);
+            } else if (isString(fileType.document.supportMultiLanguages) && allLanguages[fileType.document.supportMultiLanguages]) {
+                document.language = fileType.document.supportMultiLanguages;
+
+                if (document.language !== getCurrentLanguageTag(i18nGlobal)) {
+                    document.displayLanguageName = getLanguageDisplayName(translateFn, allLanguages[fileType.document.supportMultiLanguages].name);
+                }
+
+                document.anchor = fileType.document.anchor;
+            }
+
+            if (document.language) {
+                document.language = document.language.replace(/-/g, '_');
+            }
+
+            if (document.anchor) {
+                document.anchor = document.anchor.toLowerCase().replace(/ /g, '-');
+            }
+
+            if (document.language === defaultLanguage) {
+                document.language = '';
+            }
+        } else {
+            document = null;
+        }
 
         allSupportedImportFileTypes.push({
             type: fileType.type,
             displayName: translateFn(fileType.name),
-            extensions: fileType.extensions
+            extensions: fileType.extensions,
+            document: document
         });
     }
 
@@ -1618,7 +1657,7 @@ export function i18nFunctions(i18nGlobal) {
         getAllTransactionScheduledFrequencyTypes: () => getAllTransactionScheduledFrequencyTypes(i18nGlobal.t),
         getAllTransactionDefaultCategories: (categoryType, locale) => getAllTransactionDefaultCategories(categoryType, locale, i18nGlobal.t),
         getAllDisplayExchangeRates: (exchangeRatesData) => getAllDisplayExchangeRates(exchangeRatesData, i18nGlobal.t),
-        getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal.t),
+        getAllSupportedImportFileTypes: () => getAllSupportedImportFileTypes(i18nGlobal, i18nGlobal.t),
         getEnableDisableOptions: () => getEnableDisableOptions(i18nGlobal.t),
         getCategorizedAccountsWithDisplayBalance: (allVisibleAccounts, showAccountBalance, defaultCurrency, settingsStore, userStore, exchangeRatesStore) => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts, showAccountBalance, defaultCurrency, userStore, settingsStore, exchangeRatesStore, i18nGlobal.t),
         joinMultiText: (textArray) => joinMultiText(textArray, i18nGlobal.t),

@@ -91,6 +91,14 @@
                                 @click="showOpenFileDialog"
                             />
                         </v-col>
+
+                        <v-col cols="12" md="12" class="mb-0 pb-0" v-if="exportFileGuideDocumentUrl">
+                            <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
+                                <v-icon :icon="icons.document" size="16" />
+                                <span class="ml-1">{{ $t('How to export this file?') }}</span>
+                                <span class="ml-1" v-if="exportFileGuideDocumentLanguageName">({{ exportFileGuideDocumentLanguageName }})</span>
+                            </a>
+                        </v-col>
                     </v-row>
                 </v-window-item>
                 <v-window-item value="checkData">
@@ -486,6 +494,7 @@ import {
 
 import {
     mdiDotsVertical,
+    mdiHelpCircleOutline,
     mdiFindReplace,
     mdiClose,
     mdiArrowRight,
@@ -527,6 +536,7 @@ export default {
             reject: null,
             icons: {
                 more: mdiDotsVertical,
+                document: mdiHelpCircleOutline,
                 replace: mdiFindReplace,
                 previous: mdiClose,
                 next: mdiArrowRight,
@@ -631,6 +641,26 @@ export default {
         },
         supportedImportFileExtensions() {
             return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'extensions');
+        },
+        exportFileGuideDocumentUrl() {
+            const document = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'document');
+
+            if (!document) {
+                return null;
+            }
+
+            const language = document.language ? document.language + '/' : '';
+            const anchor = document.anchor ? '#' + document.anchor : '';
+            return `https://ezbookkeeping.mayswind.net/${language}export_and_import${anchor}`;
+        },
+        exportFileGuideDocumentLanguageName() {
+            const document = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'document');
+
+            if (!document) {
+                return null;
+            }
+
+            return document.displayLanguageName;
         },
         fileName: {
             get: function () {

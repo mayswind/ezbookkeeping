@@ -1183,6 +1183,13 @@
         "parameter invalid color": "{parameter}格式错误",
         "parameter invalid amount filter": "{parameter}格式错误"
     },
+    "document": {
+        "anchor": {
+            "export_and_import": {
+                "export-transactions": "导出交易"
+            }
+        }
+    },
     "OK": "确定",
     "Cancel": "取消",
     "Operation": "操作",
@@ -1504,11 +1511,12 @@
     "Check and Modify Your Data": "检查及修改您的数据",
     "Data Import Completed": "数据导入完成",
     "File Type": "文件类型",
+    "How to export this file?": "如何导出该文件？",
     "ezbookkeeping Data Export File (CSV)": "ezbookkeeping 数据导出文件 (CSV)",
     "ezbookkeeping Data Export File (TSV)": "ezbookkeeping 数据导出文件 (TSV)",
     "Feidee MyMoney (Web) Data Export File": "金蝶随手记 (Web版) 数据导出文件",
     "Feidee MyMoney (App) Data Export File": "金蝶随手记 (App) 数据导出文件",
-    "Alipay Data Export File": "支付宝数据导出文件",
+    "Alipay (Web) Data Export File": "支付宝 (网页版) 数据导出文件",
     "Data File": "数据文件",
     "No data to import": "没有可以导入的数据",
     "Cannot import invalid transactions": "不能导入无效的交易",

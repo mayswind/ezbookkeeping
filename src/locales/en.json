@@ -1183,6 +1183,13 @@
         "parameter invalid color": "{parameter} is invalid format",
         "parameter invalid amount filter": "{parameter} is invalid format"
     },
+    "document": {
+        "anchor": {
+            "export_and_import": {
+                "export-transactions": "export-transactions"
+            }
+        }
+    },
     "OK": "OK",
     "Cancel": "Cancel",
     "Operation": "Operation",
@@ -1504,11 +1511,12 @@
     "Check and Modify Your Data": "Check and Modify Your Data",
     "Data Import Completed": "Data Import Completed",
     "File Type": "File Type",
+    "How to export this file?": "How to export this file?",
     "ezbookkeeping Data Export File (CSV)": "ezbookkeeping Data Export File (CSV)",
     "ezbookkeeping Data Export File (TSV)": "ezbookkeeping Data Export File (TSV)",
     "Feidee MyMoney (Web) Data Export File": "Feidee MyMoney (Web) Data Export File",
     "Feidee MyMoney (App) Data Export File": "Feidee MyMoney (App) Data Export File",
-    "Alipay Data Export File": "Alipay Data Export File",
+    "Alipay (Web) Data Export File": "Alipay (Web) Data Export File",
     "Data File": "Data File",
     "No data to import": "No data to import",
     "Cannot import invalid transactions": "Cannot import invalid transactions",

@@ -45,7 +45,8 @@
             </f7-actions-group>
         </f7-actions>
 
-        <list-item-selection-sheet value-type="index"
+        <list-item-selection-sheet value-type="item"
+                                   value-field="languageTag"
                                    title-field="displayName"
                                    :items="allLanguages"
                                    v-model:show="showChangeLocaleSheet"
@@ -81,7 +82,7 @@ export default {
     computed: {
         ...mapStores(useTransactionCategoriesStore),
         allLanguages() {
-            return this.$locale.getAllLanguageInfos();
+            return this.$locale.getAllLanguageInfoArray(false);
         },
         allPresetCategories() {
             return this.$locale.getAllTransactionDefaultCategories(this.categoryType, this.currentLocale);

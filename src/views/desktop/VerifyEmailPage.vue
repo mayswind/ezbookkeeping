@@ -78,10 +78,10 @@
                                                    v-bind="props">{{ currentLanguageName }}</v-btn>
                                         </template>
                                         <v-list>
-                                            <v-list-item v-for="(lang, locale) in allLanguages" :key="locale">
+                                            <v-list-item v-for="lang in allLanguages" :key="lang.languageTag">
                                                 <v-list-item-title
                                                     class="cursor-pointer"
-                                                    @click="changeLanguage(locale)">
+                                                    @click="changeLanguage(lang.languageTag)">
                                                     {{ lang.displayName }}
                                                 </v-list-item-title>
                                             </v-list-item>
@@ -150,7 +150,7 @@ export default {
             return 'v' + this.$version;
         },
         allLanguages() {
-            return this.$locale.getAllLanguageInfos();
+            return this.$locale.getAllLanguageInfoArray(false);
         },
         isDarkMode() {
             return this.globalTheme.global.name.value === 'dark';

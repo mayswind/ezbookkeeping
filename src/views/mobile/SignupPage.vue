@@ -66,9 +66,9 @@
                 smart-select :smart-select-params="{ openIn: 'popup', popupPush: true, closeOnSelect: true, scrollToSelectedItem: true, searchbar: true, searchbarPlaceholder: $t('Language'), searchbarDisableText: $t('Cancel'), appendSearchbarNotFound: $t('No results'), pageTitle: $t('Language'), popupCloseLinkText: $t('Done') }"
             >
                 <select v-model="currentLocale">
-                    <option :value="languageTag"
-                            :key="languageTag"
-                            v-for="(lang, languageTag) in allLanguages">{{ lang.displayName }}</option>
+                    <option :value="lang.languageTag"
+                            :key="lang.languageTag"
+                            v-for="lang in allLanguages">{{ lang.displayName }}</option>
                 </select>
             </f7-list-item>
 
@@ -163,7 +163,8 @@
                 </f7-actions-group>
             </f7-actions>
 
-            <list-item-selection-sheet value-type="index"
+            <list-item-selection-sheet value-type="item"
+                                       value-field="languageTag"
                                        title-field="displayName"
                                        :items="allLanguages"
                                        v-model:show="showPresetCategoriesChangeLocaleSheet"
@@ -205,7 +206,7 @@ export default {
     computed: {
         ...mapStores(useRootStore, useSettingsStore, useTransactionCategoriesStore, useExchangeRatesStore),
         allLanguages() {
-            return this.$locale.getAllLanguageInfos();
+            return this.$locale.getAllLanguageInfoArray(false);
         },
         allCurrencies() {
             return this.$locale.getAllCurrencies();

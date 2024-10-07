@@ -77,12 +77,12 @@
                 <f7-list-item
                     link="#" no-chevron popover-close
                     :title="lang.displayName"
-                    :key="locale"
-                    v-for="(lang, locale) in allLanguages"
-                    @click="changeLanguage(locale)"
+                    :key="lang.languageTag"
+                    v-for="lang in allLanguages"
+                    @click="changeLanguage(lang.languageTag)"
                 >
                     <template #after>
-                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="currentLanguageCode === locale"></f7-icon>
+                        <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="currentLanguageCode === lang.languageTag"></f7-icon>
                     </template>
                 </f7-list-item>
             </f7-list>
@@ -231,7 +231,7 @@ export default {
             return getDesktopVersionPath();
         },
         allLanguages() {
-            return this.$locale.getAllLanguageInfos();
+            return this.$locale.getAllLanguageInfoArray(false);
         },
         isUserRegistrationEnabled() {
             return isUserRegistrationEnabled();

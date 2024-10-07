@@ -17,8 +17,8 @@
                                        v-bind="props">{{ currentLanguageName }}</v-btn>
                             </template>
                             <v-list>
-                                <v-list-item :key="locale" :value="locale" v-for="(lang, locale) in allLanguages">
-                                    <v-list-item-title class="cursor-pointer" @click="currentLocale = locale">
+                                <v-list-item :key="lang.languageTag" :value="lang.languageTag" v-for="lang in allLanguages">
+                                    <v-list-item-title class="cursor-pointer" @click="currentLocale = lang.languageTag">
                                         {{ lang.displayName }}
                                     </v-list-item-title>
                                 </v-list-item>
@@ -110,7 +110,7 @@ export default {
             }
         },
         allLanguages() {
-            return this.$locale.getAllLanguageInfos();
+            return this.$locale.getAllLanguageInfoArray(false);
         },
         allPresetCategories() {
             return this.$locale.getAllTransactionDefaultCategories(this.categoryType, this.currentLocale);

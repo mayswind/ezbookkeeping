@@ -4,6 +4,10 @@
             "title": "ezBookkeeping"
         }
     },
+    "language": {
+        "English": "English",
+        "Simplified Chinese": "Simplified Chinese"
+    },
     "default": {
         "currency": "USD",
         "firstDayOfWeek": "Sunday",

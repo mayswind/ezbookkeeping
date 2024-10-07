@@ -62,10 +62,6 @@ import {
 import logger from './logger.js';
 import services from './services.js';
 
-function getAllLanguageInfos() {
-    return allLanguages;
-}
-
 function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
     const ret = [];
 
@@ -75,10 +71,16 @@ function getAllLanguageInfoArray(translateFn, includeSystemDefault) {
         }
 
         const languageInfo = allLanguages[languageTag];
+        let displayName = languageInfo.displayName;
+        let languageNameInCurrentLanguage = translateFn(`language.${languageInfo.name}`);
+
+        if (languageNameInCurrentLanguage && languageNameInCurrentLanguage !== displayName) {
+            displayName = `${languageNameInCurrentLanguage} (${displayName})`;
+        }
 
         ret.push({
             languageTag: languageTag,
-            displayName: languageInfo.displayName
+            displayName: displayName
         });
     }
 
@@ -1537,7 +1539,6 @@ export function translateError(message, translateFn) {
 
 export function i18nFunctions(i18nGlobal) {
     return {
-        getAllLanguageInfos: getAllLanguageInfos,
         getAllLanguageInfoArray: (includeSystemDefault) => getAllLanguageInfoArray(i18nGlobal.t, includeSystemDefault),
         getLanguageInfo: getLanguageInfo,
         getDefaultLanguage: getDefaultLanguage,

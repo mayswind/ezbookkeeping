@@ -658,8 +658,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 
 		if transaction.Amount != oldTransaction.Amount {
 			if oldTransaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
-				originalBalance := sourceAccount.Balance - oldTransaction.RelatedAccountAmount
-				transaction.RelatedAccountAmount = transaction.Amount - originalBalance
+				transaction.RelatedAccountAmount = oldTransaction.RelatedAccountAmount + transaction.Amount - oldTransaction.Amount
 				updateCols = append(updateCols, "related_account_amount")
 			}
 

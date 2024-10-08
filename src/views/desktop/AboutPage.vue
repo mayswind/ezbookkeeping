@@ -33,9 +33,19 @@
                         <v-col cols="12" md="2">
                             <span class="text-body-1">{{ $t('Report Issue') }}</span>
                         </v-col>
-                        <v-col cols="12" md="10">
+                        <v-col cols="12" md="10" class="mb-6">
                             <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
                                 https://github.com/mayswind/ezbookkeeping/issues
+                            </a>
+                        </v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="12" md="2">
+                            <span class="text-body-1">{{ $t('Documents') }}</span>
+                        </v-col>
+                        <v-col cols="12" md="10">
+                            <a class="text-body-1" href="https://ezbookkeeping.mayswind.net" target="_blank">
+                                https://ezbookkeeping.mayswind.net
                             </a>
                         </v-col>
                     </v-row>

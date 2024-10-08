@@ -624,6 +624,10 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 		modifyTransactionTime := false
 
 		if utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) != utils.GetUnixTimeFromTransactionTime(oldTransaction.TransactionTime) {
+			if oldTransaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+				return errs.ErrBalanceModificationTransactionCannotModifyTime
+			}
+
 			sameSecondLatestTransaction := &models.Transaction{}
 			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 			maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
@@ -700,6 +704,23 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 
 		if err != nil {
 			return err
+		}
+
+		// Not allow to add transaction before balance modification transaction
+		if transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
+			otherTransactionExists := false
+
+			if destinationAccount != nil && sourceAccount.AccountId != destinationAccount.AccountId {
+				otherTransactionExists, err = sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND type=? AND (account_id=? OR account_id=?) AND transaction_time>=?", transaction.Uid, false, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, sourceAccount.AccountId, destinationAccount.AccountId, transaction.TransactionTime).Limit(1).Exist(&models.Transaction{})
+			} else {
+				otherTransactionExists, err = sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND type=? AND account_id=? AND transaction_time>=?", transaction.Uid, false, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, sourceAccount.AccountId, transaction.TransactionTime).Limit(1).Exist(&models.Transaction{})
+			}
+
+			if err != nil {
+				return err
+			} else if otherTransactionExists {
+				return errs.ErrCannotAddTransactionBeforeBalanceModificationTransaction
+			}
 		}
 
 		// Update transaction row
@@ -1579,6 +1600,20 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 
 		transaction.RelatedAccountId = transaction.AccountId
 		transaction.RelatedAccountAmount = transaction.Amount - sourceAccount.Balance
+	} else { // Not allow to add transaction before balance modification transaction
+		otherTransactionExists := false
+
+		if destinationAccount != nil && sourceAccount.AccountId != destinationAccount.AccountId {
+			otherTransactionExists, err = sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND type=? AND (account_id=? OR account_id=?) AND transaction_time>=?", transaction.Uid, false, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, sourceAccount.AccountId, destinationAccount.AccountId, transaction.TransactionTime).Limit(1).Exist(&models.Transaction{})
+		} else {
+			otherTransactionExists, err = sess.Cols("uid", "deleted", "account_id").Where("uid=? AND deleted=? AND type=? AND account_id=? AND transaction_time>=?", transaction.Uid, false, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, sourceAccount.AccountId, transaction.TransactionTime).Limit(1).Exist(&models.Transaction{})
+		}
+
+		if err != nil {
+			return err
+		} else if otherTransactionExists {
+			return errs.ErrCannotAddTransactionBeforeBalanceModificationTransaction
+		}
 	}
 
 	// Insert transaction row

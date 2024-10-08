@@ -1079,6 +1079,8 @@
         "import file type is empty": "导入文件类型为空",
         "import file type not supported": "导入文件类型不支持",
         "no data to import": "没有可以导入的数据",
+        "cannot add transaction before balance modification transaction": "不能添加早于修改余额的交易",
+        "balance modification transaction cannot modify transaction time": "您无法对修改余额的交易修改交易时间",
         "transaction category id is invalid": "交易分类ID无效",
         "transaction category not found": "交易分类不存在",
         "transaction category type is invalid": "交易分类类型无效",

@@ -1079,6 +1079,8 @@
         "import file type is empty": "Import file type is empty",
         "import file type not supported": "Import file type is not supported",
         "no data to import": "No data to import",
+        "cannot add transaction before balance modification transaction": "You cannot add transaction before the balance modification transaction",
+        "balance modification transaction cannot modify transaction time": "You cannot modify transaction time for balance modification transaction",
         "transaction category id is invalid": "Transaction category ID is invalid",
         "transaction category not found": "Transaction category is not found",
         "transaction category type is invalid": "Transaction category type is invalid",

@@ -324,6 +324,46 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 	assert.Equal(t, "test", allNewTransactions[0].OriginalDestinationAccountName)
 }
 
+func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
+	converter := AlipayAppTransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data1, err := simplifiedchinese.GB18030.NewEncoder().String("------------------------------------------------------------------------------------\n" +
+		"导出信息：\n" +
+		"姓名：xxx\n" +
+		"支付宝账户：xxx@xxx.xxx\n" +
+		"起始时间：[2024-01-01 00:00:00]    终止时间：[2024-09-01 23:59:59]\n" +
+		"导出交易类型：[全部]\n" +
+		"------------------------支付宝（中国）网络技术有限公司  电子客户回单------------------------\n" +
+		"交易时间,交易分类,商品说明,收/支,金额,交易状态,\n" +
+		"2024-09-01 01:23:45,Test Category,xxxx,收入,0.12,交易成功,\n" +
+		"2024-09-01 12:34:56,Test Category2,xxxx,支出,123.45,交易成功,\n" +
+		"2024-09-01 23:59:59,Test Category3,充值-普通充值,不计收支,0.05,交易成功,\n")
+	assert.Nil(t, err)
+
+	allNewTransactions, _, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 3, len(allNewTransactions))
+	assert.Equal(t, 1, len(allNewSubExpenseCategories))
+	assert.Equal(t, 1, len(allNewSubIncomeCategories))
+	assert.Equal(t, 1, len(allNewSubTransferCategories))
+
+	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[0].Uid)
+	assert.Equal(t, "Test Category2", allNewSubExpenseCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubIncomeCategories[0].Uid)
+	assert.Equal(t, "Test Category", allNewSubIncomeCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubTransferCategories[0].Uid)
+	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)
+}
+
 func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 	converter := AlipayWebTransactionDataCsvImporter
 	context := core.NewNullContext()

@@ -15,6 +15,12 @@ import (
 const feideeMymoneyTransactionDataCsvFileHeader = "随手记导出文件(headers:v5;"
 const feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + feideeMymoneyTransactionDataCsvFileHeader
 
+const feideeMymoneyCsvFileTransactionTypeModifyBalanceText = "余额变更"
+const feideeMymoneyCsvFileTransactionTypeIncomeText = "收入"
+const feideeMymoneyCsvFileTransactionTypeExpenseText = "支出"
+const feideeMymoneyCsvFileTransactionTypeTransferInText = "转入"
+const feideeMymoneyCsvFileTransactionTypeTransferOutText = "转出"
+
 // feideeMymoneyTransactionDataCsvImporter defines the structure of feidee mymoney csv importer for transaction data
 type feideeMymoneyTransactionDataCsvImporter struct{}
 
@@ -127,12 +133,12 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 
 		transactionType := data[datatable.DATA_TABLE_TRANSACTION_TYPE]
 
-		if transactionType == "余额变更" || transactionType == "收入" || transactionType == "支出" {
-			if transactionType == "余额变更" {
+		if transactionType == feideeMymoneyCsvFileTransactionTypeModifyBalanceText || transactionType == feideeMymoneyCsvFileTransactionTypeIncomeText || transactionType == feideeMymoneyCsvFileTransactionTypeExpenseText {
+			if transactionType == feideeMymoneyCsvFileTransactionTypeModifyBalanceText {
 				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
-			} else if transactionType == "收入" {
+			} else if transactionType == feideeMymoneyCsvFileTransactionTypeIncomeText {
 				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
-			} else if transactionType == "支出" {
+			} else if transactionType == feideeMymoneyCsvFileTransactionTypeExpenseText {
 				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
 			}
 
@@ -140,7 +146,7 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 			data[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = ""
 			data[datatable.DATA_TABLE_RELATED_AMOUNT] = ""
 			dataTable.Add(data)
-		} else if transactionType == "转入" || transactionType == "转出" {
+		} else if transactionType == feideeMymoneyCsvFileTransactionTypeTransferInText || transactionType == feideeMymoneyCsvFileTransactionTypeTransferOutText {
 			if relatedId == "" {
 				log.Errorf(ctx, "[feidee_mymoney_transaction_data_csv_file_importer.ParseImportedData] transfer transaction has blank related id in row \"index:%d\" for user \"uid:%d\"", i, user.Uid)
 				return nil, nil, nil, nil, nil, nil, errs.ErrRelatedIdCannotBeBlank
@@ -153,14 +159,14 @@ func (c *feideeMymoneyTransactionDataCsvImporter) ParseImportedData(ctx core.Con
 				continue
 			}
 
-			if transactionType == "转入" && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == "转出" {
+			if transactionType == feideeMymoneyCsvFileTransactionTypeTransferInText && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyCsvFileTransactionTypeTransferOutText {
 				relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
 				relatedData[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.DATA_TABLE_ACCOUNT_NAME]
 				relatedData[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.DATA_TABLE_ACCOUNT_CURRENCY]
 				relatedData[datatable.DATA_TABLE_RELATED_AMOUNT] = data[datatable.DATA_TABLE_AMOUNT]
 				dataTable.Add(relatedData)
 				delete(transferTransactionsMap, relatedId)
-			} else if transactionType == "转出" && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == "转入" {
+			} else if transactionType == feideeMymoneyCsvFileTransactionTypeTransferOutText && relatedData[datatable.DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyCsvFileTransactionTypeTransferInText {
 				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
 				data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedData[datatable.DATA_TABLE_ACCOUNT_NAME]
 				data[datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = relatedData[datatable.DATA_TABLE_ACCOUNT_CURRENCY]

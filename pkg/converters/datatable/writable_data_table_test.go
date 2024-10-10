@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -176,7 +178,7 @@ func TestWritableDataTableDataRowIterator(t *testing.T) {
 	iterator := writableDataTable.DataRowIterator()
 
 	for iterator.HasNext() {
-		dataRow := iterator.Next()
+		dataRow := iterator.Next(core.NewNullContext(), &models.User{})
 
 		actualTransactionTime, err := dataRow.GetTime(0, utils.GetTimezoneOffsetMinutes(time.Local))
 		assert.Nil(t, err)

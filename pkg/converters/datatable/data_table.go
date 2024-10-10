@@ -1,6 +1,11 @@
 package datatable
 
-import "time"
+import (
+	"time"
+
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
+)
 
 // ImportedDataTable defines the structure of imported data table
 type ImportedDataTable interface {
@@ -16,6 +21,9 @@ type ImportedDataTable interface {
 
 // ImportedDataRow defines the structure of imported data row
 type ImportedDataRow interface {
+	// IsValid returns whether this row contains valid data for importing
+	IsValid() bool
+
 	// ColumnCount returns the total count of column in this data row
 	ColumnCount() int
 
@@ -35,7 +43,7 @@ type ImportedDataRowIterator interface {
 	HasNext() bool
 
 	// Next returns the next imported data row
-	Next() ImportedDataRow
+	Next(ctx core.Context, user *models.User) ImportedDataRow
 }
 
 // DataTableBuilder defines the structure of data table builder

@@ -3,6 +3,8 @@ package datatable
 import (
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -89,6 +91,11 @@ func (t *WritableDataTable) DataRowIterator() ImportedDataRowIterator {
 	}
 }
 
+// IsValid returns whether this row contains valid data for importing
+func (r *WritableDataRow) IsValid() bool {
+	return true
+}
+
 // ColumnCount returns the total count of column in this data row
 func (r *WritableDataRow) ColumnCount() int {
 	return len(r.rowData)
@@ -121,7 +128,7 @@ func (t *WritableDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *WritableDataRowIterator) Next() ImportedDataRow {
+func (t *WritableDataRowIterator) Next(ctx core.Context, user *models.User) ImportedDataRow {
 	if t.nextIndex >= len(t.dataTable.allData) {
 		return nil
 	}

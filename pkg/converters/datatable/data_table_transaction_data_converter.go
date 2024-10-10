@@ -75,6 +75,14 @@ func CreateNewImporter(dataColumnMapping map[DataTableColumn]string, transaction
 	}
 }
 
+// CreateNewSimpleImporter returns a new data table transaction data importer according to the specified arguments
+func CreateNewSimpleImporter(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string) *DataTableTransactionDataImporter {
+	return &DataTableTransactionDataImporter{
+		dataColumnMapping:      dataColumnMapping,
+		transactionTypeMapping: transactionTypeMapping,
+	}
+}
+
 // CreateNewSimpleImporterWithPostProcessFunc returns a new data table transaction data importer according to the specified arguments
 func CreateNewSimpleImporterWithPostProcessFunc(dataColumnMapping map[DataTableColumn]string, transactionTypeMapping map[models.TransactionType]string, postProcessFunc DataTableTransactionDataImporterPostProcessFunc) *DataTableTransactionDataImporter {
 	return &DataTableTransactionDataImporter{
@@ -311,7 +319,12 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 
 	for dataRowIterator.HasNext() {
 		dataRowIndex++
-		dataRow := dataRowIterator.Next()
+		dataRow := dataRowIterator.Next(ctx, user)
+
+		if !dataRow.IsValid() {
+			continue
+		}
+
 		columnCount := dataRow.ColumnCount()
 
 		if columnCount < 1 || (columnCount == 1 && dataRow.GetData(0) == "") {
@@ -575,6 +588,11 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 		}
 
 		allNewTransactions = append(allNewTransactions, transaction)
+	}
+
+	if len(allNewTransactions) < 1 {
+		log.Errorf(ctx, "[data_table_transaction_data_converter.parseImportedData] no transaction data parsed for \"uid:%d\"", user.Uid)
+		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
 	sort.Sort(allNewTransactions)

@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -61,6 +63,11 @@ func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowIterator() datatable
 	}
 }
 
+// IsValid returns whether this row contains valid data for importing
+func (r *ezBookKeepingTransactionPlainTextDataRow) IsValid() bool {
+	return true
+}
+
 // ColumnCount returns the total count of column in this data row
 func (r *ezBookKeepingTransactionPlainTextDataRow) ColumnCount() int {
 	return len(r.allItems)
@@ -91,7 +98,7 @@ func (t *ezBookKeepingTransactionPlainTextDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next() datatable.ImportedDataRow {
+func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next(ctx core.Context, user *models.User) datatable.ImportedDataRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {
 		return nil
 	}

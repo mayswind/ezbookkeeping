@@ -7,7 +7,9 @@ import (
 	"github.com/shakinm/xlsReader/xls"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -60,6 +62,11 @@ func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowIterator() datatable
 		currentTableIndex:      0,
 		currentRowIndexInTable: 0,
 	}
+}
+
+// IsValid returns whether this row contains valid data for importing
+func (r *feideeMymoneyTransactionExcelFileDataRow) IsValid() bool {
+	return true
 }
 
 // ColumnCount returns the total count of column in this data row
@@ -142,7 +149,7 @@ func (t *feideeMymoneyTransactionExcelFileDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
+func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next(ctx core.Context, user *models.User) datatable.ImportedDataRow {
 	allSheets := t.dataTable.workbook.GetSheets()
 	currentRowIndexInTable := t.currentRowIndexInTable
 

@@ -30,8 +30,8 @@ const alipayTransactionDataProductNameTransferOutText = "转出"
 const alipayTransactionDataProductNameRepaymentText = "还款"
 
 var alipayTransactionSupportedColumns = []datatable.DataTableColumn{
-	datatable.DATA_TABLE_TRANSACTION_TYPE,
 	datatable.DATA_TABLE_TRANSACTION_TIME,
+	datatable.DATA_TABLE_TRANSACTION_TYPE,
 	datatable.DATA_TABLE_SUB_CATEGORY,
 	datatable.DATA_TABLE_ACCOUNT_NAME,
 	datatable.DATA_TABLE_AMOUNT,
@@ -128,7 +128,7 @@ func (r *alipayTransactionPlainTextDataRow) IsValid() bool {
 
 // ColumnCount returns the total count of column in this data row
 func (r *alipayTransactionPlainTextDataRow) ColumnCount() int {
-	return len(r.finalItems)
+	return len(alipayTransactionSupportedColumns)
 }
 
 // GetData returns the data in the specified column index

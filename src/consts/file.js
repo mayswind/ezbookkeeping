@@ -20,6 +20,15 @@ const supportedImportFileTypes = [
         }
     },
     {
+        type: 'firefly_iii_csv',
+        name: 'Firefly III Data Export File',
+        extensions: '.csv',
+        document: {
+            supportMultiLanguages: true,
+            anchor: 'how-to-get-firefly-iii-data-export-file'
+        }
+    },
+    {
         type: 'feidee_mymoney_csv',
         name: 'Feidee MyMoney (App) Data Export File',
         extensions: '.csv',

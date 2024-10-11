@@ -1188,7 +1188,8 @@
     "document": {
         "anchor": {
             "export_and_import": {
-                "export-transactions": "export-transactions"
+                "export-transactions": "export-transactions",
+                "how-to-get-firefly-iii-data-export-file": "how-to-get-firefly-iii-data-export-file"
             }
         }
     },
@@ -1516,6 +1517,7 @@
     "How to export this file?": "How to export this file?",
     "ezbookkeeping Data Export File (CSV)": "ezbookkeeping Data Export File (CSV)",
     "ezbookkeeping Data Export File (TSV)": "ezbookkeeping Data Export File (TSV)",
+    "Firefly III Data Export File": "Firefly III Data Export File",
     "Feidee MyMoney (App) Data Export File": "Feidee MyMoney (App) Data Export File",
     "Feidee MyMoney (Web) Data Export File": "Feidee MyMoney (Web) Data Export File",
     "Alipay (App) Data Export File": "Alipay (App) Data Export File",

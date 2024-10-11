@@ -5,6 +5,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/base"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
@@ -25,6 +26,8 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return _default.EzBookKeepingTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
 		return _default.EzBookKeepingTransactionDataTSVFileConverter, nil
+	} else if fileType == "firefly_iii_csv" {
+		return fireflyIII.FireflyIIITransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_csv" {
 		return feidee.FeideeMymoneyTransactionDataCsvImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {

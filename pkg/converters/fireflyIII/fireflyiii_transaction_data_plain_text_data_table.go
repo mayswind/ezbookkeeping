@@ -69,11 +69,6 @@ func (t *fireflyIIITransactionPlainTextDataTable) GetDataColumnMapping() map[dat
 
 	for i := 0; i < len(fireflyIIITransactionSupportedColumns); i++ {
 		column := fireflyIIITransactionSupportedColumns[i]
-
-		if t.originalColumnIndex[column] < 0 {
-			continue
-		}
-
 		dataColumnMapping[column] = utils.IntToString(int(column))
 	}
 
@@ -87,11 +82,11 @@ func (t *fireflyIIITransactionPlainTextDataTable) HeaderLineColumnNames() []stri
 	for i := 0; i < len(fireflyIIITransactionSupportedColumns); i++ {
 		column := fireflyIIITransactionSupportedColumns[i]
 
-		if t.originalColumnIndex[column] < 0 {
-			continue
+		if t.originalColumnIndex[column] >= 0 {
+			columnIndexes[i] = utils.IntToString(int(column))
+		} else {
+			columnIndexes[i] = "-1"
 		}
-
-		columnIndexes[i] = utils.IntToString(int(column))
 	}
 
 	return columnIndexes
@@ -112,7 +107,7 @@ func (r *fireflyIIITransactionPlainTextDataRow) IsValid() bool {
 
 // ColumnCount returns the total count of column in this data row
 func (r *fireflyIIITransactionPlainTextDataRow) ColumnCount() int {
-	return len(r.finalItems)
+	return len(fireflyIIITransactionSupportedColumns)
 }
 
 // GetData returns the data in the specified column index
@@ -165,7 +160,9 @@ func (t *fireflyIIITransactionPlainTextDataTable) parseTransactionData(items []s
 	data[datatable.DATA_TABLE_SUB_CATEGORY] = ""
 
 	for column, index := range t.originalColumnIndex {
-		data[column] = items[index]
+		if index >= 0 && index < len(items) {
+			data[column] = items[index]
+		}
 	}
 
 	// trim trailing zero in decimal
@@ -238,7 +235,7 @@ func createNewFireflyIIITransactionPlainTextDataTable(ctx core.Context, reader i
 	categoryColumnIdx, categoryColumnExists := originalHeaderItemMap["category"]
 	tagsColumnIdx, tagsColumnExists := originalHeaderItemMap["tags"]
 
-	if !typeColumnExists || !amountColumnExists || !dateColumnExists || !sourceNameColumnExists || !destinationNameColumnExists {
+	if !typeColumnExists || !amountColumnExists || !dateColumnExists || !sourceNameColumnExists || !destinationNameColumnExists || !categoryColumnExists {
 		log.Errorf(ctx, "[fireflyiii_transaction_data_plain_text_data_table.createNewFireflyIIITransactionPlainTextDataTable] cannot parse firefly III csv data, because missing essential columns in header row")
 		return nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
@@ -257,10 +254,6 @@ func createNewFireflyIIITransactionPlainTextDataTable(ctx core.Context, reader i
 
 	if !descriptionColumnExists {
 		descriptionColumnIdx = -1
-	}
-
-	if !categoryColumnExists {
-		categoryColumnIdx = -1
 	}
 
 	if !tagsColumnExists {

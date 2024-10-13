@@ -22,8 +22,8 @@ const alipayTransactionDataStatusClosedName = "交易关闭"
 const alipayTransactionDataStatusRefundSuccessName = "退款成功"
 const alipayTransactionDataStatusTaxRefundSuccessName = "退税成功"
 
-const alipayTransactionDataProductNameRechargePrefix = "充值-"
-const alipayTransactionDataProductNameCashWithdrawalPrefix = "提现-"
+const alipayTransactionDataProductNameTransferToAlipayPrefix = "充值-"
+const alipayTransactionDataProductNameTransferFromAlipayPrefix = "提现-"
 const alipayTransactionDataProductNameTransferInText = "转入"
 const alipayTransactionDataProductNameTransferOutText = "转出"
 const alipayTransactionDataProductNameRepaymentText = "还款"
@@ -255,10 +255,10 @@ func (t *alipayTransactionDataTable) parseTransactionData(ctx core.Context, user
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			} else {
-				if strings.Index(productName, alipayTransactionDataProductNameRechargePrefix) == 0 { // transfer to alipay wallet
+				if strings.Index(productName, alipayTransactionDataProductNameTransferToAlipayPrefix) == 0 { // transfer to alipay wallet
 					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
 					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
-				} else if strings.Index(productName, alipayTransactionDataProductNameCashWithdrawalPrefix) == 0 { // transfer from alipay wallet
+				} else if strings.Index(productName, alipayTransactionDataProductNameTransferFromAlipayPrefix) == 0 { // transfer from alipay wallet
 					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
 					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else if strings.Index(productName, alipayTransactionDataProductNameTransferInText) >= 0 { // transfer in
@@ -391,6 +391,7 @@ func parseAllLinesFromAlipayTransactionPlainText(ctx core.Context, reader io.Rea
 				continue
 			} else {
 				log.Warnf(ctx, "[alipay_transaction_data_plain_text_data_table.parseAllLinesFromAlipayTransactionPlainText] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				continue
 			}
 		}
 

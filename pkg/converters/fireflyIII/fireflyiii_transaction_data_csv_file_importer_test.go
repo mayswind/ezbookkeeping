@@ -114,6 +114,34 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidType(t *testing
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
+func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
+	converter := FireflyIIITransactionDataCsvImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56-10:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(1725230096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56+00:00,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(1725194096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("type,amount,date,source_name,destination_name,category\n"+
+		"Withdrawal,-1.00,2024-09-01T12:34:56+12:45,\"Test Account\",\"A expense account\",\"Test Category\""), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+}
+
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
 	converter := FireflyIIITransactionDataCsvImporter
 	context := core.NewNullContext()

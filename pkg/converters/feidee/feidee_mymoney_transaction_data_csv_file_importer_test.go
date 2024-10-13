@@ -36,8 +36,8 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testi
 
 	assert.Equal(t, 6, len(allNewTransactions))
 	assert.Equal(t, 2, len(allNewAccounts))
-	assert.Equal(t, 1, len(allNewSubExpenseCategories))
-	assert.Equal(t, 1, len(allNewSubIncomeCategories))
+	assert.Equal(t, 2, len(allNewSubExpenseCategories))
+	assert.Equal(t, 2, len(allNewSubIncomeCategories))
 	assert.Equal(t, 1, len(allNewSubTransferCategories))
 	assert.Equal(t, 0, len(allNewTags))
 
@@ -94,10 +94,16 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testi
 	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
 
 	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[0].Uid)
-	assert.Equal(t, "Test Category2", allNewSubExpenseCategories[0].Name)
+	assert.Equal(t, "", allNewSubExpenseCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[1].Uid)
+	assert.Equal(t, "Test Category2", allNewSubExpenseCategories[1].Name)
 
 	assert.Equal(t, int64(1234567890), allNewSubIncomeCategories[0].Uid)
-	assert.Equal(t, "Test Category", allNewSubIncomeCategories[0].Name)
+	assert.Equal(t, "", allNewSubIncomeCategories[0].Name)
+
+	assert.Equal(t, int64(1234567890), allNewSubIncomeCategories[1].Uid)
+	assert.Equal(t, "Test Category", allNewSubIncomeCategories[1].Name)
 
 	assert.Equal(t, int64(1234567890), allNewSubTransferCategories[0].Uid)
 	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)

@@ -1,39 +1,34 @@
-package feidee
+package datatable
 
 import (
 	"bytes"
-	"time"
 
 	"github.com/shakinm/xlsReader/xls"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-// feideeMymoneyTransactionExcelFileDataTable defines the structure of feidee mymoney transaction plain text data table
-type feideeMymoneyTransactionExcelFileDataTable struct {
+// DefaultExcelFileImportedDataTable defines the structure of default excel file data table
+type DefaultExcelFileImportedDataTable struct {
 	workbook              *xls.Workbook
 	headerLineColumnNames []string
 }
 
-// feideeMymoneyTransactionExcelFileDataRow defines the structure of feidee mymoney transaction plain text data row
-type feideeMymoneyTransactionExcelFileDataRow struct {
+// DefaultExcelFileDataRow defines the structure of default excel file data table row
+type DefaultExcelFileDataRow struct {
 	sheet    *xls.Sheet
 	rowIndex int
 }
 
-// feideeMymoneyTransactionExcelFileDataRowIterator defines the structure of feidee mymoney transaction plain text data row iterator
-type feideeMymoneyTransactionExcelFileDataRowIterator struct {
-	dataTable              *feideeMymoneyTransactionExcelFileDataTable
+// DefaultExcelFileDataRowIterator defines the structure of default excel file data table row iterator
+type DefaultExcelFileDataRowIterator struct {
+	dataTable              *DefaultExcelFileImportedDataTable
 	currentTableIndex      int
 	currentRowIndexInTable int
 }
 
 // DataRowCount returns the total count of data row
-func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowCount() int {
+func (t *DefaultExcelFileImportedDataTable) DataRowCount() int {
 	allSheets := t.workbook.GetSheets()
 	totalDataRowCount := 0
 
@@ -50,27 +45,22 @@ func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowCount() int {
 	return totalDataRowCount
 }
 
-// HeaderLineColumnNames returns the header column name list
-func (t *feideeMymoneyTransactionExcelFileDataTable) HeaderLineColumnNames() []string {
+// HeaderColumnNames returns the header column name list
+func (t *DefaultExcelFileImportedDataTable) HeaderColumnNames() []string {
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *feideeMymoneyTransactionExcelFileDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
-	return &feideeMymoneyTransactionExcelFileDataRowIterator{
+func (t *DefaultExcelFileImportedDataTable) DataRowIterator() ImportedDataRowIterator {
+	return &DefaultExcelFileDataRowIterator{
 		dataTable:              t,
 		currentTableIndex:      0,
 		currentRowIndexInTable: 0,
 	}
 }
 
-// IsValid returns whether this row contains valid data for importing
-func (r *feideeMymoneyTransactionExcelFileDataRow) IsValid() bool {
-	return true
-}
-
 // ColumnCount returns the total count of column in this data row
-func (r *feideeMymoneyTransactionExcelFileDataRow) ColumnCount() int {
+func (r *DefaultExcelFileDataRow) ColumnCount() int {
 	row, err := r.sheet.GetRow(r.rowIndex)
 
 	if err != nil {
@@ -81,7 +71,7 @@ func (r *feideeMymoneyTransactionExcelFileDataRow) ColumnCount() int {
 }
 
 // GetData returns the data in the specified column index
-func (r *feideeMymoneyTransactionExcelFileDataRow) GetData(columnIndex int) string {
+func (r *DefaultExcelFileDataRow) GetData(columnIndex int) string {
 	row, err := r.sheet.GetRow(r.rowIndex)
 
 	if err != nil {
@@ -97,32 +87,8 @@ func (r *feideeMymoneyTransactionExcelFileDataRow) GetData(columnIndex int) stri
 	return cell.GetString()
 }
 
-// GetTime returns the time in the specified column index
-func (r *feideeMymoneyTransactionExcelFileDataRow) GetTime(columnIndex int, timezoneOffset int16) (time.Time, error) {
-	str := r.GetData(columnIndex)
-
-	if utils.IsValidLongDateTimeFormat(str) {
-		return utils.ParseFromLongDateTime(str, timezoneOffset)
-	}
-
-	if utils.IsValidLongDateTimeWithoutSecondFormat(str) {
-		return utils.ParseFromLongDateTimeWithoutSecond(str, timezoneOffset)
-	}
-
-	if utils.IsValidLongDateFormat(str) {
-		return utils.ParseFromLongDateTimeWithoutSecond(str+" 00:00", timezoneOffset)
-	}
-
-	return time.Unix(0, 0), errs.ErrTransactionTimeInvalid
-}
-
-// GetTimezoneOffset returns the time zone offset in the specified column index
-func (r *feideeMymoneyTransactionExcelFileDataRow) GetTimezoneOffset(columnIndex int) (*time.Location, error) {
-	return nil, errs.ErrNotSupported
-}
-
 // HasNext returns whether the iterator does not reach the end
-func (t *feideeMymoneyTransactionExcelFileDataRowIterator) HasNext() bool {
+func (t *DefaultExcelFileDataRowIterator) HasNext() bool {
 	allSheets := t.dataTable.workbook.GetSheets()
 
 	if t.currentTableIndex >= len(allSheets) {
@@ -149,7 +115,7 @@ func (t *feideeMymoneyTransactionExcelFileDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next(ctx core.Context, user *models.User) datatable.ImportedDataRow {
+func (t *DefaultExcelFileDataRowIterator) Next() ImportedDataRow {
 	allSheets := t.dataTable.workbook.GetSheets()
 	currentRowIndexInTable := t.currentRowIndexInTable
 
@@ -177,13 +143,14 @@ func (t *feideeMymoneyTransactionExcelFileDataRowIterator) Next(ctx core.Context
 		return nil
 	}
 
-	return &feideeMymoneyTransactionExcelFileDataRow{
+	return &DefaultExcelFileDataRow{
 		sheet:    &currentSheet,
 		rowIndex: t.currentRowIndexInTable,
 	}
 }
 
-func createNewFeideeMymoneyTransactionExcelFileDataTable(data []byte) (*feideeMymoneyTransactionExcelFileDataTable, error) {
+// CreateNewDefaultExcelFileImportedDataTable returns default excel xls data table by file binary data
+func CreateNewDefaultExcelFileImportedDataTable(data []byte) (*DefaultExcelFileImportedDataTable, error) {
 	reader := bytes.NewReader(data)
 	workbook, err := xls.OpenReader(reader)
 
@@ -230,7 +197,7 @@ func createNewFeideeMymoneyTransactionExcelFileDataTable(data []byte) (*feideeMy
 		}
 	}
 
-	return &feideeMymoneyTransactionExcelFileDataTable{
+	return &DefaultExcelFileImportedDataTable{
 		workbook:              &workbook,
 		headerLineColumnNames: headerRowItems,
 	}, nil

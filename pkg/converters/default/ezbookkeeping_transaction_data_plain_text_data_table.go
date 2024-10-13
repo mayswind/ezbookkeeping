@@ -3,31 +3,27 @@ package _default
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-// ezBookKeepingTransactionPlainTextDataTable defines the structure of ezbookkeeping transaction plain text data table
-type ezBookKeepingTransactionPlainTextDataTable struct {
+// ezBookKeepingPlainTextDataTable defines the structure of ezbookkeeping plain text data table
+type ezBookKeepingPlainTextDataTable struct {
 	columnSeparator       string
 	lineSeparator         string
 	allLines              []string
 	headerLineColumnNames []string
 }
 
-// ezBookKeepingTransactionPlainTextDataRow defines the structure of ezbookkeeping transaction plain text data row
-type ezBookKeepingTransactionPlainTextDataRow struct {
+// ezBookKeepingPlainTextDataRow defines the structure of ezbookkeeping plain text data row
+type ezBookKeepingPlainTextDataRow struct {
 	allItems []string
 }
 
-// ezBookKeepingTransactionPlainTextDataRowIterator defines the structure of ezbookkeeping transaction plain text data row iterator
-type ezBookKeepingTransactionPlainTextDataRowIterator struct {
-	dataTable    *ezBookKeepingTransactionPlainTextDataTable
+// ezBookKeepingPlainTextDataRowIterator defines the structure of ezbookkeeping plain text data row iterator
+type ezBookKeepingPlainTextDataRowIterator struct {
+	dataTable    *ezBookKeepingPlainTextDataTable
 	currentIndex int
 }
 
@@ -35,14 +31,14 @@ type ezBookKeepingTransactionPlainTextDataRowIterator struct {
 type ezBookKeepingTransactionPlainTextDataTableBuilder struct {
 	columnSeparator       string
 	lineSeparator         string
-	columns               []datatable.DataTableColumn
-	dataColumnNameMapping map[datatable.DataTableColumn]string
+	columns               []datatable.TransactionDataTableColumn
+	dataColumnNameMapping map[datatable.TransactionDataTableColumn]string
 	dataLineFormat        string
 	builder               *strings.Builder
 }
 
 // DataRowCount returns the total count of data row
-func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowCount() int {
+func (t *ezBookKeepingPlainTextDataTable) DataRowCount() int {
 	if len(t.allLines) < 1 {
 		return 0
 	}
@@ -50,31 +46,26 @@ func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowCount() int {
 	return len(t.allLines) - 1
 }
 
-// HeaderLineColumnNames returns the header column name list
-func (t *ezBookKeepingTransactionPlainTextDataTable) HeaderLineColumnNames() []string {
+// HeaderColumnNames returns the header column name list
+func (t *ezBookKeepingPlainTextDataTable) HeaderColumnNames() []string {
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *ezBookKeepingTransactionPlainTextDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
-	return &ezBookKeepingTransactionPlainTextDataRowIterator{
+func (t *ezBookKeepingPlainTextDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
+	return &ezBookKeepingPlainTextDataRowIterator{
 		dataTable:    t,
 		currentIndex: 0,
 	}
 }
 
-// IsValid returns whether this row contains valid data for importing
-func (r *ezBookKeepingTransactionPlainTextDataRow) IsValid() bool {
-	return true
-}
-
 // ColumnCount returns the total count of column in this data row
-func (r *ezBookKeepingTransactionPlainTextDataRow) ColumnCount() int {
+func (r *ezBookKeepingPlainTextDataRow) ColumnCount() int {
 	return len(r.allItems)
 }
 
 // GetData returns the data in the specified column index
-func (r *ezBookKeepingTransactionPlainTextDataRow) GetData(columnIndex int) string {
+func (r *ezBookKeepingPlainTextDataRow) GetData(columnIndex int) string {
 	if columnIndex >= len(r.allItems) {
 		return ""
 	}
@@ -82,23 +73,13 @@ func (r *ezBookKeepingTransactionPlainTextDataRow) GetData(columnIndex int) stri
 	return r.allItems[columnIndex]
 }
 
-// GetTime returns the time in the specified column index
-func (r *ezBookKeepingTransactionPlainTextDataRow) GetTime(columnIndex int, timezoneOffset int16) (time.Time, error) {
-	return utils.ParseFromLongDateTime(r.GetData(columnIndex), timezoneOffset)
-}
-
-// GetTimezoneOffset returns the time zone offset in the specified column index
-func (r *ezBookKeepingTransactionPlainTextDataRow) GetTimezoneOffset(columnIndex int) (*time.Location, error) {
-	return utils.ParseFromTimezoneOffset(r.GetData(columnIndex))
-}
-
 // HasNext returns whether the iterator does not reach the end
-func (t *ezBookKeepingTransactionPlainTextDataRowIterator) HasNext() bool {
+func (t *ezBookKeepingPlainTextDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allLines)
 }
 
 // Next returns the next imported data row
-func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next(ctx core.Context, user *models.User) datatable.ImportedDataRow {
+func (t *ezBookKeepingPlainTextDataRowIterator) Next() datatable.ImportedDataRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {
 		return nil
 	}
@@ -108,13 +89,13 @@ func (t *ezBookKeepingTransactionPlainTextDataRowIterator) Next(ctx core.Context
 	rowContent := t.dataTable.allLines[t.currentIndex]
 	rowItems := strings.Split(rowContent, t.dataTable.columnSeparator)
 
-	return &ezBookKeepingTransactionPlainTextDataRow{
+	return &ezBookKeepingPlainTextDataRow{
 		allItems: rowItems,
 	}
 }
 
 // AppendTransaction appends the specified transaction to data builder
-func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) AppendTransaction(data map[datatable.DataTableColumn]string) {
+func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) AppendTransaction(data map[datatable.TransactionDataTableColumn]string) {
 	dataRowParams := make([]any, len(b.columns))
 
 	for i := 0; i < len(b.columns); i++ {
@@ -175,7 +156,7 @@ func (b *ezBookKeepingTransactionPlainTextDataTableBuilder) generateDataLineForm
 	return ret.String()
 }
 
-func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnSeparator string, lineSeparator string) (*ezBookKeepingTransactionPlainTextDataTable, error) {
+func createNewezbookkeepingPlainTextDataTable(content string, columnSeparator string, lineSeparator string) (*ezBookKeepingPlainTextDataTable, error) {
 	allLines := strings.Split(content, lineSeparator)
 
 	if len(allLines) < 2 {
@@ -186,7 +167,7 @@ func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnS
 	headerLine = strings.ReplaceAll(headerLine, "\r", "")
 	headerLineItems := strings.Split(headerLine, columnSeparator)
 
-	return &ezBookKeepingTransactionPlainTextDataTable{
+	return &ezBookKeepingPlainTextDataTable{
 		columnSeparator:       columnSeparator,
 		lineSeparator:         lineSeparator,
 		allLines:              allLines,
@@ -194,7 +175,7 @@ func createNewezbookkeepingTransactionPlainTextDataTable(content string, columnS
 	}, nil
 }
 
-func createNewezbookkeepingTransactionPlainTextDataTableBuilder(transactionCount int, columns []datatable.DataTableColumn, dataColumnNameMapping map[datatable.DataTableColumn]string, columnSeparator string, lineSeparator string) *ezBookKeepingTransactionPlainTextDataTableBuilder {
+func createNewezbookkeepingTransactionPlainTextDataTableBuilder(transactionCount int, columns []datatable.TransactionDataTableColumn, dataColumnNameMapping map[datatable.TransactionDataTableColumn]string, columnSeparator string, lineSeparator string) *ezBookKeepingTransactionPlainTextDataTableBuilder {
 	var builder strings.Builder
 	builder.Grow(transactionCount * 100)
 

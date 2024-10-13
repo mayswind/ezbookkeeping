@@ -30,7 +30,7 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 	enc := simplifiedchinese.GB18030
 	reader := transform.NewReader(bytes.NewReader(data), enc.NewDecoder())
 
-	dataTable, err := createNewAlipayTransactionPlainTextDataTable(
+	transactionDataTable, err := createNewAlipayTransactionDataTable(
 		ctx,
 		reader,
 		c.fileHeaderLine,
@@ -43,10 +43,7 @@ func (c *alipayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, u
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTableImporter := datatable.CreateNewSimpleImporter(
-		dataTable.GetDataColumnMapping(),
-		alipayTransactionTypeNameMapping,
-	)
+	dataTableImporter := datatable.CreateNewSimpleImporter(alipayTransactionTypeNameMapping)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

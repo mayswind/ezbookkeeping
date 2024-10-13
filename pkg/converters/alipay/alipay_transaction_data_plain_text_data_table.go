@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -29,14 +28,14 @@ const alipayTransactionDataProductNameTransferInText = "转入"
 const alipayTransactionDataProductNameTransferOutText = "转出"
 const alipayTransactionDataProductNameRepaymentText = "还款"
 
-var alipayTransactionSupportedColumns = []datatable.DataTableColumn{
-	datatable.DATA_TABLE_TRANSACTION_TIME,
-	datatable.DATA_TABLE_TRANSACTION_TYPE,
-	datatable.DATA_TABLE_SUB_CATEGORY,
-	datatable.DATA_TABLE_ACCOUNT_NAME,
-	datatable.DATA_TABLE_AMOUNT,
-	datatable.DATA_TABLE_RELATED_ACCOUNT_NAME,
-	datatable.DATA_TABLE_DESCRIPTION,
+var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]any{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:         true,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:         true,
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               true,
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: true,
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
 }
 
 // alipayTransactionColumnNames defines the structure of alipay transaction plain text header names
@@ -52,8 +51,8 @@ type alipayTransactionColumnNames struct {
 	descriptionColumnName    string
 }
 
-// alipayTransactionPlainTextDataTable defines the structure of alipay transaction plain text data table
-type alipayTransactionPlainTextDataTable struct {
+// alipayTransactionDataTable defines the structure of alipay transaction plain text data table
+type alipayTransactionDataTable struct {
 	allOriginalLines                  [][]string
 	originalHeaderLineColumnNames     []string
 	originalTimeColumnIndex           int
@@ -67,22 +66,28 @@ type alipayTransactionPlainTextDataTable struct {
 	originalDescriptionColumnIndex    int
 }
 
-// alipayTransactionPlainTextDataRow defines the structure of alipay transaction plain text data row
-type alipayTransactionPlainTextDataRow struct {
-	dataTable     *alipayTransactionPlainTextDataTable
+// alipayTransactionDataRow defines the structure of alipay transaction plain text data row
+type alipayTransactionDataRow struct {
+	dataTable     *alipayTransactionDataTable
 	isValid       bool
 	originalItems []string
-	finalItems    map[datatable.DataTableColumn]string
+	finalItems    map[datatable.TransactionDataTableColumn]string
 }
 
-// alipayTransactionPlainTextDataRowIterator defines the structure of alipay transaction plain text data row iterator
-type alipayTransactionPlainTextDataRowIterator struct {
-	dataTable    *alipayTransactionPlainTextDataTable
+// alipayTransactionDataRowIterator defines the structure of alipay transaction plain text data row iterator
+type alipayTransactionDataRowIterator struct {
+	dataTable    *alipayTransactionDataTable
 	currentIndex int
 }
 
-// DataRowCount returns the total count of data row
-func (t *alipayTransactionPlainTextDataTable) DataRowCount() int {
+// HasColumn returns whether the transaction data table has specified column
+func (t *alipayTransactionDataTable) HasColumn(column datatable.TransactionDataTableColumn) bool {
+	_, exists := alipayTransactionSupportedColumns[column]
+	return exists
+}
+
+// TransactionRowCount returns the total count of transaction data row
+func (t *alipayTransactionDataTable) TransactionRowCount() int {
 	if len(t.allOriginalLines) < 1 {
 		return 0
 	}
@@ -90,77 +95,39 @@ func (t *alipayTransactionPlainTextDataTable) DataRowCount() int {
 	return len(t.allOriginalLines) - 1
 }
 
-// GetDataColumnMapping returns data column map for data importer
-func (t *alipayTransactionPlainTextDataTable) GetDataColumnMapping() map[datatable.DataTableColumn]string {
-	dataColumnMapping := make(map[datatable.DataTableColumn]string, len(alipayTransactionSupportedColumns))
-
-	for i := 0; i < len(alipayTransactionSupportedColumns); i++ {
-		column := alipayTransactionSupportedColumns[i]
-		dataColumnMapping[column] = utils.IntToString(int(column))
-	}
-
-	return dataColumnMapping
-}
-
-// HeaderLineColumnNames returns the header column name list
-func (t *alipayTransactionPlainTextDataTable) HeaderLineColumnNames() []string {
-	columnIndexes := make([]string, len(alipayTransactionSupportedColumns))
-
-	for i := 0; i < len(alipayTransactionSupportedColumns); i++ {
-		columnIndexes[i] = utils.IntToString(int(alipayTransactionSupportedColumns[i]))
-	}
-
-	return columnIndexes
-}
-
-// DataRowIterator returns the iterator of data row
-func (t *alipayTransactionPlainTextDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
-	return &alipayTransactionPlainTextDataRowIterator{
+// TransactionRowIterator returns the iterator of transaction data row
+func (t *alipayTransactionDataTable) TransactionRowIterator() datatable.TransactionDataRowIterator {
+	return &alipayTransactionDataRowIterator{
 		dataTable:    t,
 		currentIndex: 0,
 	}
 }
 
-// IsValid returns whether this row contains valid data for importing
-func (r *alipayTransactionPlainTextDataRow) IsValid() bool {
+// IsValid returns whether this row is valid data for importing
+func (r *alipayTransactionDataRow) IsValid() bool {
 	return r.isValid
 }
 
-// ColumnCount returns the total count of column in this data row
-func (r *alipayTransactionPlainTextDataRow) ColumnCount() int {
-	return len(alipayTransactionSupportedColumns)
-}
+// GetData returns the data in the specified column type
+func (r *alipayTransactionDataRow) GetData(column datatable.TransactionDataTableColumn) string {
+	_, exists := alipayTransactionSupportedColumns[column]
 
-// GetData returns the data in the specified column index
-func (r *alipayTransactionPlainTextDataRow) GetData(columnIndex int) string {
-	if columnIndex >= len(alipayTransactionSupportedColumns) {
+	if !exists {
 		return ""
 	}
 
-	dataColumn := alipayTransactionSupportedColumns[columnIndex]
-
-	return r.finalItems[dataColumn]
-}
-
-// GetTime returns the time in the specified column index
-func (r *alipayTransactionPlainTextDataRow) GetTime(columnIndex int, timezoneOffset int16) (time.Time, error) {
-	return utils.ParseFromLongDateTime(r.GetData(columnIndex), timezoneOffset)
-}
-
-// GetTimezoneOffset returns the time zone offset in the specified column index
-func (r *alipayTransactionPlainTextDataRow) GetTimezoneOffset(columnIndex int) (*time.Location, error) {
-	return nil, errs.ErrNotSupported
+	return r.finalItems[column]
 }
 
 // HasNext returns whether the iterator does not reach the end
-func (t *alipayTransactionPlainTextDataRowIterator) HasNext() bool {
+func (t *alipayTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allOriginalLines)
 }
 
 // Next returns the next imported data row
-func (t *alipayTransactionPlainTextDataRowIterator) Next(ctx core.Context, user *models.User) datatable.ImportedDataRow {
+func (t *alipayTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allOriginalLines) {
-		return nil
+		return nil, nil
 	}
 
 	t.currentIndex++
@@ -187,7 +154,7 @@ func (t *alipayTransactionPlainTextDataRowIterator) Next(ctx core.Context, user 
 		isValid = false
 	}
 
-	var finalItems map[datatable.DataTableColumn]string
+	var finalItems map[datatable.TransactionDataTableColumn]string
 	var errMsg string
 
 	if isValid {
@@ -199,37 +166,37 @@ func (t *alipayTransactionPlainTextDataRowIterator) Next(ctx core.Context, user 
 		}
 	}
 
-	return &alipayTransactionPlainTextDataRow{
+	return &alipayTransactionDataRow{
 		dataTable:     t.dataTable,
 		isValid:       isValid,
 		originalItems: rowItems,
 		finalItems:    finalItems,
-	}
+	}, nil
 }
 
-func (t *alipayTransactionPlainTextDataTable) parseTransactionData(ctx core.Context, user *models.User, items []string) (map[datatable.DataTableColumn]string, string) {
-	data := make(map[datatable.DataTableColumn]string, 7)
+func (t *alipayTransactionDataTable) parseTransactionData(ctx core.Context, user *models.User, items []string) (map[datatable.TransactionDataTableColumn]string, string) {
+	data := make(map[datatable.TransactionDataTableColumn]string, len(alipayTransactionSupportedColumns))
 
 	if t.originalTimeColumnIndex >= 0 && t.originalTimeColumnIndex < len(items) {
-		data[datatable.DATA_TABLE_TRANSACTION_TIME] = items[t.originalTimeColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = items[t.originalTimeColumnIndex]
 	}
 
 	if t.originalCategoryColumnIndex >= 0 && t.originalCategoryColumnIndex < len(items) {
-		data[datatable.DATA_TABLE_SUB_CATEGORY] = items[t.originalCategoryColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = items[t.originalCategoryColumnIndex]
 	} else {
-		data[datatable.DATA_TABLE_SUB_CATEGORY] = ""
+		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = ""
 	}
 
 	if t.originalAmountColumnIndex >= 0 && t.originalAmountColumnIndex < len(items) {
-		data[datatable.DATA_TABLE_AMOUNT] = items[t.originalAmountColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = items[t.originalAmountColumnIndex]
 	}
 
 	if t.originalDescriptionColumnIndex >= 0 && t.originalDescriptionColumnIndex < len(items) && items[t.originalDescriptionColumnIndex] != "" {
-		data[datatable.DATA_TABLE_DESCRIPTION] = items[t.originalDescriptionColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = items[t.originalDescriptionColumnIndex]
 	} else if t.originalProductNameColumnIndex >= 0 && t.originalProductNameColumnIndex < len(items) && items[t.originalProductNameColumnIndex] != "" {
-		data[datatable.DATA_TABLE_DESCRIPTION] = items[t.originalProductNameColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = items[t.originalProductNameColumnIndex]
 	} else {
-		data[datatable.DATA_TABLE_DESCRIPTION] = ""
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = ""
 	}
 
 	relatedAccountName := ""
@@ -253,7 +220,7 @@ func (t *alipayTransactionPlainTextDataTable) parseTransactionData(ctx core.Cont
 	localeTextItems := locales.GetLocaleTextItems(locale)
 
 	if t.originalTypeColumnIndex >= 0 && t.originalTypeColumnIndex < len(items) {
-		data[datatable.DATA_TABLE_TRANSACTION_TYPE] = items[t.originalTypeColumnIndex]
+		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = items[t.originalTypeColumnIndex]
 
 		if items[t.originalTypeColumnIndex] == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
 			if statusName == alipayTransactionDataStatusClosedName {
@@ -261,11 +228,11 @@ func (t *alipayTransactionPlainTextDataTable) parseTransactionData(ctx core.Cont
 			}
 
 			if statusName == alipayTransactionDataStatusSuccessName {
-				data[datatable.DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
-				data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			} else {
-				data[datatable.DATA_TABLE_ACCOUNT_NAME] = ""
-				data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			}
 		} else if items[t.originalTypeColumnIndex] == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
 			if statusName == alipayTransactionDataStatusClosedName {
@@ -284,42 +251,42 @@ func (t *alipayTransactionPlainTextDataTable) parseTransactionData(ctx core.Cont
 			}
 
 			if statusName == alipayTransactionDataStatusRefundSuccessName {
-				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
-				data[datatable.DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
-				data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			} else {
 				if strings.Index(productName, alipayTransactionDataProductNameRechargePrefix) == 0 { // transfer to alipay wallet
-					data[datatable.DATA_TABLE_ACCOUNT_NAME] = ""
-					data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
+					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
+					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
 				} else if strings.Index(productName, alipayTransactionDataProductNameCashWithdrawalPrefix) == 0 { // transfer from alipay wallet
-					data[datatable.DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
-					data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
+					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = localeTextItems.DataConverterTextItems.Alipay
+					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else if strings.Index(productName, alipayTransactionDataProductNameTransferInText) >= 0 { // transfer in
-					data[datatable.DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
-					data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
+					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else if strings.Index(productName, alipayTransactionDataProductNameTransferOutText) >= 0 { // transfer out
-					data[datatable.DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
-					data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
+					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else if strings.Index(productName, alipayTransactionDataProductNameRepaymentText) >= 0 { // repayment
-					data[datatable.DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
-					data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
+					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else {
 					return nil, fmt.Sprintf("product name (\"%s\") is unknown", productName)
 				}
 			}
 		} else {
-			data[datatable.DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
-			data[datatable.DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
+			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 		}
 	}
 
-	if data[datatable.DATA_TABLE_TRANSACTION_TYPE] == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] && statusName != "" {
+	if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] && statusName != "" {
 		if statusName == alipayTransactionDataStatusRefundSuccessName || statusName == alipayTransactionDataStatusTaxRefundSuccessName {
-			amount, err := utils.ParseAmount(data[datatable.DATA_TABLE_AMOUNT])
+			amount, err := utils.ParseAmount(data[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 
 			if err == nil {
-				data[datatable.DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
-				data[datatable.DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
 			}
 		}
 	}
@@ -327,7 +294,7 @@ func (t *alipayTransactionPlainTextDataTable) parseTransactionData(ctx core.Cont
 	return data, ""
 }
 
-func createNewAlipayTransactionPlainTextDataTable(ctx core.Context, reader io.Reader, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune, originalColumnNames alipayTransactionColumnNames) (*alipayTransactionPlainTextDataTable, error) {
+func createNewAlipayTransactionDataTable(ctx core.Context, reader io.Reader, fileHeaderLine string, dataHeaderStartContent string, dataBottomEndLineRune rune, originalColumnNames alipayTransactionColumnNames) (*alipayTransactionDataTable, error) {
 	allOriginalLines, err := parseAllLinesFromAlipayTransactionPlainText(ctx, reader, fileHeaderLine, dataHeaderStartContent, dataBottomEndLineRune)
 
 	if err != nil {
@@ -381,7 +348,7 @@ func createNewAlipayTransactionPlainTextDataTable(ctx core.Context, reader io.Re
 		descriptionColumnIdx = -1
 	}
 
-	return &alipayTransactionPlainTextDataTable{
+	return &alipayTransactionDataTable{
 		allOriginalLines:                  allOriginalLines,
 		originalHeaderLineColumnNames:     originalHeaderItems,
 		originalTimeColumnIndex:           timeColumnIdx,

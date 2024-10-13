@@ -238,10 +238,22 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
-		"2024-09-01 12:34:56,+08:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+		"2024-09-01 12:34:56,-10:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
-	assert.Equal(t, int64(1725165296), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+	assert.Equal(t, int64(1725230096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,+00:00,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(1725194096), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte("Time,Timezone,Type,Sub Category,Account,Amount,Account2,Account2 Amount\n"+
+		"2024-09-01 12:34:56,+12:45,Expense,Test Category,Test Account,123.45,,"), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {

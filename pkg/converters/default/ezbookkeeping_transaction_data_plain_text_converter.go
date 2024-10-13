@@ -15,21 +15,21 @@ const ezbookkeepingLineSeparator = "\n"
 const ezbookkeepingGeoLocationSeparator = " "
 const ezbookkeepingTagSeparator = ";"
 
-var ezbookkeepingDataColumnNameMapping = map[datatable.DataTableColumn]string{
-	datatable.DATA_TABLE_TRANSACTION_TIME:         "Time",
-	datatable.DATA_TABLE_TRANSACTION_TIMEZONE:     "Timezone",
-	datatable.DATA_TABLE_TRANSACTION_TYPE:         "Type",
-	datatable.DATA_TABLE_CATEGORY:                 "Category",
-	datatable.DATA_TABLE_SUB_CATEGORY:             "Sub Category",
-	datatable.DATA_TABLE_ACCOUNT_NAME:             "Account",
-	datatable.DATA_TABLE_ACCOUNT_CURRENCY:         "Account Currency",
-	datatable.DATA_TABLE_AMOUNT:                   "Amount",
-	datatable.DATA_TABLE_RELATED_ACCOUNT_NAME:     "Account2",
-	datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY: "Account2 Currency",
-	datatable.DATA_TABLE_RELATED_AMOUNT:           "Account2 Amount",
-	datatable.DATA_TABLE_GEOGRAPHIC_LOCATION:      "Geographic Location",
-	datatable.DATA_TABLE_TAGS:                     "Tags",
-	datatable.DATA_TABLE_DESCRIPTION:              "Description",
+var ezbookkeepingDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:         "Time",
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE:     "Timezone",
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:         "Type",
+	datatable.TRANSACTION_DATA_TABLE_CATEGORY:                 "Category",
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:             "Sub Category",
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:             "Account",
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY:         "Account Currency",
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:                   "Amount",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME:     "Account2",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY: "Account2 Currency",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT:           "Account2 Amount",
+	datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION:      "Geographic Location",
+	datatable.TRANSACTION_DATA_TABLE_TAGS:                     "Tags",
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:              "Description",
 }
 
 var ezbookkeepingTransactionTypeNameMapping = map[models.TransactionType]string{
@@ -39,21 +39,21 @@ var ezbookkeepingTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER:       "Transfer",
 }
 
-var ezbookkeepingDataColumns = []datatable.DataTableColumn{
-	datatable.DATA_TABLE_TRANSACTION_TIME,
-	datatable.DATA_TABLE_TRANSACTION_TIMEZONE,
-	datatable.DATA_TABLE_TRANSACTION_TYPE,
-	datatable.DATA_TABLE_CATEGORY,
-	datatable.DATA_TABLE_SUB_CATEGORY,
-	datatable.DATA_TABLE_ACCOUNT_NAME,
-	datatable.DATA_TABLE_ACCOUNT_CURRENCY,
-	datatable.DATA_TABLE_AMOUNT,
-	datatable.DATA_TABLE_RELATED_ACCOUNT_NAME,
-	datatable.DATA_TABLE_RELATED_ACCOUNT_CURRENCY,
-	datatable.DATA_TABLE_RELATED_AMOUNT,
-	datatable.DATA_TABLE_GEOGRAPHIC_LOCATION,
-	datatable.DATA_TABLE_TAGS,
-	datatable.DATA_TABLE_DESCRIPTION,
+var ezbookkeepingDataColumns = []datatable.TransactionDataTableColumn{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME,
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE,
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE,
+	datatable.TRANSACTION_DATA_TABLE_CATEGORY,
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY,
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT,
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME,
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY,
+	datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT,
+	datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION,
+	datatable.TRANSACTION_DATA_TABLE_TAGS,
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION,
 }
 
 // ToExportedContent returns the exported transaction plain text data
@@ -67,7 +67,6 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 	)
 
 	dataTableExporter := datatable.CreateNewExporter(
-		ezbookkeepingDataColumnNameMapping,
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
 		ezbookkeepingTagSeparator,
@@ -84,7 +83,7 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 
 // ParseImportedData returns the imported data by parsing the transaction plain text data
 func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	dataTable, err := createNewezbookkeepingTransactionPlainTextDataTable(
+	dataTable, err := createNewezbookkeepingPlainTextDataTable(
 		string(data),
 		c.columnSeparator,
 		ezbookkeepingLineSeparator,
@@ -94,12 +93,13 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx c
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
+	transactionDataTable := datatable.CreateImportedTransactionDataTable(dataTable, ezbookkeepingDataColumnNameMapping)
+
 	dataTableImporter := datatable.CreateNewImporter(
-		ezbookkeepingDataColumnNameMapping,
 		ezbookkeepingTransactionTypeNameMapping,
 		ezbookkeepingGeoLocationSeparator,
 		ezbookkeepingTagSeparator,
 	)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }

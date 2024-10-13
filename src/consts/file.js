@@ -48,20 +48,20 @@ const supportedImportFileTypes = [
     },
     {
         type: 'alipay_app_csv',
-        name: 'Alipay (App) Data Export File',
+        name: 'Alipay (App) Transaction Flow File',
         extensions: '.csv',
         document: {
             supportMultiLanguages: 'zh-Hans',
-            anchor: '如何获取支付宝app数据导出文件'
+            anchor: '如何获取支付宝app交易流水文件'
         }
     },
     {
         type: 'alipay_web_csv',
-        name: 'Alipay (Web) Data Export File',
+        name: 'Alipay (Web) Transaction Flow File',
         extensions: '.csv',
         document: {
             supportMultiLanguages: 'zh-Hans',
-            anchor: '如何获取支付宝网页版数据导出文件'
+            anchor: '如何获取支付宝网页版交易流水文件'
         }
     }
 ];

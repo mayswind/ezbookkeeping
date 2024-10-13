@@ -20,7 +20,8 @@ type DefaultTypes struct {
 
 // DataConverterTextItems represents text items need to be translated in data converter
 type DataConverterTextItems struct {
-	Alipay string
+	Alipay       string
+	WeChatWallet string
 }
 
 // VerifyEmailTextItems represents text items need to be translated in verify mail

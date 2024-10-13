@@ -3,7 +3,12 @@ package utils
 import (
 	"crypto/rand"
 	"math/big"
+	"regexp"
 	"strings"
+)
+
+var (
+	numberPattern = regexp.MustCompile("(-?\\d+)(\\.\\d+)?")
 )
 
 // GetRandomInteger returns a random number, the max parameter represents upper limit
@@ -15,6 +20,17 @@ func GetRandomInteger(max int) (int, error) {
 	}
 
 	return int(result.Int64()), nil
+}
+
+// ParseFirstConsecutiveNumber returns the first consecutive number in the specified string
+func ParseFirstConsecutiveNumber(str string) (string, bool) {
+	result := numberPattern.FindAllString(str, 1)
+
+	if len(result) > 0 {
+		return result[0], true
+	} else {
+		return "", false
+	}
 }
 
 // TrimTrailingZerosInDecimal returns a textual number without trailing zeros in decimal

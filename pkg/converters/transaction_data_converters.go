@@ -6,6 +6,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/wechat"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
@@ -36,6 +37,8 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return alipay.AlipayAppTransactionDataCsvImporter, nil
 	} else if fileType == "alipay_web_csv" {
 		return alipay.AlipayWebTransactionDataCsvImporter, nil
+	} else if fileType == "wechat_pay_app_csv" {
+		return wechat.WeChatPayTransactionDataCsvImporter, nil
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}

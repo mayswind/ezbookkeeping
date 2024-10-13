@@ -10,7 +10,8 @@ var zhHans = &LocaleTextItems{
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
 	},
 	DataConverterTextItems: &DataConverterTextItems{
-		Alipay: "支付宝",
+		Alipay:       "支付宝",
+		WeChatWallet: "零钱",
 	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "验证邮箱",

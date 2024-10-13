@@ -10,7 +10,8 @@ var en = &LocaleTextItems{
 		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_COMMA,
 	},
 	DataConverterTextItems: &DataConverterTextItems{
-		Alipay: "Alipay",
+		Alipay:       "Alipay",
+		WeChatWallet: "Wallet",
 	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "Verify Email",

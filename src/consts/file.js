@@ -63,6 +63,15 @@ const supportedImportFileTypes = [
             supportMultiLanguages: 'zh-Hans',
             anchor: '如何获取支付宝网页版交易流水文件'
         }
+    },
+    {
+        type: 'wechat_pay_app_csv',
+        name: 'WeChat Pay Billing File',
+        extensions: '.csv',
+        document: {
+            supportMultiLanguages: 'zh-Hans',
+            anchor: '如何获取微信支付账单文件'
+        }
     }
 ];
 

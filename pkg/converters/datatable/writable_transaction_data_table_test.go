@@ -1,15 +1,66 @@
 package datatable
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
+
+// testDataRowParser defines the structure of test transaction data row parser
+type testDataRowParser struct {
+}
+
+// GetAddedColumns returns the added columns after converting the data row
+func (p *testDataRowParser) GetAddedColumns() []TransactionDataTableColumn {
+	return []TransactionDataTableColumn{
+		TRANSACTION_DATA_TABLE_DESCRIPTION,
+	}
+}
+
+// Parse returns the converted transaction data row
+func (p *testDataRowParser) Parse(data map[TransactionDataTableColumn]string) (rowData map[TransactionDataTableColumn]string, rowDataValid bool, err error) {
+	rowData = make(map[TransactionDataTableColumn]string, len(data))
+
+	for column, value := range data {
+		rowData[column] = value
+	}
+
+	if _, exists := rowData[TRANSACTION_DATA_TABLE_SUB_CATEGORY]; exists {
+		rowData[TRANSACTION_DATA_TABLE_SUB_CATEGORY] = "foo"
+	} else {
+		return nil, false, nil
+	}
+
+	rowData[TRANSACTION_DATA_TABLE_TAGS] = "test"
+	rowData[TRANSACTION_DATA_TABLE_DESCRIPTION] = "bar"
+
+	return rowData, true, nil
+}
+
+func TestWritableDataTableCreate(t *testing.T) {
+	columns := make([]TransactionDataTableColumn, 5)
+	columns[0] = TRANSACTION_DATA_TABLE_TRANSACTION_TIME
+	columns[1] = TRANSACTION_DATA_TABLE_TRANSACTION_TYPE
+	columns[2] = TRANSACTION_DATA_TABLE_SUB_CATEGORY
+	columns[3] = TRANSACTION_DATA_TABLE_ACCOUNT_NAME
+	columns[4] = TRANSACTION_DATA_TABLE_AMOUNT
+
+	writableDataTable := CreateNewWritableTransactionDataTable(columns)
+
+	assert.Equal(t, 0, writableDataTable.TransactionRowCount())
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TIME))
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TYPE))
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_SUB_CATEGORY))
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_ACCOUNT_NAME))
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_AMOUNT))
+	assert.False(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE))
+	assert.False(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY))
+}
 
 func TestWritableDataTableAdd(t *testing.T) {
 	columns := make([]TransactionDataTableColumn, 5)
@@ -38,7 +89,10 @@ func TestWritableDataTableAdd(t *testing.T) {
 	})
 	assert.Equal(t, 1, writableDataTable.TransactionRowCount())
 
-	dataRow := writableDataTable.Get(0)
+	dataRow, err := writableDataTable.Get(0)
+	assert.Nil(t, err)
+
+	assert.True(t, dataRow.IsValid())
 
 	actualTransactionTime := dataRow.GetData(TRANSACTION_DATA_TABLE_TRANSACTION_TIME)
 	assert.Equal(t, expectedTransactionTime, actualTransactionTime)
@@ -72,7 +126,8 @@ func TestWritableDataTableAdd_NotExistsColumn(t *testing.T) {
 	})
 	assert.Equal(t, 1, writableDataTable.TransactionRowCount())
 
-	dataRow := writableDataTable.Get(0)
+	dataRow, err := writableDataTable.Get(0)
+	assert.Nil(t, err)
 	assert.Equal(t, 1, dataRow.ColumnCount())
 }
 
@@ -83,7 +138,8 @@ func TestWritableDataTableGet_NotExistsRow(t *testing.T) {
 	writableDataTable := CreateNewWritableTransactionDataTable(columns)
 	assert.Equal(t, 0, writableDataTable.TransactionRowCount())
 
-	dataRow := writableDataTable.Get(0)
+	dataRow, err := writableDataTable.Get(0)
+	assert.Nil(t, err)
 	assert.Nil(t, dataRow)
 }
 
@@ -101,7 +157,8 @@ func TestWritableDataRowGetData_NotExistsColumn(t *testing.T) {
 	})
 	assert.Equal(t, 1, writableDataTable.TransactionRowCount())
 
-	dataRow := writableDataTable.Get(0)
+	dataRow, err := writableDataTable.Get(0)
+	assert.Nil(t, err)
 	assert.Equal(t, 1, dataRow.ColumnCount())
 	assert.Equal(t, "", dataRow.GetData(TRANSACTION_DATA_TABLE_TRANSACTION_TYPE))
 }
@@ -193,4 +250,131 @@ func TestWritableDataTableDataRowIterator(t *testing.T) {
 	}
 
 	assert.Equal(t, 3, index)
+}
+
+func TestWritableDataTableWithRowParser(t *testing.T) {
+	columns := make([]TransactionDataTableColumn, 5)
+	columns[0] = TRANSACTION_DATA_TABLE_TRANSACTION_TIME
+	columns[1] = TRANSACTION_DATA_TABLE_TRANSACTION_TYPE
+	columns[2] = TRANSACTION_DATA_TABLE_SUB_CATEGORY
+	columns[3] = TRANSACTION_DATA_TABLE_ACCOUNT_NAME
+	columns[4] = TRANSACTION_DATA_TABLE_AMOUNT
+
+	writableDataTable := CreateNewWritableTransactionDataTableWithRowParser(columns, &testDataRowParser{})
+
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_DESCRIPTION))
+	assert.False(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_TAGS))
+	assert.Equal(t, 0, writableDataTable.TransactionRowCount())
+
+	writableDataTable.Add(map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "2024-09-01 01:23:45",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "Expense",
+		TRANSACTION_DATA_TABLE_SUB_CATEGORY:     "Test Category",
+		TRANSACTION_DATA_TABLE_ACCOUNT_NAME:     "Test Account",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "123.45",
+	})
+	assert.Equal(t, 1, writableDataTable.TransactionRowCount())
+
+	// first row
+	dataRow, err := writableDataTable.Get(0)
+	assert.Nil(t, err)
+	assert.True(t, dataRow.IsValid())
+	assert.Equal(t, 6, dataRow.ColumnCount())
+
+	actualSubCategory := dataRow.GetData(TRANSACTION_DATA_TABLE_SUB_CATEGORY)
+	assert.Equal(t, "foo", actualSubCategory)
+
+	actualTags := dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS)
+	assert.Equal(t, "", actualTags)
+
+	actualDescription := dataRow.GetData(TRANSACTION_DATA_TABLE_DESCRIPTION)
+	assert.Equal(t, "bar", actualDescription)
+
+	writableDataTable.Add(map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "2024-09-01 12:34:56",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "Income",
+		TRANSACTION_DATA_TABLE_ACCOUNT_NAME:     "Test Account2",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "0.12",
+	})
+	assert.Equal(t, 2, writableDataTable.TransactionRowCount())
+
+	// second row
+	dataRow, err = writableDataTable.Get(1)
+	assert.Nil(t, err)
+	assert.False(t, dataRow.IsValid())
+	assert.Equal(t, 0, dataRow.ColumnCount())
+
+	actualSubCategory = dataRow.GetData(TRANSACTION_DATA_TABLE_SUB_CATEGORY)
+	assert.Equal(t, "", actualSubCategory)
+
+	actualTags = dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS)
+	assert.Equal(t, "", actualTags)
+
+	actualDescription = dataRow.GetData(TRANSACTION_DATA_TABLE_DESCRIPTION)
+	assert.Equal(t, "", actualDescription)
+}
+
+func TestWritableDataTableDataRowIteratorWithRowParser(t *testing.T) {
+	columns := make([]TransactionDataTableColumn, 5)
+	columns[0] = TRANSACTION_DATA_TABLE_TRANSACTION_TIME
+	columns[1] = TRANSACTION_DATA_TABLE_TRANSACTION_TYPE
+	columns[2] = TRANSACTION_DATA_TABLE_SUB_CATEGORY
+	columns[3] = TRANSACTION_DATA_TABLE_ACCOUNT_NAME
+	columns[4] = TRANSACTION_DATA_TABLE_AMOUNT
+
+	writableDataTable := CreateNewWritableTransactionDataTableWithRowParser(columns, &testDataRowParser{})
+
+	assert.True(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_DESCRIPTION))
+	assert.False(t, writableDataTable.HasColumn(TRANSACTION_DATA_TABLE_TAGS))
+	assert.Equal(t, 0, writableDataTable.TransactionRowCount())
+
+	writableDataTable.Add(map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "2024-09-01 01:23:45",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "Expense",
+		TRANSACTION_DATA_TABLE_SUB_CATEGORY:     "Test Category",
+		TRANSACTION_DATA_TABLE_ACCOUNT_NAME:     "Test Account",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "123.45",
+	})
+
+	writableDataTable.Add(map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "2024-09-01 12:34:56",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "Income",
+		TRANSACTION_DATA_TABLE_ACCOUNT_NAME:     "Test Account2",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "0.12",
+	})
+
+	iterator := writableDataTable.TransactionRowIterator()
+	assert.True(t, iterator.HasNext())
+
+	// first row
+	dataRow, err := iterator.Next(core.NewNullContext(), &models.User{})
+	assert.Nil(t, err)
+	assert.True(t, dataRow.IsValid())
+
+	actualSubCategory := dataRow.GetData(TRANSACTION_DATA_TABLE_SUB_CATEGORY)
+	assert.Equal(t, "foo", actualSubCategory)
+
+	actualTags := dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS)
+	assert.Equal(t, "", actualTags)
+
+	actualDescription := dataRow.GetData(TRANSACTION_DATA_TABLE_DESCRIPTION)
+	assert.Equal(t, "bar", actualDescription)
+
+	assert.True(t, iterator.HasNext())
+
+	// second row
+	dataRow, err = iterator.Next(core.NewNullContext(), &models.User{})
+	assert.Nil(t, err)
+	assert.False(t, dataRow.IsValid())
+
+	actualSubCategory = dataRow.GetData(TRANSACTION_DATA_TABLE_SUB_CATEGORY)
+	assert.Equal(t, "", actualSubCategory)
+
+	actualTags = dataRow.GetData(TRANSACTION_DATA_TABLE_TAGS)
+	assert.Equal(t, "", actualTags)
+
+	actualDescription = dataRow.GetData(TRANSACTION_DATA_TABLE_DESCRIPTION)
+	assert.Equal(t, "", actualDescription)
+
+	assert.False(t, iterator.HasNext())
 }

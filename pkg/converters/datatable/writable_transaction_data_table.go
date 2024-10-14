@@ -43,17 +43,28 @@ func (t *WritableTransactionDataTable) Add(data map[TransactionDataTableColumn]s
 }
 
 // Get returns the record in the specified index
-func (t *WritableTransactionDataTable) Get(index int) *WritableTransactionDataRow {
+func (t *WritableTransactionDataTable) Get(index int) (*WritableTransactionDataRow, error) {
 	if index >= len(t.allData) {
-		return nil
+		return nil, nil
 	}
 
 	rowData := t.allData[index]
+	rowDataValid := true
+
+	if t.rowParser != nil {
+		var err error
+		rowData, rowDataValid, err = t.rowParser.Parse(rowData)
+
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &WritableTransactionDataRow{
-		dataTable: t,
-		rowData:   rowData,
-	}
+		dataTable:    t,
+		rowData:      rowData,
+		rowDataValid: rowDataValid,
+	}, nil
 }
 
 // HasColumn returns whether the data table has specified column
@@ -90,7 +101,19 @@ func (t *WritableTransactionDataTable) TransactionRowIterator() TransactionDataR
 
 // ColumnCount returns the total count of column in this data row
 func (r *WritableTransactionDataRow) ColumnCount() int {
-	return len(r.rowData)
+	if !r.rowDataValid {
+		return 0
+	}
+
+	columnCount := 0
+
+	for column := range r.rowData {
+		if r.dataTable.supportedColumns[column] || r.dataTable.addedColumns[column] {
+			columnCount++
+		}
+	}
+
+	return columnCount
 }
 
 // IsValid returns whether this row is valid data for importing
@@ -100,7 +123,25 @@ func (r *WritableTransactionDataRow) IsValid() bool {
 
 // GetData returns the data in the specified column type
 func (r *WritableTransactionDataRow) GetData(column TransactionDataTableColumn) string {
-	return r.rowData[column]
+	if !r.rowDataValid {
+		return ""
+	}
+
+	_, exists := r.dataTable.supportedColumns[column]
+
+	if exists {
+		return r.rowData[column]
+	}
+
+	if r.dataTable.addedColumns != nil {
+		_, exists = r.dataTable.addedColumns[column]
+
+		if exists {
+			return r.rowData[column]
+		}
+	}
+
+	return ""
 }
 
 // HasNext returns whether the iterator does not reach the end

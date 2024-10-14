@@ -107,7 +107,7 @@ func createNewDefaultPlainTextDataTable(ctx core.Context, reader io.Reader, comm
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[Default_plain_text_imported_data_table.createNewDefaultPlainTextDataTable] cannot parse plain text data, because %s", err.Error())
+			log.Errorf(ctx, "[default_plain_text_imported_data_table.createNewDefaultPlainTextDataTable] cannot parse plain text data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 

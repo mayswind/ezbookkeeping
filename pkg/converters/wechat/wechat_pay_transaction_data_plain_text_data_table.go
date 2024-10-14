@@ -24,7 +24,7 @@ const wechatPayTransactionDataCategoryTransferFromWeChatWallet = "零钱提现"
 
 const wechatPayTransactionDataStatusRefundName = "退款"
 
-var wechatPayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]any{
+var wechatPayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
 	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:         true,

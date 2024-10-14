@@ -28,7 +28,7 @@ const alipayTransactionDataProductNameTransferInText = "转入"
 const alipayTransactionDataProductNameTransferOutText = "转出"
 const alipayTransactionDataProductNameRepaymentText = "还款"
 
-var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]any{
+var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
 	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:         true,

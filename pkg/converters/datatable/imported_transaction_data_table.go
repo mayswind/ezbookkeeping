@@ -13,7 +13,7 @@ type ImportedTransactionDataTable struct {
 	dataColumnMapping map[TransactionDataTableColumn]string
 	dataColumnIndexes map[TransactionDataTableColumn]int
 	rowParser         TransactionDataRowParser
-	addedColumns      map[TransactionDataTableColumn]any
+	addedColumns      map[TransactionDataTableColumn]bool
 }
 
 // ImportedTransactionDataRow defines the structure of imported transaction data row
@@ -167,11 +167,11 @@ func CreateImportedTransactionDataTableWithRowParser(dataTable ImportedDataTable
 		}
 	}
 
-	var addedColumns map[TransactionDataTableColumn]any
+	var addedColumns map[TransactionDataTableColumn]bool
 
 	if rowParser != nil {
 		addedColumnsByParser := rowParser.GetAddedColumns()
-		addedColumns = make(map[TransactionDataTableColumn]any, len(addedColumnsByParser))
+		addedColumns = make(map[TransactionDataTableColumn]bool, len(addedColumnsByParser))
 
 		for i := 0; i < len(addedColumnsByParser); i++ {
 			addedColumns[addedColumnsByParser[i]] = true

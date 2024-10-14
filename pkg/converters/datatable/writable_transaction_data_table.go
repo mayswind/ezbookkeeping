@@ -9,9 +9,9 @@ import (
 // WritableTransactionDataTable defines the structure of writable transaction data table
 type WritableTransactionDataTable struct {
 	allData          []map[TransactionDataTableColumn]string
-	supportedColumns map[TransactionDataTableColumn]any
+	supportedColumns map[TransactionDataTableColumn]bool
 	rowParser        TransactionDataRowParser
-	addedColumns     map[TransactionDataTableColumn]any
+	addedColumns     map[TransactionDataTableColumn]bool
 }
 
 // WritableTransactionDataRow defines the structure of transaction data row of writable data table
@@ -142,18 +142,18 @@ func CreateNewWritableTransactionDataTable(columns []TransactionDataTableColumn)
 
 // CreateNewWritableTransactionDataTableWithRowParser returns a new writable transaction data table according to the specified columns
 func CreateNewWritableTransactionDataTableWithRowParser(columns []TransactionDataTableColumn, rowParser TransactionDataRowParser) *WritableTransactionDataTable {
-	supportedColumns := make(map[TransactionDataTableColumn]any, len(columns))
+	supportedColumns := make(map[TransactionDataTableColumn]bool, len(columns))
 
 	for i := 0; i < len(columns); i++ {
 		column := columns[i]
 		supportedColumns[column] = true
 	}
 
-	var addedColumns map[TransactionDataTableColumn]any
+	var addedColumns map[TransactionDataTableColumn]bool
 
 	if rowParser != nil {
 		addedColumnsByParser := rowParser.GetAddedColumns()
-		addedColumns = make(map[TransactionDataTableColumn]any, len(addedColumnsByParser))
+		addedColumns = make(map[TransactionDataTableColumn]bool, len(addedColumnsByParser))
 
 		for i := 0; i < len(addedColumnsByParser); i++ {
 			addedColumns[addedColumnsByParser[i]] = true

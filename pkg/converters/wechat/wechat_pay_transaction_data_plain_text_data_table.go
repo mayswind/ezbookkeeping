@@ -266,13 +266,9 @@ func createNewWeChatPayTransactionDataTable(ctx core.Context, reader io.Reader) 
 	statusColumnIdx, statusColumnExists := originalHeaderItemMap["当前状态"]
 	descriptionColumnIdx, descriptionColumnExists := originalHeaderItemMap["备注"]
 
-	if !timeColumnExists || !amountColumnExists || !typeColumnExists || !statusColumnExists {
+	if !timeColumnExists || !categoryColumnExists || !amountColumnExists || !typeColumnExists || !statusColumnExists {
 		log.Errorf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.createNewwechatPayTransactionPlainTextDataTable] cannot parse wechat pay csv data, because missing essential columns in header row")
 		return nil, errs.ErrMissingRequiredFieldInHeaderRow
-	}
-
-	if !categoryColumnExists {
-		categoryColumnIdx = -1
 	}
 
 	if !targetNameColumnExists {

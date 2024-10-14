@@ -1,8 +1,6 @@
 package feidee
 
 import (
-	"time"
-
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -54,23 +52,12 @@ func (p *feideeMymoneyTransactionDataRowParser) getLongDateTime(str string) stri
 		return str
 	}
 
-	utcTimezone := time.UTC
-	utcTimezoneOffsetMinutes := utils.GetTimezoneOffsetMinutes(utcTimezone)
-
 	if utils.IsValidLongDateTimeWithoutSecondFormat(str) {
-		dateTime, err := utils.ParseFromLongDateTimeWithoutSecond(str, utcTimezoneOffsetMinutes)
-
-		if err == nil {
-			return utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), utcTimezone)
-		}
+		return str + ":00"
 	}
 
 	if utils.IsValidLongDateFormat(str) {
-		dateTime, err := utils.ParseFromLongDateTimeWithoutSecond(str+" 00:00", utcTimezoneOffsetMinutes)
-
-		if err == nil {
-			return utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), utcTimezone)
-		}
+		return str + " 00:00:00"
 	}
 
 	return str

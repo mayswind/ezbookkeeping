@@ -12,7 +12,7 @@ import (
 )
 
 func TestFireFlyIIICsvFileConverterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -83,7 +83,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MinimumValidData(t *testing
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -101,7 +101,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidTime(t *testing
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -115,7 +115,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidType(t *testing
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -143,7 +143,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidTimezone(t *testi
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -170,7 +170,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseValidAccountCurrency(t
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -190,7 +190,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAccountCurrency
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -208,7 +208,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseNotSupportedCurrency(t
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -226,7 +226,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseInvalidAmount(t *testi
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_ParseDescription(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -243,7 +243,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_ParseDescription(t *testing
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -256,7 +256,7 @@ func TestFireFlyIIICsvFileConverterParseImportedData_MissingFileHeader(t *testin
 }
 
 func TestFireFlyIIICsvFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := FireflyIIITransactionDataCsvImporter
+	converter := FireflyIIITransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{

@@ -13,9 +13,9 @@ import (
 // GetTransactionDataExporter returns the transaction data exporter according to the file type
 func GetTransactionDataExporter(fileType string) base.TransactionDataExporter {
 	if fileType == "csv" {
-		return _default.EzBookKeepingTransactionDataCSVFileConverter
+		return _default.DefaultTransactionDataCSVFileConverter
 	} else if fileType == "tsv" {
-		return _default.EzBookKeepingTransactionDataTSVFileConverter
+		return _default.DefaultTransactionDataTSVFileConverter
 	} else {
 		return nil
 	}
@@ -24,21 +24,21 @@ func GetTransactionDataExporter(fileType string) base.TransactionDataExporter {
 // GetTransactionDataImporter returns the transaction data importer according to the file type
 func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, error) {
 	if fileType == "ezbookkeeping_csv" {
-		return _default.EzBookKeepingTransactionDataCSVFileConverter, nil
+		return _default.DefaultTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
-		return _default.EzBookKeepingTransactionDataTSVFileConverter, nil
+		return _default.DefaultTransactionDataTSVFileConverter, nil
 	} else if fileType == "firefly_iii_csv" {
-		return fireflyIII.FireflyIIITransactionDataCsvImporter, nil
+		return fireflyIII.FireflyIIITransactionDataCsvFileImporter, nil
 	} else if fileType == "feidee_mymoney_csv" {
-		return feidee.FeideeMymoneyTransactionDataCsvImporter, nil
+		return feidee.FeideeMymoneyAppTransactionDataCsvFileImporter, nil
 	} else if fileType == "feidee_mymoney_xls" {
-		return feidee.FeideeMymoneyTransactionDataXlsImporter, nil
+		return feidee.FeideeMymoneyWebTransactionDataXlsFileImporter, nil
 	} else if fileType == "alipay_app_csv" {
-		return alipay.AlipayAppTransactionDataCsvImporter, nil
+		return alipay.AlipayAppTransactionDataCsvFileImporter, nil
 	} else if fileType == "alipay_web_csv" {
-		return alipay.AlipayWebTransactionDataCsvImporter, nil
+		return alipay.AlipayWebTransactionDataCsvFileImporter, nil
 	} else if fileType == "wechat_pay_app_csv" {
-		return wechat.WeChatPayTransactionDataCsvImporter, nil
+		return wechat.WeChatPayTransactionDataCsvFileImporter, nil
 	} else {
 		return nil, errs.ErrImportFileTypeNotSupported
 	}

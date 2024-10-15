@@ -1,34 +1,35 @@
-package datatable
+package excel
 
 import (
 	"bytes"
 
 	"github.com/shakinm/xlsReader/xls"
 
+	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
-// DefaultExcelFileImportedDataTable defines the structure of default excel file data table
-type DefaultExcelFileImportedDataTable struct {
+// ExcelFileImportedDataTable defines the structure of excel file data table
+type ExcelFileImportedDataTable struct {
 	workbook              *xls.Workbook
 	headerLineColumnNames []string
 }
 
-// DefaultExcelFileDataRow defines the structure of default excel file data table row
-type DefaultExcelFileDataRow struct {
+// ExcelFileDataRow defines the structure of excel file data table row
+type ExcelFileDataRow struct {
 	sheet    *xls.Sheet
 	rowIndex int
 }
 
-// DefaultExcelFileDataRowIterator defines the structure of default excel file data table row iterator
-type DefaultExcelFileDataRowIterator struct {
-	dataTable              *DefaultExcelFileImportedDataTable
+// ExcelFileDataRowIterator defines the structure of excel file data table row iterator
+type ExcelFileDataRowIterator struct {
+	dataTable              *ExcelFileImportedDataTable
 	currentTableIndex      int
 	currentRowIndexInTable int
 }
 
 // DataRowCount returns the total count of data row
-func (t *DefaultExcelFileImportedDataTable) DataRowCount() int {
+func (t *ExcelFileImportedDataTable) DataRowCount() int {
 	allSheets := t.workbook.GetSheets()
 	totalDataRowCount := 0
 
@@ -46,13 +47,13 @@ func (t *DefaultExcelFileImportedDataTable) DataRowCount() int {
 }
 
 // HeaderColumnNames returns the header column name list
-func (t *DefaultExcelFileImportedDataTable) HeaderColumnNames() []string {
+func (t *ExcelFileImportedDataTable) HeaderColumnNames() []string {
 	return t.headerLineColumnNames
 }
 
 // DataRowIterator returns the iterator of data row
-func (t *DefaultExcelFileImportedDataTable) DataRowIterator() ImportedDataRowIterator {
-	return &DefaultExcelFileDataRowIterator{
+func (t *ExcelFileImportedDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
+	return &ExcelFileDataRowIterator{
 		dataTable:              t,
 		currentTableIndex:      0,
 		currentRowIndexInTable: 0,
@@ -60,7 +61,7 @@ func (t *DefaultExcelFileImportedDataTable) DataRowIterator() ImportedDataRowIte
 }
 
 // ColumnCount returns the total count of column in this data row
-func (r *DefaultExcelFileDataRow) ColumnCount() int {
+func (r *ExcelFileDataRow) ColumnCount() int {
 	row, err := r.sheet.GetRow(r.rowIndex)
 
 	if err != nil {
@@ -71,7 +72,7 @@ func (r *DefaultExcelFileDataRow) ColumnCount() int {
 }
 
 // GetData returns the data in the specified column index
-func (r *DefaultExcelFileDataRow) GetData(columnIndex int) string {
+func (r *ExcelFileDataRow) GetData(columnIndex int) string {
 	row, err := r.sheet.GetRow(r.rowIndex)
 
 	if err != nil {
@@ -88,7 +89,7 @@ func (r *DefaultExcelFileDataRow) GetData(columnIndex int) string {
 }
 
 // HasNext returns whether the iterator does not reach the end
-func (t *DefaultExcelFileDataRowIterator) HasNext() bool {
+func (t *ExcelFileDataRowIterator) HasNext() bool {
 	allSheets := t.dataTable.workbook.GetSheets()
 
 	if t.currentTableIndex >= len(allSheets) {
@@ -115,7 +116,7 @@ func (t *DefaultExcelFileDataRowIterator) HasNext() bool {
 }
 
 // Next returns the next imported data row
-func (t *DefaultExcelFileDataRowIterator) Next() ImportedDataRow {
+func (t *ExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
 	allSheets := t.dataTable.workbook.GetSheets()
 	currentRowIndexInTable := t.currentRowIndexInTable
 
@@ -143,14 +144,14 @@ func (t *DefaultExcelFileDataRowIterator) Next() ImportedDataRow {
 		return nil
 	}
 
-	return &DefaultExcelFileDataRow{
+	return &ExcelFileDataRow{
 		sheet:    &currentSheet,
 		rowIndex: t.currentRowIndexInTable,
 	}
 }
 
-// CreateNewDefaultExcelFileImportedDataTable returns default excel xls data table by file binary data
-func CreateNewDefaultExcelFileImportedDataTable(data []byte) (*DefaultExcelFileImportedDataTable, error) {
+// CreateNewExcelFileImportedDataTable returns excel xls data table by file binary data
+func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTable, error) {
 	reader := bytes.NewReader(data)
 	workbook, err := xls.OpenReader(reader)
 
@@ -197,7 +198,7 @@ func CreateNewDefaultExcelFileImportedDataTable(data []byte) (*DefaultExcelFileI
 		}
 	}
 
-	return &DefaultExcelFileImportedDataTable{
+	return &ExcelFileImportedDataTable{
 		workbook:              &workbook,
 		headerLineColumnNames: headerRowItems,
 	}, nil

@@ -15,7 +15,7 @@ import (
 )
 
 func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -94,7 +94,7 @@ func TestAlipayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -142,7 +142,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testin
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -176,7 +176,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -198,7 +198,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -325,7 +325,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
-	converter := AlipayAppTransactionDataCsvImporter
+	converter := AlipayAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -365,7 +365,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -405,7 +405,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -427,7 +427,7 @@ func TestAlipayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) 
 }
 
 func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := AlipayWebTransactionDataCsvImporter
+	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{

@@ -12,7 +12,7 @@ import (
 )
 
 func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	transactions := make([]*models.Transaction, 3)
@@ -126,7 +126,7 @@ func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -197,7 +197,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -215,7 +215,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTime(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -229,7 +229,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidType(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -257,7 +257,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -271,7 +271,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -298,7 +298,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurre
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -318,7 +318,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountCur
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -336,7 +336,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurre
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -354,7 +354,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNoAmount2(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -378,7 +378,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNoAmount2(t *test
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -396,7 +396,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLo
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidGeographicLocation(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -421,7 +421,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidGeographic
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -450,7 +450,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T)
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -467,7 +467,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *te
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -480,7 +480,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MissingFileHeader(t *t
 }
 
 func TestEzBookKeepingPlainFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := EzBookKeepingTransactionDataCSVFileConverter
+	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
 	user := &models.User{

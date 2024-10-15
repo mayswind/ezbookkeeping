@@ -139,7 +139,7 @@ func (t *alipayTransactionDataRowIterator) Next(ctx core.Context, user *models.U
 		rowItems[t.dataTable.originalTypeColumnIndex] != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		rowItems[t.dataTable.originalTypeColumnIndex] != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		rowItems[t.dataTable.originalTypeColumnIndex] != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-		log.Warnf(ctx, "[alipay_transaction_data_plain_text_data_table.Next] skip parsing transaction in row \"index:%d\", because type is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalTypeColumnIndex])
+		log.Warnf(ctx, "[alipay_transaction_csv_data_table.Next] skip parsing transaction in row \"index:%d\", because type is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalTypeColumnIndex])
 		isValid = false
 	}
 
@@ -150,7 +150,7 @@ func (t *alipayTransactionDataRowIterator) Next(ctx core.Context, user *models.U
 		rowItems[t.dataTable.originalStatusColumnIndex] != alipayTransactionDataStatusClosedName &&
 		rowItems[t.dataTable.originalStatusColumnIndex] != alipayTransactionDataStatusRefundSuccessName &&
 		rowItems[t.dataTable.originalStatusColumnIndex] != alipayTransactionDataStatusTaxRefundSuccessName {
-		log.Warnf(ctx, "[alipay_transaction_data_plain_text_data_table.Next] skip parsing transaction in row \"index:%d\", because status is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalStatusColumnIndex])
+		log.Warnf(ctx, "[alipay_transaction_csv_data_table.Next] skip parsing transaction in row \"index:%d\", because status is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalStatusColumnIndex])
 		isValid = false
 	}
 
@@ -161,7 +161,7 @@ func (t *alipayTransactionDataRowIterator) Next(ctx core.Context, user *models.U
 		finalItems, errMsg = t.dataTable.parseTransactionData(ctx, user, rowItems)
 
 		if finalItems == nil {
-			log.Warnf(ctx, "[alipay_transaction_data_plain_text_data_table.Next] skip parsing transaction in row \"index:%d\", because %s", t.currentIndex, errMsg)
+			log.Warnf(ctx, "[alipay_transaction_csv_data_table.Next] skip parsing transaction in row \"index:%d\", because %s", t.currentIndex, errMsg)
 			isValid = false
 		}
 	}
@@ -302,7 +302,7 @@ func createNewAlipayTransactionDataTable(ctx core.Context, reader io.Reader, fil
 	}
 
 	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[alipay_transaction_data_plain_text_data_table.createNewAlipayTransactionPlainTextDataTable] cannot parse import data, because data table row count is less 1")
+		log.Errorf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayTransactionPlainTextDataTable] cannot parse import data, because data table row count is less 1")
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
@@ -324,7 +324,7 @@ func createNewAlipayTransactionDataTable(ctx core.Context, reader io.Reader, fil
 	descriptionColumnIdx, descriptionColumnExists := originalHeaderItemMap[originalColumnNames.descriptionColumnName]
 
 	if !timeColumnExists || !amountColumnExists || !typeColumnExists || !statusColumnExists {
-		log.Errorf(ctx, "[alipay_transaction_data_plain_text_data_table.createNewAlipayTransactionPlainTextDataTable] cannot parse alipay csv data, because missing essential columns in header row")
+		log.Errorf(ctx, "[alipay_transaction_csv_data_table.createNewAlipayTransactionPlainTextDataTable] cannot parse alipay csv data, because missing essential columns in header row")
 		return nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
@@ -379,7 +379,7 @@ func parseAllLinesFromAlipayTransactionPlainText(ctx core.Context, reader io.Rea
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[alipay_transaction_data_plain_text_data_table.parseAllLinesFromAlipayTransactionPlainText] cannot parse alipay csv data, because %s", err.Error())
+			log.Errorf(ctx, "[alipay_transaction_csv_data_table.parseAllLinesFromAlipayTransactionPlainText] cannot parse alipay csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
@@ -390,7 +390,7 @@ func parseAllLinesFromAlipayTransactionPlainText(ctx core.Context, reader io.Rea
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[alipay_transaction_data_plain_text_data_table.parseAllLinesFromAlipayTransactionPlainText] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				log.Warnf(ctx, "[alipay_transaction_csv_data_table.parseAllLinesFromAlipayTransactionPlainText] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
 				continue
 			}
 		}
@@ -418,7 +418,7 @@ func parseAllLinesFromAlipayTransactionPlainText(ctx core.Context, reader io.Rea
 			}
 
 			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[alipay_transaction_data_plain_text_data_table.parseAllLinesFromAlipayTransactionPlainText] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
+				log.Errorf(ctx, "[alipay_transaction_csv_data_table.parseAllLinesFromAlipayTransactionPlainText] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
 				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 			}
 

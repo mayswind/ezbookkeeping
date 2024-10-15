@@ -13,7 +13,7 @@ import (
 )
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -110,7 +110,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_MinimumValidData(t *testi
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -130,7 +130,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidTime(t *testi
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -145,7 +145,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidType(t *testi
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -174,7 +174,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseValidAccountCurrency
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -198,7 +198,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAccountCurren
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -225,7 +225,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseNotSupportedCurrency
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -252,7 +252,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseInvalidAmount(t *tes
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -271,7 +271,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_ParseDescription(t *testi
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_InvalidRelatedId(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -297,7 +297,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_InvalidRelatedId(t *testi
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -313,7 +313,7 @@ func TestFeideeMymoneyCsvFileImporterParseImportedData_MissingFileHeader(t *test
 }
 
 func TestFeideeMymoneyCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataCsvImporter
+	converter := FeideeMymoneyAppTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{

@@ -13,7 +13,7 @@ import (
 )
 
 func TestWeChatPayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -93,7 +93,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MinimumValidData(t *testing.T
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseRefundTransaction(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -120,7 +120,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseRefundTransaction(t *tes
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -150,7 +150,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidTime(t *testing.T
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -170,7 +170,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -244,7 +244,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -278,7 +278,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{
@@ -296,7 +296,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing.T) {
-	converter := WeChatPayTransactionDataCsvImporter
+	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{

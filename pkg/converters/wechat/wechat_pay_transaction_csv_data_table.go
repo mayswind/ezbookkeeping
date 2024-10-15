@@ -122,7 +122,7 @@ func (t *wechatPayTransactionDataRowIterator) Next(ctx core.Context, user *model
 		rowItems[t.dataTable.originalTypeColumnIndex] != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		rowItems[t.dataTable.originalTypeColumnIndex] != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		rowItems[t.dataTable.originalTypeColumnIndex] != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-		log.Warnf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.Next] skip parsing transaction in row \"index:%d\", because type is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalTypeColumnIndex])
+		log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.Next] skip parsing transaction in row \"index:%d\", because type is \"%s\"", t.currentIndex, rowItems[t.dataTable.originalTypeColumnIndex])
 		isValid = false
 	}
 
@@ -133,7 +133,7 @@ func (t *wechatPayTransactionDataRowIterator) Next(ctx core.Context, user *model
 		finalItems, errMsg = t.dataTable.parseTransactionData(ctx, user, rowItems)
 
 		if finalItems == nil {
-			log.Warnf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.Next] skip parsing transaction in row \"index:%d\", because %s", t.currentIndex, errMsg)
+			log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.Next] skip parsing transaction in row \"index:%d\", because %s", t.currentIndex, errMsg)
 			isValid = false
 		}
 	}
@@ -245,7 +245,7 @@ func createNewWeChatPayTransactionDataTable(ctx core.Context, reader io.Reader) 
 	}
 
 	if len(allOriginalLines) < 2 {
-		log.Errorf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.createNewwechatPayTransactionPlainTextDataTable] cannot parse import data, because data table row count is less 1")
+		log.Errorf(ctx, "[wechat_pay_transaction_csv_data_table.createNewwechatPayTransactionPlainTextDataTable] cannot parse import data, because data table row count is less 1")
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
@@ -267,7 +267,7 @@ func createNewWeChatPayTransactionDataTable(ctx core.Context, reader io.Reader) 
 	descriptionColumnIdx, descriptionColumnExists := originalHeaderItemMap["备注"]
 
 	if !timeColumnExists || !categoryColumnExists || !typeColumnExists || !amountColumnExists || !statusColumnExists {
-		log.Errorf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.createNewwechatPayTransactionPlainTextDataTable] cannot parse wechat pay csv data, because missing essential columns in header row")
+		log.Errorf(ctx, "[wechat_pay_transaction_csv_data_table.createNewwechatPayTransactionPlainTextDataTable] cannot parse wechat pay csv data, because missing essential columns in header row")
 		return nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
@@ -318,7 +318,7 @@ func parseAllLinesFromWechatPayTransactionPlainText(ctx core.Context, reader io.
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.parseAllLinesFromWechatPayTransactionPlainText] cannot parse wechat pay csv data, because %s", err.Error())
+			log.Errorf(ctx, "[wechat_pay_transaction_csv_data_table.parseAllLinesFromWechatPayTransactionPlainText] cannot parse wechat pay csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
@@ -329,7 +329,7 @@ func parseAllLinesFromWechatPayTransactionPlainText(ctx core.Context, reader io.
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.parseAllLinesFromWechatPayTransactionPlainText] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.parseAllLinesFromWechatPayTransactionPlainText] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
 				continue
 			}
 		}
@@ -355,7 +355,7 @@ func parseAllLinesFromWechatPayTransactionPlainText(ctx core.Context, reader io.
 			}
 
 			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[wechat_pay_transaction_data_plain_text_data_table.parseAllLinesFromWechatPayTransactionPlainText] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
+				log.Errorf(ctx, "[wechat_pay_transaction_csv_data_table.parseAllLinesFromWechatPayTransactionPlainText] cannot parse row \"index:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", len(allOriginalLines), len(items), len(allOriginalLines[0]))
 				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
 			}
 

@@ -6,8 +6,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-// ezBookKeepingTransactionDataPlainTextConverter defines the structure of ezbookkeeping plain text converter for transaction data
-type ezBookKeepingTransactionDataPlainTextConverter struct {
+// defaultTransactionDataPlainTextConverter defines the structure of ezbookkeeping default plain text converter for transaction data
+type defaultTransactionDataPlainTextConverter struct {
 	columnSeparator string
 }
 
@@ -57,8 +57,8 @@ var ezbookkeepingDataColumns = []datatable.TransactionDataTableColumn{
 }
 
 // ToExportedContent returns the exported transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
-	dataTableBuilder := createNewezbookkeepingTransactionPlainTextDataTableBuilder(
+func (c *defaultTransactionDataPlainTextConverter) ToExportedContent(ctx core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
+	dataTableBuilder := createNewDefaultTransactionPlainTextDataTableBuilder(
 		len(transactions),
 		ezbookkeepingDataColumns,
 		ezbookkeepingDataColumnNameMapping,
@@ -82,8 +82,8 @@ func (c *ezBookKeepingTransactionDataPlainTextConverter) ToExportedContent(ctx c
 }
 
 // ParseImportedData returns the imported data by parsing the transaction plain text data
-func (c *ezBookKeepingTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	dataTable, err := createNewezbookkeepingPlainTextDataTable(
+func (c *defaultTransactionDataPlainTextConverter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+	dataTable, err := createNewDefaultPlainTextDataTable(
 		string(data),
 		c.columnSeparator,
 		ezbookkeepingLineSeparator,

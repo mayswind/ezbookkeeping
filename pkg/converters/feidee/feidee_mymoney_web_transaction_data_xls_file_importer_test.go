@@ -13,7 +13,7 @@ import (
 )
 
 func TestFeideeMymoneyTransactionDataXlsImporterParseImportedData_MinimumValidData(t *testing.T) {
-	converter := FeideeMymoneyTransactionDataXlsImporter
+	converter := FeideeMymoneyWebTransactionDataXlsFileImporter
 	context := core.NewNullContext()
 
 	user := &models.User{

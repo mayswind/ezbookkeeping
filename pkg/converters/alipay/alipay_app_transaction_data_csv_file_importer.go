@@ -1,14 +1,14 @@
 package alipay
 
-// alipayAppTransactionDataCsvImporter defines the structure of alipay app csv importer for transaction data
-type alipayAppTransactionDataCsvImporter struct {
-	alipayTransactionDataCsvImporter
+// alipayAppTransactionDataCsvFileImporter defines the structure of alipay app csv importer for transaction data
+type alipayAppTransactionDataCsvFileImporter struct {
+	alipayTransactionDataCsvFileImporter
 }
 
 // Initialize a alipay app transaction data csv file importer singleton instance
 var (
-	AlipayAppTransactionDataCsvImporter = &alipayAppTransactionDataCsvImporter{
-		alipayTransactionDataCsvImporter{
+	AlipayAppTransactionDataCsvFileImporter = &alipayAppTransactionDataCsvFileImporter{
+		alipayTransactionDataCsvFileImporter{
 			fileHeaderLine:         "------------------------------------------------------------------------------------",
 			dataHeaderStartContent: "支付宝（中国）网络技术有限公司  电子客户回单",
 			originalColumnNames: alipayTransactionColumnNames{

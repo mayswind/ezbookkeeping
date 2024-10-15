@@ -14,19 +14,19 @@ var wechatPayTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER: "/",
 }
 
-// wechatPayTransactionDataCsvImporter defines the structure of wechatPay csv importer for transaction data
-type wechatPayTransactionDataCsvImporter struct {
+// wechatPayTransactionDataCsvFileImporter defines the structure of wechatPay csv importer for transaction data
+type wechatPayTransactionDataCsvFileImporter struct {
 	fileHeaderLineBeginning         string
 	dataHeaderStartContentBeginning string
 }
 
 // Initialize a webchat pay transaction data csv file importer singleton instance
 var (
-	WeChatPayTransactionDataCsvImporter = &wechatPayTransactionDataCsvImporter{}
+	WeChatPayTransactionDataCsvFileImporter = &wechatPayTransactionDataCsvFileImporter{}
 )
 
 // ParseImportedData returns the imported data by parsing the wechat pay transaction csv data
-func (c *wechatPayTransactionDataCsvImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+func (c *wechatPayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	reader := bytes.NewReader(data)
 	transactionDataTable, err := createNewWeChatPayTransactionDataTable(ctx, reader)
 

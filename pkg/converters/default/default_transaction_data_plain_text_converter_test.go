@@ -11,7 +11,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterToExportedContent(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -125,7 +125,7 @@ func TestEzBookKeepingPlainFileConverterToExportedContent(t *testing.T) {
 	assert.Equal(t, expectedContent, string(actualContent))
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_MinimumValidData(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -196,7 +196,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MinimumValidData(t *te
 	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTime(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -214,7 +214,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTime(t *te
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidType(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -228,7 +228,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidType(t *te
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidTimezone(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -256,7 +256,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidTimezone(t *
 	assert.Equal(t, int64(1725148196), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidTimezone(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -270,7 +270,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidTimezone(t
 	assert.EqualError(t, err, errs.ErrTransactionTimeZoneInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidAccountCurrency(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -297,7 +297,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidAccountCurre
 	assert.Equal(t, "EUR", allNewAccounts[1].Currency)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAccountCurrency(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -317,7 +317,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAccountCur
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNotSupportedCurrency(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -335,7 +335,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNotSupportedCurre
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidAmount(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -353,7 +353,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidAmount(t *
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNoAmount2(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseNoAmount2(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -377,7 +377,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseNoAmount2(t *test
 	assert.Equal(t, int64(12345), allNewTransactions[0].RelatedAccountAmount)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseValidGeographicLocation(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -395,7 +395,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseValidGeographicLo
 	assert.Equal(t, 45.56, allNewTransactions[0].GeoLatitude)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidGeographicLocation(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseInvalidGeographicLocation(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -420,7 +420,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseInvalidGeographic
 	assert.EqualError(t, err, errs.ErrGeographicLocationInvalid.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseTag(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -449,7 +449,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseTag(t *testing.T)
 	assert.Equal(t, "hello\tworld", allNewTags[3].Name)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseDescription(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -466,7 +466,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_ParseDescription(t *te
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingFileHeader(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 
@@ -479,7 +479,7 @@ func TestEzBookKeepingPlainFileConverterParseImportedData_MissingFileHeader(t *t
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
-func TestEzBookKeepingPlainFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingRequiredColumn(t *testing.T) {
 	converter := DefaultTransactionDataCSVFileConverter
 	context := core.NewNullContext()
 

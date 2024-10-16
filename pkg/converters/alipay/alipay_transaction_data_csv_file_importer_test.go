@@ -364,6 +364,56 @@ func TestAlipayCsvFileImporterParseImportedData_ParseCategory(t *testing.T) {
 	assert.Equal(t, "Test Category3", allNewSubTransferCategories[0].Name)
 }
 
+func TestAlipayCsvFileImporterParseImportedData_ParseRelatedAccount(t *testing.T) {
+	converter := AlipayAppTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data1, err := simplifiedchinese.GB18030.NewEncoder().String("------------------------------------------------------------------------------------\n" +
+		"导出信息：\n" +
+		"姓名：xxx\n" +
+		"支付宝账户：xxx@xxx.xxx\n" +
+		"起始时间：[2024-01-01 00:00:00]    终止时间：[2024-09-01 23:59:59]\n" +
+		"导出交易类型：[全部]\n" +
+		"------------------------支付宝（中国）网络技术有限公司  电子客户回单------------------------\n" +
+		"交易时间,商品说明,收/支,金额,收/付款方式,交易状态,\n" +
+		"2024-09-01 03:45:07,余额宝-单次转入,不计收支,0.01,Test Account,交易成功,\n" +
+		"2024-09-01 05:07:29,信用卡还款,不计收支,0.02,Test Account2,交易成功,\n")
+	assert.Nil(t, err)
+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allNewTransactions))
+	assert.Equal(t, 3, len(allNewAccounts))
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
+	assert.Equal(t, int64(1), allNewTransactions[0].Amount)
+	assert.Equal(t, "Test Account", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[0].OriginalDestinationAccountName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[1].Uid)
+	assert.Equal(t, int64(2), allNewTransactions[1].Amount)
+	assert.Equal(t, "Test Account2", allNewTransactions[1].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[1].OriginalDestinationAccountName)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
+	assert.Equal(t, "Test Account", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[1].Uid)
+	assert.Equal(t, "", allNewAccounts[1].Name)
+	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[2].Uid)
+	assert.Equal(t, "Test Account2", allNewAccounts[2].Name)
+	assert.Equal(t, "CNY", allNewAccounts[2].Currency)
+}
+
 func TestAlipayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {
 	converter := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
@@ -478,4 +528,24 @@ func TestAlipayCsvFileImporterParseImportedData_MissingRequiredColumn(t *testing
 		"------------------------------------------------------------------------------------\n")
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data4), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
+}
+
+func TestAlipayCsvFileImporterParseImportedData_NoTransactionData(t *testing.T) {
+	converter := AlipayWebTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1,
+		DefaultCurrency: "CNY",
+	}
+
+	// Missing Time Column
+	data1, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
+		"账号:[xxx@xxx.xxx]\n" +
+		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
+		"---------------------------------交易记录明细列表------------------------------------\n" +
+		"交易创建时间              ,金额（元）,收/支     ,交易状态    ,\n" +
+		"------------------------------------------------------------------------------------\n")
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data1), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }

@@ -93,7 +93,7 @@ func (c *defaultTransactionDataPlainTextConverter) ParseImportedData(ctx core.Co
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	transactionDataTable := datatable.CreateImportedTransactionDataTable(dataTable, ezbookkeepingDataColumnNameMapping)
+	transactionDataTable := datatable.CreateNewImportedTransactionDataTable(dataTable, ezbookkeepingDataColumnNameMapping)
 
 	dataTableImporter := datatable.CreateNewImporter(
 		ezbookkeepingTransactionTypeNameMapping,

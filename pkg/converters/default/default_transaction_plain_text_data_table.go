@@ -78,6 +78,11 @@ func (t *defaultPlainTextDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allLines)
 }
 
+// CurrentRowId returns current index
+func (t *defaultPlainTextDataRowIterator) CurrentRowId() string {
+	return fmt.Sprintf("line#%d", t.currentIndex)
+}
+
 // Next returns the next imported data row
 func (t *defaultPlainTextDataRowIterator) Next() datatable.ImportedDataRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {

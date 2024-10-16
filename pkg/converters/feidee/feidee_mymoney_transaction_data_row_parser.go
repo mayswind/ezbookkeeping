@@ -7,6 +7,13 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+var feideeMymoneyTransactionTypeNameMapping = map[models.TransactionType]string{
+	models.TRANSACTION_TYPE_MODIFY_BALANCE: "余额变更",
+	models.TRANSACTION_TYPE_INCOME:         "收入",
+	models.TRANSACTION_TYPE_EXPENSE:        "支出",
+	models.TRANSACTION_TYPE_TRANSFER:       "转账",
+}
+
 // feideeMymoneyTransactionDataRowParser defines the structure of feidee mymoney transaction data row parser
 type feideeMymoneyTransactionDataRowParser struct {
 }

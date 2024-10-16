@@ -2,6 +2,7 @@ package csv
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -72,6 +73,11 @@ func (t *CsvFileImportedDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allLines)
 }
 
+// CurrentRowId returns current index
+func (t *CsvFileImportedDataRowIterator) CurrentRowId() string {
+	return fmt.Sprintf("line#%d", t.currentIndex)
+}
+
 // Next returns the next imported data row
 func (t *CsvFileImportedDataRowIterator) Next() datatable.ImportedDataRow {
 	if t.currentIndex+1 >= len(t.dataTable.allLines) {
@@ -88,9 +94,16 @@ func (t *CsvFileImportedDataRowIterator) Next() datatable.ImportedDataRow {
 	}
 }
 
-// CreateNewCsvDataTable returns comma separated values data table by io readers
-func CreateNewCsvDataTable(ctx core.Context, reader io.Reader) (*CsvFileImportedDataTable, error) {
+// CreateNewCsvImportedDataTable returns comma separated values data table by io readers
+func CreateNewCsvImportedDataTable(ctx core.Context, reader io.Reader) (*CsvFileImportedDataTable, error) {
 	return createNewCsvFileDataTable(ctx, reader, ',')
+}
+
+// CreateNewCustomCsvImportedDataTable returns character separated values data table by io readers
+func CreateNewCustomCsvImportedDataTable(allLines [][]string) *CsvFileImportedDataTable {
+	return &CsvFileImportedDataTable{
+		allLines: allLines,
+	}
 }
 
 func createNewCsvFileDataTable(ctx core.Context, reader io.Reader, separator rune) (*CsvFileImportedDataTable, error) {

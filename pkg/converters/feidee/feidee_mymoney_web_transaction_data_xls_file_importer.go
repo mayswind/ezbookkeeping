@@ -7,6 +7,17 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
+var feideeMymoneyWebDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     "日期",
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     "交易类型",
+	datatable.TRANSACTION_DATA_TABLE_CATEGORY:             "分类",
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:         "子分类",
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:         "账户1",
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               "金额",
+	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: "账户2",
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          "备注",
+}
+
 // feideeMymoneyWebTransactionDataXlsFileImporter defines the structure of feidee mymoney (web) xls importer for transaction data
 type feideeMymoneyWebTransactionDataXlsFileImporter struct {
 	datatable.DataTableTransactionDataImporter
@@ -26,7 +37,7 @@ func (c *feideeMymoneyWebTransactionDataXlsFileImporter) ParseImportedData(ctx c
 	}
 
 	transactionRowParser := createFeideeMymoneyTransactionDataRowParser()
-	transactionDataTable := datatable.CreateImportedTransactionDataTableWithRowParser(dataTable, feideeMymoneyDataColumnNameMapping, transactionRowParser)
+	transactionDataTable := datatable.CreateNewImportedTransactionDataTableWithRowParser(dataTable, feideeMymoneyWebDataColumnNameMapping, transactionRowParser)
 	dataTableImporter := datatable.CreateNewSimpleImporter(feideeMymoneyTransactionTypeNameMapping)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

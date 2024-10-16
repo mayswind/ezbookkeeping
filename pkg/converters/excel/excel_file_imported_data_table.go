@@ -2,6 +2,7 @@ package excel
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/shakinm/xlsReader/xls"
 
@@ -113,6 +114,11 @@ func (t *ExcelFileDataRowIterator) HasNext() bool {
 	}
 
 	return false
+}
+
+// CurrentRowId returns current index
+func (t *ExcelFileDataRowIterator) CurrentRowId() string {
+	return fmt.Sprintf("table#%d-row#%d", t.currentTableIndex, t.currentRowIndexInTable)
 }
 
 // Next returns the next imported data row

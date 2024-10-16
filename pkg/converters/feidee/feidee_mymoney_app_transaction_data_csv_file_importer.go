@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	csvdatatable "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -12,14 +13,35 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-const feideeMymoneyTransactionDataCsvFileHeader = "随手记导出文件(headers:v5;"
-const feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + feideeMymoneyTransactionDataCsvFileHeader
+const feideeMymoneyAppTransactionDataCsvFileHeader = "随手记导出文件(headers:v5;"
+const feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + feideeMymoneyAppTransactionDataCsvFileHeader
 
-const feideeMymoneyCsvFileTransactionTypeModifyBalanceText = "余额变更"
-const feideeMymoneyCsvFileTransactionTypeIncomeText = "收入"
-const feideeMymoneyCsvFileTransactionTypeExpenseText = "支出"
-const feideeMymoneyCsvFileTransactionTypeTransferInText = "转入"
-const feideeMymoneyCsvFileTransactionTypeTransferOutText = "转出"
+const feideeMymoneyAppTransactionTimeColumnName = "日期"
+const feideeMymoneyAppTransactionTypeColumnName = "交易类型"
+const feideeMymoneyAppTransactionCategoryColumnName = "类别"
+const feideeMymoneyAppTransactionSubCategoryColumnName = "子类别"
+const feideeMymoneyAppTransactionAccountNameColumnName = "账户"
+const feideeMymoneyAppTransactionAccountCurrencyColumnName = "账户币种"
+const feideeMymoneyAppTransactionAmountColumnName = "金额"
+const feideeMymoneyAppTransactionDescriptionColumnName = "备注"
+const feideeMymoneyAppTransactionRelatedIdColumnName = "关联Id"
+
+const feideeMymoneyAppTransactionTypeModifyBalanceText = "余额变更"
+const feideeMymoneyAppTransactionTypeIncomeText = "收入"
+const feideeMymoneyAppTransactionTypeExpenseText = "支出"
+const feideeMymoneyAppTransactionTypeTransferInText = "转入"
+const feideeMymoneyAppTransactionTypeTransferOutText = "转出"
+
+var feideeMymoneyAppDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME: feideeMymoneyAppTransactionTimeColumnName,
+	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: feideeMymoneyAppTransactionTypeColumnName,
+	datatable.TRANSACTION_DATA_TABLE_CATEGORY:         feideeMymoneyAppTransactionCategoryColumnName,
+	datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY:     feideeMymoneyAppTransactionSubCategoryColumnName,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME:     feideeMymoneyAppTransactionAccountNameColumnName,
+	datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY: feideeMymoneyAppTransactionAccountCurrencyColumnName,
+	datatable.TRANSACTION_DATA_TABLE_AMOUNT:           feideeMymoneyAppTransactionAmountColumnName,
+	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:      feideeMymoneyAppTransactionDescriptionColumnName,
+}
 
 // feideeMymoneyAppTransactionDataCsvFileImporter defines the structure of feidee mymoney app csv importer for transaction data
 type feideeMymoneyAppTransactionDataCsvFileImporter struct{}
@@ -32,173 +54,44 @@ var (
 // ParseImportedData returns the imported data by parsing the feidee mymoney app transaction csv data
 func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
 	content := string(data)
-
-	if strings.Index(content, feideeMymoneyTransactionDataCsvFileHeader) != 0 && strings.Index(content, feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom) != 0 {
-		return nil, nil, nil, nil, nil, nil, errs.ErrInvalidFileHeader
-	}
-
-	allLines, err := c.parseAllLinesFromCsvData(ctx, content)
+	dataTable, err := c.createNewFeideeMymoneyAppImportedDataTable(ctx, content)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	if len(allLines) < 2 {
-		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because data table row count is less 1", user.Uid)
-		return nil, nil, nil, nil, nil, nil, errs.ErrNotFoundTransactionDataInFile
-	}
+	commonDataTable := datatable.CreateNewImportedCommonDataTable(dataTable)
 
-	headerLineItems := allLines[0]
-	headerItemMap := make(map[string]int)
-
-	for i := 0; i < len(headerLineItems); i++ {
-		headerItemMap[headerLineItems[i]] = i
-	}
-
-	timeColumnIdx, timeColumnExists := headerItemMap["日期"]
-	typeColumnIdx, typeColumnExists := headerItemMap["交易类型"]
-	categoryColumnIdx, categoryColumnExists := headerItemMap["类别"]
-	subCategoryColumnIdx, subCategoryColumnExists := headerItemMap["子类别"]
-	accountColumnIdx, accountColumnExists := headerItemMap["账户"]
-	accountCurrencyColumnIdx, accountCurrencyColumnExists := headerItemMap["账户币种"]
-	amountColumnIdx, amountColumnExists := headerItemMap["金额"]
-	descriptionColumnIdx, descriptionColumnExists := headerItemMap["备注"]
-	relatedIdColumnIdx, relatedIdColumnExists := headerItemMap["关联Id"]
-
-	if !timeColumnExists || !typeColumnExists || !subCategoryColumnExists ||
-		!accountColumnExists || !amountColumnExists || !relatedIdColumnExists {
-		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] cannot parse import data for user \"uid:%d\", because missing essential columns in header row", user.Uid)
+	if !commonDataTable.HasColumn(feideeMymoneyAppTransactionTimeColumnName) ||
+		!commonDataTable.HasColumn(feideeMymoneyAppTransactionTypeColumnName) ||
+		!commonDataTable.HasColumn(feideeMymoneyAppTransactionSubCategoryColumnName) ||
+		!commonDataTable.HasColumn(feideeMymoneyAppTransactionAccountNameColumnName) ||
+		!commonDataTable.HasColumn(feideeMymoneyAppTransactionAmountColumnName) ||
+		!commonDataTable.HasColumn(feideeMymoneyAppTransactionRelatedIdColumnName) {
+		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] cannot parse import data, because missing essential columns in header row")
 		return nil, nil, nil, nil, nil, nil, errs.ErrMissingRequiredFieldInHeaderRow
 	}
 
-	newColumns := make([]datatable.TransactionDataTableColumn, 0, 11)
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE)
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME)
+	transactionDataTable, err := c.createNewFeideeMymoneyAppTransactionDataTable(ctx, commonDataTable)
 
-	if categoryColumnExists {
-		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_CATEGORY)
-	}
-
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY)
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME)
-
-	if accountCurrencyColumnExists {
-		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY)
-	}
-
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_AMOUNT)
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME)
-
-	if accountCurrencyColumnExists {
-		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
-	}
-
-	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT)
-
-	if descriptionColumnExists {
-		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_DESCRIPTION)
-	}
-
-	transactionRowParser := createFeideeMymoneyTransactionDataRowParser()
-	dataTable := datatable.CreateNewWritableTransactionDataTableWithRowParser(newColumns, transactionRowParser)
-	transferTransactionsMap := make(map[string]map[datatable.TransactionDataTableColumn]string, 0)
-
-	for i := 1; i < len(allLines); i++ {
-		items := allLines[i]
-
-		if len(items) < len(headerLineItems) {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] cannot parse row \"index:%d\" for user \"uid:%d\", because may missing some columns (column count %d in data row is less than header column count %d)", i, user.Uid, len(items), len(headerLineItems))
-			return nil, nil, nil, nil, nil, nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
-		}
-
-		data, relatedId := c.parseTransactionData(items,
-			timeColumnIdx,
-			timeColumnExists,
-			typeColumnIdx,
-			typeColumnExists,
-			categoryColumnIdx,
-			categoryColumnExists,
-			subCategoryColumnIdx,
-			subCategoryColumnExists,
-			accountColumnIdx,
-			accountColumnExists,
-			accountCurrencyColumnIdx,
-			accountCurrencyColumnExists,
-			amountColumnIdx,
-			amountColumnExists,
-			descriptionColumnIdx,
-			descriptionColumnExists,
-			relatedIdColumnIdx,
-			relatedIdColumnExists,
-		)
-
-		transactionType := data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE]
-
-		if transactionType == feideeMymoneyCsvFileTransactionTypeModifyBalanceText || transactionType == feideeMymoneyCsvFileTransactionTypeIncomeText || transactionType == feideeMymoneyCsvFileTransactionTypeExpenseText {
-			if transactionType == feideeMymoneyCsvFileTransactionTypeModifyBalanceText {
-				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
-			} else if transactionType == feideeMymoneyCsvFileTransactionTypeIncomeText {
-				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
-			} else if transactionType == feideeMymoneyCsvFileTransactionTypeExpenseText {
-				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
-			}
-
-			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
-			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = ""
-			data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = ""
-			dataTable.Add(data)
-		} else if transactionType == feideeMymoneyCsvFileTransactionTypeTransferInText || transactionType == feideeMymoneyCsvFileTransactionTypeTransferOutText {
-			if relatedId == "" {
-				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] transfer transaction has blank related id in row \"index:%d\" for user \"uid:%d\"", i, user.Uid)
-				return nil, nil, nil, nil, nil, nil, errs.ErrRelatedIdCannotBeBlank
-			}
-
-			relatedData, exists := transferTransactionsMap[relatedId]
-
-			if !exists {
-				transferTransactionsMap[relatedId] = data
-				continue
-			}
-
-			if transactionType == feideeMymoneyCsvFileTransactionTypeTransferInText && relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyCsvFileTransactionTypeTransferOutText {
-				relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
-				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
-				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
-				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
-				dataTable.Add(relatedData)
-				delete(transferTransactionsMap, relatedId)
-			} else if transactionType == feideeMymoneyCsvFileTransactionTypeTransferOutText && relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyCsvFileTransactionTypeTransferInText {
-				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
-				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedData[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
-				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = relatedData[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
-				data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = relatedData[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
-				dataTable.Add(data)
-				delete(transferTransactionsMap, relatedId)
-			} else {
-				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] transfer transaction type \"%s\" is not expected in row \"index:%d\" for user \"uid:%d\"", transactionType, i, user.Uid)
-				return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
-			}
-		} else {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] cannot parse transaction type \"%s\" in row \"index:%d\" for user \"uid:%d\"", transactionType, i, user.Uid)
-			return nil, nil, nil, nil, nil, nil, errs.ErrTransactionTypeInvalid
-		}
-	}
-
-	if len(transferTransactionsMap) > 0 {
-		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.ParseImportedData] there are %d transactions (related id is %s) which don't have related records", len(transferTransactionsMap), c.getRelatedIds(transferTransactionsMap))
-		return nil, nil, nil, nil, nil, nil, errs.ErrFoundRecordNotHasRelatedRecord
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	dataTableImporter := datatable.CreateNewSimpleImporter(feideeMymoneyTransactionTypeNameMapping)
 
-	return dataTableImporter.ParseImportedData(ctx, user, dataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) parseAllLinesFromCsvData(ctx core.Context, content string) ([][]string, error) {
+func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppImportedDataTable(ctx core.Context, content string) (datatable.ImportedDataTable, error) {
+	if strings.Index(content, feideeMymoneyAppTransactionDataCsvFileHeader) != 0 && strings.Index(content, feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom) != 0 {
+		return nil, errs.ErrInvalidFileHeader
+	}
+
 	csvReader := csv.NewReader(strings.NewReader(content))
 	csvReader.FieldsPerRecord = -1
 
-	allLines := make([][]string, 0)
+	allOriginalLines := make([][]string, 0)
 	hasFileHeader := false
 
 	for {
@@ -209,91 +102,156 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) parseAllLinesFromCsvDat
 		}
 
 		if err != nil {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.parseAllLinesFromCsvData] cannot parse feidee mymoney csv data, because %s", err.Error())
+			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse feidee mymoney csv data, because %s", err.Error())
 			return nil, errs.ErrInvalidCSVFile
 		}
 
 		if !hasFileHeader {
 			if len(items) <= 0 {
 				continue
-			} else if strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], feideeMymoneyTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
+			} else if strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.parseAllLinesFromCsvData] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				log.Warnf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
 			}
 		}
 
-		allLines = append(allLines, items)
+		allOriginalLines = append(allOriginalLines, items)
 	}
 
-	return allLines, nil
+	if !hasFileHeader {
+		return nil, errs.ErrInvalidFileHeader
+	}
+
+	if len(allOriginalLines) < 2 {
+		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse import data, because data table row count is less 1")
+		return nil, errs.ErrNotFoundTransactionDataInFile
+	}
+
+	dataTable := csvdatatable.CreateNewCustomCsvImportedDataTable(allOriginalLines)
+
+	return dataTable, nil
 }
 
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) parseTransactionData(
-	items []string,
-	timeColumnIdx int,
-	timeColumnExists bool,
-	typeColumnIdx int,
-	typeColumnExists bool,
-	categoryColumnIdx int,
-	categoryColumnExists bool,
-	subCategoryColumnIdx int,
-	subCategoryColumnExists bool,
-	accountColumnIdx int,
-	accountColumnExists bool,
-	accountCurrencyColumnIdx int,
-	accountCurrencyColumnExists bool,
-	amountColumnIdx int,
-	amountColumnExists bool,
-	descriptionColumnIdx int,
-	descriptionColumnExists bool,
-	relatedIdColumnIdx int,
-	relatedIdColumnExists bool,
-) (map[datatable.TransactionDataTableColumn]string, string) {
-	data := make(map[datatable.TransactionDataTableColumn]string, 11)
-	relatedId := ""
+func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppTransactionDataTable(ctx core.Context, commonDataTable datatable.CommonDataTable) (datatable.TransactionDataTable, error) {
+	newColumns := make([]datatable.TransactionDataTableColumn, 0, 11)
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE)
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME)
 
-	if timeColumnExists && timeColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = items[timeColumnIdx]
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionCategoryColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_CATEGORY)
 	}
 
-	if typeColumnExists && typeColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = items[typeColumnIdx]
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY)
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME)
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionAccountCurrencyColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY)
 	}
 
-	if categoryColumnExists && categoryColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = items[categoryColumnIdx]
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_AMOUNT)
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME)
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionAccountCurrencyColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY)
 	}
 
-	if subCategoryColumnExists && subCategoryColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = items[subCategoryColumnIdx]
+	newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT)
+
+	if commonDataTable.HasColumn(feideeMymoneyAppTransactionDescriptionColumnName) {
+		newColumns = append(newColumns, datatable.TRANSACTION_DATA_TABLE_DESCRIPTION)
 	}
 
-	if accountColumnExists && accountColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = items[accountColumnIdx]
+	transactionRowParser := createFeideeMymoneyTransactionDataRowParser()
+	transactionDataTable := datatable.CreateNewWritableTransactionDataTableWithRowParser(newColumns, transactionRowParser)
+	transferTransactionsMap := make(map[string]map[datatable.TransactionDataTableColumn]string, 0)
+
+	commonDataTableIterator := commonDataTable.DataRowIterator()
+
+	for commonDataTableIterator.HasNext() {
+		dataRow := commonDataTableIterator.Next()
+		rowId := commonDataTableIterator.CurrentRowId()
+
+		if dataRow.ColumnCount() < commonDataTable.HeaderColumnCount() {
+			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse row \"%s\", because may missing some columns (column count %d in data row is less than header column count %d)", rowId, dataRow.ColumnCount(), commonDataTable.HeaderColumnCount())
+			return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+		}
+
+		data := make(map[datatable.TransactionDataTableColumn]string, 11)
+		relatedId := ""
+
+		for columnType, columnName := range feideeMymoneyAppDataColumnNameMapping {
+			if dataRow.HasData(columnName) {
+				data[columnType] = dataRow.GetData(columnName)
+			}
+		}
+
+		if dataRow.HasData(feideeMymoneyAppTransactionRelatedIdColumnName) {
+			relatedId = dataRow.GetData(feideeMymoneyAppTransactionRelatedIdColumnName)
+		}
+
+		transactionType := data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE]
+
+		if transactionType == feideeMymoneyAppTransactionTypeModifyBalanceText || transactionType == feideeMymoneyAppTransactionTypeIncomeText || transactionType == feideeMymoneyAppTransactionTypeExpenseText {
+			if transactionType == feideeMymoneyAppTransactionTypeModifyBalanceText {
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
+			} else if transactionType == feideeMymoneyAppTransactionTypeIncomeText {
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
+			} else if transactionType == feideeMymoneyAppTransactionTypeExpenseText {
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+			}
+
+			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
+			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = ""
+			data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = ""
+			transactionDataTable.Add(data)
+		} else if transactionType == feideeMymoneyAppTransactionTypeTransferInText || transactionType == feideeMymoneyAppTransactionTypeTransferOutText {
+			if relatedId == "" {
+				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction has blank related id in row \"%s\"", rowId)
+				return nil, errs.ErrRelatedIdCannotBeBlank
+			}
+
+			relatedData, exists := transferTransactionsMap[relatedId]
+
+			if !exists {
+				transferTransactionsMap[relatedId] = data
+				continue
+			}
+
+			if transactionType == feideeMymoneyAppTransactionTypeTransferInText && relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyAppTransactionTypeTransferOutText {
+				relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
+				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
+				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
+				relatedData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+				transactionDataTable.Add(relatedData)
+				delete(transferTransactionsMap, relatedId)
+			} else if transactionType == feideeMymoneyAppTransactionTypeTransferOutText && relatedData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == feideeMymoneyAppTransactionTypeTransferInText {
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = relatedData[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = relatedData[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = relatedData[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+				transactionDataTable.Add(data)
+				delete(transferTransactionsMap, relatedId)
+			} else {
+				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction type \"%s\" is not expected in row \"%s\"", transactionType, rowId)
+				return nil, errs.ErrTransactionTypeInvalid
+			}
+		} else {
+			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse transaction type \"%s\" in row \"%s\"", transactionType, rowId)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
 	}
 
-	if accountCurrencyColumnExists && accountCurrencyColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = items[accountCurrencyColumnIdx]
+	if len(transferTransactionsMap) > 0 {
+		log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] there are %d transactions (related id is %s) which don't have related records", len(transferTransactionsMap), c.getFeideeMymoneyAppRelatedTransactionIds(transferTransactionsMap))
+		return nil, errs.ErrFoundRecordNotHasRelatedRecord
 	}
 
-	if amountColumnExists && amountColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = items[amountColumnIdx]
-	}
-
-	if descriptionColumnExists && descriptionColumnIdx < len(items) {
-		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = items[descriptionColumnIdx]
-	}
-
-	if relatedIdColumnExists && relatedIdColumnIdx < len(items) {
-		relatedId = items[relatedIdColumnIdx]
-	}
-
-	return data, relatedId
+	return transactionDataTable, nil
 }
 
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) getRelatedIds(transferTransactionsMap map[string]map[datatable.TransactionDataTableColumn]string) string {
+func (c *feideeMymoneyAppTransactionDataCsvFileImporter) getFeideeMymoneyAppRelatedTransactionIds(transferTransactionsMap map[string]map[datatable.TransactionDataTableColumn]string) string {
 	builder := strings.Builder{}
 
 	for relatedId := range transferTransactionsMap {

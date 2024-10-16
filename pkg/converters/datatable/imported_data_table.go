@@ -26,6 +26,9 @@ type ImportedDataRowIterator interface {
 	// HasNext returns whether the iterator does not reach the end
 	HasNext() bool
 
+	// CurrentRowId returns current row id
+	CurrentRowId() string
+
 	// Next returns the next imported data row
 	Next() ImportedDataRow
 }

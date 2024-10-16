@@ -143,13 +143,13 @@ func (t *ImportedTransactionDataRowIterator) Next(ctx core.Context, user *models
 	}, nil
 }
 
-// CreateImportedTransactionDataTable returns transaction data table from imported data table
-func CreateImportedTransactionDataTable(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string) *ImportedTransactionDataTable {
-	return CreateImportedTransactionDataTableWithRowParser(dataTable, dataColumnMapping, nil)
+// CreateNewImportedTransactionDataTable returns transaction data table from imported data table
+func CreateNewImportedTransactionDataTable(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string) *ImportedTransactionDataTable {
+	return CreateNewImportedTransactionDataTableWithRowParser(dataTable, dataColumnMapping, nil)
 }
 
-// CreateImportedTransactionDataTableWithRowParser returns transaction data table from imported data table
-func CreateImportedTransactionDataTableWithRowParser(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string, rowParser TransactionDataRowParser) *ImportedTransactionDataTable {
+// CreateNewImportedTransactionDataTableWithRowParser returns transaction data table from imported data table
+func CreateNewImportedTransactionDataTableWithRowParser(dataTable ImportedDataTable, dataColumnMapping map[TransactionDataTableColumn]string, rowParser TransactionDataRowParser) *ImportedTransactionDataTable {
 	headerLineItems := dataTable.HeaderColumnNames()
 	headerItemMap := make(map[string]int, len(headerLineItems))
 

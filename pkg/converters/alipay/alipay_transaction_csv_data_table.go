@@ -200,7 +200,7 @@ func (t *alipayTransactionDataTable) parseTransactionData(ctx core.Context, user
 
 		if dataRow.GetData(t.columns.typeColumnName) == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
 			if statusName == alipayTransactionDataStatusClosedName {
-				log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because income transaction is closed", rowId)
+				log.Warnf(ctx, "[alipay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because income transaction is closed", rowId)
 				return nil, false, nil
 			}
 
@@ -213,7 +213,7 @@ func (t *alipayTransactionDataTable) parseTransactionData(ctx core.Context, user
 			}
 		} else if dataRow.GetData(t.columns.typeColumnName) == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
 			if statusName == alipayTransactionDataStatusClosedName {
-				log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because non-income/expense transaction is closed", rowId)
+				log.Warnf(ctx, "[alipay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because non-income/expense transaction is closed", rowId)
 				return nil, false, nil
 			}
 
@@ -249,7 +249,7 @@ func (t *alipayTransactionDataTable) parseTransactionData(ctx core.Context, user
 					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
 					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else {
-					log.Warnf(ctx, "[wechat_pay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because product name (\"%s\") is unknown", rowId, productName)
+					log.Warnf(ctx, "[alipay_transaction_csv_data_table.parseTransactionData] skip parsing transaction in row \"%s\", because product name (\"%s\") is unknown", rowId, productName)
 					return nil, false, nil
 				}
 			}

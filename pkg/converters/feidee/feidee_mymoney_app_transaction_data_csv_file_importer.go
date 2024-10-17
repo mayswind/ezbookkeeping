@@ -114,6 +114,7 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 				continue
 			} else {
 				log.Warnf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] read unexpected line before read file header, line content is %s", strings.Join(items, ","))
+				continue
 			}
 		}
 
@@ -179,16 +180,11 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 		}
 
 		data := make(map[datatable.TransactionDataTableColumn]string, 11)
-		relatedId := ""
 
 		for columnType, columnName := range feideeMymoneyAppDataColumnNameMapping {
 			if dataRow.HasData(columnName) {
 				data[columnType] = dataRow.GetData(columnName)
 			}
-		}
-
-		if dataRow.HasData(feideeMymoneyAppTransactionRelatedIdColumnName) {
-			relatedId = dataRow.GetData(feideeMymoneyAppTransactionRelatedIdColumnName)
 		}
 
 		transactionType := data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE]
@@ -207,6 +203,12 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 			data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = ""
 			transactionDataTable.Add(data)
 		} else if transactionType == feideeMymoneyAppTransactionTypeTransferInText || transactionType == feideeMymoneyAppTransactionTypeTransferOutText {
+			relatedId := ""
+
+			if dataRow.HasData(feideeMymoneyAppTransactionRelatedIdColumnName) {
+				relatedId = dataRow.GetData(feideeMymoneyAppTransactionRelatedIdColumnName)
+			}
+
 			if relatedId == "" {
 				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction has blank related id in row \"%s\"", rowId)
 				return nil, errs.ErrRelatedIdCannotBeBlank

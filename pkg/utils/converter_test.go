@@ -278,6 +278,21 @@ func TestParseAmount(t *testing.T) {
 	actualValue, err = ParseAmount("-12.34")
 	assert.Nil(t, err)
 	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(0)
+	actualValue, err = ParseAmount("+0")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(12)
+	actualValue, err = ParseAmount("+0.12")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = int64(1234)
+	actualValue, err = ParseAmount("+12.34")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
 }
 
 func TestParseAmount_InvalidAmount(t *testing.T) {

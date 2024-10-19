@@ -29,6 +29,21 @@ const supportedImportFileTypes = [
         }
     },
     {
+        type: 'qif_ymd',
+        name: 'Quicken Interchange Format (QIF) File (Year-month-day format)',
+        extensions: '.qif'
+    },
+    {
+        type: 'qif_mdy',
+        name: 'Quicken Interchange Format (QIF) File (Month-day-year format)',
+        extensions: '.qif'
+    },
+    {
+        type: 'qif_dmy',
+        name: 'Quicken Interchange Format (QIF) File (Day-month-year format)',
+        extensions: '.qif'
+    },
+    {
         type: 'feidee_mymoney_csv',
         name: 'Feidee MyMoney (App) Data Export File',
         extensions: '.csv',

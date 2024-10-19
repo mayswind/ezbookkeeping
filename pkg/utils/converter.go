@@ -140,6 +140,9 @@ func ParseAmount(amount string) (int64, error) {
 	if amount[0] == '-' {
 		amount = amount[1:]
 		sign = -1
+	} else if amount[0] == '+' {
+		amount = amount[1:]
+		sign = 1
 	}
 
 	if len(amount) < 1 {

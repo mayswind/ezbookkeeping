@@ -6,6 +6,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/default"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/feidee"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/qif"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/wechat"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
@@ -27,6 +28,12 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return _default.DefaultTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
 		return _default.DefaultTransactionDataTSVFileConverter, nil
+	} else if fileType == "qif_ymd" {
+		return qif.QifYearMonthDayTransactionDataImporter, nil
+	} else if fileType == "qif_mdy" {
+		return qif.QifMonthDayYearTransactionDataImporter, nil
+	} else if fileType == "qif_dmy" {
+		return qif.QifDayMonthYearTransactionDataImporter, nil
 	} else if fileType == "firefly_iii_csv" {
 		return fireflyIII.FireflyIIITransactionDataCsvFileImporter, nil
 	} else if fileType == "feidee_mymoney_csv" {

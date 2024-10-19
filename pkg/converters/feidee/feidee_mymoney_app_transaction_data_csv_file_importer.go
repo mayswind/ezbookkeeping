@@ -1,7 +1,10 @@
 package feidee
 
 import (
+	"bytes"
 	"encoding/csv"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 	"io"
 	"strings"
 
@@ -14,7 +17,6 @@ import (
 )
 
 const feideeMymoneyAppTransactionDataCsvFileHeader = "随手记导出文件(headers:v5;"
-const feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + feideeMymoneyAppTransactionDataCsvFileHeader
 
 const feideeMymoneyAppTransactionTimeColumnName = "日期"
 const feideeMymoneyAppTransactionTypeColumnName = "交易类型"
@@ -53,8 +55,10 @@ var (
 
 // ParseImportedData returns the imported data by parsing the feidee mymoney app transaction csv data
 func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	content := string(data)
-	dataTable, err := c.createNewFeideeMymoneyAppImportedDataTable(ctx, content)
+	fallback := unicode.UTF8.NewDecoder()
+	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
+
+	dataTable, err := c.createNewFeideeMymoneyAppImportedDataTable(ctx, reader)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -83,12 +87,8 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx c
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezoneOffset, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 }
 
-func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppImportedDataTable(ctx core.Context, content string) (datatable.ImportedDataTable, error) {
-	if strings.Index(content, feideeMymoneyAppTransactionDataCsvFileHeader) != 0 && strings.Index(content, feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom) != 0 {
-		return nil, errs.ErrInvalidFileHeader
-	}
-
-	csvReader := csv.NewReader(strings.NewReader(content))
+func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyAppImportedDataTable(ctx core.Context, reader io.Reader) (datatable.ImportedDataTable, error) {
+	csvReader := csv.NewReader(reader)
 	csvReader.FieldsPerRecord = -1
 
 	allOriginalLines := make([][]string, 0)
@@ -109,7 +109,7 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 		if !hasFileHeader {
 			if len(items) <= 0 {
 				continue
-			} else if strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
+			} else if strings.Index(items[0], feideeMymoneyAppTransactionDataCsvFileHeader) == 0 {
 				hasFileHeader = true
 				continue
 			} else {

@@ -3,6 +3,8 @@ package wechat
 import (
 	"bytes"
 	"encoding/csv"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 	"io"
 	"strings"
 
@@ -43,7 +45,8 @@ var (
 
 // ParseImportedData returns the imported data by parsing the wechat pay transaction csv data
 func (c *wechatPayTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezoneOffset int16, accountMap map[string]*models.Account, expenseCategoryMap map[string]*models.TransactionCategory, incomeCategoryMap map[string]*models.TransactionCategory, transferCategoryMap map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	reader := bytes.NewReader(data)
+	fallback := unicode.UTF8.NewDecoder()
+	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
 
 	dataTable, err := c.createNewWeChatPayImportedDataTable(ctx, reader)
 
@@ -92,7 +95,7 @@ func (c *wechatPayTransactionDataCsvFileImporter) createNewWeChatPayImportedData
 		if !hasFileHeader {
 			if len(items) <= 0 {
 				continue
-			} else if strings.Index(items[0], wechatPayTransactionDataCsvFileHeader) == 0 || strings.Index(items[0], wechatPayTransactionDataCsvFileHeaderWithUtf8Bom) == 0 {
+			} else if strings.Index(items[0], wechatPayTransactionDataCsvFileHeader) == 0 {
 				hasFileHeader = true
 				continue
 			} else {

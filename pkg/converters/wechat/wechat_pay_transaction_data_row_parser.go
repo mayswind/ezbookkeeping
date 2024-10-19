@@ -13,7 +13,6 @@ import (
 )
 
 const wechatPayTransactionDataCsvFileHeader = "微信支付账单明细"
-const wechatPayTransactionDataCsvFileHeaderWithUtf8Bom = "\xEF\xBB\xBF" + wechatPayTransactionDataCsvFileHeader
 const wechatPayTransactionDataHeaderStartContentBeginning = "----------------------微信支付账单明细列表--------------------"
 
 const wechatPayTransactionTimeColumnName = "交易时间"

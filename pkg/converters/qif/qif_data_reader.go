@@ -33,6 +33,7 @@ type qifDataReader struct {
 }
 
 // read returns the imported qif data
+// Reference: https://www.w3.org/2000/10/swap/pim/qif-doc/QIF-doc.htm
 func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 	if len(r.allLines) < 1 {
 		return nil, errs.ErrNotFoundTransactionDataInFile

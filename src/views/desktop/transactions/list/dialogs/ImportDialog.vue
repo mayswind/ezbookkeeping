@@ -78,6 +78,18 @@
                             />
                         </v-col>
 
+                        <v-col cols="12" md="12" v-if="allFileSubTypes">
+                            <v-select
+                                item-title="displayName"
+                                item-value="type"
+                                :disabled="submitting"
+                                :label="$t('Type')"
+                                :placeholder="$t('Type')"
+                                :items="allFileSubTypes"
+                                v-model="fileSubType"
+                            />
+                        </v-col>
+
                         <v-col cols="12" md="12">
                             <v-text-field
                                 readonly
@@ -523,6 +535,7 @@ export default {
             clientSessionId: '',
             currentStep: 'uploadFile',
             fileType: 'ezbookkeeping_csv',
+            fileSubType: '',
             importFile: null,
             importTransactions: null,
             editingTransaction: null,
@@ -578,6 +591,9 @@ export default {
         },
         allSupportedImportFileTypes() {
             return this.$locale.getAllSupportedImportFileTypes();
+        },
+        allFileSubTypes() {
+            return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'subTypes');
         },
         allTransactionTypes() {
             return transactionConstants.allTransactionTypes;
@@ -826,6 +842,10 @@ export default {
     },
     watch: {
         fileType: function () {
+            if (this.allFileSubTypes && this.allFileSubTypes.length) {
+                this.fileSubType = this.allFileSubTypes[0].type;
+            }
+
             this.importFile = null;
             this.importTransactions = null;
             this.editingTransaction = null;
@@ -893,8 +913,14 @@ export default {
             const self = this;
             self.submitting = true;
 
+            let fileType = self.fileType;
+
+            if (self.allFileSubTypes) {
+                fileType = self.fileSubType;
+            }
+
             self.transactionsStore.parseImportTransaction({
-                fileType: self.fileType,
+                fileType: fileType,
                 importFile: self.importFile
             }).then(response => {
                 const parsedTransactions = response.items;

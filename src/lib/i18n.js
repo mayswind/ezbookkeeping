@@ -1299,10 +1299,24 @@ function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
             document = null;
         }
 
+        const subTypes = [];
+
+        if (fileType.subTypes) {
+            for (let i = 0; i < fileType.subTypes.length; i++) {
+                const subType = fileType.subTypes[i];
+
+                subTypes.push({
+                    type: subType.type,
+                    displayName: translateFn(subType.name),
+                });
+            }
+        }
+
         allSupportedImportFileTypes.push({
             type: fileType.type,
             displayName: translateFn(fileType.name),
             extensions: fileType.extensions,
+            subTypes: subTypes.length ? subTypes : undefined,
             document: document
         });
     }

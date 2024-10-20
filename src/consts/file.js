@@ -29,19 +29,23 @@ const supportedImportFileTypes = [
         }
     },
     {
-        type: 'qif_ymd',
-        name: 'Quicken Interchange Format (QIF) File (Year-month-day format)',
-        extensions: '.qif'
-    },
-    {
-        type: 'qif_mdy',
-        name: 'Quicken Interchange Format (QIF) File (Month-day-year format)',
-        extensions: '.qif'
-    },
-    {
-        type: 'qif_dmy',
-        name: 'Quicken Interchange Format (QIF) File (Day-month-year format)',
-        extensions: '.qif'
+        type: 'qif',
+        name: 'Quicken Interchange Format (QIF) File',
+        extensions: '.qif',
+        subTypes: [
+            {
+                type: 'qif_ymd',
+                name: 'Year-month-day format',
+            },
+            {
+                type: 'qif_mdy',
+                name: 'Month-day-year format',
+            },
+            {
+                type: 'qif_dmy',
+                name: 'Day-month-year format',
+            }
+        ]
     },
     {
         type: 'feidee_mymoney_csv',

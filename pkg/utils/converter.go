@@ -101,8 +101,8 @@ func StringToFloat64(str string) (float64, error) {
 }
 
 // FormatAmount returns a textual representation of amount
-func FormatAmount(amount int64) string {
-	displayAmount := Int64ToString(amount)
+func FormatAmount(value int64) string {
+	displayAmount := Int64ToString(value)
 	negative := displayAmount[0] == '-'
 
 	if negative {

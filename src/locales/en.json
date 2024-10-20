@@ -1195,6 +1195,7 @@
         "anchor": {
             "export_and_import": {
                 "export-transactions": "export-transactions",
+                "how-to-get-gnucash-xml-database": "how-to-get-gnucash-xml-database",
                 "how-to-get-firefly-iii-data-export-file": "how-to-get-firefly-iii-data-export-file"
             }
         }

@@ -1195,6 +1195,7 @@
         "anchor": {
             "export_and_import": {
                 "export-transactions": "导出交易",
+                "how-to-get-gnucash-xml-database": "如何获取-gnucash-xml-数据库",
                 "how-to-get-firefly-iii-data-export-file": "如何获取-firefly-iii-数据导出文件"
             }
         }

@@ -44,7 +44,7 @@ const supportedImportFileTypes = [
         extensions: '.gnucash',
         document: {
             supportMultiLanguages: true,
-            anchor: 'how-to-get-gnucash-data-export-file'
+            anchor: 'how-to-get-gnucash-xml-database'
         }
     },
     {

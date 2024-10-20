@@ -17,4 +17,5 @@ var (
 	ErrRelatedIdCannotBeBlank              = NewNormalError(NormalSubcategoryConverter, 10, http.StatusBadRequest, "related id cannot be blank")
 	ErrFoundRecordNotHasRelatedRecord      = NewNormalError(NormalSubcategoryConverter, 11, http.StatusBadRequest, "found some transactions without related records")
 	ErrInvalidQIFFile                      = NewNormalError(NormalSubcategoryConverter, 12, http.StatusBadRequest, "invalid qif file")
+	ErrMissingTransactionTime              = NewNormalError(NormalSubcategoryConverter, 13, http.StatusBadRequest, "missing transaction time field")
 )

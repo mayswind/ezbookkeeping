@@ -1127,6 +1127,7 @@
         "related id cannot be blank": "关联Id不能为空",
         "found some transactions without related records": "有一些交易没有关联记录",
         "invalid qif file": "无效的 QIF 文件",
+        "missing transaction time field": "缺少交易时间字段",
         "query items cannot be blank": "请求项目不能为空",
         "query items too much": "请求项目过多",
         "query items have invalid item": "请求项目中有非法项目",

@@ -118,6 +118,10 @@ func (t *qifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user *models.User, qifTransaction *qifTransactionData) (map[datatable.TransactionDataTableColumn]string, error) {
 	data := make(map[datatable.TransactionDataTableColumn]string, len(qifTransactionSupportedColumns))
 
+	if qifTransaction.date == "" {
+		return nil, errs.ErrMissingTransactionTime
+	}
+
 	transactionTime, err := t.parseTransactionTime(ctx, qifTransaction.date)
 
 	if err != nil {

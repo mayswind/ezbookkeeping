@@ -426,7 +426,7 @@ func TestQIFTransactionDataFileParseImportedData_MissingRequiredFields(t *testin
 		"!Type:Bank\n"+
 			"T-123.45\n"+
 			"^\n"), 0, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
+	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Amount Field
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(

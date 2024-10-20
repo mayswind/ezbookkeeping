@@ -1127,6 +1127,7 @@
         "related id cannot be blank": "Related ID cannot be blank",
         "found some transactions without related records": "There are some transactions which don't have related records",
         "invalid qif file": "Invalid QIF file",
+        "missing transaction time field": "Missing transaction time field",
         "query items cannot be blank": "There are no query items",
         "query items too much": "There are too many query items",
         "query items have invalid item": "There is invalid item in query items",

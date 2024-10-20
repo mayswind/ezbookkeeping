@@ -11,6 +11,7 @@ import (
 const (
 	longDateTimeFormat              = "2006-01-02 15:04:05"
 	longDateTimeWithTimezoneFormat  = "2006-01-02 15:04:05Z07:00"
+	longDateTimeWithTimezoneFormat2 = "2006-01-02 15:04:05 Z0700"
 	longDateTimeWithoutSecondFormat = "2006-01-02 15:04"
 	shortDateTimeFormat             = "2006-1-2 15:4:5"
 	yearMonthDateTimeFormat         = "2006-01"
@@ -139,6 +140,11 @@ func ParseFromLongDateTime(t string, utcOffset int16) (time.Time, error) {
 // ParseFromLongDateTimeWithTimezone parses a formatted string in long date time format
 func ParseFromLongDateTimeWithTimezone(t string) (time.Time, error) {
 	return time.Parse(longDateTimeWithTimezoneFormat, t)
+}
+
+// ParseFromLongDateTimeWithTimezone2 parses a formatted string in long date time format
+func ParseFromLongDateTimeWithTimezone2(t string) (time.Time, error) {
+	return time.Parse(longDateTimeWithTimezoneFormat2, t)
 }
 
 // ParseFromLongDateTimeWithoutSecond parses a formatted string in long date time format (no second)

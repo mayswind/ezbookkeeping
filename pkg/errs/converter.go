@@ -18,4 +18,8 @@ var (
 	ErrFoundRecordNotHasRelatedRecord      = NewNormalError(NormalSubcategoryConverter, 11, http.StatusBadRequest, "found some transactions without related records")
 	ErrInvalidQIFFile                      = NewNormalError(NormalSubcategoryConverter, 12, http.StatusBadRequest, "invalid qif file")
 	ErrMissingTransactionTime              = NewNormalError(NormalSubcategoryConverter, 13, http.StatusBadRequest, "missing transaction time field")
+	ErrInvalidGnuCashFile                  = NewNormalError(NormalSubcategoryConverter, 14, http.StatusBadRequest, "invalid gnucash file")
+	ErrMissingAccountData                  = NewNormalError(NormalSubcategoryConverter, 15, http.StatusBadRequest, "missing account data")
+	ErrNotSupportedSplitTransactions       = NewNormalError(NormalSubcategoryConverter, 16, http.StatusBadRequest, "not supported to import split transaction")
+	ErrThereAreNotSupportedTransactionType = NewNormalError(NormalSubcategoryConverter, 17, http.StatusBadRequest, "there are not supported transaction type")
 )

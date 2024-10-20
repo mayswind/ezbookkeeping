@@ -39,6 +39,15 @@ const supportedImportFileTypes = [
         ]
     },
     {
+        type: 'gnucash',
+        name: 'GnuCash XML Database File',
+        extensions: '.gnucash',
+        document: {
+            supportMultiLanguages: true,
+            anchor: 'how-to-get-gnucash-data-export-file'
+        }
+    },
+    {
         type: 'firefly_iii_csv',
         name: 'Firefly III Data Export File',
         extensions: '.csv',

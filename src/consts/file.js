@@ -20,15 +20,6 @@ const supportedImportFileTypes = [
         }
     },
     {
-        type: 'firefly_iii_csv',
-        name: 'Firefly III Data Export File',
-        extensions: '.csv',
-        document: {
-            supportMultiLanguages: true,
-            anchor: 'how-to-get-firefly-iii-data-export-file'
-        }
-    },
-    {
         type: 'qif',
         name: 'Quicken Interchange Format (QIF) File',
         extensions: '.qif',
@@ -46,6 +37,15 @@ const supportedImportFileTypes = [
                 name: 'Day-month-year format',
             }
         ]
+    },
+    {
+        type: 'firefly_iii_csv',
+        name: 'Firefly III Data Export File',
+        extensions: '.csv',
+        document: {
+            supportMultiLanguages: true,
+            anchor: 'how-to-get-firefly-iii-data-export-file'
+        }
     },
     {
         type: 'feidee_mymoney_csv',

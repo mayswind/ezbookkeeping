@@ -38,11 +38,15 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"D2024-09-04\n"+
 			"T-0.05\n"+
 			"L[Test Account2]\n"+
+			"^\n"+
+			"D2024-09-05\n"+
+			"T0.06\n"+
+			"L[Test Account2]\n"+
 			"^\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, 4, len(allNewTransactions))
+	assert.Equal(t, 5, len(allNewTransactions))
 	assert.Equal(t, 3, len(allNewAccounts))
 	assert.Equal(t, 1, len(allNewSubExpenseCategories))
 	assert.Equal(t, 1, len(allNewSubIncomeCategories))
@@ -77,6 +81,14 @@ func TestQIFTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 	assert.Equal(t, "", allNewTransactions[3].OriginalSourceAccountName)
 	assert.Equal(t, "Test Account2", allNewTransactions[3].OriginalDestinationAccountName)
 	assert.Equal(t, "", allNewTransactions[3].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[4].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[4].Type)
+	assert.Equal(t, int64(1725494400), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
+	assert.Equal(t, int64(6), allNewTransactions[4].Amount)
+	assert.Equal(t, "Test Account2", allNewTransactions[4].OriginalSourceAccountName)
+	assert.Equal(t, "", allNewTransactions[4].OriginalDestinationAccountName)
+	assert.Equal(t, "", allNewTransactions[4].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
 	assert.Equal(t, "Test Account", allNewAccounts[0].Name)

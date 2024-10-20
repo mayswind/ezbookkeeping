@@ -151,10 +151,17 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
-		} else { // transfer to [account name]
+		} else { // transfer
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
-			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
-			data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+
+			if amount >= 0 { // transfer from [account name]
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+			} else { // transfer to [account name]
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = qifTransaction.category[1 : len(qifTransaction.category)-1]
+			}
 		}
 	} else { // income/expense
 		if amount >= 0 {

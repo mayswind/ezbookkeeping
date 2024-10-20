@@ -10,7 +10,7 @@ import (
 
 const (
 	longDateTimeFormat              = "2006-01-02 15:04:05"
-	longDateTimeWithTimezoneFormat  = "2006-01-02T15:04:05Z07:00"
+	longDateTimeWithTimezoneFormat  = "2006-01-02 15:04:05Z07:00"
 	longDateTimeWithoutSecondFormat = "2006-01-02 15:04"
 	shortDateTimeFormat             = "2006-1-2 15:4:5"
 	yearMonthDateTimeFormat         = "2006-01"

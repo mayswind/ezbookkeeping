@@ -1,6 +1,8 @@
 package fireflyIII
 
 import (
+	"strings"
+
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -30,7 +32,11 @@ func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.Transactio
 
 	// parse long date time and timezone
 	if rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] != "" {
-		dateTime, err := utils.ParseFromLongDateTimeWithTimezone(rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
+		if strings.Index(rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME], "T") <= 0 {
+			return nil, false, errs.ErrTransactionTimeInvalid
+		}
+
+		dateTime, err := utils.ParseFromLongDateTimeWithTimezone(strings.ReplaceAll(rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME], "T", " "))
 
 		if err != nil {
 			return nil, false, errs.ErrTransactionTimeInvalid

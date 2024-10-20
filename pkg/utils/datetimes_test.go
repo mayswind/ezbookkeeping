@@ -133,7 +133,7 @@ func TestParseFromLongDateTime(t *testing.T) {
 
 func TestParseFromLongDateTimeWithTimezone(t *testing.T) {
 	expectedValue := int64(1617238883)
-	actualTime, err := ParseFromLongDateTimeWithTimezone("2021-04-01T06:01:23+05:00")
+	actualTime, err := ParseFromLongDateTimeWithTimezone("2021-04-01 06:01:23+05:00")
 	assert.Equal(t, nil, err)
 
 	actualValue := actualTime.Unix()

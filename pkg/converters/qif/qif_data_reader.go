@@ -19,10 +19,12 @@ const qifCreditCardTransactionHeader = "!Type:CCard"
 const qifAssetAccountTransactionHeader = "!Type:Oth A"
 const qifLiabilityAccountTransactionHeader = "!Type:Oth L"
 const qifMemorizedTransactionHeader = "!Type:Memorized"
+const qifMemorisedTransactionHeader = "!Type:Memorised"
 const qifInvestmentTransactionHeader = "!Type:Invst"
 const qifAccountHeader = "!Account"
 const qifCategoryHeader = "!Type:Cat"
 const qifClassHeader = "!Type:Class"
+const qifTypeHeaderPrefix = "!Type:"
 
 const qifEntryStartRune = '!'
 const qifEntryEnd = '^'
@@ -57,17 +59,24 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 				return nil, errs.ErrInvalidQIFFile
 			}
 
+			line = strings.TrimRight(line, " ")
+
 			if line == qifBankTransactionHeader ||
 				line == qifCashTransactionHeader ||
 				line == qifCreditCardTransactionHeader ||
 				line == qifAssetAccountTransactionHeader ||
 				line == qifLiabilityAccountTransactionHeader ||
 				line == qifMemorizedTransactionHeader ||
+				line == qifMemorisedTransactionHeader ||
 				line == qifInvestmentTransactionHeader ||
 				line == qifAccountHeader ||
 				line == qifCategoryHeader ||
 				line == qifClassHeader {
 				currentEntryHeader = line
+			} else if strings.Index(line, qifTypeHeaderPrefix) == 0 {
+				currentEntryHeader = line
+				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header line \"%s\" and skip the following entries", line)
+				continue
 			} else {
 				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header line \"%s\" and skip this line", line)
 				continue
@@ -81,7 +90,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 				currentEntryHeader == qifCreditCardTransactionHeader ||
 				currentEntryHeader == qifAssetAccountTransactionHeader ||
 				currentEntryHeader == qifLiabilityAccountTransactionHeader {
-				transactionData, err := r.parseTransaction(ctx, entryData)
+				transactionData, err := r.parseTransaction(ctx, entryData, false)
 
 				if err != nil {
 					return nil, err
@@ -104,7 +113,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 				} else if currentEntryHeader == qifLiabilityAccountTransactionHeader {
 					data.liabilityAccountTransactions = append(data.liabilityAccountTransactions, transactionData)
 				}
-			} else if currentEntryHeader == qifMemorizedTransactionHeader {
+			} else if currentEntryHeader == qifMemorizedTransactionHeader || currentEntryHeader == qifMemorisedTransactionHeader {
 				transactionData, err := r.parseMemorizedTransaction(ctx, entryData)
 
 				if err != nil {
@@ -182,7 +191,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 	return data, nil
 }
 
-func (r *qifDataReader) parseTransaction(ctx core.Context, data []string) (*qifTransactionData, error) {
+func (r *qifDataReader) parseTransaction(ctx core.Context, data []string, ignoreUnknown bool) (*qifTransactionData, error) {
 	if len(data) < 1 {
 		return nil, nil
 	}
@@ -219,8 +228,10 @@ func (r *qifDataReader) parseTransaction(ctx core.Context, data []string) (*qifT
 		} else if line[0] == '$' {
 			transactionData.subTransactionAmount = append(transactionData.subTransactionAmount, line[1:])
 		} else {
-			log.Warnf(ctx, "[qif_data_reader.parseTransaction] read unsupported line \"%s\" and skip this line", line)
-			continue
+			if !ignoreUnknown {
+				log.Warnf(ctx, "[qif_data_reader.parseTransaction] read unsupported line \"%s\" and skip this line", line)
+				continue
+			}
 		}
 	}
 
@@ -232,7 +243,7 @@ func (r *qifDataReader) parseMemorizedTransaction(ctx core.Context, data []strin
 		return nil, nil
 	}
 
-	baseTransactionData, err := r.parseTransaction(ctx, data)
+	baseTransactionData, err := r.parseTransaction(ctx, data, true)
 
 	if err != nil {
 		return nil, err
@@ -247,6 +258,13 @@ func (r *qifDataReader) parseMemorizedTransaction(ctx core.Context, data []strin
 		line := data[i]
 
 		if len(line) < 1 {
+			continue
+		}
+
+		// these lines has been already processed in parseTransaction
+		if line[0] == 'D' || line[0] == 'T' || line[0] == 'C' || line[0] == 'N' ||
+			line[0] == 'P' || line[0] == 'M' || line[0] == 'A' || line[0] == 'L' ||
+			line[0] == 'S' || line[0] == 'E' || line[0] == '$' {
 			continue
 		}
 

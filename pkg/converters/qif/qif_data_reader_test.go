@@ -197,6 +197,54 @@ func TestQifDataReaderParse_EmptyEntry(t *testing.T) {
 	assert.Equal(t, 0, len(actualData.classes))
 }
 
+func TestQifDataReaderParse_UnsupportedEntryHeader(t *testing.T) {
+	reader := &qifDataReader{
+		allLines: []string{
+			"!Type:Bank",
+			"D2024/10/9",
+			"T-123.45",
+			"^",
+			"!Type:Unknown",
+			"D2024/10/11",
+			"T100.00",
+			"^",
+		},
+	}
+	context := core.NewNullContext()
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.bankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
+	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
+}
+
+func TestQifDataReaderParse_UnsupportedLine(t *testing.T) {
+	reader := &qifDataReader{
+		allLines: []string{
+			"!Type:Bank",
+			"D2024/10/9",
+			"T-123.45",
+			"^",
+			"!Option:Unknown",
+			"D2024/10/11",
+			"T100.00",
+			"^",
+		},
+	}
+	context := core.NewNullContext()
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(actualData.bankAccountTransactions))
+	assert.Equal(t, "2024/10/9", actualData.bankAccountTransactions[0].date)
+	assert.Equal(t, "-123.45", actualData.bankAccountTransactions[0].amount)
+	assert.Equal(t, "2024/10/11", actualData.bankAccountTransactions[1].date)
+	assert.Equal(t, "100.00", actualData.bankAccountTransactions[1].amount)
+}
+
 func TestQifDataReaderParse_NewEntryHeaderAfterUnclosedEntry(t *testing.T) {
 	reader := &qifDataReader{
 		allLines: []string{
@@ -238,7 +286,7 @@ func TestQifDataReaderParseTransaction_SupportedFields(t *testing.T) {
 		"SPart2 Category",
 		"EPart2 Memo",
 		"$-23.45",
-	})
+	}, false)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "2024/10/12", actualData.date)
@@ -439,7 +487,7 @@ func TestQifDataReaderParse_UnsupportedFieldsOrValues(t *testing.T) {
 		"ZTest",
 		"CZ",
 		"",
-	})
+	}, false)
 	assert.Nil(t, err)
 	assert.Equal(t, qifClearedStatusUnreconciled, actualTransactionData.clearedStatus)
 

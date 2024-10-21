@@ -187,15 +187,13 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 				toAccount = account1
 			}
 
-			if len(fromAmount) > 0 && fromAmount[0] == '-' {
-				amount, err := utils.ParseAmount(fromAmount)
+			amount, err := utils.ParseAmount(fromAmount)
 
-				if err != nil {
-					return nil, false, errs.ErrAmountInvalid
-				}
-
-				fromAmount = utils.FormatAmount(-amount)
+			if err != nil {
+				return nil, false, errs.ErrAmountInvalid
 			}
+
+			fromAmount = utils.FormatAmount(-amount)
 
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_EXPENSE))
 			data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = t.getCategoryName(toAccount)

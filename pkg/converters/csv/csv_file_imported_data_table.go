@@ -125,7 +125,7 @@ func createNewCsvFileDataTable(ctx core.Context, reader io.Reader, separator run
 			return nil, errs.ErrInvalidCSVFile
 		}
 
-		if len(items) == 0 && items[0] == "" {
+		if len(items) == 1 && items[0] == "" {
 			continue
 		}
 

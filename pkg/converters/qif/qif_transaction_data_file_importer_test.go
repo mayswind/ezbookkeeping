@@ -351,7 +351,7 @@ func TestQIFTransactionDataFileParseImportedData_ParseAccount(t *testing.T) {
 	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
 }
 
-func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSing(t *testing.T) {
+func TestQIFTransactionDataFileParseImportedData_ParseAmountWithLeadingPlusSign(t *testing.T) {
 	converter := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()
 

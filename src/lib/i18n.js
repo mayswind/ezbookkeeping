@@ -1308,6 +1308,7 @@ function getAllSupportedImportFileTypes(i18nGlobal, translateFn) {
                 subTypes.push({
                     type: subType.type,
                     displayName: translateFn(subType.name),
+                    extensions: subType.extensions
                 });
             }
         }

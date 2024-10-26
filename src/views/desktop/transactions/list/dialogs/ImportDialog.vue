@@ -83,8 +83,8 @@
                                 item-title="displayName"
                                 item-value="type"
                                 :disabled="submitting"
-                                :label="$t('Type')"
-                                :placeholder="$t('Type')"
+                                :label="$t('Format')"
+                                :placeholder="$t('Format')"
                                 :items="allFileSubTypes"
                                 v-model="fileSubType"
                             />
@@ -490,6 +490,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.js';
 import categoryConstants from '@/consts/category.js';
 import transactionConstants from '@/consts/transaction.js';
 import { getNameByKeyValue } from '@/lib/common.js';
+import { isFileExtensionSupported } from '@/lib/file.js';
 import { generateRandomUUID } from '@/lib/misc.js';
 import logger from '@/lib/logger.js';
 import {
@@ -534,8 +535,8 @@ export default {
             showState: false,
             clientSessionId: '',
             currentStep: 'uploadFile',
-            fileType: 'ezbookkeeping_csv',
-            fileSubType: '',
+            fileType: 'ezbookkeeping',
+            fileSubType: 'ezbookkeeping_csv',
             importFile: null,
             importTransactions: null,
             editingTransaction: null,
@@ -656,6 +657,14 @@ export default {
             return getTimezoneOffsetMinutes(this.settingsStore.appSettings.timeZone);
         },
         supportedImportFileExtensions() {
+            if (this.allFileSubTypes && this.allFileSubTypes.length) {
+                const subTypeExtensions = getNameByKeyValue(this.allFileSubTypes, this.fileSubType, 'type', 'extensions');
+
+                if (subTypeExtensions) {
+                    return subTypeExtensions;
+                }
+            }
+
             return getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'extensions');
         },
         exportFileGuideDocumentUrl() {
@@ -852,12 +861,24 @@ export default {
             this.editingTags = [];
             this.currentPage = 1;
             this.countPerPage = 10;
+        },
+        fileSubType: function (newValue) {
+            let supportedExtensions = getNameByKeyValue(this.allFileSubTypes, newValue, 'type', 'extensions');
+
+            if (!supportedExtensions) {
+                supportedExtensions = getNameByKeyValue(this.allSupportedImportFileTypes, this.fileType, 'type', 'extensions');
+            }
+
+            if (this.importFile && this.importFile.name && !isFileExtensionSupported(this.importFile.name, supportedExtensions)) {
+                this.importFile = null;
+            }
         }
     },
     methods: {
         open() {
             const self = this;
-            self.fileType = 'ezbookkeeping_csv';
+            self.fileType = 'ezbookkeeping';
+            self.fileSubType = 'ezbookkeeping_csv';
             self.currentStep = 'uploadFile';
             self.importFile = null;
             self.importTransactions = null;

@@ -2,18 +2,21 @@ const supportedImageExtensions = '.jpg,.jpeg,.png,.gif,.webp';
 
 const supportedImportFileTypes = [
     {
-        type: 'ezbookkeeping_csv',
-        name: 'ezbookkeeping Data Export File (CSV)',
-        extensions: '.csv',
-        document: {
-            supportMultiLanguages: true,
-            anchor: 'export-transactions'
-        }
-    },
-    {
-        type: 'ezbookkeeping_tsv',
-        name: 'ezbookkeeping Data Export File (TSV)',
-        extensions: '.tsv',
+        type: 'ezbookkeeping',
+        name: 'ezbookkeeping Data Export File',
+        extensions: '.csv,.tsv',
+        subTypes: [
+            {
+                type: 'ezbookkeeping_csv',
+                name: 'CSV (Comma-separated values) File',
+                extensions: '.csv',
+            },
+            {
+                type: 'ezbookkeeping_tsv',
+                name: 'TSV (Tab-separated values) File',
+                extensions: '.tsv',
+            }
+        ],
         document: {
             supportMultiLanguages: true,
             anchor: 'export-transactions'

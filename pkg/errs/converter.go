@@ -22,4 +22,5 @@ var (
 	ErrMissingAccountData                  = NewNormalError(NormalSubcategoryConverter, 15, http.StatusBadRequest, "missing account data")
 	ErrNotSupportedSplitTransactions       = NewNormalError(NormalSubcategoryConverter, 16, http.StatusBadRequest, "not supported to import split transaction")
 	ErrThereAreNotSupportedTransactionType = NewNormalError(NormalSubcategoryConverter, 17, http.StatusBadRequest, "there are not supported transaction type")
+	ErrInvalidIIFFile                      = NewNormalError(NormalSubcategoryConverter, 18, http.StatusBadRequest, "invalid iif file")
 )

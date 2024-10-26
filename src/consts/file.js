@@ -39,6 +39,11 @@ const supportedImportFileTypes = [
         ]
     },
     {
+        type: 'iif',
+        name: 'Intuit Interchange Format (IIF) File',
+        extensions: '.iif'
+    },
+    {
         type: 'gnucash',
         name: 'GnuCash XML Database File',
         extensions: '.gnucash',

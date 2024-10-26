@@ -76,10 +76,8 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 			} else if strings.Index(line, qifTypeHeaderPrefix) == 0 {
 				currentEntryHeader = line
 				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header line \"%s\" and skip the following entries", line)
-				continue
 			} else {
 				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header line \"%s\" and skip this line", line)
-				continue
 			}
 		} else if line[0] == qifEntryEnd {
 			entryData := currentEntryData
@@ -178,13 +176,11 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 				data.classes = append(data.classes, classData)
 			} else {
 				log.Warnf(ctx, "[qif_data_reader.read] read unsupported entry header \"%s\" and skip this entry", currentEntryHeader)
-				continue
 			}
 		} else if currentEntryHeader != "" {
 			currentEntryData = append(currentEntryData, line)
 		} else {
 			log.Warnf(ctx, "[qif_data_reader.read] read unsupported line \"%s\" and skip this line", line)
-			continue
 		}
 	}
 

@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
 
 func TestParseNumericYearMonth(t *testing.T) {
@@ -257,6 +259,47 @@ func TestFormatTimezoneOffset(t *testing.T) {
 	expectedValue = "+00:00"
 	actualValue = FormatTimezoneOffset(timezone)
 	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatTimezoneOffsetFromHoursOffset(t *testing.T) {
+	expectedValue := "+02:00"
+	actualValue, err := FormatTimezoneOffsetFromHoursOffset("2")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "+05:45"
+	actualValue, err = FormatTimezoneOffsetFromHoursOffset("+5.75")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-12:00"
+	actualValue, err = FormatTimezoneOffsetFromHoursOffset("-12.00")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "-02:30"
+	actualValue, err = FormatTimezoneOffsetFromHoursOffset("-2.5")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "+00:00"
+	actualValue, err = FormatTimezoneOffsetFromHoursOffset("0")
+	assert.Nil(t, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatTimezoneOffsetFromHoursOffset_InvalidHoursOffset(t *testing.T) {
+	_, err := FormatTimezoneOffsetFromHoursOffset("")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = FormatTimezoneOffsetFromHoursOffset("+")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = FormatTimezoneOffsetFromHoursOffset("-")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
+
+	_, err = FormatTimezoneOffsetFromHoursOffset("a")
+	assert.EqualError(t, err, errs.ErrFormatInvalid.Message)
 }
 
 func TestParseFromTimezoneOffset(t *testing.T) {

@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/converters/fireflyIII"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/gnucash"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/iif"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/ofx"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/qif"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/wechat"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -38,6 +39,8 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return qif.QifDayMonthYearTransactionDataImporter, nil
 	} else if fileType == "iif" {
 		return iif.IifTransactionDataFileImporter, nil
+	} else if fileType == "ofx" {
+		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "gnucash" {
 		return gnucash.GnuCashTransactionDataImporter, nil
 	} else if fileType == "firefly_iii_csv" {

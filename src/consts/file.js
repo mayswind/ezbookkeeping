@@ -47,6 +47,11 @@ const supportedImportFileTypes = [
         extensions: '.iif'
     },
     {
+        type: 'ofx',
+        name: 'Open Financial Exchange (OFX) File',
+        extensions: '.ofx'
+    },
+    {
         type: 'gnucash',
         name: 'GnuCash XML Database File',
         extensions: '.gnucash',

@@ -216,6 +216,29 @@ func FormatTimezoneOffset(timezone *time.Location) string {
 	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset)
 }
 
+// FormatTimezoneOffsetFromHoursOffset returns "+/-HH:MM" format of timezone from hours offset
+func FormatTimezoneOffsetFromHoursOffset(hoursOffset string) (string, error) {
+	hoursOffsetValue, err := StringToFloat64(hoursOffset)
+
+	if err != nil {
+		return "", errs.ErrFormatInvalid
+	}
+
+	tzMinutesOffset := int16(hoursOffsetValue * 60)
+
+	sign := "+"
+	hourAbsOffset := tzMinutesOffset / 60
+	minuteAbsOffset := tzMinutesOffset % 60
+
+	if hourAbsOffset < 0 {
+		sign = "-"
+		hourAbsOffset = -hourAbsOffset
+		minuteAbsOffset = -minuteAbsOffset
+	}
+
+	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset), nil
+}
+
 // ParseFromTimezoneOffset parses a formatted string in timezone offset format
 func ParseFromTimezoneOffset(tzOffset string) (*time.Location, error) {
 	if len(tzOffset) != 6 { // +/-HH:MM

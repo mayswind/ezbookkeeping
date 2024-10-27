@@ -59,7 +59,8 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 			return nil, nil, errs.ErrInvalidIIFFile
 		}
 
-		if items[0][0] == '!' { // sample line
+		// read sample line
+		if items[0][0] == '!' {
 			if lastLineSign != "" {
 				log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction end line")
 				return nil, nil, errs.ErrInvalidIIFFile
@@ -82,65 +83,66 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				currentDatasetType = items[0]
 				lastLineSign = ""
 			}
-		}
 
-		if currentDatasetType == "" {
-			log.Errorf(ctx, "[iif_data_reader.read] cannot read data line before sample line")
-			return nil, nil, errs.ErrInvalidIIFFile
-		} else if currentDatasetType == iifAccountSampleLineSignColumnName {
-			if currentAccountDataset == nil {
+			if currentDatasetType == iifAccountSampleLineSignColumnName {
 				currentAccountDataset, err = r.readAccountSampleLine(ctx, items)
 
 				if err != nil {
 					return nil, nil, err
 				}
-			} else {
-				if items[0] == iifAccountLineSignColumnName {
-					accountData := &iifAccountData{
-						dataItems: items,
-					}
-					currentAccountDataset.accounts = append(currentAccountDataset.accounts, accountData)
-				} else {
-					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading account sign, but actual is \"%s\"", items[0])
-					return nil, nil, errs.ErrInvalidIIFFile
-				}
-			}
-		} else if currentDatasetType == iifTransactionSampleLineSignColumnName {
-			if currentTransactionDataset == nil {
+			} else if currentDatasetType == iifTransactionSampleLineSignColumnName {
 				currentTransactionDataset, err = r.readTransactionSampleLines(ctx, items)
 
 				if err != nil {
 					return nil, nil, err
 				}
+			}
+
+			continue
+		}
+
+		// read data lines
+		if currentDatasetType == "" {
+			log.Errorf(ctx, "[iif_data_reader.read] cannot read data line before sample line")
+			return nil, nil, errs.ErrInvalidIIFFile
+		} else if currentDatasetType == iifAccountSampleLineSignColumnName && currentAccountDataset != nil {
+			if items[0] == iifAccountLineSignColumnName {
+				accountData := &iifAccountData{
+					dataItems: items,
+				}
+				currentAccountDataset.accounts = append(currentAccountDataset.accounts, accountData)
 			} else {
-				if lastLineSign == "" {
-					if items[0] == iifTransactionLineSignColumnName {
-						currentTransactionData = &iifTransactionData{
-							dataItems: items,
-							splitData: make([]*iifTransactionSplitData, 0),
-						}
-						lastLineSign = items[0]
-					} else {
-						log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading transaction sign, but actual is \"%s\"", items[0])
-						return nil, nil, errs.ErrInvalidIIFFile
+				log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading account sign, but actual is \"%s\"", items[0])
+				return nil, nil, errs.ErrInvalidIIFFile
+			}
+		} else if currentDatasetType == iifTransactionSampleLineSignColumnName && currentTransactionDataset != nil {
+			if lastLineSign == "" {
+				if items[0] == iifTransactionLineSignColumnName {
+					currentTransactionData = &iifTransactionData{
+						dataItems: items,
+						splitData: make([]*iifTransactionSplitData, 0),
 					}
-				} else if lastLineSign == iifTransactionLineSignColumnName || lastLineSign == iifTransactionSplitLineSignColumnName {
-					if items[0] == iifTransactionSplitLineSignColumnName {
-						currentTransactionData.splitData = append(currentTransactionData.splitData, &iifTransactionSplitData{
-							dataItems: items,
-						})
-						lastLineSign = items[0]
-					} else if items[0] == iifTransactionEndLineSignColumnName {
-						currentTransactionDataset.transactions = append(currentTransactionDataset.transactions, currentTransactionData)
-						lastLineSign = ""
-					} else {
-						log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading split sign or transaction end sign, but actual is \"%s\"", items[0])
-						return nil, nil, errs.ErrInvalidIIFFile
-					}
+					lastLineSign = items[0]
 				} else {
-					log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction sample end line")
+					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading transaction sign, but actual is \"%s\"", items[0])
 					return nil, nil, errs.ErrInvalidIIFFile
 				}
+			} else if lastLineSign == iifTransactionLineSignColumnName || lastLineSign == iifTransactionSplitLineSignColumnName {
+				if items[0] == iifTransactionSplitLineSignColumnName {
+					currentTransactionData.splitData = append(currentTransactionData.splitData, &iifTransactionSplitData{
+						dataItems: items,
+					})
+					lastLineSign = items[0]
+				} else if items[0] == iifTransactionEndLineSignColumnName {
+					currentTransactionDataset.transactions = append(currentTransactionDataset.transactions, currentTransactionData)
+					lastLineSign = ""
+				} else {
+					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading split sign or transaction end sign, but actual is \"%s\"", items[0])
+					return nil, nil, errs.ErrInvalidIIFFile
+				}
+			} else {
+				log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction sample end line")
+				return nil, nil, errs.ErrInvalidIIFFile
 			}
 		}
 	}

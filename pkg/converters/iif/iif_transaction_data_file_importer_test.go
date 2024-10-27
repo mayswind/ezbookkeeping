@@ -183,7 +183,7 @@ func TestIIFTransactionDataFileParseImportedData_MultipleDataset(t *testing.T) {
 			"!TRNS\tTRNSID\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tCLEAR\tTOPRINT\tADDR5\tDUEDATE\tTERMS\n"+
 			"!SPL\tSPLID\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tCLEAR\tQNTY\tREIMBEXP\tSERVICEDATE\tOTHER2\n"+
 			"!ENDTRNS\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n"+
-			"TRNS\t\tTRANSFER\t09/04/2024\tTest Account3\tTest Category\tTest Class\t123.45\t\t\t\t\t\t\t\n"+
+			"TRNS\t\tTRANSFER\t09/04/2024\tTest Account3\t\tTest Class\t123.45\t\t\t\t\t\t\t\n"+
 			"SPL\t\tTRANSFER\t09/04/2024\tTest Account4\t\t\t-123.45\t\t\t\t\t\t\t\n"+
 			"ENDTRNS\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n"+
 			"!CLASS\tNAME\tHIDDEN\n"+
@@ -235,7 +235,7 @@ func TestIIFTransactionDataFileParseImportedData_MultipleDataset(t *testing.T) {
 	assert.Equal(t, int64(12345), allNewTransactions[3].Amount)
 	assert.Equal(t, "Test Account4", allNewTransactions[3].OriginalSourceAccountName)
 	assert.Equal(t, "Test Account3", allNewTransactions[3].OriginalDestinationAccountName)
-	assert.Equal(t, "Test Category", allNewTransactions[3].OriginalCategoryName)
+	assert.Equal(t, "", allNewTransactions[3].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[4].Uid)
 	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[4].Type)
@@ -296,40 +296,6 @@ func TestIIFTransactionDataFileParseImportedData_ParseCategoryAndSubCategory(t *
 
 	assert.Equal(t, int64(1234567890), allNewSubExpenseCategories[0].Uid)
 	assert.Equal(t, "Test Category2", allNewSubExpenseCategories[0].Name)
-}
-
-func TestIIFTransactionDataFileParseImportedData_ParseNameAsTransferCategory(t *testing.T) {
-	converter := IifTransactionDataFileImporter
-	context := core.NewNullContext()
-
-	user := &models.User{
-		Uid:             1234567890,
-		DefaultCurrency: "CNY",
-	}
-
-	allNewTransactions, _, _, _, allNewSubTransferCategories, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tDATE\tACCNT\tNAME\tAMOUNT\n"+
-			"!SPL\tDATE\tACCNT\tNAME\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\t09/01/2024\tTest Account\tTest Category\t-123.45\n"+
-			"SPL\t09/01/2024\tTest Account2\t\t123.45\n"+
-			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
-
-	assert.Nil(t, err)
-
-	assert.Equal(t, 1, len(allNewTransactions))
-	assert.Equal(t, 1, len(allNewSubTransferCategories))
-
-	assert.Equal(t, int64(1234567890), allNewTransactions[0].Uid)
-	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[0].Type)
-	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
-	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
-	assert.Equal(t, "Test Account", allNewTransactions[0].OriginalSourceAccountName)
-	assert.Equal(t, "Test Account2", allNewTransactions[0].OriginalDestinationAccountName)
-	assert.Equal(t, "Test Category", allNewTransactions[0].OriginalCategoryName)
-
-	assert.Equal(t, int64(1234567890), allNewSubTransferCategories[0].Uid)
-	assert.Equal(t, "Test Category", allNewSubTransferCategories[0].Name)
 }
 
 func TestIIFTransactionDataFileParseImportedData_ParseYearMonthDayFormatTime(t *testing.T) {
@@ -496,16 +462,28 @@ func TestIIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
-			"!SPL\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\t09/01/2024\tTest Account\t123.45\t\"foo    bar\t#test\"\n"+
-			"SPL\t09/01/2024\tTest Account2\t-123.45\t\n"+
-			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tNAME\tAMOUNT\tMEMO\n"+
+			"!SPL\tDATE\tACCNT\tNAME\tAMOUNT\tMEMO\n"+
+			"!ENDTRNS\t\t\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t\"Test\"\t123.45\t\"foo    bar\t#test\"\n"+
+			"SPL\t09/01/2024\tTest Account2\t\t-123.45\t\n"+
+			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
+
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+		"!TRNS\tDATE\tACCNT\tNAME\tAMOUNT\tMEMO\n"+
+			"!SPL\tDATE\tACCNT\tNAME\tAMOUNT\tMEMO\n"+
+			"!ENDTRNS\t\t\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\tTest\t123.45\t\n"+
+			"SPL\t09/01/2024\tTest Account2\t\t-123.45\t\n"+
+			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 }
 
 func TestIIFTransactionDataFileParseImportedData_NotSupportedToParseSplitTransaction(t *testing.T) {

@@ -213,8 +213,6 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		return nil, errs.ErrAmountInvalid
 	}
 
-	name, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionNameColumnName)
-
 	if transactionType == iifTransactionTypeBeginningBalance { // balance modification
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = iifTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = accountName1
@@ -281,7 +279,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amountNum)
 	} else {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = iifTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
-		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = name
+		data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = ""
 
 		if amountNum1 >= 0 {
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = accountName2
@@ -296,8 +294,13 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		}
 	}
 
-	memo, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionMemoColumnName)
-	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = memo
+	if memo, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionMemoColumnName); memo != "" {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = memo
+	} else if name, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionNameColumnName); name != "" {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = name
+	} else {
+		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = ""
+	}
 
 	return data, nil
 }

@@ -243,6 +243,28 @@ func TestQIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
+func TestQIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparator(t *testing.T) {
+	converter := QifYearMonthDayTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D2024-09-01\n"+
+			"T-123,456.78\n"+
+			"^\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+
+	assert.Equal(t, int64(12345678), allNewTransactions[0].Amount)
+}
+
 func TestQIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T) {
 	converter := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()

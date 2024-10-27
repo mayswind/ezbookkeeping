@@ -435,6 +435,29 @@ func TestIIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
+func TestIIFTransactionDataFileParseImportedData_ParseAmountWithThousandsSeparator(t *testing.T) {
+	converter := IifTransactionDataFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t9/01/2024\tTest Account\t123,456.78\n"+
+			"SPL\t9/01/2024\tTest Account2\t-123,456.78\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, int64(12345678), allNewTransactions[0].Amount)
+}
+
 func TestIIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T) {
 	converter := IifTransactionDataFileImporter
 	context := core.NewNullContext()

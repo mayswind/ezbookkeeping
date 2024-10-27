@@ -201,13 +201,13 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	accountName2, _ := dataset.getSplitDataItemValue(transactionData.splitData[0], iifTransactionAccountNameColumnName)
 	amount1, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionAmountColumnName)
 	amount2, _ := dataset.getSplitDataItemValue(transactionData.splitData[0], iifTransactionAmountColumnName)
-	amountNum1, err := utils.ParseAmount(amount1)
+	amountNum1, err := utils.ParseAmount(strings.ReplaceAll(amount1, ",", ""))
 
 	if err != nil {
 		return nil, errs.ErrAmountInvalid
 	}
 
-	amountNum2, err := utils.ParseAmount(amount2)
+	amountNum2, err := utils.ParseAmount(strings.ReplaceAll(amount2, ",", ""))
 
 	if err != nil {
 		return nil, errs.ErrAmountInvalid

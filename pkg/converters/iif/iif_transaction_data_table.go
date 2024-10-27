@@ -314,6 +314,12 @@ func (t *iifTransactionDataRowIterator) parseTransactionTime(dataset *iifTransac
 	day := dateParts[1]
 	year := dateParts[2]
 
+	if utils.IsValidYearMonthDayLongOrShortDateFormat(date) {
+		year = dateParts[0]
+		month = dateParts[1]
+		day = dateParts[2]
+	}
+
 	if len(month) < 2 {
 		month = "0" + month
 	}

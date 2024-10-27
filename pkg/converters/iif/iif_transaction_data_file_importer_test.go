@@ -332,6 +332,41 @@ func TestIIFTransactionDataFileParseImportedData_ParseNameAsTransferCategory(t *
 	assert.Equal(t, "Test Category", allNewSubTransferCategories[0].Name)
 }
 
+func TestIIFTransactionDataFileParseImportedData_ParseYearMonthDayFormatTime(t *testing.T) {
+	converter := IifTransactionDataFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t2024/09/01\tTest Account\t123.45\n"+
+			"SPL\t2024/09/01\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t2024/09/2\tTest Account\t123.45\n"+
+			"SPL\t2024/09/2\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t2024/9/03\tTest Account\t123.45\n"+
+			"SPL\t2024/9/03\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t2024/9/4\tTest Account\t123.45\n"+
+			"SPL\t2024/9/4\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 4, len(allNewTransactions))
+	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+	assert.Equal(t, int64(1725235200), utils.GetUnixTimeFromTransactionTime(allNewTransactions[1].TransactionTime))
+	assert.Equal(t, int64(1725321600), utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime))
+	assert.Equal(t, int64(1725408000), utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime))
+}
+
 func TestIIFTransactionDataFileParseImportedData_ParseShortMonthDayFormatTime(t *testing.T) {
 	converter := IifTransactionDataFileImporter
 	context := core.NewNullContext()
@@ -373,15 +408,6 @@ func TestIIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\n"+
-			"TRNS\t2024/09/01\tTest Account\t123.45\n"+
-			"SPL\t2024/09/01\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
-
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
 		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
 			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
 			"!ENDTRNS\t\t\t\n"+

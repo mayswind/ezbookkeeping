@@ -70,7 +70,7 @@ const supportedImportFileTypes = [
         extensions: '.csv',
         document: {
             supportMultiLanguages: 'zh-Hans',
-            anchor: '如何获取金蝶随手记app数据导出文件'
+            anchor: '如何获取随手记app数据导出文件'
         }
     },
     {
@@ -79,7 +79,7 @@ const supportedImportFileTypes = [
         extensions: '.xls',
         document: {
             supportMultiLanguages: 'zh-Hans',
-            anchor: '如何获取金蝶随手记web版数据导出文件'
+            anchor: '如何获取随手记web版数据导出文件'
         }
     },
     {

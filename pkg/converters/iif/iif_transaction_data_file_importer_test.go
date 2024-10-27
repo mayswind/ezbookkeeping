@@ -141,12 +141,12 @@ func TestIIFTransactionDataFileParseImportedData_MinimumValidDataWithoutAccountD
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tDEPOSIT\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tDEPOSIT\t09/01/2024\tTest Category\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Category\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -174,12 +174,12 @@ func TestIIFTransactionDataFileParseImportedData_MultipleDataset(t *testing.T) {
 		"!ACCNT\tNAME\tACCNTTYPE\n"+
 			"ACCNT\tTest Account3\tBANK\n"+
 			"ACCNT\tTest Account4\tBANK\n"+
-			"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/05/2024\tTest Account\t-0.05\n"+
-			"SPL\tGENERAL JOURNAL\t09/05/2024\tTest Account2\t0.05\n"+
-			"ENDTRNS\t\t\t\t\t\n"+
+			"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/05/2024\tTest Account\t-0.05\n"+
+			"SPL\t09/05/2024\tTest Account2\t0.05\n"+
+			"ENDTRNS\t\t\t\n"+
 			"!TRNS\tTRNSID\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tCLEAR\tTOPRINT\tADDR5\tDUEDATE\tTERMS\n"+
 			"!SPL\tSPLID\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tCLEAR\tQNTY\tREIMBEXP\tSERVICEDATE\tOTHER2\n"+
 			"!ENDTRNS\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n"+
@@ -259,15 +259,15 @@ func TestIIFTransactionDataFileParseImportedData_ParseCategoryAndSubCategory(t *
 		"!ACCNT\tNAME\tACCNTTYPE\n"+
 			"ACCNT\tTest Parent Category:Test Category\tINC\n"+
 			"ACCNT\tTest Parent Category2:Test Category2\tEXP\n"+
-			"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tDEPOSIT\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tDEPOSIT\t09/01/2024\tTest Parent Category:Test Category\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\n"+
-			"TRNS\tDEPOSIT\t09/02/2024\tTest Account2\t-123.45\n"+
-			"SPL\tDEPOSIT\t09/02/2024\tTest Parent Category2:Test Category2\t123.45\n"+
-			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+			"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Parent Category:Test Category\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t09/02/2024\tTest Account2\t-123.45\n"+
+			"SPL\t09/02/2024\tTest Parent Category2:Test Category2\t123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -308,11 +308,11 @@ func TestIIFTransactionDataFileParseImportedData_ParseNameAsTransferCategory(t *
 	}
 
 	allNewTransactions, _, _, _, allNewSubTransferCategories, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tNAME\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tNAME\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tTRANSFER\t09/01/2024\tTest Account\tTest Category\t-123.45\n"+
-			"SPL\tTRANSFER\t09/01/2024\tTest Account2\t\t123.45\n"+
+		"!TRNS\tDATE\tACCNT\tNAME\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tNAME\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\tTest Category\t-123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t\t123.45\n"+
 			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -342,18 +342,18 @@ func TestIIFTransactionDataFileParseImportedData_ParseShortMonthDayFormatTime(t 
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t9/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t9/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/2/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/2/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t9/3/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t9/3/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t9/01/2024\tTest Account\t123.45\n"+
+			"SPL\t9/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t09/2/2024\tTest Account\t123.45\n"+
+			"SPL\t09/2/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"+
+			"TRNS\t9/3/2024\tTest Account\t123.45\n"+
+			"SPL\t9/3/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 
@@ -373,39 +373,39 @@ func TestIIFTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) 
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t2024/09/01\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t2024/09/01\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t2024/09/01\tTest Account\t123.45\n"+
+			"SPL\t2024/09/01\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t9/1/24\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t9/1/24\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t9/1/24\tTest Account\t123.45\n"+
+			"SPL\t9/1/24\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t2024-09-01\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t2024-09-01\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t2024-09-01\tTest Account\t123.45\n"+
+			"SPL\t2024-09-01\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t9/24\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t9/24\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t9/24\tTest Account\t123.45\n"+
+			"SPL\t9/24\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
 
@@ -419,21 +419,21 @@ func TestIIFTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123 45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123 45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123 45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123 45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
@@ -447,12 +447,12 @@ func TestIIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
-			"!ENDTRNS\t\t\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\t\"foo    bar\t#test\"\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\t\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\tMEMO\n"+
+			"!ENDTRNS\t\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\t\"foo    bar\t#test\"\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\t\n"+
+			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
@@ -469,13 +469,13 @@ func TestIIFTransactionDataFileParseImportedData_NotSupportedToParseSplitTransac
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-100.00\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account3\t-23.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-100.00\n"+
+			"SPL\t09/01/2024\tTest Account3\t-23.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrNotSupportedSplitTransactions.Message)
 }
 
@@ -490,74 +490,74 @@ func TestIIFTransactionDataFileParseImportedData_InvalidDataLines(t *testing.T) 
 
 	// Missing Transaction Line
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Split Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Transaction End Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Transaction End Line (following is another header)
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
 			"!ACCNT\tNAME\tACCNTTYPE\n"+
 			"ACCNT\tTest Account\tBANK\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Invalid Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"TEST\t\t\t\t\t\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"TEST\t\t\t\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Repeat Transaction Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Repeat Transaction End Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
 		"!TRNS\tDATE\tACCNT\tAMOUNT\t\n"+
 			"!SPL\tDATE\tACCNT\tAMOUNT\t\n"+
-			"!ENDTRNS\t\t\t\t\n"+
+			"!ENDTRNS\t\t\t\n"+
 			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
 			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
 			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+			"ENDTRNS\t\t\t\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 }
 
@@ -572,43 +572,43 @@ func TestIIFTransactionDataFileParseImportedData_InvalidHeaderLines(t *testing.T
 
 	// Missing All Sample Lines
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Transaction Sample Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Split Sample Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Transaction End Sample Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Missing Transaction End Sample Line (following is data line)
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!SPL\tDATE\tACCNT\tAMOUNT\n"+
+			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
+			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 
 	// Invalid Sample Line
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!TEST\tTRNSTYPE\tDATE\tACCNT\tAMOUNT\n"+
-			"!ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\tAMOUNT\n"+
+			"!TEST\tDATE\tACCNT\tAMOUNT\n"+
+			"!ENDTRNS\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidIIFFile.Message)
 }
 
@@ -621,43 +621,33 @@ func TestIIFTransactionDataFileParseImportedData_MissingRequiredColumn(t *testin
 		DefaultCurrency: "CNY",
 	}
 
-	// Missing Transaction Type Column
-	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tDATE\tACCNT\tAMOUNT\t\n"+
-			"!SPL\tDATE\tACCNT\tAMOUNT\t\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\t09/01/2024\tTest Account\t123.45\n"+
-			"SPL\t09/01/2024\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
-
 	// Missing Date Column
-	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tACCNT\tAMOUNT\t\n"+
-			"!SPL\tTRNSTYPE\tACCNT\tAMOUNT\t\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\tTest Account\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\tTest Account2\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"!TRNS\tACCNT\tAMOUNT\t\n"+
+			"!SPL\tACCNT\tAMOUNT\t\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\tTest Account\t123.45\n"+
+			"SPL\tTest Account2\t-123.45\n"+
+			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Account Column
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tAMOUNT\t\n"+
-			"!SPL\tTRNSTYPE\tDATE\tAMOUNT\t\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\t123.45\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\t-123.45\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tAMOUNT\t\n"+
+			"!SPL\tDATE\tAMOUNT\t\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\t123.45\n"+
+			"SPL\t09/01/2024\t-123.45\n"+
+			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 
 	// Missing Amount Column
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"!TRNS\tTRNSTYPE\tDATE\tACCNT\t\n"+
-			"!SPL\tTRNSTYPE\tDATE\tACCNT\t\n"+
-			"!ENDTRNS\t\t\t\t\n"+
-			"TRNS\tGENERAL JOURNAL\t09/01/2024\tTest Account\n"+
-			"SPL\tGENERAL JOURNAL\t09/01/2024\tTest Account2\n"+
-			"ENDTRNS\t\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
+		"!TRNS\tDATE\tACCNT\t\n"+
+			"!SPL\tDATE\tACCNT\t\n"+
+			"!ENDTRNS\t\t\t\n"+
+			"TRNS\t09/01/2024\tTest Account\n"+
+			"SPL\t09/01/2024\tTest Account2\n"+
+			"ENDTRNS\t\t\t\t\n"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
 }

@@ -336,7 +336,6 @@ func createNewIIfTransactionDataTable(ctx core.Context, accountDatasets []*iifAc
 		transactionDataset := transactionDatasets[i]
 
 		for _, requiredColumnName := range []string{
-			iifTransactionTypeColumnName,
 			iifTransactionDateColumnName,
 			iifTransactionAccountNameColumnName,
 			iifTransactionAmountColumnName,

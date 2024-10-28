@@ -573,7 +573,7 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAccountCurren
 	assert.Equal(t, "EUR", allNewAccounts[1].Currency)
 }
 
-func TestGnuCashTransactionDatabaseFileParseImportedData_ParseAmount(t *testing.T) {
+func TestGnuCashTransactionDatabaseFileParseImportedData_ParseValidAmount(t *testing.T) {
 	converter := GnuCashTransactionDataImporter
 	context := core.NewNullContext()
 
@@ -627,6 +627,76 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_ParseAmount(t *testing.
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, int64(1234), allNewTransactions[0].Amount)
+}
+
+func TestGnuCashTransactionDatabaseFileParseImportedData_ParseInvalidAmount(t *testing.T) {
+	converter := GnuCashTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		gnucashCommonValidDataCaseHeader+
+			"<gnc:transaction version=\"2.0.0\">\n"+
+			"  <trn:date-posted>\n"+
+			"    <ts:date>2024-09-01 12:34:56 +0000</ts:date>\n"+
+			"  </trn:date-posted>\n"+
+			"  <trn:splits>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>/</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000001000</split:account>\n"+
+			"    </trn:split>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>/</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000000010</split:account>\n"+
+			"    </trn:split>\n"+
+			"  </trn:splits>\n"+
+			"</gnc:transaction>\n"+
+			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+		gnucashCommonValidDataCaseHeader+
+			"<gnc:transaction version=\"2.0.0\">\n"+
+			"  <trn:date-posted>\n"+
+			"    <ts:date>2024-09-01 12:34:56 +0000</ts:date>\n"+
+			"  </trn:date-posted>\n"+
+			"  <trn:splits>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>12345</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000001000</split:account>\n"+
+			"    </trn:split>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>-12345</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000000010</split:account>\n"+
+			"    </trn:split>\n"+
+			"  </trn:splits>\n"+
+			"</gnc:transaction>\n"+
+			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+		gnucashCommonValidDataCaseHeader+
+			"<gnc:transaction version=\"2.0.0\">\n"+
+			"  <trn:date-posted>\n"+
+			"    <ts:date>2024-09-01 12:34:56 +0000</ts:date>\n"+
+			"  </trn:date-posted>\n"+
+			"  <trn:splits>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>12345/</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000001000</split:account>\n"+
+			"    </trn:split>\n"+
+			"    <trn:split>\n"+
+			"      <split:quantity>-12345/</split:quantity>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000000010</split:account>\n"+
+			"    </trn:split>\n"+
+			"  </trn:splits>\n"+
+			"</gnc:transaction>\n"+
+			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
 
 func TestGnuCashTransactionDatabaseFileParseImportedData_ParseDescription(t *testing.T) {

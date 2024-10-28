@@ -844,6 +844,25 @@ func TestGnuCashTransactionDatabaseFileParseImportedData_MissingTransactionRequi
 			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrInvalidGnuCashFile.Message)
 
+	// Missing Transaction Split Quantity Node
+	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
+		gnucashCommonValidDataCaseHeader+
+			"<gnc:transaction version=\"2.0.0\">\n"+
+			"  <trn:date-posted>\n"+
+			"    <ts:date>2024-09-01 00:00:00 +0000</ts:date>\n"+
+			"  </trn:date-posted>\n"+
+			"  <trn:splits>\n"+
+			"    <trn:split>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000001000</split:account>\n"+
+			"    </trn:split>\n"+
+			"    <trn:split>\n"+
+			"      <split:account type=\"guid\">00000000000000000000000000000010</split:account>\n"+
+			"    </trn:split>\n"+
+			"  </trn:splits>\n"+
+			"</gnc:transaction>\n"+
+			gnucashCommonValidDataCaseFooter), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+
 	// Missing Transaction Split Account Node
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
 		gnucashCommonValidDataCaseHeader+

@@ -136,6 +136,10 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 			return nil, false, errs.ErrMissingAccountData
 		}
 
+		if splitData1.Quantity == "" || splitData2.Quantity == "" {
+			return nil, false, errs.ErrAmountInvalid
+		}
+
 		amount1, err := t.parseAmount(splitData1.Quantity)
 
 		if err != nil {
@@ -251,6 +255,10 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 
 		if account == nil {
 			return nil, false, errs.ErrMissingAccountData
+		}
+
+		if splitData.Quantity == "" {
+			return nil, false, errs.ErrAmountInvalid
 		}
 
 		amount, err := t.parseAmount(splitData.Quantity)

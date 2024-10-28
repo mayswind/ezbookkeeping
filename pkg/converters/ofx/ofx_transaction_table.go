@@ -175,6 +175,7 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	}
 
 	if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
+		data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ofxTransaction.ToAccountId
 		data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
 		data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
 	}

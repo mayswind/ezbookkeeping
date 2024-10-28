@@ -144,6 +144,89 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 	assert.Equal(t, "", allNewSubTransferCategories[0].Name)
 }
 
+func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
+	converter := OFXTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
+		"<OFX>"+
+			"  <BANKMSGSRSV1>"+
+			"    <STMTTRNRS>"+
+			"      <STMTRS>"+
+			"        <CURDEF>CNY</CURDEF>"+
+			"        <BANKACCTFROM>"+
+			"          <ACCTID>123</ACCTID>"+
+			"        </BANKACCTFROM>"+
+			"        <BANKTRANLIST>"+
+			"          <STMTTRN>"+
+			"            <TRNTYPE>XFER</TRNTYPE>"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
+			"            <TRNAMT>-123.45</TRNAMT>"+
+			"            <BANKACCTTO>"+
+			"              <ACCTID>456</ACCTID>"+
+			"            </BANKACCTTO>"+
+			"          </STMTTRN>"+
+			"        </BANKTRANLIST>"+
+			"      </STMTRS>"+
+			"    </STMTTRNRS>"+
+			"  </BANKMSGSRSV1>"+
+			"  <CREDITCARDMSGSRSV1>"+
+			"    <CCSTMTTRNRS>"+
+			"      <CCSTMTRS>"+
+			"        <CURDEF>CNY</CURDEF>"+
+			"        <CCACCTFROM>"+
+			"          <ACCTID>456</ACCTID>"+
+			"        </CCACCTFROM>"+
+			"        <BANKTRANLIST>"+
+			"          <STMTTRN>"+
+			"            <TRNTYPE>XFER</TRNTYPE>"+
+			"            <DTPOSTED>20240902012345.000[+8:CST]</DTPOSTED>"+
+			"            <TRNAMT>-1.23</TRNAMT>"+
+			"            <CCACCTTO>"+
+			"              <ACCTID>789</ACCTID>"+
+			"            </CCACCTTO>"+
+			"          </STMTTRN>"+
+			"        </BANKTRANLIST>"+
+			"      </CCSTMTRS>"+
+			"    </CCSTMTTRNRS>"+
+			"  </CREDITCARDMSGSRSV1>"+
+			"</OFX>"), 0, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allNewTransactions))
+	assert.Equal(t, 3, len(allNewAccounts))
+
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+	assert.Equal(t, "123", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[0].OriginalSourceAccountCurrency)
+	assert.Equal(t, "456", allNewTransactions[0].OriginalDestinationAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[0].OriginalDestinationAccountCurrency)
+
+	assert.Equal(t, int64(123), allNewTransactions[1].Amount)
+	assert.Equal(t, "456", allNewTransactions[1].OriginalSourceAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[1].OriginalSourceAccountCurrency)
+	assert.Equal(t, "789", allNewTransactions[1].OriginalDestinationAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[1].OriginalDestinationAccountCurrency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
+	assert.Equal(t, "123", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[1].Uid)
+	assert.Equal(t, "456", allNewAccounts[1].Name)
+	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
+
+	assert.Equal(t, int64(1234567890), allNewAccounts[2].Uid)
+	assert.Equal(t, "789", allNewAccounts[2].Name)
+	assert.Equal(t, "CNY", allNewAccounts[2].Currency)
+}
+
 func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *testing.T) {
 	converter := OFXTransactionDataImporter
 	context := core.NewNullContext()

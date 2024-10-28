@@ -6,6 +6,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestIsStringOnlyContainsDigits(t *testing.T) {
+	actualValue := IsStringOnlyContainsDigits("0123456789")
+	assert.True(t, actualValue)
+
+	actualValue = IsStringOnlyContainsDigits("12345a")
+	assert.False(t, actualValue)
+
+	actualValue = IsStringOnlyContainsDigits("12345 ")
+	assert.False(t, actualValue)
+}
+
 func TestParseFirstConsecutiveNumber(t *testing.T) {
 	expectedValue := "￥123.45"
 	actualValue, success := ParseFirstConsecutiveNumber(expectedValue)

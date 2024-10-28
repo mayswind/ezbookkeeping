@@ -117,6 +117,10 @@ func (t *ofxTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user *models.User, ofxTransaction *ofxTransactionData) (map[datatable.TransactionDataTableColumn]string, error) {
 	data := make(map[datatable.TransactionDataTableColumn]string, len(ofxTransactionSupportedColumns))
 
+	if ofxTransaction.PostedDate == "" {
+		return nil, errs.ErrMissingTransactionTime
+	}
+
 	datetime, timezone, err := t.parseTransactionTimeAndTimeZone(ctx, ofxTransaction.PostedDate)
 
 	if err != nil {
@@ -126,10 +130,18 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = datetime
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = timezone
 
+	if ofxTransaction.Amount == "" {
+		return nil, errs.ErrAmountInvalid
+	}
+
 	amount, err := utils.ParseAmount(strings.ReplaceAll(ofxTransaction.Amount, ",", ".")) // ofx supports decimal point or comma to indicate the start of the fractional amount
 
 	if err != nil {
 		return nil, errs.ErrAmountInvalid
+	}
+
+	if ofxTransaction.TransactionType == "" {
+		return nil, errs.ErrTransactionTypeInvalid
 	}
 
 	if transactionType, exists := ofxTransactionTypeMapping[ofxTransaction.TransactionType]; exists {
@@ -148,6 +160,10 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
 		}
+	}
+
+	if ofxTransaction.FromAccountId == "" {
+		return nil, errs.ErrMissingAccountData
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ofxTransaction.FromAccountId
@@ -189,12 +205,22 @@ func (t *ofxTransactionDataRowIterator) parseTransactionTimeAndTimeZone(ctx core
 	tzOffset := ofxDefaultTimezoneOffset
 
 	if len(datetime) >= 8 { // YYYYMMDD
+		if !utils.IsStringOnlyContainsDigits(datetime[0:8]) {
+			log.Errorf(ctx, "[ofx_transaction_table.parseTransactionTimeAndTimeZone] cannot parse time \"%s\", because contains non-digit character", datetime)
+			return "", "", errs.ErrTransactionTimeInvalid
+		}
+
 		year = datetime[0:4]
 		month = datetime[4:6]
 		day = datetime[6:8]
 	}
 
 	if len(datetime) >= 14 { // YYYYMMDDHHMMSS
+		if !utils.IsStringOnlyContainsDigits(datetime[8:14]) {
+			log.Errorf(ctx, "[ofx_transaction_table.parseTransactionTimeAndTimeZone] cannot parse time \"%s\", because contains non-digit character", datetime)
+			return "", "", errs.ErrTransactionTimeInvalid
+		}
+
 		hour = datetime[8:10]
 		minute = datetime[10:12]
 		second = datetime[12:14]

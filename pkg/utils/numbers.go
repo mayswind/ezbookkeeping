@@ -11,6 +11,17 @@ var (
 	numberPattern = regexp.MustCompile("(-?\\d+)(\\.\\d+)?")
 )
 
+// IsStringOnlyContainsDigits returns whether the specified string only contains digit characters
+func IsStringOnlyContainsDigits(str string) bool {
+	for i := 0; i < len(str); i++ {
+		if str[i] < '0' || str[i] > '9' {
+			return false
+		}
+	}
+
+	return true
+}
+
 // GetRandomInteger returns a random number, the max parameter represents upper limit
 func GetRandomInteger(max int) (int, error) {
 	result, err := rand.Int(rand.Reader, big.NewInt(int64(max)))

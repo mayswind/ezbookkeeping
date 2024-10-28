@@ -34,4 +34,5 @@ var (
 	ErrNoDataToImport                                           = NewSystemError(NormalSubcategoryTransaction, 27, http.StatusBadRequest, "no data to import")
 	ErrCannotAddTransactionBeforeBalanceModificationTransaction = NewSystemError(NormalSubcategoryTransaction, 28, http.StatusBadRequest, "cannot add transaction before balance modification transaction")
 	ErrBalanceModificationTransactionCannotModifyTime           = NewSystemError(NormalSubcategoryTransaction, 29, http.StatusBadRequest, "balance modification transaction cannot modify transaction time")
+	ErrTransferTransactionAmountCannotBeLessThanZero            = NewNormalError(NormalSubcategoryTransaction, 30, http.StatusBadRequest, "transfer transaction amount cannot be less than zero")
 )

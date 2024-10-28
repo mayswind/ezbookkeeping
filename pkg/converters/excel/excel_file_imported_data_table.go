@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/shakinm/xlsReader/xls"
+	"github.com/extrame/xls"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -12,36 +12,35 @@ import (
 
 // ExcelFileImportedDataTable defines the structure of excel file data table
 type ExcelFileImportedDataTable struct {
-	workbook              *xls.Workbook
+	workbook              *xls.WorkBook
 	headerLineColumnNames []string
 }
 
 // ExcelFileDataRow defines the structure of excel file data table row
 type ExcelFileDataRow struct {
-	sheet    *xls.Sheet
+	sheet    *xls.WorkSheet
 	rowIndex int
 }
 
 // ExcelFileDataRowIterator defines the structure of excel file data table row iterator
 type ExcelFileDataRowIterator struct {
 	dataTable              *ExcelFileImportedDataTable
-	currentTableIndex      int
-	currentRowIndexInTable int
+	currentSheetIndex      int
+	currentRowIndexInSheet uint16
 }
 
 // DataRowCount returns the total count of data row
 func (t *ExcelFileImportedDataTable) DataRowCount() int {
-	allSheets := t.workbook.GetSheets()
 	totalDataRowCount := 0
 
-	for i := 0; i < len(allSheets); i++ {
-		sheet := allSheets[i]
+	for i := 0; i < t.workbook.NumSheets(); i++ {
+		sheet := t.workbook.GetSheet(i)
 
-		if sheet.GetNumberRows() <= 1 {
+		if sheet.MaxRow < 1 {
 			continue
 		}
 
-		totalDataRowCount += sheet.GetNumberRows() - 1
+		totalDataRowCount += int(sheet.MaxRow)
 	}
 
 	return totalDataRowCount
@@ -56,57 +55,41 @@ func (t *ExcelFileImportedDataTable) HeaderColumnNames() []string {
 func (t *ExcelFileImportedDataTable) DataRowIterator() datatable.ImportedDataRowIterator {
 	return &ExcelFileDataRowIterator{
 		dataTable:              t,
-		currentTableIndex:      0,
-		currentRowIndexInTable: 0,
+		currentSheetIndex:      0,
+		currentRowIndexInSheet: 0,
 	}
 }
 
 // ColumnCount returns the total count of column in this data row
 func (r *ExcelFileDataRow) ColumnCount() int {
-	row, err := r.sheet.GetRow(r.rowIndex)
-
-	if err != nil {
-		return 0
-	}
-
-	return len(row.GetCols())
+	row := r.sheet.Row(r.rowIndex)
+	return row.LastCol() + 1
 }
 
 // GetData returns the data in the specified column index
 func (r *ExcelFileDataRow) GetData(columnIndex int) string {
-	row, err := r.sheet.GetRow(r.rowIndex)
-
-	if err != nil {
-		return ""
-	}
-
-	cell, err := row.GetCol(columnIndex)
-
-	if err != nil {
-		return ""
-	}
-
-	return cell.GetString()
+	row := r.sheet.Row(r.rowIndex)
+	return row.Col(columnIndex)
 }
 
 // HasNext returns whether the iterator does not reach the end
 func (t *ExcelFileDataRowIterator) HasNext() bool {
-	allSheets := t.dataTable.workbook.GetSheets()
+	workbook := t.dataTable.workbook
 
-	if t.currentTableIndex >= len(allSheets) {
+	if t.currentSheetIndex >= workbook.NumSheets() {
 		return false
 	}
 
-	currentSheet := allSheets[t.currentTableIndex]
+	currentSheet := workbook.GetSheet(t.currentSheetIndex)
 
-	if t.currentRowIndexInTable+1 < currentSheet.GetNumberRows() {
+	if t.currentRowIndexInSheet+1 <= currentSheet.MaxRow {
 		return true
 	}
 
-	for i := t.currentTableIndex + 1; i < len(allSheets); i++ {
-		sheet := allSheets[i]
+	for i := t.currentSheetIndex + 1; i < workbook.NumSheets(); i++ {
+		sheet := workbook.GetSheet(i)
 
-		if sheet.GetNumberRows() <= 1 {
+		if sheet.MaxRow < 1 {
 			continue
 		}
 
@@ -118,74 +101,67 @@ func (t *ExcelFileDataRowIterator) HasNext() bool {
 
 // CurrentRowId returns current index
 func (t *ExcelFileDataRowIterator) CurrentRowId() string {
-	return fmt.Sprintf("table#%d-row#%d", t.currentTableIndex, t.currentRowIndexInTable)
+	return fmt.Sprintf("table#%d-row#%d", t.currentSheetIndex, t.currentRowIndexInSheet)
 }
 
 // Next returns the next imported data row
 func (t *ExcelFileDataRowIterator) Next() datatable.ImportedDataRow {
-	allSheets := t.dataTable.workbook.GetSheets()
-	currentRowIndexInTable := t.currentRowIndexInTable
+	workbook := t.dataTable.workbook
+	currentRowIndexInTable := t.currentRowIndexInSheet
 
-	for i := t.currentTableIndex; i < len(allSheets); i++ {
-		sheet := allSheets[i]
+	for i := t.currentSheetIndex; i < workbook.NumSheets(); i++ {
+		sheet := workbook.GetSheet(i)
 
-		if currentRowIndexInTable+1 < sheet.GetNumberRows() {
-			t.currentRowIndexInTable++
-			currentRowIndexInTable = t.currentRowIndexInTable
+		if currentRowIndexInTable+1 <= sheet.MaxRow {
+			t.currentRowIndexInSheet++
+			currentRowIndexInTable = t.currentRowIndexInSheet
 			break
 		}
 
-		t.currentTableIndex++
-		t.currentRowIndexInTable = 0
+		t.currentSheetIndex++
+		t.currentRowIndexInSheet = 0
 		currentRowIndexInTable = 0
 	}
 
-	if t.currentTableIndex >= len(allSheets) {
+	if t.currentSheetIndex >= workbook.NumSheets() {
 		return nil
 	}
 
-	currentSheet := allSheets[t.currentTableIndex]
+	currentSheet := workbook.GetSheet(t.currentSheetIndex)
 
-	if t.currentRowIndexInTable >= currentSheet.GetNumberRows() {
+	if t.currentRowIndexInSheet > currentSheet.MaxRow {
 		return nil
 	}
 
 	return &ExcelFileDataRow{
-		sheet:    &currentSheet,
-		rowIndex: t.currentRowIndexInTable,
+		sheet:    currentSheet,
+		rowIndex: int(t.currentRowIndexInSheet),
 	}
 }
 
 // CreateNewExcelFileImportedDataTable returns excel xls data table by file binary data
 func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTable, error) {
 	reader := bytes.NewReader(data)
-	workbook, err := xls.OpenReader(reader)
+	workbook, err := xls.OpenReader(reader, "")
 
 	if err != nil {
 		return nil, err
 	}
 
-	allSheets := workbook.GetSheets()
 	var headerRowItems []string
 
-	for i := 0; i < len(allSheets); i++ {
-		sheet := allSheets[i]
+	for i := 0; i < workbook.NumSheets(); i++ {
+		sheet := workbook.GetSheet(i)
 
-		if sheet.GetNumberRows() < 1 {
+		if sheet.MaxRow < 0 {
 			continue
 		}
 
-		row, err := sheet.GetRow(0)
-
-		if err != nil {
-			return nil, err
-		}
-
-		cells := row.GetCols()
+		row := sheet.Row(0)
 
 		if i == 0 {
-			for j := 0; j < len(cells); j++ {
-				headerItem := cells[j].GetString()
+			for j := 0; j <= row.LastCol(); j++ {
+				headerItem := row.Col(j)
 
 				if headerItem == "" {
 					break
@@ -194,8 +170,8 @@ func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTab
 				headerRowItems = append(headerRowItems, headerItem)
 			}
 		} else {
-			for j := 0; j < min(len(cells), len(headerRowItems)); j++ {
-				headerItem := cells[j].GetString()
+			for j := 0; j <= min(row.LastCol(), len(headerRowItems)-1); j++ {
+				headerItem := row.Col(j)
 
 				if headerItem != headerRowItems[j] {
 					return nil, errs.ErrFieldsInMultiTableAreDifferent
@@ -205,7 +181,7 @@ func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTab
 	}
 
 	return &ExcelFileImportedDataTable{
-		workbook:              &workbook,
+		workbook:              workbook,
 		headerLineColumnNames: headerRowItems,
 	}, nil
 }

@@ -28,7 +28,7 @@ var ofxTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bo
 
 // ofxTransactionData defines the structure of open financial exchange (ofx) transaction data
 type ofxTransactionData struct {
-	ofxBasicStatementTransaction
+	ofxBaseStatementTransaction
 	DefaultCurrency string
 	FromAccountId   string
 	ToAccountId     string
@@ -243,10 +243,10 @@ func createNewOFXTransactionDataTable(file *ofxFile) (*ofxTransactionDataTable, 
 			}
 
 			allData = append(allData, &ofxTransactionData{
-				ofxBasicStatementTransaction: bankTransactions[i].ofxBasicStatementTransaction,
-				DefaultCurrency:              statement.DefaultCurrency,
-				FromAccountId:                fromAccountId,
-				ToAccountId:                  toAccountId,
+				ofxBaseStatementTransaction: bankTransactions[i].ofxBaseStatementTransaction,
+				DefaultCurrency:             statement.DefaultCurrency,
+				FromAccountId:               fromAccountId,
+				ToAccountId:                 toAccountId,
 			})
 		}
 	}
@@ -271,10 +271,10 @@ func createNewOFXTransactionDataTable(file *ofxFile) (*ofxTransactionDataTable, 
 			}
 
 			allData = append(allData, &ofxTransactionData{
-				ofxBasicStatementTransaction: bankTransactions[i].ofxBasicStatementTransaction,
-				DefaultCurrency:              statement.DefaultCurrency,
-				FromAccountId:                fromAccountId,
-				ToAccountId:                  toAccountId,
+				ofxBaseStatementTransaction: bankTransactions[i].ofxBaseStatementTransaction,
+				DefaultCurrency:             statement.DefaultCurrency,
+				FromAccountId:               fromAccountId,
+				ToAccountId:                 toAccountId,
 			})
 		}
 	}

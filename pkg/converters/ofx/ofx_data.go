@@ -144,8 +144,8 @@ type ofxCreditCardTransactionList struct {
 	StatementTransactions []*ofxCreditCardStatementTransaction `xml:"STMTTRN"`
 }
 
-// ofxBasicStatementTransaction represents the struct of open financial exchange (ofx) basic statement transaction
-type ofxBasicStatementTransaction struct {
+// ofxBaseStatementTransaction represents the struct of open financial exchange (ofx) base statement transaction
+type ofxBaseStatementTransaction struct {
 	TransactionId    string             `xml:"FITID"`
 	TransactionType  ofxTransactionType `xml:"TRNTYPE"`
 	PostedDate       string             `xml:"DTPOSTED"`
@@ -159,13 +159,13 @@ type ofxBasicStatementTransaction struct {
 
 // ofxBankStatementTransaction represents the struct of open financial exchange (ofx) bank statement transaction
 type ofxBankStatementTransaction struct {
-	ofxBasicStatementTransaction
-	AccountTo *ofxCreditCardAccount `xml:"BANKACCTTO"`
+	ofxBaseStatementTransaction
+	AccountTo *ofxBankAccount `xml:"BANKACCTTO"`
 }
 
 // ofxCreditCardStatementTransaction represents the struct of open financial exchange (ofx) credit card statement transaction
 type ofxCreditCardStatementTransaction struct {
-	ofxBasicStatementTransaction
+	ofxBaseStatementTransaction
 	AccountTo *ofxCreditCardAccount `xml:"CCACCTTO"`
 }
 

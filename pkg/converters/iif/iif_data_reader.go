@@ -96,7 +96,7 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				if err != nil {
 					return nil, nil, err
 				}
-			}
+			} // not process (read sample line) for other dataset type
 
 			continue
 		}
@@ -144,7 +144,7 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction sample end line")
 				return nil, nil, errs.ErrInvalidIIFFile
 			}
-		}
+		} // not process (read data line) for other dataset type
 	}
 
 	if lastLineSign != "" {

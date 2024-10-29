@@ -16,12 +16,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-var wechatPayTransactionTypeNameMapping = map[models.TransactionType]string{
-	models.TRANSACTION_TYPE_INCOME:   "收入",
-	models.TRANSACTION_TYPE_EXPENSE:  "支出",
-	models.TRANSACTION_TYPE_TRANSFER: "/",
-}
-
 var wechatPayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
@@ -30,6 +24,12 @@ var wechatPayTransactionSupportedColumns = map[datatable.TransactionDataTableCol
 	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               true,
 	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: true,
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
+}
+
+var wechatPayTransactionTypeNameMapping = map[models.TransactionType]string{
+	models.TRANSACTION_TYPE_INCOME:   "收入",
+	models.TRANSACTION_TYPE_EXPENSE:  "支出",
+	models.TRANSACTION_TYPE_TRANSFER: "/",
 }
 
 // wechatPayTransactionDataCsvFileImporter defines the structure of wechatPay csv importer for transaction data

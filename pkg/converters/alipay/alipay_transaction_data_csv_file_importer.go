@@ -18,12 +18,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-var alipayTransactionTypeNameMapping = map[models.TransactionType]string{
-	models.TRANSACTION_TYPE_INCOME:   "收入",
-	models.TRANSACTION_TYPE_EXPENSE:  "支出",
-	models.TRANSACTION_TYPE_TRANSFER: "不计收支",
-}
-
 var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bool{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:     true,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:     true,
@@ -32,6 +26,12 @@ var alipayTransactionSupportedColumns = map[datatable.TransactionDataTableColumn
 	datatable.TRANSACTION_DATA_TABLE_AMOUNT:               true,
 	datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME: true,
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
+}
+
+var alipayTransactionTypeNameMapping = map[models.TransactionType]string{
+	models.TRANSACTION_TYPE_INCOME:   "收入",
+	models.TRANSACTION_TYPE_EXPENSE:  "支出",
+	models.TRANSACTION_TYPE_TRANSFER: "不计收支",
 }
 
 // alipayTransactionColumnNames defines the structure of alipay transaction plain text header names

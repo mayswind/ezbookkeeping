@@ -159,6 +159,10 @@ func CreateNewExcelFileImportedDataTable(data []byte) (*ExcelFileImportedDataTab
 
 		row := sheet.Row(0)
 
+		if row == nil {
+			continue
+		}
+
 		if i == 0 {
 			for j := 0; j <= row.LastCol(); j++ {
 				headerItem := row.Col(j)

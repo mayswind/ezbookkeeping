@@ -42,6 +42,7 @@ func (p *feideeMymoneyTransactionDataRowParser) Parse(data map[datatable.Transac
 			return nil, false, errs.ErrAmountInvalid
 		}
 
+		// balance modification transaction in feidee mymoney app is not the opening balance transaction, it can be added many times
 		if amount >= 0 {
 			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = feideeMymoneyTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
 		} else {

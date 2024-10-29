@@ -689,10 +689,6 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionDestinationAmountCannotBeSet
 	}
 
-	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER && (transactionCreateReq.SourceAmount < 0 || transactionCreateReq.DestinationAmount < 0) {
-		return nil, errs.ErrTransferTransactionAmountCannotBeLessThanZero
-	}
-
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 
@@ -821,10 +817,6 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transactionModifyReq.Id, uid)
 		return nil, errs.ErrTransactionTypeInvalid
-	}
-
-	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && (transactionModifyReq.SourceAmount < 0 || transactionModifyReq.DestinationAmount < 0) {
-		return nil, errs.ErrTransferTransactionAmountCannotBeLessThanZero
 	}
 
 	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, []int64{transaction.TransactionId})

@@ -599,6 +599,11 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			return errs.ErrTransactionSourceAndDestinationAmountNotEqual
 		}
 
+		if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
+			(transaction.Amount < 0 || transaction.RelatedAccountAmount < 0) {
+			return errs.ErrTransferTransactionAmountCannotBeLessThanZero
+		}
+
 		oldSourceAccount, oldDestinationAccount, err := s.getOldAccountModels(sess, transaction, oldTransaction, sourceAccount, destinationAccount)
 
 		if err != nil {
@@ -1564,6 +1569,11 @@ func (s *TransactionService) doCreateTransaction(sess *xorm.Session, transaction
 	if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
 		sourceAccount.Currency == destinationAccount.Currency && transaction.Amount != transaction.RelatedAccountAmount {
 		return errs.ErrTransactionSourceAndDestinationAmountNotEqual
+	}
+
+	if (transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN) &&
+		(transaction.Amount < 0 || transaction.RelatedAccountAmount < 0) {
+		return errs.ErrTransferTransactionAmountCannotBeLessThanZero
 	}
 
 	// Get and verify category

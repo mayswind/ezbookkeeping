@@ -134,7 +134,7 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		return nil, errs.ErrAmountInvalid
 	}
 
-	amount, err := utils.ParseAmount(strings.ReplaceAll(qifTransaction.amount, ",", ""))
+	amount, err := utils.ParseAmount(strings.ReplaceAll(qifTransaction.amount, ",", "")) // trim thousands separator
 
 	if err != nil {
 		return nil, errs.ErrAmountInvalid

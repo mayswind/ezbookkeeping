@@ -169,6 +169,26 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
+func TestWeChatPayCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing.T) {
+	converter := WeChatPayTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
+		"2024-09-01 01:23:45,二维码收款,收入,￥,已收钱\n"
+	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+}
+
 func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
 	converter := WeChatPayTransactionDataCsvFileImporter
 	context := core.NewNullContext()
@@ -270,11 +290,42 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T
 		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
 		",,,,\n" +
 		"----------------------微信支付账单明细列表--------------------,,,,\n" +
-		"交易时间,交易类型,收/支,金额(元),当前状态,备注\n" +
-		"2024-09-01 01:23:45,二维码收款,收入,￥0.12,已收钱,\"foo\"\"bar,\ntest\"\n"
+		"交易时间,交易类型,商品,收/支,金额(元),当前状态,备注\n" +
+		"2024-09-01 01:23:45,二维码收款,Test,收入,￥0.12,已收钱,\"foo\"\"bar,\ntest\"\n"
 	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data2), 0, nil, nil, nil, nil, nil)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo\"bar,\ntest", allNewTransactions[0].Comment)
+
+	data3 := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,商品,收/支,金额(元),当前状态,备注\n" +
+		"2024-09-01 01:23:45,二维码收款,Test,收入,￥0.12,已收钱,\"\"\n"
+	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data3), 0, nil, nil, nil, nil, nil)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "Test", allNewTransactions[0].Comment)
+}
+
+func TestWeChatPayCsvFileImporterParseImportedData_SkipUnknownTransferTransaction(t *testing.T) {
+	converter := WeChatPayTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),当前状态\n" +
+		"2024-09-01 23:59:59,/,/,￥0.05,充值完成\n"
+	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {
@@ -358,4 +409,23 @@ func TestWeChatPayCsvFileImporterParseImportedData_MissingRequiredColumn(t *test
 		"2024-09-01 01:23:45,二维码收款,收入,￥0.12\n"
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(data5), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingRequiredFieldInHeaderRow.Message)
+}
+
+func TestWeChatPayCsvFileImporterParseImportedData_NoTransactionData(t *testing.T) {
+	converter := WeChatPayTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),当前状态\n"
+	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(data), 0, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }

@@ -31,6 +31,10 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return _default.DefaultTransactionDataCSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_tsv" {
 		return _default.DefaultTransactionDataTSVFileConverter, nil
+	} else if fileType == "ofx" {
+		return ofx.OFXTransactionDataImporter, nil
+	} else if fileType == "qfx" {
+		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "qif_ymd" {
 		return qif.QifYearMonthDayTransactionDataImporter, nil
 	} else if fileType == "qif_mdy" {
@@ -39,8 +43,6 @@ func GetTransactionDataImporter(fileType string) (base.TransactionDataImporter, 
 		return qif.QifDayMonthYearTransactionDataImporter, nil
 	} else if fileType == "iif" {
 		return iif.IifTransactionDataFileImporter, nil
-	} else if fileType == "ofx" {
-		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "gnucash" {
 		return gnucash.GnuCashTransactionDataImporter, nil
 	} else if fileType == "firefly_iii_csv" {

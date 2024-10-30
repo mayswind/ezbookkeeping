@@ -23,6 +23,16 @@ const supportedImportFileTypes = [
         }
     },
     {
+        type: 'ofx',
+        name: 'Open Financial Exchange (OFX) File',
+        extensions: '.ofx'
+    },
+    {
+        type: 'qfx',
+        name: 'Quicken Financial Exchange (QFX) File',
+        extensions: '.qfx'
+    },
+    {
         type: 'qif',
         name: 'Quicken Interchange Format (QIF) File',
         extensions: '.qif',
@@ -45,11 +55,6 @@ const supportedImportFileTypes = [
         type: 'iif',
         name: 'Intuit Interchange Format (IIF) File',
         extensions: '.iif'
-    },
-    {
-        type: 'ofx',
-        name: 'Open Financial Exchange (OFX) File',
-        extensions: '.ofx'
     },
     {
         type: 'gnucash',

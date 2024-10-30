@@ -41,13 +41,6 @@ var iifTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bo
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:          true,
 }
 
-var iifTransactionTypeNameMapping = map[models.TransactionType]string{
-	models.TRANSACTION_TYPE_MODIFY_BALANCE: utils.IntToString(int(models.TRANSACTION_TYPE_MODIFY_BALANCE)),
-	models.TRANSACTION_TYPE_INCOME:         utils.IntToString(int(models.TRANSACTION_TYPE_INCOME)),
-	models.TRANSACTION_TYPE_EXPENSE:        utils.IntToString(int(models.TRANSACTION_TYPE_EXPENSE)),
-	models.TRANSACTION_TYPE_TRANSFER:       utils.IntToString(int(models.TRANSACTION_TYPE_TRANSFER)),
-}
-
 // iifTransactionDataTable defines the structure of intuit interchange format (iif) transaction data table
 type iifTransactionDataTable struct {
 	incomeAccountNames  map[string]bool

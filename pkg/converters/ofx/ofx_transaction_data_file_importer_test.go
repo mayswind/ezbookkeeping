@@ -42,8 +42,13 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 			"          </STMTTRN>"+
 			"          <STMTTRN>"+
 			"            <TRNTYPE>XFER</TRNTYPE>"+
-			"            <DTPOSTED>20240901235959.000[+8:CST]</DTPOSTED>"+
+			"            <DTPOSTED>20240901225959.000[+8:CST]</DTPOSTED>"+
 			"            <TRNAMT>-1.00</TRNAMT>"+
+			"          </STMTTRN>"+
+			"          <STMTTRN>"+
+			"            <TRNTYPE>XFER</TRNTYPE>"+
+			"            <DTPOSTED>20240901235959.000[+8:CST]</DTPOSTED>"+
+			"            <TRNAMT>2.00</TRNAMT>"+
 			"          </STMTTRN>"+
 			"        </BANKTRANLIST>"+
 			"      </STMTRS>"+
@@ -75,7 +80,7 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, 5, len(allNewTransactions))
+	assert.Equal(t, 6, len(allNewTransactions))
 	assert.Equal(t, 3, len(allNewAccounts))
 	assert.Equal(t, 1, len(allNewSubExpenseCategories))
 	assert.Equal(t, 1, len(allNewSubIncomeCategories))
@@ -100,27 +105,35 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[2].Uid)
 	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[2].Type)
-	assert.Equal(t, int64(1725206399), utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime))
+	assert.Equal(t, int64(1725202799), utils.GetUnixTimeFromTransactionTime(allNewTransactions[2].TransactionTime))
 	assert.Equal(t, int64(100), allNewTransactions[2].Amount)
 	assert.Equal(t, "123", allNewTransactions[2].OriginalSourceAccountName)
 	assert.Equal(t, "", allNewTransactions[2].OriginalDestinationAccountName)
 	assert.Equal(t, "", allNewTransactions[2].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[3].Uid)
-	assert.Equal(t, models.TRANSACTION_DB_TYPE_INCOME, allNewTransactions[3].Type)
-	assert.Equal(t, int64(1725211425), utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime))
-	assert.Equal(t, int64(123), allNewTransactions[3].Amount)
-	assert.Equal(t, "456", allNewTransactions[3].OriginalSourceAccountName)
-	assert.Equal(t, "USD", allNewTransactions[3].OriginalSourceAccountCurrency)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[3].Type)
+	assert.Equal(t, int64(1725206399), utils.GetUnixTimeFromTransactionTime(allNewTransactions[3].TransactionTime))
+	assert.Equal(t, int64(200), allNewTransactions[3].Amount)
+	assert.Equal(t, "", allNewTransactions[3].OriginalSourceAccountName)
+	assert.Equal(t, "123", allNewTransactions[3].OriginalDestinationAccountName)
 	assert.Equal(t, "", allNewTransactions[3].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewTransactions[4].Uid)
-	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[4].Type)
-	assert.Equal(t, int64(1725251696), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
-	assert.Equal(t, int64(1), allNewTransactions[4].Amount)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_INCOME, allNewTransactions[4].Type)
+	assert.Equal(t, int64(1725211425), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
+	assert.Equal(t, int64(123), allNewTransactions[4].Amount)
 	assert.Equal(t, "456", allNewTransactions[4].OriginalSourceAccountName)
 	assert.Equal(t, "USD", allNewTransactions[4].OriginalSourceAccountCurrency)
 	assert.Equal(t, "", allNewTransactions[4].OriginalCategoryName)
+
+	assert.Equal(t, int64(1234567890), allNewTransactions[5].Uid)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[5].Type)
+	assert.Equal(t, int64(1725251696), utils.GetUnixTimeFromTransactionTime(allNewTransactions[5].TransactionTime))
+	assert.Equal(t, int64(1), allNewTransactions[5].Amount)
+	assert.Equal(t, "456", allNewTransactions[5].OriginalSourceAccountName)
+	assert.Equal(t, "USD", allNewTransactions[5].OriginalSourceAccountCurrency)
+	assert.Equal(t, "", allNewTransactions[5].OriginalCategoryName)
 
 	assert.Equal(t, int64(1234567890), allNewAccounts[0].Uid)
 	assert.Equal(t, "123", allNewAccounts[0].Name)

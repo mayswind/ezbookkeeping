@@ -130,36 +130,8 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = datetime
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = timezone
 
-	if ofxTransaction.Amount == "" {
-		return nil, errs.ErrAmountInvalid
-	}
-
-	amount, err := utils.ParseAmount(strings.ReplaceAll(ofxTransaction.Amount, ",", ".")) // ofx supports decimal point or comma to indicate the start of the fractional amount
-
-	if err != nil {
-		return nil, errs.ErrAmountInvalid
-	}
-
 	if ofxTransaction.TransactionType == "" {
 		return nil, errs.ErrTransactionTypeInvalid
-	}
-
-	if transactionType, exists := ofxTransactionTypeMapping[ofxTransaction.TransactionType]; exists {
-		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(transactionType))
-
-		if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
-			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
-		} else {
-			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
-		}
-	} else {
-		if amount >= 0 {
-			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
-			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
-		} else {
-			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
-			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
-		}
 	}
 
 	if ofxTransaction.FromAccountId == "" {
@@ -174,10 +146,45 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = ofxTransaction.DefaultCurrency
 	}
 
-	if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-		data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ofxTransaction.ToAccountId
-		data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
-		data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+	if ofxTransaction.Amount == "" {
+		return nil, errs.ErrAmountInvalid
+	}
+
+	amount, err := utils.ParseAmount(strings.ReplaceAll(ofxTransaction.Amount, ",", ".")) // ofx supports decimal point or comma to indicate the start of the fractional amount
+
+	if err != nil {
+		return nil, errs.ErrAmountInvalid
+	}
+
+	if transactionType, exists := ofxTransactionTypeMapping[ofxTransaction.TransactionType]; exists { // known transaction type
+		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(transactionType))
+
+		if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] { // income
+			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+		} else if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] { // expense
+			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+		} else { // transfer
+			if amount >= 0 { // transfer in
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
+			} else { // transfer out
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ofxTransaction.ToAccountId
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+			}
+		}
+	} else { // transaction type depends on signage of amount
+		if amount >= 0 { // income
+			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME]
+			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+		} else { // expense
+			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+		}
 	}
 
 	if ofxTransaction.Memo != "" {

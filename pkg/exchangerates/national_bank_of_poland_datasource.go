@@ -6,6 +6,8 @@ import (
 	"math"
 	"time"
 
+	"golang.org/x/net/html/charset"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -128,7 +130,7 @@ func (e *NationalBankOfPolandDataSource) Parse(c core.Context, content []byte) (
 	nationalBankOfPolandData := &NationalBankOfPolandExchangeRateData{}
 
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(content))
-	xmlDecoder.CharsetReader = utils.IdentReader
+	xmlDecoder.CharsetReader = charset.NewReaderLabel
 	err := xmlDecoder.Decode(&nationalBankOfPolandData)
 
 	if err != nil {

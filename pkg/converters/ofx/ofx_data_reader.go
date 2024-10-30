@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 
+	"golang.org/x/net/html/charset"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // ofxFileReader defines the structure of open financial exchange (ofx) file reader
@@ -30,7 +31,7 @@ func (r *ofxFileReader) read(ctx core.Context) (*ofxFile, error) {
 func createNewOFXFileReader(data []byte) (*ofxFileReader, error) {
 	if len(data) > 5 && data[0] == 0x3C && data[1] == 0x3F && data[2] == 0x78 && data[3] == 0x6D && data[4] == 0x6C { // ofx 2.x starts with <?xml
 		xmlDecoder := xml.NewDecoder(bytes.NewReader(data))
-		xmlDecoder.CharsetReader = utils.IdentReader
+		xmlDecoder.CharsetReader = charset.NewReaderLabel
 
 		return &ofxFileReader{
 			xmlDecoder: xmlDecoder,
@@ -39,7 +40,7 @@ func createNewOFXFileReader(data []byte) (*ofxFileReader, error) {
 
 	} else if len(data) > 5 && string(data[0:5]) == "<OFX>" { // no ofx header
 		xmlDecoder := xml.NewDecoder(bytes.NewReader(data))
-		xmlDecoder.CharsetReader = utils.IdentReader
+		xmlDecoder.CharsetReader = charset.NewReaderLabel
 
 		return &ofxFileReader{
 			xmlDecoder: xmlDecoder,

@@ -125,8 +125,3 @@ func GetFileNameExtension(path string) string {
 
 	return extension[1:]
 }
-
-// IdentReader returns the original io reader
-func IdentReader(encoding string, input io.Reader) (io.Reader, error) {
-	return input, nil
-}

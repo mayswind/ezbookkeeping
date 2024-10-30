@@ -5,9 +5,10 @@ import (
 	"compress/gzip"
 	"encoding/xml"
 
+	"golang.org/x/net/html/charset"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // gnucashDatabaseReader defines the structure of gnucash database reader
@@ -37,14 +38,14 @@ func createNewGnuCashDatabaseReader(data []byte) (*gnucashDatabaseReader, error)
 		}
 
 		xmlDecoder := xml.NewDecoder(gzipReader)
-		xmlDecoder.CharsetReader = utils.IdentReader
+		xmlDecoder.CharsetReader = charset.NewReaderLabel
 
 		return &gnucashDatabaseReader{
 			xmlDecoder: xmlDecoder,
 		}, nil
 	} else if len(data) > 5 && data[0] == 0x3C && data[1] == 0x3F && data[2] == 0x78 && data[3] == 0x6D && data[4] == 0x6C { // <?xml
 		xmlDecoder := xml.NewDecoder(bytes.NewReader(data))
-		xmlDecoder.CharsetReader = utils.IdentReader
+		xmlDecoder.CharsetReader = charset.NewReaderLabel
 
 		return &gnucashDatabaseReader{
 			xmlDecoder: xmlDecoder,

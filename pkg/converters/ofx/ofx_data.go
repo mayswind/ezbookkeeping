@@ -6,8 +6,13 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
-const ofxVersion1 = "100"
-const ofxVersion2 = "200"
+// oFXDeclarationVersion represents the declaration version of open financial exchange (ofx) file
+type oFXDeclarationVersion string
+
+const (
+	ofxVersion1 oFXDeclarationVersion = "100"
+	ofxVersion2 oFXDeclarationVersion = "200"
+)
 
 const ofxDefaultTimezoneOffset = "+00:00"
 
@@ -74,11 +79,11 @@ type ofxFile struct {
 
 // ofxFileHeader represents the struct of open financial exchange (ofx) file header
 type ofxFileHeader struct {
-	OFXVersion     string
-	OFXDataVersion string
-	Security       string
-	OldFileUid     string
-	NewFileUid     string
+	OFXDeclarationVersion oFXDeclarationVersion
+	OFXDataVersion        string
+	Security              string
+	OldFileUid            string
+	NewFileUid            string
 }
 
 // ofxBankMessageResponseV1 represents the struct of open financial exchange (ofx) bank message response v1

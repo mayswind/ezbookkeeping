@@ -21,61 +21,61 @@ func TestOFXTransactionDataFileParseImportedData_MinimumValidData(t *testing.T) 
 	}
 
 	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, allNewSubIncomeCategories, allNewSubTransferCategories, allNewTags, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>CHECK</TRNTYPE>"+
-			"            <DTPOSTED>20240901123456.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>-0.12</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>XFER</TRNTYPE>"+
-			"            <DTPOSTED>20240901225959.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>-1.00</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>XFER</TRNTYPE>"+
-			"            <DTPOSTED>20240901235959.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>2.00</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
-			"  <CREDITCARDMSGSRSV1>"+
-			"    <CCSTMTTRNRS>"+
-			"      <CCSTMTRS>"+
-			"        <CURDEF>USD</CURDEF>"+
-			"        <CCACCTFROM>"+
-			"          <ACCTID>456</ACCTID>"+
-			"        </CCACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>ATM</TRNTYPE>"+
-			"            <DTPOSTED>20240902012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>1.23</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>POS</TRNTYPE>"+
-			"            <DTPOSTED>20240902123456.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>-0.01</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </CCSTMTRS>"+
-			"    </CCSTMTTRNRS>"+
-			"  </CREDITCARDMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>CHECK</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901123456.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>-0.12</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>XFER</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901225959.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>-1.00</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>XFER</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901235959.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>2.00</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
+			"  <CREDITCARDMSGSRSV1>\n"+
+			"    <CCSTMTTRNRS>\n"+
+			"      <CCSTMTRS>\n"+
+			"        <CURDEF>USD</CURDEF>\n"+
+			"        <CCACCTFROM>\n"+
+			"          <ACCTID>456</ACCTID>\n"+
+			"        </CCACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>ATM</TRNTYPE>\n"+
+			"            <DTPOSTED>20240902012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>1.23</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>POS</TRNTYPE>\n"+
+			"            <DTPOSTED>20240902123456.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>-0.01</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </CCSTMTRS>\n"+
+			"    </CCSTMTTRNRS>\n"+
+			"  </CREDITCARDMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -167,47 +167,47 @@ func TestOFXTransactionDataFileParseImportedData_ParseAccountTo(t *testing.T) {
 	}
 
 	allNewTransactions, allNewAccounts, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>XFER</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>-123.45</TRNAMT>"+
-			"            <BANKACCTTO>"+
-			"              <ACCTID>456</ACCTID>"+
-			"            </BANKACCTTO>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
-			"  <CREDITCARDMSGSRSV1>"+
-			"    <CCSTMTTRNRS>"+
-			"      <CCSTMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <CCACCTFROM>"+
-			"          <ACCTID>456</ACCTID>"+
-			"        </CCACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>XFER</TRNTYPE>"+
-			"            <DTPOSTED>20240902012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>-1.23</TRNAMT>"+
-			"            <CCACCTTO>"+
-			"              <ACCTID>789</ACCTID>"+
-			"            </CCACCTTO>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </CCSTMTRS>"+
-			"    </CCSTMTTRNRS>"+
-			"  </CREDITCARDMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>XFER</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>-123.45</TRNAMT>\n"+
+			"            <BANKACCTTO>\n"+
+			"              <ACCTID>456</ACCTID>\n"+
+			"            </BANKACCTTO>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
+			"  <CREDITCARDMSGSRSV1>\n"+
+			"    <CCSTMTTRNRS>\n"+
+			"      <CCSTMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <CCACCTFROM>\n"+
+			"          <ACCTID>456</ACCTID>\n"+
+			"        </CCACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>XFER</TRNTYPE>\n"+
+			"            <DTPOSTED>20240902012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>-1.23</TRNAMT>\n"+
+			"            <CCACCTTO>\n"+
+			"              <ACCTID>789</ACCTID>\n"+
+			"            </CCACCTTO>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </CCSTMTRS>\n"+
+			"    </CCSTMTTRNRS>\n"+
+			"  </CREDITCARDMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -250,49 +250,49 @@ func TestOFXTransactionDataFileParseImportedData_ParseValidTransactionTime(t *te
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901123456</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901123456.789</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901125959.000[-3]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901122959.000[-3.5]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240902030405.000[0]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901123456</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901123456.789</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901125959.000[-3]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901122959.000[-3.5]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240902030405.000[0]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -317,90 +317,90 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidTransactionTime(t *
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>2024</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>2024</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>2024-09-01</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>2024-09-01</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>202491</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>202491</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901 12:34:56</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901 12:34:56</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTimeInvalid.Message)
 }
@@ -415,24 +415,24 @@ func TestOFXTransactionDataFileParseImportedData_ParseAmount_CommaAsDecimalPoint
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123,45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123,45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -451,24 +451,24 @@ func TestOFXTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T
 	}
 
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123 45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123 45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }
@@ -483,25 +483,25 @@ func TestOFXTransactionDataFileParseImportedData_ParseTransactionCurrency(t *tes
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"        <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"            <CURRENCY>USD</CURRENCY>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"        <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"            <CURRENCY>USD</CURRENCY>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -519,26 +519,26 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	}
 
 	allNewTransactions, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"            <NAME>Test</NAME>"+
-			"            <MEMO>foo    bar\t#test</MEMO>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"            <NAME>Test</NAME>\n"+
+			"            <MEMO>foo    bar\t#test</MEMO>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -546,25 +546,25 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
 
 	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"            <NAME>Test</NAME>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"            <NAME>Test</NAME>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -572,27 +572,27 @@ func TestOFXTransactionDataFileParseImportedData_ParseDescription(t *testing.T) 
 	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 
 	allNewTransactions, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"            <PAYEE>"+
-			"              <NAME>Test</NAME>"+
-			"            </PAYEE>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"            <PAYEE>\n"+
+			"              <NAME>Test</NAME>\n"+
+			"            </PAYEE>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 
 	assert.Nil(t, err)
@@ -611,21 +611,21 @@ func TestOFXTransactionDataFileParseImportedData_MissingAccountFromNode(t *testi
 
 	// Missing Posted Date Node
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"  <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"  <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingAccountData.Message)
 }
@@ -641,23 +641,23 @@ func TestOFXTransactionDataFileParseImportedData_MissingCurrencyNode(t *testing.
 
 	// Missing Default Currency Node
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"    <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"    <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAccountCurrencyInvalid.Message)
 }
@@ -673,67 +673,67 @@ func TestOFXTransactionDataFileParseImportedData_MissingTransactionRequiredNode(
 
 	// Missing Posted Date Node
 	_, _, _, _, _, _, err := converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"    <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"    <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrMissingTransactionTime.Message)
 
 	// Missing Transaction Type Node
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"    <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"            <TRNAMT>123.45</TRNAMT>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"    <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"            <TRNAMT>123.45</TRNAMT>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 
 	// Missing Amount Node
 	_, _, _, _, _, _, err = converter.ParseImportedData(context, user, []byte(
-		"<OFX>"+
-			"    <BANKMSGSRSV1>"+
-			"    <STMTTRNRS>"+
-			"      <STMTRS>"+
-			"        <CURDEF>CNY</CURDEF>"+
-			"        <BANKACCTFROM>"+
-			"          <ACCTID>123</ACCTID>"+
-			"        </BANKACCTFROM>"+
-			"        <BANKTRANLIST>"+
-			"          <STMTTRN>"+
-			"            <TRNTYPE>DEP</TRNTYPE>"+
-			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>"+
-			"          </STMTTRN>"+
-			"        </BANKTRANLIST>"+
-			"      </STMTRS>"+
-			"    </STMTTRNRS>"+
-			"  </BANKMSGSRSV1>"+
+		"<OFX>\n"+
+			"    <BANKMSGSRSV1>\n"+
+			"    <STMTTRNRS>\n"+
+			"      <STMTRS>\n"+
+			"        <CURDEF>CNY</CURDEF>\n"+
+			"        <BANKACCTFROM>\n"+
+			"          <ACCTID>123</ACCTID>\n"+
+			"        </BANKACCTFROM>\n"+
+			"        <BANKTRANLIST>\n"+
+			"          <STMTTRN>\n"+
+			"            <TRNTYPE>DEP</TRNTYPE>\n"+
+			"            <DTPOSTED>20240901012345.000[+8:CST]</DTPOSTED>\n"+
+			"          </STMTTRN>\n"+
+			"        </BANKTRANLIST>\n"+
+			"      </STMTRS>\n"+
+			"    </STMTTRNRS>\n"+
+			"  </BANKMSGSRSV1>\n"+
 			"</OFX>"), 0, nil, nil, nil, nil, nil)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
 }

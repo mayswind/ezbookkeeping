@@ -1135,6 +1135,7 @@
         "there are not supported transaction type": "There are not supported transaction type in import file",
         "invalid iif file": "Invalid IIF file",
         "invalid ofx file": "Invalid OFX file",
+        "invalid sgml file": "Invalid SGML file",
         "query items cannot be blank": "There are no query items",
         "query items too much": "There are too many query items",
         "query items have invalid item": "There is invalid item in query items",

@@ -1135,6 +1135,7 @@
         "there are not supported transaction type": "导入文件中有不支持的交易类型",
         "invalid iif file": "无效的 IIF 文件",
         "invalid ofx file": "无效的 OFX 文件",
+        "invalid sgml file": "无效的 SGML 文件",
         "query items cannot be blank": "请求项目不能为空",
         "query items too much": "请求项目过多",
         "query items have invalid item": "请求项目中有非法项目",

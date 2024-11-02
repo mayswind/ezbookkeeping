@@ -1,6 +1,8 @@
 package ofx
 
 import (
+	"encoding/xml"
+
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
@@ -69,9 +71,10 @@ var ofxTransactionTypeMapping = map[ofxTransactionType]models.TransactionType{
 
 // ofxFile represents the struct of open financial exchange (ofx) file
 type ofxFile struct {
+	XMLName                     xml.Name `xml:"OFX"`
 	FileHeader                  *ofxFileHeader
-	BankMessageResponseV1       *ofxBankMessageResponseV1
-	CreditCardMessageResponseV1 *ofxCreditCardMessageResponseV1
+	BankMessageResponseV1       *ofxBankMessageResponseV1       `xml:"BANKMSGSRSV1"`
+	CreditCardMessageResponseV1 *ofxCreditCardMessageResponseV1 `xml:"CREDITCARDMSGSRSV1"`
 }
 
 // ofxFileHeader represents the struct of open financial exchange (ofx) file header
@@ -85,101 +88,101 @@ type ofxFileHeader struct {
 
 // ofxBankMessageResponseV1 represents the struct of open financial exchange (ofx) bank message response v1
 type ofxBankMessageResponseV1 struct {
-	StatementTransactionResponse *ofxBankStatementTransactionResponse
+	StatementTransactionResponse *ofxBankStatementTransactionResponse `xml:"STMTTRNRS"`
 }
 
 // ofxCreditCardMessageResponseV1 represents the struct of open financial exchange (ofx) credit card message response v1
 type ofxCreditCardMessageResponseV1 struct {
-	StatementTransactionResponse *ofxCreditCardStatementTransactionResponse
+	StatementTransactionResponse *ofxCreditCardStatementTransactionResponse `xml:"CCSTMTTRNRS"`
 }
 
 // ofxBankStatementTransactionResponse represents the struct of open financial exchange (ofx) bank statement transaction response
 type ofxBankStatementTransactionResponse struct {
-	StatementResponse *ofxBankStatementResponse
+	StatementResponse *ofxBankStatementResponse `xml:"STMTRS"`
 }
 
 // ofxCreditCardStatementTransactionResponse represents the struct of open financial exchange (ofx) credit card statement transaction response
 type ofxCreditCardStatementTransactionResponse struct {
-	StatementResponse *ofxCreditCardStatementResponse
+	StatementResponse *ofxCreditCardStatementResponse `xml:"CCSTMTRS"`
 }
 
 // ofxBankStatementResponse represents the struct of open financial exchange (ofx) bank statement response
 type ofxBankStatementResponse struct {
-	DefaultCurrency string
-	AccountFrom     *ofxBankAccount
-	TransactionList *ofxBankTransactionList
+	DefaultCurrency string                  `xml:"CURDEF"`
+	AccountFrom     *ofxBankAccount         `xml:"BANKACCTFROM"`
+	TransactionList *ofxBankTransactionList `xml:"BANKTRANLIST"`
 }
 
 // ofxCreditCardStatementResponse represents the struct of open financial exchange (ofx) credit card statement response
 type ofxCreditCardStatementResponse struct {
-	DefaultCurrency string
-	AccountFrom     *ofxCreditCardAccount
-	TransactionList *ofxCreditCardTransactionList
+	DefaultCurrency string                        `xml:"CURDEF"`
+	AccountFrom     *ofxCreditCardAccount         `xml:"CCACCTFROM"`
+	TransactionList *ofxCreditCardTransactionList `xml:"BANKTRANLIST"`
 }
 
 // ofxBankAccount represents the struct of open financial exchange (ofx) bank account
 type ofxBankAccount struct {
-	BankId      string
-	BranchId    string
-	AccountId   string
-	AccountType ofxAccountType
-	AccountKey  string
+	BankId      string         `xml:"BANKID"`
+	BranchId    string         `xml:"BRANCHID"`
+	AccountId   string         `xml:"ACCTID"`
+	AccountType ofxAccountType `xml:"ACCTTYPE"`
+	AccountKey  string         `xml:"ACCTKEY"`
 }
 
 // ofxCreditCardAccount represents the struct of open financial exchange (ofx) credit card account
 type ofxCreditCardAccount struct {
-	AccountId  string
-	AccountKey string
+	AccountId  string `xml:"ACCTID"`
+	AccountKey string `xml:"ACCTKEY"`
 }
 
 // ofxBankTransactionList represents the struct of open financial exchange (ofx) bank transaction list
 type ofxBankTransactionList struct {
-	StartDate             string
-	EndDate               string
-	StatementTransactions []*ofxBankStatementTransaction
+	StartDate             string                         `xml:"DTSTART"`
+	EndDate               string                         `xml:"DTEND"`
+	StatementTransactions []*ofxBankStatementTransaction `xml:"STMTTRN"`
 }
 
 // ofxCreditCardTransactionList represents the struct of open financial exchange (ofx) credit card transaction list
 type ofxCreditCardTransactionList struct {
-	StartDate             string
-	EndDate               string
-	StatementTransactions []*ofxCreditCardStatementTransaction
+	StartDate             string                               `xml:"DTSTART"`
+	EndDate               string                               `xml:"DTEND"`
+	StatementTransactions []*ofxCreditCardStatementTransaction `xml:"STMTTRN"`
 }
 
 // ofxBaseStatementTransaction represents the struct of open financial exchange (ofx) base statement transaction
 type ofxBaseStatementTransaction struct {
-	TransactionId    string
-	TransactionType  ofxTransactionType
-	PostedDate       string
-	Amount           string
-	Name             string
-	Payee            *ofxPayee
-	Memo             string
-	Currency         string
-	OriginalCurrency string
+	TransactionId    string             `xml:"FITID"`
+	TransactionType  ofxTransactionType `xml:"TRNTYPE"`
+	PostedDate       string             `xml:"DTPOSTED"`
+	Amount           string             `xml:"TRNAMT"`
+	Name             string             `xml:"NAME"`
+	Payee            *ofxPayee          `xml:"PAYEE"`
+	Memo             string             `xml:"MEMO"`
+	Currency         string             `xml:"CURRENCY"`
+	OriginalCurrency string             `xml:"ORIGCURRENCY"`
 }
 
 // ofxBankStatementTransaction represents the struct of open financial exchange (ofx) bank statement transaction
 type ofxBankStatementTransaction struct {
 	ofxBaseStatementTransaction
-	AccountTo *ofxBankAccount
+	AccountTo *ofxBankAccount `xml:"BANKACCTTO"`
 }
 
 // ofxCreditCardStatementTransaction represents the struct of open financial exchange (ofx) credit card statement transaction
 type ofxCreditCardStatementTransaction struct {
 	ofxBaseStatementTransaction
-	AccountTo *ofxCreditCardAccount
+	AccountTo *ofxCreditCardAccount `xml:"CCACCTTO"`
 }
 
 // ofxPayee represents the struct of open financial exchange (ofx) payee info
 type ofxPayee struct {
-	Name       string
-	Address1   string
-	Address2   string
-	Address3   string
-	City       string
-	State      string
-	PostalCode string
-	Country    string
-	Phone      string
+	Name       string `xml:"NAME"`
+	Address1   string `xml:"ADDR1"`
+	Address2   string `xml:"ADDR2"`
+	Address3   string `xml:"ADDR3"`
+	City       string `xml:"CITY"`
+	State      string `xml:"STATE"`
+	PostalCode string `xml:"POSTALCODE"`
+	Country    string `xml:"COUNTRY"`
+	Phone      string `xml:"PHONE"`
 }

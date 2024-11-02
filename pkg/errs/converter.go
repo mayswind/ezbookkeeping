@@ -24,4 +24,5 @@ var (
 	ErrThereAreNotSupportedTransactionType = NewNormalError(NormalSubcategoryConverter, 17, http.StatusBadRequest, "there are not supported transaction type")
 	ErrInvalidIIFFile                      = NewNormalError(NormalSubcategoryConverter, 18, http.StatusBadRequest, "invalid iif file")
 	ErrInvalidOFXFile                      = NewNormalError(NormalSubcategoryConverter, 19, http.StatusBadRequest, "invalid ofx file")
+	ErrInvalidSGMLFile                     = NewNormalError(NormalSubcategoryConverter, 20, http.StatusBadRequest, "invalid sgml file")
 )

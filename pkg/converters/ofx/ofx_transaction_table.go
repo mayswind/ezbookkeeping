@@ -29,9 +29,10 @@ var ofxTransactionSupportedColumns = map[datatable.TransactionDataTableColumn]bo
 // ofxTransactionData defines the structure of open financial exchange (ofx) transaction data
 type ofxTransactionData struct {
 	ofxBaseStatementTransaction
-	DefaultCurrency string
-	FromAccountId   string
-	ToAccountId     string
+	DefaultCurrency   string
+	FromAccountId     string
+	FromCreditAccount bool
+	ToAccountId       string
 }
 
 // ofxTransactionDataTable defines the structure of open financial exchange (ofx) transaction data table
@@ -187,6 +188,22 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		}
 	}
 
+	if data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] != ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
+		if ofxTransaction.FromCreditAccount || ofxTransaction.TransactionType == ofxGenericCreditTransaction {
+			if amount >= 0 { // payment
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = data[datatable.TRANSACTION_DATA_TABLE_AMOUNT]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
+			} else { // purchase
+				data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = ofxTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE]
+				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
+			}
+		}
+	}
+
 	if ofxTransaction.Memo != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = ofxTransaction.Memo
 	} else if ofxTransaction.Name != "" {
@@ -264,9 +281,14 @@ func createNewOFXTransactionDataTable(file *ofxFile) (*ofxTransactionDataTable, 
 		statement := file.BankMessageResponseV1.StatementTransactionResponse.StatementResponse
 		bankTransactions := statement.TransactionList.StatementTransactions
 		fromAccountId := ""
+		fromCreditAccount := false
 
 		if statement.AccountFrom != nil {
 			fromAccountId = statement.AccountFrom.AccountId
+
+			if statement.AccountFrom.AccountType == ofxLineOfCreditAccount {
+				fromCreditAccount = true
+			}
 		}
 
 		for i := 0; i < len(bankTransactions); i++ {
@@ -280,6 +302,7 @@ func createNewOFXTransactionDataTable(file *ofxFile) (*ofxTransactionDataTable, 
 				ofxBaseStatementTransaction: bankTransactions[i].ofxBaseStatementTransaction,
 				DefaultCurrency:             statement.DefaultCurrency,
 				FromAccountId:               fromAccountId,
+				FromCreditAccount:           fromCreditAccount,
 				ToAccountId:                 toAccountId,
 			})
 		}
@@ -308,6 +331,7 @@ func createNewOFXTransactionDataTable(file *ofxFile) (*ofxTransactionDataTable, 
 				ofxBaseStatementTransaction: bankTransactions[i].ofxBaseStatementTransaction,
 				DefaultCurrency:             statement.DefaultCurrency,
 				FromAccountId:               fromAccountId,
+				FromCreditAccount:           true,
 				ToAccountId:                 toAccountId,
 			})
 		}

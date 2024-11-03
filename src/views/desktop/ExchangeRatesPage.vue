@@ -245,9 +245,9 @@ export default {
 
             try {
                 exchangeRateAmount = getConvertedAmount(this.baseAmount / 100, fromExchangeRate, toExchangeRate);
-            } catch (e) {
+            } catch (ex) {
                 exchangeRateAmount = 0;
-                logger.warn('failed to convert amount by exchange rates, original base amount is ' + this.baseAmount)
+                logger.warn('failed to convert amount by exchange rates, original base amount is ' + this.baseAmount, ex)
             }
 
             return this.$locale.formatExchangeRateAmount(this.userStore, exchangeRateAmount);

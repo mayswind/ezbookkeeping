@@ -36,6 +36,7 @@ import { useUserStore } from '@/stores/user.js';
 
 import transactionConstants from '@/consts/transaction.js';
 import { removeAll } from '@/lib/common.js';
+import logger from '@/lib/logger.js';
 
 export default {
     props: [
@@ -75,7 +76,8 @@ export default {
                         }
 
                         return (val >= transactionConstants.minAmountNumber && val <= transactionConstants.maxAmountNumber) || self.$t('Amount value exceeds limitation');
-                    } catch (e) {
+                    } catch (ex) {
+                        logger.warn('cannot parse amount in amount input, original value is ' + v, ex);
                         return self.$t('Amount value is not number');
                     }
                 }
@@ -249,8 +251,8 @@ export default {
                     this.currentValue = finalValue;
                     e.preventDefault();
                 }
-            } catch (e) {
-                e.target.value = '0';
+            } catch (ex) {
+                ex.target.value = '0';
             }
         },
         onPaste(e) {

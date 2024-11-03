@@ -133,7 +133,7 @@ export default {
                     amount2 = parseInt(filterItems[2]);
                 }
             } catch (ex) {
-                logger.warn('cannot parse amount from filter value, original value is ' + query.value);
+                logger.warn('cannot parse amount from filter value, original value is ' + query.value, ex);
             }
         }
 
